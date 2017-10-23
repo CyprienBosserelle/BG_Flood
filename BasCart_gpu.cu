@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////////
 //						                                                        //
 //Copyright (C) 2017 Bosserelle                                                 //
 //                                                                              //
@@ -113,6 +113,52 @@ void update(int nx, int ny, double dt, double eps)
 	dim3 blockDim(16, 16, 1);
 	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
 
+	////calc gradient in h, eta, u and v
+
+	/////if Hi is dry
+
+	/////
+	//double dx = delta/2.;
+	//double zi = eta[] - hi;
+	//double zl = zi - dx*(geta.x[] - gh.x[]);
+	//double zn = eta[-1] - hn;
+	//double zr = zn + dx*(geta.x[-1] - gh.x[-1]);
+	//double zlr = max(zl, zr);
+
+	//double hl = hi - dx*gh.x[];
+	//double up = u.x[] - dx*gu.x.x[];
+	//double hp = max(0., hl + zl - zlr);
+
+	//double hr = hn + dx*gh.x[-1];
+	//double um = u.x[-1] + dx*gu.x.x[-1];
+	//double hm = max(0., hr + zr - zlr);
+
+	//// Reimann solver
+	//double fh, fu, fv;
+	//kurganov(hm, hp, um, up, Δ*cm[] / fm.x[], &fh, &fu, &dtmax);
+	//fv = (fh > 0. ? u.y[-1] + dx*gu.y.x[-1] : u.y[] - dx*gu.y.x[])*fh;
+
+	////
+	//double sl = G / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
+	//double sr = G / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+
+	////Flux update
+
+	//Fh.x[] = fm.x[] * fh;
+	//Fq.x.x[] = fm.x[] * (fu - sl);
+	//S.x[] = fm.x[] * (fu - sr);
+	//Fq.y.x[] = fm.x[] * fv;
+
+	////
+	//vector dhu = vector(updates[1 + dimension*l]);
+	//foreach() {
+	//	double dhl =
+	//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+	//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+	//	foreach_dimension()
+	//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+
+	MetricTerm << <gridDim, blockDim, 0 >> >(nx, ny, delta, G, double *h, double *u, double *v, double * fmu, double * fmv, double* dhu, double *dhv);
 
 }
 

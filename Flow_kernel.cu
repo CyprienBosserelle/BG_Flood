@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////////
 //XBeach_GPU                                                                    //
 //Copyright (C) 2013 Bosserelle                                                 //
 //                                                                              //
@@ -103,6 +103,35 @@ __device__ float minmod(float delta1, float delta2)
 	}
 
 	return(minmod);
+}
+__global__ void MetricTerm(int nx, int ny, double delta, double G, double *h, double *u, double *v, double * fmu, double * fmv,  double* dhu, double *dhv)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+
+	double cm = 1.0;
+
+	if (ix < nx && iy < ny)
+	{
+		unsigned int xminus = mminus(ix, nx);
+		unsigned int xplus = pplus(ix, nx);
+		unsigned int xplus2 = pplus2(ix, nx);
+		unsigned int yminus = mminus(iy, ny);
+		unsigned int yplus = pplus(iy, ny);
+		//
+		double hi = h[i];
+		double dmdl = (fmu[xplus+iy*nx] - fmu[i]) / (cm * delta);
+		double dmdt = (fmv[ix+yplus*nx] - fmv[i]) / (cm  * delta);
+		double fG = v[i] * dmdl - u[i] * dmdt;
+		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) / (cm*delta);
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[xplus + iy*nx] - Fqvx[ix + yplus*nx]) / (cm*delta);
+		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		dhu[i] += hi * (G*hi / 2.*dmdl + fG*v[i]);
+		dhv[i] += hi * (G*hi / 2.*dmdt - fG*u[i]);
+
+	}
 }
 
 __global__ void adv_stvenant(int nx, int ny, double dt, double eps, double * zb,double *hh, double * zs, double * uu, double *vv, double *dh, double *dhu, double *dhv )
