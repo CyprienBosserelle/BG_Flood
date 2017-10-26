@@ -33,6 +33,7 @@ double twopi = 8 * atan(1.0f);
 double g = 9.81f;
 double rho = 1025.0f;
 
+double delta;
 
 double *x, *y;
 double *x_g, *y_g;
@@ -42,6 +43,8 @@ double *zs_g, *hh_g, *zb_g, *uu_g, *vv_g;
 
 double * dhdx_g, *dhdy_g, *dudx_g, *dudy_g, *dvdx_g, *dvdy_g;
 double *dzsdx_g, *dzsdy_g;
+
+double *fmu_g, *fmv_g, *Su_g, *Sv_g, *Fqux_g, *Fquy_g, *Fqvx_g, *Fqvy_g;
 
 double * dh_g, *dhu_g, *dhv_g;
 
@@ -158,7 +161,10 @@ void update(int nx, int ny, double dt, double eps)
 	//	foreach_dimension()
 	//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 
-	MetricTerm << <gridDim, blockDim, 0 >> >(nx, ny, delta, G, double *h, double *u, double *v, double * fmu, double * fmv, double* dhu, double *dhv);
+	
+
+	//__global__ void MetricTerm(int nx, int ny, double delta, double G, double *h, double *u, double *v, double * fmu, double * fmv, double* dhu, double *dhv, double *Su, double *Sv, double * Fqux, double * Fquy, double * Fqvx, double * Fqvy)
+	MetricTerm << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, hh_g, uu_g, vv_g, fmu_g, fmv_g, dhu_g, dhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g);
 
 }
 
@@ -241,7 +247,7 @@ int main(int argc, char **argv)
 	int nx = 32;
 	int ny = 32;
 	double length = 1.0;
-	double delta = length / nx;
+	delta = length / nx;
 	double dx;
 	double dt;
 	
@@ -304,6 +310,15 @@ int main(int argc, char **argv)
 	CUDA_CHECK(cudaMalloc((void **)&dhu_g, nx*ny * sizeof(double)));
 	CUDA_CHECK(cudaMalloc((void **)&dhv_g, nx*ny * sizeof(double)));
 
+	CUDA_CHECK(cudaMalloc((void **)&fmu_g, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMalloc((void **)&fmv_g, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMalloc((void **)&Su_g, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMalloc((void **)&Sv_g, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMalloc((void **)&Fqux_g, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMalloc((void **)&Fquy_g, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMalloc((void **)&Fqvx_g, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMalloc((void **)&Fqvy_g, nx*ny * sizeof(double)));
+
 	//i don't think x and y are needed here
 	CUDA_CHECK(cudaMalloc((void **)&x_g, nx*ny * sizeof(double)));
 	CUDA_CHECK(cudaMalloc((void **)&y_g, nx*ny * sizeof(double)));
@@ -319,6 +334,15 @@ int main(int argc, char **argv)
 	CUDA_CHECK(cudaMemset(dh_g, 0.0f, nx*ny * sizeof(double)));
 	CUDA_CHECK(cudaMemset(dhu_g, 0.0f, nx*ny * sizeof(double)));
 	CUDA_CHECK(cudaMemset(dhv_g, 0.0f, nx*ny * sizeof(double)));
+
+	CUDA_CHECK(cudaMemset(fmu_g, 0.0f, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMemset(fmv_g, 0.0f, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMemset(Su_g, 0.0f, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMemset(Sv_g, 0.0f, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMemset(Fqux_g, 0.0f, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMemset(Fquy_g, 0.0f, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMemset(Fqvx_g, 0.0f, nx*ny * sizeof(double)));
+	CUDA_CHECK(cudaMemset(Fqvy_g, 0.0f, nx*ny * sizeof(double)));
 
 	CUDA_CHECK(cudaMemcpy(x_g, x, nx*ny * sizeof(double), cudaMemcpyHostToDevice));
 	CUDA_CHECK(cudaMemcpy(y_g, y, nx*ny * sizeof(double), cudaMemcpyHostToDevice));

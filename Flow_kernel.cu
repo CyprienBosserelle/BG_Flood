@@ -104,7 +104,7 @@ __device__ float minmod(float delta1, float delta2)
 
 	return(minmod);
 }
-__global__ void MetricTerm(int nx, int ny, double delta, double G, double *h, double *u, double *v, double * fmu, double * fmv,  double* dhu, double *dhv)
+__global__ void MetricTerm(int nx, int ny, double delta, double G, double *h, double *u, double *v, double * fmu, double * fmv, double* dhu, double *dhv, double *Su, double *Sv, double * Fqux, double * Fquy, double * Fqvx, double * Fqvy)
 {
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -125,6 +125,9 @@ __global__ void MetricTerm(int nx, int ny, double delta, double G, double *h, do
 		double dmdt = (fmv[ix+yplus*nx] - fmv[i]) / (cm  * delta);
 		double fG = v[i] * dmdl - u[i] * dmdt;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+
+
+
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) / (cm*delta);
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[xplus + iy*nx] - Fqvx[ix + yplus*nx]) / (cm*delta);
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
