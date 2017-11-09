@@ -573,8 +573,8 @@ void mainloop()
 	//iter = inext, t = tnext;
 	
 	dt = CFL*delta / sqrt(g*5.0);
-	//update(nx, ny, dt, eps);
-	//advance(nx, ny, dt/2, eps);
+	update(nx, ny, dt, eps);
+	advance(nx, ny, dt/2, eps);
 
 	update(nx, ny, dt, eps);
 	advance(nx, ny, dt, eps);
