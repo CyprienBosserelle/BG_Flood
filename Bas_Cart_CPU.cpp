@@ -33,7 +33,7 @@ double aphi = 1 / (phi + 1);
 double bphi = phi / (phi + 1);
 double twopi = 8 * atan(1.0f);
 
-double g = 9.81;
+double g = 1.0;// 9.81;
 double rho = 1025.0;
 double eps = 0.0001;
 double CFL = 0.5;
@@ -48,6 +48,7 @@ double *x, *y;
 double *x_g, *y_g;
 
 double *zs, *hh, *zb, *uu, *vv;
+double *zso, *hho, *uuo, *vvo;
 
 
 double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
@@ -62,9 +63,14 @@ double * dh, *dhu, *dhv;
 double dtmax = 1.0 / epsilon;
 
 
-template <class T> const T& sq(const T& a) {
+template <class T> T sq(T a) {
 	return (a*a);
 }
+
+double sqd(double a) {
+	return (a*a);
+}
+
 template <class T> const T& max(const T& a, const T& b) {
 	return (a<b) ? b : a;     // or: return comp(a,b)?b:a; for version (2)
 }
@@ -116,8 +122,7 @@ void gradient(int nx, int ny, double *a, double *&dadx, double * &dady)
 
 }
 
-void kurganov(double hm, double hp, double um, double up, double Delta,
-	double * fh, double * fq, double * dtmax)
+void kurganov(double hm, double hp, double um, double up, double Delta,	double * fh, double * fq, double * dtmax)
 {
 	double cp = sqrt(g*hp), cm = sqrt(g*hm);
 	double ap = max(up + cp, um + cm); ap = max(ap, 0.);
@@ -176,7 +181,7 @@ void neumannbnd(int nx, int ny, double*a)
 
 }
 
-void update(int nx, int ny, double dt, double eps)
+void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
@@ -206,11 +211,15 @@ void update(int nx, int ny, double dt, double eps)
 			//dvdx[i] = (vv[i] - vv[xplus + iy*nx]) / delta;
 			//dvdy[i] = (vv[i] - vv[ix + yplus*nx]) / delta;
 
-			dtmax = min(dtmax, delta / (sqrt(g*hh[i])));
+			//dtmax = min(dtmax, delta / (sqrt(g*hh[i])));
 
 		}
 	}
 	
+	dtmax = dt;
+
+
+
 	gradient(nx, ny, hh, dhdx, dhdy);
 	gradient(nx, ny, zs, dzsdx, dzsdy);
 	gradient(nx, ny, uu, dudx, dudy);
@@ -258,7 +267,7 @@ void update(int nx, int ny, double dt, double eps)
 
 				//// Reimann solver
 				double fh, fu, fv;
-				double cm = 1.0;
+				double cm = 0.1;
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
 				kurganov(hm, hp, um, up, delta*cm / fmu[i], &fh, &fu, &dtmax);
@@ -380,7 +389,7 @@ void update(int nx, int ny, double dt, double eps)
 }
 
 
-void advance(int nx, int ny, double dt, double eps)
+void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
 {
 	//dim3 blockDim(16, 16, 1);
 	//dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
@@ -401,7 +410,7 @@ void advance(int nx, int ny, double dt, double eps)
 			double hold = hh[i];
 			double ho, uo, vo;
 			ho = hold + dt*dh[i];
-			zs[i] = zb[i] + ho;
+			zso[i] = zb[i] + ho;
 			if (ho > eps) {
 				//for (int l = 0; l < nl; l++) {
 				//vector uo = vector(output[1 + dimension*l]);
@@ -426,9 +435,9 @@ void advance(int nx, int ny, double dt, double eps)
 				uo = 0.;
 				vo = 0.;
 			}
-			hh[i] = ho;
-			uu[i] = uo;
-			vv[i] = vo;
+			hho[i] = ho;
+			uuo[i] = uo;
+			vvo[i] = vo;
 		}
 	}
 
@@ -442,6 +451,25 @@ void advance(int nx, int ny, double dt, double eps)
 
 
 }
+
+
+void cleanup(int nx, int ny, double * hhi, double *zsi, double *uui, double *vvi, double * &hho, double *&zso, double *&uuo, double *&vvo)
+{
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+			int i = ix + iy*nx;
+			hho[i] = hhi[i];
+			zso[i] = zsi[i];
+			uuo[i] = uui[i];
+			vvo[i] = vvi[i];
+		}
+	}
+
+}
+
+
 extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, double * var)
 {
 	int status;
@@ -572,12 +600,21 @@ void mainloop()
 	//update_perf();
 	//iter = inext, t = tnext;
 	
-	dt = CFL*delta / sqrt(g*5.0);
-	update(nx, ny, dt, eps);
-	advance(nx, ny, dt/2, eps);
+	dt = 0.0016;// CFL*delta / sqrt(g*5.0);
+	
+	
+	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
+	update(nx, ny, dt, eps, hh,zs,uu,vv,dh,dhu,dhv);
+	
+	//predictor
+	//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
+	advance(nx, ny, dt/2, eps,hh,zs,uu,vv,dh,dhu,dhv,hho,zso,uuo,vvo);
 
-	update(nx, ny, dt, eps);
-	advance(nx, ny, dt, eps);
+	//corrector
+	update(nx, ny, dt, eps, hho, zso, uuo, vvo, dh, dhu, dhv);
+	advance(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+
+	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 
 
 
@@ -636,8 +673,8 @@ int main(int argc, char **argv)
 
 
 	// This is just for temporary use
-	nx = 32;
-	ny = 32;
+	nx = 256;
+	ny = 256;
 	double length = 1.0;
 	delta = length / nx;
 	
@@ -660,6 +697,11 @@ int main(int argc, char **argv)
 	vv = (double *)malloc(nx*ny * sizeof(double));
 	zs = (double *)malloc(nx*ny * sizeof(double));
 	zb = (double *)malloc(nx*ny * sizeof(double));
+
+	hho = (double *)malloc(nx*ny * sizeof(double));
+	uuo = (double *)malloc(nx*ny * sizeof(double));
+	vvo = (double *)malloc(nx*ny * sizeof(double));
+	zso = (double *)malloc(nx*ny * sizeof(double));
 
 	dhdx = (double *)malloc(nx*ny * sizeof(double));
 	dhdy = (double *)malloc(nx*ny * sizeof(double));
@@ -700,10 +742,10 @@ int main(int argc, char **argv)
 			zb[i + j*nx] = 0.0;
 			uu[i + j*nx] = 0.0;
 			vv[i + j*nx] = 0.0;
-			x[i + j*nx] = (i-nx/2)*delta;
-			xx[i] = (i - nx / 2)*delta;
-			yy[j] = (j - ny / 2)*delta;
-			y[i + j*nx] = (j-ny/2)*delta;
+			x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
+			xx[i] = (i - nx / 2)*delta+0.5*delta;
+			yy[j] = (j - ny / 2)*delta+0.5*delta;
+			y[i + j*nx] = (j-ny/2)*delta + 0.5*delta;
 			fmu[i + j*nx] = 1.0;
 			fmv[i + j*nx] = 1.0;
 		}
@@ -713,7 +755,21 @@ int main(int argc, char **argv)
 	{
 		for (int i = 0; i < nx; i++)
 		{
-			hh[i + j*nx] = 0.1 + 1.*exp(-200.*(x[i + j*nx] * x[i + j*nx] + y[i + j*nx] * y[i + j*nx]));;
+			double a, b;
+
+			a = sq(x[i + j*nx]) + sq(y[i + j*nx]);
+			//b =x[i + j*nx] * x[i + j*nx] + y[i + j*nx] * y[i + j*nx];
+
+
+			//if (abs(a - b) > 0.00001)
+			//{
+			//	printf("%f\t%f\n", a, b);
+			//}
+
+
+
+			hh[i + j*nx] = 0.1 + 1.*exp(-200.*(a));
+
 			zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
 		}
 	}
@@ -721,11 +777,11 @@ int main(int argc, char **argv)
 
 	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 	
-	while (totaltime < 20.0)
+	while (totaltime < 0.1)
 	{
 		mainloop();
 		totaltime = totaltime + dt;
-		write2varnc(nx, ny, 2.0, hh);
+		write2varnc(nx, ny, totaltime, hh);
 	}
 	
 
