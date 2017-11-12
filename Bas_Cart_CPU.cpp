@@ -23,6 +23,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <cmath>
 #include <ctime>
@@ -95,7 +96,7 @@ double minmod2(double s0, double s1, double s2)
 	return 0.;
 }
 
-void gradient(int nx, int ny, double *a, double *&dadx, double * &dady)
+void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady)
 {
 
 	int i, xplus, yplus, xminus, yminus;
@@ -113,8 +114,8 @@ void gradient(int nx, int ny, double *a, double *&dadx, double * &dady)
 			i = ix + iy*nx;
 
 
-			dadx[i] = minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-			dady[i] = minmod2(a[ix + yminus*nx], a[i], a[ix + yminus*nx]);
+			dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
+			dady[i] = (a[i] - a[ix + yminus*nx]) / delta;//minmod2(a[ix + yminus*nx], a[i], a[ix + yminus*nx]);
 
 
 		}
@@ -220,10 +221,10 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 
 
-	gradient(nx, ny, hh, dhdx, dhdy);
-	gradient(nx, ny, zs, dzsdx, dzsdy);
-	gradient(nx, ny, uu, dudx, dudy);
-	gradient(nx, ny, vv, dvdx, dvdy);
+	gradient(nx, ny,delta, hh, dhdx, dhdy);
+	gradient(nx, ny,delta, zs, dzsdx, dzsdy);
+	gradient(nx, ny,delta, uu, dudx, dudy);
+	gradient(nx, ny, delta, vv, dvdx, dvdy);
 	/////if Hi is dry
 
 	/////
