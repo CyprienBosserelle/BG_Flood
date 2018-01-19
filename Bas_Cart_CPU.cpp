@@ -82,9 +82,15 @@ template <class T> const T& min(const T& a, const T& b) {
 
 double minmod2(double s0, double s1, double s2)
 {
+	//theta should be used as a global var 
+	// can be used to tune the limiting (theta=1
+	//gives minmod, the most dissipative limiter and theta = 2 gives
+	//	superbee, the least dissipative).
 	double theta = 1.3;
 	if (s0 < s1 && s1 < s2) {
-		double d1 = theta*(s1 - s0), d2 = (s2 - s0) / 2., d3 = theta*(s2 - s1);
+		double d1 = theta*(s1 - s0);
+		double d2 = (s2 - s0) / 2.;
+		double d3 = theta*(s2 - s1);
 		if (d2 < d1) d1 = d2;
 		return min(d1, d3);
 	}
@@ -114,8 +120,10 @@ void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &
 			i = ix + iy*nx;
 
 
-			dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-			dady[i] = (a[i] - a[ix + yminus*nx]) / delta;//minmod2(a[ix + yminus*nx], a[i], a[ix + yminus*nx]);
+			//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
+			dadx[i] = minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
+			//dady[i] = (a[i] - a[ix + yminus*nx]) / delta;
+			dady[i] = minmod2(a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
 
 
 		}
@@ -253,9 +261,19 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				// along X
 				dx = delta / 2.;
 				zi = zs[i] - hi;
+
+				//printf("%f\n", zi);
+
+
 				zl = zi - dx*(dzsdx[i] - dhdx[i]);
+				//printf("%f\n", zl);
+
 				zn = zs[xminus + iy*nx] - hn;
+
+				//printf("%f\n", zn);
 				zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdx[xminus + iy*nx]);
+
+				
 				zlr = max(zl, zr);
 
 				hl = hi - dx*dhdx[i];
@@ -270,9 +288,14 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				double fh, fu, fv;
 				double cm = 0.1;
 
+				
+
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
 				kurganov(hm, hp, um, up, delta*cm / fmu[i], &fh, &fu, &dtmax);
 				fv = (fh > 0. ? vv[ix + yminus*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+
+				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
+				
 
 				//// Topographic term
 
@@ -295,6 +318,8 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 
 				//Along Y
+
+				hn = hh[ix + yminus*nx];
 				dx = delta / 2.;
 				zi = zs[i] - hi;
 				zl = zi - dx*(dzsdy[i] - dhdy[i]);
@@ -310,10 +335,13 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
 				hm = max(0., hr + zr - zlr);
 
+				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
+				//printf("%f\n", hr);
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
 				kurganov(hm, hp, um, up, delta*cm / fmv[i], &fh, &fu, &dtmax);
 				fv = (fh > 0. ? uu[xminus + iy*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
 
+				printf("%f\t%f\t%f\n", x[i], y[i], fh);
 				//// Topographic term
 
 				/**
@@ -348,6 +376,8 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 		}
 	}
 
+	
+
 
 	// UPDATES For evolving quantities
 
@@ -373,7 +403,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			double cm = 1.0;
 
 			dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) / (cm * delta);
-
+			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 			double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
@@ -601,12 +631,12 @@ void mainloop()
 	//update_perf();
 	//iter = inext, t = tnext;
 	
-	dt = 0.0016;// CFL*delta / sqrt(g*5.0);
+	dt = 0.014286;// CFL*delta / sqrt(g*5.0);
 	
 	
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
-	update(nx, ny, dt, eps, hh,zs,uu,vv,dh,dhu,dhv);
-	
+	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
+	write2varnc(nx, ny, totaltime, hh);
 	//predictor
 	//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
 	advance(nx, ny, dt/2, eps,hh,zs,uu,vv,dh,dhu,dhv,hho,zso,uuo,vvo);
@@ -674,8 +704,8 @@ int main(int argc, char **argv)
 
 
 	// This is just for temporary use
-	nx = 256;
-	ny = 256;
+	nx = 32;
+	ny = 32;
 	double length = 1.0;
 	delta = length / nx;
 	
@@ -778,11 +808,13 @@ int main(int argc, char **argv)
 
 	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 	
-	while (totaltime < 0.1)
+	//while (totaltime < 10.0)
+	for (int i = 0; i <2; i++)
 	{
 		mainloop();
 		totaltime = totaltime + dt;
 		write2varnc(nx, ny, totaltime, hh);
+		//write2varnc(nx, ny, totaltime, dhdx);
 	}
 	
 
@@ -791,7 +823,7 @@ int main(int argc, char **argv)
 
 
 	endcputime = clock();
-	printf("End Computation");
+	printf("End Computation totaltime=%f\n",totaltime);
 	printf("Total runtime= %d  seconds\n", (endcputime - startcputime) / CLOCKS_PER_SEC);
 
 
