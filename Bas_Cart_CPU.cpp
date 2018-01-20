@@ -314,7 +314,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				Su[i] = fmu[i] * (fu - sr);
 				Fqvx[i] = fmu[i] * fv;
 
-
+				
 
 
 				//Along Y
@@ -341,7 +341,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				kurganov(hm, hp, um, up, delta*cm / fmv[i], &fh, &fu, &dtmax);
 				fv = (fh > 0. ? uu[xminus + iy*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
 
-				printf("%f\t%f\t%f\n", x[i], y[i], fh);
+				
 				//// Topographic term
 
 				/**
@@ -358,6 +358,8 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				Fqvy[i] = fmv[i] * (fu - sl);
 				Sv[i] = fmv[i] * (fu - sr);
 				Fquy[i] = fmv[i] * fv;
+
+				//printf("%f\t%f\t%f\n", x[i], y[i], Fhv[i]);
 			}
 			else
 			{
@@ -410,10 +412,13 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
 			double fG = vv[i] * dmdl - uu[i] * dmdt;
 			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) / (cm*delta);
-			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[xplus + iy*nx] - Fqvx[ix + yplus*nx]) / (cm*delta);
+			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) / (cm*delta);
 			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 			dhu[i] += hi * (g*hi / 2.*dmdl + fG*vv[i]);
 			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
+
+
+			printf("%f\t%f\t%f\n", x[i], y[i], dhv[i]);
 
 		}
 	}
@@ -636,7 +641,7 @@ void mainloop()
 	
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
-	write2varnc(nx, ny, totaltime, hh);
+	//write2varnc(nx, ny, totaltime, hh);
 	//predictor
 	//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
 	advance(nx, ny, dt/2, eps,hh,zs,uu,vv,dh,dhu,dhv,hho,zso,uuo,vvo);
@@ -809,7 +814,7 @@ int main(int argc, char **argv)
 	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 	
 	//while (totaltime < 10.0)
-	for (int i = 0; i <2; i++)
+	for (int i = 0; i <10; i++)
 	{
 		mainloop();
 		totaltime = totaltime + dt;
