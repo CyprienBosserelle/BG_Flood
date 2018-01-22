@@ -418,7 +418,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
 
 
-			printf("%f\t%f\t%f\n", x[i], y[i], dhv[i]);
+			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 		}
 	}
@@ -446,6 +446,7 @@ void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, doub
 			double hold = hh[i];
 			double ho, uo, vo;
 			ho = hold + dt*dh[i];
+			printf("%f\t%f\t%f\n", x[i], y[i], ho);
 			zso[i] = zb[i] + ho;
 			if (ho > eps) {
 				//for (int l = 0; l < nl; l++) {
@@ -471,6 +472,9 @@ void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, doub
 				uo = 0.;
 				vo = 0.;
 			}
+
+			
+
 			hho[i] = ho;
 			uuo[i] = uo;
 			vvo[i] = vo;
@@ -497,6 +501,7 @@ void cleanup(int nx, int ny, double * hhi, double *zsi, double *uui, double *vvi
 		{
 			int i = ix + iy*nx;
 			hho[i] = hhi[i];
+			//printf("%f\t%f\t%f\n", x[i], y[i], hho[i]);
 			zso[i] = zsi[i];
 			uuo[i] = uui[i];
 			vvo[i] = vvi[i];
@@ -636,23 +641,28 @@ void mainloop()
 	//update_perf();
 	//iter = inext, t = tnext;
 	
-	dt = 0.014286;// CFL*delta / sqrt(g*5.0);
+	dt = 0.015571;// CFL*delta / sqrt(g*5.0);
 	
 	
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
 	//write2varnc(nx, ny, totaltime, hh);
-	//predictor
-	//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
-	advance(nx, ny, dt/2, eps,hh,zs,uu,vv,dh,dhu,dhv,hho,zso,uuo,vvo);
+	//if (gradient!=0)
+	if (totaltime>0.0) //Fix this!
+	{
+		//predictor
+		//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
+		advance(nx, ny, dt*0.5, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
-	//corrector
-	update(nx, ny, dt, eps, hho, zso, uuo, vvo, dh, dhu, dhv);
+		//corrector
+		update(nx, ny, dt, eps, hho, zso, uuo, vvo, dh, dhu, dhv);
+	}
+	//
 	advance(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
-
-
+	
+	//write2varnc(nx, ny, totaltime, hh);
 
 
 
@@ -818,7 +828,7 @@ int main(int argc, char **argv)
 	{
 		mainloop();
 		totaltime = totaltime + dt;
-		write2varnc(nx, ny, totaltime, hh);
+		//write2varnc(nx, ny, totaltime, hh);
 		//write2varnc(nx, ny, totaltime, dhdx);
 	}
 	
