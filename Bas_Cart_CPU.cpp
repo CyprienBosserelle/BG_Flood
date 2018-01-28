@@ -292,7 +292,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
 				kurganov(hm, hp, um, up, delta*cm / fmu[i], &fh, &fu, &dtmax);
-				fv = (fh > 0. ? vv[ix + yminus*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+				fv = (fh > 0. ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
 
 				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
 				
@@ -339,7 +339,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				//printf("%f\n", hr);
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
 				kurganov(hm, hp, um, up, delta*cm / fmv[i], &fh, &fu, &dtmax);
-				fv = (fh > 0. ? uu[xminus + iy*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
 
 				
 				//// Topographic term
@@ -374,7 +374,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				Fquy[i] = 0.0;
 			}
 
-
+			printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
 		}
 	}
 
@@ -418,7 +418,9 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
 
 
-			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+			
 
 		}
 	}
@@ -446,7 +448,7 @@ void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, doub
 			double hold = hh[i];
 			double ho, uo, vo;
 			ho = hold + dt*dh[i];
-			printf("%f\t%f\t%f\n", x[i], y[i], ho);
+			
 			zso[i] = zb[i] + ho;
 			if (ho > eps) {
 				//for (int l = 0; l < nl; l++) {
@@ -478,6 +480,7 @@ void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, doub
 			hho[i] = ho;
 			uuo[i] = uo;
 			vvo[i] = vo;
+			
 		}
 	}
 
@@ -648,7 +651,7 @@ void mainloop()
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
 	//write2varnc(nx, ny, totaltime, hh);
 	//if (gradient!=0)
-	if (totaltime>0.0) //Fix this!
+	if (totaltime>=0.0) //Fix this!
 	{
 		//predictor
 		//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
@@ -828,7 +831,7 @@ int main(int argc, char **argv)
 	{
 		mainloop();
 		totaltime = totaltime + dt;
-		//write2varnc(nx, ny, totaltime, hh);
+		write2varnc(nx, ny, totaltime, hh);
 		//write2varnc(nx, ny, totaltime, dhdx);
 	}
 	
