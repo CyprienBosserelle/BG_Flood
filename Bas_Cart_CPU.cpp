@@ -2,6 +2,12 @@
 //						                                                        //
 //Copyright (C) 2017 Bosserelle                                                 //
 //                                                                              //
+// This code is a modification of the St Venant equation from Basilisk			//
+// See																			//
+// http://basilisk.fr/src/saint-venant.h and									//
+// S. Popinet. Quadtree-adaptive tsunami modelling. Ocean Dynamics,				//
+// doi: 61(9) : 1261 - 1285, 2011												//	
+//                                                                              //
 //This program is free software: you can redistribute it and/or modify          //
 //it under the terms of the GNU General Public License as published by          //
 //the Free Software Foundation.                                                 //
@@ -100,6 +106,37 @@ double minmod2(double s0, double s1, double s2)
 		return max(d1, d3);
 	}
 	return 0.;
+}
+
+double dtnext(double t, double tnext, double dt)
+{
+	//Function to make dt match output time step and prevent dt from chnaging too fast
+	// tnext = t+dtp with dtp is the previous dt
+
+
+	
+	//COpied staright from BASILISK and it sucks a little
+	//Maybe make this part of a model param structure...
+
+
+	double TEPS = 1e-9;
+	if (tnext != HUGE && tnext > t) {
+		unsigned int n = (tnext - t) / dt;
+		//assert(n < INT_MAX); // check that dt is not too small
+		if (n == 0)
+			dt = tnext - t;
+		else {
+			double dt1 = (tnext - t) / n;
+			if (dt1 > dt + TEPS)
+				dt = (tnext - t) / (n + 1);
+			else if (dt1 < dt)
+				dt = dt1;
+			tnext = t + dt;
+		}
+	}
+	else
+		tnext = t + dt;
+	return dt;
 }
 
 void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady)
@@ -374,7 +411,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				Fquy[i] = 0.0;
 			}
 
-			printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
+			//printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
 		}
 	}
 
@@ -643,8 +680,8 @@ void mainloop()
 	//free(updates);
 	//update_perf();
 	//iter = inext, t = tnext;
-	
-	dt = 0.015571;// CFL*delta / sqrt(g*5.0);
+	//dt = dtnext(totaltime, totaltime + dt, dt);
+	dt =  CFL*delta / sqrt(g*5.0);
 	
 	
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
@@ -827,7 +864,7 @@ int main(int argc, char **argv)
 	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 	
 	//while (totaltime < 10.0)
-	for (int i = 0; i <10; i++)
+	for (int i = 0; i <120; i++)
 	{
 		mainloop();
 		totaltime = totaltime + dt;
