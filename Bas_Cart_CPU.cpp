@@ -262,8 +262,8 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 		}
 	}
 	
-	dtmax = dt;
-
+	dtmax = 1 / epsilon;
+	double dtmaxtmp = dtmax;
 
 
 	gradient(nx, ny,delta, hh, dhdx, dhdy);
@@ -331,6 +331,9 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				kurganov(hm, hp, um, up, delta*cm / fmu[i], &fh, &fu, &dtmax);
 				fv = (fh > 0. ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
 
+				dtmaxtmp = min(dtmax, dtmaxtmp);
+
+
 				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
 				
 
@@ -378,7 +381,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				kurganov(hm, hp, um, up, delta*cm / fmv[i], &fh, &fu, &dtmax);
 				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
 
-				
+				dtmaxtmp = min(dtmax, dtmaxtmp);
 				//// Topographic term
 
 				/**
@@ -415,7 +418,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 		}
 	}
 
-	
+	dtmax = dtmaxtmp;
 
 
 	// UPDATES For evolving quantities
@@ -439,6 +442,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
 			//	foreach_dimension()
 			//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 			double cm = 1.0;
 
 			dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) / (cm * delta);
@@ -454,7 +458,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			dhu[i] += hi * (g*hi / 2.*dmdl + fG*vv[i]);
 			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
 
-
+			printf("%f\t%f\t%f\n", x[i], y[i], Fhv[i]);
 
 
 			
@@ -680,12 +684,14 @@ void mainloop()
 	//free(updates);
 	//update_perf();
 	//iter = inext, t = tnext;
-	//dt = dtnext(totaltime, totaltime + dt, dt);
-	dt =  CFL*delta / sqrt(g*5.0);
+	//dt = dtnext(totaltime, totaltime + dt, dtmax);
+	//dt =  CFL*delta / sqrt(g*5.0);
+	dt = 0.015571;
 	
 	
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
+	//dt = dtnext(totaltime, totaltime + dtmax, dtmax);
 	//write2varnc(nx, ny, totaltime, hh);
 	//if (gradient!=0)
 	if (totaltime>=0.0) //Fix this!
@@ -767,7 +773,8 @@ int main(int argc, char **argv)
 
 	double *xx, *yy;
 
-
+	//dt = CFL*delta / sqrt(g*5.0);
+	dt = 0.015571;
 	//
 	//double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
 	//double *dzsdx, *dzsdy;
@@ -864,7 +871,7 @@ int main(int argc, char **argv)
 	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 	
 	//while (totaltime < 10.0)
-	for (int i = 0; i <120; i++)
+	for (int i = 0; i <10; i++)
 	{
 		mainloop();
 		totaltime = totaltime + dt;
