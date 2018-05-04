@@ -2,7 +2,7 @@
 //						                                                        //
 //Copyright (C) 2017 Bosserelle                                                 //
 //                                                                              //
-// This code is a modification of the St Venant equation from Basilisk			//
+// This code is an adaptation of the St Venant equation from Basilisk			//
 // See																			//
 // http://basilisk.fr/src/saint-venant.h and									//
 // S. Popinet. Quadtree-adaptive tsunami modelling. Ocean Dynamics,				//
@@ -233,47 +233,18 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 	double hi;
 
-	////calc gradient in h, eta, u and v
-	for (int iy = 0; iy < ny; iy++)
-	{
-		for (int ix = 0; ix < nx; ix++)
-		{
-			i = ix + iy*nx;
-			xplus = min(ix + 1, nx - 1);
-			xminus = max(ix - 1, 0);
-			yplus = min(iy + 1, ny - 1);
-			yminus = max(iy - 1, 0);
-
-
-			//dhdx[i] = (hh[i] - hh[xplus + iy*nx]) / delta;
-			//dhdy[i] = (hh[i] - hh[ix + yplus*nx]) / delta;
-
-			//dzsdx[i] = (zs[i] - zs[xplus + iy*nx]) / delta;
-			//dzsdy[i] = (zs[i] - zs[ix + yplus*nx]) / delta;
-
-			//dudx[i] = (uu[i] - uu[xplus + iy*nx]) / delta;
-			//dudy[i] = (uu[i] - uu[ix + yplus*nx]) / delta;
-
-			//dvdx[i] = (vv[i] - vv[xplus + iy*nx]) / delta;
-			//dvdy[i] = (vv[i] - vv[ix + yplus*nx]) / delta;
-
-			//dtmax = min(dtmax, delta / (sqrt(g*hh[i])));
-
-		}
-	}
-	
+		
 	dtmax = 1 / epsilon;
 	double dtmaxtmp = dtmax;
 
-
+	// calculate gradients
 	gradient(nx, ny,delta, hh, dhdx, dhdy);
 	gradient(nx, ny,delta, zs, dzsdx, dzsdy);
 	gradient(nx, ny,delta, uu, dudx, dudy);
 	gradient(nx, ny, delta, vv, dvdx, dvdy);
-	/////if Hi is dry
+	
 
-	/////
-	//for each face
+	
 	for (int iy = 0; iy < ny; iy++)
 	{
 		for (int ix = 0; ix < nx; ix++)
@@ -310,7 +281,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				//printf("%f\n", zn);
 				zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdx[xminus + iy*nx]);
 
-				
+
 				zlr = max(zl, zr);
 
 				hl = hi - dx*dhdx[i];
@@ -325,7 +296,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				double fh, fu, fv;
 				double cm = 1.0;// 0.1;
 
-				
+
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
 				kurganov(hm, hp, um, up, delta*cm / fmu[i], &fh, &fu, &dtmax);
@@ -335,7 +306,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 
 				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
-				
+
 
 				//// Topographic term
 
@@ -353,8 +324,36 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				Fqux[i] = fmu[i] * (fu - sl);
 				Su[i] = fmu[i] * (fu - sr);
 				Fqvx[i] = fmu[i] * fv;
+			}
+			else
+			{
+				Fhu[i] = 0.0;
+				Fqux[i] = 0.0;
+				Su[i] = 0.0;
+				Fqvx[i] = 0.0;
+			}
 
+			}
+		}
+		for (int iy = 0; iy < ny; iy++)
+		{
+			for (int ix = 0; ix < nx; ix++)
+			{
 				
+				i = ix + iy*nx;
+				xplus = min(ix + 1, nx - 1);
+				xminus = max(ix - 1, 0);
+				yplus = min(iy + 1, ny - 1);
+				yminus = max(iy - 1, 0);
+				hi = hh[i];
+
+				double hn = hh[xminus + iy*nx];
+				double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+				
+
+
+				if (hi > eps || hn > eps)
+				{
 
 
 				//Along Y
@@ -375,6 +374,9 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
 				hm = max(0., hr + zr - zlr);
 
+				//// Reimann solver
+				double fh, fu, fv;
+				double cm = 1.0;// 0.1;
 				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
 				//printf("%f\n", hr);
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
@@ -389,8 +391,8 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 				In the case of adaptive refinement, care must be taken to ensure
 				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-				sl = g / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-				sr = g / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+				double sl = g / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
+				double sr = g / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
 
 				////Flux update
 
@@ -403,11 +405,6 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			}
 			else
 			{
-				Fhu[i] = 0.0;
-				Fqux[i] = 0.0;
-				Su[i] = 0.0;
-				Fqvx[i] = 0.0;
-
 				Fhv[i] = 0.0;
 				Fqvy[i] = 0.0;
 				Sv[i] = 0.0;
@@ -666,37 +663,14 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, double * var)
 void mainloop()
 {
 
-	// list of updates
-	//scalar * updates = list_clone(evolving);
-	//dt = dtnext(update(evolving, updates, DT));
-	//if (gradient != zero) {
-	//	/* 2nd-order time-integration */
-	//	scalar * predictor = list_clone(evolving);
-	//	/* predictor */
-	//	advance(predictor, evolving, updates, dt / 2.);
-	//	/* corrector */
-	//	update(predictor, updates, dt);
-	//	delete (predictor);
-	//	free(predictor);
-	//}
-	//advance(evolving, evolving, updates, dt);
-	//delete (updates);
-	//free(updates);
-	//update_perf();
-	//iter = inext, t = tnext;
-	//dt = dtnext(totaltime, totaltime + dt, dtmax);
-	//dt =  CFL*delta / sqrt(g*5.0);
-	//dt = 0.0148533;
 	
 	
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
 	printf("dtmax=%f\n", dtmax);
 	dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
-	//dt = dtnext(totaltime, totaltime + dtmax, dtmax);
-	//write2varnc(nx, ny, totaltime, hh);
-	//if (gradient!=0)
-	if (totaltime>=0.0) //Fix this!
+	
+	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor
 		//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
@@ -774,9 +748,9 @@ int main(int argc, char **argv)
 	
 
 	double *xx, *yy;
-
+	dt = 0.0;// Will be resolved in update
 	//dt = CFL*delta / sqrt(g*5.0);
-	dt = 0.015571;
+	//dt = 0.015571;
 	//dt = 0.0159624;
 	//
 	//double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
