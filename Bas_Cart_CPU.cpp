@@ -542,7 +542,6 @@ void cleanup(int nx, int ny, double * hhi, double *zsi, double *uui, double *vvi
 		{
 			int i = ix + iy*nx;
 			hho[i] = hhi[i];
-			//printf("%f\t%f\t%f\n", x[i], y[i], hho[i]);
 			zso[i] = zsi[i];
 			uuo[i] = uui[i];
 			vvo[i] = vvi[i];
@@ -663,8 +662,10 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, double * var)
 void mainloop()
 {
 
-	
-	
+	//forcing bnd update 
+	//////////////////////////////
+	//flowbnd();
+
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
 	printf("dtmax=%f\n", dtmax);
@@ -673,7 +674,6 @@ void mainloop()
 	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor
-		//advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
 		advance(nx, ny, dt*0.5, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 		//corrector
@@ -701,18 +701,6 @@ void flowbnd()
 
 }
 
-
-void flowstep()
-{
-
-	//advance
-
-	//update
-
-	//advance
-
-
-}
 
 
 
@@ -749,16 +737,7 @@ int main(int argc, char **argv)
 
 	double *xx, *yy;
 	dt = 0.0;// Will be resolved in update
-	//dt = CFL*delta / sqrt(g*5.0);
-	//dt = 0.015571;
-	//dt = 0.0159624;
-	//
-	//double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
-	//double *dzsdx, *dzsdy;
 
-	//double *fmu, *fmv, *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
-
-	//double * dh, *dhu, *dhv;
 
 
 
