@@ -323,7 +323,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 				//// Reimann solver
 				double fh, fu, fv;
-				double cm = 0.1;
+				double cm = 1.0;// 0.1;
 
 				
 
@@ -686,12 +686,13 @@ void mainloop()
 	//iter = inext, t = tnext;
 	//dt = dtnext(totaltime, totaltime + dt, dtmax);
 	//dt =  CFL*delta / sqrt(g*5.0);
-	dt = 0.0148533;
+	//dt = 0.0148533;
 	
 	
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
-	//dt = dtnext(totaltime, totaltime + dt, dtmax);
+	printf("dtmax=%f\n", dtmax);
+	dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
 	//dt = dtnext(totaltime, totaltime + dtmax, dtmax);
 	//write2varnc(nx, ny, totaltime, hh);
 	//if (gradient!=0)
@@ -776,7 +777,7 @@ int main(int argc, char **argv)
 
 	//dt = CFL*delta / sqrt(g*5.0);
 	dt = 0.015571;
-	dt = 0.0159624;
+	//dt = 0.0159624;
 	//
 	//double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
 	//double *dzsdx, *dzsdy;
