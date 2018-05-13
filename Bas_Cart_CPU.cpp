@@ -778,9 +778,9 @@ int main(int argc, char **argv)
 	dhu = (double *)malloc(nx*ny * sizeof(double));
 	dhv = (double *)malloc(nx*ny * sizeof(double));
 
-	x = (double *)malloc(nx*ny * sizeof(double));
+	//x = (double *)malloc(nx*ny * sizeof(double));
 	xx= (double *)malloc(nx * sizeof(double));
-	y = (double *)malloc(nx*ny * sizeof(double));
+	//y = (double *)malloc(nx*ny * sizeof(double));
 	yy= (double *)malloc(ny * sizeof(double));
 
 	//init variables
@@ -791,10 +791,10 @@ int main(int argc, char **argv)
 			zb[i + j*nx] = 0.0;
 			uu[i + j*nx] = 0.0;
 			vv[i + j*nx] = 0.0;
-			x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
+			//x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
 			xx[i] = (i - nx / 2)*delta+0.5*delta;
 			yy[j] = (j - ny / 2)*delta+0.5*delta;
-			y[i + j*nx] = (j-ny/2)*delta + 0.5*delta;
+			//y[i + j*nx] = (j-ny/2)*delta + 0.5*delta;
 			fmu[i + j*nx] = 1.0;
 			fmv[i + j*nx] = 1.0;
 		}
