@@ -167,7 +167,25 @@ void kurganov(double hm, double hp, double um, double up, double Delta,	double *
 	else
 		*fh = *fq = 0.;
 }
-
+void kurganovf(float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
+{
+	float eps = epsilon;
+	float cp = sqrt(g*hp), cm = sqrt(g*hm);
+	float ap = max(up + cp, um + cm); ap = max(ap, 0.0f);
+	float am = min(up - cp, um - cm); am = min(am, 0.0f);
+	float qm = hm*um, qp = hp*up;
+	float a = max(ap, -am);
+	if (a > eps) {
+		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
+		*fq = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
+			ap*am*(qp - qm)) / (ap - am);
+		float dt = CFL*Delta / a;
+		if (dt < *dtmax)
+			*dtmax = dt;
+	}
+	else
+		*fh = *fq = 0.;
+}
 
 void neumannbnd(int nx, int ny, double*a)
 {
@@ -276,13 +294,13 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				hm = max(0., hr + zr - zlr);
 
 				//// Reimann solver
-				double fh, fu, fv;
-				
+				float fh, fu, fv;
+				float dtmaxf=1 / (float)epsilon;
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganov(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmax);
+				kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 				fv = (fh > 0. ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
-
+				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
 
 
@@ -356,14 +374,14 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				hm = max(0., hr + zr - zlr);
 
 				//// Reimann solver
-				double fh, fu, fv;
-				
+				float fh, fu, fv;
+				float dtmaxf = 1 / (float)epsilon;
 				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
 				//printf("%f\n", hr);
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganov(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmax);
+				kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
-
+				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
 				//// Topographic term
 
