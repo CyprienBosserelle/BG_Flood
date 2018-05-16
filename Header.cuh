@@ -30,21 +30,21 @@ extern double delta;
 extern double *x, *y;
 extern double *x_g, *y_g;
 
-extern double *zs, *hh, *zb, *uu, *vv;
-extern double *zso, *hho, *uuo, *vvo;
+extern float *zs, *hh, *zb, *uu, *vv;
+extern float *zso, *hho, *uuo, *vvo;
 
 
-extern double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
-extern double *dzsdx, *dzsdy;
+extern float * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
+extern float *dzsdx, *dzsdy;
 //double *fmu, *fmv;
 
-extern double *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
+extern float *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
 
-extern double * Fhu, *Fhv;
+extern float * Fhu, *Fhv;
 
-extern double * dh, *dhu, *dhv;
+extern float * dh, *dhu, *dhv;
 
-extern double dtmax;
+extern float dtmax;
 
 
 template <class T> T sq(T a);
@@ -56,19 +56,20 @@ template <class T> const T& min(const T& a, const T& b);
 void mainloopCPU();
 double minmod2(double s0, double s1, double s2);
 double dtnext(double t, double tnext, double dt);
-void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady);
+//void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady);
+void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dady);
 void kurganov(double hm, double hp, double um, double up, double Delta, double * fh, double * fq, double * dtmax);
-void update(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv);
-void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo);
-void cleanup(int nx, int ny, double * hhi, double *zsi, double *uui, double *vvi, double * &hho, double *&zso, double *&uuo, double *&vvo);
+void update(int nx, int ny, double dt, double eps, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
+void advance(int nx, int ny, double dt, double eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
+void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
 
 
 //Bnd functions
 void neumannbnd(int nx, int ny, double*a);
 
 //Output functions
-extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, double * var);
-extern "C" void write2varnc(int nx, int ny, double totaltime, double * var);
+extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var);
+extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
 
 // End of global definition
 #endif

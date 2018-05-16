@@ -43,21 +43,21 @@ double delta;
 double *x, *y;
 double *x_g, *y_g;
 
-double *zs, *hh, *zb, *uu, *vv;
-double *zso, *hho, *uuo, *vvo;
+float *zs, *hh, *zb, *uu, *vv;
+float *zso, *hho, *uuo, *vvo;
 
 
-double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
-double *dzsdx, *dzsdy;
+float * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
+float *dzsdx, *dzsdy;
 //double *fmu, *fmv;
 
-double *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
+float *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
 
-double * Fhu, *Fhv;
+float * Fhu, *Fhv;
 
-double * dh, *dhu, *dhv;
+float * dh, *dhu, *dhv;
 
-double dtmax = 1.0 / epsilon;
+float dtmax = 1.0 / epsilon;
 
 
 void CUDA_CHECK(cudaError CUDerr)
@@ -151,42 +151,42 @@ int main(int argc, char **argv)
 
 
 
-	hh = (double *)malloc(nx*ny * sizeof(double));
-	uu = (double *)malloc(nx*ny * sizeof(double));
-	vv = (double *)malloc(nx*ny * sizeof(double));
-	zs = (double *)malloc(nx*ny * sizeof(double));
-	zb = (double *)malloc(nx*ny * sizeof(double));
+	hh = (float *)malloc(nx*ny * sizeof(float));
+	uu = (float *)malloc(nx*ny * sizeof(float));
+	vv = (float *)malloc(nx*ny * sizeof(float));
+	zs = (float *)malloc(nx*ny * sizeof(float));
+	zb = (float *)malloc(nx*ny * sizeof(float));
 
-	hho = (double *)malloc(nx*ny * sizeof(double));
-	uuo = (double *)malloc(nx*ny * sizeof(double));
-	vvo = (double *)malloc(nx*ny * sizeof(double));
-	zso = (double *)malloc(nx*ny * sizeof(double));
+	hho = (float *)malloc(nx*ny * sizeof(float));
+	uuo = (float *)malloc(nx*ny * sizeof(float));
+	vvo = (float *)malloc(nx*ny * sizeof(float));
+	zso = (float *)malloc(nx*ny * sizeof(float));
 
-	dhdx = (double *)malloc(nx*ny * sizeof(double));
-	dhdy = (double *)malloc(nx*ny * sizeof(double));
-	dudx = (double *)malloc(nx*ny * sizeof(double));
-	dudy = (double *)malloc(nx*ny * sizeof(double));
-	dvdx = (double *)malloc(nx*ny * sizeof(double));
-	dvdy = (double *)malloc(nx*ny * sizeof(double));
+	dhdx = (float *)malloc(nx*ny * sizeof(float));
+	dhdy = (float *)malloc(nx*ny * sizeof(float));
+	dudx = (float *)malloc(nx*ny * sizeof(float));
+	dudy = (float *)malloc(nx*ny * sizeof(float));
+	dvdx = (float *)malloc(nx*ny * sizeof(float));
+	dvdy = (float *)malloc(nx*ny * sizeof(float));
 
-	dzsdx = (double *)malloc(nx*ny * sizeof(double));
-	dzsdy = (double *)malloc(nx*ny * sizeof(double));
+	dzsdx = (float *)malloc(nx*ny * sizeof(float));
+	dzsdy = (float *)malloc(nx*ny * sizeof(float));
 
 
 	//fmu = (double *)malloc(nx*ny * sizeof(double));
 	//fmv = (double *)malloc(nx*ny * sizeof(double));
-	Su = (double *)malloc(nx*ny * sizeof(double));
-	Sv = (double *)malloc(nx*ny * sizeof(double));
-	Fqux = (double *)malloc(nx*ny * sizeof(double));
-	Fquy = (double *)malloc(nx*ny * sizeof(double));
-	Fqvx = (double *)malloc(nx*ny * sizeof(double));
-	Fqvy = (double *)malloc(nx*ny * sizeof(double));
-	Fhu = (double *)malloc(nx*ny * sizeof(double));
-	Fhv = (double *)malloc(nx*ny * sizeof(double));
+	Su = (float *)malloc(nx*ny * sizeof(float));
+	Sv = (float *)malloc(nx*ny * sizeof(float));
+	Fqux = (float *)malloc(nx*ny * sizeof(float));
+	Fquy = (float *)malloc(nx*ny * sizeof(float));
+	Fqvx = (float *)malloc(nx*ny * sizeof(float));
+	Fqvy = (float *)malloc(nx*ny * sizeof(float));
+	Fhu = (float *)malloc(nx*ny * sizeof(float));
+	Fhv = (float *)malloc(nx*ny * sizeof(float));
 
-	dh = (double *)malloc(nx*ny * sizeof(double));
-	dhu = (double *)malloc(nx*ny * sizeof(double));
-	dhv = (double *)malloc(nx*ny * sizeof(double));
+	dh = (float *)malloc(nx*ny * sizeof(float));
+	dhu = (float *)malloc(nx*ny * sizeof(float));
+	dhv = (float *)malloc(nx*ny * sizeof(float));
 
 	//x = (double *)malloc(nx*ny * sizeof(double));
 	xx = (double *)malloc(nx * sizeof(double));
@@ -198,9 +198,9 @@ int main(int argc, char **argv)
 	{
 		for (int i = 0; i < nx; i++)
 		{
-			zb[i + j*nx] = 0.0;
-			uu[i + j*nx] = 0.0;
-			vv[i + j*nx] = 0.0;
+			zb[i + j*nx] = 0.0f;
+			uu[i + j*nx] = 0.0f;
+			vv[i + j*nx] = 0.0f;
 			//x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
 			xx[i] = (i - nx / 2)*delta + 0.5*delta;
 			yy[j] = (j - ny / 2)*delta + 0.5*delta;
