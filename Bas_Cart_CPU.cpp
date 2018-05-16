@@ -68,6 +68,27 @@ double minmod2(double s0, double s1, double s2)
 	return 0.;
 }
 
+float minmod2f(float s0, float s1, float s2)
+{
+	//theta should be used as a global var 
+	// can be used to tune the limiting (theta=1
+	//gives minmod, the most dissipative limiter and theta = 2 gives
+	//	superbee, the least dissipative).
+	float theta = 1.3;
+	if (s0 < s1 && s1 < s2) {
+		float d1 = theta*(s1 - s0);
+		float d2 = (s2 - s0) / 2.;
+		float d3 = theta*(s2 - s1);
+		if (d2 < d1) d1 = d2;
+		return min(d1, d3);
+	}
+	if (s0 > s1 && s1 > s2) {
+		float d1 = theta*(s1 - s0), d2 = (s2 - s0) / 2., d3 = theta*(s2 - s1);
+		if (d2 > d1) d1 = d2;
+		return max(d1, d3);
+	}
+	return 0.;
+}
 double dtnext(double t, double tnext, double dt)
 {
 	//Function to make dt match output time step and prevent dt from chnaging too fast
@@ -118,9 +139,9 @@ void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &
 
 
 			//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-			dadx[i] = minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
+			dadx[i] = minmod2f(a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
 			//dady[i] = (a[i] - a[ix + yminus*nx]) / delta;
-			dady[i] = minmod2(a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
+			dady[i] = minmod2f(a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
 
 
 		}
