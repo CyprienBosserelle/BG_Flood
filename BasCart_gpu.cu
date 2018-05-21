@@ -43,7 +43,8 @@ double delta;
 double *x, *y;
 double *x_g, *y_g;
 
-float *zs, *hh, *zb, *uu, *vv;
+float *zs, *hh, *zb, *uu, *vv;//for CPU
+float *zs_g, *hh_g, *zb_g, *uu_g, *vv_g; // for GPU
 float *zso, *hho, *uuo, *vvo;
 
 
@@ -133,6 +134,7 @@ int main(int argc, char **argv)
 	// Start timer to keep track of time 
 	clock_t startcputime, endcputime;
 
+	int GPUDEVICE = -1; //CPU by default
 
 	startcputime = clock();
 
@@ -173,6 +175,8 @@ int main(int argc, char **argv)
 	dzsdy = (float *)malloc(nx*ny * sizeof(float));
 
 
+
+
 	//fmu = (double *)malloc(nx*ny * sizeof(double));
 	//fmv = (double *)malloc(nx*ny * sizeof(double));
 	Su = (float *)malloc(nx*ny * sizeof(float));
@@ -192,6 +196,33 @@ int main(int argc, char **argv)
 	xx = (double *)malloc(nx * sizeof(double));
 	//y = (double *)malloc(nx*ny * sizeof(double));
 	yy = (double *)malloc(ny * sizeof(double));
+
+	if (GPUDEVICE >= 0)
+	{
+		// Init GPU
+		// This should be in the sanity check
+		int nDevices;
+		cudaGetDeviceCount(&nDevices);
+		cudaDeviceProp prop;
+
+		if (GPUDEVICE > (nDevices - 1))
+		{
+			// 
+			GPUDEVICE = (nDevices - 1);
+		}
+
+	}
+
+	// Now that we checked that there was indeed a GPU available
+	if (GPUDEVICE >= 0)
+	{
+		CUDA_CHECK(cudaMalloc((void **)&hh_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&uu_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&vv_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&zb_g, nx*ny*sizeof(float)));
+	}
+
+
 
 	//init variables
 	for (int j = 0; j < ny; j++)

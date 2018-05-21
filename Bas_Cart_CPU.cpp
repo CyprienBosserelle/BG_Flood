@@ -71,16 +71,16 @@ float minmod2f(float s0, float s1, float s2)
 	// can be used to tune the limiting (theta=1
 	//gives minmod, the most dissipative limiter and theta = 2 gives
 	//	superbee, the least dissipative).
-	float theta = 1.3;
+	float theta = 1.3f;
 	if (s0 < s1 && s1 < s2) {
 		float d1 = theta*(s1 - s0);
-		float d2 = (s2 - s0) / 2.;
+		float d2 = (s2 - s0) / 2.0f;
 		float d3 = theta*(s2 - s1);
 		if (d2 < d1) d1 = d2;
 		return min(d1, d3);
 	}
 	if (s0 > s1 && s1 > s2) {
-		float d1 = theta*(s1 - s0), d2 = (s2 - s0) / 2., d3 = theta*(s2 - s1);
+		float d1 = theta*(s1 - s0), d2 = (s2 - s0) / 2.0f, d3 = theta*(s2 - s1);
 		if (d2 > d1) d1 = d2;
 		return max(d1, d3);
 	}
@@ -167,7 +167,7 @@ void kurganov(double hm, double hp, double um, double up, double Delta,	double *
 void kurganovf(float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
 {
 	float eps = epsilon;
-	float cp = sqrt(g*hp), cm = sqrt(g*hm);
+	float cp = sqrtf(g*hp), cm = sqrtf(g*hm);
 	float ap = max(up + cp, um + cm); ap = max(ap, 0.0f);
 	float am = min(up - cp, um - cm); am = min(am, 0.0f);
 	float qm = hm*um, qp = hp*up;
