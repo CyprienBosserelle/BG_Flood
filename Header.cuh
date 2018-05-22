@@ -31,18 +31,27 @@ extern double *x, *y;
 extern double *x_g, *y_g;
 
 extern float *zs, *hh, *zb, *uu, *vv;
-extern float *zso, *hho, *uuo, *vvo;
+extern float *zs_g, *hh_g, *zb_g, *uu_g, *vv_g; // for GPU
 
+extern float *zso, *hho, *uuo, *vvo;
+extern float *zso_g, *hho_g, *uuo_g, *vvo_g; // for GPU
 
 extern float * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
 extern float *dzsdx, *dzsdy;
+
+//GPU
+extern float * dhdx_g, *dhdy_g, *dudx_g, *dudy_g, *dvdx_g, *dvdy_g;
+extern float *dzsdx_g, *dzsdy_g;
 //double *fmu, *fmv;
 
 extern float *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
-
 extern float * Fhu, *Fhv;
-
 extern float * dh, *dhu, *dhv;
+
+//GPU
+extern float *Su_g, *Sv_g, *Fqux_g, *Fquy_g, *Fqvx_g, *Fqvy_g;
+extern float * Fhu_g, *Fhv_g;
+extern float * dh_g, *dhu_g, *dhv_g;
 
 extern float dtmax;
 

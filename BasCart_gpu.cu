@@ -46,20 +46,27 @@ double *x_g, *y_g;
 float *zs, *hh, *zb, *uu, *vv;//for CPU
 float *zs_g, *hh_g, *zb_g, *uu_g, *vv_g; // for GPU
 float *zso, *hho, *uuo, *vvo;
-
-
+float *zso_g, *hho_g, *uuo_g, *vvo_g; // for GPU
+//CPU
 float * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
 float *dzsdx, *dzsdy;
+//GPU
+float * dhdx_g, *dhdy_g, *dudx_g, *dudy_g, *dvdx_g, *dvdy_g;
+float *dzsdx_g, *dzsdy_g;
 //double *fmu, *fmv;
 
 float *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
-
 float * Fhu, *Fhv;
-
 float * dh, *dhu, *dhv;
+//GPU
+float *Su_g, *Sv_g, *Fqux_g, *Fquy_g, *Fqvx_g, *Fqvy_g;
+float * Fhu_g, *Fhv_g;
+float * dh_g, *dhu_g, *dhv_g;
 
 float dtmax = 1.0 / epsilon;
 
+
+#include "Flow_kernel.cu"
 
 void CUDA_CHECK(cudaError CUDerr)
 {
@@ -77,31 +84,45 @@ void CUDA_CHECK(cudaError CUDerr)
 }
 
 
-// Main loop that actually runs the model
-void mainloopGPU()
+
+
+void updateGPU()
 {
-	
-	
-
-	
-	
-}
-
-
-
-
-
-
-void updateGPU(int nx, int ny, double dt, double eps)
-{
-	dim3 blockDim(16, 16, 1);
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
 
+	int i, xplus, yplus, xminus, yminus;
 
-	//__global__ void MetricTerm(int nx, int ny, double delta, double G, double *h, double *u, double *v, double * fmu, double * fmv, double* dhu, double *dhv, double *Su, double *Sv, double * Fqux, double * Fquy, double * Fqvx, double * Fqvy)
-	//MetricTerm << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, hh_g, uu_g, vv_g, fmu_g, fmv_g, dhu_g, dhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g);
+	float hi;
 
+
+	dtmax = 1 / epsilon;
+	float dtmaxtmp = dtmax;
+
+	// calculate gradients
+	gradientGPUX <<<gridDim, blockDim, 0 >>>(nx, ny, delta, hh_g, dhdx_g);
+	gradientGPUY <<<gridDim, blockDim, 0 >>>(nx, ny, delta, hh_g, dhdy_g);
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdy_g);
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, uu_g, dudx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, uu_g, dudy_g);
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, vv_g, dvdx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, vv_g, dvdy_g);
+	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	float cm = 1.0;// 0.1;
+	float fmu = 1.0;
+	float fmv = 1.0;
 }
+
+
+
+
+
 
 
 void advanceGPU(int nx, int ny, double dt, double eps)
@@ -112,7 +133,17 @@ void advanceGPU(int nx, int ny, double dt, double eps)
 	
 }
 
+// Main loop that actually runs the model
+void mainloopGPU()
+{
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	//update
+	updateGPU();
 
+
+
+}
 
 int main(int argc, char **argv)
 {
@@ -220,6 +251,37 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMalloc((void **)&uu_g, nx*ny*sizeof(float)));
 		CUDA_CHECK(cudaMalloc((void **)&vv_g, nx*ny*sizeof(float)));
 		CUDA_CHECK(cudaMalloc((void **)&zb_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&zs_g, nx*ny*sizeof(float)));
+
+		CUDA_CHECK(cudaMalloc((void **)&hho_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&uuo_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&vvo_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&zso_g, nx*ny*sizeof(float)));
+
+		CUDA_CHECK(cudaMalloc((void **)&dhdx_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dhdy_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dudx_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dudy_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dvdx_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dvdy_g, nx*ny*sizeof(float)));
+
+		CUDA_CHECK(cudaMalloc((void **)&dzsdx_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dzsdy_g, nx*ny*sizeof(float)));
+
+		CUDA_CHECK(cudaMalloc((void **)&Su_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&Sv_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&Fqux_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&Fquy_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&Fqvx_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&Fqvy_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&Fhu_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&Fhv_g, nx*ny*sizeof(float)));
+
+		CUDA_CHECK(cudaMalloc((void **)&dh_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dhu_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&dhv_g, nx*ny*sizeof(float)));
+
+		
 	}
 
 
@@ -264,13 +326,31 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (GPUDEVICE >= 0)
+	{
+		CUDA_CHECK(cudaMemcpy(zb_g, zb, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(hh_g, hh, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(uu_g, uu, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(vv_g, vv, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(zs_g, zs, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+	}
+
+
 
 	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
 	//while (totaltime < 10.0)
 	for (int i = 0; i <10; i++)
 	{
-		mainloopCPU();
+		if (GPUDEVICE >= 0)
+		{
+			mainloopCPU();
+		}
+		else
+		{
+			mainloopCPU();
+		}
+		
 		totaltime = totaltime + dt;
 		write2varnc(nx, ny, totaltime, hh);
 		//write2varnc(nx, ny, totaltime, dhdx);
@@ -284,8 +364,8 @@ int main(int argc, char **argv)
 	endcputime = clock();
 	printf("End Computation totaltime=%f\n", totaltime);
 	printf("Total runtime= %d  seconds\n", (endcputime - startcputime) / CLOCKS_PER_SEC);
-
-
+	//if GPU?
+	cudaDeviceReset();
 
 
 
