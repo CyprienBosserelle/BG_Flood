@@ -64,7 +64,7 @@ float * Fhu_g, *Fhv_g;
 float * dh_g, *dhu_g, *dhv_g;
 
 float dtmax = 1.0 / epsilon;
-
+float * dtmax_g;
 
 #include "Flow_kernel.cu"
 
@@ -117,6 +117,19 @@ void updateGPU()
 	float cm = 1.0;// 0.1;
 	float fmu = 1.0;
 	float fmv = 1.0;
+
+	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL,hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//WARNING dtmax is overwritten below 
+
+	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Here needs a dtmax reduction 
+
+	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 }
 
 
@@ -281,6 +294,8 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMalloc((void **)&dhu_g, nx*ny*sizeof(float)));
 		CUDA_CHECK(cudaMalloc((void **)&dhv_g, nx*ny*sizeof(float)));
 
+		CUDA_CHECK(cudaMalloc((void **)&dtmax_g, nx*ny*sizeof(float)));
+
 		
 	}
 
@@ -333,6 +348,7 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMemcpy(uu_g, uu, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(vv_g, vv, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(zs_g, zs, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+
 	}
 
 

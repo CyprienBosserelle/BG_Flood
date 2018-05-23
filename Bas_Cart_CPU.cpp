@@ -343,7 +343,7 @@ void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *u
 				yminus = max(iy - 1, 0);
 				hi = hh[i];
 
-				float hn = hh[xminus + iy*nx];
+				float hn = hh[ix + yminus*nx];
 				float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 				
 

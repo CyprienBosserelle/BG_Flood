@@ -54,7 +54,7 @@ extern float * Fhu_g, *Fhv_g;
 extern float * dh_g, *dhu_g, *dhv_g;
 
 extern float dtmax;
-
+extern float * dtmax_g;
 
 template <class T> T sq(T a);
 double sqd(double a);
