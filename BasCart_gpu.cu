@@ -65,6 +65,8 @@ float * dh_g, *dhu_g, *dhv_g;
 
 float dtmax = 1.0 / epsilon;
 float * dtmax_g;
+float *arrmax_g, float *arrmin_g;
+float *arrmin;
 
 #include "Flow_kernel.cu"
 
@@ -86,10 +88,14 @@ void CUDA_CHECK(cudaError CUDerr)
 
 
 
-void updateGPU()
+
+void FlowGPU()
 {
 	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+
+	dim3 blockDimLine(32, 1, 1);
+	dim3 gridDimLine(ceil((nx*ny*1.0f) / blockDimLine.x), 1, 1);
 
 	int i, xplus, yplus, xminus, yminus;
 
@@ -99,9 +105,11 @@ void updateGPU()
 	dtmax = 1 / epsilon;
 	float dtmaxtmp = dtmax;
 
+	//update step 1
+
 	// calculate gradients
-	gradientGPUX <<<gridDim, blockDim, 0 >>>(nx, ny, delta, hh_g, dhdx_g);
-	gradientGPUY <<<gridDim, blockDim, 0 >>>(nx, ny, delta, hh_g, dhdy_g);
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, hh_g, dhdx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, hh_g, dhdy_g);
 
 	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdx_g);
 	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdy_g);
@@ -114,48 +122,78 @@ void updateGPU()
 	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	float cm = 1.0;// 0.1;
-	float fmu = 1.0;
-	float fmv = 1.0;
 
-	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL,hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	//WARNING dtmax is overwritten below 
 
 	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	// Here needs a dtmax reduction 
+	minmaxKernel << <gridDimLine, blockDimLine, 0 >> >(nx*ny, arrmax_g, arrmin_g, dtmax_g);
+	//CUT_CHECK_ERROR("UpdateZom execution failed\n");
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	finalminmaxKernel << <1, blockDimLine, 0 >> >(arrmax_g, arrmin_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//CUDA_CHECK(cudaMemcpy(arrmax, arrmax_g, nx*ny*sizeof(DECNUM), cudaMemcpyDeviceToHost));
+	CUDA_CHECK(cudaMemcpy(arrmin, arrmin_g, nx*ny*sizeof(float), cudaMemcpyDeviceToHost));
+
+	dt = arrmin[0];
 
 	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
-}
+	
 
 
+	//predictor (advance 1/2 dt)
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, dt*0.5, eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//corrector setp
+	//update again
+	// calculate gradients
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, hho_g, dhdx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, hho_g, dhdy_g);
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, zso_g, dzsdx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, zso_g, dzsdy_g);
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, uuo_g, dudx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, uuo_g, dudy_g);
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, vvo_g, dvdx_g);
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, vvo_g, dvdy_g);
+	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-
-
-
-void advanceGPU(int nx, int ny, double dt, double eps)
-{
-	dim3 blockDim(16, 16, 1);
-	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	
+	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// no reduction of dtmax during the corrector step
+
+	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, dt, eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
+	cleanupGPU << <gridDim, blockDim, 0 >> >(nx, ny, hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 }
 
 // Main loop that actually runs the model
 void mainloopGPU()
 {
-	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
-	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
-	//update
-	updateGPU();
-
-
-
+	FlowGPU();
 }
 
 int main(int argc, char **argv)
@@ -296,6 +334,9 @@ int main(int argc, char **argv)
 
 		CUDA_CHECK(cudaMalloc((void **)&dtmax_g, nx*ny*sizeof(float)));
 
+		arrmin = (float *)malloc(nx*ny * sizeof(float));
+		CUDA_CHECK(cudaMalloc((void **)&arrmin_g, nx*ny*sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&arrmax_g, nx*ny*sizeof(float)));
 		
 	}
 
@@ -348,6 +389,10 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMemcpy(uu_g, uu, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(vv_g, vv, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(zs_g, zs, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+		dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+		dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+
+		initdtmax << <gridDim, blockDim, 0 >> >(nx, ny, (float) epsilon, dtmax_g);
 
 	}
 
