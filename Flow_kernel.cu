@@ -27,7 +27,7 @@ __device__ float minmod2fGPU(float s0, float s1, float s2)
 	return 0.;
 }
 
-__global__ void gradientGPUX(unsigned int nx, unsigned int ny, float delta, float *a, float *&dadx)
+__global__ void gradientGPUX(unsigned int nx, unsigned int ny, float delta, float *a, float *dadx)
 {
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -55,7 +55,7 @@ __global__ void gradientGPUX(unsigned int nx, unsigned int ny, float delta, floa
 
 }
 
-__global__ void gradientGPUY(unsigned int nx, unsigned int ny, float delta, float *a, float *&dady)
+__global__ void gradientGPUY(unsigned int nx, unsigned int ny, float delta, float *a, float *dady)
 {
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;

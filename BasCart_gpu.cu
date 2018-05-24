@@ -109,15 +109,22 @@ void FlowGPU()
 
 	// calculate gradients
 	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, hh_g, dhdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, hh_g, dhdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, uu_g, dudx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, uu_g, dudy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, vv_g, dvdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, vv_g, dvdy_g);
 	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
 	CUDA_CHECK(cudaDeviceSynchronize());
