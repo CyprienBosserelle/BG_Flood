@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 	// Start timer to keep track of time 
 	clock_t startcputime, endcputime;
 
-	int GPUDEVICE = -1; //CPU by default
+	int GPUDEVICE = 0; //CPU by default
 
 	startcputime = clock();
 
@@ -405,7 +405,7 @@ int main(int argc, char **argv)
 	{
 		if (GPUDEVICE >= 0)
 		{
-			mainloopCPU();
+			mainloopGPU();
 		}
 		else
 		{
