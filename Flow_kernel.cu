@@ -27,11 +27,11 @@ __device__ float minmod2fGPU(float s0, float s1, float s2)
 	return 0.;
 }
 
-__global__ void gradientGPUX(unsigned int nx, unsigned int ny, float delta, float *a, float *dadx)
+__global__ void gradientGPUX(int nx, int ny, float delta, float *a, float *dadx)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
 	int xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
@@ -40,9 +40,9 @@ __global__ void gradientGPUX(unsigned int nx, unsigned int ny, float delta, floa
 		//
 		//
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, (unsigned int)0);
+		xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, (unsigned int)0);
+		yminus = max(iy - 1, 0);
 		i = ix + iy*nx;
 
 
@@ -55,11 +55,11 @@ __global__ void gradientGPUX(unsigned int nx, unsigned int ny, float delta, floa
 
 }
 
-__global__ void gradientGPUY(unsigned int nx, unsigned int ny, float delta, float *a, float *dady)
+__global__ void gradientGPUY(int nx, int ny, float delta, float *a, float *dady)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
@@ -67,9 +67,9 @@ __global__ void gradientGPUY(unsigned int nx, unsigned int ny, float delta, floa
 		//
 		//
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, (unsigned int)0);
+		xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, (unsigned int)0);
+		yminus = max(iy - 1, 0);
 		i = ix + iy*nx;
 
 
@@ -83,21 +83,21 @@ __global__ void gradientGPUY(unsigned int nx, unsigned int ny, float delta, floa
 }
 
 
-__global__ void updateKurgX(unsigned int nx, unsigned int ny, float delta, float g, float eps,float CFL, float * hh, float *zs, float *uu, float * vv, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
+__global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,float CFL, float * hh, float *zs, float *uu, float * vv, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, (unsigned int)0);
+		xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, (unsigned int)0);
+		yminus = max(iy - 1, 0);
 
 		float cm = 1.0;// 0.1;
 		float fmu = 1.0;
@@ -237,21 +237,21 @@ __global__ void updateKurgX(unsigned int nx, unsigned int ny, float delta, float
 
 }
 
-__global__ void updateKurgY(unsigned int nx, unsigned int ny, float delta, float g, float eps, float CFL, float * hh, float *zs, float *uu, float * vv, float *dzsdy, float *dhdy, float * dudy, float *dvdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
+__global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, float CFL, float * hh, float *zs, float *uu, float * vv, float *dzsdy, float *dhdy, float * dudy, float *dvdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, (unsigned int)0);
+		xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, (unsigned int)0);
+		yminus = max(iy - 1, 0);
 
 
 		float cm = 1.0;// 0.1;
@@ -353,21 +353,21 @@ __global__ void updateKurgY(unsigned int nx, unsigned int ny, float delta, float
 	}
 }
 
-__global__ void updateEV(unsigned int nx, unsigned int ny, float delta, float g, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+__global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, (unsigned int)0);
+		xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, (unsigned int)0);
+		yminus = max(iy - 1, 0);
 
 		float cm = 1.0;// 0.1;
 		float fmu = 1.0;
@@ -402,11 +402,11 @@ __global__ void updateEV(unsigned int nx, unsigned int ny, float delta, float g,
 	}
 }
 
-__global__ void Advkernel(unsigned int nx, unsigned int ny, float dt, float eps, float * hh, float *zb, float *uu, float * vv, float *dh, float *dhu, float * dhv, float *zso, float *hho, float *uuo, float *vvo )
+__global__ void Advkernel(int nx, int ny, float dt, float eps, float * hh, float *zb, float *uu, float * vv, float *dh, float *dhu, float * dhv, float *zso, float *hho, float *uuo, float *vvo )
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
 
 	if (ix < nx && iy < ny)
 	{
@@ -452,11 +452,11 @@ __global__ void Advkernel(unsigned int nx, unsigned int ny, float dt, float eps,
 
 
 
-__global__ void cleanupGPU(unsigned int nx, unsigned int ny, float * hhi, float *zsi, float *uui, float *vvi, float * hho, float *zso, float *uuo, float *vvo)
+__global__ void cleanupGPU(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * hho, float *zso, float *uuo, float *vvo)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
 	if (ix < nx && iy < ny)
 	{
 		hho[i] = hhi[i];
@@ -466,11 +466,11 @@ __global__ void cleanupGPU(unsigned int nx, unsigned int ny, float * hhi, float 
 	}
 }
 
-__global__ void initdtmax(unsigned int nx, unsigned int ny, float epsi,float *dtmax)
+__global__ void initdtmax(int nx, int ny, float epsi,float *dtmax)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
 	
 		dtmax[i] = 1.0f / epsi;
 	

@@ -413,6 +413,7 @@ int main(int argc, char **argv)
 		if (GPUDEVICE >= 0)
 		{
 			mainloopGPU();
+			CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 		}
 		else
 		{
