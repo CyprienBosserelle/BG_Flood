@@ -140,11 +140,11 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			hm = max(0.f, hr + zr - zlr);
 
 			float fh, fu, fv;
-			float dtmaxf = 1 / (float)epsilon;
+			float dtmaxf = 1 / 1e-30f;
 
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
 			float cp, cm, ap, am, qm, qp, a, dlt;
-			float epsi = epsilon;
+			float epsi = 1e-30f;
 
 			cp = sqrtf(g*hp);
 			cm = sqrtf(g*hm);
@@ -225,7 +225,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 		}
 		else
 		{
-			dtmax[i] = 1.0f / (float)epsilon;
+			dtmax[i] = 1.0f / 1e-30f;
 			Fhu[i] = 0.0f;
 			Fqux[i] = 0.0f;
 			Su[i] = 0.0f;
@@ -285,12 +285,12 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 
 			//// Reimann solver
 			float fh, fu, fv;
-			float dtmaxf = 1 / (float)epsilon;
+			float dtmaxf = 1.0f / 1e-30f;
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
 			float cp, cm, ap, am, qm, qp, a, dlt;
-			float epsi = epsilon;
+			float epsi = 1e-30f;
 
 			cp = sqrtf(g*hp);
 			cm = sqrtf(g*hm);
@@ -344,7 +344,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 		}
 		else
 		{
-			dtmax[i] = 1.0f / (float)epsilon;
+			dtmax[i] = 1.0f / 1e-30f;
 			Fhv[i] = 0.0f;
 			Fqvy[i] = 0.0f;
 			Sv[i] = 0.0f;

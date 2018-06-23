@@ -5,7 +5,7 @@
 
 #define pi 3.14159265
 
-#define epsilon 1e-30
+#define epsilone 1e-30
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
@@ -14,13 +14,24 @@
 #include <math.h>
 #include <cmath>
 #include <ctime>
+#include <string>
+#include <vector>
+#include <map>
 #include <netcdf.h>
 
-
+extern double epsilon;
 extern double g;
 extern double rho;
 extern double eps;
 extern double CFL;
+
+extern std::string outfile;
+//Output variables
+extern std::vector<std::string> outvars; //list of names of the variables to output
+
+// Map arrays: this is to link variable name as a string to the pointers holding the data
+extern std::map<std::string, float *> OutputVarMapCPU;
+
 
 extern double dt, dx;
 extern int nx, ny;
@@ -79,6 +90,14 @@ void neumannbnd(int nx, int ny, double*a);
 //Output functions
 extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var);
 extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
+
+// Netcdf functions
+extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, double totaltime);
+
+extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
+extern "C" void writenctimestep(std::string outfile, double totaltime);
+extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
+
 
 // End of global definition
 #endif

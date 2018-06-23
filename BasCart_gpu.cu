@@ -26,7 +26,7 @@ double phi = (1.0f + sqrt(5.0f)) / 2;
 double aphi = 1 / (phi + 1);
 double bphi = phi / (phi + 1);
 double twopi = 8 * atan(1.0f);
-
+double epsilon = 1e-30;
 double g = 1.0;// 9.81;
 double rho = 1025.0;
 double eps = 0.0001;
@@ -67,6 +67,34 @@ float dtmax = 1.0 / epsilon;
 float * dtmax_g;
 float *arrmax_g, float *arrmin_g;
 float *arrmin;
+
+std::string outfile = "output.nc";
+std::vector<std::string> outvars;
+std::map<std::string, float *> OutputVarMapCPU;
+std::map<std::string, float *> OutputVarMapGPU;
+std::map<std::string, int> OutputVarMaplen;
+/*
+//constructor cant be global
+OutputVarMapCPU["zb"] = zb;
+OutputVarMapGPU["zb"] = zb_g;
+OutputVarMaplen["zb"] = nx*ny;
+
+OutputVarMapCPU["uu"] = uu;
+OutputVarMapGPU["uu"] = uu_g;
+OutputVarMaplen["uu"] = nx*ny;
+
+OutputVarMapCPU["vv"] = vv;
+OutputVarMapGPU["vv"] = vv_g;
+OutputVarMaplen["vv"] = nx*ny;
+
+OutputVarMapCPU["zs"] = zs;
+OutputVarMapGPU["zs"] = zs_g;
+OutputVarMaplen["zs"] = nx*ny;
+
+OutputVarMapCPU["hh"] = hh;
+OutputVarMapGPU["hh"] = hh_g;
+OutputVarMaplen["hh"] = nx*ny;
+*/
 
 #include "Flow_kernel.cu"
 
@@ -223,7 +251,7 @@ int main(int argc, char **argv)
 	// Start timer to keep track of time 
 	clock_t startcputime, endcputime;
 
-	int GPUDEVICE = 0; //CPU by default
+	int GPUDEVICE = -1; //CPU by default
 
 	startcputime = clock();
 
@@ -239,7 +267,12 @@ int main(int argc, char **argv)
 	double *xx, *yy;
 	dt = 0.0;// Will be resolved in update
 
+	std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh" };
+	for (int isup = 0; isup < SupportedVarNames.size(); isup++)
+	{
+		outvars.push_back(SupportedVarNames[isup]);
 
+	}
 
 
 	hh = (float *)malloc(nx*ny * sizeof(float));
@@ -403,9 +436,37 @@ int main(int argc, char **argv)
 
 	}
 
+	
+
+	OutputVarMapCPU["zb"] = zb;
+	OutputVarMapGPU["zb"] = zb_g;
+	OutputVarMaplen["zb"] = nx*ny;
+
+	OutputVarMapCPU["uu"] = uu;
+	OutputVarMapGPU["uu"] = uu_g;
+	OutputVarMaplen["uu"] = nx*ny;
+
+	OutputVarMapCPU["vv"] = vv;
+	OutputVarMapGPU["vv"] = vv_g;
+	OutputVarMaplen["vv"] = nx*ny;
+
+	OutputVarMapCPU["zs"] = zs;
+	OutputVarMapGPU["zs"] = zs_g;
+	OutputVarMaplen["zs"] = nx*ny;
+
+	OutputVarMapCPU["hh"] = hh;
+	OutputVarMapGPU["hh"] = hh_g;
+	OutputVarMaplen["hh"] = nx*ny;
+	//create nc file with no variables
 
 
-	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
+	creatncfileUD(outfile, nx, ny, delta, 0.0);
+	for (int ivar = 0; ivar < outvars.size(); ivar++)
+	{
+		//Create definition for each variable and store it
+		defncvar(outfile, 0,1.0f,0.0f,nx,ny,outvars[ivar], 3, OutputVarMapCPU[outvars[ivar]]);
+	}
+	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
 	//while (totaltime < 10.0)
 	for (int i = 0; i <10; i++)
@@ -413,7 +474,7 @@ int main(int argc, char **argv)
 		if (GPUDEVICE >= 0)
 		{
 			mainloopGPU();
-			CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+			//CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 		}
 		else
 		{
@@ -421,7 +482,27 @@ int main(int argc, char **argv)
 		}
 		
 		totaltime = totaltime + dt;
-		write2varnc(nx, ny, totaltime, hh);
+		//void creatncfileUD(std::string outfile, int nx, int ny, double dx, double totaltime);
+		//void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
+		//void writenctimestep(std::string outfile, double totaltime);
+		//void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
+		writenctimestep(outfile, totaltime);
+
+		for (int ivar = 0; ivar < outvars.size(); ivar++)
+		{
+			if (OutputVarMaplen[outvars[ivar]] > 0)
+			{
+				if (GPUDEVICE >= 0)
+				{
+					//Should be async
+					CUDA_CHECK(cudaMemcpy(OutputVarMapCPU[outvars[ivar]], OutputVarMapGPU[outvars[ivar]], OutputVarMaplen[outvars[ivar]] * sizeof(float), cudaMemcpyDeviceToHost));
+
+				}
+				//Create definition for each variable and store it
+				writencvarstep(outfile, 0,1.0f,0.0f,outvars[ivar], OutputVarMapCPU[outvars[ivar]]);
+			}
+		}
+		//write2varnc(nx, ny, totaltime, hh);
 		//write2varnc(nx, ny, totaltime, dhdx);
 	}
 
