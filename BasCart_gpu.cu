@@ -68,6 +68,8 @@ float * dtmax_g;
 float *arrmax_g, float *arrmin_g;
 float *arrmin;
 
+float * dummy;
+
 std::string outfile = "output.nc";
 std::vector<std::string> outvars;
 std::map<std::string, float *> OutputVarMapCPU;
@@ -114,6 +116,123 @@ void CUDA_CHECK(cudaError CUDerr)
 }
 
 
+float maxdiff(int nxny, float * ref, float * pred)
+{
+	float maxd = 0.0f;
+	for (int i = 0; i < nxny; i++)
+	{
+		maxd = max(abs(pred[i] - ref[i]), maxd);
+	}
+	return maxd;
+}
+
+void checkloopGPU()
+{
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+
+	dim3 blockDimLine(32, 1, 1);
+	dim3 gridDimLine(ceil((nx*ny*1.0f) / blockDimLine.x), 1, 1);
+
+	int i, xplus, yplus, xminus, yminus;
+
+	float hi;
+
+	float maxdiffer;
+
+	dtmax = 1 / epsilon;
+	float dtmaxtmp = dtmax;
+
+	//update step 1
+
+	// calculate gradients
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, hh_g, dhdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, hh_g, dhdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, zs_g, dzsdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, uu_g, dudx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, uu_g, dudy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, vv_g, dvdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, vv_g, dvdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
+	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
+
+
+	// check gradients
+
+	CUDA_CHECK(cudaMemcpy(dummy, dhdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dhdx, dummy);
+	if (maxdiffer > 1e-4f)
+	{ 
+		printf("High error in dhdx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dhdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dhdy, dummy);
+	if (maxdiffer > 1e-4f)
+	{
+		printf("High error in dhdy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dzsdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dzsdx, dummy);
+	if (maxdiffer > 1e-4f)
+	{
+		printf("High error in dzsdx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dzsdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dzsdy, dummy);
+	if (maxdiffer > 1e-4f)
+	{
+		printf("High error in dzsdy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dudx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dudx, dummy);
+	if (maxdiffer > 1e-4f)
+	{
+		printf("High error in dudx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dudy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dudy, dummy);
+	if (maxdiffer > 1e-4f)
+	{
+		printf("High error in dudy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dvdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dvdx, dummy);
+	if (maxdiffer > 1e-4f)
+	{
+		printf("High error in dvdx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dvdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dvdy, dummy);
+	if (maxdiffer > 1e-4f)
+	{
+		printf("High error in dvdy: %f\n", maxdiffer);
+	}
+
+
+
+
+}
 
 
 
@@ -314,6 +433,8 @@ int main(int argc, char **argv)
 	dhu = (float *)malloc(nx*ny * sizeof(float));
 	dhv = (float *)malloc(nx*ny * sizeof(float));
 
+	dummy = (float *)malloc(nx*ny * sizeof(float));
+
 	//x = (double *)malloc(nx*ny * sizeof(double));
 	xx = (double *)malloc(nx * sizeof(double));
 	//y = (double *)malloc(nx*ny * sizeof(double));
@@ -473,8 +594,9 @@ int main(int argc, char **argv)
 	{
 		if (GPUDEVICE >= 0)
 		{
-			mainloopGPU();
+			//mainloopGPU();
 			//CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+			checkloopGPU();
 		}
 		else
 		{
