@@ -534,3 +534,13 @@ __global__ void finalminmaxKernel(float *max, float *min) {
 		min[blockIdx.x] = mintile[0];
 	}
 }
+__global__ void resetdtmax(int nx, int ny, float *dtmax)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	if (ix < nx && iy < ny)
+	{
+		dtmax[i] = 1.0f / 1e-30f;
+	}
+}
