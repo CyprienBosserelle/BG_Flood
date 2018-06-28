@@ -136,6 +136,8 @@ void checkloopGPU()
 
 	int i, xplus, yplus, xminus, yminus;
 
+	float maxerr = 1e-11f;//1e-7f
+
 	float hi;
 
 	float maxdiffer;
@@ -145,6 +147,15 @@ void checkloopGPU()
 
 	resetdtmax << <gridDim, blockDim, 0 >> > (nx, ny, dtmax_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CUDA_CHECK(cudaMemcpy(dummy, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	float mindtmax = 1.0f / 1e-30f;
+	for (int i = 0; i < nx*ny; i++)
+	{
+		mindtmax = min(dummy[i], mindtmax);
+	}
+
+
 	//update step 1
 
 	// calculate gradients
@@ -173,60 +184,70 @@ void checkloopGPU()
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
 
 
+
+	CUDA_CHECK(cudaMemcpy(dummy, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, hh, dummy);
+	if (maxdiffer > 1e-7f)
+	{
+		printf("High error in dhdx: %f\n", maxdiffer);
+	}
+
+
+	
 	// check gradients
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dhdx, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{ 
 		printf("High error in dhdx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dhdy, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhdy: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dzsdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dzsdx, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dzsdx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dzsdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dzsdy, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dzsdy: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dudx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dudx, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dudx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dudy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dudy, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dudy: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dvdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dvdx, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dvdx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dvdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dvdy, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dvdy: %f\n", maxdiffer);
 	}
@@ -238,67 +259,68 @@ void checkloopGPU()
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-	//updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
-	//CUDA_CHECK(cudaDeviceSynchronize());
+	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Fhu, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Fhu: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Fhv, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Fhv: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fqux_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Fqux, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Fqux: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fqvx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Fqvx, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Fqvx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fqvy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Fqvy, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Fqvy: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fquy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Fquy, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Fquy: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Su_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Su, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Su: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Sv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, Sv, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in Sv: %f\n", maxdiffer);
 	}
 
 	// All good so far continuing
-
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
 	minmaxKernel << <gridDimLine, blockDimLine, 0 >> >(nx*ny, arrmax_g, arrmin_g, dtmax_g);
 	//CUT_CHECK_ERROR("UpdateZom execution failed\n");
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -313,7 +335,10 @@ void checkloopGPU()
 
 
 	CUDA_CHECK(cudaMemcpy(dummy, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	float mindtmax=1.0f/1e-30f;
+
+
+	
+	mindtmax=1.0f/1e-30f;
 	for (int i = 0; i < nx*ny; i++)
 	{
 		mindtmax=min(dummy[i], mindtmax);
@@ -325,24 +350,315 @@ void checkloopGPU()
 
 	CUDA_CHECK(cudaMemcpy(dummy, dh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dh, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dh: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dhu, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhu: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, dhv, dummy);
-	if (maxdiffer > 1e-4f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhv: %f\n", maxdiffer);
 	}
+
+	// All good so far continuing
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+	dt = arrmin[0];
+	
+	//predictor (advance 1/2 dt)
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, dt*0.5, eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//predictor
+	advance(nx, ny, dt*0.5, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+
+	CUDA_CHECK(cudaMemcpy(dummy, zso_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, zso, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in zso: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, hho_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, hho, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in hho: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, uuo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, uuo, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in uuo: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, vvo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, vvo, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in vvo: %f\n", maxdiffer);
+	}
+
+	// All good so far continuing
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+
+	//corrector
+	update(nx, ny, dt, eps, hho, zso, uuo, vvo, dh, dhu, dhv);
+
+	//corrector setp
+	//update again
+	// calculate gradients
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, hho_g, dhdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, hho_g, dhdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, zso_g, dzsdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, zso_g, dzsdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, uuo_g, dudx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, uuo_g, dudy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, delta, vvo_g, dvdx_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, delta, vvo_g, dvdy_g);
+	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// check gradients
+
+	CUDA_CHECK(cudaMemcpy(dummy, dhdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dhdx, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dhdx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dhdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dhdy, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dhdy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dzsdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dzsdx, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dzsdx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dzsdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dzsdy, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dzsdy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dudx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dudx, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dudx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dudy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dudy, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dudy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dvdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dvdx, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dvdx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dvdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dvdy, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dvdy: %f\n", maxdiffer);
+	}
+
+
+
+	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// no reduction of dtmax during the corrector step
+
+
+	CUDA_CHECK(cudaMemcpy(dummy, Fhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Fhu, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Fhu: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, Fhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Fhv, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Fhv: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, Fqux_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Fqux, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Fqux: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, Fqvx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Fqvx, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Fqvx: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, Fqvy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Fqvy, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Fqvy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, Fquy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Fquy, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Fquy: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, Su_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Su, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Su: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, Sv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, Sv, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in Sv: %f\n", maxdiffer);
+	}
+
+
+	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	CUDA_CHECK(cudaMemcpy(dummy, dh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dh, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dh: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dhu, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dhu: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, dhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, dhv, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in dhv: %f\n", maxdiffer);
+	}
+
+
+	advance(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+
+	//
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, dt, eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CUDA_CHECK(cudaMemcpy(dummy, zso_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, zso, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in zso: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, hho_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, hho, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in hho: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, uuo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, uuo, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in uuo: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, vvo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, vvo, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in vvo: %f\n", maxdiffer);
+	}
+
+	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
+
+	cleanupGPU << <gridDim, blockDim, 0 >> >(nx, ny, hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	CUDA_CHECK(cudaMemcpy(dummy, zs_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, zs, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in zs: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, hh, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in hh: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, uu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, uu, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in uu: %f\n", maxdiffer);
+	}
+
+	CUDA_CHECK(cudaMemcpy(dummy, vv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	maxdiffer = maxdiff(nx*ny, vv, dummy);
+	if (maxdiffer > maxerr)
+	{
+		printf("High error in vv: %f\n", maxdiffer);
+	}
+
 
 }
 
@@ -406,9 +722,18 @@ void FlowGPU()
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//CUDA_CHECK(cudaMemcpy(arrmax, arrmax_g, nx*ny*sizeof(DECNUM), cudaMemcpyDeviceToHost));
-	CUDA_CHECK(cudaMemcpy(arrmin, arrmin_g, nx*ny*sizeof(float), cudaMemcpyDeviceToHost));
+	//CUDA_CHECK(cudaMemcpy(arrmin, arrmin_g, nx*ny*sizeof(float), cudaMemcpyDeviceToHost));
+	CUDA_CHECK(cudaMemcpy(arrmin, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	//dt = arrmin[0];
+	float mindtmax = 1.0f / 1e-30f;
+	for (int i = 0; i < nx*ny; i++)
+	{
+		mindtmax = min(arrmin[i], mindtmax);
+	}
+	dt = mindtmax;
 
-	dt = arrmin[0];
+	printf("dt=%f\n", dt);
+
 
 	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -484,7 +809,7 @@ int main(int argc, char **argv)
 	// Start timer to keep track of time 
 	clock_t startcputime, endcputime;
 
-	int GPUDEVICE = 0; //CPU by default
+	int GPUDEVICE = 0; //-1:CPU 0:default GPU (first available) 1+:other GPU  [0]
 
 	startcputime = clock();
 
@@ -708,9 +1033,9 @@ int main(int argc, char **argv)
 	{
 		if (GPUDEVICE >= 0)
 		{
-			//mainloopGPU();
+			mainloopGPU();
 			//CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-			checkloopGPU();
+			//checkloopGPU();
 		}
 		else
 		{

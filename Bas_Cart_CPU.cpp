@@ -265,7 +265,7 @@ void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *u
 				float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 				// along X
-				dx = delta / 2.;
+				dx = delta / 2.0f;
 				zi = zs[i] - hi;
 
 				//printf("%f\n", zi);
@@ -292,7 +292,7 @@ void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *u
 
 				//// Reimann solver
 				float fh, fu, fv;
-				float dtmaxf=1 / (float)epsilon;
+				float dtmaxf= 1.0f / (float)epsilon;
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
 				kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
@@ -463,7 +463,7 @@ void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *u
 }
 
 
-void advance(int nx, int ny, double dt, double eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo)
+void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo)
 {
 	//dim3 blockDim(16, 16, 1);
 	//dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
@@ -668,7 +668,7 @@ void mainloopCPU()
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
 	printf("dtmax=%f\n", dtmax);
 	dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
-	
+	printf("dt=%f\n", dt);
 	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor

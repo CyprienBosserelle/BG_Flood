@@ -82,7 +82,7 @@ double dtnext(double t, double tnext, double dt);
 void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dady);
 void kurganov(double hm, double hp, double um, double up, double Delta, double * fh, double * fq, double * dtmax);
 void update(int nx, int ny, double dt, double eps, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
-void advance(int nx, int ny, double dt, double eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
+void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
 void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
 
 

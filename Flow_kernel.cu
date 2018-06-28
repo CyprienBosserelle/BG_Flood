@@ -114,7 +114,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 			// along X
-			dx = delta / 2.;
+			dx = delta / 2.0f;
 			zi = zs[i] - hi;
 
 			//printf("%f\n", zi);
@@ -133,26 +133,26 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 			hl = hi - dx*dhdx[i];
 			up = uu[i] - dx*dudx[i];
-			hp = max(0.f, hl + zl - zlr);
+			hp = max(0.0f, hl + zl - zlr);
 
 			hr = hn + dx*dhdx[xminus + iy*nx];
 			um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
-			hm = max(0.f, hr + zr - zlr);
+			hm = max(0.0f, hr + zr - zlr);
 
 			float fh, fu, fv;
 			float dtmaxf = 1 / 1e-30f;
 
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cm, ap, am, qm, qp, a, dlt;
+			float cp, cmo, ap, am, qm, qp, a, dlt;
 			float epsi = 1e-30f;
 
 			cp = sqrtf(g*hp);
-			cm = sqrtf(g*hm);
+			cmo = sqrtf(g*hm);
 
-			ap = max(up + cp, um + cm);
+			ap = max(up + cp, um + cmo);
 			ap = max(ap, 0.0f);
 
-			am = min(up - cp, um - cm);
+			am = min(up - cp, um - cmo);
 			am = min(am, 0.0f);
 
 			qm = hm*um;
@@ -289,16 +289,16 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cm, ap, am, qm, qp, a, dlt;
+			float cp, cmo, ap, am, qm, qp, a, dlt;
 			float epsi = 1e-30f;
 
 			cp = sqrtf(g*hp);
-			cm = sqrtf(g*hm);
+			cmo = sqrtf(g*hm);
 
-			ap = max(up + cp, um + cm);
+			ap = max(up + cp, um + cmo);
 			ap = max(ap, 0.0f);
 
-			am = min(up - cp, um - cm);
+			am = min(up - cp, um - cmo);
 			am = min(am, 0.0f);
 
 			qm = hm*um;
