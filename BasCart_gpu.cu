@@ -115,6 +115,18 @@ void CUDA_CHECK(cudaError CUDerr)
 	}
 }
 
+unsigned int nextPow2(unsigned int x)
+{
+	--x;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	return ++x;
+}
+
+
 
 float maxdiff(int nxny, float * ref, float * pred)
 {
@@ -669,8 +681,7 @@ void FlowGPU()
 	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
 
-	dim3 blockDimLine(32, 1, 1);
-	dim3 gridDimLine(ceil((nx*ny*1.0f) / blockDimLine.x), 1, 1);
+	
 
 	int i, xplus, yplus, xminus, yminus;
 
@@ -714,6 +725,25 @@ void FlowGPU()
 	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, delta, g, eps, CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+
+	/////////////////////////////////////////////////////
+	// Reduction of dtmax
+	/////////////////////////////////////////////////////
+
+	// copy from GPU and do the reduction on the CPU  ///LAME!
+	/*
+	CUDA_CHECK(cudaMemcpy(dummy, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+	float mindtmax = 1.0f / 1e-30f;
+	for (int i = 0; i < nx*ny; i++)
+	{
+		mindtmax = min(dummy[i], mindtmax);
+	}
+	dt = mindtmax;
+	*/
+
+
+	//GPU but it doesn't work
+	/*
 	minmaxKernel << <gridDimLine, blockDimLine, 0 >> >(nx*ny, arrmax_g, arrmin_g, dtmax_g);
 	//CUT_CHECK_ERROR("UpdateZom execution failed\n");
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -721,16 +751,68 @@ void FlowGPU()
 	finalminmaxKernel << <1, blockDimLine, 0 >> >(arrmax_g, arrmin_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	
+
 	//CUDA_CHECK(cudaMemcpy(arrmax, arrmax_g, nx*ny*sizeof(DECNUM), cudaMemcpyDeviceToHost));
-	//CUDA_CHECK(cudaMemcpy(arrmin, arrmin_g, nx*ny*sizeof(float), cudaMemcpyDeviceToHost));
-	CUDA_CHECK(cudaMemcpy(arrmin, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	//dt = arrmin[0];
-	float mindtmax = 1.0f / 1e-30f;
-	for (int i = 0; i < nx*ny; i++)
+	CUDA_CHECK(cudaMemcpy(arrmin, arrmin_g, nx*ny*sizeof(float), cudaMemcpyDeviceToHost));
+	
+	dt = arrmin[0];
+	float diffdt = arrmin[0] - mindtmax;
+	*/
+
+	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 
+	//reducemax3 << <gridDimLine, blockDimLine, 64*sizeof(float) >> >(dtmax_g, arrmax_g, nx*ny)
+	int s = nx*ny;
+	int maxThreads = 256;
+	int threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+	int blocks = (s + (threads * 2 - 1)) / (threads * 2);
+	int smemSize = (threads <= 32) ? 2 * threads * sizeof(float) : threads * sizeof(float);
+	dim3 blockDimLine(threads, 1, 1);
+	dim3 gridDimLine(blocks, 1, 1);
+
+	float mindtmaxB;
+
+	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (dtmax_g, arrmax_g, nx*ny);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
+
+	s = gridDimLine.x;
+	while (s > 1)//cpuFinalThreshold
 	{
-		mindtmax = min(arrmin[i], mindtmax);
+		threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+		blocks = (s + (threads * 2 - 1)) / (threads * 2);
+
+		smemSize = (threads <= 32) ? 2 * threads * sizeof(float) : threads * sizeof(float);
+
+		dim3 blockDimLineS(threads, 1, 1);
+		dim3 gridDimLineS(blocks, 1, 1);
+
+		CUDA_CHECK(cudaMemcpy(dtmax_g, arrmax_g, s * sizeof(float), cudaMemcpyDeviceToDevice));
+
+		reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (dtmax_g, arrmax_g, s);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		s = (s + (threads * 2 - 1)) / (threads * 2);
 	}
-	dt = mindtmax;
+
+	
+	CUDA_CHECK(cudaMemcpy(dummy, arrmax_g, 32*sizeof(float), cudaMemcpyDeviceToHost));
+	mindtmaxB = dummy[0];
+
+	//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
+	/*
+	for (int i = 0; i < 32; i++)
+	{
+		mindtmaxB = min(dummy[i], mindtmaxB);
+		printf("dt=%f\n", dummy[i]);
+		
+	}
+	*/
+	
+
+	//float diffdt = mindtmaxB - mindtmax;
+	dt = mindtmaxB;
 
 	printf("dt=%f\n", dt);
 

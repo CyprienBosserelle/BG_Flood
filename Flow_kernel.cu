@@ -544,3 +544,129 @@ __global__ void resetdtmax(int nx, int ny, float *dtmax)
 		dtmax[i] = 1.0f / 1e-30f;
 	}
 }
+
+__global__ void reduce3(float *g_idata, float *g_odata, unsigned int n)
+{
+	//T *sdata = SharedMemory<T>();
+	extern __shared__ float sdata[];
+	// perform first level of reduction,
+	// reading from global memory, writing to shared memory
+	unsigned int tid = threadIdx.x;
+	unsigned int i = blockIdx.x*(blockDim.x * 2) + threadIdx.x;
+
+	float mySum = (i < n) ? g_idata[i] : 0;
+
+	if (i + blockDim.x < n)
+		mySum += g_idata[i + blockDim.x];
+
+	sdata[tid] = mySum;
+	__syncthreads();
+	
+
+	// do reduction in shared mem
+	for (unsigned int s = blockDim.x / 2; s>0; s >>= 1)
+	{
+		if (tid < s)
+		{
+			sdata[tid] = mySum = mySum + sdata[tid + s];
+		}
+
+		__syncthreads();
+	}
+
+	// write result for this block to global mem
+	if (tid == 0) g_odata[blockIdx.x] = mySum;
+}
+
+__global__ void reducemax3(float *g_idata, float *g_odata, unsigned int n)
+{
+	//T *sdata = SharedMemory<T>();
+	extern __shared__ float sdata[];
+	// perform first level of reduction,
+	// reading from global memory, writing to shared memory
+	unsigned int tid = threadIdx.x;
+	unsigned int i = blockIdx.x*(blockDim.x * 2) + threadIdx.x;
+
+	float myMax = (i < n) ? g_idata[i] : -1e-30f;
+
+	if (i + blockDim.x < n)
+		myMax = max(myMax,g_idata[i + blockDim.x]);
+
+	sdata[tid] = myMax;
+	__syncthreads();
+
+
+	// do reduction in shared mem
+	for (unsigned int s = blockDim.x / 2; s>0; s >>= 1)
+	{
+		if (tid < s)
+		{
+			sdata[tid] = myMax = max(myMax, sdata[tid + s]);
+		}
+
+		__syncthreads();
+	}
+
+	// write result for this block to global mem
+	if (tid == 0) g_odata[blockIdx.x] = myMax;
+}
+
+__global__ void reducemin3(float *g_idata, float *g_odata, unsigned int n)
+{
+	//T *sdata = SharedMemory<T>();
+	extern __shared__ float sdata[];
+	// perform first level of reduction,
+	// reading from global memory, writing to shared memory
+	unsigned int tid = threadIdx.x;
+	unsigned int i = blockIdx.x*(blockDim.x * 2) + threadIdx.x;
+
+	float myMin = (i < n) ? g_idata[i] : 1e30f;
+
+	if (i + blockDim.x < n)
+		myMin = min(myMin, g_idata[i + blockDim.x]);
+
+	sdata[tid] = myMin;
+	__syncthreads();
+
+
+	// do reduction in shared mem
+	for (unsigned int s = blockDim.x / 2; s>0; s >>= 1)
+	{
+		if (tid < s)
+		{
+			sdata[tid] = myMin = min(myMin, sdata[tid + s]);
+		}
+
+		__syncthreads();
+	}
+
+	// write result for this block to global mem
+	if (tid == 0) g_odata[blockIdx.x] = myMin;
+}
+
+
+/*
+template <unsigned int blockSize>
+__global__ void reducemin6(int *g_idata, int *g_odata, unsigned int n)
+{
+	extern __shared__ int sdata[];
+	unsigned int tid = threadIdx.x;
+	unsigned int i = blockIdx.x*(blockSize * 2) + tid;
+	unsigned int gridSize = blockSize * 2 * gridDim.x;
+	sdata[tid] = 1e30f;
+	while (i < n) { sdata[tid] = min(g_idata[i], min( g_idata[i + blockSize],sdata[tid])); i += gridSize; }
+	__syncthreads();
+	if (blockSize >= 512) { if (tid < 256) { sdata[tid] = min(sdata[tid + 256], sdata[tid]); } __syncthreads(); }
+	if (blockSize >= 256) { if (tid < 128) { sdata[tid] = min(sdata[tid + 128], sdata[tid]); } __syncthreads(); }
+	if (blockSize >= 128) { if (tid < 64) { sdata[tid] = min(sdata[tid + 64], sdata[tid]); } __syncthreads(); }
+	if (tid < 32) {
+		if (blockSize >= 64) sdata[tid] = min(sdata[tid + 32], sdata[tid]);
+		if (blockSize >= 32) sdata[tid] = min(sdata[tid + 16], sdata[tid]);
+		if (blockSize >= 16) sdata[tid] = min(sdata[tid + 8], sdata[tid]);
+		if (blockSize >= 8) sdata[tid] = min(sdata[tid + 4], sdata[tid]);
+		if (blockSize >= 4) sdata[tid] = min(sdata[tid + 2], sdata[tid]);
+		if (blockSize >= 2) sdata[tid] = min(sdata[tid + 1], sdata[tid]);
+	}
+	if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}
+*/
