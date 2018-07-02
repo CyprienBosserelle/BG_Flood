@@ -32,7 +32,7 @@ __global__ void gradientGPUX(int nx, int ny, float delta, float *a, float *dadx)
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-	int xplus, yplus, xminus, yminus;
+	int xplus, xminus;
 
 	if (ix < nx && iy < ny)
 	{
@@ -41,8 +41,7 @@ __global__ void gradientGPUX(int nx, int ny, float delta, float *a, float *dadx)
 		//
 		xplus = min(ix + 1, nx - 1);
 		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		
 		i = ix + iy*nx;
 
 
@@ -60,14 +59,13 @@ __global__ void gradientGPUY(int nx, int ny, float delta, float *a, float *dady)
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-	int  xplus, yplus, xminus, yminus;
+	int  yplus, yminus;
 
 	if (ix < nx && iy < ny)
 	{
 		//
 		//
-		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
+		
 		yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 		i = ix + iy*nx;
@@ -88,8 +86,8 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-	int tx = threadIdx.x;
-	int ty = threadIdx.y;
+//	int tx = threadIdx.x;
+//	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
@@ -101,7 +99,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 		float cm = 1.0;// 0.1;
 		float fmu = 1.0;
-		float fmv = 1.0;
+		//float fmv = 1.0;
 
 		//__shared__ float hi[16][16];
 		float hi = hh[i];
@@ -140,7 +138,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			hm = max(0.0f, hr + zr - zlr);
 
 			float fh, fu, fv;
-			float dtmaxf = 1 / 1e-30f;
+			//float dtmaxf = 1 / 1e-30f;
 
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
 			float cp, cmo, ap, am, qm, qp, a, dlt;
@@ -242,8 +240,8 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-	int tx = threadIdx.x;
-	int ty = threadIdx.y;
+//	int tx = threadIdx.x;
+//	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
@@ -255,7 +253,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 
 
 		float cm = 1.0;// 0.1;
-		float fmu = 1.0;
+		//float fmu = 1.0;
 		float fmv = 1.0;
 
 		//__shared__ float hi[16][16];
@@ -285,7 +283,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 
 			//// Reimann solver
 			float fh, fu, fv;
-			float dtmaxf = 1.0f / 1e-30f;
+			//float dtmaxf = 1.0f / 1e-30f;
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
@@ -358,8 +356,8 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-	int tx = threadIdx.x;
-	int ty = threadIdx.y;
+//	int tx = threadIdx.x;
+//	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)

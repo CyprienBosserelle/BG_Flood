@@ -146,7 +146,7 @@ void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dad
 
 }
 
-void kurganov(double hm, double hp, double um, double up, double Delta,	double * fh, double * fq, double * dtmax)
+void kurganov(double g,double CFL,double hm, double hp, double um, double up, double Delta,	double * fh, double * fq, double * dtmax)
 {
 	double cp = sqrt(g*hp), cm = sqrt(g*hm);
 	double ap = max(up + cp, um + cm); ap = max(ap, 0.);
@@ -164,7 +164,7 @@ void kurganov(double hm, double hp, double um, double up, double Delta,	double *
 	else
 		*fh = *fq = 0.;
 }
-void kurganovf(float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
+void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
 {
 	float eps = epsilon;
 	float cp = sqrtf(g*hp), cm = sqrtf(g*hm);
@@ -223,7 +223,10 @@ void neumannbnd(int nx, int ny, double*a)
 
 }
 
-void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
+
+//Warning all the g, dt etc shouyld all be float so the compiler does the conversion before running the 
+
+void update(int nx, int ny, double dt, double eps, double g,double CFL, double delta,float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
@@ -234,9 +237,9 @@ void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *u
 	float dtmaxtmp = dtmax;
 
 	// calculate gradients
-	gradient(nx, ny,delta, hh, dhdx, dhdy);
-	gradient(nx, ny,delta, zs, dzsdx, dzsdy);
-	gradient(nx, ny,delta, uu, dudx, dudy);
+	gradient(nx, ny, delta, hh, dhdx, dhdy);
+	gradient(nx, ny, delta, zs, dzsdx, dzsdy);
+	gradient(nx, ny, delta, uu, dudx, dudy);
 	gradient(nx, ny, delta, vv, dvdx, dvdy);
 	
 	float cm = 1.0;// 0.1;
@@ -295,7 +298,7 @@ void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *u
 				float dtmaxf= 1.0f / (float)epsilon;
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+				kurganovf(g,CFL,hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 				fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
 				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
@@ -376,7 +379,7 @@ void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *u
 				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
 				//printf("%f\n", hr);
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+				kurganovf(g,CFL,hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
 				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
@@ -657,28 +660,30 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, float * var)
 }
 
 // Main loop that actually runs the model
-void mainloopCPU()
+void mainloopCPU(Param XParam)
 {
+	int nx = XParam.nx;
+	int ny = XParam.ny;
 
 	//forcing bnd update 
 	//////////////////////////////
 	//flowbnd();
 
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
-	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
+	update(nx, ny, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
 	printf("dtmax=%f\n", dtmax);
-	dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
-	printf("dt=%f\n", dt);
+	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
+	printf("dt=%f\n", XParam.dt);
 	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor
-		advance(nx, ny, dt*0.5, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+		advance(nx, ny, XParam.dt*0.5, XParam.eps,  hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 		//corrector
-		update(nx, ny, dt, eps, hho, zso, uuo, vvo, dh, dhu, dhv);
+		update(nx, ny, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
 	}
 	//
-	advance(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+	advance(nx, ny, XParam.dt, XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	

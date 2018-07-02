@@ -19,25 +19,76 @@
 #include <map>
 #include <netcdf.h>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+class TSnode {
+public:
+	int i, j;
+};
+
+class Param {
+public:
+	//general parameters
+	double g=9.81; // Gravity
+	double rho=1025.0; // fluid density
+	double eps= 0.0001; // //drying height in m
+	double dt=0.0; // Model time step in s.
+	double CFL=0.5; // Current Freidrich Limiter
+	double theta=1.3; // minmod limiter can be used to tune the momentum dissipation (theta=1 gives minmod, the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
+	int frictionmodel=0; // Not implemented yet 0: No friction; 
+	double cf=0.0001; // bottom friction for flow model cf 
+	double Cd=0.002; // Wind drag coeff
+	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
+
+	//grid parameters
+	double dx=0.0; // grid resolution
+	double delta; // 
+	int nx=0; // grid size
+	int ny=0; //grid size
+	double xo = 0.0; // grid origin
+	double yo = 0.0; // grid origin
+	double grdalpha=0.0; // grid rotation Y axis from the North input in degrees but later converted to rad
+
+	//files
+	std::string Bathymetryfile;// bathymetry file name
+	std::string outfile="Output.nc"; // netcdf output file name
+	
+	//Timekeeping
+	double outputtimestep=0.0; //number of seconds between output 0.0 for none
+	double endtime=0.0; // Total runtime in s will be calculated based on bnd input as min(length of the shortest time series, user defined)
+	double totaltime = 0.0; //
+
+	//Timeseries output
+	std::vector<std::string> TSoutfile; //filename of output time series (Only save time, H U,V and zs)
+	std::vector<TSnode> TSnodesout; // vector containing i and j of each variables
+									//Output variables
+	std::vector<std::string> outvars; //list of names of teh variables to output
+
+	//other
+	clock_t startcputime, endcputime;
+
+};
 
 extern double epsilon;
-extern double g;
-extern double rho;
-extern double eps;
-extern double CFL;
-
-extern std::string outfile;
-//Output variables
-extern std::vector<std::string> outvars; //list of names of the variables to output
-
-// Map arrays: this is to link variable name as a string to the pointers holding the data
-extern std::map<std::string, float *> OutputVarMapCPU;
-
-
-extern double dt, dx;
-extern int nx, ny;
-
-extern double delta;
+//extern double g;
+//extern double rho;
+//extern double eps;
+//extern double CFL;
+//
+//extern std::string outfile;
+////Output variables
+//extern std::vector<std::string> outvars; //list of names of the variables to output
+//
+//// Map arrays: this is to link variable name as a string to the pointers holding the data
+//extern std::map<std::string, float *> OutputVarMapCPU;
+//
+//
+//extern double dt, dx;
+//extern int nx, ny;
+//
+//extern double delta;
 
 extern double *x, *y;
 extern double *x_g, *y_g;
@@ -75,14 +126,14 @@ double sqd(double a);
 template <class T> const T& max(const T& a, const T& b);
 template <class T> const T& min(const T& a, const T& b);
 
-//General CPU functions
-void mainloopCPU();
+//General CPU functions //Unecessary to declare here?
+void mainloopCPU(Param XParam);
 double minmod2(double s0, double s1, double s2);
 double dtnext(double t, double tnext, double dt);
 //void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady);
 void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dady);
-void kurganov(double hm, double hp, double um, double up, double Delta, double * fh, double * fq, double * dtmax);
-void update(int nx, int ny, double dt, double eps, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
+void kurganov(double g, double CFL, double hm, double hp, double um, double up, double Delta, double * fh, double * fq, double * dtmax);
+void update(int nx, int ny, double dt, double eps, double g, double CFL, double delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
 void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
 void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
 
@@ -101,6 +152,13 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
 
+// I/O
+Param readparamstr(std::string line, Param param);
+std::string findparameter(std::string parameterstr, std::string line);
+void split(const std::string &s, char delim, std::vector<std::string> &elems);
+std::vector<std::string> split(const std::string &s, char delim);
+std::string trim(const std::string& str, const std::string& whitespace);
 
+void write_text_to_log_file(std::string text);
 // End of global definition
 #endif
