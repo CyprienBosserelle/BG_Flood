@@ -68,7 +68,7 @@ public:
 
 	//other
 	clock_t startcputime, endcputime;
-
+	int demo = 0;
 };
 
 extern double epsilon;
@@ -160,5 +160,6 @@ std::vector<std::string> split(const std::string &s, char delim);
 std::string trim(const std::string& str, const std::string& whitespace);
 
 void write_text_to_log_file(std::string text);
+void SaveParamtolog(Param XParam);
 // End of global definition
 #endif

@@ -876,25 +876,96 @@ int main(int argc, char **argv)
 	// Start timer to keep track of time 
 	
 
-	XParam.GPUDEVICE = 0; //-1:CPU 0:default GPU (first available) 1+:other GPU  [0]
+	
 
 	XParam.startcputime = clock();
 
 
 
-	// This is just for temporary use
+	// Reset the log file 
+	FILE * flog;
+	flog = fopen("BG_log.txt", "w"); //Find better name
+	fclose(flog);
 
-	XParam.g = 1.0;// 9.81;
-	XParam.rho = 1025.0;
-	XParam.eps = 0.0001;
-	XParam.CFL = 0.5;
-	XParam.nx = 32;
-	XParam.ny = 32;
-	double length = 1.0;
-	XParam.delta = length / XParam.nx;
+	//Logfile header
+	time_t rawtime, dstart;
+	struct tm * timeinfo;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
+	std::string strtimenow(buffer);
+	write_text_to_log_file("#################################");
+	write_text_to_log_file("Basilisk-like Cartesian GPU v0.0");
+	write_text_to_log_file("#################################");
+	write_text_to_log_file("model started at " + strtimenow);
 
 
-	double *xx, *yy;
+	//////////////////////////////////////////////////////
+	/////             Read Operational file          /////
+	//////////////////////////////////////////////////////
+
+
+	std::ifstream fs("BG_param.txt");
+
+	if (fs.fail()) {
+		std::cerr << "BG_param.txt file could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: BG_param.txt file could not be opened...use this log file to create a file named BG_param.txt");
+		SaveParamtolog(XParam);
+
+		std::cerr << "Running in Demo Mode" << std::endl;
+		write_text_to_log_file("Running in Demo Mode");
+		XParam.demo = 1;
+		
+	}
+	else
+	{
+		// Read and interpret each line of the BG_param.txt
+		std::string line;
+		while (std::getline(fs, line))
+		{
+			//std::cout << line << std::endl;
+
+			//Get param or skip empty lines
+			if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+			{
+				XParam = readparamstr(line, XParam);
+				//std::cout << line << std::endl;
+			}
+
+		}
+		fs.close();
+
+		
+	}
+
+
+
+
+
+
+	if (XParam.demo == 1)
+	{
+		// This is just for temporary use
+		XParam.GPUDEVICE = 0; //-1:CPU 0:default GPU (first available) 1+:other GPU  [0]
+		XParam.g = 1.0;// 9.81;
+		XParam.rho = 1025.0;
+		XParam.eps = 0.0001;
+		XParam.CFL = 0.5;
+		XParam.nx = 32;
+		XParam.ny = 32;
+		double length = 1.0;
+		XParam.delta = length / XParam.nx;
+	}
+	else 
+	{
+		//read bathy and perform sanity check
+
+	}
+
+	
 	XParam.dt = 0.0;// Will be resolved in update
 
 	std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh" };
@@ -948,10 +1019,10 @@ int main(int argc, char **argv)
 
 	dummy = (float *)malloc(nx*ny * sizeof(float));
 
-	//x = (double *)malloc(nx*ny * sizeof(double));
-	xx = (double *)malloc(nx * sizeof(double));
-	//y = (double *)malloc(nx*ny * sizeof(double));
-	yy = (double *)malloc(ny * sizeof(double));
+
+
+
+
 
 	if (XParam.GPUDEVICE >= 0)
 	{
@@ -1025,34 +1096,49 @@ int main(int argc, char **argv)
 			uu[i + j*nx] = 0.0f;
 			vv[i + j*nx] = 0.0f;
 			//x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
-			xx[i] = (i - nx / 2)*XParam.delta + 0.5*XParam.delta;
-			yy[j] = (j - ny / 2)*XParam.delta + 0.5*XParam.delta;
+			//not really needed
+			
 			//y[i + j*nx] = (j-ny/2)*delta + 0.5*delta;
 			//fmu[i + j*nx] = 1.0;
 			//fmv[i + j*nx] = 1.0;
 		}
 	}
 
-	for (int j = 0; j < ny; j++)
+
+
+	if (XParam.demo == 1)
 	{
-		for (int i = 0; i < nx; i++)
+		double *xx, *yy;
+		//x = (double *)malloc(nx*ny * sizeof(double));
+		xx = (double *)malloc(nx * sizeof(double));
+		//y = (double *)malloc(nx*ny * sizeof(double));
+		yy = (double *)malloc(ny * sizeof(double));
+
+
+		for (int j = 0; j < ny; j++)
 		{
-			double a;
+			for (int i = 0; i < nx; i++)
+			{
+				double a;
 
-			a = sq(xx[i]) + sq(yy[j]);
-			//b =x[i + j*nx] * x[i + j*nx] + y[i + j*nx] * y[i + j*nx];
+				xx[i] = (i - nx / 2)*XParam.delta + 0.5*XParam.delta;
+				yy[j] = (j - ny / 2)*XParam.delta + 0.5*XParam.delta;
 
-
-			//if (abs(a - b) > 0.00001)
-			//{
-			//	printf("%f\t%f\n", a, b);
-			//}
-
+				a = sq(xx[i]) + sq(yy[j]);
+				//b =x[i + j*nx] * x[i + j*nx] + y[i + j*nx] * y[i + j*nx];
 
 
-			hh[i + j*nx] = 0.1 + 1.*exp(-200.*(a));
+				//if (abs(a - b) > 0.00001)
+				//{
+				//	printf("%f\t%f\n", a, b);
+				//}
 
-			zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
+
+
+				hh[i + j*nx] = 0.1 + 1.*exp(-200.*(a));
+
+				zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
+			}
 		}
 	}
 

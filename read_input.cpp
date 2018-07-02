@@ -589,9 +589,9 @@ extern "C" void readXBbathy(std::string filename, int nx,int ny, float *&zb)
 void write_text_to_log_file(std::string text)
 {
 	std::ofstream log_file(
-		"XBG_log.txt", std::ios_base::out | std::ios_base::app);
+		"BG_log.txt", std::ios_base::out | std::ios_base::app);
 	log_file << text << std::endl;
-	log_file.close(); //destructoir implicitly does it
+	log_file.close(); //destructor implicitly does it
 }
 
 void SaveParamtolog(Param XParam)
