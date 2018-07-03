@@ -685,3 +685,26 @@ __global__ void leftdirichlet(int nx, int ny,float g, float zsbnd, float *zs, fl
 		vv[i] = 0.0f;
 	}
 }
+
+
+__global__ void quadfriction(int nx, int ny, float dt,float eps, float cf, float *hh, float *uu, float *vv)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	
+	float normu,hhi;
+	
+	if (ix < nx && iy < ny)
+	{
+		hhi = hh[i];
+		if (hhi > eps)
+		{
+			normu = uu[i] * uu[i] + vv[i] * vv[i];
+				//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
+			uu[i] = uu[i] / (1.0 + dt*cf*normu / hhi);
+		}
+		
+	}
+
+}

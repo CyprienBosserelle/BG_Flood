@@ -880,6 +880,10 @@ float FlowGPU(Param XParam)
 	cleanupGPU << <gridDim, blockDim, 0 >> >(nx, ny, hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	//Bottom friction
+	quadfriction << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, XParam.cf, hh_g, uu_g, vv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
 	return XParam.dt;
 }
 
@@ -1332,7 +1336,7 @@ int main(int argc, char **argv)
 	//init variables
 
 	//Cold start
-	float zsbnd = 0.0;// slbnd[0].wlev0 + (slbnd[0].wlev1 - slbnd[0].wlev0)*(fnod - 1) / ny;
+	float zsbnd = leftWLbnd[0].wlev;
 	for (int j = 0; j < ny; j++)
 	{
 		for (int i = 0; i < nx; i++)
