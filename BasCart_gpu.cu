@@ -661,9 +661,40 @@ void checkloopGPU(Param XParam)
 
 }
 
+void LeftFlowBndGPU(Param XParam, std::vector<SLTS> leftWLbnd)
+{
+	//
+
+	int SLstepinbnd = 1;
+
+	double zsbndleft, zsbndright, zsbndtop, zsbndbot;
 
 
-void FlowGPU(Param XParam)
+
+	// Do this for all the corners
+	//Needs limiter in case WLbnd is empty
+	double difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+	while (difft < 0.0)
+	{
+		SLstepinbnd++;
+		difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+	}
+
+	zsbndleft = interptime(leftWLbnd[SLstepinbnd].wlev, leftWLbnd[SLstepinbnd - 1].wlev, leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time);
+
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+
+	leftdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, XParam.g, zsbndleft,zs_g, zb_g, hh_g, uu_g, vv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+}
+
+
+float FlowGPU(Param XParam)
 {
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -799,7 +830,7 @@ void FlowGPU(Param XParam)
 	//float diffdt = mindtmaxB - mindtmax;
 	XParam.dt = mindtmaxB;
 
-	printf("dt=%f\n", XParam.dt);
+	//printf("dt=%f\n", XParam.dt);
 
 
 	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
@@ -848,12 +879,138 @@ void FlowGPU(Param XParam)
 	//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	cleanupGPU << <gridDim, blockDim, 0 >> >(nx, ny, hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	return XParam.dt;
 }
 
 // Main loop that actually runs the model
-void mainloopGPU(Param XParam)
+void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
 {
-	FlowGPU(XParam);
+	float nextoutputtime = XParam.outputtimestep;
+	int nstep = 0;
+	while (XParam.totaltime < XParam.endtime)
+	{
+		// Bnd stuff here
+		LeftFlowBndGPU(XParam, leftWLbnd);
+
+		// Run the model step
+		XParam.dt=FlowGPU(XParam);
+		
+		//Time keeping
+		XParam.totaltime = XParam.totaltime + XParam.dt;
+		nstep++;
+		
+		// Do Sum & Max variables Here
+
+
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		{
+			// Avg var sum here
+			if (!XParam.outvars.empty())
+			{
+				writenctimestep(XParam.outfile, XParam.totaltime);
+
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
+					{
+						if (XParam.GPUDEVICE >= 0)
+						{
+							//Should be async
+							CUDA_CHECK(cudaMemcpy(OutputVarMapCPU[XParam.outvars[ivar]], OutputVarMapGPU[XParam.outvars[ivar]], OutputVarMaplen[XParam.outvars[ivar]] * sizeof(float), cudaMemcpyDeviceToHost));
+
+						}
+						//Create definition for each variable and store it
+						writencvarstep(XParam.outfile, 0, 1.0f, 0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+					}
+				}
+			}
+			nextoutputtime = min(nextoutputtime + XParam.outputtimestep,XParam.endtime);
+
+			printf("Writing output, totaltime:%f s, Mean dt=%f\n", XParam.totaltime, XParam.outputtimestep / nstep);
+			write_text_to_log_file("Writing outputs, totaltime: " + std::to_string(XParam.totaltime) + ", Mean dt= " + std::to_string(XParam.outputtimestep / nstep));
+
+			//.Reset Avg Variables
+
+			// Reset nstep
+			nstep = 0;
+		}
+
+	}
+}
+
+float demoloopGPU(Param XParam)
+{
+	
+	XParam.dt = FlowGPU(XParam);
+	return XParam.dt;
+	
+}
+
+
+void mainloopCPU(Param XParam)
+{
+	float nextoutputtime = XParam.outputtimestep;
+	int nstep = 0;
+	while (XParam.totaltime < XParam.endtime)
+	{
+		// Bnd stuff here
+		//NOT IMPLEMENTED YET
+
+		// Run the model step
+		XParam.dt = FlowCPU(XParam);
+
+		//Time keeping
+		XParam.totaltime = XParam.totaltime + XParam.dt;
+		nstep++;
+
+		// Do Sum & Max variables Here
+
+
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		{
+			// Avg var sum here
+			if (!XParam.outvars.empty())
+			{
+				writenctimestep(XParam.outfile, XParam.totaltime);
+
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
+					{
+						if (XParam.GPUDEVICE >= 0)
+						{
+							//Should be async
+							CUDA_CHECK(cudaMemcpy(OutputVarMapCPU[XParam.outvars[ivar]], OutputVarMapGPU[XParam.outvars[ivar]], OutputVarMaplen[XParam.outvars[ivar]] * sizeof(float), cudaMemcpyDeviceToHost));
+
+						}
+						//Create definition for each variable and store it
+						writencvarstep(XParam.outfile, 0, 1.0f, 0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+					}
+				}
+			}
+			nextoutputtime = min(nextoutputtime + XParam.outputtimestep, XParam.endtime);
+
+			printf("Writing output, totaltime:%f s, Mean dt=%f\n", XParam.totaltime, XParam.outputtimestep / nstep);
+			write_text_to_log_file("Writing outputs, totaltime: " + std::to_string(XParam.totaltime) + ", Mean dt= " + std::to_string(XParam.outputtimestep / nstep));
+
+			//.Reset Avg Variables
+
+			// Reset nstep
+			nstep = 0;
+		}
+
+	}
+}
+
+
+float demoloopCPU(Param XParam)
+{
+
+	XParam.dt = FlowCPU(XParam);
+
+	return XParam.dt;
+
 }
 
 int main(int argc, char **argv)
@@ -945,7 +1102,7 @@ int main(int argc, char **argv)
 
 
 
-
+	std::string bathyext;
 	if (XParam.demo == 1)
 	{
 		// This is just for temporary use
@@ -962,10 +1119,84 @@ int main(int argc, char **argv)
 	else 
 	{
 		//read bathy and perform sanity check
+		
+		if (!XParam.Bathymetryfile.empty())
+		{
+			printf("bathy: %s\n", XParam.Bathymetryfile.c_str());
+
+			write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
+
+			std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+			bathyext = extvec.back();
+			write_text_to_log_file("bathy extension: " + bathyext);
+			if (bathyext.compare("md") == 0)
+			{
+				write_text_to_log_file("Reading 'md' file");
+				readbathyHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
+				XParam.delta = XParam.dx;
+			}
+			if (bathyext.compare("nc") == 0)
+			{
+				//write_text_to_log_file("Reading 'nc' file");
+				//readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
+				//write_text_to_log_file("For nc of bathy file please specify grdalpha in the XBG_param.txt (default 0)");
+
+			}
+			if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
+			{
+				//XBeach style file
+				//write_text_to_log_file("Reading " + bathyext + " file");
+				//write_text_to_log_file("For this type of bathy file please specify nx, ny, dx and grdalpha in the XBG_param.txt");
+			}
+			if (bathyext.compare("asc") == 0)
+			{
+				//
+			}
+
+			XParam.grdalpha = XParam.grdalpha*pi / 180; // grid rotation
+
+														//fid = fopen(XParam.Bathymetryfile.c_str(), "r");
+														//fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &XParam.nx, &XParam.ny, &XParam.dx, &XParam.grdalpha);
+			printf("nx=%d\tny=%d\tdx=%f\talpha=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180 / pi);
+			write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+		}
+		else
+		{
+			std::cerr << "Fatal error: No bathymetry file specified. Please specify using 'bathy = Filename.bot'" << std::endl;
+			write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
+			exit(1);
+		}
+
 
 	}
 
-	
+
+	// So far bnd are limited to be cst along an edge
+	// Read Bnd file if/where needed
+	std::vector<SLTS> leftWLbnd;
+	std::vector<SLTS> rightWLbnd;
+	std::vector<SLTS> topWLbnd;
+	std::vector<SLTS> botWLbnd;
+
+	if (!XParam.leftbndfile.empty())
+	{
+		leftWLbnd = readWLfile(XParam.leftbndfile);
+	}
+	if (!XParam.rightbndfile.empty())
+	{
+		rightWLbnd = readWLfile(XParam.rightbndfile);
+	}
+	if (!XParam.topbndfile.empty())
+	{
+		topWLbnd = readWLfile(XParam.topbndfile);
+	}
+	if (!XParam.botbndfile.empty())
+	{
+		botWLbnd = readWLfile(XParam.botbndfile);
+	}
+
+
+
 	XParam.dt = 0.0;// Will be resolved in update
 
 	std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh" };
@@ -1085,16 +1316,32 @@ int main(int argc, char **argv)
 		
 	}
 
-
+	if (bathyext.compare("md") == 0)
+	{
+		readbathy(XParam.Bathymetryfile, zb);
+	}
+	if (bathyext.compare("nc") == 0)
+	{
+		//readnczb(XParam.nx, XParam.ny, XParam.Bathymetryfile, zb);
+	}
+	if (bathyext.compare("bot") == 0 || bathyext.compare("dep") == 0)
+	{
+		//readXBbathy(XParam.Bathymetryfile, XParam.nx, XParam.ny, zb);
+	}
 
 	//init variables
+
+	//Cold start
+	float zsbnd = 0.0;// slbnd[0].wlev0 + (slbnd[0].wlev1 - slbnd[0].wlev0)*(fnod - 1) / ny;
 	for (int j = 0; j < ny; j++)
 	{
 		for (int i = 0; i < nx; i++)
 		{
-			zb[i + j*nx] = 0.0f;
+			//zb[i + j*nx] = 0.0f;
 			uu[i + j*nx] = 0.0f;
 			vv[i + j*nx] = 0.0f;
+			zs[i + j*nx] = max(zsbnd,zb[i + j*nx]);
+			hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx],(float) XParam.eps);
 			//x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
 			//not really needed
 			
@@ -1188,47 +1435,62 @@ int main(int argc, char **argv)
 	}
 	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
-	//while (totaltime < 10.0)
-	for (int i = 0; i <10; i++)
+	if (XParam.demo == 0)
+
 	{
 		if (XParam.GPUDEVICE >= 0)
 		{
-			mainloopGPU(XParam);
-			//CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-			//checkloopGPU();
+			mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 		}
 		else
 		{
 			mainloopCPU(XParam);
 		}
-		
-		XParam.totaltime = XParam.totaltime + XParam.dt;
-		//void creatncfileUD(std::string outfile, int nx, int ny, double dx, double totaltime);
-		//void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
-		//void writenctimestep(std::string outfile, double totaltime);
-		//void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
-		writenctimestep(XParam.outfile, XParam.totaltime);
 
-		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
-		{
-			if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
-			{
-				if (XParam.GPUDEVICE >= 0)
-				{
-					//Should be async
-					CUDA_CHECK(cudaMemcpy(OutputVarMapCPU[XParam.outvars[ivar]], OutputVarMapGPU[XParam.outvars[ivar]], OutputVarMaplen[XParam.outvars[ivar]] * sizeof(float), cudaMemcpyDeviceToHost));
-
-				}
-				//Create definition for each variable and store it
-				writencvarstep(XParam.outfile, 0,1.0f,0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
-			}
-		}
-		//write2varnc(nx, ny, totaltime, hh);
-		//write2varnc(nx, ny, totaltime, dhdx);
 	}
+	else
+	{
+		//while (totaltime < 10.0)
+		for (int i = 0; i < 10; i++)
+		{
+			if (XParam.GPUDEVICE >= 0)
+			{
+				XParam.dt=demoloopGPU(XParam);
+				//CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
+				//checkloopGPU();
+			}
+			else
+			{
+				XParam.dt = demoloopCPU(XParam);
+			}
 
-	// Free the allocated memory
+			XParam.totaltime = XParam.totaltime + XParam.dt;
+			//void creatncfileUD(std::string outfile, int nx, int ny, double dx, double totaltime);
+			//void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
+			//void writenctimestep(std::string outfile, double totaltime);
+			//void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
+			writenctimestep(XParam.outfile, XParam.totaltime);
 
+			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+			{
+				if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
+				{
+					if (XParam.GPUDEVICE >= 0)
+					{
+						//Should be async
+						CUDA_CHECK(cudaMemcpy(OutputVarMapCPU[XParam.outvars[ivar]], OutputVarMapGPU[XParam.outvars[ivar]], OutputVarMaplen[XParam.outvars[ivar]] * sizeof(float), cudaMemcpyDeviceToHost));
+
+					}
+					//Create definition for each variable and store it
+					writencvarstep(XParam.outfile, 0, 1.0f, 0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+				}
+			}
+			//write2varnc(nx, ny, totaltime, hh);
+			//write2varnc(nx, ny, totaltime, dhdx);
+		}
+
+		// Free the allocated memory
+	}
 
 
 

@@ -20,7 +20,74 @@
 
 #include "Header.cuh"
 
+std::vector<SLTS> readWLfile(std::string WLfilename)
+{
+	std::vector<SLTS> slbnd;
 
+	std::ifstream fs(WLfilename);
+
+	if (fs.fail()) {
+		std::cerr << WLfilename << " Water level bnd file could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: Water level bnd file could not be opened ");
+		exit(1);
+	}
+
+	std::string line;
+	std::vector<std::string> lineelements;
+	SLTS slbndline;
+	while (std::getline(fs, line))
+	{
+		//std::cout << line << std::endl;
+
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//Data should be in teh format :
+
+			//by default we expect tab delimitation
+			lineelements = split(line, '\t');
+			if (lineelements.size() < 2)
+			{
+				// Is it space delimited?
+				lineelements.clear();
+				lineelements = split(line, ' ');
+			}
+
+			if (lineelements.size() < 2)
+			{
+				//Well it has to be comma delimited then
+				lineelements.clear();
+				lineelements = split(line, ',');
+			}
+			if (lineelements.size() < 2)
+			{
+				// Giving up now! Could not read the files
+				//issue a warning and exit
+				std::cerr << WLfilename << "ERROR Water level bnd file format error. only " << lineelements.size() << " where 2 were expected. Exiting." << std::endl;
+				write_text_to_log_file("ERROR:  Water level bnd file (" + WLfilename + ") format error. only " + std::to_string(lineelements.size()) + " where 2 were expected. Exiting.");
+				write_text_to_log_file(line);
+				exit(1);
+			}
+
+
+			slbndline.time = std::stod(lineelements[0]);
+			slbndline.wlev = std::stod(lineelements[1]);
+			
+			
+
+			//slbndline = readBSHline(line);
+			slbnd.push_back(slbndline);
+			//std::cout << line << std::endl;
+		}
+
+	}
+	fs.close();
+
+	//std::cout << slbnd[0].wlev << std::endl;
+
+
+	return slbnd;
+}
 
 Param readparamstr(std::string line, Param param)
 {
@@ -193,7 +260,13 @@ Param readparamstr(std::string line, Param param)
 		
 	}
 
-	
+	parameterstr = "leftbndfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.leftbndfile = parametervalue;
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	}
 
 
 	parameterstr = "nx";
@@ -511,20 +584,6 @@ void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &g
 	fs.close();
 }
 
-extern "C" void readbathyHeadOld(std::string filename, int &nx, int &ny, double &dx, double &grdalpha )
-{
-	//read input data:
-	//printf("bathy: %s\n", filename);
-	FILE *fid;
-	//int nx, ny;
-	//double dx, grdalpha;
-	//read md file
-	fid = fopen(filename.c_str(), "r");
-	fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &nx, &ny, &dx, &grdalpha);
-	//grdalpha = grdalpha*pi / 180; // grid rotation
-	fclose(fid);
-}
-
 
 
 
@@ -653,4 +712,8 @@ void SaveParamtolog(Param XParam)
 }
 
 
+double interptime(double next, double prev, double timenext, double time)
+{
+	return prev + (time) / (timenext)*(next - prev);
+}
 

@@ -660,7 +660,7 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, float * var)
 }
 
 // Main loop that actually runs the model
-void mainloopCPU(Param XParam)
+float FlowCPU(Param XParam)
 {
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -689,12 +689,10 @@ void mainloopCPU(Param XParam)
 	
 	//write2varnc(nx, ny, totaltime, hh);
 
-
+	return XParam.dt;
 
 
 }
-
-
 
 
 

@@ -668,3 +668,20 @@ __global__ void reducemin6(int *g_idata, int *g_odata, unsigned int n)
 	if (tid == 0) g_odata[blockIdx.x] = sdata[0];
 }
 */
+
+__global__ void leftdirichlet(int nx, int ny,float g, float zsbnd, float *zs, float *zb, float *hh, float *uu, float *vv )
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int xplus;
+	float hhi;
+	if (ix == 0 && iy < ny)
+	{
+		xplus = min(ix + 1, nx - 1);
+		hh[i] = zsbnd-zb[i];
+		zs[i] = zsbnd;
+		uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
+		vv[i] = 0.0f;
+	}
+}

@@ -66,10 +66,34 @@ public:
 									//Output variables
 	std::vector<std::string> outvars; //list of names of teh variables to output
 
+	//bnd
+	// 0:Wall; 1:sealevel dirichlet
+	int right = 0;
+	int left = 0;
+	int top = 0;
+	int bot = 0;
+
+	std::string rightbndfile;
+	std::string leftbndfile;
+	std::string topbndfile;
+	std::string botbndfile;
+									  
 	//other
 	clock_t startcputime, endcputime;
 	int demo = 0;
+
+
+
 };
+
+
+class SLTS {
+public:
+	double time, wlev;
+};
+
+
+
 
 extern double epsilon;
 //extern double g;
@@ -128,6 +152,8 @@ template <class T> const T& min(const T& a, const T& b);
 
 //General CPU functions //Unecessary to declare here?
 void mainloopCPU(Param XParam);
+float FlowCPU(Param XParam);
+float demoloopCPU(Param XParam);
 double minmod2(double s0, double s1, double s2);
 double dtnext(double t, double tnext, double dt);
 //void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady);
@@ -153,6 +179,10 @@ extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
 
 // I/O
+extern "C" void readbathy(std::string filename, float *&zb);
+void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
+std::vector<SLTS> readWLfile(std::string WLfilename);
+
 Param readparamstr(std::string line, Param param);
 std::string findparameter(std::string parameterstr, std::string line);
 void split(const std::string &s, char delim, std::vector<std::string> &elems);
@@ -161,5 +191,9 @@ std::string trim(const std::string& str, const std::string& whitespace);
 
 void write_text_to_log_file(std::string text);
 void SaveParamtolog(Param XParam);
+
+//
+double interptime(double next, double prev, double timenext, double time);
+
 // End of global definition
 #endif
