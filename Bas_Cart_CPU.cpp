@@ -671,9 +671,9 @@ float FlowCPU(Param XParam)
 
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 	update(nx, ny, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
-	printf("dtmax=%f\n", dtmax);
+	//printf("dtmax=%f\n", dtmax);
 	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
-	printf("dt=%f\n", XParam.dt);
+	//printf("dt=%f\n", XParam.dt);
 	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor
@@ -687,6 +687,7 @@ float FlowCPU(Param XParam)
 
 	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	
+	quadfrictionCPU(nx, ny, XParam.dt, XParam.eps, XParam.cf, hh, uu, vv);
 	//write2varnc(nx, ny, totaltime, hh);
 
 	return XParam.dt;
@@ -695,8 +696,52 @@ float FlowCPU(Param XParam)
 }
 
 
+void leftdirichletCPU(int nx, int ny, float g, float zsbnd, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	for (int iy = 0; iy < ny; iy++)
+	{
+		int ix = 0;
+			int i = ix + iy*nx;
+			int xplus;
+			float hhi;
+			if (ix == 0 && iy < ny)
+			{
+				xplus = min(ix + 1, nx - 1);
+				hh[i] = zsbnd - zb[i];
+				zs[i] = zsbnd;
+				uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
+				vv[i] = 0.0f;
+			}
+		
+	}
+}
 
+void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv)
+{
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+			int i = ix + iy*nx;
 
+			float normu, hhi;
+
+			
+				hhi = hh[i];
+				if (hhi > eps)
+				{
+					normu = uu[i] * uu[i] + vv[i] * vv[i];
+					float frc = (1.0 + dt*cf*normu / hhi);
+					//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
+					uu[i] = uu[i] / frc;
+					vv[i] = vv[i] / frc;
+				}
+
+			
+		}
+	}
+
+}
 
 
 

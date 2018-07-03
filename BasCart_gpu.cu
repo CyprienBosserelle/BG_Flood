@@ -661,7 +661,7 @@ void checkloopGPU(Param XParam)
 
 }
 
-void LeftFlowBndGPU(Param XParam, std::vector<SLTS> leftWLbnd)
+void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 {
 	//
 
@@ -688,9 +688,15 @@ void LeftFlowBndGPU(Param XParam, std::vector<SLTS> leftWLbnd)
 
 	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
-
-	leftdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, XParam.g, zsbndleft,zs_g, zb_g, hh_g, uu_g, vv_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	if (XParam.GPUDEVICE>=0)
+	{
+		leftdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, XParam.g, zsbndleft, zs_g, zb_g, hh_g, uu_g, vv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		leftdirichletCPU(nx, ny, XParam.g, zsbndleft, zs, zb, hh, uu, vv);
+	}
 }
 
 
@@ -895,7 +901,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-		LeftFlowBndGPU(XParam, leftWLbnd);
+		LeftFlowBnd(XParam, leftWLbnd);
 
 		// Run the model step
 		XParam.dt=FlowGPU(XParam);
@@ -952,14 +958,14 @@ float demoloopGPU(Param XParam)
 }
 
 
-void mainloopCPU(Param XParam)
+void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
 {
 	float nextoutputtime = XParam.outputtimestep;
 	int nstep = 0;
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-		//NOT IMPLEMENTED YET
+		LeftFlowBnd(XParam, leftWLbnd);
 
 		// Run the model step
 		XParam.dt = FlowCPU(XParam);
@@ -1448,7 +1454,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			mainloopCPU(XParam);
+			mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 		}
 
 	}
