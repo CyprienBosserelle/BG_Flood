@@ -710,3 +710,51 @@ __global__ void quadfriction(int nx, int ny, float dt,float eps, float cf, float
 	}
 
 }
+
+
+__global__ void noslipbndall(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
+
+	if (ix < nx && iy < ny)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+		if (ix == 0 )
+		{
+			uu[i] = 0.0f;
+			zs[i] = zs[xplus+iy*nx];
+			hh[i] = max(zs[xplus + iy*nx]-zb[i],eps);
+		}
+		if ( ix == nx - 1)
+		{
+			uu[i] = 0.0f;
+			zs[i] = zs[xminus + iy*nx];
+			hh[i] = max(zs[xminus + iy*nx] - zb[i], eps);
+
+		}
+
+		if ( iy == 0 )
+		{
+			vv[i] = 0.0f;
+			zs[i] = zs[ix + yplus*nx];
+			hh[i] = max(zs[ix + yplus*nx] - zb[i], eps);
+		}
+		if ( iy == ny - 1)
+		{
+			vv[i] = 0.0f;
+			zs[i] = zs[ix + yminus*nx];
+			hh[i] = max(zs[ix + yminus*nx] - zb[i], eps);
+
+		}
+
+	}
+
+}

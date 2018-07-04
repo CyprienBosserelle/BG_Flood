@@ -890,6 +890,9 @@ float FlowGPU(Param XParam)
 	quadfriction << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, XParam.cf, hh_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	// Impose no slip condition by default
+	noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	return XParam.dt;
 }
 
