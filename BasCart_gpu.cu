@@ -1508,9 +1508,60 @@ int main(int argc, char **argv)
 
 
 	XParam.endcputime = clock();
-	printf("End Computation totaltime=%f\n", XParam.totaltime);
+	printf("End Computation \n");
+	write_text_to_log_file("End Computation" );
+
 	printf("Total runtime= %d  seconds\n", (XParam.endcputime - XParam.startcputime) / CLOCKS_PER_SEC);
+	write_text_to_log_file("Total runtime= " + std::to_string((XParam.endcputime - XParam.startcputime) / CLOCKS_PER_SEC) + "  seconds" );
+
 	//if GPU?
+
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		free(hh_g);
+		free(uu_g);
+		free(vv_g);
+		free(zb_g);
+		free(zs_g);
+
+		free(hho_g);
+		free(uuo_g);
+		free(vvo_g);
+		free(zso_g);
+
+		free(dhdx_g);
+		free(dhdy_g);
+		free(dudx_g);
+		free(dudy_g);
+		free(dvdx_g);
+		free(dvdy_g);
+
+		free(dzsdx_g);
+		free(dzsdy_g);
+
+		free(Su_g);
+		free(Sv_g);
+		free(Fqux_g);
+		free(Fquy_g);
+		free(Fqvx_g);
+		free(Fqvy_g);
+		free(Fhu_g);
+		free(Fhv_g);
+
+		free(dh_g);
+		free(dhu_g);
+		free(dhv_g);
+
+		free(dtmax_g);
+
+		
+		free(arrmin_g);
+		free(arrmax_g);
+		
+	}
+
+
 	cudaDeviceReset();
 
 
