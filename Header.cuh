@@ -26,6 +26,7 @@
 class TSnode {
 public:
 	int i, j;
+	float x, y;
 };
 
 class Param {
@@ -164,7 +165,7 @@ void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *u
 void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
 void leftdirichletCPU(int nx, int ny, float g, float zsbnd, float *zs, float *zb, float *hh, float *uu, float *vv);
 void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv);
-
+void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
 //Bnd functions
 void neumannbnd(int nx, int ny, double*a);
 
@@ -190,6 +191,7 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
 std::string trim(const std::string& str, const std::string& whitespace);
 
+Param checkparamsanity(Param XParam);
 void write_text_to_log_file(std::string text);
 void SaveParamtolog(Param XParam);
 
