@@ -223,8 +223,12 @@ Param readparamstr(std::string line, Param param)
 	{
 		std::vector<std::string> nodes = split(parametervalue, ',');
 		TSnode node;
-		node.i = std::stoi(nodes[0]);
-		node.j = std::stoi(nodes[1]);
+		node.x = std::stod(nodes[0]);
+		node.y = std::stod(nodes[1]);
+
+		node.i = min(max((int) round((node.x - param.xo) / param.dx), 0), param.nx - 1);
+		node.j = min(max((int) round((node.y - param.yo) / param.dx), 0), param.ny - 1);
+
 		param.TSnodesout.push_back(node);
 
 		

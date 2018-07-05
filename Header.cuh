@@ -93,7 +93,10 @@ public:
 	double time, wlev;
 };
 
-
+class Pointout {
+public:
+	double time, zs, hh, uu,vv;
+};
 
 
 extern double epsilon;
@@ -143,7 +146,7 @@ extern float * dh_g, *dhu_g, *dhv_g;
 
 extern float dtmax;
 extern float * dtmax_g;
-
+extern float * TSstore, *TSstore_g;
 extern float * dummy;
 
 template <class T> T sq(T a);

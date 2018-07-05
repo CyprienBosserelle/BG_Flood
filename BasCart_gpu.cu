@@ -63,6 +63,8 @@ float *Su_g, *Sv_g, *Fqux_g, *Fquy_g, *Fqvx_g, *Fqvy_g;
 float * Fhu_g, *Fhv_g;
 float * dh_g, *dhu_g, *dhv_g;
 
+float * TSstore, *TSstore_g;
+
 float dtmax = 1.0 / epsilon;
 float * dtmax_g;
 float *arrmax_g;
@@ -965,6 +967,28 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 {
 	float nextoutputtime = XParam.outputtimestep;
 	int nstep = 0;
+
+	int nTSstep = 0;
+
+
+	std::vector<Pointout> zsout;
+
+	std::vector< std::vector< Pointout > > zsAllout;
+
+	Pointout stepread;
+
+	FILE * fsSLTS;
+
+	for (int o = 0; o < XParam.TSoutfile.size(); o++)
+	{
+		//Overwrite existing files
+		fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
+		fclose(fsSLTS);
+
+		// Add empty row for each output point
+		zsAllout.push_back(std::vector<Pointout>());
+	}
+
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
@@ -980,6 +1004,24 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		// Do Sum & Max variables Here
 
 
+		//Check for TSoutput
+		if (XParam.TSnodesout.size() > 0)
+		{
+			for (int o = 0; o < XParam.TSnodesout.size(); o++)
+			{
+				//
+				stepread.time = XParam.totaltime;
+				stepread.zs = zs[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
+				stepread.hh = hh[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
+				stepread.uu = uu[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
+				stepread.vv = vv[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
+				zsAllout[o].push_back(stepread);
+
+			}
+			nTSstep++;
+
+		}
+		// CHeck for grid output
 		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
 		{
 			// Avg var sum here
@@ -1009,22 +1051,35 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 
 			//.Reset Avg Variables
 
+
+			//
+			if (!XParam.TSoutfile.empty())
+			{
+				for (int o = 0; o < XParam.TSoutfile.size(); o++)
+				{
+					//Overwrite existing files
+					fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
+					for (int n = 0; n < zsAllout[o].size(); n++)
+					{
+						fprintf(fsSLTS, "%f\t%.4f\t%.4f\t%.4f\t%.4f\n", zsAllout[o][n].time, zsAllout[o][n].zs, zsAllout[o][n].hh, zsAllout[o][n].uu, zsAllout[o][n].vv);
+					}
+					fclose(fsSLTS);
+					//reset zsout
+					zsAllout[o].clear();
+					//zsAllout.push_back(std::vector<SLBnd>());
+				}
+			}
 			// Reset nstep
 			nstep = 0;
 		}
+
+		
 
 	}
 }
 
 
-float demoloopCPU(Param XParam)
-{
 
-	XParam.dt = FlowCPU(XParam);
-
-	return XParam.dt;
-
-}
 
 int main(int argc, char **argv)
 {
@@ -1085,9 +1140,7 @@ int main(int argc, char **argv)
 		write_text_to_log_file("ERROR: BG_param.txt file could not be opened...use this log file to create a file named BG_param.txt");
 		SaveParamtolog(XParam);
 
-		std::cerr << "Running in Demo Mode" << std::endl;
-		write_text_to_log_file("Running in Demo Mode");
-		XParam.demo = 1;
+		exit(1);
 		
 	}
 	else
@@ -1116,75 +1169,70 @@ int main(int argc, char **argv)
 
 
 	std::string bathyext;
-	if (XParam.demo == 1)
-	{
-		// This is just for temporary use
-		XParam.GPUDEVICE = 0; //-1:CPU 0:default GPU (first available) 1+:other GPU  [0]
-		XParam.g = 1.0;// 9.81;
-		XParam.rho = 1025.0;
-		XParam.eps = 0.0001;
-		XParam.CFL = 0.5;
-		XParam.nx = 32;
-		XParam.ny = 32;
-		double length = 1.0;
-		XParam.delta = length / XParam.nx;
-	}
-	else 
-	{
-		//read bathy and perform sanity check
+	
+	//read bathy and perform sanity check
 		
-		if (!XParam.Bathymetryfile.empty())
+	if (!XParam.Bathymetryfile.empty())
+	{
+		printf("bathy: %s\n", XParam.Bathymetryfile.c_str());
+
+		write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
+
+		std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+		bathyext = extvec.back();
+		write_text_to_log_file("bathy extension: " + bathyext);
+		if (bathyext.compare("md") == 0)
 		{
-			printf("bathy: %s\n", XParam.Bathymetryfile.c_str());
-
-			write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
-
-			std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
-			bathyext = extvec.back();
-			write_text_to_log_file("bathy extension: " + bathyext);
-			if (bathyext.compare("md") == 0)
-			{
-				write_text_to_log_file("Reading 'md' file");
-				readbathyHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
-				XParam.delta = XParam.dx;
-			}
-			if (bathyext.compare("nc") == 0)
-			{
-				//write_text_to_log_file("Reading 'nc' file");
-				//readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
-				//write_text_to_log_file("For nc of bathy file please specify grdalpha in the XBG_param.txt (default 0)");
-
-			}
-			if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
-			{
-				//XBeach style file
-				//write_text_to_log_file("Reading " + bathyext + " file");
-				//write_text_to_log_file("For this type of bathy file please specify nx, ny, dx and grdalpha in the XBG_param.txt");
-			}
-			if (bathyext.compare("asc") == 0)
-			{
-				//
-			}
-
-			XParam.grdalpha = XParam.grdalpha*pi / 180; // grid rotation
-
-														//fid = fopen(XParam.Bathymetryfile.c_str(), "r");
-														//fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &XParam.nx, &XParam.ny, &XParam.dx, &XParam.grdalpha);
-			printf("nx=%d\tny=%d\tdx=%f\talpha=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180 / pi);
-			write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
-
-			XParam = checkparamsanity(XParam);
+			write_text_to_log_file("Reading 'md' file");
+			readbathyHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
+			XParam.delta = XParam.dx;
 		}
-		else
+		if (bathyext.compare("nc") == 0)
 		{
-			std::cerr << "Fatal error: No bathymetry file specified. Please specify using 'bathy = Filename.bot'" << std::endl;
-			write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
-			exit(1);
+			//write_text_to_log_file("Reading 'nc' file");
+			//readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
+			//write_text_to_log_file("For nc of bathy file please specify grdalpha in the XBG_param.txt (default 0)");
+
 		}
+		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
+		{
+			//XBeach style file
+			//write_text_to_log_file("Reading " + bathyext + " file");
+			//write_text_to_log_file("For this type of bathy file please specify nx, ny, dx and grdalpha in the XBG_param.txt");
+		}
+		if (bathyext.compare("asc") == 0)
+		{
+			//
+		}
+
+		XParam.grdalpha = XParam.grdalpha*pi / 180; // grid rotation
+
+													//fid = fopen(XParam.Bathymetryfile.c_str(), "r");
+													//fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &XParam.nx, &XParam.ny, &XParam.dx, &XParam.grdalpha);
+		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180 / pi);
+		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+
+
+		/////////////////////////////////////////////////////
+		////// CHECK PARAMETER SANITY
+		/////////////////////////////////////////////////////
+		XParam = checkparamsanity(XParam);
+
+
+
 
 
 	}
+	else
+	{
+		std::cerr << "Fatal error: No bathymetry file specified. Please specify using 'bathy = Filename.bot'" << std::endl;
+		write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
+		exit(1);
+	}
 
+	//////////////////////////////////////////////////
+	////// Preprare Bnd
+	//////////////////////////////////////////////////
 
 	// So far bnd are limited to be cst along an edge
 	// Read Bnd file if/where needed
@@ -1214,7 +1262,10 @@ int main(int argc, char **argv)
 
 	XParam.dt = 0.0;// Will be resolved in update
 
-	
+	////////////////////////////////////////////////
+	///// Allocate memory on CPU
+	////////////////////////////////////////////////
+
 	int nx = XParam.nx;
 	int ny = XParam.ny;
 
@@ -1259,7 +1310,16 @@ int main(int argc, char **argv)
 
 	dummy = (float *)malloc(nx*ny * sizeof(float));
 
+	if (XParam.TSnodesout.size() > 0)
+	{
+		// Allocate mmemory to store TSoutput in between writing to disk
+		int nTS = XParam.TSnodesout.size(); // Nb of points
+		int nvts = 4; // NB of variables hh, zs, uu, vv
+		int nstore = 256; //store up to 256 steps
+		TSstore = (float *)malloc(nTS*nvts*nstore * sizeof(float));
+		//Gpu part done below after device check
 
+	}
 
 
 
@@ -1281,6 +1341,9 @@ int main(int argc, char **argv)
 	}
 
 	// Now that we checked that there was indeed a GPU available
+	////////////////////////////////////////
+	//////// ALLLOCATE GPU memory
+	////////////////////////////////////////
 	if (XParam.GPUDEVICE >= 0)
 	{
 		CUDA_CHECK(cudaMalloc((void **)&hh_g, nx*ny*sizeof(float)));
@@ -1323,6 +1386,19 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMalloc((void **)&arrmin_g, nx*ny*sizeof(float)));
 		CUDA_CHECK(cudaMalloc((void **)&arrmax_g, nx*ny*sizeof(float)));
 		
+
+		if (XParam.TSnodesout.size() > 0)
+		{
+			// Allocate mmemory to store TSoutput in between writing to disk
+			int nTS = XParam.TSnodesout.size(); // Nb of points
+			int nvts = 4; // NB of variables hh, zs, uu, vv
+			int nstore = 256; //store up to 256 steps
+			//TSstore = (float *)malloc(nTS*nvts*nstore * sizeof(float));
+			CUDA_CHECK(cudaMalloc((void **)&TSstore_g, nTS*nvts*nstore*sizeof(float)));
+			//Cpu part done above
+
+		}
+
 	}
 
 	if (bathyext.compare("md") == 0)
@@ -1362,41 +1438,6 @@ int main(int argc, char **argv)
 
 
 
-	if (XParam.demo == 1)
-	{
-		double *xx, *yy;
-		//x = (double *)malloc(nx*ny * sizeof(double));
-		xx = (double *)malloc(nx * sizeof(double));
-		//y = (double *)malloc(nx*ny * sizeof(double));
-		yy = (double *)malloc(ny * sizeof(double));
-
-
-		for (int j = 0; j < ny; j++)
-		{
-			for (int i = 0; i < nx; i++)
-			{
-				double a;
-
-				xx[i] = (i - nx / 2)*XParam.delta + 0.5*XParam.delta;
-				yy[j] = (j - ny / 2)*XParam.delta + 0.5*XParam.delta;
-
-				a = sq(xx[i]) + sq(yy[j]);
-				//b =x[i + j*nx] * x[i + j*nx] + y[i + j*nx] * y[i + j*nx];
-
-
-				//if (abs(a - b) > 0.00001)
-				//{
-				//	printf("%f\t%f\n", a, b);
-				//}
-
-
-
-				hh[i + j*nx] = 0.1 + 1.*exp(-200.*(a));
-
-				zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
-			}
-		}
-	}
 
 	if (XParam.GPUDEVICE >= 0)
 	{
@@ -1444,9 +1485,7 @@ int main(int argc, char **argv)
 	}
 	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
-	if (XParam.demo == 0)
-
-	{
+	
 		if (XParam.GPUDEVICE >= 0)
 		{
 			mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
@@ -1456,50 +1495,8 @@ int main(int argc, char **argv)
 			mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 		}
 
-	}
-	else
-	{
-		//while (totaltime < 10.0)
-		for (int i = 0; i < 10; i++)
-		{
-			if (XParam.GPUDEVICE >= 0)
-			{
-				XParam.dt=demoloopGPU(XParam);
-				//CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-				//checkloopGPU();
-			}
-			else
-			{
-				XParam.dt = demoloopCPU(XParam);
-			}
-
-			XParam.totaltime = XParam.totaltime + XParam.dt;
-			//void creatncfileUD(std::string outfile, int nx, int ny, double dx, double totaltime);
-			//void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
-			//void writenctimestep(std::string outfile, double totaltime);
-			//void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
-			writenctimestep(XParam.outfile, XParam.totaltime);
-
-			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
-			{
-				if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
-				{
-					if (XParam.GPUDEVICE >= 0)
-					{
-						//Should be async
-						CUDA_CHECK(cudaMemcpy(OutputVarMapCPU[XParam.outvars[ivar]], OutputVarMapGPU[XParam.outvars[ivar]], OutputVarMaplen[XParam.outvars[ivar]] * sizeof(float), cudaMemcpyDeviceToHost));
-
-					}
-					//Create definition for each variable and store it
-					writencvarstep(XParam.outfile, 0, 1.0f, 0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
-				}
-			}
-			//write2varnc(nx, ny, totaltime, hh);
-			//write2varnc(nx, ny, totaltime, dhdx);
-		}
-
-		// Free the allocated memory
-	}
+	
+	
 
 
 
