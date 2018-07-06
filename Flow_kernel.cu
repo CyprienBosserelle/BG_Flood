@@ -758,3 +758,20 @@ __global__ void noslipbndall(int nx, int ny, float dt, float eps, float *zb, flo
 	}
 
 }
+
+
+__global__ void noslipbndall(int nx, int ny,int noutnodes, int outnode, int istep, int inode,int jnode, float *zs, float *hh, float *uu, float *vv,float * store)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	
+
+	if (ix == inode && iy == jnode )
+	{
+		store[0 + outnode * 4 + istep*noutnodes * 4] = hh[i];
+		store[1 + outnode * 4 + istep*noutnodes * 4] = zs[i];
+		store[2 + outnode * 4 + istep*noutnodes * 4] = uu[i];
+		store[3 + outnode * 4 + istep*noutnodes * 4] = vv[i];
+	}
+}

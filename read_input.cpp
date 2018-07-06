@@ -226,8 +226,7 @@ Param readparamstr(std::string line, Param param)
 		node.x = std::stod(nodes[0]);
 		node.y = std::stod(nodes[1]);
 
-		node.i = min(max((int) round((node.x - param.xo) / param.dx), 0), param.nx - 1);
-		node.j = min(max((int) round((node.y - param.yo) / param.dx), 0), param.ny - 1);
+		//i and j are calculated in the Sanity check
 
 		param.TSnodesout.push_back(node);
 
@@ -432,27 +431,9 @@ Param checkparamsanity(Param XParam)
 	{
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)
 		{
-			if (XParam.TSnodesout[o].i < 0)
-			{
-				//An idiot is in charge
-				XParam.TSnodesout[o].i = 0;
-			}
-
-			if (XParam.TSnodesout[o].i > XParam.nx-1)
-			{
-				XParam.TSnodesout[o].i = XParam.nx - 1;
-			}
-
-			if (XParam.TSnodesout[o].j < 0)
-			{
-				//An idiot is in charge
-				XParam.TSnodesout[o].j = 0;
-			}
-
-			if (XParam.TSnodesout[o].j > XParam.ny - 1)
-			{
-				XParam.TSnodesout[o].j = XParam.ny - 1;
-			}
+			XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XParam.xo) / XParam.dx), 0), XParam.nx - 1);
+			XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XParam.yo) / XParam.dx), 0), XParam.ny - 1);
+			
 		}
 
 	}

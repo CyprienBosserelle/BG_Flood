@@ -903,6 +903,34 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 {
 	float nextoutputtime = XParam.outputtimestep;
 	int nstep = 0;
+	int nTSsteps = 0;
+
+	std::vector<Pointout> zsout;
+
+	std::vector< std::vector< Pointout > > zsAllout;
+
+	Pointout stepread;
+
+	FILE * fsSLTS;
+
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((XParam.nx*1.0f) / blockDim.x), ceil((XParam.ny*1.0f) / blockDim.y), 1);
+	
+
+
+	for (int o = 0; o < XParam.TSoutfile.size(); o++)
+	{
+		//Overwrite existing files
+		fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o]);
+		fclose(fsSLTS);
+
+		// Add empty row for each output point
+		zsAllout.push_back(std::vector<Pointout>());
+	}
+
+
+
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
@@ -916,7 +944,50 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		nstep++;
 		
 		// Do Sum & Max variables Here
+		//Check for TSoutput
+		if (XParam.TSnodesout.size() > 0)
+		{
+			for (int o = 0; o < XParam.TSnodesout.size(); o++)
+			{
+				//
+				stepread.time = XParam.totaltime;
+				stepread.zs = 0.0;
+				stepread.hh = 0.0;
+				stepread.uu = 0.0;
+				stepread.vv = 0.0;
+				zsAllout[o].push_back(stepread);
 
+				noslipbndall << <gridDim, blockDim, 0 >> > (XParam.nx, XParam.ny, XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, zs_g, hh_g, uu_g, vv_g, TSstore_g);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			nTSsteps++;
+			
+			if ((nTSsteps+1)*XParam.TSnodesout.size() * 4 > 2048 || XParam.endtime-XParam.totaltime <= XParam.dt*0.00001f)
+			{
+				//Flush
+				CUDA_CHECK(cudaMemcpy(TSstore, TSstore_g, 2048 * sizeof(float), cudaMemcpyDeviceToHost));
+				for (int o = 0; o < XParam.TSnodesout.size(); o++)
+				{
+					fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
+					for (int n = 0; n < nTSsteps; n++)
+					{
+						//
+						
+						
+							fprintf(fsSLTS, "%f\t%.4f\t%.4f\t%.4f\t%.4f\n", zsAllout[o][n].time, TSstore[1 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[0 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[2 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[3 + o * 4 + n*XParam.TSnodesout.size() * 4]);
+						
+						
+					}
+					fclose(fsSLTS);
+					//reset zsout
+					zsAllout[o].clear();
+				}
+				nTSsteps = 0;
+
+			}
+			
+
+		}
 
 		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
 		{
@@ -946,6 +1017,10 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			write_text_to_log_file("Writing outputs, totaltime: " + std::to_string(XParam.totaltime) + ", Mean dt= " + std::to_string(XParam.outputtimestep / nstep));
 
 			//.Reset Avg Variables
+
+
+
+			//
 
 			// Reset nstep
 			nstep = 0;
@@ -983,6 +1058,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 	{
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o]);
 		fclose(fsSLTS);
 
 		// Add empty row for each output point
@@ -1310,16 +1386,7 @@ int main(int argc, char **argv)
 
 	dummy = (float *)malloc(nx*ny * sizeof(float));
 
-	if (XParam.TSnodesout.size() > 0)
-	{
-		// Allocate mmemory to store TSoutput in between writing to disk
-		int nTS = XParam.TSnodesout.size(); // Nb of points
-		int nvts = 4; // NB of variables hh, zs, uu, vv
-		int nstore = 256; //store up to 256 steps
-		TSstore = (float *)malloc(nTS*nvts*nstore * sizeof(float));
-		//Gpu part done below after device check
-
-	}
+	
 
 
 
@@ -1390,12 +1457,12 @@ int main(int argc, char **argv)
 		if (XParam.TSnodesout.size() > 0)
 		{
 			// Allocate mmemory to store TSoutput in between writing to disk
-			int nTS = XParam.TSnodesout.size(); // Nb of points
-			int nvts = 4; // NB of variables hh, zs, uu, vv
-			int nstore = 256; //store up to 256 steps
-			//TSstore = (float *)malloc(nTS*nvts*nstore * sizeof(float));
+			int nTS = 1; // Nb of points
+			int nvts = 1; // NB of variables hh, zs, uu, vv
+			int nstore = 2048; //store up to 2048 pts
+			TSstore = (float *)malloc(nTS*nvts*nstore * sizeof(float));
 			CUDA_CHECK(cudaMalloc((void **)&TSstore_g, nTS*nvts*nstore*sizeof(float)));
-			//Cpu part done above
+			//Cpu part done differently because there are no latency issue (i.e. none that I care about) 
 
 		}
 
