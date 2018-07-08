@@ -109,7 +109,7 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	int  var_dimid3D[3];
 	int  var_dimid4D[4];
 
-	short * var_s;
+	int * var_s;
 	int recid, xid, yid, thid;
 	size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
@@ -141,14 +141,14 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(nx*ny*sizeof(short));
+		var_s = (int *)malloc(nx*ny*sizeof(int));
 
 		for (int i = 0; i < nx; i++)
 		{
 			for (int j = 0; j < ny; j++)
 			{
 				// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
-				var_s[i + nx*j] = (short)round((var[i + nx*j] - addoffset) / scalefactor);
+				var_s[i + nx*j] = (int)round((var[i + nx*j] - addoffset) / scalefactor);
 			}
 		}
 	}
@@ -157,7 +157,7 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	{
 		if (smallnc > 0)
 		{
-			status = nc_def_var(ncid, varst.c_str(), NC_SHORT, vdim, var_dimid2D, &var_id);
+			status = nc_def_var(ncid, varst.c_str(), NC_INT, vdim, var_dimid2D, &var_id);
 
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
 			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
@@ -165,7 +165,7 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
 			status = nc_enddef(ncid);
 
-			status = nc_put_vara_short(ncid, var_id, start2D, count2D, var_s);
+			status = nc_put_vara_int(ncid, var_id, start2D, count2D, var_s);
 
 		}
 		else
@@ -183,14 +183,14 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	{
 		if (smallnc > 0)
 		{
-			status = nc_def_var(ncid, varst.c_str(), NC_SHORT, vdim, var_dimid3D, &var_id);
+			status = nc_def_var(ncid, varst.c_str(), NC_INT, vdim, var_dimid3D, &var_id);
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
 			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
 			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
 			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
 			status = nc_enddef(ncid);
 
-			status = nc_put_vara_short(ncid, var_id, start3D, count3D, var_s);
+			status = nc_put_vara_int(ncid, var_id, start3D, count3D, var_s);
 
 		}
 		else
@@ -285,7 +285,7 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 			{
 				// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
 				var_s[i + nx*j] = (short) round((var[i + nx*j] - addoffset) / scalefactor);
-				printf("var=%f\tvar_s=%d\n", var[i + nx*j],var_s[i + nx*j]);
+				//printf("var=%f\tvar_s=%d\n", var[i + nx*j],var_s[i + nx*j]);
 			}
 		}
 		status = nc_put_vara_short(ncid, var_id, start, count, var_s);
