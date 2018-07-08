@@ -1039,26 +1039,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		nstep++;
 		
 		// Do Sum & Max variables Here
-		
-		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, uumean_g, uu_g);
-		//CUT_CHECK_ERROR("Add avg execution failed\n");
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, vvmean_g, vv_g);
-		//CUT_CHECK_ERROR("Add avg execution failed\n");
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, hhmean_g, hh_g);
-		//CUT_CHECK_ERROR("Add avg execution failed\n");
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmean_g, zs_g);
-		//CUT_CHECK_ERROR("Add avg execution failed\n");
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-		max_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmax_g, zs_g);
-		//CUT_CHECK_ERROR("Add avg execution failed\n");
-		CUDA_CHECK(cudaDeviceSynchronize());
+		meanmaxvarGPU(XParam);
 
 
 		//Check for TSoutput
@@ -1111,6 +1092,11 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			// Avg var sum here
 			DivmeanvarGPU(XParam, nstep);
 
+			if (XParam.outvort == 1)
+			{
+				CalcVorticity << <gridDim, blockDim, 0 >> > (XParam.nx, XParam.ny, vort_g, dvdx_g, dudy_g);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
 
 			if (!XParam.outvars.empty())
 			{
@@ -1216,7 +1202,12 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		{
 			// Avg var sum here
 			DivmeanCPU(XParam, (float)nstep);
-			//
+			// Check for and calculate Vorticity if required
+			if (XParam.outvort == 1)
+			{
+				CalcVort(XParam);
+			}
+
 			if (!XParam.outvars.empty())
 			{
 				writenctimestep(XParam.outfile, XParam.totaltime);
@@ -1225,12 +1216,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 				{
 					if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
 					{
-						if (XParam.GPUDEVICE >= 0)
-						{
-							//Should be async
-							CUDA_CHECK(cudaMemcpy(OutputVarMapCPU[XParam.outvars[ivar]], OutputVarMapGPU[XParam.outvars[ivar]], OutputVarMaplen[XParam.outvars[ivar]] * sizeof(float), cudaMemcpyDeviceToHost));
-
-						}
+						
 						//Create definition for each variable and store it
 						writencvarstep(XParam.outfile, 0, 1.0f, 0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 					}

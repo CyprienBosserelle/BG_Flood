@@ -853,3 +853,26 @@ __global__ void max_var(int nx, int ny, float * Varmax, float * Var)
 
 
 }
+
+__global__ void CalcVorticity(int nx, int ny, float * Vort,float * dvdx, float * dudy)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+	unsigned int tx = threadIdx.x;
+	unsigned int ty = threadIdx.y;
+
+	__shared__ float dvdxi[16][16];
+	__shared__ float dudyi[16][16];
+
+	if (ix < nx && iy < ny)
+	{
+
+		dvdxi[tx][ty] = dvdx[i];
+		dudyi[tx][ty] = dudy[i];
+
+		Vort[i] = dvdxi[tx][ty] - dudyi[tx][ty];
+	}
+
+
+}

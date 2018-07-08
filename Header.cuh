@@ -198,7 +198,7 @@ void AddmeanCPU(Param XParam);
 void DivmeanCPU(Param XParam, float nstep);
 void ResetmeanCPU(Param XParam);
 void maxallCPU(Param XParam);
-
+void CalcVort(Param XParam);
 //Output functions
 extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var);
 extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);

@@ -992,3 +992,15 @@ void maxallCPU(Param XParam)
 		}
 	}
 }
+void CalcVort(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+	for (int j = 0; j < ny; j++)
+	{
+		for (int i = 0; i < nx; i++)
+		{
+			vort[i + j*nx] = dvdy[i + j*nx] - dudx[i + j*nx];
+		}
+	}
+}

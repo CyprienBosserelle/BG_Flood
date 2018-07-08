@@ -268,7 +268,7 @@ Param readparamstr(std::string line, Param param)
 			param.outuumax = (vvar.compare("uumax") == 0) ? 1 : param.outuumax;
 			param.outvvmax = (vvar.compare("vvmax") == 0) ? 1 : param.outvvmax;
 
-			param.outvort = (vvar.compare("vortmax") == 0) ? 1 : param.outvort;
+			param.outvort = (vvar.compare("vort") == 0) ? 1 : param.outvort;
 		}
 		
 
