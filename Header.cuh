@@ -81,9 +81,11 @@ public:
 									  
 	//other
 	clock_t startcputime, endcputime;
-	int demo = 0;
-
-	int tempmax = 0;
+	
+	//Netcdf parameters
+	int smallnc = 0;//default save as short integer if smallnc=0 then save all variables as float
+	float scalefactor = 0.01;
+	float addoffset = 0.0;
 
 	// This is controlled by the sanity checker not directly by the user
 	int outhhmax = 0;

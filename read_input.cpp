@@ -312,6 +312,20 @@ Param readparamstr(std::string line, Param param)
 		param.grdalpha = std::stod(parametervalue);
 	}
 
+	parameterstr = "xo";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.grdalpha = std::stod(parametervalue);
+	}
+
+	parameterstr = "yo";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.grdalpha = std::stod(parametervalue);
+	}
+
 	parameterstr = "g";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -327,11 +341,23 @@ Param readparamstr(std::string line, Param param)
 		param.rho = std::stod(parametervalue);
 	}
 
-	parameterstr = "tempmax";
+	parameterstr = "smallnc";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.tempmax = std::stoi(parametervalue);
+		param.smallnc = std::stoi(parametervalue);
+	}
+	parameterstr = "scalefactor";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.scalefactor = std::stod(parametervalue);
+	}
+	parameterstr = "addoffset";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.addoffset = std::stod(parametervalue);
 	}
 	return param;
 }

@@ -1146,7 +1146,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam.outfile, 0, 1.0f, 0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstep(XParam.outfile, XParam.smallnc, XParam.scalefactor,XParam.addoffset, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1251,7 +1251,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 					{
 						
 						//Create definition for each variable and store it
-						writencvarstep(XParam.outfile, 0, 1.0f, 0.0f, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstep(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1882,7 +1882,8 @@ int main(int argc, char **argv)
 	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 	{
 		//Create definition for each variable and store it
-		defncvar(XParam.outfile, 0,1.0f,0.0f,nx,ny, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
+		//defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var)
+		defncvar(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
 	}
 	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
