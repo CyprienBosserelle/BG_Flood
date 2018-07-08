@@ -83,7 +83,20 @@ public:
 	clock_t startcputime, endcputime;
 	int demo = 0;
 
+	int tempmax = 0;
 
+	// This is controlled by the sanity checker not directly by the user
+	int outhhmax = 0;
+	int outzsmax = 0;
+	int outuumax = 0;
+	int outvvmax = 0;
+
+	int outhhmean = 0;
+	int outzsmean = 0;
+	int outuumean = 0;
+	int outvvmean = 0;
+
+	int outvort = 0;
 
 };
 
@@ -144,6 +157,14 @@ extern float *Su_g, *Sv_g, *Fqux_g, *Fquy_g, *Fqvx_g, *Fqvy_g;
 extern float * Fhu_g, *Fhv_g;
 extern float * dh_g, *dhu_g, *dhv_g;
 
+extern float * hhmean, *uumean, *vvmean, *zsmean;
+extern float * hhmean_g, *uumean_g, *vvmean_g, *zsmean_g;
+
+extern float * hhmax, *uumax, *vvmax, *zsmax;
+extern float * hhmax_g, *uumax_g, *vvmax_g, *zsmax_g;
+
+extern float * vort, *vort_g;// Vorticity output
+
 extern float dtmax;
 extern float * dtmax_g;
 extern float * TSstore, *TSstore_g;
@@ -171,6 +192,12 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
 //Bnd functions
 void neumannbnd(int nx, int ny, double*a);
+
+// CPU mean max
+void AddmeanCPU(Param XParam);
+void DivmeanCPU(Param XParam, float nstep);
+void ResetmeanCPU(Param XParam);
+void maxallCPU(Param XParam);
 
 //Output functions
 extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var);

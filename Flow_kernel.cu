@@ -760,7 +760,7 @@ __global__ void noslipbndall(int nx, int ny, float dt, float eps, float *zb, flo
 }
 
 
-__global__ void noslipbndall(int nx, int ny,int noutnodes, int outnode, int istep, int inode,int jnode, float *zs, float *hh, float *uu, float *vv,float * store)
+__global__ void storeTSout(int nx, int ny,int noutnodes, int outnode, int istep, int inode,int jnode, float *zs, float *hh, float *uu, float *vv,float * store)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -774,4 +774,82 @@ __global__ void noslipbndall(int nx, int ny,int noutnodes, int outnode, int iste
 		store[2 + outnode * 4 + istep*noutnodes * 4] = uu[i];
 		store[3 + outnode * 4 + istep*noutnodes * 4] = vv[i];
 	}
+}
+
+
+
+__global__ void addavg_var(int nx, int ny, float * Varmean, float * Var)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+	unsigned int tx = threadIdx.x;
+	unsigned int ty = threadIdx.y;
+
+	__shared__ float mvari[16][16];
+	__shared__ float vari[16][16];
+
+	if (ix < nx && iy < ny)
+	{
+
+		mvari[tx][ty] = Varmean[i];
+		vari[tx][ty] = Var[i];
+
+		Varmean[i] = mvari[tx][ty] + vari[tx][ty];
+	}
+
+
+}
+
+
+__global__ void divavg_var(int nx, int ny, float ntdiv, float * Varmean)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+	unsigned int tx = threadIdx.x;
+	unsigned int ty = threadIdx.y;
+
+	__shared__ float mvari[16][16];
+	if (ix < nx && iy < ny)
+	{
+		mvari[tx][ty] = Varmean[i];
+		Varmean[i] = mvari[tx][ty] / ntdiv;
+	}
+
+
+}
+
+__global__ void resetavg_var(int nx, int ny, float * Varmean)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+	if (ix < nx && iy < ny)
+	{
+		Varmean[i] = 0.0f;
+	}
+}
+
+__global__ void max_var(int nx, int ny, float * Varmax, float * Var)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+	unsigned int tx = threadIdx.x;
+	unsigned int ty = threadIdx.y;
+
+	__shared__ float mvari[16][16];
+	__shared__ float vari[16][16];
+
+	if (ix < nx && iy < ny)
+	{
+
+		mvari[tx][ty] = Varmax[i];
+		vari[tx][ty] = Var[i];
+
+		Varmax[i] = max(mvari[tx][ty], vari[tx][ty]);
+	}
+
+
 }

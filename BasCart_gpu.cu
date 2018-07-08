@@ -64,6 +64,13 @@ float * Fhu_g, *Fhv_g;
 float * dh_g, *dhu_g, *dhv_g;
 
 float * TSstore, *TSstore_g;
+float * hhmean, *uumean, *vvmean, *zsmean;
+float * hhmean_g, *uumean_g, *vvmean_g, *zsmean_g;
+
+float * hhmax, *uumax, *vvmax, *zsmax;
+float * hhmax_g, *uumax_g, *vvmax_g, *zsmax_g;
+
+float * vort, *vort_g;// Vorticity output
 
 float dtmax = 1.0 / epsilon;
 float * dtmax_g;
@@ -951,13 +958,13 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			{
 				//
 				stepread.time = XParam.totaltime;
-				stepread.zs = 0.0;
+				stepread.zs = 0.0;// a bit useless this
 				stepread.hh = 0.0;
 				stepread.uu = 0.0;
 				stepread.vv = 0.0;
 				zsAllout[o].push_back(stepread);
 
-				noslipbndall << <gridDim, blockDim, 0 >> > (XParam.nx, XParam.ny, XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, zs_g, hh_g, uu_g, vv_g, TSstore_g);
+				storeTSout << <gridDim, blockDim, 0 >> > (XParam.nx, XParam.ny, XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, zs_g, hh_g, uu_g, vv_g, TSstore_g);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			nTSsteps++;
@@ -1029,13 +1036,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 	}
 }
 
-float demoloopGPU(Param XParam)
-{
-	
-	XParam.dt = FlowGPU(XParam);
-	return XParam.dt;
-	
-}
+
 
 
 void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
@@ -1078,8 +1079,8 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		nstep++;
 
 		// Do Sum & Max variables Here
-
-
+		AddmeanCPU(XParam);
+		maxallCPU(XParam);
 		//Check for TSoutput
 		if (XParam.TSnodesout.size() > 0)
 		{
@@ -1101,6 +1102,8 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
 		{
 			// Avg var sum here
+			DivmeanCPU(XParam, (float)nstep);
+			//
 			if (!XParam.outvars.empty())
 			{
 				writenctimestep(XParam.outfile, XParam.totaltime);
@@ -1126,7 +1129,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			write_text_to_log_file("Writing outputs, totaltime: " + std::to_string(XParam.totaltime) + ", Mean dt= " + std::to_string(XParam.outputtimestep / nstep));
 
 			//.Reset Avg Variables
-
+			ResetmeanCPU(XParam);
 
 			//
 			if (!XParam.TSoutfile.empty())
@@ -1175,10 +1178,6 @@ int main(int argc, char **argv)
 
 
 	// Start timer to keep track of time 
-	
-
-	
-
 	XParam.startcputime = clock();
 
 
@@ -1225,8 +1224,7 @@ int main(int argc, char **argv)
 		std::string line;
 		while (std::getline(fs, line))
 		{
-			//std::cout << line << std::endl;
-
+			
 			//Get param or skip empty lines
 			if (!line.empty() && line.substr(0, 1).compare("#") != 0)
 			{
@@ -1265,7 +1263,7 @@ int main(int argc, char **argv)
 		}
 		if (bathyext.compare("nc") == 0)
 		{
-			//write_text_to_log_file("Reading 'nc' file");
+			write_text_to_log_file("Reading bathy netcdf file");
 			//readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
 			//write_text_to_log_file("For nc of bathy file please specify grdalpha in the XBG_param.txt (default 0)");
 
@@ -1385,8 +1383,46 @@ int main(int argc, char **argv)
 	dhv = (float *)malloc(nx*ny * sizeof(float));
 
 	dummy = (float *)malloc(nx*ny * sizeof(float));
+	//not allocating below may be usefull
 
+	if (XParam.outhhmax == 1)
+	{
+		hhmax = (float *)malloc(nx*ny * sizeof(float));
+	}
+	if (XParam.outuumax == 1)
+	{
+		uumax = (float *)malloc(nx*ny * sizeof(float));
+	}
+	if (XParam.outvvmax == 1)
+	{
+		vvmax = (float *)malloc(nx*ny * sizeof(float));
+	}
+	if (XParam.outzsmax == 1)
+	{
+		zsmax = (float *)malloc(nx*ny * sizeof(float));
+	}
 	
+	if (XParam.outhhmean == 1)
+	{
+		hhmean = (float *)malloc(nx*ny * sizeof(float));
+	}
+	if (XParam.outzsmean == 1)
+	{
+		zsmean = (float *)malloc(nx*ny * sizeof(float));
+	}
+	if (XParam.outuumean == 1)
+	{
+		uumean = (float *)malloc(nx*ny * sizeof(float));
+	}
+	if (XParam.outvvmean == 1)
+	{
+		vvmean = (float *)malloc(nx*ny * sizeof(float));
+	}
+
+	if (XParam.outvort == 1)
+	{
+		vort = (float *)malloc(nx*ny * sizeof(float));
+	}
 
 
 
@@ -1454,6 +1490,44 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMalloc((void **)&arrmax_g, nx*ny*sizeof(float)));
 		
 
+		if (XParam.outhhmax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&hhmax_g, nx*ny*sizeof(float)));
+		}
+		if (XParam.outzsmax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&zsmax_g, nx*ny*sizeof(float)));
+		}
+		if (XParam.outuumax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&uumax_g, nx*ny*sizeof(float)));
+		}
+		if (XParam.outvvmax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&vvmax_g, nx*ny*sizeof(float)));
+		}
+		if (XParam.outhhmean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&hhmean_g, nx*ny*sizeof(float)));
+		}
+		if (XParam.outzsmean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&zsmean_g, nx*ny*sizeof(float)));
+		}
+		if (XParam.outuumean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&uumean_g, nx*ny*sizeof(float)));
+		}
+		if (XParam.outvvmean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&vvmean_g, nx*ny*sizeof(float)));
+		}
+
+		if (XParam.outvort == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&vort_g, nx*ny*sizeof(float)));
+		}
+
 		if (XParam.TSnodesout.size() > 0)
 		{
 			// Allocate mmemory to store TSoutput in between writing to disk
@@ -1494,17 +1568,105 @@ int main(int argc, char **argv)
 			vv[i + j*nx] = 0.0f;
 			zs[i + j*nx] = max(zsbnd,zb[i + j*nx]);
 			hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx],(float) XParam.eps);
-			//x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
-			//not really needed
-			
-			//y[i + j*nx] = (j-ny/2)*delta + 0.5*delta;
-			//fmu[i + j*nx] = 1.0;
-			//fmv[i + j*nx] = 1.0;
+		
+		}
+	}
+	// Below is not succint but way faster than one loop that checks teh if statemenst each time
+	if (XParam.outhhmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmax[i + j*nx] = hh[i + j*nx];
+			}
 		}
 	}
 
+	if (XParam.outhhmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmean[i + j*nx] = 0.0;
+			}
+		}
+	}
+	if (XParam.outzsmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmax[i + j*nx] = zs[i + j*nx];
+			}
+		}
+	}
 
+	if (XParam.outzsmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmean[i + j*nx] = 0.0;
+			}
+		}
+	}
 
+	if (XParam.outuumax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumax[i + j*nx] = uu[i + j*nx];
+			}
+		}
+	}
+
+	if (XParam.outuumean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumean[i + j*nx] = 0.0;
+			}
+		}
+	}
+	if (XParam.outvvmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmax[i + j*nx] = vv[i + j*nx];
+			}
+		}
+	}
+
+	if (XParam.outvvmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmean[i + j*nx] = 0.0;
+			}
+		}
+	}
+	if (XParam.outvort == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vort[i + j*nx] = 0.0;
+			}
+		}
+	}
 
 	if (XParam.GPUDEVICE >= 0)
 	{
@@ -1513,6 +1675,10 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMemcpy(uu_g, uu, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(vv_g, vv, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(zs_g, zs, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
+
+
+
+
 		dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 		dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
 
@@ -1541,6 +1707,42 @@ int main(int argc, char **argv)
 	OutputVarMapCPU["hh"] = hh;
 	OutputVarMapGPU["hh"] = hh_g;
 	OutputVarMaplen["hh"] = nx*ny;
+
+	OutputVarMapCPU["hhmean"] = hhmean;
+	OutputVarMapGPU["hhmean"] = hhmean_g;
+	OutputVarMaplen["hhmean"] = nx*ny;
+
+	OutputVarMapCPU["hhmax"] = hhmax;
+	OutputVarMapGPU["hhmax"] = hhmax_g;
+	OutputVarMaplen["hhmax"] = nx*ny;
+
+	OutputVarMapCPU["zsmean"] = zsmean;
+	OutputVarMapGPU["zsmean"] = zsmean_g;
+	OutputVarMaplen["zsmean"] = nx*ny;
+
+	OutputVarMapCPU["zsmax"] = zsmax;
+	OutputVarMapGPU["zsmax"] = zsmax_g;
+	OutputVarMaplen["zsmax"] = nx*ny;
+
+	OutputVarMapCPU["uumean"] = uumean;
+	OutputVarMapGPU["uumean"] = uumean_g;
+	OutputVarMaplen["uumean"] = nx*ny;
+
+	OutputVarMapCPU["uumax"] = uumax;
+	OutputVarMapGPU["uumax"] = uumax_g;
+	OutputVarMaplen["uumax"] = nx*ny;
+
+	OutputVarMapCPU["vvmean"] = vvmean;
+	OutputVarMapGPU["vvmean"] = vvmean_g;
+	OutputVarMaplen["vvmean"] = nx*ny;
+
+	OutputVarMapCPU["vvmax"] = vvmax;
+	OutputVarMapGPU["vvmax"] = vvmax_g;
+	OutputVarMaplen["vvmax"] = nx*ny;
+
+	OutputVarMapCPU["vort"] = vort;
+	OutputVarMapGPU["vort"] = vort_g;
+	OutputVarMaplen["vort"] = nx*ny;
 	//create nc file with no variables
 
 
@@ -1619,6 +1821,7 @@ int main(int argc, char **argv)
 		free(arrmin_g);
 		free(arrmax_g);
 		
+
 	}
 
 

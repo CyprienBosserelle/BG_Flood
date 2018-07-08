@@ -794,4 +794,201 @@ void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, 
 
 }
 
+void AddmeanCPU(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
 
+	if (XParam.outhhmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmean[i + j*nx] = hhmean[i + j*nx] + hh[i + j*nx];
+			}
+		}
+	}
+
+	if (XParam.outzsmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmean[i + j*nx] = zsmean[i + j*nx] + zs[i + j*nx];
+			}
+		}
+	}
+
+	if (XParam.outuumean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumean[i + j*nx] = uumean[i + j*nx] + uu[i + j*nx];
+			}
+		}
+	}
+	if (XParam.outvvmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmean[i + j*nx] = vvmean[i + j*nx] + vv[i + j*nx];
+			}
+		}
+	}
+
+
+}
+void DivmeanCPU(Param XParam, float nstep)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	if (XParam.outhhmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmean[i + j*nx] = hhmean[i + j*nx] /nstep;
+			}
+		}
+	}
+
+	if (XParam.outzsmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmean[i + j*nx] = zsmean[i + j*nx] / nstep;
+			}
+		}
+	}
+
+	if (XParam.outuumean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumean[i + j*nx] = uumean[i + j*nx] / nstep;
+			}
+		}
+	}
+	if (XParam.outvvmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmean[i + j*nx] = vvmean[i + j*nx] / nstep;
+			}
+		}
+	}
+
+
+}
+
+void ResetmeanCPU(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	if (XParam.outhhmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmean[i + j*nx] = 0.0;
+			}
+		}
+	}
+
+	if (XParam.outzsmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmean[i + j*nx] = 0.0;
+			}
+		}
+	}
+
+	if (XParam.outuumean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumean[i + j*nx] = 0.0;
+			}
+		}
+	}
+	if (XParam.outvvmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmean[i + j*nx] = 0.0;
+			}
+		}
+	}
+
+
+}
+
+void maxallCPU(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	if (XParam.outhhmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmax[i + j*nx] = max(hhmax[i + j*nx] , hh[i + j*nx]);
+			}
+		}
+	}
+	if (XParam.outzsmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmax[i + j*nx] = max(zsmax[i + j*nx], zs[i + j*nx]);
+			}
+		}
+	}
+	if (XParam.outuumax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumax[i + j*nx] = max(uumax[i + j*nx], uu[i + j*nx]);
+			}
+		}
+	}
+	if (XParam.outvvmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmax[i + j*nx] = max(vvmax[i + j*nx], vv[i + j*nx]);
+			}
+		}
+	}
+}

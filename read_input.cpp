@@ -244,19 +244,31 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh" };
-
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh", "hhmean", "zsmean", "uumean", "vvmean", "hhmax", "zsmax", "uumax", "vvmax" ,"vort"};
+			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
-				std::string vvar = trim(vars[nv]," ");
+				
 				//std::cout << "..." << vvar << "..." << std::endl;
 				if (vvar.compare(SupportedVarNames[isup]) == 0)
 				{
 					param.outvars.push_back(vvar);
 					break;
 				}
+
 			}
-			
+
+			param.outhhmean = (vvar.compare("hhmean") == 0) ? 1 : param.outhhmean;
+			param.outzsmean = (vvar.compare("zsmean") == 0) ? 1 : param.outzsmean;
+			param.outuumean = (vvar.compare("uumean") == 0) ? 1 : param.outuumean;
+			param.outvvmean = (vvar.compare("vvmean") == 0) ? 1 : param.outvvmean;
+
+			param.outhhmax = (vvar.compare("hhmax") == 0) ? 1 : param.outhhmax;
+			param.outzsmax = (vvar.compare("zsmax") == 0) ? 1 : param.outzsmax;
+			param.outuumax = (vvar.compare("uumax") == 0) ? 1 : param.outuumax;
+			param.outvvmax = (vvar.compare("vvmax") == 0) ? 1 : param.outvvmax;
+
+			param.outvort = (vvar.compare("vortmax") == 0) ? 1 : param.outvort;
 		}
 		
 
@@ -315,7 +327,12 @@ Param readparamstr(std::string line, Param param)
 		param.rho = std::stod(parametervalue);
 	}
 
-	
+	parameterstr = "tempmax";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.tempmax = std::stoi(parametervalue);
+	}
 	return param;
 }
 
