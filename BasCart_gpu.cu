@@ -905,6 +905,94 @@ float FlowGPU(Param XParam)
 	return XParam.dt;
 }
 
+void meanmaxvarGPU(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	if (XParam.outuumean == 1)
+	{
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, uumean_g, uu_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	if (XParam.outvvmean == 1)
+	{
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, vvmean_g, vv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	if (XParam.outhhmean == 1)
+	{
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, hhmean_g, hh_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	if (XParam.outzsmean == 1)
+	{
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmean_g, zs_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	if (XParam.outzsmax == 1)
+	{
+		max_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmax_g, zs_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	if (XParam.outhhmax == 1)
+	{
+		max_var << <gridDim, blockDim, 0 >> >(nx, ny, hhmax_g, hh_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	if (XParam.outuumax == 1)
+	{
+		max_var << <gridDim, blockDim, 0 >> >(nx, ny, uumax_g, uu_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	if (XParam.outvvmax == 1)
+	{
+		max_var << <gridDim, blockDim, 0 >> >(nx, ny, vvmax_g, vv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
+}
+
+void DivmeanvarGPU(Param XParam, float nstep)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	if (XParam.outuumean == 1)
+	{
+		divavg_var << <gridDim, blockDim, 0 >> >(nx, ny, nstep, uumean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		
+	}
+	if (XParam.outvvmean == 1)
+	{
+		divavg_var << <gridDim, blockDim, 0 >> >(nx, ny, nstep, vvmean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		
+	}
+	if (XParam.outhhmean == 1)
+	{
+		divavg_var << <gridDim, blockDim, 0 >> >(nx, ny, nstep, hhmean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		
+	}
+	if (XParam.outzsmean == 1)
+	{
+		divavg_var << <gridDim, blockDim, 0 >> >(nx, ny, nstep, zsmean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	
+	
+
+}
+
 // Main loop that actually runs the model
 void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
 {
@@ -929,7 +1017,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 	{
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
-		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o]);
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o].c_str());
 		fclose(fsSLTS);
 
 		// Add empty row for each output point
@@ -951,6 +1039,28 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		nstep++;
 		
 		// Do Sum & Max variables Here
+		
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, uumean_g, uu_g);
+		//CUT_CHECK_ERROR("Add avg execution failed\n");
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, vvmean_g, vv_g);
+		//CUT_CHECK_ERROR("Add avg execution failed\n");
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, hhmean_g, hh_g);
+		//CUT_CHECK_ERROR("Add avg execution failed\n");
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		addavg_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmean_g, zs_g);
+		//CUT_CHECK_ERROR("Add avg execution failed\n");
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		max_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmax_g, zs_g);
+		//CUT_CHECK_ERROR("Add avg execution failed\n");
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
 		//Check for TSoutput
 		if (XParam.TSnodesout.size() > 0)
 		{
@@ -999,6 +1109,9 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
 		{
 			// Avg var sum here
+			DivmeanvarGPU(XParam, nstep);
+
+
 			if (!XParam.outvars.empty())
 			{
 				writenctimestep(XParam.outfile, XParam.totaltime);
@@ -1059,7 +1172,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 	{
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
-		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o]);
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o].c_str());
 		fclose(fsSLTS);
 
 		// Add empty row for each output point
