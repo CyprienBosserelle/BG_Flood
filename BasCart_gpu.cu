@@ -992,7 +992,40 @@ void DivmeanvarGPU(Param XParam, float nstep)
 	
 
 }
+void ResetmeanvarGPU(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
 
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	if (XParam.outuumean == 1)
+	{
+		resetavg_var << <gridDim, blockDim, 0 >> >(nx, ny, uumean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outvvmean == 1)
+	{
+		resetavg_var << <gridDim, blockDim, 0 >> >(nx, ny,  vvmean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outhhmean == 1)
+	{
+		resetavg_var << <gridDim, blockDim, 0 >> >(nx, ny, hhmean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outzsmean == 1)
+	{
+		resetavg_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmean_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+}
 // Main loop that actually runs the model
 void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
 {
@@ -1123,7 +1156,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			write_text_to_log_file("Writing outputs, totaltime: " + std::to_string(XParam.totaltime) + ", Mean dt= " + std::to_string(XParam.outputtimestep / nstep));
 
 			//.Reset Avg Variables
-
+			ResetmeanvarGPU(XParam);
 
 
 			//
