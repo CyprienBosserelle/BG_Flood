@@ -1,6 +1,6 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////
 //						                                                        //
-//Copyright (C) 2017 Bosserelle                                                 //
+//Copyright (C) 2018 Bosserelle                                                 //
 //                                                                              //
 //This program is free software: you can redistribute it and/or modify          //
 //it under the terms of the GNU General Public License as published by          //
