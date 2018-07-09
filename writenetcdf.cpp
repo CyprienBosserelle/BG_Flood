@@ -67,35 +67,43 @@ extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, do
 
 	//create the netcdf datasetXParam.outfile.c_str()
 	status = nc_create(outfile.c_str(), NC_NOCLOBBER, &ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 	//Define dimensions: Name and length
 
 	status = nc_def_dim(ncid, "xx", nxx, &xx_dim);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_def_dim(ncid, "yy", nyy, &yy_dim);
-	
+	if (status != NC_NOERR) handle_error(status);
 	//status = nc_def_dim(ncid, "npart",nnpart,&p_dim);
 	status = nc_def_dim(ncid, "time", NC_UNLIMITED, &time_dim);
-
+	if (status != NC_NOERR) handle_error(status);
 	int tdim[] = { time_dim };
 	int xdim[] = { xx_dim };
 	int ydim[] = { yy_dim };
 	
 	
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_def_var(ncid, "xx", NC_FLOAT, 1, xdim, &xx_id);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_def_var(ncid, "yy", NC_FLOAT, 1, ydim, &yy_id);
-	
+	if (status != NC_NOERR) handle_error(status);
 	//End definitions: leave define mode
+
 	status = nc_enddef(ncid);
+	if (status != NC_NOERR) handle_error(status);
 
 	//Provide values for variables
 	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_put_vara_float(ncid, xx_id, xstart, xcount, xval);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_put_vara_float(ncid, yy_id, ystart, ycount, yval);
-	
+	if (status != NC_NOERR) handle_error(status);
+
 	//close and save new file
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 	free(xval);
 	free(yval);
 	
@@ -109,18 +117,21 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	int  var_dimid3D[3];
 	int  var_dimid4D[4];
 
-	int * var_s;
+	short * var_s;
 	int recid, xid, yid, thid;
 	size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
 	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_redef(ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 	//Inquire dimensions ids
 	status = nc_inq_unlimdim(ncid, &recid);//time
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_dimid(ncid, "xx", &xid);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_dimid(ncid, "yy", &yid);
-	
+	if (status != NC_NOERR) handle_error(status);
 	
 
 	var_dimid2D[0] = yid;
@@ -131,7 +142,8 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	var_dimid3D[2] = xid;
 
 	float fillval = 9.9692e+36f;
-
+	short Sfillval = 32767;
+//short fillval = 32767
 	static size_t start2D[] = { 0, 0 }; // start at first value 
 	static size_t count2D[] = { ny, nx };
 
@@ -141,14 +153,14 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (int *)malloc(nx*ny*sizeof(int));
+		var_s = (short *)malloc(nx*ny*sizeof(short));
 
 		for (int i = 0; i < nx; i++)
 		{
 			for (int j = 0; j < ny; j++)
 			{
 				// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
-				var_s[i + nx*j] = (int)round((var[i + nx*j] - addoffset) / scalefactor);
+				var_s[i + nx*j] = (short)round((var[i + nx*j] - addoffset) / scalefactor);
 			}
 		}
 	}
@@ -157,24 +169,34 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	{
 		if (smallnc > 0)
 		{
-			status = nc_def_var(ncid, varst.c_str(), NC_INT, vdim, var_dimid2D, &var_id);
-
+			
+			status = nc_def_var(ncid, varst.c_str(), NC_SHORT, vdim, var_dimid2D, &var_id);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
-			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
-			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_error(status);
+			status = nc_put_att_short(ncid, var_id, "_FillValue", NC_SHORT, 1, &Sfillval);
+			if (status != NC_NOERR) handle_error(status);
+			status = nc_put_att_short(ncid, var_id, "missingvalue", NC_SHORT, 1, &Sfillval);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
-
-			status = nc_put_vara_int(ncid, var_id, start2D, count2D, var_s);
-
+			if (status != NC_NOERR) handle_error(status);
+			status = nc_put_vara_short(ncid, var_id, start2D, count2D, var_s);
+			if (status != NC_NOERR) handle_error(status);
 		}
 		else
 		{
 			status = nc_def_var(ncid, varst.c_str(), NC_FLOAT, vdim, var_dimid2D, &var_id);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_vara_float(ncid, var_id, start2D, count2D, var);
+			if (status != NC_NOERR) handle_error(status);
 		}
 
 		
@@ -183,23 +205,35 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	{
 		if (smallnc > 0)
 		{
-			status = nc_def_var(ncid, varst.c_str(), NC_INT, vdim, var_dimid3D, &var_id);
+			status = nc_def_var(ncid, varst.c_str(), NC_SHORT, vdim, var_dimid3D, &var_id);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
-			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
-			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_error(status);
+			status = nc_put_att_short(ncid, var_id, "_FillValue", NC_SHORT, 1, &Sfillval);
+			if (status != NC_NOERR) handle_error(status);
+			status = nc_put_att_short(ncid, var_id, "missingvalue", NC_SHORT, 1, &Sfillval);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
-
-			status = nc_put_vara_int(ncid, var_id, start3D, count3D, var_s);
+			if (status != NC_NOERR) handle_error(status);
+			status = nc_put_vara_short(ncid, var_id, start3D, count3D, var_s);
+			if (status != NC_NOERR) handle_error(status);
 
 		}
 		else
 		{
 			status = nc_def_var(ncid, varst.c_str(), NC_FLOAT, vdim, var_dimid3D, &var_id);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
+			if (status != NC_NOERR) handle_error(status);
+			
 			status = nc_put_vara_float(ncid, var_id, start3D, count3D, var);
+			if (status != NC_NOERR) handle_error(status);
 		}
 	}
 	
@@ -209,6 +243,7 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	}
 	//close and save new file
 	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_error(status);
 
 }
 
@@ -217,17 +252,22 @@ extern "C" void writenctimestep(std::string outfile,  double totaltime)
 {
 	int status, ncid, recid, time_id;
 	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
+	if (status != NC_NOERR) handle_error(status);
 	static size_t nrec;
 	static size_t tst[] = { 0 };
 	//read id from time dimension
 	status = nc_inq_unlimdim(ncid, &recid);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_dimlen(ncid, recid, &nrec);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_varid(ncid, "time", &time_id);
+	if (status != NC_NOERR) handle_error(status);
 	tst[0] = nrec;
 	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
+	if (status != NC_NOERR) handle_error(status);
 	//close and save
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 }
 
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var)
@@ -240,13 +280,14 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 	size_t  *ddim, *start,*count;
 //XParam.outfile.c_str()
 	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 	//read id from time dimension
 	status = nc_inq_unlimdim(ncid, &recid);
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_dimlen(ncid, recid, &nrec);
-
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_varid(ncid, varst.c_str(), &var_id);
-
+	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_varndims(ncid, var_id, &ndims);
 	if (status != NC_NOERR) handle_error(status);
 	//printf("hhVar:%d dims\n", ndimshh);
@@ -300,7 +341,7 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 	
 	//close and save
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 	free(ddim);
 	free(start);
 	free(count);
