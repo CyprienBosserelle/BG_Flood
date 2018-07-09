@@ -83,7 +83,7 @@ public:
 	clock_t startcputime, endcputime;
 	
 	//Netcdf parameters
-	int smallnc = 0;//default save as short integer if smallnc=0 then save all variables as float
+	int smallnc = 1;//default save as short integer if smallnc=0 then save all variables as float
 	float scalefactor = 0.01;
 	float addoffset = 0.0;
 
