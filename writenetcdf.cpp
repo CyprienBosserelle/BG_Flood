@@ -22,7 +22,7 @@
 void handle_error(int status) {
 	if (status != NC_NOERR) {
 		fprintf(stderr, "Netcdf %s\n", nc_strerror(status));
-		
+		write_text_to_log_file("Netcdf error:" + std::to_string(status));
 		//fprintf(logfile, "Netcdf: %s\n", nc_strerror(status));
 		exit(-1);
 	}
@@ -347,3 +347,221 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 	free(count);
 }
 
+
+extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
+{
+	int status;
+	int ncid, hh_id;
+	static size_t count[] = { nx, ny };
+	std::string varstr,ncfilestr;
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(ncfile, '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		ncfilestr = nameelements[0];
+		varstr = nameelements[1];
+	}
+	else
+	{
+		ncfilestr = ncfile;
+		varstr = "zb";
+	}
+
+
+	status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, varstr.c_str(), &hh_id);
+	status = nc_get_var_float(ncid, hh_id, zb);
+	status = nc_close(ncid);
+
+
+}
+void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx)
+{
+	//read the dimentions of grid, levels and time 
+	int status;
+	int ncid, ndimshh, ndims;
+	double *xcoord, *ycoord;
+	int varid;
+
+	int ndimsp, nvarsp, nattsp, unlimdimidp;
+
+	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
+	char coordname[NC_MAX_NAME + 1];
+	char varname[NC_MAX_NAME + 1];
+	size_t  *ddimhh;
+
+	std::string ncfilestr;
+	std::string varstr;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(ncfile, '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		ncfilestr = nameelements[0];
+		varstr = nameelements[1];
+	}
+	else
+	{
+		ncfilestr = ncfile;
+		varstr = "zb";
+	}
+	//Open NC file
+	printf("Open file\n");
+	status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	
+	//printf(" %s...\n", hhvar);
+	status = nc_inq_varid(ncid, varstr.c_str(), &varid);
+	if (status != NC_NOERR)	handle_error(status);
+
+
+
+	status = nc_inq_varndims(ncid, varid, &ndimshh);
+	if (status != NC_NOERR) handle_error(status);
+	//printf("hhVar:%d dims\n", ndimshh);
+
+	status = nc_inq_vardimid(ncid, varid, dimids);
+	if (status != NC_NOERR) handle_error(status);
+
+	ddimhh = (size_t *)malloc(ndimshh*sizeof(size_t));
+
+	//Read dimensions nx_u ny_u 
+	for (int iddim = 0; iddim < ndimshh; iddim++)
+	{
+		status = nc_inq_dimlen(ncid, dimids[iddim], &ddimhh[iddim]);
+		if (status != NC_NOERR) handle_error(status);
+
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+	}
+
+	if (ndimshh > 2)
+	{
+		ny = ddimhh[1];
+		nx = ddimhh[2];
+	}
+	else
+	{
+		ny = ddimhh[0];
+		nx = ddimhh[1];
+	}
+
+	//allocate
+	xcoord = (double *)malloc(nx*ny*sizeof(double));
+	ycoord = (double *)malloc(nx*ny*sizeof(double));
+
+	//inquire variable name for x dimension
+	//aka x dim of hh
+	int ycovar, xcovar;
+
+	if (ndimshh > 2)
+	{
+		ycovar = dimids[1];
+		xcovar = dimids[2];
+	}
+	else
+	{
+		ycovar = dimids[0];
+		xcovar = dimids[1];
+	}
+
+	//ycoord
+	status = nc_inq_dimname(ncid, ycovar, coordname);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varid(ncid, coordname, &varid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varndims(ncid, varid, &ndims);
+	if (status != NC_NOERR) handle_error(status);
+
+	if (ndims < 2)
+	{
+		double * ytempvar;
+		ytempvar = (double *)malloc(ny*sizeof(double));
+		size_t start[] = { 0 };
+		size_t count[] = { ny };
+		status = nc_get_vara_double(ncid, varid, start, count, ytempvar);
+		if (status != NC_NOERR) handle_error(status);
+
+		for (int i = 0; i<nx; i++)
+		{
+			for (int j = 0; j<ny; j++)
+			{
+
+				ycoord[i + j*nx] = ytempvar[j];
+
+			}
+		}
+		free(ytempvar);
+	}
+	else
+	{
+		size_t start[] = { 0, 0 };
+		size_t count[] = { ny, nx };
+		status = nc_get_vara_double(ncid, varid, start, count, ycoord);
+		if (status != NC_NOERR) handle_error(status);
+
+	}
+	//xcoord
+	status = nc_inq_dimname(ncid, xcovar, coordname);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varid(ncid, coordname, &varid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varndims(ncid, varid, &ndims);
+	if (status != NC_NOERR) handle_error(status);
+
+	if (ndims < 2)
+	{
+		double * xtempvar;
+		xtempvar = (double *)malloc(nx*sizeof(double));
+		size_t start[] = { 0 };
+		size_t count[] = { nx };
+		status = nc_get_vara_double(ncid, varid, start, count, xtempvar);
+		if (status != NC_NOERR) handle_error(status);
+
+		for (int i = 0; i<nx; i++)
+		{
+			for (int j = 0; j<ny; j++)
+			{
+
+				xcoord[i + j*nx] = xtempvar[i];
+
+			}
+		}
+		free(xtempvar);
+	}
+	else
+	{
+		size_t start[] = { 0, 0 };
+		size_t count[] = { ny, nx };
+		status = nc_get_vara_double(ncid, varid, start, count, xcoord);
+		if (status != NC_NOERR) handle_error(status);
+
+	}
+
+	float dxx, dyy;
+	//check dx
+	dxx = abs(xcoord[0] - xcoord[nx - 1]) / (nx - 1);
+	dyy = abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
+
+
+	dx = dxx;
+
+
+	status = nc_close(ncid);
+
+	free(ddimhh);
+	free(xcoord);
+	free(ycoord);
+
+
+}

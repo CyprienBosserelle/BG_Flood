@@ -1388,7 +1388,21 @@ int main(int argc, char **argv)
 		write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
 
 		std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
-		bathyext = extvec.back();
+
+		std::vector<std::string> nameelements;
+		//by default we expect tab delimitation
+		nameelements = split(extvec.back(), '?');
+		if (nameelements.size() > 1)
+		{
+			//variable name for bathy is not given so it is assumed to be zb
+			bathyext = nameelements[0];
+		}
+		else
+		{
+			bathyext = extvec.back();
+		}
+
+		
 		write_text_to_log_file("bathy extension: " + bathyext);
 		if (bathyext.compare("md") == 0)
 		{
@@ -1399,8 +1413,8 @@ int main(int argc, char **argv)
 		if (bathyext.compare("nc") == 0)
 		{
 			write_text_to_log_file("Reading bathy netcdf file");
-			//readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
-			//write_text_to_log_file("For nc of bathy file please specify grdalpha in the XBG_param.txt (default 0)");
+			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
+			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 		}
 		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
@@ -1683,7 +1697,7 @@ int main(int argc, char **argv)
 	}
 	if (bathyext.compare("nc") == 0)
 	{
-		//readnczb(XParam.nx, XParam.ny, XParam.Bathymetryfile, zb);
+		readnczb(XParam.nx, XParam.ny, XParam.Bathymetryfile, zb);
 	}
 	if (bathyext.compare("bot") == 0 || bathyext.compare("dep") == 0)
 	{

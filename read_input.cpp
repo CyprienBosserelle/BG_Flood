@@ -673,6 +673,7 @@ extern "C" void readXBbathy(std::string filename, int nx,int ny, float *&zb)
 }
 
 
+
 void write_text_to_log_file(std::string text)
 {
 	std::ofstream log_file(

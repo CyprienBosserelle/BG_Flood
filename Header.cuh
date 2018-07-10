@@ -208,6 +208,8 @@ extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, do
 extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
 extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
+void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx);
+extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 
 // I/O
 extern "C" void readbathy(std::string filename, float *&zb);
