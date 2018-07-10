@@ -181,17 +181,14 @@ template <class T> const T& min(const T& a, const T& b);
 void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
 float FlowCPU(Param XParam);
 float demoloopCPU(Param XParam);
-double minmod2(double s0, double s1, double s2);
-double dtnext(double t, double tnext, double dt);
-//void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady);
-void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dady);
-void kurganov(double g, double CFL, double hm, double hp, double um, double up, double Delta, double * fh, double * fq, double * dtmax);
-void update(int nx, int ny, double dt, double eps, double g, double CFL, double delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
+
+void update(int nx, int ny, float theta, double dt, double eps, double g, double CFL, double delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
 void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
 void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
 void leftdirichletCPU(int nx, int ny, float g, float zsbnd, float *zs, float *zb, float *hh, float *uu, float *vv);
 void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv);
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
+
 //Bnd functions
 void neumannbnd(int nx, int ny, double*a);
 

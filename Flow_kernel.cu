@@ -5,13 +5,13 @@ __device__ float sq(float a)
 }
 
 
-__device__ float minmod2fGPU(float s0, float s1, float s2)
+__device__ float minmod2fGPU(float theta,float s0, float s1, float s2)
 {
 	//theta should be used as a global var 
 	// can be used to tune the limiting (theta=1
 	//gives minmod, the most dissipative limiter and theta = 2 gives
 	//	superbee, the least dissipative).
-	float theta = 1.3f;
+	//float theta = 1.3f;
 	if (s0 < s1 && s1 < s2) {
 		float d1 = theta*(s1 - s0);
 		float d2 = (s2 - s0) / 2.0f;
@@ -27,7 +27,7 @@ __device__ float minmod2fGPU(float s0, float s1, float s2)
 	return 0.;
 }
 
-__global__ void gradientGPUX(int nx, int ny, float delta, float *a, float *dadx)
+__global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, float *dadx)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -46,7 +46,7 @@ __global__ void gradientGPUX(int nx, int ny, float delta, float *a, float *dadx)
 
 
 		//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-		dadx[i] = minmod2fGPU(a[xminus + iy*nx], a[i], a[xplus + iy*nx]) / delta;
+		dadx[i] = minmod2fGPU(theta,a[xminus + iy*nx], a[i], a[xplus + iy*nx]) / delta;
 
 	}
 
@@ -54,7 +54,7 @@ __global__ void gradientGPUX(int nx, int ny, float delta, float *a, float *dadx)
 
 }
 
-__global__ void gradientGPUY(int nx, int ny, float delta, float *a, float *dady)
+__global__ void gradientGPUY(int nx, int ny,float theta, float delta, float *a, float *dady)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -72,7 +72,7 @@ __global__ void gradientGPUY(int nx, int ny, float delta, float *a, float *dady)
 
 
 		//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-		dady[i] = minmod2fGPU(a[ix + yminus*nx], a[i], a[ix + yplus*nx]) / delta;
+		dady[i] = minmod2fGPU(theta,a[ix + yminus*nx], a[i], a[ix + yplus*nx]) / delta;
 
 	}
 

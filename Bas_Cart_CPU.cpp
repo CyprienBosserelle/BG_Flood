@@ -65,13 +65,13 @@ double minmod2(double s0, double s1, double s2)
 	return 0.;
 }
 
-float minmod2f(float s0, float s1, float s2)
+float minmod2f(float theta, float s0, float s1, float s2)
 {
 	//theta should be used as a global var 
 	// can be used to tune the limiting (theta=1
 	//gives minmod, the most dissipative limiter and theta = 2 gives
 	//	superbee, the least dissipative).
-	float theta = 1.3f;
+	//float theta = 1.3f;
 	if (s0 < s1 && s1 < s2) {
 		float d1 = theta*(s1 - s0);
 		float d2 = (s2 - s0) / 2.0f;
@@ -117,7 +117,7 @@ double dtnext(double t, double tnext, double dt)
 	return dt;
 }
 
-void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dady)
+void gradient(int nx, int ny,float theta, double delta, float *a, float *&dadx, float * &dady)
 {
 
 	int i, xplus, yplus, xminus, yminus;
@@ -136,9 +136,9 @@ void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dad
 
 
 			//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-			dadx[i] = minmod2f(a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
+			dadx[i] = minmod2f(theta,a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
 			//dady[i] = (a[i] - a[ix + yminus*nx]) / delta;
-			dady[i] = minmod2f(a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
+			dady[i] = minmod2f(theta,a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
 
 
 		}
@@ -226,7 +226,7 @@ void neumannbnd(int nx, int ny, double*a)
 
 //Warning all the g, dt etc shouyld all be float so the compiler does the conversion before running the 
 
-void update(int nx, int ny, double dt, double eps, double g,double CFL, double delta,float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
+void update(int nx, int ny, float theta, double dt, double eps, double g,double CFL, double delta,float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
@@ -237,10 +237,10 @@ void update(int nx, int ny, double dt, double eps, double g,double CFL, double d
 	float dtmaxtmp = dtmax;
 
 	// calculate gradients
-	gradient(nx, ny, delta, hh, dhdx, dhdy);
-	gradient(nx, ny, delta, zs, dzsdx, dzsdy);
-	gradient(nx, ny, delta, uu, dudx, dudy);
-	gradient(nx, ny, delta, vv, dvdx, dvdy);
+	gradient(nx, ny, theta, delta, hh, dhdx, dhdy);
+	gradient(nx, ny, theta, delta, zs, dzsdx, dzsdy);
+	gradient(nx, ny, theta, delta, uu, dudx, dudy);
+	gradient(nx, ny, theta, delta, vv, dvdx, dvdy);
 	
 	float cm = 1.0;// 0.1;
 	float fmu = 1.0;
@@ -670,7 +670,7 @@ float FlowCPU(Param XParam)
 	//flowbnd();
 
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
-	update(nx, ny, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
+	update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
 	//printf("dtmax=%f\n", dtmax);
 	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
 	//printf("dt=%f\n", XParam.dt);
@@ -680,7 +680,7 @@ float FlowCPU(Param XParam)
 		advance(nx, ny, XParam.dt*0.5, XParam.eps,  hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 		//corrector
-		update(nx, ny, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
+		update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
 	}
 	//
 	advance(nx, ny, XParam.dt, XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
