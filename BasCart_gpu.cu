@@ -1927,55 +1927,93 @@ int main(int argc, char **argv)
 	write_text_to_log_file("Total runtime= " + std::to_string((XParam.endcputime - XParam.startcputime) / CLOCKS_PER_SEC) + "  seconds" );
 
 	//if GPU?
+	free(hh);
+	free(uu);
+	free(vv);
+	free(zb);
+	free(zs);
+
+	free(hho);
+	free(uuo);
+	free(vvo);
+	free(zso);
+
+	free(dhdx);
+	free(dhdy);
+	free(dudx);
+	free(dudy);
+	free(dvdx);
+	free(dvdy);
+
+	free(dzsdx);
+	free(dzsdy);
+
+	free(Su);
+	free(Sv);
+	free(Fqux);
+	free(Fquy);
+	free(Fqvx);
+	free(Fqvy);
+	free(Fhu);
+	free(Fhv);
+
+	free(dh);
+	free(dhu);
+	free(dhv);
+
+	
+
+
 
 
 	if (XParam.GPUDEVICE >= 0)
 	{
-		free(hh_g);
-		free(uu_g);
-		free(vv_g);
-		free(zb_g);
-		free(zs_g);
+		cudaFree(hh_g);
+		cudaFree(uu_g);
+		cudaFree(vv_g);
+		cudaFree(zb_g);
+		cudaFree(zs_g);
 
-		free(hho_g);
-		free(uuo_g);
-		free(vvo_g);
-		free(zso_g);
+		cudaFree(hho_g);
+		cudaFree(uuo_g);
+		cudaFree(vvo_g);
+		cudaFree(zso_g);
 
-		free(dhdx_g);
-		free(dhdy_g);
-		free(dudx_g);
-		free(dudy_g);
-		free(dvdx_g);
-		free(dvdy_g);
+		cudaFree(dhdx_g);
+		cudaFree(dhdy_g);
+		cudaFree(dudx_g);
+		cudaFree(dudy_g);
+		cudaFree(dvdx_g);
+		cudaFree(dvdy_g);
 
-		free(dzsdx_g);
-		free(dzsdy_g);
+		cudaFree(dzsdx_g);
+		cudaFree(dzsdy_g);
 
-		free(Su_g);
-		free(Sv_g);
-		free(Fqux_g);
-		free(Fquy_g);
-		free(Fqvx_g);
-		free(Fqvy_g);
-		free(Fhu_g);
-		free(Fhv_g);
+		cudaFree(Su_g);
+		cudaFree(Sv_g);
+		cudaFree(Fqux_g);
+		cudaFree(Fquy_g);
+		cudaFree(Fqvx_g);
+		cudaFree(Fqvy_g);
+		cudaFree(Fhu_g);
+		cudaFree(Fhv_g);
 
-		free(dh_g);
-		free(dhu_g);
-		free(dhv_g);
+		cudaFree(dh_g);
+		cudaFree(dhu_g);
+		cudaFree(dhv_g);
 
-		free(dtmax_g);
+		cudaFree(dtmax_g);
 
 		
-		free(arrmin_g);
-		free(arrmax_g);
-		
+		cudaFree(arrmin_g);
+		cudaFree(arrmax_g);
+
+		cudaDeviceReset();
 
 	}
 
 
-	cudaDeviceReset();
+	
 
 
 
