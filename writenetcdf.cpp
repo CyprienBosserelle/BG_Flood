@@ -20,11 +20,16 @@
 
 
 void handle_error(int status) {
+	
+	
 	if (status != NC_NOERR) {
 		fprintf(stderr, "Netcdf %s\n", nc_strerror(status));
-		write_text_to_log_file("Netcdf error:" + std::to_string(status));
+		std::ostringstream stringStream;
+		stringStream << nc_strerror(status);
+		std::string copyOfStr = stringStream.str();
+		write_text_to_log_file("Netcdf error:" + copyOfStr);
 		//fprintf(logfile, "Netcdf: %s\n", nc_strerror(status));
-		exit(-1);
+		exit(2);
 	}
 }
 

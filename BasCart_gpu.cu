@@ -1408,13 +1408,14 @@ int main(int argc, char **argv)
 		{
 			write_text_to_log_file("Reading 'md' file");
 			readbathyHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
-			XParam.delta = XParam.dx;
+			
 		}
 		if (bathyext.compare("nc") == 0)
 		{
 			write_text_to_log_file("Reading bathy netcdf file");
 			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
 			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+			
 
 		}
 		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
@@ -1428,6 +1429,7 @@ int main(int argc, char **argv)
 			//
 		}
 
+		XParam.delta = XParam.dx;
 		XParam.grdalpha = XParam.grdalpha*pi / 180; // grid rotation
 
 													//fid = fopen(XParam.Bathymetryfile.c_str(), "r");
@@ -1705,6 +1707,18 @@ int main(int argc, char **argv)
 	}
 
 	//init variables
+	if (XParam.posdown == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zb[i + j*nx] = zb[i + j*nx] * -1.0f;
+				
+			}
+		}
+	}
+
 
 	//Cold start
 	float zsbnd = leftWLbnd[0].wlev;
@@ -1712,11 +1726,12 @@ int main(int argc, char **argv)
 	{
 		for (int i = 0; i < nx; i++)
 		{
-			//zb[i + j*nx] = 0.0f;
+						
 			uu[i + j*nx] = 0.0f;
 			vv[i + j*nx] = 0.0f;
 			zs[i + j*nx] = max(zsbnd,zb[i + j*nx]);
 			hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx],(float) XParam.eps);
+			
 		
 		}
 	}

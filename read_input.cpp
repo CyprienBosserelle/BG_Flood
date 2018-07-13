@@ -359,6 +359,12 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.addoffset = std::stod(parametervalue);
 	}
+	parameterstr = "posdown";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.posdown = std::stoi(parametervalue);
+	}
 	return param;
 }
 
