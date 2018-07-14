@@ -204,7 +204,7 @@ extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltim
 extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
 
 // Netcdf functions
-extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, double totaltime);
+Param creatncfileUD(Param XParam);
 
 extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
 extern "C" void writenctimestep(std::string outfile, double totaltime);
@@ -216,7 +216,7 @@ extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 extern "C" void readbathy(std::string filename, float *&zb);
 void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
-void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
+void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
 extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);
 

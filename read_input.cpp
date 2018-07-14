@@ -752,7 +752,7 @@ double interptime(double next, double prev, double timenext, double time)
 	return prev + (time) / (timenext)*(next - prev);
 }
 
-void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
+void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha)
 {
 	std::ifstream fs(filename);
 
@@ -802,6 +802,20 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 				dx = std::stod(right);
 
 			}
+			if (left.compare("xllcenter") == 0) // found the parameter
+			{
+
+				//
+				xo = std::stod(right);
+
+			}
+			if (left.compare("yllcenter") == 0) // found the parameter
+			{
+
+				//
+				yo = std::stod(right);
+
+			}
 			linehead++;
 		}
 	}
@@ -813,35 +827,36 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 {
 	//
-	//printf("bathy: %s\n", filename);
-	FILE *fid;
-
-	int jread;
-	//read md file
-	fid = fopen(filename.c_str(), "r");
-
-	fscanf(fid, "%*s\t%u", &jread);
-	fscanf(fid, "%*s\t%u", &jread);
-	fscanf(fid, "%*s\t%u", &jread);
-	fscanf(fid, "%*s\t%u", &jread);
-	fscanf(fid, "%*s\t%u", &jread);
-	fscanf(fid, "%*s\t%u", &jread);
-
-
+	std::ifstream fs(filename);
+	int linehead = 0;
+	std::string line;
+	if (fs.fail()) {
+		std::cerr << filename << " bathy file (md file) could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: bathy file could not be opened ");
+		exit(1);
+	}
+	while (linehead < 6)
+	{
+		//Skip header
+		std::getline(fs, line);
+		linehead++;
+	}
 	//int jreadzs;
-	for (int jnod = 0; jnod < ny; jnod++)
+	for (int jnod = ny-1; jnod >= 0; jnod--)
 	{
 
 
 
 		for (int inod = 0; inod < nx; inod++)
 		{
-			fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
+			//fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
+
+			fs >> zb[inod + (jnod)*nx];
 			//printf("%f\n", zb[inod + (jnod)*nx]);
 
 		}
 	}
 
-	fclose(fid);
+	fs.close();
 }
 

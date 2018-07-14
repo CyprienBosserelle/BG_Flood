@@ -34,10 +34,11 @@ void handle_error(int status) {
 }
 
 
-extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, double totaltime)
+Param creatncfileUD(Param XParam)
 {
 	int status;
-	
+	int nx = XParam.nx;
+	int ny = XParam.ny;
 	//double dx = XParam.dx;
 	size_t nxx, nyy, nth;
 	int ncid, xx_dim, yy_dim, time_dim;
@@ -62,16 +63,48 @@ extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, do
 
 	for (int i = 0; i<nx; i++)
 	{
-		xval[i] = i*dx;
+		xval[i] = XParam.xo+i*XParam.dx;
 	}
 	for (int i = 0; i<ny; i++)
 	{
-		yval[i] = i*dx;
+		yval[i] = XParam.yo + i*XParam.dx;
 	}
 	
 
 	//create the netcdf datasetXParam.outfile.c_str()
-	status = nc_create(outfile.c_str(), NC_NOCLOBBER, &ncid);
+	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
+	if (status != NC_NOERR)
+	{
+		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
+		{
+			int fileinc = 1;
+			std::vector<std::string> extvec = split(XParam.outfile, '.');
+			std::string bathyext = extvec.back();
+			std::string newname;
+
+			while (status == NC_EEXIST)
+			{
+				newname = extvec[0];
+				for (int nstin = 1; nstin < extvec.size() - 1; nstin++)
+				{
+					// This is in case there are "." in the file name that do not relate to the file extension"
+					newname = newname+"."+extvec[nstin];
+				}
+				newname = newname + "(" + std::to_string(fileinc) + ")" + "." + bathyext;
+				XParam.outfile = newname;
+				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
+				fileinc++;
+			}
+			
+		}
+		else
+		{
+			// Other error
+			handle_error(status);
+		}
+	}
+
+	// status could be a new error after renaming the file
 	if (status != NC_NOERR) handle_error(status);
 	//Define dimensions: Name and length
 
@@ -99,7 +132,7 @@ extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, do
 	if (status != NC_NOERR) handle_error(status);
 
 	//Provide values for variables
-	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
+	status = nc_put_var1_double(ncid, time_id, tst, &XParam.totaltime);
 	if (status != NC_NOERR) handle_error(status);
 	status = nc_put_vara_float(ncid, xx_id, xstart, xcount, xval);
 	if (status != NC_NOERR) handle_error(status);
@@ -111,6 +144,8 @@ extern "C" void creatncfileUD(std::string outfile, int nx, int ny, double dx, do
 	if (status != NC_NOERR) handle_error(status);
 	free(xval);
 	free(yval);
+
+	return XParam;
 	
 }
 

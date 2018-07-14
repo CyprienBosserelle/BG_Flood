@@ -1428,7 +1428,7 @@ int main(int argc, char **argv)
 		{
 			//
 			write_text_to_log_file("Reading bathy asc file");
-			readbathyASCHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
+			readbathyASCHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.xo, XParam.yo, XParam.grdalpha);
 			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
@@ -1714,6 +1714,12 @@ int main(int argc, char **argv)
 		readbathyASCzb(XParam.Bathymetryfile, XParam.nx, XParam.ny, zb);
 	}
 
+	//printf("%f\n", zb[0]);
+	//printf("%f\n", zb[(nx - 1) + (0)*nx]);
+	//printf("%f\n", zb[(0) + (ny-1)*nx]);
+	//printf("%f\n", zb[(nx - 1) + (ny - 1)*nx]);
+	
+
 	//init variables
 	if (XParam.posdown == 1)
 	{
@@ -1859,8 +1865,8 @@ int main(int argc, char **argv)
 
 	}
 
-	
-
+	// Here map array to their name as a string. it makes it super easy to convert user define variables to the array it represents.
+	// COul add more to output gradients etc...
 	OutputVarMapCPU["zb"] = zb;
 	OutputVarMapGPU["zb"] = zb_g;
 	OutputVarMaplen["zb"] = nx*ny;
@@ -1916,10 +1922,10 @@ int main(int argc, char **argv)
 	OutputVarMapCPU["vort"] = vort;
 	OutputVarMapGPU["vort"] = vort_g;
 	OutputVarMaplen["vort"] = nx*ny;
+
+
 	//create nc file with no variables
-
-
-	creatncfileUD(XParam.outfile, nx, ny, XParam.delta, 0.0);
+	XParam=creatncfileUD(XParam);
 	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 	{
 		//Create definition for each variable and store it
