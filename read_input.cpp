@@ -752,3 +752,96 @@ double interptime(double next, double prev, double timenext, double time)
 	return prev + (time) / (timenext)*(next - prev);
 }
 
+void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
+{
+	std::ifstream fs(filename);
+
+	if (fs.fail()) {
+		std::cerr << filename << " bathy file (md file) could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: bathy file could not be opened ");
+		exit(1);
+	}
+
+	std::string line,left,right;
+	std::vector<std::string> lineelements;
+	std::size_t found;
+	//std::getline(fs, line);
+	int linehead = 0;
+
+	while (linehead < 6)
+	{
+		std::getline(fs, line);
+		// skip empty lines
+		if (!line.empty())
+		{
+
+			//by default we expect tab delimitation
+			lineelements = split(line, ' ');
+			left = trim(lineelements[0], " ");
+			right = lineelements[1]; // if there are more than one equal sign in the line the second one is ignored
+			//found = left.compare("ncols");// it needs to strictly compare
+			if (left.compare("ncols") == 0) // found the parameter
+			{
+
+				//
+				nx = std::stoi(right);
+
+			}
+
+			if (left.compare("nrows") == 0) // found the parameter
+			{
+
+				//
+				ny = std::stoi(right);
+
+			}
+			if (left.compare("cellsize") == 0) // found the parameter
+			{
+
+				//
+				dx = std::stod(right);
+
+			}
+			linehead++;
+		}
+	}
+	grdalpha = 0.0;
+	fs.close();
+
+}
+
+void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
+{
+	//
+	//printf("bathy: %s\n", filename);
+	FILE *fid;
+
+	int jread;
+	//read md file
+	fid = fopen(filename.c_str(), "r");
+
+	fscanf(fid, "%*s\t%u", &jread);
+	fscanf(fid, "%*s\t%u", &jread);
+	fscanf(fid, "%*s\t%u", &jread);
+	fscanf(fid, "%*s\t%u", &jread);
+	fscanf(fid, "%*s\t%u", &jread);
+	fscanf(fid, "%*s\t%u", &jread);
+
+
+	//int jreadzs;
+	for (int jnod = 0; jnod < ny; jnod++)
+	{
+
+
+
+		for (int inod = 0; inod < nx; inod++)
+		{
+			fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
+			//printf("%f\n", zb[inod + (jnod)*nx]);
+
+		}
+	}
+
+	fclose(fid);
+}
+

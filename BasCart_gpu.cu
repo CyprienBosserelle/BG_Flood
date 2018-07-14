@@ -1427,6 +1427,9 @@ int main(int argc, char **argv)
 		if (bathyext.compare("asc") == 0)
 		{
 			//
+			write_text_to_log_file("Reading bathy asc file");
+			readbathyASCHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
+			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
 		XParam.delta = XParam.dx;
@@ -1703,7 +1706,12 @@ int main(int argc, char **argv)
 	}
 	if (bathyext.compare("bot") == 0 || bathyext.compare("dep") == 0)
 	{
-		//readXBbathy(XParam.Bathymetryfile, XParam.nx, XParam.ny, zb);
+		readXBbathy(XParam.Bathymetryfile, XParam.nx, XParam.ny, zb);
+	}
+	if (bathyext.compare("asc") == 0)
+	{
+		//
+		readbathyASCzb(XParam.Bathymetryfile, XParam.nx, XParam.ny, zb);
 	}
 
 	//init variables
@@ -1714,6 +1722,7 @@ int main(int argc, char **argv)
 			for (int i = 0; i < nx; i++)
 			{
 				zb[i + j*nx] = zb[i + j*nx] * -1.0f;
+				//printf("%f\n", zb[i + (j)*nx]);
 				
 			}
 		}

@@ -216,6 +216,9 @@ extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 extern "C" void readbathy(std::string filename, float *&zb);
 void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
+void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
+void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
+extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);
 
 Param readparamstr(std::string line, Param param);
 std::string findparameter(std::string parameterstr, std::string line);
