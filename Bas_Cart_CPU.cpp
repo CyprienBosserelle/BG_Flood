@@ -660,7 +660,7 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, float * var)
 }
 
 // Main loop that actually runs the model
-float FlowCPU(Param XParam)
+float FlowCPU(Param XParam, float nextoutputtime)
 {
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -673,6 +673,10 @@ float FlowCPU(Param XParam)
 	update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
 	//printf("dtmax=%f\n", dtmax);
 	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
+	if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
+	{
+		XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
+	}
 	//printf("dt=%f\n", XParam.dt);
 	//if (totaltime>0.0) //Fix this!
 	{

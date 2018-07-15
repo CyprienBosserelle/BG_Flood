@@ -180,7 +180,7 @@ template <class T> const T& min(const T& a, const T& b);
 
 //General CPU functions //Unecessary to declare here?
 void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
-float FlowCPU(Param XParam);
+float FlowCPU(Param XParam, float nextoutputtime);
 float demoloopCPU(Param XParam);
 
 void update(int nx, int ny, float theta, double dt, double eps, double g, double CFL, double delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);

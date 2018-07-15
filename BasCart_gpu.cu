@@ -712,7 +712,7 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 }
 
 
-float FlowGPU(Param XParam)
+float FlowGPU(Param XParam, float nextoutputtime)
 {
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -847,7 +847,10 @@ float FlowGPU(Param XParam)
 
 	//float diffdt = mindtmaxB - mindtmax;
 	XParam.dt = mindtmaxB;
-
+	if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
+	{
+		XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
+	}
 	//printf("dt=%f\n", XParam.dt);
 
 
@@ -1068,7 +1071,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		LeftFlowBnd(XParam, leftWLbnd);
 
 		// Run the model step
-		XParam.dt=FlowGPU(XParam);
+		XParam.dt = FlowGPU(XParam, nextoutputtime);
 		
 		//Time keeping
 		XParam.totaltime = XParam.totaltime + XParam.dt;
@@ -1207,7 +1210,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		LeftFlowBnd(XParam, leftWLbnd);
 
 		// Run the model step
-		XParam.dt = FlowCPU(XParam);
+		XParam.dt = FlowCPU(XParam, nextoutputtime);
 
 		//Time keeping
 		XParam.totaltime = XParam.totaltime + XParam.dt;
