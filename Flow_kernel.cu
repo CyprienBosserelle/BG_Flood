@@ -34,22 +34,64 @@ __global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, 
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
 	int i = ix + iy*nx;
 	int xplus, xminus;
 
+	__shared__ float a_s[18][16]; // Hard wired stuff Be carefull
+	//__shared__ float al_s[16][16];
+	//__shared__ float ar_s[16][16];
+	float dadxi=0.0f;
 	if (ix < nx && iy < ny)
 	{
-
 		//
 		//
 		xplus = min(ix + 1, nx - 1);
 		xminus = max(ix - 1, 0);
-		
-		i = ix + iy*nx;
 
+		i = ix + iy*nx;
+		//a_s[tx][ty] = a[ix + iy*nx];
+		//al_s[tx][ty] = a[xminus + iy*nx];
+		//ar_s[tx][ty] = a[xplus + iy*nx];
+		
+		a_s[tx][ty] = a[xminus + iy*nx];
+
+		// read the halo around the tile
+		
+		if (threadIdx.x == 15)//blockDim.x - 1
+		{
+			a_s[tx + 1][ty] = a[i];
+			a_s[tx + 2][ty] = a[xplus + iy*nx];
+			
+		}
+
+		// Need to wait for threadX 0 and threadX 16-1 to finish
+		__syncthreads;
+		
 
 		//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-		dadx[i] = minmod2fGPU(theta,a[xminus + iy*nx], a[i], a[xplus + iy*nx]) / delta;
+		//dadx[i] = minmod2fGPU(theta,a[xminus + iy*nx], a[i], a[xplus + iy*nx]) / delta;
+		// These below are somewhat slower when using shared mem. I'm unsure why (bank conflict?)
+		//dadx[i] = minmod2fGPU(theta, al_s[tx][ty], a_s[tx][ty], ar_s[tx][ty]) / delta;
+		//dadx[i] = minmod2fGPU(theta, a_s[tx][ty], a_s[tx+1][ty], a_s[tx+2][ty]) / delta;
+		//__device__ float minmod2fGPU(float theta,float s0, float s1, float s2)
+		float d1, d2, d3;
+		if (a_s[tx][ty] < a_s[tx + 1][ty] && a_s[tx + 1][ty] < a_s[tx + 2][ty]) {
+			d1 = theta*(a_s[tx + 1][ty] - a_s[tx][ty]);
+			d2 = (a_s[tx + 2][ty] - a_s[tx][ty]) / 2.0f;
+			d3 = theta*(a_s[tx + 2][ty] - a_s[tx + 1][ty]);
+			if (d2 < d1) d1 = d2;
+			dadxi=min(d1, d3);
+		}
+		if (a_s[tx][ty] > a_s[tx + 1][ty] && a_s[tx + 1][ty] > a_s[tx + 2][ty]) {
+			d1 = theta*(a_s[tx + 1][ty] - a_s[tx][ty]);
+			d2 = (a_s[tx + 2][ty] - a_s[tx][ty]) / 2.0f;
+			d3 = theta*(a_s[tx + 2][ty] - a_s[tx + 1][ty]);
+			if (d2 > d1) d1 = d2;
+			dadxi=max(d1, d3);
+		}
+		dadx[i] = dadxi;
 
 	}
 
@@ -57,7 +99,91 @@ __global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, 
 
 }
 
-__global__ void gradientGPUY(int nx, int ny,float theta, float delta, float *a, float *dady)
+__global__ void gradientGPUXOLD(int nx, int ny, float theta, float delta, float *a, float *dadx)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int  xplus, xminus;
+
+	if (ix < nx && iy < ny)
+	{
+		//
+		//
+
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		i = ix + iy*nx;
+
+
+		//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
+		dadx[i] = minmod2fGPU(theta, a[xminus + iy*nx], a[i], a[xplus + iy*nx]) / delta;
+
+	}
+
+
+
+}
+__global__ void gradientGPUY(int nx, int ny, float theta, float delta, float *a, float *dady)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
+	int i = ix + iy*nx;
+	int  yplus, yminus;
+
+	__shared__ float a_s[16][18];
+
+	float dadyi = 0.0f;
+	if (ix < nx && iy < ny)
+	{
+		//
+		//
+
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+		i = ix + iy*nx;
+
+		a_s[tx][ty] = a[ix + yminus*nx];
+
+		// read the halo around the tile
+
+		if (threadIdx.x == 15)//blockDim.x - 1
+		{
+			a_s[tx][ty + 1] = a[i];
+			a_s[tx][ty + 2] = a[ix + yplus*nx];
+
+		}
+
+		// Need to wait for threadX 0 and threadX 16-1 to finish
+		__syncthreads;
+
+		//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
+		//dady[i] = minmod2fGPU(theta, a[ix + yminus*nx], a[i], a[ix + yplus*nx]) / delta;
+		//dady[i] = minmod2fGPU(theta, a_s[tx][ty], a_s[tx][ty + 1], a_s[tx][ty + 2]) / delta;
+		float d1, d2, d3;
+		if (a_s[tx][ty] < a_s[tx][ty + 1] && a_s[tx][ty + 1] < a_s[tx][ty + 2]) {
+			d1 = theta*(a_s[tx][ty + 1] - a_s[tx][ty]);
+			d2 = (a_s[tx][ty + 2] - a_s[tx][ty]) / 2.0f;
+			d3 = theta*(a_s[tx][ty + 2] - a_s[tx][ty + 1]);
+			if (d2 < d1) d1 = d2;
+			dadyi = min(d1, d3);
+		}
+		if (a_s[tx][ty] > a_s[tx][ty + 1] && a_s[tx][ty + 1] > a_s[tx][ty + 2]) {
+			d1 = theta*(a_s[tx][ty + 1] - a_s[tx][ty]);
+			d2 = (a_s[tx][ty + 2] - a_s[tx][ty]) / 2.0f;
+			d3 = theta*(a_s[tx][ty + 2] - a_s[tx][ty + 1]);
+			if (d2 > d1) d1 = d2;
+			dadyi = max(d1, d3);
+		}
+		dady[i] = dadyi;
+	}
+
+
+
+}
+__global__ void gradientGPUYOLD(int nx, int ny,float theta, float delta, float *a, float *dady)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -89,8 +215,8 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-//	int tx = threadIdx.x;
-//	int ty = threadIdx.y;
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
@@ -100,8 +226,14 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 		yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
-		float cm = 1.0;// 0.1;
-		float fmu = 1.0;
+
+		
+
+
+
+		float dhdxi= dhdx[i];
+		float cm = 1.0f;// 0.1;
+		float fmu = 1.0f;
 		//float fmv = 1.0;
 
 		//__shared__ float hi[16][16];
@@ -121,7 +253,8 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			//printf("%f\n", zi);
 
 
-			zl = zi - dx*(dzsdx[i] - dhdx[i]);
+			//zl = zi - dx*(dzsdx[i] - dhdx[i]);
+			zl = zi - dx*(dzsdx[i] - dhdxi);
 			//printf("%f\n", zl);
 
 			zn = zs[xminus + iy*nx] - hn;
@@ -132,7 +265,8 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 			zlr = max(zl, zr);
 
-			hl = hi - dx*dhdx[i];
+			//hl = hi - dx*dhdx[i];
+			hl = hi - dx*dhdxi;
 			up = uu[i] - dx*dudx[i];
 			hp = max(0.0f, hl + zl - zlr);
 
@@ -255,11 +389,12 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 		yminus = max(iy - 1, 0);
 
 
-		float cm = 1.0;// 0.1;
+		float cm = 1.0f;// 0.1;
 		//float fmu = 1.0;
-		float fmv = 1.0;
+		float fmv = 1.0f;
 
 		//__shared__ float hi[16][16];
+		float dhdyi = dhdy[i];
 		float hi = hh[i];
 		float hn = hh[ix + yminus*nx];
 		float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
@@ -271,12 +406,12 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 			hn = hh[ix + yminus*nx];
 			dx = delta / 2.;
 			zi = zs[i] - hi;
-			zl = zi - dx*(dzsdy[i] - dhdy[i]);
+			zl = zi - dx*(dzsdy[i] - dhdyi);
 			zn = zs[ix + yminus*nx] - hn;
 			zr = zn + dx*(dzsdy[ix + yminus*nx] - dhdy[ix + yminus*nx]);
 			zlr = max(zl, zr);
 
-			hl = hi - dx*dhdy[i];
+			hl = hi - dx*dhdyi;
 			up = vv[i] - dx*dvdy[i];
 			hp = max(0.f, hl + zl - zlr);
 
@@ -327,14 +462,14 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 			{
 				fh = fu = 0.f;
 			}
-			fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+			fv = (fh > 0.f ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
 			/**
 			#### Topographic source term
 
 			In the case of adaptive refinement, care must be taken to ensure
 			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-			float sl = g / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-			float sr = g / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+			float sl = g / 2.0f*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
+			float sr = g / 2.0f*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
 
 			////Flux update
 
@@ -370,11 +505,13 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
-		float cm = 1.0;// 0.1;
-		float fmu = 1.0;
-		float fmv = 1.0;
+		float cm = 1.0f;// 0.1;
+		float fmu = 1.0f;
+		float fmv = 1.0f;
 
 		float hi = hh[i];
+		float uui = uu[i];
+		float vvi = vv[i];
 		////
 		//vector dhu = vector(updates[1 + dimension*l]);
 		//foreach() {
@@ -386,7 +523,7 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 		//float cm = 1.0;
 
-		dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) / (cm * delta);
+		dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) / (cm * delta);
 		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
@@ -394,12 +531,12 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
 		float dmdl = (fmu - fmu) / (cm * delta);// absurd!
 		float dmdt = (fmv - fmv) / (cm  * delta);// absurd!
-		float fG = vv[i] * dmdl - uu[i] * dmdt;
+		float fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) / (cm*delta);
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) / (cm*delta);
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
-		dhu[i] += hi * (g*hi / 2.*dmdl + fG*vv[i]);
-		dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
+		dhu[i] += hi * (g*hi / 2.f*dmdl + fG*vvi);
+		dhv[i] += hi * (g*hi / 2.f*dmdt - fG*uui);
 	}
 }
 
@@ -700,18 +837,21 @@ __global__ void quadfriction(int nx, int ny, float dt,float eps, float cf, float
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
 	
-	float normu,hhi;
+	float normu,hhi,uui,vvi;
 	
 	if (ix < nx && iy < ny)
 	{
+
 		hhi = hh[i];
+		uui = uu[i];
+		vvi = vv[i];
 		if (hhi > eps)
 		{
-			normu = uu[i] * uu[i] + vv[i] * vv[i];
-			float frc = (1.0 + dt*cf*normu / hhi);
+			normu = uui * uui + vvi * vvi;
+			float frc = (1.0f + dt*cf*normu / hhi);
 				//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
-			uu[i] = uu[i] / frc;
-			vv[i] = vv[i] / frc;
+			uu[i] = uui / frc;
+			vv[i] = vvi / frc;
 		}
 		
 	}
