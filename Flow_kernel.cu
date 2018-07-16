@@ -1,4 +1,7 @@
 ﻿
+// textures have to be declared here...
+texture<float, 2, cudaReadModeElementType> texLBND;
+
 __device__ float sq(float a)
 {
 	return a*a;
@@ -669,13 +672,17 @@ __global__ void reducemin6(int *g_idata, int *g_odata, unsigned int n)
 }
 */
 
-__global__ void leftdirichlet(int nx, int ny,float g, float zsbnd, float *zs, float *zb, float *hh, float *uu, float *vv )
+__global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv )
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int iy = blockIdx.x*blockDim.x + threadIdx.x;
+	int ix = 0;
+	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
 	int xplus;
 	float hhi;
+	float zsbnd;
+	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	zsbnd = tex2D(texLBND, itime, iy*1.0f / ny*1.0f);
 	if (ix == 0 && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);

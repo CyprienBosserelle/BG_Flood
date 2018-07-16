@@ -701,23 +701,68 @@ float FlowCPU(Param XParam, float nextoutputtime)
 }
 
 
-void leftdirichletCPU(int nx, int ny, float g, float zsbnd, float *zs, float *zb, float *hh, float *uu, float *vv)
+void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
+	float zsbnd;
 	for (int iy = 0; iy < ny; iy++)
 	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int) ceil(iy / (1 / (zsbndvec.size() - 1))),0), (int) zsbndvec.size()-2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(iy - iprev));
+		}
 		int ix = 0;
-			int i = ix + iy*nx;
-			int xplus;
-			float hhi;
-			if (ix == 0 && iy < ny)
-			{
-				xplus = min(ix + 1, nx - 1);
-				hh[i] = zsbnd - zb[i];
-				zs[i] = zsbnd;
-				uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
-				vv[i] = 0.0f;
-			}
+		int i = ix + iy*nx;
+		int xplus;
+		float hhi;
+		if (ix == 0 && iy < ny)
+		{
+			xplus = min(ix + 1, nx - 1);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
+			vv[i] = 0.0f;
+		}
 		
+	}
+}
+
+
+void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	float zsbnd;
+	for (int iy = 0; iy < ny; iy++)
+	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(iy - iprev));
+		}
+		int ix = nx-1;
+		int i = ix + iy*nx;
+		int xminus;
+		float hhi;
+		if ( iy < ny)
+		{
+			xminus = max(ix - 1, 0);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			uu[i] = +2.0f*(sqrtf(g*max(hh[xminus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xminus + iy*nx], 0.0f))) + uu[xminus + iy*nx];
+			vv[i] = 0.0f;
+		}
+
 	}
 }
 

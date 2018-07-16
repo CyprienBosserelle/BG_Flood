@@ -106,7 +106,8 @@ public:
 
 class SLTS {
 public:
-	double time, wlev;
+	double time;
+	std::vector<double> wlevs;
 };
 
 class Pointout {
@@ -173,6 +174,20 @@ extern float * dtmax_g;
 extern float * TSstore, *TSstore_g;
 extern float * dummy;
 
+//Cuda Array to pre-store Water level boundary on the GOU and interpolate through the texture fetch
+extern cudaArray* leftWLS_gp; // Cuda array to pre-store HD vel data before converting to textures
+extern cudaArray* rightWLS_gp;
+extern cudaArray* topWLS_gp;
+extern cudaArray* botWLS_gp;
+
+// Below create channels between cuda arrays (see above) and textures
+extern cudaChannelFormatDesc channelDescleftbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+extern cudaChannelFormatDesc channelDescrightbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+extern cudaChannelFormatDesc channelDescbotbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+extern cudaChannelFormatDesc channelDesctopbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+
+
+
 template <class T> T sq(T a);
 double sqd(double a);
 template <class T> const T& max(const T& a, const T& b);
@@ -186,7 +201,7 @@ float demoloopCPU(Param XParam);
 void update(int nx, int ny, float theta, double dt, double eps, double g, double CFL, double delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
 void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
 void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
-void leftdirichletCPU(int nx, int ny, float g, float zsbnd, float *zs, float *zb, float *hh, float *uu, float *vv);
+void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
 void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv);
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
 

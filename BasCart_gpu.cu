@@ -86,6 +86,15 @@ std::map<std::string, float *> OutputVarMapCPU;
 std::map<std::string, float *> OutputVarMapGPU;
 std::map<std::string, int> OutputVarMaplen;
 
+cudaArray* leftWLS_gp; // Cuda array to pre-store HD vel data before converting to textures
+cudaArray* rightWLS_gp;
+cudaArray* topWLS_gp;
+cudaArray* botWLS_gp;
+
+cudaChannelFormatDesc channelDescleftbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescrightbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescbotbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDesctopbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
 #include "Flow_kernel.cu"
 
@@ -676,7 +685,7 @@ void checkloopGPU(Param XParam)
 void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 {
 	//
-
+	
 	int SLstepinbnd = 1;
 
 	double zsbndleft, zsbndright, zsbndtop, zsbndbot;
@@ -693,20 +702,28 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 		difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
 	}
 
-	zsbndleft = interptime(leftWLbnd[SLstepinbnd].wlev, leftWLbnd[SLstepinbnd - 1].wlev, leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time);
-
 	int nx = XParam.nx;
 	int ny = XParam.ny;
 
-	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
-	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((ny*1.0f) / blockDim.x), 1, 1);
 	if (XParam.GPUDEVICE>=0)
 	{
-		leftdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, XParam.g, zsbndleft, zs_g, zb_g, hh_g, uu_g, vv_g);
+		//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+		float itime = SLstepinbnd - 1.0 + (XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time) / (leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time);
+		
+		leftdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, leftWLbnd[0].wlevs.size(), XParam.g, itime, zs_g, zb_g, hh_g, uu_g, vv_g);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
+		std::vector<double> zsbndleft;
+		for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
+		{
+			zsbndleft.push_back(interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
+
+		}
+		
 		leftdirichletCPU(nx, ny, XParam.g, zsbndleft, zs, zb, hh, uu, vv);
 	}
 }
@@ -1424,8 +1441,8 @@ int main(int argc, char **argv)
 		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
 		{
 			//XBeach style file
-			//write_text_to_log_file("Reading " + bathyext + " file");
-			//write_text_to_log_file("For this type of bathy file please specify nx, ny, dx and grdalpha in the XBG_param.txt");
+			write_text_to_log_file("Reading " + bathyext + " file");
+			write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
 		}
 		if (bathyext.compare("asc") == 0)
 		{
@@ -1475,6 +1492,7 @@ int main(int argc, char **argv)
 	if (!XParam.leftbndfile.empty())
 	{
 		leftWLbnd = readWLfile(XParam.leftbndfile);
+		
 	}
 	if (!XParam.rightbndfile.empty())
 	{
@@ -1697,6 +1715,38 @@ int main(int argc, char **argv)
 
 		}
 
+		if (!XParam.leftbndfile.empty())
+		{
+			//leftWLbnd = readWLfile(XParam.leftbndfile);
+			//Flatten bnd to copy to cuda array
+			int nbndtimes = leftWLbnd.size();
+			int nbndvec = leftWLbnd[0].wlevs.size();
+			CUDA_CHECK(cudaMallocArray(&leftWLS_gp, &channelDescleftbnd, nbndtimes, nbndvec));
+
+			float * leftWLS;
+			leftWLS=(float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+			{
+				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+				{
+					//
+					leftWLS[ibndt + ibndv*nbndtimes] = leftWLbnd[ibndt].wlevs[ibndv];
+				}
+			}
+			CUDA_CHECK(cudaMemcpyToArray(leftWLS_gp, 0, 0, leftWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+			texLBND.addressMode[0] = cudaAddressModeClamp;
+			texLBND.addressMode[1] = cudaAddressModeClamp;
+			texLBND.filterMode = cudaFilterModeLinear;
+			texLBND.normalized = false;
+
+
+			CUDA_CHECK(cudaBindTextureToArray(texLBND, leftWLS_gp, channelDescleftbnd));
+			free(leftWLS);
+
+		}
+
 	}
 
 	if (bathyext.compare("md") == 0)
@@ -1739,7 +1789,7 @@ int main(int argc, char **argv)
 
 
 	//Cold start
-	float zsbnd = leftWLbnd[0].wlev;
+	float zsbnd = leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
 	for (int j = 0; j < ny; j++)
 	{
 		for (int i = 0; i < nx; i++)
@@ -2055,6 +2105,6 @@ int main(int argc, char **argv)
 
 
 
-
+	exit(0);
 }
 

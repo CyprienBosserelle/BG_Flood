@@ -34,6 +34,7 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 
 	std::string line;
 	std::vector<std::string> lineelements;
+	std::vector<double> WLS;
 	SLTS slbndline;
 	while (std::getline(fs, line))
 	{
@@ -42,7 +43,8 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 		// skip empty lines and lines starting with #
 		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
 		{
-			//Data should be in teh format :
+			//Data should be in the format : time,Water level 1,Water level 2,...Water level n
+			//Location where the water level is 0:ny/(nwl-1):ny where nwl i the number of wlevnodes
 
 			//by default we expect tab delimitation
 			lineelements = split(line, '\t');
@@ -63,21 +65,30 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 			{
 				// Giving up now! Could not read the files
 				//issue a warning and exit
-				std::cerr << WLfilename << "ERROR Water level bnd file format error. only " << lineelements.size() << " where 2 were expected. Exiting." << std::endl;
-				write_text_to_log_file("ERROR:  Water level bnd file (" + WLfilename + ") format error. only " + std::to_string(lineelements.size()) + " where 2 were expected. Exiting.");
+				std::cerr << WLfilename << "ERROR Water level bnd file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
+				write_text_to_log_file("ERROR:  Water level bnd file (" + WLfilename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
 				write_text_to_log_file(line);
 				exit(1);
 			}
 
 
 			slbndline.time = std::stod(lineelements[0]);
-			slbndline.wlev = std::stod(lineelements[1]);
+
+			for (int n = 1; n < lineelements.size(); n++)
+			{
+				WLS.push_back(std::stod(lineelements[n]));
+			}
+
+
+
+			slbndline.wlevs = WLS;
 			
 			
 
 			//slbndline = readBSHline(line);
 			slbnd.push_back(slbndline);
 			//std::cout << line << std::endl;
+			WLS.clear();
 		}
 
 	}
