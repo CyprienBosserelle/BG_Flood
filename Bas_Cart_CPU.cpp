@@ -792,7 +792,28 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 	}
 
 }
+void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+	int i,ix;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
 
+	for (int iy = 0; iy < ny; iy++)
+	{
+		ix = 0;
+		i = ix + iy*nx;
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+		
+			uu[i] = 0.0f;
+			zs[i] = zs[xplus + iy*nx];
+			hh[i] = max(zs[xplus + iy*nx] - zb[i], eps);
+		
+	}
+}
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
 {
 	

@@ -69,11 +69,11 @@ public:
 	std::vector<std::string> outvars; //list of names of teh variables to output
 
 	//bnd
-	// 0:Wall; 1:sealevel dirichlet
-	int right = 0;
-	int left = 0;
-	int top = 0;
-	int bot = 0;
+	// 0:Wall; 1:sealevel dirichlet; 2:neumann (zeros gredient)
+	int right = 2;
+	int left = 2;
+	int top = 2;
+	int bot = 2;
 
 	std::string rightbndfile;
 	std::string leftbndfile;
@@ -204,7 +204,7 @@ void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, fl
 void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
 void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv);
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
-
+void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
 //Bnd functions
 void neumannbnd(int nx, int ny, double*a);
 
