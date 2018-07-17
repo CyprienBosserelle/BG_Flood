@@ -294,6 +294,52 @@ Param readparamstr(std::string line, Param param)
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
+	parameterstr = "rightbndfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.rightbndfile = parametervalue;
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	}
+	parameterstr = "topbndfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.topbndfile = parametervalue;
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	}
+	parameterstr = "botbndfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.botbndfile = parametervalue;
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	}
+
+	parameterstr = "left";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.left = std::stoi(parametervalue);
+	}
+	parameterstr = "right";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.right = std::stoi(parametervalue);
+	}
+	parameterstr = "top";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.top = std::stoi(parametervalue);
+	}
+	parameterstr = "bot";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bot = std::stoi(parametervalue);
+	}
 
 	parameterstr = "nx";
 	parametervalue = findparameter(parameterstr, line);

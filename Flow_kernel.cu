@@ -34,7 +34,7 @@ __device__ float minmod2fGPU(float theta,float s0, float s1, float s2)
 	return 0.;
 }
 
-__global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, float *dadx)
+__global__ void gradientGPUXSM(int nx, int ny,float theta, float delta, float *a, float *dadx)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -103,7 +103,7 @@ __global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, 
 
 }
 
-__global__ void gradientGPUXOLD(int nx, int ny, float theta, float delta, float *a, float *dadx)
+__global__ void gradientGPUX(int nx, int ny, float theta, float delta, float *a, float *dadx)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -128,7 +128,7 @@ __global__ void gradientGPUXOLD(int nx, int ny, float theta, float delta, float 
 
 
 }
-__global__ void gradientGPUY(int nx, int ny, float theta, float delta, float *a, float *dady)
+__global__ void gradientGPUYSM(int nx, int ny, float theta, float delta, float *a, float *dady)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -187,7 +187,7 @@ __global__ void gradientGPUY(int nx, int ny, float theta, float delta, float *a,
 
 
 }
-__global__ void gradientGPUYOLD(int nx, int ny,float theta, float delta, float *a, float *dady)
+__global__ void gradientGPUY(int nx, int ny,float theta, float delta, float *a, float *dady)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
@@ -219,8 +219,8 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-	int tx = threadIdx.x;
-	int ty = threadIdx.y;
+	//int tx = threadIdx.x;
+	//int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
 	if (ix < nx && iy < ny)
