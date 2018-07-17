@@ -2105,7 +2105,7 @@ int main(int argc, char **argv)
 
 
 	//Cold start
-	float zsbnd = 200.0f;//leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
+	float zsbnd = 0.0f;//leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
 	for (int j = 0; j < ny; j++)
 	{
 		for (int i = 0; i < nx; i++)
@@ -2115,10 +2115,10 @@ int main(int argc, char **argv)
 			vv[i + j*nx] = 0.0f;
 			//zb[i + j*nx] = 0.0f;
 			zs[i + j*nx] = max(zsbnd, zb[i + j*nx]);
-			//if (i >= 64 && i < 82)
-			//{
-			//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
-			//}
+			if (i >= 64 && i < 82)
+			{
+				zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
+			}
 			hh[i + j*nx] =  max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
 			
 		
