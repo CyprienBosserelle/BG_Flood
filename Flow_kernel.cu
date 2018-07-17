@@ -304,8 +304,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			if (a > epsi)
 			{
 				fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am);
-				fu = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
-					ap*am*(qp - qm)) / (ap - am);
+				fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +	ap*am*(qp - qm)) / (ap - am);
 				float dt = CFL*dlt / a;
 				if (dt < dtmax[i])
 				{
@@ -352,8 +351,8 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 			In the case of adaptive refinement, care must be taken to ensure
 			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-			float sl = g / 2.f*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-			float sr = g / 2.f*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+			float sl = g / 2.0f*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
+			float sr = g / 2.0f*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
 
 			////Flux update
 
@@ -451,8 +450,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 			if (a > epsi)
 			{
 				fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am);
-				fu = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
-					ap*am*(qp - qm)) / (ap - am);
+				fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +	ap*am*(qp - qm)) / (ap - am);
 				float dt = CFL*dlt / a;
 				if (dt < dtmax[i])
 				{

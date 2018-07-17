@@ -174,14 +174,14 @@ void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float 
 	float a = max(ap, -am);
 	if (a > eps) {
 		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
-		*fq = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
+		*fq = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +
 			ap*am*(qp - qm)) / (ap - am);
 		float dt = CFL*Delta / a;
 		if (dt < *dtmax)
 			*dtmax = dt;
 	}
 	else
-		*fh = *fq = 0.;
+		*fh = *fq = 0.0f;
 }
 
 void neumannbnd(int nx, int ny, double*a)
@@ -226,7 +226,7 @@ void neumannbnd(int nx, int ny, double*a)
 
 //Warning all the g, dt etc shouyld all be float so the compiler does the conversion before running the 
 
-void update(int nx, int ny, float theta, double dt, double eps, double g,double CFL, double delta,float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
+void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL, float delta,float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
@@ -314,8 +314,8 @@ void update(int nx, int ny, float theta, double dt, double eps, double g,double 
 
 				In the case of adaptive refinement, care must be taken to ensure
 				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-				float sl = g / 2.f*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-				float sr = g / 2.f*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+				float sl =  g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				float sr =  g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
 
 				////Flux update
 
@@ -358,7 +358,7 @@ void update(int nx, int ny, float theta, double dt, double eps, double g,double 
 				//Along Y
 
 				hn = hh[ix + yminus*nx];
-				dx = delta / 2.;
+				dx = delta / 2.0f;
 				zi = zs[i] - hi;
 				zl = zi - dx*(dzsdy[i] - dhdy[i]);
 				zn = zs[ix + yminus*nx] - hn;
@@ -390,8 +390,8 @@ void update(int nx, int ny, float theta, double dt, double eps, double g,double 
 
 				In the case of adaptive refinement, care must be taken to ensure
 				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-				float sl = g / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-				float sr = g / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+				float sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				float sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
 
 				////Flux update
 
@@ -694,7 +694,7 @@ float FlowCPU(Param XParam, float nextoutputtime)
 	quadfrictionCPU(nx, ny, XParam.dt, XParam.eps, XParam.cf, hh, uu, vv);
 	//write2varnc(nx, ny, totaltime, hh);
 
-	noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
+	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
 	return XParam.dt;
 
 

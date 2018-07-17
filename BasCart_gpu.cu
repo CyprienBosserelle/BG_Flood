@@ -140,10 +140,10 @@ void checkloopGPU(Param XParam)
 {
 	int nx = XParam.nx;
 	int ny = XParam.ny;
-	double delta = XParam.delta;
-	double eps = XParam.eps;
-	double CFL = XParam.CFL;
-	double g = XParam.g;
+	float delta = XParam.delta;
+	float eps = XParam.eps;
+	float CFL = XParam.CFL;
+	float g = XParam.g;
 
 	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
@@ -204,7 +204,7 @@ void checkloopGPU(Param XParam)
 
 	CUDA_CHECK(cudaMemcpy(dummy, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	maxdiffer = maxdiff(nx*ny, hh, dummy);
-	if (maxdiffer > 1e-7f)
+	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhdx: %f\n", maxdiffer);
 	}
@@ -1139,8 +1139,8 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Impose no slip condition by default
-	noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 	return XParam.dt;
 }
 
@@ -2105,16 +2105,21 @@ int main(int argc, char **argv)
 
 
 	//Cold start
-	float zsbnd = leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
+	float zsbnd = 200.0f;//leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
 	for (int j = 0; j < ny; j++)
 	{
 		for (int i = 0; i < nx; i++)
 		{
-						
+
 			uu[i + j*nx] = 0.0f;
 			vv[i + j*nx] = 0.0f;
-			zs[i + j*nx] = max(zsbnd,zb[i + j*nx]);
-			hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx],(float) XParam.eps);
+			//zb[i + j*nx] = 0.0f;
+			zs[i + j*nx] = max(zsbnd, zb[i + j*nx]);
+			//if (i >= 64 && i < 82)
+			//{
+			//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
+			//}
+			hh[i + j*nx] =  max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
 			
 		
 		}
@@ -2306,7 +2311,9 @@ int main(int argc, char **argv)
 	
 		if (XParam.GPUDEVICE >= 0)
 		{
-			mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+			//mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+			checkloopGPU(XParam);
+			
 		}
 		else
 		{
