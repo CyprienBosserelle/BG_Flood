@@ -1,6 +1,10 @@
 ﻿
 // textures have to be declared here...
 texture<float, 2, cudaReadModeElementType> texLBND;
+texture<float, 2, cudaReadModeElementType> texRBND;
+texture<float, 2, cudaReadModeElementType> texTBND;
+texture<float, 2, cudaReadModeElementType> texBBND;
+
 
 __device__ float sq(float a)
 {
@@ -831,6 +835,68 @@ __global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, flo
 }
 
 
+__global__ void rightdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	int iy = blockIdx.x*blockDim.x + threadIdx.x;
+	int ix = nx-1;
+	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int xminus;
+	float hhi;
+	float zsbnd;
+	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	zsbnd = tex2D(texRBND, itime, iy*1.0f / ny*1.0f);
+	if (ix == nx-1 && iy < ny)
+	{
+		xminus = max(ix - 1, 0);
+		hh[i] = zsbnd - zb[i];
+		zs[i] = zsbnd;
+		uu[i] = +2.0f*(sqrtf(g*max(hh[xminus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xminus + iy*nx], 0.0f))) + uu[xminus + iy*nx];
+		vv[i] = 0.0f;
+	}
+}
+
+__global__ void topdirichlet(int nx, int ny, int nxbnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = ny-1;
+	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int yminus;
+	float hhi;
+	float zsbnd;
+	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
+	zsbnd = tex2D(texTBND, itime, ix*1.0f / nx*1.0f);
+	if (iy == ny-1 && ix < nx)
+	{
+		yminus = max(iy - 1, 0);
+		hh[i] = zsbnd - zb[i];
+		zs[i] = zsbnd;
+		vv[i] = +2.0f*(sqrtf(g*max(hh[ix + yminus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yminus*nx], 0.0f))) + vv[ix + yminus*nx];
+		uu[i] = 0.0f;
+	}
+}
+__global__ void botdirichlet(int nx, int ny, int nxbnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = 0;
+	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	int yplus;
+	float hhi;
+	float zsbnd;
+	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
+	zsbnd = tex2D(texBBND, itime, ix*1.0f / nx*1.0f);
+	if (iy == 0 && ix < nx)
+	{
+		yplus = min(iy + 1, ny-1);
+		hh[i] = zsbnd - zb[i];
+		zs[i] = zsbnd;
+		vv[i] = -2.0f*(sqrtf(g*max(hh[ix + yplus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yplus*nx], 0.0f))) + vv[ix + yplus*nx];
+		uu[i] = 0.0f;
+	}
+}
+
 __global__ void quadfriction(int nx, int ny, float dt,float eps, float cf, float *hh, float *uu, float *vv)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
@@ -905,7 +971,108 @@ __global__ void noslipbndall(int nx, int ny, float dt, float eps, float *zb, flo
 	}
 
 }
+__global__ void noslipbndLeft(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+	int iy = blockIdx.x*blockDim.x + threadIdx.x;
+	int ix = 0;
+	int i = ix + iy*nx;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
 
+	if (ix ==0 && iy < ny)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+		
+		uu[i] = 0.0f;
+		zs[i] = zs[xplus + iy*nx];
+		hh[i] = max(zs[xplus + iy*nx] - zb[i], eps);
+		
+		
+
+	}
+
+}
+__global__ void noslipbndBot(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = 0;
+	int i = ix + iy*nx;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
+
+	if (iy == 0 && ix < nx)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+
+		vv[i] = 0.0f;
+		zs[i] = zs[ix + yplus*nx];
+		hh[i] = max(zs[ix + yplus*nx] - zb[i], eps);
+
+
+
+	}
+
+}
+
+
+__global__ void noslipbndRight(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+	int iy = blockIdx.x*blockDim.x + threadIdx.x;
+	int ix = nx-1;
+	int i = ix + iy*nx;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
+
+	if (ix == nx-1 && iy < ny)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+
+		uu[i] = 0.0f;
+		zs[i] = zs[xminus + iy*nx];
+		hh[i] = max(zs[xminus + iy*nx] - zb[i], eps);
+
+
+
+	}
+
+}
+__global__ void noslipbndTop(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = ny - 1;
+	int i = ix + iy*nx;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
+
+	if (iy == ny - 1 && ix < nx)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+
+		vv[i] = 0.0f;
+		zs[i] = zs[ix + yminus*nx];
+		hh[i] = max(zs[ix + yminus*nx] - zb[i], eps);
+
+
+
+	}
+
+}
 
 __global__ void storeTSout(int nx, int ny,int noutnodes, int outnode, int istep, int inode,int jnode, float *zs, float *hh, float *uu, float *vv,float * store)
 {

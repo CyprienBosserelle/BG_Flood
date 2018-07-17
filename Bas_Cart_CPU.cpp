@@ -766,6 +766,79 @@ void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, fl
 	}
 }
 
+void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	float zsbnd;
+	for (int ix = 0; ix < nx; ix++)
+	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ix - iprev));
+		}
+		int iy = ny - 1;
+		int i = ix + iy*nx;
+		int yminus;
+		float hhi;
+		if (iy < ny)
+		{
+			//xminus = max(ix - 1, 0);
+			//xplus = min(ix + 1, nx - 1);
+			//xminus = max(ix - 1, 0);
+			//yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			vv[i] = +2.0f*(sqrtf(g*max(hh[ix + yminus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yminus*nx], 0.0f))) + vv[ix + yminus*nx];
+			uu[i] = 0.0f;
+		}
+
+	}
+}
+
+
+void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	float zsbnd;
+	for (int ix = 0; ix < nx; ix++)
+	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ix - iprev));
+		}
+		int iy = 0;
+		int i = ix + iy*nx;
+		int yplus;
+		float hhi;
+		if (iy < ny)
+		{
+			//xminus = max(ix - 1, 0);
+			//xplus = min(ix + 1, nx - 1);
+			//xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			//yminus = max(iy - 1, 0);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			vv[i] = -2.0f*(sqrtf(g*max(hh[ix + yplus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yplus*nx], 0.0f))) + vv[ix + yplus*nx];
+			uu[i] = 0.0f;
+		}
+
+	}
+}
+
 void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv)
 {
 	for (int iy = 0; iy < ny; iy++)
@@ -792,6 +865,7 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 	}
 
 }
+
 void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
 {
 	int i,ix;
@@ -803,9 +877,9 @@ void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh
 		ix = 0;
 		i = ix + iy*nx;
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
 
 		
 			uu[i] = 0.0f;
@@ -814,6 +888,90 @@ void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh
 		
 	}
 }
+
+void noslipbndRightCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+
+	int i,ix;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
+
+	for (int iy = 0; iy < ny; iy++)
+	{
+		ix = nx - 1;
+		i = ix + iy*nx;
+		//xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+			
+		uu[i] = 0.0f;
+		zs[i] = zs[xminus + iy*nx];
+		hh[i] = max(zs[xminus + iy*nx] - zb[i], eps);
+
+			
+
+
+	}
+
+}
+void noslipbndTopCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+
+	int i, iy;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
+
+	for (int ix = 0; ix < nx; ix++)
+	{
+		iy = ny - 1;
+		i = ix + iy*nx;
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+
+		vv[i] = 0.0f;
+		zs[i] = zs[ix + yminus*nx];
+		hh[i] = max(zs[ix + yminus*nx] - zb[i], eps);
+
+
+
+
+	}
+
+}
+
+void noslipbndBotCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+{
+
+	int i, iy;
+	int  xplus, yplus, xminus, yminus;
+	float normu, hhi;
+
+	for (int ix = 0; ix < nx; ix++)
+	{
+		iy = 0;
+		i = ix + iy*nx;
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+
+		vv[i] = 0.0f;
+		zs[i] = zs[ix + yplus*nx];
+		hh[i] = max(zs[ix + yplus*nx] - zb[i], eps);
+
+
+
+
+	}
+
+}
+
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
 {
 	

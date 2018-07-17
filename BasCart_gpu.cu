@@ -685,13 +685,13 @@ void checkloopGPU(Param XParam)
 void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 {
 	//
-	if (XParam.left == 1)
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+	if (XParam.left == 1 && !leftWLbnd.empty())
 	{
 		int SLstepinbnd = 1;
 
-		double zsbndleft, zsbndright, zsbndtop, zsbndbot;
-
-
+		
 
 		// Do this for all the corners
 		//Needs limiter in case WLbnd is empty
@@ -703,8 +703,7 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 			difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
 		}
 
-		int nx = XParam.nx;
-		int ny = XParam.ny;
+		
 
 		dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 		dim3 gridDim(ceil((ny*1.0f) / blockDim.x), 1, 1);
@@ -730,11 +729,221 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 	}
 	if (XParam.left == 0)
 	{
-		// Left Wall
-		noslipbndLeftCPU(XParam.nx, XParam.ny, XParam.eps, zb, zs, hh, uu, vv);
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//
+			dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+			dim3 gridDim(ceil((ny*1.0f) / blockDim.x), 1, 1);
+			noslipbndLeft << <gridDim, blockDim, 0 >> > (nx, ny, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			// Left Wall
+			noslipbndLeftCPU(XParam.nx, XParam.ny, XParam.eps, zb, zs, hh, uu, vv);
+		}
 	}
+	//else neumann bnd (is already built in the solver)
 }
 
+void RightFlowBnd(Param XParam, std::vector<SLTS> rightWLbnd)
+{
+	//
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+	if (XParam.right == 1 && !rightWLbnd.empty())
+	{
+		int SLstepinbnd = 1;
+
+		
+
+
+
+		// Do this for all the corners
+		//Needs limiter in case WLbnd is empty
+		double difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+		while (difft < 0.0)
+		{
+			SLstepinbnd++;
+			difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
+		}
+
+		
+
+		dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+		dim3 gridDim(ceil((ny*1.0f) / blockDim.x), 1, 1);
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+			float itime = SLstepinbnd - 1.0 + (XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time) / (rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time);
+
+			rightdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, rightWLbnd[0].wlevs.size(), XParam.g, itime, zs_g, zb_g, hh_g, uu_g, vv_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			std::vector<double> zsbndright;
+			for (int n = 0; n < rightWLbnd[SLstepinbnd].wlevs.size(); n++)
+			{
+				zsbndright.push_back(interptime(rightWLbnd[SLstepinbnd].wlevs[n], rightWLbnd[SLstepinbnd - 1].wlevs[n], rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time, XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time));
+
+			}
+
+			rightdirichletCPU(nx, ny, XParam.g, zsbndright, zs, zb, hh, uu, vv);
+		}
+	}
+	if (XParam.right == 0)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//
+			dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+			dim3 gridDim(ceil((ny*1.0f) / blockDim.x), 1, 1);
+			noslipbndRight << <gridDim, blockDim, 0 >> > (nx, ny, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			// Left Wall
+			noslipbndRightCPU(XParam.nx, XParam.ny, XParam.eps, zb, zs, hh, uu, vv);
+		}
+	}
+	//else neumann bnd (is already built in the algorithm)
+}
+
+void TopFlowBnd(Param XParam, std::vector<SLTS> topWLbnd)
+{
+	//
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+	if (XParam.top == 1 && !topWLbnd.empty())
+	{
+		int SLstepinbnd = 1;
+
+
+
+
+
+		// Do this for all the corners
+		//Needs limiter in case WLbnd is empty
+		double difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+		while (difft < 0.0)
+		{
+			SLstepinbnd++;
+			difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
+		}
+
+
+		dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+		dim3 gridDim(ceil((nx*1.0f) / blockDim.x), 1, 1);
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+			float itime = SLstepinbnd - 1.0 + (XParam.totaltime - topWLbnd[SLstepinbnd - 1].time) / (topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time);
+
+			topdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, topWLbnd[0].wlevs.size(), XParam.g, itime, zs_g, zb_g, hh_g, uu_g, vv_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			std::vector<double> zsbndtop;
+			for (int n = 0; n < topWLbnd[SLstepinbnd].wlevs.size(); n++)
+			{
+				zsbndtop.push_back(interptime(topWLbnd[SLstepinbnd].wlevs[n], topWLbnd[SLstepinbnd - 1].wlevs[n], topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time, XParam.totaltime - topWLbnd[SLstepinbnd - 1].time));
+
+			}
+
+			topdirichletCPU(nx, ny, XParam.g, zsbndtop, zs, zb, hh, uu, vv);
+		}
+	}
+	if (XParam.top == 0)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//
+			dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+			dim3 gridDim(ceil((nx*1.0f) / blockDim.x), 1, 1);
+			noslipbndTop << <gridDim, blockDim, 0 >> > (nx, ny, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			// Left Wall
+			noslipbndTopCPU(XParam.nx, XParam.ny, XParam.eps, zb, zs, hh, uu, vv);
+		}
+	}
+	//else neumann bnd (is already built in the algorithm)
+}
+
+void BotFlowBnd(Param XParam, std::vector<SLTS> botWLbnd)
+{
+	//
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+	if (XParam.bot == 1 && !botWLbnd.empty())
+	{
+		int SLstepinbnd = 1;
+
+
+
+
+
+		// Do this for all the corners
+		//Needs limiter in case WLbnd is empty
+		double difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+		while (difft < 0.0)
+		{
+			int nx = XParam.nx;
+			int ny = XParam.ny;
+			SLstepinbnd++;
+			difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
+		}
+
+		
+
+		dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+		dim3 gridDim(ceil((nx*1.0f) / blockDim.x), 1, 1);
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+			float itime = SLstepinbnd - 1.0 + (XParam.totaltime - botWLbnd[SLstepinbnd - 1].time) / (botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time);
+
+			botdirichlet << <gridDim, blockDim, 0 >> > (nx, ny, botWLbnd[0].wlevs.size(), XParam.g, itime, zs_g, zb_g, hh_g, uu_g, vv_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			std::vector<double> zsbndbot;
+			for (int n = 0; n < botWLbnd[SLstepinbnd].wlevs.size(); n++)
+			{
+				zsbndbot.push_back(interptime(botWLbnd[SLstepinbnd].wlevs[n], botWLbnd[SLstepinbnd - 1].wlevs[n], botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time, XParam.totaltime - botWLbnd[SLstepinbnd - 1].time));
+
+			}
+
+			botdirichletCPU(nx, ny, XParam.g, zsbndbot, zs, zb, hh, uu, vv);
+		}
+	}
+	if (XParam.bot == 0)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//
+			dim3 blockDim(16, 1, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+			dim3 gridDim(ceil((nx*1.0f) / blockDim.x), 1, 1);
+			noslipbndBot << <gridDim, blockDim, 0 >> > (nx, ny, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			// Left Wall
+			noslipbndBotCPU(XParam.nx, XParam.ny, XParam.eps, zb, zs, hh, uu, vv);
+		}
+	}
+	//else neumann bnd (is already built in the algorithm)
+}
 
 float FlowGPU(Param XParam, float nextoutputtime)
 {
@@ -1093,6 +1302,9 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 	{
 		// Bnd stuff here
 		LeftFlowBnd(XParam, leftWLbnd);
+		RightFlowBnd(XParam, rightWLbnd);
+		TopFlowBnd(XParam, topWLbnd);
+		BotFlowBnd(XParam, botWLbnd);
 
 		// Run the model step
 		XParam.dt = FlowGPU(XParam, nextoutputtime);
@@ -1232,6 +1444,10 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 	{
 		// Bnd stuff here
 		LeftFlowBnd(XParam, leftWLbnd);
+		RightFlowBnd(XParam, rightWLbnd);
+		TopFlowBnd(XParam, topWLbnd);
+		BotFlowBnd(XParam, botWLbnd);
+
 
 		// Run the model step
 		XParam.dt = FlowCPU(XParam, nextoutputtime);
@@ -1751,6 +1967,99 @@ int main(int argc, char **argv)
 
 			CUDA_CHECK(cudaBindTextureToArray(texLBND, leftWLS_gp, channelDescleftbnd));
 			free(leftWLS);
+
+		}
+		if (!XParam.rightbndfile.empty())
+		{
+			//leftWLbnd = readWLfile(XParam.leftbndfile);
+			//Flatten bnd to copy to cuda array
+			int nbndtimes = rightWLbnd.size();
+			int nbndvec = rightWLbnd[0].wlevs.size();
+			CUDA_CHECK(cudaMallocArray(&rightWLS_gp, &channelDescrightbnd, nbndtimes, nbndvec));
+
+			float * rightWLS;
+			rightWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+			{
+				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+				{
+					//
+					rightWLS[ibndt + ibndv*nbndtimes] = rightWLbnd[ibndt].wlevs[ibndv];
+				}
+			}
+			CUDA_CHECK(cudaMemcpyToArray(rightWLS_gp, 0, 0, rightWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+			texRBND.addressMode[0] = cudaAddressModeClamp;
+			texRBND.addressMode[1] = cudaAddressModeClamp;
+			texRBND.filterMode = cudaFilterModeLinear;
+			texRBND.normalized = false;
+
+
+			CUDA_CHECK(cudaBindTextureToArray(texRBND, rightWLS_gp, channelDescrightbnd));
+			free(rightWLS);
+
+		}
+		if (!XParam.topbndfile.empty())
+		{
+			//leftWLbnd = readWLfile(XParam.leftbndfile);
+			//Flatten bnd to copy to cuda array
+			int nbndtimes = topWLbnd.size();
+			int nbndvec = topWLbnd[0].wlevs.size();
+			CUDA_CHECK(cudaMallocArray(&topWLS_gp, &channelDesctopbnd, nbndtimes, nbndvec));
+
+			float * topWLS;
+			topWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+			{
+				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+				{
+					//
+					topWLS[ibndt + ibndv*nbndtimes] = topWLbnd[ibndt].wlevs[ibndv];
+				}
+			}
+			CUDA_CHECK(cudaMemcpyToArray(topWLS_gp, 0, 0, topWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+			texTBND.addressMode[0] = cudaAddressModeClamp;
+			texTBND.addressMode[1] = cudaAddressModeClamp;
+			texTBND.filterMode = cudaFilterModeLinear;
+			texTBND.normalized = false;
+
+
+			CUDA_CHECK(cudaBindTextureToArray(texTBND, topWLS_gp, channelDesctopbnd));
+			free(topWLS);
+
+		}
+		if (!XParam.botbndfile.empty())
+		{
+			//leftWLbnd = readWLfile(XParam.leftbndfile);
+			//Flatten bnd to copy to cuda array
+			int nbndtimes = botWLbnd.size();
+			int nbndvec = botWLbnd[0].wlevs.size();
+			CUDA_CHECK(cudaMallocArray(&botWLS_gp, &channelDescbotbnd, nbndtimes, nbndvec));
+
+			float * botWLS;
+			botWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+			{
+				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+				{
+					//
+					botWLS[ibndt + ibndv*nbndtimes] = botWLbnd[ibndt].wlevs[ibndv];
+				}
+			}
+			CUDA_CHECK(cudaMemcpyToArray(botWLS_gp, 0, 0, botWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+			texBBND.addressMode[0] = cudaAddressModeClamp;
+			texBBND.addressMode[1] = cudaAddressModeClamp;
+			texBBND.filterMode = cudaFilterModeLinear;
+			texBBND.normalized = false;
+
+
+			CUDA_CHECK(cudaBindTextureToArray(texBBND, botWLS_gp, channelDescbotbnd));
+			free(botWLS);
 
 		}
 
