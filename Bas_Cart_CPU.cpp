@@ -927,6 +927,8 @@ void noslipbndTopCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh,
 	int  xplus, yplus, xminus, yminus;
 	float normu, hhi;
 
+
+
 	for (int ix = 0; ix < nx; ix++)
 	{
 		iy = ny - 1;
@@ -1024,6 +1026,66 @@ void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, 
 		}
 	}
 
+}
+void warmstart(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightbnd, std::vector<SLTS> topbnd, std::vector<SLTS> botbnd)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+	float zsbnd;
+
+
+
+
+	if (!leftWLbnd.empty() && XParam.left == 1)
+	{
+		
+		int SLstepinbnd = 1;
+
+
+
+		// Do this for all the corners
+		//Needs limiter in case WLbnd is empty
+		double difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+		while (difft < 0.0)
+		{
+			SLstepinbnd++;
+			difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+		}
+		std::vector<float> leftbnd;
+		for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
+		{
+			leftbnd.push_back(interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
+
+		}
+
+		for (int iy = 0; iy < ny; iy++)
+		{
+			if (leftbnd.size() == 1)
+			{
+				zsbnd = leftbnd[0];
+			}
+			else
+			{
+				int iprev = min(max((int)ceil(iy / (1 / (leftbnd.size() - 1))), 0), (int)leftbnd.size() - 2);
+				int inext = iprev + 1;
+				// here interp time is used to interpolate to the right node rather than in time...
+				zsbnd = interptime(leftbnd[inext], leftbnd[iprev], (float)(inext - iprev), (float)(iy - iprev));
+			}
+			int ix = 0;
+			int i = ix + iy*nx;
+			int xplus;
+			float hhi;
+			if (ix == 0 && iy < ny)
+			{
+
+				hh[i] = zsbnd - zb[i];
+				zs[i] = zsbnd;
+
+			}
+
+		}
+	}
 }
 
 void AddmeanCPU(Param XParam)

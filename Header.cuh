@@ -261,6 +261,7 @@ std::vector<std::string> split(const std::string &s, char delim);
 std::string trim(const std::string& str, const std::string& whitespace);
 
 Param checkparamsanity(Param XParam);
+double setendtime(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
 void write_text_to_log_file(std::string text);
 void SaveParamtolog(Param XParam);
 

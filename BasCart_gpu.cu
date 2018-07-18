@@ -1754,7 +1754,7 @@ int main(int argc, char **argv)
 		botWLbnd = readWLfile(XParam.botbndfile);
 	}
 
-
+	XParam.endtime = setendtime(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 
 	XParam.dt = 0.0;// Will be resolved in update
 
@@ -2129,21 +2129,27 @@ int main(int argc, char **argv)
 
 
 	//Cold start
-	float zsbnd = leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
+	if (!leftWLbnd.empty() && XParam.left == 1)
+	{
+		XParam.zsinit = leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
+	}
+
+
+
 	for (int j = 0; j < ny; j++)
 	{
 		for (int i = 0; i < nx; i++)
 		{
-
+			
 			uu[i + j*nx] = 0.0f;
 			vv[i + j*nx] = 0.0f;
 			//zb[i + j*nx] = 0.0f;
-			//zs[i + j*nx] = max(zsbnd, zb[i + j*nx]);
+			zs[i + j*nx] = max((float) XParam.zsinit, zb[i + j*nx]);
 			//if (i >= 64 && i < 82)
 			//{
 			//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
 			//}
-			hh[i + j*nx] =  max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
+			hh[i + j*nx] =  max(zs[i + j*nx] - zb[i + j*nx], (float) XParam.eps);
 			
 		
 		}

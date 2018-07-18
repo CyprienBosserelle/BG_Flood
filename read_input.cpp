@@ -205,6 +205,13 @@ Param readparamstr(std::string line, Param param)
 		param.endtime = std::stod(parametervalue);
 
 	}
+	parameterstr = "totaltime";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.totaltime = std::stod(parametervalue);
+
+	}
 
 	///////////////////////////////////////////////////////
 	// Input and output files
@@ -500,6 +507,7 @@ Param checkparamsanity(Param XParam)
 	{
 		//No; i.e. endtimne =0.0
 		XParam.endtime = 1.0 / tiny; //==huge
+		
 	//	if (slbnd.back().time>0.0 && wndbnd.back().time > 0.0)
 	//	{
 	//		XParam.endtime = min(slbnd.back().time, wndbnd.back().time);
@@ -507,6 +515,7 @@ Param checkparamsanity(Param XParam)
 	//
 	//	
 	}
+	
 	
 
 
@@ -586,6 +595,36 @@ Param checkparamsanity(Param XParam)
 	}
 
 	return XParam;
+}
+
+double setendtime(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
+{
+	//endtime cannot be bigger thn the smallest time set in a boundary
+	SLTS tempSLTS;
+	double endtime = XParam.endtime;
+	if (!leftWLbnd.empty() && XParam.left == 1)
+	{
+		tempSLTS = leftWLbnd.back();
+		endtime = min((float) endtime, tempSLTS.time);
+		
+	}
+	if (!rightWLbnd.empty() && XParam.right == 1)
+	{
+		tempSLTS = rightWLbnd.back();
+		endtime = min((float)endtime, tempSLTS.time);
+	}
+	if (!topWLbnd.empty() && XParam.top == 1)
+	{
+		tempSLTS = topWLbnd.back();
+		endtime = min((float)endtime, tempSLTS.time);
+	}
+	if (!botWLbnd.empty() && XParam.bot == 1)
+	{
+		tempSLTS = botWLbnd.back();
+		endtime = min((float)endtime, tempSLTS.time);
+	}
+
+	return endtime;
 }
 
 std::string findparameter(std::string parameterstr, std::string line)
