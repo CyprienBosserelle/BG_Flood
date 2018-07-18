@@ -422,6 +422,35 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.posdown = std::stoi(parametervalue);
 	}
+
+	parameterstr = "initzs";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.zsinit = std::stod(parametervalue);
+	}
+
+	parameterstr = "zsinit";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.zsinit = std::stod(parametervalue);
+	}
+	parameterstr = "hotstartfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.hotstartfile = parametervalue;
+		
+	}
+	parameterstr = "deformfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.deformfile = parametervalue;
+
+	}
+
 	return param;
 }
 
