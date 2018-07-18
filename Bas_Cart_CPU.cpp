@@ -728,10 +728,10 @@ void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, floa
 			zs[i] = zsbnd;
 			uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
 			vv[i] = 0.0f;
-			if (iy == 0)
-			{
-				printf("zsbnd=%f\t", zsbnd);
-			}
+			//if (iy == 0)
+			//{
+			//	printf("zsbnd=%f\t", zsbnd);
+			//}
 		}
 		
 	}

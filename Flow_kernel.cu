@@ -821,7 +821,7 @@ __global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, flo
 	float hhi;
 	float zsbnd;
 	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texLBND, itime, itx);
+	zsbnd = tex2D(texLBND, itime+0.5f, itx+0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
 	if (ix == 0 && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
@@ -829,10 +829,10 @@ __global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, flo
 		zs[i] = zsbnd;
 		uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
 		vv[i] = 0.0f;
-		if (iy == 0)
-		{
-			printf("zsbnd=%f\t", zsbnd);
-		}
+		//if (iy == 0)
+		//{
+		//	printf("zsbnd=%f\t", zsbnd);
+		//}
 	}
 }
 
@@ -847,7 +847,7 @@ __global__ void rightdirichlet(int nx, int ny, int nybnd, float g, float itime, 
 	float hhi;
 	float zsbnd;
 	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texRBND, itime, iy*1.0f / ny*1.0f);
+	zsbnd = tex2D(texRBND, itime+0.5f, itx+0.5f);
 	if (ix == nx-1 && iy < ny)
 	{
 		xminus = max(ix - 1, 0);
@@ -868,7 +868,7 @@ __global__ void topdirichlet(int nx, int ny, int nxbnd, float g, float itime, fl
 	float hhi;
 	float zsbnd;
 	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texTBND, itime, ix*1.0f / nx*1.0f);
+	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
 	if (iy == ny-1 && ix < nx)
 	{
 		yminus = max(iy - 1, 0);
@@ -888,7 +888,7 @@ __global__ void botdirichlet(int nx, int ny, int nxbnd, float g, float itime, fl
 	float hhi;
 	float zsbnd;
 	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texBBND, itime, ix*1.0f / nx*1.0f);
+	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
 	if (iy == 0 && ix < nx)
 	{
 		yplus = min(iy + 1, ny-1);
