@@ -106,8 +106,8 @@ public:
 
 class SLTS {
 public:
-	double time;
-	std::vector<double> wlevs;
+	float time;
+	std::vector<float> wlevs;
 };
 
 class Pointout {
@@ -205,10 +205,10 @@ void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, fl
 //Bnd functions
 //void neumannbnd(int nx, int ny, double*a);
 
-void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void rightdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void topdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void botdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
 
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
 void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);

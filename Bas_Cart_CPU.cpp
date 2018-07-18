@@ -701,7 +701,7 @@ float FlowCPU(Param XParam, float nextoutputtime)
 }
 
 
-void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int iy = 0; iy < ny; iy++)
@@ -715,7 +715,7 @@ void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, flo
 			int iprev = min(max((int) ceil(iy / (1 / (zsbndvec.size() - 1))),0), (int) zsbndvec.size()-2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(iy - iprev));
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(iy - iprev));
 		}
 		int ix = 0;
 		int i = ix + iy*nx;
@@ -728,13 +728,17 @@ void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, flo
 			zs[i] = zsbnd;
 			uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
 			vv[i] = 0.0f;
+			if (iy == 0)
+			{
+				printf("zsbnd=%f\t", zsbnd);
+			}
 		}
 		
 	}
 }
 
 
-void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+void rightdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int iy = 0; iy < ny; iy++)
@@ -748,7 +752,7 @@ void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, fl
 			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(iy - iprev));
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(iy - iprev));
 		}
 		int ix = nx-1;
 		int i = ix + iy*nx;
@@ -766,7 +770,7 @@ void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, fl
 	}
 }
 
-void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+void topdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int ix = 0; ix < nx; ix++)
@@ -780,7 +784,7 @@ void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, floa
 			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ix - iprev));
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
 		}
 		int iy = ny - 1;
 		int i = ix + iy*nx;
@@ -803,7 +807,7 @@ void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, floa
 }
 
 
-void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+void botdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int ix = 0; ix < nx; ix++)
@@ -817,7 +821,7 @@ void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, floa
 			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ix - iprev));
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
 		}
 		int iy = 0;
 		int i = ix + iy*nx;

@@ -136,6 +136,25 @@ float maxdiff(int nxny, float * ref, float * pred)
 	return maxd;
 }
 
+float maxdiffID(int nx, int ny, int &im, int &jm,  float * ref, float * pred)
+{
+	float maxd = 0.0f;
+	
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			if (abs(pred[i] - ref[i]) > maxd)
+			{
+				im = i;
+				jm = j;
+				maxd = abs(pred[i] - ref[i]);
+			}
+		}
+	}
+	return maxd;
+}
+
 void checkloopGPU(Param XParam)
 {
 	int nx = XParam.nx;
@@ -158,6 +177,9 @@ void checkloopGPU(Param XParam)
 	float hi;
 
 	float maxdiffer;
+
+	int imax = 0;
+	int jmax = 0;
 
 	dtmax = 1 / epsilon;
 	float dtmaxtmp = dtmax;
@@ -203,7 +225,7 @@ void checkloopGPU(Param XParam)
 
 
 	CUDA_CHECK(cudaMemcpy(dummy, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, hh, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, hh, dummy);
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhdx: %f\n", maxdiffer);
@@ -214,42 +236,42 @@ void checkloopGPU(Param XParam)
 	// check gradients
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhdx, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhdx, dummy);
 	if (maxdiffer > maxerr)
 	{ 
 		printf("High error in dhdx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhdy, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhdy, dummy);
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhdy: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dzsdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dzsdx, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dzsdx, dummy);
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dzsdx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dzsdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dzsdy, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dzsdy, dummy);
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dzsdy: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dudx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dudx, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dudx, dummy);
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dudx: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dudy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dudy, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dudy, dummy);
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dudy: %f\n", maxdiffer);
@@ -294,45 +316,47 @@ void checkloopGPU(Param XParam)
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fqux_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fqux, dummy);
+	
+	
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fqux, dummy);
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Fqux: %f\n", maxdiffer);
+		printf("High error in Fqux (%f) in i=%d, j=%d\n", maxdiffer,imax,jmax);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fqvx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fqvx, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fqvx, dummy);;
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Fqvx: %f\n", maxdiffer);
+		printf("High error in Fqvx (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fqvy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fqvy, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fqvy, dummy);;
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Fqvy: %f\n", maxdiffer);
+		printf("High error in Fqvy (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fquy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fquy, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fquy, dummy);;
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Fquy: %f\n", maxdiffer);
+		printf("High error in Fquy (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Su_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Su, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Su, dummy);;
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Su: %f\n", maxdiffer);
+		printf("High error in Su (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Sv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Sv, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Sv, dummy);;
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Sv: %f\n", maxdiffer);
+		printf("High error in Sv (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
 	}
 
 	// All good so far continuing
@@ -366,21 +390,21 @@ void checkloopGPU(Param XParam)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaMemcpy(dummy, dh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dh, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dh, dummy);;
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dh: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhu, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhu, dummy);;
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhu: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, dhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhv, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhv, dummy);;
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in dhv: %f\n", maxdiffer);
@@ -399,28 +423,28 @@ void checkloopGPU(Param XParam)
 	advance(nx, ny, XParam.dt*0.5, eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 	CUDA_CHECK(cudaMemcpy(dummy, zso_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, zso, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, zso, dummy);;
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in zso: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, hho_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, hho, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, hho, dummy);;
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in hho: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, uuo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, uuo, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, uuo, dummy);;
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in uuo: %f\n", maxdiffer);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, vvo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, vvo, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, vvo, dummy);;
 	if (maxdiffer > maxerr)
 	{
 		printf("High error in vvo: %f\n", maxdiffer);
@@ -717,7 +741,7 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 		}
 		else
 		{
-			std::vector<double> zsbndleft;
+			std::vector<float> zsbndleft;
 			for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
 			{
 				zsbndleft.push_back(interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
@@ -783,7 +807,7 @@ void RightFlowBnd(Param XParam, std::vector<SLTS> rightWLbnd)
 		}
 		else
 		{
-			std::vector<double> zsbndright;
+			std::vector<float> zsbndright;
 			for (int n = 0; n < rightWLbnd[SLstepinbnd].wlevs.size(); n++)
 			{
 				zsbndright.push_back(interptime(rightWLbnd[SLstepinbnd].wlevs[n], rightWLbnd[SLstepinbnd - 1].wlevs[n], rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time, XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time));
@@ -848,7 +872,7 @@ void TopFlowBnd(Param XParam, std::vector<SLTS> topWLbnd)
 		}
 		else
 		{
-			std::vector<double> zsbndtop;
+			std::vector<float> zsbndtop;
 			for (int n = 0; n < topWLbnd[SLstepinbnd].wlevs.size(); n++)
 			{
 				zsbndtop.push_back(interptime(topWLbnd[SLstepinbnd].wlevs[n], topWLbnd[SLstepinbnd - 1].wlevs[n], topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time, XParam.totaltime - topWLbnd[SLstepinbnd - 1].time));
@@ -916,7 +940,7 @@ void BotFlowBnd(Param XParam, std::vector<SLTS> botWLbnd)
 		}
 		else
 		{
-			std::vector<double> zsbndbot;
+			std::vector<float> zsbndbot;
 			for (int n = 0; n < botWLbnd[SLstepinbnd].wlevs.size(); n++)
 			{
 				zsbndbot.push_back(interptime(botWLbnd[SLstepinbnd].wlevs[n], botWLbnd[SLstepinbnd - 1].wlevs[n], botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time, XParam.totaltime - botWLbnd[SLstepinbnd - 1].time));
@@ -2105,7 +2129,7 @@ int main(int argc, char **argv)
 
 
 	//Cold start
-	float zsbnd = 0.0f;//leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
+	float zsbnd = leftWLbnd[0].wlevs[0];//Needs attention here!!!!!
 	for (int j = 0; j < ny; j++)
 	{
 		for (int i = 0; i < nx; i++)
@@ -2114,11 +2138,11 @@ int main(int argc, char **argv)
 			uu[i + j*nx] = 0.0f;
 			vv[i + j*nx] = 0.0f;
 			//zb[i + j*nx] = 0.0f;
-			zs[i + j*nx] = max(zsbnd, zb[i + j*nx]);
-			if (i >= 64 && i < 82)
-			{
-				zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
-			}
+			//zs[i + j*nx] = max(zsbnd, zb[i + j*nx]);
+			//if (i >= 64 && i < 82)
+			//{
+			//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
+			//}
 			hh[i + j*nx] =  max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
 			
 		
@@ -2311,8 +2335,8 @@ int main(int argc, char **argv)
 	
 		if (XParam.GPUDEVICE >= 0)
 		{
-			//mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
-			checkloopGPU(XParam);
+			mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+			//checkloopGPU(XParam);
 			
 		}
 		else

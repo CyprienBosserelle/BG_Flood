@@ -248,7 +248,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 		if (hi > eps || hn > eps)
 		{
-			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm,sl,sr;
 
 			// along X
 			dx = delta / 2.0f;
@@ -351,8 +351,8 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 			In the case of adaptive refinement, care must be taken to ensure
 			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-			float sl = g / 2.0f*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-			float sr = g / 2.0f*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+			sl = g / 2.0f*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
+			sr = g / 2.0f*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
 
 			////Flux update
 
@@ -821,7 +821,7 @@ __global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, flo
 	float hhi;
 	float zsbnd;
 	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texLBND, itime, iy*1.0f / ny*1.0f);
+	zsbnd = tex2D(texLBND, itime, itx);
 	if (ix == 0 && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
@@ -829,6 +829,10 @@ __global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, flo
 		zs[i] = zsbnd;
 		uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
 		vv[i] = 0.0f;
+		if (iy == 0)
+		{
+			printf("zsbnd=%f\t", zsbnd);
+		}
 	}
 }
 

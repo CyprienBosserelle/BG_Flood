@@ -34,7 +34,7 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 
 	std::string line;
 	std::vector<std::string> lineelements;
-	std::vector<double> WLS;
+	std::vector<float> WLS;
 	SLTS slbndline;
 	while (std::getline(fs, line))
 	{
@@ -72,11 +72,11 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 			}
 
 
-			slbndline.time = std::stod(lineelements[0]);
+			slbndline.time = std::stof(lineelements[0]);
 
 			for (int n = 1; n < lineelements.size(); n++)
 			{
-				WLS.push_back(std::stod(lineelements[n]));
+				WLS.push_back(std::stof(lineelements[n]));
 			}
 
 
