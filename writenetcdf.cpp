@@ -605,3 +605,427 @@ void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx)
 
 
 }
+
+int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
+{
+	int status, zserror, hherror, uuerror,vverror,zberror, sferr,oferr;
+	int ncid, varid,ndims;
+	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
+	int nx, ny, nt;
+	float scalefac = 1.0f;
+	float offset=0.0f;
+	size_t  *ddim;
+
+
+
+
+	//Open NC file
+	printf("Open file\n");
+	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+
+	//first check if hotstart has zb 
+	zberror = nc_inq_varid(ncid, "zb", &varid);
+	if (zberror != NC_NOERR)
+	{
+
+		status = nc_inq_varndims(ncid, varid, &ndims);
+		if (status != NC_NOERR) handle_error(status);
+		//printf("hhVar:%d dims\n", ndimshh);
+
+		status = nc_inq_vardimid(ncid, varid, dimids);
+		if (status != NC_NOERR) handle_error(status);
+
+		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+
+		//Read dimensions nx_u ny_u 
+		for (int iddim = 0; iddim < ndims; iddim++)
+		{
+			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
+			if (status != NC_NOERR) handle_error(status);
+
+			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		}
+		if (ndims > 2)
+		{
+			nt = ddim[0];
+			ny = ddim[1];
+			nx = ddim[2];
+			size_t start[] = {XParam.hotstep, 0, 0 };
+			size_t count[] = {1, ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, zb);
+			if (status != NC_NOERR) handle_error(status);
+		}
+		else
+		{
+			ny = ddim[0];
+			nx = ddim[1];
+			size_t start[] = { 0, 0 };
+			size_t count[] = { ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, zb);
+			if (status != NC_NOERR) handle_error(status);
+		}
+
+		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
+		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
+
+		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					zb[i + j*nx] = zb[i + j*nx] * scalefac + offset;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+		
+
+		
+		//status = nc_get_var_float(ncid, varid, zb);
+		free(ddim);
+	}
+	// second check if zs or hh are in teh file 
+	zserror = nc_inq_varid(ncid, "zs", &varid);
+	if (zserror != NC_NOERR)
+	{
+
+		status = nc_inq_varndims(ncid, varid, &ndims);
+		if (status != NC_NOERR) handle_error(status);
+		//printf("hhVar:%d dims\n", ndimshh);
+
+		status = nc_inq_vardimid(ncid, varid, dimids);
+		if (status != NC_NOERR) handle_error(status);
+
+		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+
+		//Read dimensions nx_u ny_u 
+		for (int iddim = 0; iddim < ndims; iddim++)
+		{
+			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
+			if (status != NC_NOERR) handle_error(status);
+
+			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		}
+		if (ndims > 2)
+		{
+			nt = ddim[0];
+			ny = ddim[1];
+			nx = ddim[2];
+			size_t start[] = { XParam.hotstep, 0, 0 };
+			size_t count[] = { 1, ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, zs);
+			if (status != NC_NOERR) handle_error(status);
+		}
+		else
+		{
+			ny = ddim[0];
+			nx = ddim[1];
+			size_t start[] = { 0, 0 };
+			size_t count[] = { ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, zs);
+			if (status != NC_NOERR) handle_error(status);
+		}
+
+		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
+		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
+
+		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					zs[i + j*nx] = zs[i + j*nx] * scalefac + offset;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+		//check sanity
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zs[i + j*nx] = max(zs[i + j*nx], zb[i + j*nx]);
+				//unpacked_value = packed_value * scale_factor + add_offset
+			}
+		}
+		
+		//status = nc_get_var_float(ncid, varid, zb);
+		free(ddim);
+	}
+	else
+	{
+		if (zserror == -49)
+		{
+			//Variable not found
+			//It's ok if hh is specified
+			printf("zs not found in hotstart file. Looking for hh");
+		}
+		else
+		{
+			handle_error(zserror);
+		}
+	}
+	hherror = nc_inq_varid(ncid, "hh", &varid);
+	if (hherror != NC_NOERR)
+	{
+
+		status = nc_inq_varndims(ncid, varid, &ndims);
+		if (status != NC_NOERR) handle_error(status);
+		//printf("hhVar:%d dims\n", ndimshh);
+
+		status = nc_inq_vardimid(ncid, varid, dimids);
+		if (status != NC_NOERR) handle_error(status);
+
+		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+
+		//Read dimensions nx_u ny_u 
+		for (int iddim = 0; iddim < ndims; iddim++)
+		{
+			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
+			if (status != NC_NOERR) handle_error(status);
+
+			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		}
+		if (ndims > 2)
+		{
+			nt = ddim[0];
+			ny = ddim[1];
+			nx = ddim[2];
+			size_t start[] = { XParam.hotstep, 0, 0 };
+			size_t count[] = { 1, ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, hh);
+			if (status != NC_NOERR) handle_error(status);
+		}
+		else
+		{
+			ny = ddim[0];
+			nx = ddim[1];
+			size_t start[] = { 0, 0 };
+			size_t count[] = { ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, hh);
+			if (status != NC_NOERR) handle_error(status);
+		}
+
+		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
+		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
+
+		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					hh[i + j*nx] = hh[i + j*nx] * scalefac + offset;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+		//if zs was not specified
+		if (zserror == -49)
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
+
+				}
+			}
+		}
+		free(ddim);
+		
+
+	}
+	else
+	{
+		if (zserror == -49 && hherror ==-49)
+		{
+			//Variable not found
+			//It's ok if hh is specified
+			printf("neither zs nor hh were found in hotstart file. this is not a valid hotstart file. using a cold start instead");
+			return 0;
+		}
+		else
+		{
+			//hherror ==-49
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
+
+				}
+			}
+			
+		}
+	}
+
+	uuerror = nc_inq_varid(ncid, "uu", &varid);
+	if (uuerror != NC_NOERR)
+	{
+
+		status = nc_inq_varndims(ncid, varid, &ndims);
+		if (status != NC_NOERR) handle_error(status);
+		//printf("hhVar:%d dims\n", ndimshh);
+
+		status = nc_inq_vardimid(ncid, varid, dimids);
+		if (status != NC_NOERR) handle_error(status);
+
+		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+
+		//Read dimensions nx_u ny_u 
+		for (int iddim = 0; iddim < ndims; iddim++)
+		{
+			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
+			if (status != NC_NOERR) handle_error(status);
+
+			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		}
+		if (ndims > 2)
+		{
+			nt = ddim[0];
+			ny = ddim[1];
+			nx = ddim[2];
+			size_t start[] = { XParam.hotstep, 0, 0 };
+			size_t count[] = { 1, ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, uu);
+			if (status != NC_NOERR) handle_error(status);
+		}
+		else
+		{
+			ny = ddim[0];
+			nx = ddim[1];
+			size_t start[] = { 0, 0 };
+			size_t count[] = { ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, uu);
+			if (status != NC_NOERR) handle_error(status);
+		}
+
+		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
+		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
+
+		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					uu[i + j*nx] = uu[i + j*nx] * scalefac + offset;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+		
+		free(ddim);
+		
+
+	}
+	else
+	{
+		if (uuerror == -49)
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					uu[i + j*nx] = 0.0f;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+		else
+		{
+			handle_error(zserror);
+		}
+	}
+
+	vverror = nc_inq_varid(ncid, "vv", &varid);
+	if (vverror != NC_NOERR)
+	{
+
+		status = nc_inq_varndims(ncid, varid, &ndims);
+		if (status != NC_NOERR) handle_error(status);
+		//printf("hhVar:%d dims\n", ndimshh);
+
+		status = nc_inq_vardimid(ncid, varid, dimids);
+		if (status != NC_NOERR) handle_error(status);
+
+		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+
+		//Read dimensions nx_u ny_u 
+		for (int iddim = 0; iddim < ndims; iddim++)
+		{
+			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
+			if (status != NC_NOERR) handle_error(status);
+
+			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		}
+		if (ndims > 2)
+		{
+			nt = ddim[0];
+			ny = ddim[1];
+			nx = ddim[2];
+			size_t start[] = { XParam.hotstep, 0, 0 };
+			size_t count[] = { 1, ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, vv);
+			if (status != NC_NOERR) handle_error(status);
+		}
+		else
+		{
+			ny = ddim[0];
+			nx = ddim[1];
+			size_t start[] = { 0, 0 };
+			size_t count[] = { ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, vv);
+			if (status != NC_NOERR) handle_error(status);
+		}
+
+		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
+		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
+
+		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					vv[i + j*nx] = vv[i + j*nx] * scalefac + offset;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+
+		free(ddim);
+
+
+	}
+	else
+	{
+		if (vverror == -49)
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					vv[i + j*nx] = 0.0f;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+		else
+		{
+			handle_error(zserror);
+		}
+	}
+	//status = nc_get_var_float(ncid, hh_id, zb);
+	status = nc_close(ncid);
+
+
+	return 1;
+
+}
+

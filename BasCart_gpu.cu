@@ -2134,7 +2134,7 @@ int main(int argc, char **argv)
 	if (!XParam.hotstartfile.empty())
 	{
 		// hotstart
-		//TODO
+		hotstartsucess = readhotstartfile(XParam, zs, zb, hh, uu, vv);
 	}
 	if (XParam.hotstartfile.empty() || hotstartsucess == 0)
 	{

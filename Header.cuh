@@ -84,7 +84,7 @@ public:
 
 	std::string hotstartfile;
 	std::string deformfile;
-									  
+	int hotstep = 0; //step to read if hotstart file has multiple steps
 	//other
 	clock_t startcputime, endcputime;
 	
@@ -245,6 +245,7 @@ extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
 void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
+int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 
 // I/O
 extern "C" void readbathy(std::string filename, float *&zb);
