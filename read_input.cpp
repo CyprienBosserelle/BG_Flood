@@ -902,6 +902,14 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 
 			//by default we expect tab delimitation
 			lineelements = split(line, ' ');
+			if (lineelements.size() < 2)
+			{
+				lineelements = split(line, '\t');
+			}
+
+
+
+
 			left = trim(lineelements[0], " ");
 			right = lineelements[1]; // if there are more than one equal sign in the line the second one is ignored
 			//found = left.compare("ncols");// it needs to strictly compare
