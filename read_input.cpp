@@ -905,13 +905,15 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 			if (lineelements.size() < 2)
 			{
 				lineelements = split(line, '\t');
+
 			}
 
 
 
 
 			left = trim(lineelements[0], " ");
-			right = lineelements[1]; // if there are more than one equal sign in the line the second one is ignored
+			right = lineelements[1]; 
+			printf("left: %s ;right: %s\n", left, right);
 			//found = left.compare("ncols");// it needs to strictly compare
 			if (left.compare("ncols") == 0) // found the parameter
 			{
