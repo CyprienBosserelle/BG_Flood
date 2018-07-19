@@ -1729,6 +1729,9 @@ int main(int argc, char **argv)
 
 	// So far bnd are limited to be cst along an edge
 	// Read Bnd file if/where needed
+	printf("Reading and preparing Boundaries...");
+	write_text_to_log_file("Reading and preparing Boundaries");
+
 	std::vector<SLTS> leftWLbnd;
 	std::vector<SLTS> rightWLbnd;
 	std::vector<SLTS> topWLbnd;
@@ -1754,11 +1757,18 @@ int main(int argc, char **argv)
 
 	XParam.endtime = setendtime(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 
+
+	printf("...done!\n");
+	write_text_to_log_file("Done Reading and preparing Boundaries");
+
 	XParam.dt = 0.0;// Will be resolved in update
 
 	////////////////////////////////////////////////
 	///// Allocate memory on CPU
 	////////////////////////////////////////////////
+
+	printf("Allocate CPU memory...");
+	write_text_to_log_file("Allocate CPU memory...");
 
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -1844,7 +1854,8 @@ int main(int argc, char **argv)
 		vort = (float *)malloc(nx*ny * sizeof(float));
 	}
 
-
+	printf("...done!\n");
+	write_text_to_log_file("Done");
 
 
 	if (XParam.GPUDEVICE >= 0)
@@ -1860,6 +1871,13 @@ int main(int argc, char **argv)
 			// 
 			XParam.GPUDEVICE = (nDevices - 1);
 		}
+		cudaGetDeviceProperties(&prop, XParam.GPUDEVICE);
+		printf("There are %d GPU devices on this machine\n", nDevices);
+		printf("Using Device : %s\n", prop.name);
+
+
+		write_text_to_log_file("There are " + std::to_string(nDevices) + "GPU devices on this machine");
+		write_text_to_log_file("There are " + std::string(prop.name) + "GPU devices on this machine");
 
 	}
 
@@ -1869,6 +1887,8 @@ int main(int argc, char **argv)
 	////////////////////////////////////////
 	if (XParam.GPUDEVICE >= 0)
 	{
+		printf("Allocating GPU memory...");
+		write_text_to_log_file("Allocating GPU memory");
 		CUDA_CHECK(cudaMalloc((void **)&hh_g, nx*ny*sizeof(float)));
 		CUDA_CHECK(cudaMalloc((void **)&uu_g, nx*ny*sizeof(float)));
 		CUDA_CHECK(cudaMalloc((void **)&vv_g, nx*ny*sizeof(float)));
@@ -2084,8 +2104,13 @@ int main(int argc, char **argv)
 			free(botWLS);
 
 		}
+		printf("Done\n");
+		write_text_to_log_file("Done");
 
 	}
+
+	printf("Read Bathy data...");
+	write_text_to_log_file("Read Bathy data");
 
 	if (bathyext.compare("md") == 0)
 	{
@@ -2104,7 +2129,8 @@ int main(int argc, char **argv)
 		//
 		readbathyASCzb(XParam.Bathymetryfile, XParam.nx, XParam.ny, zb);
 	}
-
+	printf("Done\n");
+	write_text_to_log_file("Done");
 	//printf("%f\n", zb[0]);
 	//printf("%f\n", zb[(nx - 1) + (0)*nx]);
 	//printf("%f\n", zb[(0) + (ny-1)*nx]);
@@ -2128,16 +2154,26 @@ int main(int argc, char **argv)
 	/////////////////////////////////////////////////////
 	// Initial Condition
 	/////////////////////////////////////////////////////
-
+	printf("Initial condition: ");
+	write_text_to_log_file("Initial condition:");
 
 	int hotstartsucess = 0;
 	if (!XParam.hotstartfile.empty())
 	{
 		// hotstart
+		printf("Hotstart "); 
+		write_text_to_log_file("Hotstart");
 		hotstartsucess = readhotstartfile(XParam, zs, zb, hh, uu, vv);
+		if (hotstartsucess == 0)
+		{
+			printf("Failed...  ");
+			write_text_to_log_file("Hotstart failed switching to cold start");
+		}
 	}
 	if (XParam.hotstartfile.empty() || hotstartsucess == 0)
 	{
+		printf("Cold start  ");
+		write_text_to_log_file("Cold start");
 		//Cold start
 		// 2 options: 
 		//		(1) if zsinit is set, then apply zsinit everywhere
@@ -2377,6 +2413,8 @@ int main(int argc, char **argv)
 
 		
 	}
+	printf("done \n  ");
+	write_text_to_log_file("Done");
 	// Below is not succint but way faster than one loop that checks teh if statemenst each time
 	if (XParam.outhhmax == 1)
 	{
@@ -2476,6 +2514,8 @@ int main(int argc, char **argv)
 
 	if (XParam.GPUDEVICE >= 0)
 	{
+		printf("Init data on GPU ");
+		write_text_to_log_file("Init data on GPU ");
 		CUDA_CHECK(cudaMemcpy(zb_g, zb, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(hh_g, hh, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(uu_g, uu, nx*ny*sizeof(float), cudaMemcpyHostToDevice));
@@ -2489,6 +2529,9 @@ int main(int argc, char **argv)
 		dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
 
 		initdtmax << <gridDim, blockDim, 0 >> >(nx, ny, (float) epsilon, dtmax_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		printf("...Done\n ");
+		write_text_to_log_file("Done ");
 
 	}
 
@@ -2551,6 +2594,8 @@ int main(int argc, char **argv)
 	OutputVarMaplen["vort"] = nx*ny;
 
 
+	printf("Create netCDF output file ");
+	write_text_to_log_file("Create netCDF output file ");
 	//create nc file with no variables
 	XParam=creatncfileUD(XParam);
 	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -2561,17 +2606,22 @@ int main(int argc, char **argv)
 	}
 	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
-	
-		if (XParam.GPUDEVICE >= 0)
-		{
-			mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
-			//checkloopGPU(XParam);
+	printf("done \n ");
+	write_text_to_log_file("Done ");
+
+	printf("Starting Model.\n ");
+	write_text_to_log_file("Starting Model. ");
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+		//checkloopGPU(XParam);
 			
-		}
-		else
-		{
-			mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
-		}
+	}
+	else
+	{
+		mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+	}
 
 	
 	

@@ -913,7 +913,7 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 
 			left = trim(lineelements[0], " ");
 			right = lineelements[1]; 
-			printf("left: %s ;right: %s\n", left.c_str(), right.c_str());
+			//printf("left: %s ;right: %s\n", left.c_str(), right.c_str());
 			//found = left.compare("ncols");// it needs to strictly compare
 			if (left.compare("ncols") == 0) // found the parameter
 			{
