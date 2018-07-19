@@ -198,7 +198,7 @@ ALL_CCFLAGS += $(addprefix -Xcompiler ,$(EXTRA_CCFLAGS))
 
 SAMPLE_ENABLED := 1
 
-ALL_LDFLAGS := -lnetcdf -lfftw3 -I./
+ALL_LDFLAGS := -lnetcdf -I./
 ALL_LDFLAGS += $(ALL_CCFLAGS)
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
@@ -240,7 +240,7 @@ OBJ = Bas_Cart_CPU.o BasCart_gpu.o Flow_kernel.o read_input.o  writenetcdf.o
 # Target rules
 all: build
 
-build: XBGPU
+build: BasCGPU
 
 check.deps:
 ifeq ($(SAMPLE_ENABLED),0)
