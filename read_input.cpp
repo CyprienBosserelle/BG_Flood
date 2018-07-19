@@ -516,8 +516,8 @@ Param checkparamsanity(Param XParam)
 	//	
 	}
 	
-	
-
+	// Endtime is checked versus the bnd input i.e. model cannot go further than secified bnd (actually in GPU case it can but it probably shoudn't)
+	// This is done in a separate function.
 
 
 
