@@ -2609,6 +2609,10 @@ int main(int argc, char **argv)
 	printf("done \n ");
 	write_text_to_log_file("Done ");
 
+	
+	SaveParamtolog(XParam);
+
+
 	printf("Starting Model.\n ");
 	write_text_to_log_file("Starting Model. ");
 

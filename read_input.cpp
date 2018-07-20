@@ -197,6 +197,13 @@ Param readparamstr(std::string line, Param param)
 		param.outputtimestep = std::stod(parametervalue);
 
 	}
+	parameterstr = "outtimestep";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.outputtimestep = std::stod(parametervalue);
+
+	}
 
 	parameterstr = "endtime";
 	parametervalue = findparameter(parameterstr, line);
