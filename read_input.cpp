@@ -822,7 +822,9 @@ void write_text_to_log_file(std::string text)
 
 void SaveParamtolog(Param XParam)
 {
-	write_text_to_log_file("#################################");
+	write_text_to_log_file("###################################");
+	write_text_to_log_file("### Summary of model parameters ###");
+	write_text_to_log_file("###################################");
 	write_text_to_log_file("# Bathymetry file");
 	write_text_to_log_file("bathy = " + XParam.Bathymetryfile + ";");
 	write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
@@ -872,6 +874,9 @@ void SaveParamtolog(Param XParam)
 			write_text_to_log_file("TSnode = " + std::to_string(XParam.TSnodesout[o].i) + "," + std::to_string(XParam.TSnodesout[o].j) + ";");
 		}
 	}
+
+
+
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Others");
 	write_text_to_log_file("g = " + std::to_string(XParam.g) + ";");

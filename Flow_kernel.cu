@@ -43,10 +43,10 @@ __global__ void gradientGPUXSM(int nx, int ny,float theta, float delta, float *a
 	int i = ix + iy*nx;
 	int xplus, xminus;
 
-	__shared__ float a_s[18][16]; // Hard wired stuff Be carefull
-	//__shared__ float al_s[16][16];
-	//__shared__ float ar_s[16][16];
-	float dadxi=0.0f;
+	__shared__ float a_s[16][16]; // Hard wired stuff Be carefull
+	__shared__ float al_s[16][16];
+	__shared__ float ar_s[16][16];
+	float dadxi;
 	if (ix < nx && iy < ny)
 	{
 		//
@@ -59,20 +59,35 @@ __global__ void gradientGPUXSM(int nx, int ny,float theta, float delta, float *a
 		//al_s[tx][ty] = a[xminus + iy*nx];
 		//ar_s[tx][ty] = a[xplus + iy*nx];
 		
-		a_s[tx][ty] = a[xminus + iy*nx];
+		a_s[tx][ty] = a[ix + iy*nx];
 
 		// read the halo around the tile
-		
-		if (threadIdx.x == 15)//blockDim.x - 1
+		__syncthreads;
+
+		if (threadIdx.x > 0)//blockDim.x - 1
 		{
-			a_s[tx + 1][ty] = a[i];
-			a_s[tx + 2][ty] = a[xplus + iy*nx];
-			
+			al_s[tx][ty] = a_s[tx-1][ty];
+		}
+		else
+		{
+			al_s[tx][ty] = a[xminus + iy*nx];
+		}
+		//__syncthreads; //
+		if (threadIdx.x < blockDim.x - 2)//blockDim.x - 1
+		{
+			ar_s[tx][ty] = a_s[tx + 1][ty];
+		}
+		else
+		{
+			ar_s[tx][ty] = a[xplus + iy*nx];
 		}
 
 		// Need to wait for threadX 0 and threadX 16-1 to finish
 		__syncthreads;
 		
+
+
+
 
 		//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
 		//dadx[i] = minmod2fGPU(theta,a[xminus + iy*nx], a[i], a[xplus + iy*nx]) / delta;
@@ -80,23 +95,36 @@ __global__ void gradientGPUXSM(int nx, int ny,float theta, float delta, float *a
 		//dadx[i] = minmod2fGPU(theta, al_s[tx][ty], a_s[tx][ty], ar_s[tx][ty]) / delta;
 		//dadx[i] = minmod2fGPU(theta, a_s[tx][ty], a_s[tx+1][ty], a_s[tx+2][ty]) / delta;
 		//__device__ float minmod2fGPU(float theta,float s0, float s1, float s2)
-		float d1, d2, d3;
-		if (a_s[tx][ty] < a_s[tx + 1][ty] && a_s[tx + 1][ty] < a_s[tx + 2][ty]) {
-			d1 = theta*(a_s[tx + 1][ty] - a_s[tx][ty]);
-			d2 = (a_s[tx + 2][ty] - a_s[tx][ty]) / 2.0f;
-			d3 = theta*(a_s[tx + 2][ty] - a_s[tx + 1][ty]);
-			if (d2 < d1) d1 = d2;
-			dadxi=min(d1, d3);
-		}
-		if (a_s[tx][ty] > a_s[tx + 1][ty] && a_s[tx + 1][ty] > a_s[tx + 2][ty]) {
-			d1 = theta*(a_s[tx + 1][ty] - a_s[tx][ty]);
-			d2 = (a_s[tx + 2][ty] - a_s[tx][ty]) / 2.0f;
-			d3 = theta*(a_s[tx + 2][ty] - a_s[tx + 1][ty]);
-			if (d2 > d1) d1 = d2;
-			dadxi=max(d1, d3);
-		}
-		dadx[i] = dadxi;
 
+
+		float d1, d2, d3;
+		float s0, s1, s2;
+		
+		//dadxi = 0.0f;
+		dadx[i] = minmod2fGPU(theta, al_s[tx][ty], a_s[tx][ty], ar_s[tx][ty]) / delta;
+		/*
+		s0 = al_s[tx][ty];// there will be bank conflict here
+		s1 = a_s[tx][ty];// there will be bank conflict here
+		s2 = ar_s[tx][ty];// there will be bank conflict here
+
+		if (s0 < s1 && s1 < s2) {
+			d1 = theta*(s1 - s0);
+			d2 = (s2 - s0) / 2.0f;
+			d3 = theta*(s2 - s1);
+			if (d2 < d1) d1 = d2;
+			dadxi = min(d1, d3);
+		}
+		if (s0 > s1 && s1 > s2) {
+			d1 = theta*(s1 - s0);
+			d2 = (s2 - s0) / 2.0f;
+			d3 = theta*(s2 - s1);
+			if (d2 > d1) d1 = d2;
+			dadxi = max(d1, d3);
+		}
+		
+		dadx[i] = dadxi / delta;
+		*/
+		
 	}
 
 
@@ -181,7 +209,7 @@ __global__ void gradientGPUYSM(int nx, int ny, float theta, float delta, float *
 			if (d2 > d1) d1 = d2;
 			dadyi = max(d1, d3);
 		}
-		dady[i] = dadyi;
+		dady[i] = dadyi / delta;
 	}
 
 
