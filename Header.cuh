@@ -52,6 +52,8 @@ public:
 	double yo = 0.0; // grid origin
 	double grdalpha=0.0; // grid rotation Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // flag for bathy input. model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
+	int spherical = 0; // flag for geographical coordinate. can be activated by using teh keyword geographic
+	double Radius = 6371220.; //Earth radius [m]
 
 	//files
 	std::string Bathymetryfile;// bathymetry file name

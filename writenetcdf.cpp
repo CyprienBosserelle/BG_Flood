@@ -627,7 +627,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 
 	//first check if hotstart has zb 
 	zberror = nc_inq_varid(ncid, "zb", &varid);
-	if (zberror != NC_NOERR)
+	if (zberror == NC_NOERR)
 	{
 
 		status = nc_inq_varndims(ncid, varid, &ndims);
@@ -652,7 +652,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 			nt = ddim[0];
 			ny = ddim[1];
 			nx = ddim[2];
-			size_t start[] = {XParam.hotstep, 0, 0 };
+			size_t start[] = {max(XParam.hotstep,nt-1), 0, 0 };
 			size_t count[] = {1, ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, zb);
 			if (status != NC_NOERR) handle_error(status);
@@ -689,7 +689,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 	}
 	// second check if zs or hh are in teh file 
 	zserror = nc_inq_varid(ncid, "zs", &varid);
-	if (zserror != NC_NOERR)
+	if (zserror == NC_NOERR)
 	{
 
 		status = nc_inq_varndims(ncid, varid, &ndims);
@@ -762,7 +762,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		{
 			//Variable not found
 			//It's ok if hh is specified
-			printf("zs not found in hotstart file. Looking for hh");
+			printf("zs not found in hotstart file. Looking for hh\n");
 		}
 		else
 		{
@@ -770,7 +770,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 	}
 	hherror = nc_inq_varid(ncid, "hh", &varid);
-	if (hherror != NC_NOERR)
+	if (hherror == NC_NOERR)
 	{
 
 		status = nc_inq_varndims(ncid, varid, &ndims);
@@ -865,7 +865,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 	}
 
 	uuerror = nc_inq_varid(ncid, "uu", &varid);
-	if (uuerror != NC_NOERR)
+	if (uuerror == NC_NOERR)
 	{
 
 		status = nc_inq_varndims(ncid, varid, &ndims);
@@ -944,7 +944,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 	}
 
 	vverror = nc_inq_varid(ncid, "vv", &varid);
-	if (vverror != NC_NOERR)
+	if (vverror == NC_NOERR)
 	{
 
 		status = nc_inq_varndims(ncid, varid, &ndims);

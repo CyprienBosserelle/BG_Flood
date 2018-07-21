@@ -1697,8 +1697,24 @@ int main(int argc, char **argv)
 			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
-		XParam.delta = XParam.dx;
-		XParam.grdalpha = XParam.grdalpha*pi / 180; // grid rotation
+		if (XParam.spherical < 1)
+		{
+			XParam.delta = XParam.dx;
+			XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+			
+		}
+		else
+		{
+			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+			if (XParam.grdalpha != 0.0)
+			{
+				printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
+				write_text_to_log_file("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+			}
+		}
+		
+
+
 
 													//fid = fopen(XParam.Bathymetryfile.c_str(), "r");
 													//fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &XParam.nx, &XParam.ny, &XParam.dx, &XParam.grdalpha);

@@ -464,7 +464,12 @@ Param readparamstr(std::string line, Param param)
 		param.deformfile = parametervalue;
 
 	}
-
+	parameterstr = "hotstep";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.hotstep = std::stoi(parametervalue);
+	}
 	return param;
 }
 
