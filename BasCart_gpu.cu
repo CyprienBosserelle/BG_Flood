@@ -2145,8 +2145,7 @@ int main(int argc, char **argv)
 		//
 		readbathyASCzb(XParam.Bathymetryfile, XParam.nx, XParam.ny, zb);
 	}
-	printf("Done\n");
-	write_text_to_log_file("Done");
+	
 	//printf("%f\n", zb[0]);
 	//printf("%f\n", zb[(nx - 1) + (0)*nx]);
 	//printf("%f\n", zb[(0) + (ny-1)*nx]);
@@ -2156,6 +2155,8 @@ int main(int argc, char **argv)
 	//init variables
 	if (XParam.posdown == 1)
 	{
+		printf("Bathy data is positive down...correcting ...");
+		write_text_to_log_file("Bathy data is positive down...correcting");
 		for (int j = 0; j < ny; j++)
 		{
 			for (int i = 0; i < nx; i++)
@@ -2166,7 +2167,8 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-
+	printf("Done\n");
+	write_text_to_log_file("Done");
 	/////////////////////////////////////////////////////
 	// Initial Condition
 	/////////////////////////////////////////////////////

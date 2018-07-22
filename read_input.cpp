@@ -827,15 +827,19 @@ void write_text_to_log_file(std::string text)
 
 void SaveParamtolog(Param XParam)
 {
+	write_text_to_log_file("\n");
 	write_text_to_log_file("###################################");
 	write_text_to_log_file("### Summary of model parameters ###");
 	write_text_to_log_file("###################################");
 	write_text_to_log_file("# Bathymetry file");
 	write_text_to_log_file("bathy = " + XParam.Bathymetryfile + ";");
+	write_text_to_log_file("posdown = " + std::to_string(XParam.posdown) + ";");
 	write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
 	write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");
 	write_text_to_log_file("dx = " + std::to_string(XParam.dx) + ";");
 	write_text_to_log_file("grdalpha = " + std::to_string(XParam.grdalpha*180.0/pi) + ";");
+	write_text_to_log_file("xo = " + std::to_string(XParam.xo) + ";");
+	write_text_to_log_file("yo = " + std::to_string(XParam.yo) + ";");
 	write_text_to_log_file("\n");
 
 
@@ -853,7 +857,11 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Timekeeping parameters");
 	write_text_to_log_file("CFL = " + std::to_string(XParam.CFL) + ";");
+	write_text_to_log_file("totaltime = " + std::to_string(XParam.totaltime) + "; # Start time");
+	write_text_to_log_file("endtime = " + std::to_string(XParam.endtime) + ";");
 	write_text_to_log_file("outputtimestep = " + std::to_string(XParam.outputtimestep) + ";");
+
+
 	std::string alloutvars= "";
 	for (int nvar = 0; nvar < XParam.outvars.size(); nvar++)
 	{
@@ -866,10 +874,16 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("outvars = " + alloutvars + ";");
 
 
-	write_text_to_log_file("endtime = " + std::to_string(XParam.endtime) + ";");
+	
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Files");
 	write_text_to_log_file("outfile = " + XParam.outfile + ";");
+	write_text_to_log_file("smallnc = " + std::to_string(XParam.smallnc) + "; #if smallnc==1 all Output are scaled and saved as a short int");
+	if (XParam.smallnc == 1)
+	{
+		write_text_to_log_file("scalefactor = " + std::to_string(XParam.scalefactor) + ";");
+		write_text_to_log_file("addoffset = " + std::to_string(XParam.addoffset) + ";");
+	}
 	
 	if (!XParam.TSoutfile.empty())
 	{
@@ -879,13 +893,42 @@ void SaveParamtolog(Param XParam)
 			write_text_to_log_file("TSnode = " + std::to_string(XParam.TSnodesout[o].i) + "," + std::to_string(XParam.TSnodesout[o].j) + ";");
 		}
 	}
+	write_text_to_log_file("\n");
+	write_text_to_log_file("# Boundaries");
+	write_text_to_log_file("# 0:wall; 1:Dirichlet (zs); 2: Neumann (Default)");
+	write_text_to_log_file("right = " + std::to_string(XParam.right) + ";");
+	write_text_to_log_file("left = " + std::to_string(XParam.left) + ";");
+	write_text_to_log_file("top = " + std::to_string(XParam.top) + ";");
+	write_text_to_log_file("bot = " + std::to_string(XParam.bot) + ";");
+	
+	if (!XParam.rightbndfile.empty())
+		write_text_to_log_file("rightbndfile = " + XParam.rightbndfile + ";");
+	if (!XParam.leftbndfile.empty())
+		write_text_to_log_file("leftbndfile = " + XParam.leftbndfile + ";");
+	if (!XParam.topbndfile.empty())
+		write_text_to_log_file("topbndfile = " + XParam.topbndfile + ";");
+	if (!XParam.botbndfile.empty())
+		write_text_to_log_file("botbndfile = " + XParam.botbndfile + ";");
 
-
+	/*
+	std::string rightbndfile;
+	std::string leftbndfile;
+	std::string topbndfile;
+	std::string botbndfile;
+	*/
+	//hot start
+	if (!XParam.hotstartfile.empty())
+	{
+		write_text_to_log_file("hotstartfile = " + XParam.hotstartfile + ";");
+		write_text_to_log_file("hotstep = " + std::to_string(XParam.hotstep) + ";");
+	}
+	
 
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Others");
 	write_text_to_log_file("g = " + std::to_string(XParam.g) + ";");
 	write_text_to_log_file("rho = " + std::to_string(XParam.rho) + ";");
+	write_text_to_log_file("\n");
 }
 
 
