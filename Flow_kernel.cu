@@ -609,6 +609,12 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		float hi = hh[i];
 		float uui = uu[i];
 		float vvi = vv[i];
+
+
+		float cmdinv, ga;
+
+		cmdinv = 1 / (cm*delta);
+		ga = 0.5f*g;
 		////
 		//vector dhu = vector(updates[1 + dimension*l]);
 		//foreach() {
@@ -620,20 +626,20 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 		//float cm = 1.0;
 
-		dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) / (cm * delta);
+		dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdinv;
 		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmu - fmu) / (cm * delta);// absurd!
-		float dmdt = (fmv - fmv) / (cm  * delta);// absurd!
+		float dmdl = (fmu - fmu) * cmdinv;// absurd if not spherical!
+		float dmdt = (fmv - fmv) * cmdinv;
 		float fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) / (cm*delta);
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) / (cm*delta);
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdinv;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdinv;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
-		dhu[i] += hi * (g*hi / 2.f*dmdl + fG*vvi);
-		dhv[i] += hi * (g*hi / 2.f*dmdt - fG*uui);
+		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
+		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
 	}
 }
 
@@ -1074,7 +1080,7 @@ __global__ void noslipbndLeft(int nx, int ny, float eps, float *zb, float *zs, f
 	int ix = 0;
 	int i = ix + iy*nx;
 	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	float normu, hhi,zsp;
 
 	if (ix ==0 && iy < ny)
 	{
@@ -1083,10 +1089,12 @@ __global__ void noslipbndLeft(int nx, int ny, float eps, float *zb, float *zs, f
 		yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
+		zsp = zs[xplus + iy*nx];
+
 		
 		uu[i] = 0.0f;
-		zs[i] = zs[xplus + iy*nx];
-		hh[i] = max(zs[xplus + iy*nx] - zb[i], eps);
+		zs[i] = zsp;
+		hh[i] = max(zsp - zb[i], eps);
 		
 		
 
