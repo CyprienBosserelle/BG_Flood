@@ -984,25 +984,39 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	//update step 1
 
 	// calculate gradients
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdy_g);
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdx_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdx_g, dhdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdy_g);
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdx_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdx_g,dzsdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudy_g);
+
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudx_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudx_g, dudy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdy_g);
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdx_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdy_g);
 	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdx_g, dvdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
@@ -1121,19 +1135,33 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	//corrector setp
 	//update again
 	// calculate gradients
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdx_g);
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdy_g);
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdy_g);
 
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdx_g);
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdy_g);
-
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudx_g);
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudy_g);
-
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdx_g);
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdy_g);
-	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdx_g, dhdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdy_g);
+
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdx_g, dzsdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudy_g);
+
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudx_g, dudy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdy_g);
+
+	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdx_g, dvdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 
 	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
