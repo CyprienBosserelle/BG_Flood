@@ -391,6 +391,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			{
 				fh = 0.0f;
 				fu = 0.0f;
+				dtmax[i] = 1.0f / 1e-30f;
 			}
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 
@@ -505,7 +506,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 			hm = max(0.f, hr + zr - zlr);
 
 			//// Reimann solver
-			float fh, fu, fv;
+			float fh, fu, fv,sl,sr;
 			//float dtmaxf = 1.0f / 1e-30f;
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
@@ -549,6 +550,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 			{
 				fh = 0.0f;
 				fu = 0.0f;
+				dtmax[i] = 1.0f / 1e-30f;
 			}
 
 			if (fh > 0.0f)
@@ -565,8 +567,8 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 
 			In the case of adaptive refinement, care must be taken to ensure
 			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-			float sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
-			float sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
+			sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
+			sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
 
 			////Flux update
 

@@ -972,6 +972,16 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	int nx = XParam.nx;
 	int ny = XParam.ny;
 
+	const int num_streams = 2;
+
+	cudaStream_t streams[num_streams];
+	for (int i = 0; i < num_streams; i++) 
+	{
+		CUDA_CHECK(cudaStreamCreate(&streams[i]));
+	}
+
+
+
 	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
 
@@ -979,54 +989,55 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	dtmax = 1 / epsilon;
 	float dtmaxtmp = dtmax;
 
-	resetdtmax << <gridDim, blockDim, 0 >> > (nx, ny, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	resetdtmax << <gridDim, blockDim,0, streams[0] >> > (nx, ny, dtmax_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 	//update step 1
 
 	// calculate gradients
-	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdx_g);
+	//gradientGPUX << <gridDim, blockDim,0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdx_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
-	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdy_g);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdx_g, dhdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdx_g);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdy_g);
+	//gradientGPUY << <gridDim, blockDim,0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdx_g,dzsdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
 
-
-	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudx_g);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudy_g);
+	gradientGPUXY << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, hh_g, dhdx_g, dhdy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudx_g, dudy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdx_g);
+	//gradientGPUX << <gridDim, blockDim,0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdx_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
-	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdy_g);
+	//gradientGPUY << <gridDim, blockDim,0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUXY << <gridDim, blockDim, 0 , streams[1] >> >(nx, ny, XParam.theta, XParam.delta, zs_g, dzsdx_g,dzsdy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	//gradientGPUX << <gridDim, blockDim,0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudx_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	//gradientGPUY << <gridDim, blockDim,0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientGPUXY << <gridDim, blockDim,0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, uu_g, dudx_g, dudy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradientGPUX << <gridDim, blockDim,0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdx_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	//gradientGPUY << <gridDim, blockDim,0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdy_g);
 	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdx_g, dvdy_g);
+	gradientGPUXY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, vv_g, dvdx_g, dvdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
+	updateKurgX << <gridDim, blockDim,0, streams[0] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+	//CUDA_CHECK(cudaStreamSynchronize(streams[1]));
+	updateKurgY << <gridDim, blockDim,0, streams[1] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+	
 	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
+	
 
 	/////////////////////////////////////////////////////
 	// Reduction of dtmax
@@ -1138,25 +1149,26 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdx_g);
 	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdy_g);
 
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdx_g, dhdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUXY << <gridDim, blockDim, 0 , streams[0] >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdx_g, dhdy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdx_g);
 	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdy_g);
 
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdx_g, dzsdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUXY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdx_g, dzsdy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudx_g);
 	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudy_g);
 
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudx_g, dudy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientGPUXY << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudx_g, dudy_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdx_g);
 	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdy_g);
 
-	gradientGPUXY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdx_g, dvdy_g);
+	gradientGPUXY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdx_g, dvdy_g);
+	
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
@@ -1164,11 +1176,11 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
 
-	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	updateKurgX << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	
-	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+	updateKurgY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// no reduction of dtmax during the corrector step
@@ -1187,6 +1199,9 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	//Bottom friction
 	quadfriction << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, XParam.cf, hh_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CUDA_CHECK(cudaStreamDestroy(streams[0]));
+	CUDA_CHECK(cudaStreamDestroy(streams[1]));
 
 	// Impose no slip condition by default
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
