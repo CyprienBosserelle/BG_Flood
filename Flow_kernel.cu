@@ -320,7 +320,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm,sl,sr;
 
 			// along X
-			dx = delta / 2.0f;
+			dx = delta*0.5f;
 			zi = zs[i] - hi;
 
 			//printf("%f\n", zi);
@@ -426,7 +426,10 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			//dtmax needs to be stored in an array and reduced at the end
 			//dtmax = dtmaxf;
 			//dtmaxtmp = min(dtmax, dtmaxtmp);
-
+			if (ix == 11 && iy == 0)
+			{
+				printf("fh=%f\n", fh);
+			}
 
 			/*
 			#### Topographic source term

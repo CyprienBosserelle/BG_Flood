@@ -302,17 +302,18 @@ void checkloopGPU(Param XParam)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fhu, dummy);
+	//maxdiffer = maxdiff(nx*ny, Fhu, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fhu, dummy);
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Fhu: %f\n", maxdiffer);
+		printf("High error in Fhu (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fhv, dummy);
+	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fhv, dummy);
 	if (maxdiffer > maxerr)
 	{
-		printf("High error in Fhv: %f\n", maxdiffer);
+		printf("High error in Fhv (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
 	}
 
 	CUDA_CHECK(cudaMemcpy(dummy, Fqux_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
@@ -1140,7 +1141,7 @@ float FlowGPU(Param XParam, float nextoutputtime)
 
 
 	//predictor (advance 1/2 dt)
-	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, XParam.dt*0.5, XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, XParam.dt*0.5f, XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//corrector setp
@@ -1189,7 +1190,7 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//
-	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, XParam.dt, XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, (float) XParam.dt, XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
@@ -1197,7 +1198,7 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Bottom friction
-	quadfriction << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, XParam.cf, hh_g, uu_g, vv_g);
+	quadfriction << <gridDim, blockDim, 0 >> > (nx, ny, (float) XParam.dt, XParam.eps, XParam.cf, hh_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaStreamDestroy(streams[0]));
@@ -2679,8 +2680,8 @@ int main(int argc, char **argv)
 
 	if (XParam.GPUDEVICE >= 0)
 	{
-		mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
-		//checkloopGPU(XParam);
+		//mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+		checkloopGPU(XParam);
 			
 	}
 	else

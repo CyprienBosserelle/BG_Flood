@@ -303,7 +303,10 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
 
-
+				if (ix == 11 && iy == 0)
+				{
+					printf("fh=%f\n", fh);
+				}
 				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
 
 
