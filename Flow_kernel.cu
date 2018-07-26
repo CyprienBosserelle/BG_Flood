@@ -362,7 +362,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 			am = min(min(up - cp, um - cmo),0.0f);
 			//am = min(am, 0.0f);
-			ad = 1 / (ap - am);
+			ad = 1.0f / (ap - am);
 			qm = hm*um;
 			qp = hp*up;
 
@@ -378,6 +378,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			{
 				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
 				fu = (ap*(qm*um + ga*hm2 ) - am*(qp*up + ga*hp2 ) + apm*(qp - qm)) *ad;
+				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
 				float dt = CFL*dlt / a;
 				if (dt < dtmax[i])
 				{
@@ -426,11 +427,11 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			//dtmax needs to be stored in an array and reduced at the end
 			//dtmax = dtmaxf;
 			//dtmaxtmp = min(dtmax, dtmaxtmp);
-			if (ix == 11 && iy == 0)
+			/*if (ix == 11 && iy == 0)
 			{
-				printf("fh=%f\n", fh);
+				printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + ga*hm2), -am*(qp*up + ga*hp2),( ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm) ) *ad/100.0f, ad);
 			}
-
+			*/
 			/*
 			#### Topographic source term
 
@@ -525,7 +526,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 
 			am = min(min(up - cp, um - cmo),0.0f);
 			//am = min(am, 0.0f);
-			ad = 1 / (ap - am);
+			ad = 1.0f / (ap - am);
 			qm = hm*um;
 			qp = hp*up;
 
@@ -618,7 +619,7 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 
 		float cmdinv, ga;
 
-		cmdinv = 1 / (cm*delta);
+		cmdinv = 1.0f / (cm*delta);
 		ga = 0.5f*g;
 		////
 		//vector dhu = vector(updates[1 + dimension*l]);
@@ -631,14 +632,14 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 		//float cm = 1.0;
 
-		dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdinv;
+		dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i])*cmdinv;
 		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmu - fmu) * cmdinv;// absurd if not spherical!
-		float dmdt = (fmv - fmv) * cmdinv;
+		float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
+		float dmdt = (fmv - fmv) / (cm*delta);
 		float fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdinv;
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdinv;

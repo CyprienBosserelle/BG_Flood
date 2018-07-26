@@ -2680,8 +2680,8 @@ int main(int argc, char **argv)
 
 	if (XParam.GPUDEVICE >= 0)
 	{
-		//mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
-		checkloopGPU(XParam);
+		mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+		//checkloopGPU(XParam);
 			
 	}
 	else

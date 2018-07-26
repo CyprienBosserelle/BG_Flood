@@ -172,10 +172,11 @@ void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float 
 	float am = min(up - cp, um - cm); am = min(am, 0.0f);
 	float qm = hm*um, qp = hp*up;
 	float a = max(ap, -am);
+	float ad = 1.0f / (ap - am);
 	if (a > eps) {
-		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
+		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) *ad; // (4.5) of [1]
 		*fq = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +
-			ap*am*(qp - qm)) / (ap - am);
+			ap*am*(qp - qm)) *ad;
 		float dt = CFL*Delta / a;
 		if (dt < *dtmax)
 			*dtmax = dt;
@@ -302,11 +303,18 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 				fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
 				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
+				float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
+				float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
+				float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
+				float qm = hm*um, qp = hp*up;
 
+				float fubis= (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +	ap*am*(qp - qm)) / (ap - am);
+				/*
 				if (ix == 11 && iy == 0)
 				{
-					printf("fh=%f\n", fh);
+					printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + g*sq(hm) / 2.0f), -am*(qp*up + g*sq(hp) / 2.0f), (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am),1 / (ap - am));
 				}
+				*/
 				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
 
 
@@ -442,19 +450,19 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 			//	foreach_dimension()
 			//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
-			float cm = 1.0;
-
-			dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) / (cm * delta);
+			float cm = 1.0f;
+			float cmdel = 1.0f / (cm * delta);
+			dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdel;
 			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 			//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 			//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-			float dmdl = (fmu - fmu) / (cm * delta);// absurd!
-			float dmdt = (fmv - fmv) / (cm  * delta);// absurd!
+			float dmdl = (fmu - fmu) *cmdel;// absurd!
+			float dmdt = (fmv - fmv) *cmdel;// absurd!
 			float fG = vv[i] * dmdl - uu[i] * dmdt;
-			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) / (cm*delta);
-			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) / (cm*delta);
+			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdel;
+			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdel;
 			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 			dhu[i] += hi * (g*hi / 2.*dmdl + fG*vv[i]);
 			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
