@@ -23,60 +23,17 @@
 
 // includes, system
 
-#define pi 3.14159265
-
-#define epsilon 1e-30
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <cmath>
-#include <ctime>
-#include "netcdf.h"
-
-double phi = (1.0f + sqrt(5.0f)) / 2;
-double aphi = 1 / (phi + 1);
-double bphi = phi / (phi + 1);
-double twopi = 8 * atan(1.0f);
-
-double g = 1.0;// 9.81;
-double rho = 1025.0;
-double eps = 0.0001;
-double CFL = 0.5;
-
-double totaltime = 0.0;
-double dt, dx;
-int nx, ny;
-
-double delta;
-
-double *x, *y;
-double *x_g, *y_g;
-
-double *zs, *hh, *zb, *uu, *vv;
-double *zso, *hho, *uuo, *vvo;
+#include "Header.cuh"
 
 
-double * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
-double *dzsdx, *dzsdy;
-
-double *fmu, *fmv, *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
-
-double * Fhu, *Fhv;
-
-double * dh, *dhu, *dhv;
-
-double dtmax = 1.0 / epsilon;
 
 
 template <class T> T sq(T a) {
 	return (a*a);
 }
 
-double sqd(double a) {
-	return (a*a);
-}
 
 template <class T> const T& max(const T& a, const T& b) {
 	return (a<b) ? b : a;     // or: return comp(a,b)?b:a; for version (2)
@@ -108,6 +65,27 @@ double minmod2(double s0, double s1, double s2)
 	return 0.;
 }
 
+float minmod2f(float s0, float s1, float s2)
+{
+	//theta should be used as a global var 
+	// can be used to tune the limiting (theta=1
+	//gives minmod, the most dissipative limiter and theta = 2 gives
+	//	superbee, the least dissipative).
+	float theta = 1.3f;
+	if (s0 < s1 && s1 < s2) {
+		float d1 = theta*(s1 - s0);
+		float d2 = (s2 - s0) / 2.0f;
+		float d3 = theta*(s2 - s1);
+		if (d2 < d1) d1 = d2;
+		return min(d1, d3);
+	}
+	if (s0 > s1 && s1 > s2) {
+		float d1 = theta*(s1 - s0), d2 = (s2 - s0) / 2.0f, d3 = theta*(s2 - s1);
+		if (d2 > d1) d1 = d2;
+		return max(d1, d3);
+	}
+	return 0.;
+}
 double dtnext(double t, double tnext, double dt)
 {
 	//Function to make dt match output time step and prevent dt from chnaging too fast
@@ -139,7 +117,7 @@ double dtnext(double t, double tnext, double dt)
 	return dt;
 }
 
-void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &dady)
+void gradient(int nx, int ny, double delta, float *a, float *&dadx, float * &dady)
 {
 
 	int i, xplus, yplus, xminus, yminus;
@@ -158,9 +136,9 @@ void gradient(int nx, int ny, double delta, double *a, double *&dadx, double * &
 
 
 			//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-			dadx[i] = minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
+			dadx[i] = minmod2f(a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
 			//dady[i] = (a[i] - a[ix + yminus*nx]) / delta;
-			dady[i] = minmod2(a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
+			dady[i] = minmod2f(a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
 
 
 		}
@@ -186,7 +164,25 @@ void kurganov(double hm, double hp, double um, double up, double Delta,	double *
 	else
 		*fh = *fq = 0.;
 }
-
+void kurganovf(float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
+{
+	float eps = epsilon;
+	float cp = sqrtf(g*hp), cm = sqrtf(g*hm);
+	float ap = max(up + cp, um + cm); ap = max(ap, 0.0f);
+	float am = min(up - cp, um - cm); am = min(am, 0.0f);
+	float qm = hm*um, qp = hp*up;
+	float a = max(ap, -am);
+	if (a > eps) {
+		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
+		*fq = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
+			ap*am*(qp - qm)) / (ap - am);
+		float dt = CFL*Delta / a;
+		if (dt < *dtmax)
+			*dtmax = dt;
+	}
+	else
+		*fh = *fq = 0.;
+}
 
 void neumannbnd(int nx, int ny, double*a)
 {
@@ -227,15 +223,15 @@ void neumannbnd(int nx, int ny, double*a)
 
 }
 
-void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
+void update(int nx, int ny, double dt, double eps,float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
-	double hi;
+	float hi;
 
 		
 	dtmax = 1 / epsilon;
-	double dtmaxtmp = dtmax;
+	float dtmaxtmp = dtmax;
 
 	// calculate gradients
 	gradient(nx, ny,delta, hh, dhdx, dhdy);
@@ -243,7 +239,9 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 	gradient(nx, ny,delta, uu, dudx, dudy);
 	gradient(nx, ny, delta, vv, dvdx, dvdy);
 	
-
+	float cm = 1.0;// 0.1;
+	float fmu = 1.0;
+	float fmv = 1.0;
 	
 	for (int iy = 0; iy < ny; iy++)
 	{
@@ -258,16 +256,16 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 
 
-			double hn = hh[xminus + iy*nx];
+			float hn = hh[xminus + iy*nx];
 
 
 			if (hi > eps || hn > eps)
 			{
 
-				double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+				float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 				// along X
-				dx = delta / 2.;
+				dx = delta / 2.0f;
 				zi = zs[i] - hi;
 
 				//printf("%f\n", zi);
@@ -286,22 +284,20 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 				hl = hi - dx*dhdx[i];
 				up = uu[i] - dx*dudx[i];
-				hp = max(0., hl + zl - zlr);
+				hp = max(0.f, hl + zl - zlr);
 
 				hr = hn + dx*dhdx[xminus + iy*nx];
 				um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
-				hm = max(0., hr + zr - zlr);
+				hm = max(0.f, hr + zr - zlr);
 
 				//// Reimann solver
-				double fh, fu, fv;
-				double cm = 1.0;// 0.1;
-
-
+				float fh, fu, fv;
+				float dtmaxf= 1.0f / (float)epsilon;
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganov(hm, hp, um, up, delta*cm / fmu[i], &fh, &fu, &dtmax);
-				fv = (fh > 0. ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
-
+				kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+				fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
 
 
@@ -315,22 +311,22 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 				In the case of adaptive refinement, care must be taken to ensure
 				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-				double sl = g / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-				double sr = g / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+				float sl = g / 2.f*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
+				float sr = g / 2.f*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
 
 				////Flux update
 
-				Fhu[i] = fmu[i] * fh;
-				Fqux[i] = fmu[i] * (fu - sl);
-				Su[i] = fmu[i] * (fu - sr);
-				Fqvx[i] = fmu[i] * fv;
+				Fhu[i] = fmu * fh;
+				Fqux[i] = fmu * (fu - sl);
+				Su[i] = fmu * (fu - sr);
+				Fqvx[i] = fmu * fv;
 			}
 			else
 			{
-				Fhu[i] = 0.0;
-				Fqux[i] = 0.0;
-				Su[i] = 0.0;
-				Fqvx[i] = 0.0;
+				Fhu[i] = 0.0f;
+				Fqux[i] = 0.0f;
+				Su[i] = 0.0f;
+				Fqvx[i] = 0.0f;
 			}
 
 			}
@@ -347,8 +343,8 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 				yminus = max(iy - 1, 0);
 				hi = hh[i];
 
-				double hn = hh[xminus + iy*nx];
-				double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+				float hn = hh[ix + yminus*nx];
+				float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 				
 
 
@@ -368,21 +364,21 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 				hl = hi - dx*dhdy[i];
 				up = vv[i] - dx*dvdy[i];
-				hp = max(0., hl + zl - zlr);
+				hp = max(0.f, hl + zl - zlr);
 
 				hr = hn + dx*dhdy[ix + yminus*nx];
 				um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
-				hm = max(0., hr + zr - zlr);
+				hm = max(0.f, hr + zr - zlr);
 
 				//// Reimann solver
-				double fh, fu, fv;
-				double cm = 1.0;// 0.1;
+				float fh, fu, fv;
+				float dtmaxf = 1 / (float)epsilon;
 				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
 				//printf("%f\n", hr);
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganov(hm, hp, um, up, delta*cm / fmv[i], &fh, &fu, &dtmax);
+				kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
-
+				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
 				//// Topographic term
 
@@ -391,24 +387,24 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 
 				In the case of adaptive refinement, care must be taken to ensure
 				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-				double sl = g / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
-				double sr = g / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
+				float sl = g / 2.*(sq(hp) - sq(hl) + (hl + hi)*(zi - zl));
+				float sr = g / 2.*(sq(hm) - sq(hr) + (hr + hn)*(zn - zr));
 
 				////Flux update
 
-				Fhv[i] = fmv[i] * fh;
-				Fqvy[i] = fmv[i] * (fu - sl);
-				Sv[i] = fmv[i] * (fu - sr);
-				Fquy[i] = fmv[i] * fv;
+				Fhv[i] = fmv * fh;
+				Fqvy[i] = fmv * (fu - sl);
+				Sv[i] = fmv * (fu - sr);
+				Fquy[i] = fmv* fv;
 
 				//printf("%f\t%f\t%f\n", x[i], y[i], Fhv[i]);
 			}
 			else
 			{
-				Fhv[i] = 0.0;
-				Fqvy[i] = 0.0;
-				Sv[i] = 0.0;
-				Fquy[i] = 0.0;
+				Fhv[i] = 0.0f;
+				Fqvy[i] = 0.0f;
+				Sv[i] = 0.0f;
+				Fquy[i] = 0.0f;
 			}
 
 			//printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
@@ -440,15 +436,17 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 			//	foreach_dimension()
 			//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
-			double cm = 1.0;
+			float cm = 1.0;
 
 			dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) / (cm * delta);
 			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
-			double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
-			double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-			double fG = vv[i] * dmdl - uu[i] * dmdt;
+			//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+			//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+			float dmdl = (fmu - fmu) / (cm * delta);// absurd!
+			float dmdt = (fmv - fmv) / (cm  * delta);// absurd!
+			float fG = vv[i] * dmdl - uu[i] * dmdt;
 			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) / (cm*delta);
 			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) / (cm*delta);
 			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
@@ -465,7 +463,7 @@ void update(int nx, int ny, double dt, double eps,double *hh, double *zs, double
 }
 
 
-void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, double *uu, double * vv, double * dh, double *dhu, double *dhv, double * &hho, double *&zso, double *&uuo, double *&vvo)
+void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo)
 {
 	//dim3 blockDim(16, 16, 1);
 	//dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
@@ -483,8 +481,8 @@ void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, doub
 		for (int ix = 0; ix < nx; ix++)
 		{
 			int i = ix + iy*nx;
-			double hold = hh[i];
-			double ho, uo, vo;
+			float hold = hh[i];
+			float ho, uo, vo;
 			ho = hold + dt*dh[i];
 			
 			zso[i] = zb[i] + ho;
@@ -509,8 +507,8 @@ void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, doub
 			 //for (int l = 0; l < nl; l++) {
 			 //vector uo = vector(output[1 + dimension*l]);
 			 //foreach_dimension()
-				uo = 0.;
-				vo = 0.;
+				uo = 0.f;
+				vo = 0.f;
 			}
 
 			
@@ -534,7 +532,7 @@ void advance(int nx, int ny, double dt, double eps, double *hh, double *zs, doub
 }
 
 
-void cleanup(int nx, int ny, double * hhi, double *zsi, double *uui, double *vvi, double * &hho, double *&zso, double *&uuo, double *&vvo)
+void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo)
 {
 	for (int iy = 0; iy < ny; iy++)
 	{
@@ -551,7 +549,7 @@ void cleanup(int nx, int ny, double * hhi, double *zsi, double *uui, double *vvi
 }
 
 
-extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, double * var)
+extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var)
 {
 	int status;
 	int ncid, xx_dim, yy_dim, time_dim, p_dim, tvar_id;
@@ -592,7 +590,7 @@ extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltim
 
 
 
-	status = nc_def_var(ncid, "2Dvar", NC_DOUBLE, 3, var_dimids, &tvar_id);
+	status = nc_def_var(ncid, "2Dvar", NC_FLOAT, 3, var_dimids, &tvar_id);
 
 
 	status = nc_enddef(ncid);
@@ -616,12 +614,12 @@ extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltim
 	status = nc_put_vara_double(ncid, yy_id, ystart, ycount, yy);
 
 
-	status = nc_put_vara_double(ncid, tvar_id, start, count, var);
+	status = nc_put_vara_float(ncid, tvar_id, start, count, var);
 	status = nc_close(ncid);
 
 }
 
-extern "C" void write2varnc(int nx, int ny, double totaltime, double * var)
+extern "C" void write2varnc(int nx, int ny, double totaltime, float * var)
 {
 	int status;
 	int ncid, time_dim, recid;
@@ -653,13 +651,13 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, double * var)
 
 	//Provide values for variables
 	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
-	status = nc_put_vara_double(ncid, var_id, start, count, var);
+	status = nc_put_vara_float(ncid, var_id, start, count, var);
 	status = nc_close(ncid);
 
 }
 
 // Main loop that actually runs the model
-void mainloop()
+void mainloopCPU()
 {
 
 	//forcing bnd update 
@@ -670,7 +668,7 @@ void mainloop()
 	update(nx, ny, dt, eps, hh, zs, uu, vv, dh, dhu, dhv);
 	printf("dtmax=%f\n", dtmax);
 	dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
-	
+	printf("dt=%f\n", dt);
 	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor
@@ -695,164 +693,8 @@ void mainloop()
 
 
 
-void flowbnd()
-{
-
-
-}
 
 
 
 
-
-int main(int argc, char **argv)
-{
-	//Model starts Here//
-
-	//The main function setups all the init of the model and then calls the mainloop to actually run the model
-
-
-	//First part reads the inputs to the model 
-	//then allocate memory on GPU and CPU
-	//Then prepare and initialise memory and arrays on CPU and GPU
-	// Prepare output file
-	// Run main loop
-	// Clean up and close
-
-
-	// Start timer to keep track of time 
-	clock_t startcputime, endcputime;
-
-
-	startcputime = clock();
-
-
-
-	// This is just for temporary use
-	nx = 32;
-	ny = 32;
-	double length = 1.0;
-	delta = length / nx;
-	
-
-	double *xx, *yy;
-	dt = 0.0;// Will be resolved in update
-
-
-
-
-	hh = (double *)malloc(nx*ny * sizeof(double));
-	uu = (double *)malloc(nx*ny * sizeof(double));
-	vv = (double *)malloc(nx*ny * sizeof(double));
-	zs = (double *)malloc(nx*ny * sizeof(double));
-	zb = (double *)malloc(nx*ny * sizeof(double));
-
-	hho = (double *)malloc(nx*ny * sizeof(double));
-	uuo = (double *)malloc(nx*ny * sizeof(double));
-	vvo = (double *)malloc(nx*ny * sizeof(double));
-	zso = (double *)malloc(nx*ny * sizeof(double));
-
-	dhdx = (double *)malloc(nx*ny * sizeof(double));
-	dhdy = (double *)malloc(nx*ny * sizeof(double));
-	dudx = (double *)malloc(nx*ny * sizeof(double));
-	dudy = (double *)malloc(nx*ny * sizeof(double));
-	dvdx = (double *)malloc(nx*ny * sizeof(double));
-	dvdy = (double *)malloc(nx*ny * sizeof(double));
-
-	dzsdx = (double *)malloc(nx*ny * sizeof(double));
-	dzsdy = (double *)malloc(nx*ny * sizeof(double));
-
-
-	fmu = (double *)malloc(nx*ny * sizeof(double));
-	fmv = (double *)malloc(nx*ny * sizeof(double));
-	Su = (double *)malloc(nx*ny * sizeof(double));
-	Sv = (double *)malloc(nx*ny * sizeof(double));
-	Fqux = (double *)malloc(nx*ny * sizeof(double));
-	Fquy = (double *)malloc(nx*ny * sizeof(double));
-	Fqvx = (double *)malloc(nx*ny * sizeof(double));
-	Fqvy = (double *)malloc(nx*ny * sizeof(double));
-	Fhu = (double *)malloc(nx*ny * sizeof(double));
-	Fhv = (double *)malloc(nx*ny * sizeof(double));
-
-	dh = (double *)malloc(nx*ny * sizeof(double));
-	dhu = (double *)malloc(nx*ny * sizeof(double));
-	dhv = (double *)malloc(nx*ny * sizeof(double));
-
-	//x = (double *)malloc(nx*ny * sizeof(double));
-	xx= (double *)malloc(nx * sizeof(double));
-	//y = (double *)malloc(nx*ny * sizeof(double));
-	yy= (double *)malloc(ny * sizeof(double));
-
-	//init variables
-	for (int j = 0; j < ny; j++)
-	{
-		for (int i = 0; i < nx; i++)
-		{
-			zb[i + j*nx] = 0.0;
-			uu[i + j*nx] = 0.0;
-			vv[i + j*nx] = 0.0;
-			//x[i + j*nx] = (i-nx/2)*delta+0.5*delta;
-			xx[i] = (i - nx / 2)*delta+0.5*delta;
-			yy[j] = (j - ny / 2)*delta+0.5*delta;
-			//y[i + j*nx] = (j-ny/2)*delta + 0.5*delta;
-			fmu[i + j*nx] = 1.0;
-			fmv[i + j*nx] = 1.0;
-		}
-	}
-
-	for (int j = 0; j < ny; j++)
-	{
-		for (int i = 0; i < nx; i++)
-		{
-			double a, b;
-
-			a = sq(x[i + j*nx]) + sq(y[i + j*nx]);
-			//b =x[i + j*nx] * x[i + j*nx] + y[i + j*nx] * y[i + j*nx];
-
-
-			//if (abs(a - b) > 0.00001)
-			//{
-			//	printf("%f\t%f\n", a, b);
-			//}
-
-
-
-			hh[i + j*nx] = 0.1 + 1.*exp(-200.*(a));
-
-			zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
-		}
-	}
-
-
-	create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
-	
-	//while (totaltime < 10.0)
-	for (int i = 0; i <10; i++)
-	{
-		mainloop();
-		totaltime = totaltime + dt;
-		write2varnc(nx, ny, totaltime, hh);
-		//write2varnc(nx, ny, totaltime, dhdx);
-	}
-	
-
-	
-
-
-
-	endcputime = clock();
-	printf("End Computation totaltime=%f\n",totaltime);
-	printf("Total runtime= %d  seconds\n", (endcputime - startcputime) / CLOCKS_PER_SEC);
-
-
-
-
-
-
-
-
-
-
-
-}
 
