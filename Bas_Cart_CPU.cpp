@@ -476,6 +476,265 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 	}
 }
 
+void update_Spherical(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta,float yo,float Radius, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
+{
+	int i, xplus, yplus, xminus, yminus;
+
+	float hi;
+
+
+	dtmax = 1 / epsilon;
+	float dtmaxtmp = dtmax;
+
+	// calculate gradients
+	gradient(nx, ny, theta, delta, hh, dhdx, dhdy);
+	gradient(nx, ny, theta, delta, zs, dzsdx, dzsdy);
+	gradient(nx, ny, theta, delta, uu, dudx, dudy);
+	gradient(nx, ny, theta, delta, vv, dvdx, dvdy);
+
+	float cm = 1.0;// 0.1;
+	float fmu = 1.0;
+	float fmv = 1.0;
+	float phi, dphi,y;
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+			i = ix + iy*nx;
+			xplus = min(ix + 1, nx - 1);
+			xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hi = hh[i];
+
+			y = yo + iy*delta;
+
+			phi = y*(float) pi / 180.0f;
+
+			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+
+			cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+
+			fmu = 1.0f;
+			fmv = cosf(phi);
+
+
+			float hn = hh[xminus + iy*nx];
+
+
+			if (hi > eps || hn > eps)
+			{
+
+				float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+				// along X
+				dx = delta / 2.0f;
+				zi = zs[i] - hi;
+
+				//printf("%f\n", zi);
+
+
+				zl = zi - dx*(dzsdx[i] - dhdx[i]);
+				//printf("%f\n", zl);
+
+				zn = zs[xminus + iy*nx] - hn;
+
+				//printf("%f\n", zn);
+				zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdx[xminus + iy*nx]);
+
+
+				zlr = max(zl, zr);
+
+				hl = hi - dx*dhdx[i];
+				up = uu[i] - dx*dudx[i];
+				hp = max(0.f, hl + zl - zlr);
+
+				hr = hn + dx*dhdx[xminus + iy*nx];
+				um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
+				hm = max(0.f, hr + zr - zlr);
+
+				//// Reimann solver
+				float fh, fu, fv;
+				float dtmaxf = 1.0f / (float)epsilon;
+
+				//We can now call one of the approximate Riemann solvers to get the fluxes.
+				kurganovf(g, CFL, hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+				fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+				dtmax = dtmaxf;
+				dtmaxtmp = min(dtmax, dtmaxtmp);
+				float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
+				float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
+				float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
+				float qm = hm*um, qp = hp*up;
+
+				float fubis = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
+				/*
+				if (ix == 11 && iy == 0)
+				{
+				printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + g*sq(hm) / 2.0f), -am*(qp*up + g*sq(hp) / 2.0f), (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am),1 / (ap - am));
+				}
+				*/
+				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
+
+
+				//// Topographic term
+
+				/**
+				#### Topographic source term
+
+				In the case of adaptive refinement, care must be taken to ensure
+				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+				float sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				float sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+
+				////Flux update
+
+				Fhu[i] = fmu * fh;
+				Fqux[i] = fmu * (fu - sl);
+				Su[i] = fmu * (fu - sr);
+				Fqvx[i] = fmu * fv;
+			}
+			else
+			{
+				Fhu[i] = 0.0f;
+				Fqux[i] = 0.0f;
+				Su[i] = 0.0f;
+				Fqvx[i] = 0.0f;
+			}
+
+		}
+	}
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+
+			i = ix + iy*nx;
+			xplus = min(ix + 1, nx - 1);
+			xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hi = hh[i];
+
+			float hn = hh[ix + yminus*nx];
+			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+
+
+			if (hi > eps || hn > eps)
+			{
+
+
+				//Along Y
+
+				hn = hh[ix + yminus*nx];
+				dx = delta / 2.0f;
+				zi = zs[i] - hi;
+				zl = zi - dx*(dzsdy[i] - dhdy[i]);
+				zn = zs[ix + yminus*nx] - hn;
+				zr = zn + dx*(dzsdy[ix + yminus*nx] - dhdy[ix + yminus*nx]);
+				zlr = max(zl, zr);
+
+				hl = hi - dx*dhdy[i];
+				up = vv[i] - dx*dvdy[i];
+				hp = max(0.f, hl + zl - zlr);
+
+				hr = hn + dx*dhdy[ix + yminus*nx];
+				um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
+				hm = max(0.f, hr + zr - zlr);
+
+				//// Reimann solver
+				float fh, fu, fv;
+				float dtmaxf = 1 / (float)epsilon;
+				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
+				//printf("%f\n", hr);
+				//We can now call one of the approximate Riemann solvers to get the fluxes.
+				kurganovf(g, CFL, hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+				dtmax = dtmaxf;
+				dtmaxtmp = min(dtmax, dtmaxtmp);
+				//// Topographic term
+
+				/**
+				#### Topographic source term
+
+				In the case of adaptive refinement, care must be taken to ensure
+				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+				float sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				float sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+
+				////Flux update
+
+				Fhv[i] = fmv * fh;
+				Fqvy[i] = fmv * (fu - sl);
+				Sv[i] = fmv * (fu - sr);
+				Fquy[i] = fmv* fv;
+
+				//printf("%f\t%f\t%f\n", x[i], y[i], Fhv[i]);
+			}
+			else
+			{
+				Fhv[i] = 0.0f;
+				Fqvy[i] = 0.0f;
+				Sv[i] = 0.0f;
+				Fquy[i] = 0.0f;
+			}
+
+			//printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
+		}
+	}
+
+	dtmax = dtmaxtmp;
+
+
+	// UPDATES For evolving quantities
+
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+
+			i = ix + iy*nx;
+			xplus = min(ix + 1, nx - 1);
+			xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hi = hh[i];
+			////
+			//vector dhu = vector(updates[1 + dimension*l]);
+			//foreach() {
+			//	double dhl =
+			//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+			//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+			//	foreach_dimension()
+			//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
+			float cm = 1.0f;
+			float cmdel = 1.0f / (cm * delta);
+			dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdel;
+			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+			//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+			//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+			float dmdl = (fmu - fmu) *cmdel;// absurd!
+			float dmdt = (fmv - fmv) *cmdel;// absurd!
+			float fG = vv[i] * dmdl - uu[i] * dmdt;
+			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdel;
+			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdel;
+			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+			dhu[i] += hi * (g*hi / 2.*dmdl + fG*vv[i]);
+			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
+
+
+
+
+
+
+		}
+	}
+}
+
 
 void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo)
 {
