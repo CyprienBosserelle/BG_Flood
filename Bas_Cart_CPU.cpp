@@ -476,7 +476,7 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 	}
 }
 
-void update_Spherical(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta,float yo,float Radius, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
+void update_spherical(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta,float yo,float Radius, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
@@ -618,7 +618,16 @@ void update_Spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 			float hn = hh[ix + yminus*nx];
 			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+			y = yo + iy*delta;
 
+			phi = y*(float)pi / 180.0f;
+
+			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+
+			cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+
+			fmu = 1.0f;
+			fmv = cosf(phi);
 
 
 			if (hi > eps || hn > eps)
@@ -700,6 +709,18 @@ void update_Spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yplus = min(iy + 1, ny - 1);
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
+
+			y = yo + iy*delta;
+
+			phi = y*(float)pi / 180.0f;
+
+			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+
+			cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+
+			fmu = 1.0f;
+			fmv = cosf(phi);
+
 			////
 			//vector dhu = vector(updates[1 + dimension*l]);
 			//foreach() {
@@ -709,7 +730,7 @@ void update_Spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			//	foreach_dimension()
 			//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
-			float cm = 1.0f;
+			
 			float cmdel = 1.0f / (cm * delta);
 			dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdel;
 			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
@@ -717,8 +738,8 @@ void update_Spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 			//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 			//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-			float dmdl = (fmu - fmu) *cmdel;// absurd!
-			float dmdt = (fmv - fmv) *cmdel;// absurd!
+			float dmdl = (fmu - fmu) *cmdel; 
+			float dmdt = (fmv - fmv) *cmdel; 
 			float fG = vv[i] * dmdl - uu[i] * dmdt;
 			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdel;
 			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdel;
@@ -940,7 +961,16 @@ float FlowCPU(Param XParam, float nextoutputtime)
 	//flowbnd();
 
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
-	update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
+
+	if (XParam.spherical == 1)
+	{
+		update_spherical(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.yo, XParam.Radius, hh, zs, uu, vv, dh, dhu, dhv);
+	}
+	else
+	{
+		update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
+	}
+	
 	//printf("dtmax=%f\n", dtmax);
 	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
 	if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
@@ -954,7 +984,15 @@ float FlowCPU(Param XParam, float nextoutputtime)
 		advance(nx, ny, XParam.dt*0.5, XParam.eps,  hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 		//corrector
-		update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
+		if (XParam.spherical == 1)
+		{
+			update_spherical(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.yo, XParam.Radius, hho, zso, uuo, vvo, dh, dhu, dhv);
+		}
+		else
+		{
+			update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
+		}
+		
 	}
 	//
 	advance(nx, ny, XParam.dt, XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
