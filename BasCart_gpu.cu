@@ -1749,7 +1749,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;//double?
+			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
 			if (XParam.grdalpha != 0.0)
 			{
 				printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
