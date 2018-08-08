@@ -470,6 +470,21 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.hotstep = std::stoi(parametervalue);
 	}
+	
+
+	parameterstr = "spherical";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.spherical = std::stoi(parametervalue);
+	}
+
+	parameterstr = "Radius";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.Radius = std::stod(parametervalue);
+	}
 	return param;
 }
 
@@ -1009,6 +1024,24 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 
 				//
 				yo = std::stod(right);
+
+			}
+			//if gridnode registration this should happen
+			if (left.compare("xllcorner") == 0) // found the parameter
+			{
+
+				//
+				xo = std::stod(right);
+
+			}
+			if (left.compare("yllcorner") == 0) // found the parameter
+			{
+
+				//
+				yo = std::stod(right);
+				//This should be:
+				//yo = std::stod(right) + dx / 2.0;
+				//but by the time xo and yo are found dx has not been setup... awkward...
 
 			}
 			linehead++;

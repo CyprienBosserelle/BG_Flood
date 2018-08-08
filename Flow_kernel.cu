@@ -489,7 +489,7 @@ __global__ void updateKurgXSPH(int nx, int ny, float delta, float g, float eps, 
 		float dhdxi = dhdx[i];
 		float dhdxmin = dhdx[xminus + iy*nx];
 
-		y = yo + iy*delta;
+		y = yo + iy*delta / Radius*180.0 / pi;
 
 		phi = y*(float)pi / 180.0f;
 
@@ -806,7 +806,7 @@ __global__ void updateKurgYSPH(int nx, int ny, float delta, float g, float eps, 
 		yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
-		y = yo + iy*delta;
+		y = yo + iy*delta / Radius*180.0 / pi;;
 
 		phi = y*(float)pi / 180.0f;
 
@@ -1008,8 +1008,8 @@ __global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, floa
 		yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
-		y = yo + iy*delta;
-
+		y = yo + iy*delta / Radius*180.0 / pi;
+		float yp= yo + min(iy + 1, ny - 1)*delta / Radius*180.0 / pi;
 		phi = y*(float)pi / 180.0f;
 
 		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
@@ -1019,7 +1019,7 @@ __global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, floa
 		fmu = 1.0f;
 		fmup = 1.0f;
 		fmv = cosf(phi);
-		fmvp = cosf(yo + min(iy + 1, ny - 1)*delta);
+		fmvp = cosf(yp*pi/180.0f);
 		//float cm = 1.0f;// 0.1;
 		//float fmu = 1.0f;
 		//float fmv = 1.0f;

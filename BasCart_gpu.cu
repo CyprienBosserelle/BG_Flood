@@ -1791,6 +1791,8 @@ int main(int argc, char **argv)
 		else
 		{
 			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+			printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
+			write_text_to_log_file("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
 			if (XParam.grdalpha != 0.0)
 			{
 				printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
@@ -1803,8 +1805,8 @@ int main(int argc, char **argv)
 
 													//fid = fopen(XParam.Bathymetryfile.c_str(), "r");
 													//fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &XParam.nx, &XParam.ny, &XParam.dx, &XParam.grdalpha);
-		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi);
-		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi,XParam.xo, XParam.yo);
+		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(XParam.xo) + " yo=" + std::to_string(XParam.yo));
 
 
 		/////////////////////////////////////////////////////

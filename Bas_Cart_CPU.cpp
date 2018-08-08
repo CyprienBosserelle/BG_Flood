@@ -507,7 +507,7 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
 
-			y = yo + iy*delta;
+			y = yo + iy*delta / Radius*180.0 / pi;
 
 			phi = y*(float) pi / 180.0f;
 
@@ -618,9 +618,10 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 			float hn = hh[ix + yminus*nx];
 			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
-			y = yo + iy*delta;
 
-			phi = y*(float)pi / 180.0f;
+			y = yo + iy*delta/Radius*180.0/pi;
+
+			phi = y*pi / 180.0f;
 
 			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
 
@@ -710,7 +711,8 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
 
-			y = yo + iy*delta;
+			y = yo + iy*delta / Radius*180.0 / pi;
+			float yp = yo + min(iy + 1, ny - 1)*delta / Radius*180.0 / pi;
 
 			phi = y*(float)pi / 180.0f;
 
@@ -720,7 +722,7 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 			fmu = 1.0f;
 			fmv = cosf(phi);
-			float fmvp = cosf(yo + min(iy + 1, ny - 1)*delta);
+			float fmvp = cosf(yp*pi/180.0f);
 			////
 			//vector dhu = vector(updates[1 + dimension*l]);
 			//foreach() {
