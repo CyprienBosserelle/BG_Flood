@@ -1009,7 +1009,7 @@ __global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, floa
 		yminus = max(iy - 1, 0);
 
 		y = yo + iy*delta / Radius*180.0 / pi;
-		float yp= yo + min(iy + 1, ny - 1)*delta / Radius*180.0 / pi;
+		float yp= yo + yplus*delta / Radius*180.0 / pi;
 		phi = y*(float)pi / 180.0f;
 
 		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
