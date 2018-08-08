@@ -1031,14 +1031,27 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
-	updateKurgX << <gridDim, blockDim,0, streams[0] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
-	//CUDA_CHECK(cudaDeviceSynchronize());
+	if (XParam.spherical == 0)
+	{
+		//normal cartesian case
+		updateKurgX << <gridDim, blockDim, 0, streams[0] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
 
-	//CUDA_CHECK(cudaStreamSynchronize(streams[1]));
-	updateKurgY << <gridDim, blockDim,0, streams[1] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
-	
-	CUDA_CHECK(cudaDeviceSynchronize());
-	
+		//CUDA_CHECK(cudaStreamSynchronize(streams[1]));
+		updateKurgY << <gridDim, blockDim, 0, streams[1] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		//Spherical coordinates 
+		updateKurgXSPH << <gridDim, blockDim, 0, streams[0] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, XParam.yo, XParam.Radius, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+		
+		updateKurgYSPH << <gridDim, blockDim, 0, streams[1] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, XParam.yo, XParam.Radius, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+	}
 
 	/////////////////////////////////////////////////////
 	// Reduction of dtmax
@@ -1134,10 +1147,18 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	}
 	//printf("dt=%f\n", XParam.dt);
 
+	if (XParam.spherical == 0)
+	{
+		updateEV << <gridDim, blockDim, 0 >> > (nx, ny, XParam.delta, XParam.g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
-	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	
+	}
+	else
+	{
+		//if spherical corrdinate use this kernel with the right corrections
+		updateEVSPH << <gridDim, blockDim, 0 >> > (nx, ny, XParam.delta, XParam.g,XParam.yo,XParam.Radius, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 
 
 	//predictor (advance 1/2 dt)

@@ -628,7 +628,7 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 			fmu = 1.0f;
 			fmv = cosf(phi);
-
+			
 
 			if (hi > eps || hn > eps)
 			{
@@ -720,7 +720,7 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 			fmu = 1.0f;
 			fmv = cosf(phi);
-
+			float fmvp = cosf(yo + min(iy + 1, ny - 1)*delta);
 			////
 			//vector dhu = vector(updates[1 + dimension*l]);
 			//foreach() {
@@ -737,9 +737,10 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 
 			//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+			//but fmu is always ==1 event in spherical grids????
 			//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
 			float dmdl = (fmu - fmu) *cmdel; 
-			float dmdt = (fmv - fmv) *cmdel; 
+			float dmdt = (fmvp - fmv) *cmdel; 
 			float fG = vv[i] * dmdl - uu[i] * dmdt;
 			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdel;
 			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdel;

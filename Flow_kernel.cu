@@ -461,6 +461,201 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 }
 
+
+__global__ void updateKurgXSPH(int nx, int ny, float delta, float g, float eps, float CFL,float yo,float Radius, float * hh, float *zs, float *uu, float * vv, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
+{
+	//Same as updateKurgX but with Spherical coordinates
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	//int tx = threadIdx.x;
+	//int ty = threadIdx.y;
+	int  xplus, yplus, xminus, yminus;
+
+	float cm, fmu,y,phi,dphi;
+
+	if (ix < nx && iy < ny)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+
+
+
+
+
+		float dhdxi = dhdx[i];
+		float dhdxmin = dhdx[xminus + iy*nx];
+
+		y = yo + iy*delta;
+
+		phi = y*(float)pi / 180.0f;
+
+		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+
+		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+
+		fmu = 1.0f;
+		//fmv = cosf(phi);
+
+		//float cm = 1.0f;// 0.1;
+		//float fmu = 1.0f;
+		//float fmv = 1.0;
+
+		//__shared__ float hi[16][16];
+		float hi = hh[i];
+
+		float hn = hh[xminus + iy*nx];
+
+
+		if (hi > eps || hn > eps)
+		{
+			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
+
+			// along X
+			dx = delta*0.5f;
+			zi = zs[i] - hi;
+
+			//printf("%f\n", zi);
+
+
+			//zl = zi - dx*(dzsdx[i] - dhdx[i]);
+			zl = zi - dx*(dzsdx[i] - dhdxi);
+			//printf("%f\n", zl);
+
+			zn = zs[xminus + iy*nx] - hn;
+
+			//printf("%f\n", zn);
+			zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdxmin);
+
+
+			zlr = max(zl, zr);
+
+			//hl = hi - dx*dhdx[i];
+			hl = hi - dx*dhdxi;
+			up = uu[i] - dx*dudx[i];
+			hp = max(0.0f, hl + zl - zlr);
+
+			hr = hn + dx*dhdxmin;
+			um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
+			hm = max(0.0f, hr + zr - zlr);
+
+			float fh, fu, fv;
+			//float dtmaxf = 1 / 1e-30f;
+
+			//We can now call one of the approximate Riemann solvers to get the fluxes.
+			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			float epsi = 1e-30f;
+
+			cp = sqrtf(g*hp);
+			cmo = sqrtf(g*hm);
+
+			ap = max(max(up + cp, um + cmo), 0.0f);
+			//ap = max(ap, 0.0f);
+
+			am = min(min(up - cp, um - cmo), 0.0f);
+			//am = min(am, 0.0f);
+			ad = 1.0f / (ap - am);
+			qm = hm*um;
+			qp = hp*up;
+
+			a = max(ap, -am);
+
+			dlt = delta*cm / fmu;
+			hm2 = sq(hm);
+			hp2 = sq(hp);
+			ga = g*0.5f;
+			apm = ap*am;
+
+			if (a > epsi)
+			{
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
+				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
+				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
+				float dt = CFL*dlt / a;
+				if (dt < dtmax[i])
+				{
+					dtmax[i] = dt;
+				}
+				//	*dtmax = dt;
+
+
+			}
+			else
+			{
+				fh = 0.0f;
+				fu = 0.0f;
+				dtmax[i] = 1.0f / 1e-30f;
+			}
+			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+
+			/*
+			void kurganovf(float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
+			float eps = epsilon;
+			float cp = sqrtf(g*hp), cm = sqrtf(g*hm);
+			float ap = max(up + cp, um + cm); ap = max(ap, 0.0f);
+			float am = min(up - cp, um - cm); am = min(am, 0.0f);
+			float qm = hm*um, qp = hp*up;
+			float a = max(ap, -am);
+			if (a > eps) {
+			*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
+			*fq = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
+			ap*am*(qp - qm)) / (ap - am);
+			float dt = CFL*Delta / a;
+			if (dt < *dtmax)
+			*dtmax = dt;
+			}
+			else
+			*fh = *fq = 0.;*/
+
+			if (fh > 0.0f)
+			{
+				fv = (vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx])*fh;
+			}
+			else
+			{
+				fv = (vv[i] - dx*dvdx[i])*fh;
+			}
+			//fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+			//dtmax needs to be stored in an array and reduced at the end
+			//dtmax = dtmaxf;
+			//dtmaxtmp = min(dtmax, dtmaxtmp);
+			/*if (ix == 11 && iy == 0)
+			{
+			printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + ga*hm2), -am*(qp*up + ga*hp2),( ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm) ) *ad/100.0f, ad);
+			}
+			*/
+			/*
+			#### Topographic source term
+
+			In the case of adaptive refinement, care must be taken to ensure
+			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+			sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
+			sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
+
+			////Flux update
+
+			Fhu[i] = fmu * fh;
+			Fqux[i] = fmu * (fu - sl);
+			Su[i] = fmu * (fu - sr);
+			Fqvx[i] = fmu * fv;
+		}
+		else
+		{
+			dtmax[i] = 1.0f / 1e-30f;
+			Fhu[i] = 0.0f;
+			Fqux[i] = 0.0f;
+			Su[i] = 0.0f;
+			Fqvx[i] = 0.0f;
+		}
+
+	}
+
+
+}
+
 __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, float CFL, float * hh, float *zs, float *uu, float * vv, float *dzsdy, float *dhdy, float * dudy, float *dvdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
@@ -592,6 +787,150 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 	}
 }
 
+__global__ void updateKurgYSPH(int nx, int ny, float delta, float g, float eps, float CFL, float yo, float Radius, float * hh, float *zs, float *uu, float * vv, float *dzsdy, float *dhdy, float * dudy, float *dvdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
+{
+	// Same as updateKurgY but with Spherical coordinate corrections
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	//	int tx = threadIdx.x;
+	//	int ty = threadIdx.y;
+	int  xplus, yplus, xminus, yminus;
+
+	float cm, fmv, phi, dphi, y;
+
+	if (ix < nx && iy < ny)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+		y = yo + iy*delta;
+
+		phi = y*(float)pi / 180.0f;
+
+		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+
+		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+
+		//fmu = 1.0f;
+		fmv = cosf(phi);
+
+		//float cm = 1.0f;// 0.1;
+						//float fmu = 1.0;
+		//float fmv = 1.0f;
+
+		//__shared__ float hi[16][16];
+		float dhdyi = dhdy[i];
+		float dhdymin = dhdy[ix + yminus*nx];
+		float hi = hh[i];
+		float hn = hh[ix + yminus*nx];
+		float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+
+
+		if (hi > eps || hn > eps)
+		{
+			hn = hh[ix + yminus*nx];
+			dx = delta / 2.;
+			zi = zs[i] - hi;
+			zl = zi - dx*(dzsdy[i] - dhdyi);
+			zn = zs[ix + yminus*nx] - hn;
+			zr = zn + dx*(dzsdy[ix + yminus*nx] - dhdymin);
+			zlr = max(zl, zr);
+
+			hl = hi - dx*dhdyi;
+			up = vv[i] - dx*dvdy[i];
+			hp = max(0.f, hl + zl - zlr);
+
+			hr = hn + dx*dhdymin;
+			um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
+			hm = max(0.f, hr + zr - zlr);
+
+			//// Reimann solver
+			float fh, fu, fv, sl, sr;
+			//float dtmaxf = 1.0f / 1e-30f;
+			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+			//We can now call one of the approximate Riemann solvers to get the fluxes.
+			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			float epsi = 1e-30f;
+
+			cp = sqrtf(g*hp);
+			cmo = sqrtf(g*hm);
+
+			ap = max(max(up + cp, um + cmo), 0.0f);
+			//ap = max(ap, 0.0f);
+
+			am = min(min(up - cp, um - cmo), 0.0f);
+			//am = min(am, 0.0f);
+			ad = 1.0f / (ap - am);
+			qm = hm*um;
+			qp = hp*up;
+
+			hm2 = sq(hm);
+			hp2 = sq(hp);
+			a = max(ap, -am);
+			ga = g*0.5f;
+			apm = ap*am;
+			dlt = delta*cm / fmv;
+
+			if (a > epsi)
+			{
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
+				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
+				float dt = CFL*dlt / a;
+				if (dt < dtmax[i])
+				{
+					dtmax[i] = dt;
+				}
+				//	*dtmax = dt;
+
+
+			}
+			else
+			{
+				fh = 0.0f;
+				fu = 0.0f;
+				dtmax[i] = 1.0f / 1e-30f;
+			}
+
+			if (fh > 0.0f)
+			{
+				fv = (uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx])*fh;
+			}
+			else
+			{
+				fv = (uu[i] - dx*dudy[i])*fh;
+			}
+			//fv = (fh > 0.f ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+			/**
+			#### Topographic source term
+
+			In the case of adaptive refinement, care must be taken to ensure
+			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+			sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
+			sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
+
+			////Flux update
+
+			Fhv[i] = fmv * fh;
+			Fqvy[i] = fmv * (fu - sl);
+			Sv[i] = fmv * (fu - sr);
+			Fquy[i] = fmv* fv;
+		}
+		else
+		{
+			dtmax[i] = 1.0f / 1e-30f;
+			Fhv[i] = 0.0f;
+			Fqvy[i] = 0.0f;
+			Sv[i] = 0.0f;
+			Fquy[i] = 0.0f;
+		}
+	}
+}
+
 __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
@@ -640,6 +979,79 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
 		float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
 		float dmdt = (fmv - fmv) / (cm*delta);
+		float fG = vvi * dmdl - uui * dmdt;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdinv;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdinv;
+		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
+		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
+	}
+}
+
+__global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, float Radius, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+{
+	// Same as updateEV but with Spherical coordinate corrections
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	int i = ix + iy*nx;
+	//	int tx = threadIdx.x;
+	//	int ty = threadIdx.y;
+	int  xplus, yplus, xminus, yminus;
+
+	float cm, fmu, fmv, y, phi, dphi,fmvp,fmup;
+
+
+	if (ix < nx && iy < ny)
+	{
+		xplus = min(ix + 1, nx - 1);
+		xminus = max(ix - 1, 0);
+		yplus = min(iy + 1, ny - 1);
+		yminus = max(iy - 1, 0);
+
+		y = yo + iy*delta;
+
+		phi = y*(float)pi / 180.0f;
+
+		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+
+		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+
+		fmu = 1.0f;
+		fmup = 1.0f;
+		fmv = cosf(phi);
+		fmvp = cosf(yo + min(iy + 1, ny - 1)*delta);
+		//float cm = 1.0f;// 0.1;
+		//float fmu = 1.0f;
+		//float fmv = 1.0f;
+
+		float hi = hh[i];
+		float uui = uu[i];
+		float vvi = vv[i];
+
+
+		float cmdinv, ga;
+
+		cmdinv = 1.0f / (cm*delta);
+		ga = 0.5f*g;
+		////
+		//vector dhu = vector(updates[1 + dimension*l]);
+		//foreach() {
+		//	double dhl =
+		//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+		//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+		//	foreach_dimension()
+		//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
+		//float cm = 1.0;
+
+		dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i])*cmdinv;
+		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		float dmdt = (fmvp - fmv) / (cm*delta);
 		float fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdinv;
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdinv;
