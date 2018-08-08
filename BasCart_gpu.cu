@@ -1197,18 +1197,38 @@ float FlowGPU(Param XParam, float nextoutputtime)
 	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
+	if (XParam.spherical == 0)
+	{
+		updateKurgX << <gridDim, blockDim, 0, streams[0] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
 
-	updateKurgX << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
-	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	
-	updateKurgY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+		updateKurgY << <gridDim, blockDim, 0, streams[1] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		//Spherical coordinates 
+		updateKurgXSPH << <gridDim, blockDim, 0, streams[0] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, XParam.yo, XParam.Radius, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
 
+		updateKurgYSPH << <gridDim, blockDim, 0, streams[1] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, XParam.yo, XParam.Radius, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+	}
 	// no reduction of dtmax during the corrector step
 
-	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, XParam.delta, XParam.g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	if (XParam.spherical == 0)
+	{
+		updateEV << <gridDim, blockDim, 0 >> > (nx, ny, XParam.delta, XParam.g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		//if spherical corrdinate use this kernel with the right corrections
+		updateEVSPH << <gridDim, blockDim, 0 >> > (nx, ny, XParam.delta, XParam.g, XParam.yo, XParam.Radius, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 
 	//
 	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, (float) XParam.dt, XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
