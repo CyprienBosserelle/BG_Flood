@@ -2256,6 +2256,33 @@ int main(int argc, char **argv)
 	}
 	printf("Done\n");
 	write_text_to_log_file("Done");
+
+	// set grid edges. this is necessary for boundary conditions to work
+	//could be more efficient
+	for (int j = 0; j < ny; j++)
+	{
+
+		for (int i = 0; i < nx; i++)
+		{
+			if (i == 0)
+			{
+				zb[i + j*nx] = zb[(i+1) + j*nx];
+			}
+			if (i == nx-1)
+			{
+				zb[i + j*nx] = zb[(i -1) + j*nx];
+			}
+			if (j == 0)
+			{
+				zb[i + j*nx] = zb[i + (j+1)*nx];
+			}
+			if (j == ny-1)
+			{
+				zb[i + j*nx] = zb[i + (j - 1)*nx];
+			}
+
+		}
+	}
 	/////////////////////////////////////////////////////
 	// Initial Condition
 	/////////////////////////////////////////////////////
