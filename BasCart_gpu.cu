@@ -2806,7 +2806,44 @@ int main(int argc, char **argv)
 	free(dhu);
 	free(dhv);
 
+	if (XParam.outhhmax == 1)
+	{
+		free(hhmax);
+	}
 	
+	if (XParam.outzsmax == 1)
+	{
+		free(zsmax);
+	}
+	if (XParam.outuumax == 1)
+	{
+		free(uumax);
+	}
+	if (XParam.outvvmax == 1)
+	{
+		free(vvmax);
+	}
+	if (XParam.outhhmean == 1)
+	{
+		free(hhmean);
+	}
+	if (XParam.outzsmean == 1)
+	{
+		free(zsmean);
+	}
+	if (XParam.outuumean == 1)
+	{
+		free(uumean);
+	}
+	if (XParam.outvvmean == 1)
+	{
+		free(vvmax);
+	}
+
+	if (XParam.outvort == 1)
+	{
+		free(vort);
+	}
 
 
 
@@ -2852,6 +2889,45 @@ int main(int argc, char **argv)
 		
 		cudaFree(arrmin_g);
 		cudaFree(arrmax_g);
+
+		if (XParam.outhhmax == 1)
+		{
+			cudaFree(hhmax_g);
+		}
+
+		if (XParam.outzsmax == 1)
+		{
+			cudaFree(zsmax_g);
+		}
+		if (XParam.outuumax == 1)
+		{
+			cudaFree(uumax_g);
+		}
+		if (XParam.outvvmax == 1)
+		{
+			cudaFree(vvmax_g);
+		}
+		if (XParam.outhhmean == 1)
+		{
+			cudaFree(hhmean_g);
+		}
+		if (XParam.outzsmean == 1)
+		{
+			cudaFree(zsmean_g);
+		}
+		if (XParam.outuumean == 1)
+		{
+			cudaFree(uumean_g);
+		}
+		if (XParam.outvvmean == 1)
+		{
+			cudaFree(vvmax_g);
+		}
+
+		if (XParam.outvort == 1)
+		{
+			cudaFree(vort_g);
+		}
 
 		cudaDeviceReset();
 
