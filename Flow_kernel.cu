@@ -472,7 +472,7 @@ __global__ void updateKurgXSPH(int nx, int ny, float delta, float g, float eps, 
 	//int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
-	float cm, fmu,y,phi,dphi;
+	double cm, fmu,y,phi,dphi;
 
 	if (ix < nx && iy < ny)
 	{
@@ -491,13 +491,13 @@ __global__ void updateKurgXSPH(int nx, int ny, float delta, float g, float eps, 
 
 		y = yo + iy*delta / Radius*180.0 / pi;
 
-		phi = y*(float)pi / 180.0f;
+		phi = y*pi / 180.0;
 
-		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
 
-		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0*dphi);
 
-		fmu = 1.0f;
+		fmu = 1.0;
 		//fmv = cosf(phi);
 
 		//float cm = 1.0f;// 0.1;
@@ -798,7 +798,7 @@ __global__ void updateKurgYSPH(int nx, int ny, float delta, float g, float eps, 
 	//	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
-	float cm, fmv, phi, dphi, y;
+	double cm, fmv, phi, dphi, y;
 
 	if (ix < nx && iy < ny)
 	{
@@ -809,14 +809,14 @@ __global__ void updateKurgYSPH(int nx, int ny, float delta, float g, float eps, 
 
 		y = yo + iy*delta / Radius*180.0 / pi;;
 
-		phi = y*(float)pi / 180.0f;
+		phi = y*pi / 180.0;
 
-		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
 
-		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0*dphi);
 
 		//fmu = 1.0f;
-		fmv = cosf(phi);
+		fmv = cos(phi);
 
 		//float cm = 1.0f;// 0.1;
 						//float fmu = 1.0;
@@ -1000,7 +1000,7 @@ __global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, floa
 	//	int ty = threadIdx.y;
 	int  xplus, yplus, xminus, yminus;
 
-	float cm, fmu, fmv, y, phi, dphi,fmvp,fmup;
+	double cm, fmu, fmv, y, phi, dphi,fmvp,fmup;
 
 
 	if (ix < nx && iy < ny)
@@ -1011,17 +1011,17 @@ __global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, floa
 		yminus = max(iy - 1, 0);
 
 		y = yo + iy*delta / Radius*180.0 / pi;
-		float yp= yo + yplus*delta / Radius*180.0 / pi;
-		phi = y*(float)pi / 180.0f;
+		double yp= yo + yplus*delta / Radius*180.0 / pi;
+		phi = y*pi / 180.0;
 
-		dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
 
-		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+		cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0*dphi);
 
-		fmu = 1.0f;
-		fmup = 1.0f;
+		fmu = 1.0;
+		fmup = 1.0;
 		fmv = cosf(phi);
-		fmvp = cosf(yp*pi/180.0f);
+		fmvp = cosf(yp*pi/180.0);
 		//float cm = 1.0f;// 0.1;
 		//float fmu = 1.0f;
 		//float fmv = 1.0f;
