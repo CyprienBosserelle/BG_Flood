@@ -546,16 +546,17 @@ __global__ void updateKurgXSPH(int nx, int ny, float delta, float g, float eps, 
 			//float dtmaxf = 1 / 1e-30f;
 
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			float cp, cmo, qm, qp, a, dlt, hm2, hp2, ga, apm;
+			double ap, am,ad;
 			float epsi = 1e-30f;
 
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
 
-			ap = max(max(up + cp, um + cmo), 0.0f);
+			ap = max(max(up*1.0 + cp*1.0, um*1.0 + cmo*1.0), 0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo), 0.0f);
+			am = min(min(up*1.0 - cp*1.0, um*1.0 - cmo*1.0), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
 			qm = hm*um;
@@ -854,16 +855,17 @@ __global__ void updateKurgYSPH(int nx, int ny, float delta, float g, float eps, 
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			float cp, cmo, qm, qp, a, dlt, hm2, hp2, ga, apm;
+			double ap, am, ad;
 			float epsi = 1e-30f;
 
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
 
-			ap = max(max(up + cp, um + cmo), 0.0f);
+			ap = max(max(up*1.0 + cp*1.0, um*1.0 + cmo*1.0), 0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo), 0.0f);
+			am = min(min(up*1.0 - cp*1.0, um*1.0 - cmo*1.0), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
 			qm = hm*um;
