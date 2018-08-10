@@ -1437,7 +1437,7 @@ __global__ void quadfriction(int nx, int ny, float dt,float eps, float cf, float
 		if (hhi > eps)
 		{
 			normu = uui * uui + vvi * vvi;
-			float frc = (1.0f + dt*cf*sqrtf(normu) / hhi);
+			float frc = (1.0f + dt*cf*(normu) / hhi);
 				//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 			uu[i] = uui / frc;
 			vv[i] = vvi / frc;

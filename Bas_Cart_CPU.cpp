@@ -1169,7 +1169,7 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 				if (hhi > eps)
 				{
 					normu = uu[i] * uu[i] + vv[i] * vv[i];
-					float frc = (1.0 + dt*cf*sqrtf(normu) / hhi);
+					float frc = (1.0 + dt*cf*(normu) / hhi);
 					//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 					uu[i] = uu[i] / frc;
 					vv[i] = vv[i] / frc;
