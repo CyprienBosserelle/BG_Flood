@@ -559,12 +559,12 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 				fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
 				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
-				float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
-				float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
-				float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
-				float qm = hm*um, qp = hp*up;
+				//float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
+				//float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
+				//float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
+				//float qm = hm*um, qp = hp*up;
 
-				float fubis = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
+				//float fubis = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
 				/*
 				if (ix == 11 && iy == 0)
 				{
@@ -1029,7 +1029,7 @@ void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, floa
 		int i = ix + iy*nx;
 		int xplus;
 		
-		if (ix == 0 && iy < ny)
+		//if (ix == 0 && iy < ny)
 		{
 			xplus = min(ix + 1, nx - 1);
 			hh[i] = zsbnd - zb[i];
@@ -1153,19 +1153,21 @@ void botdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float
 
 void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv)
 {
+	
+
 	for (int iy = 0; iy < ny; iy++)
 	{
 		for (int ix = 0; ix < nx; ix++)
 		{
 			int i = ix + iy*nx;
 
-			float normu, hhi;
+			
 
 			
-				hhi = hh[i];
+				float hhi = hh[i];
 				if (hhi > eps)
 				{
-					normu = uu[i] * uu[i] + vv[i] * vv[i];
+					float normu = uu[i] * uu[i] + vv[i] * vv[i];
 					float frc = (1.0f + dt*cf*(normu) / hhi);
 					//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 					uu[i] = uu[i] / frc;
