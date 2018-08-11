@@ -248,8 +248,8 @@ Param readparamstr(std::string line, Param param)
 	{
 		std::vector<std::string> nodes = split(parametervalue, ',');
 		TSnode node;
-		node.x = std::stod(nodes[0]);
-		node.y = std::stod(nodes[1]);
+		node.x = std::stof(nodes[0]);
+		node.y = std::stof(nodes[1]);
 
 		//i and j are calculated in the Sanity check
 
@@ -422,13 +422,13 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.scalefactor = std::stod(parametervalue);
+		param.scalefactor = std::stof(parametervalue);
 	}
 	parameterstr = "addoffset";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.addoffset = std::stod(parametervalue);
+		param.addoffset = std::stof(parametervalue);
 	}
 	parameterstr = "posdown";
 	parametervalue = findparameter(parameterstr, line);
@@ -581,7 +581,7 @@ Param checkparamsanity(Param XParam)
 		write_text_to_log_file("TSOfile = Shore.txt");
 		write_text_to_log_file("TSnode = 233,256;");
 		//min not defined for const so use this convoluted statement below
-		int minsize;
+		size_t minsize;
 		if (XParam.TSoutfile.size() > XParam.TSnodesout.size())
 		{
 			minsize = XParam.TSnodesout.size();
@@ -656,7 +656,7 @@ double setendtime(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> r
 
 std::string findparameter(std::string parameterstr, std::string line)
 {
-	std::size_t found, Numberstart, Numberend;
+	std::size_t found;
 	std::string parameternumber,left,right;
 	std::vector<std::string> splittedstr;
 	
@@ -964,7 +964,7 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 
 	std::string line,left,right;
 	std::vector<std::string> lineelements;
-	std::size_t found;
+	//std::size_t found;
 	//std::getline(fs, line);
 	int linehead = 0;
 

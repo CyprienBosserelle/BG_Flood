@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 #include "Header.cuh"
-#define pi 3.14159265
+#define pi 3.14159265f
 
 
 void handle_error(int status) {
@@ -40,13 +40,13 @@ Param creatncfileUD(Param XParam)
 	int nx = XParam.nx;
 	int ny = XParam.ny;
 	//double dx = XParam.dx;
-	size_t nxx, nyy, nth;
+	size_t nxx, nyy;
 	int ncid, xx_dim, yy_dim, time_dim;
-	float * xval, *yval, *thetaval;
+	float * xval, *yval;
 	static size_t xcount[] = { nx };
 	static size_t ycount[] = { ny };
 
-	int time_id, xx_id, yy_id, th_id;
+	int time_id, xx_id, yy_id;
 
 	static size_t tst[] = { 0 };
 	static size_t xstart[] = { 0 }; // start at first value
@@ -63,11 +63,11 @@ Param creatncfileUD(Param XParam)
 
 	for (int i = 0; i<nx; i++)
 	{
-		xval[i] = XParam.xo+i*XParam.dx;
+		xval[i] = (float) (XParam.xo+i*XParam.dx);
 	}
 	for (int i = 0; i<ny; i++)
 	{
-		yval[i] = XParam.yo + i*XParam.dx;
+		yval[i] = (float) (XParam.yo + i*XParam.dx);
 	}
 	
 
@@ -159,11 +159,11 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	int ncid, var_id;
 	int  var_dimid2D[2];
 	int  var_dimid3D[3];
-	int  var_dimid4D[4];
+	//int  var_dimid4D[4];
 
 	short * var_s;
-	int recid, xid, yid, thid;
-	size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
+	int recid, xid, yid;
+	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
 	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
@@ -316,7 +316,7 @@ extern "C" void writenctimestep(std::string outfile,  double totaltime)
 
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var)
 {
-	int status, ncid,time_dim, recid, var_id,ndims;
+	int status, ncid, recid, var_id,ndims;
 	static size_t nrec;
 	short * var_s;
 	int nx, ny;
@@ -357,8 +357,8 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 	count[0] = 1;
 	if (smallnc > 0)
 	{
-		nx = count[ndims - 1];
-		ny = count[ndims - 2];//yuk!
+		nx = (int) count[ndims - 1];
+		ny = (int) count[ndims - 2];//yuk!
 
 		//printf("nx=%d\tny=%d\n", nx, ny);
 		//If saving as short than we first need to scale and shift the data
@@ -429,11 +429,11 @@ void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx)
 	double *xcoord, *ycoord;
 	int varid;
 
-	int ndimsp, nvarsp, nattsp, unlimdimidp;
+	//int ndimsp, nvarsp, nattsp, unlimdimidp;
 
 	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
 	char coordname[NC_MAX_NAME + 1];
-	char varname[NC_MAX_NAME + 1];
+	//char varname[NC_MAX_NAME + 1];
 	size_t  *ddimhh;
 
 	std::string ncfilestr;
@@ -487,13 +487,13 @@ void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx)
 
 	if (ndimshh > 2)
 	{
-		ny = ddimhh[1];
-		nx = ddimhh[2];
+		ny = (int) ddimhh[1];
+		nx = (int) ddimhh[2];
 	}
 	else
 	{
-		ny = ddimhh[0];
-		nx = ddimhh[1];
+		ny = (int) ddimhh[0];
+		nx = (int) ddimhh[1];
 	}
 
 	//allocate
@@ -594,8 +594,8 @@ void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx)
 
 	float dxx, dyy;
 	//check dx
-	dxx = abs(xcoord[0] - xcoord[nx - 1]) / (nx - 1);
-	dyy = abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
+	dxx = (float) abs(xcoord[0] - xcoord[nx - 1]) / (nx - 1);
+	dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
 
 
 	dx = dxx;
@@ -653,9 +653,9 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = ddim[0];
-			ny = ddim[1];
-			nx = ddim[2];
+			nt = (int) ddim[0];
+			ny = (int) ddim[1];
+			nx = (int) ddim[2];
 			size_t start[] = {max(XParam.hotstep,nt-1), 0, 0 };
 			size_t count[] = {1, ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, zb);
@@ -663,8 +663,8 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		else
 		{
-			ny = ddim[0];
-			nx = ddim[1];
+			ny = (int) ddim[0];
+			nx = (int) ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, zb);
@@ -715,9 +715,9 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = ddim[0];
-			ny = ddim[1];
-			nx = ddim[2];
+			nt = (int) ddim[0];
+			ny = (int) ddim[1];
+			nx = (int) ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, zs);
@@ -725,8 +725,8 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		else
 		{
-			ny = ddim[0];
-			nx = ddim[1];
+			ny = (int) ddim[0];
+			nx = (int) ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, zs);
@@ -796,9 +796,9 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = ddim[0];
-			ny = ddim[1];
-			nx = ddim[2];
+			nt = (int) ddim[0];
+			ny = (int) ddim[1];
+			nx = (int) ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, hh);
@@ -806,8 +806,8 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		else
 		{
-			ny = ddim[0];
-			nx = ddim[1];
+			ny = (int) ddim[0];
+			nx = (int) ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, hh);
@@ -891,9 +891,9 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = ddim[0];
-			ny = ddim[1];
-			nx = ddim[2];
+			nt = (int) ddim[0];
+			ny = (int) ddim[1];
+			nx = (int) ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, uu);
@@ -901,8 +901,8 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		else
 		{
-			ny = ddim[0];
-			nx = ddim[1];
+			ny = (int) ddim[0];
+			nx = (int) ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, uu);
@@ -970,9 +970,9 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = ddim[0];
-			ny = ddim[1];
-			nx = ddim[2];
+			nt = (int) ddim[0];
+			ny = (int) ddim[1];
+			nx = (int) ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, vv);
@@ -980,8 +980,8 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		else
 		{
-			ny = ddim[0];
-			nx = ddim[1];
+			ny = (int) ddim[0];
+			nx = (int) ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
 			status = nc_get_vara_float(ncid, varid, start, count, vv);

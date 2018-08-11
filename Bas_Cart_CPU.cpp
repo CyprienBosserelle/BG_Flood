@@ -86,7 +86,7 @@ float minmod2f(float theta, float s0, float s1, float s2)
 	}
 	return 0.;
 }
-double dtnext(double t, double tnext, double dt)
+/*double dtnext(double t, double tnext, double dt)
 {
 	//Function to make dt match output time step and prevent dt from chnaging too fast
 	// tnext = t+dtp with dtp is the previous dt
@@ -112,12 +112,9 @@ double dtnext(double t, double tnext, double dt)
 			tnext = t + dt;
 		}
 	}
-	else
-		tnext = t + dt;
-	return dt;
-}
+	*/
 
-void gradient(int nx, int ny,float theta, double delta, float *a, float *&dadx, float * &dady)
+void gradient(int nx, int ny,float theta, float delta, float *a, float *&dadx, float * &dady)
 {
 
 	int i, xplus, yplus, xminus, yminus;
@@ -166,7 +163,7 @@ void kurganov(double g,double CFL,double hm, double hp, double um, double up, do
 }
 void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
 {
-	float eps = epsilon;
+	float eps = (float) epsilon; //this epsilon doesn't need to be a gloabl variable
 	float cp = sqrtf(g*hp), cm = sqrtf(g*hm);
 	float ap = max(up + cp, um + cm); ap = max(ap, 0.0f);
 	float am = min(up - cp, um - cm); am = min(am, 0.0f);
@@ -234,7 +231,7 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 	float hi;
 
 		
-	dtmax = 1 / epsilon;
+	dtmax = (float) (1.0 / epsilon);
 	float dtmaxtmp = dtmax;
 
 	// calculate gradients
@@ -303,12 +300,12 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 				fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
 				dtmax = dtmaxf;
 				dtmaxtmp = min(dtmax, dtmaxtmp);
-				float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
-				float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
-				float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
-				float qm = hm*um, qp = hp*up;
+				//float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
+				//float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
+				//float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
+				//float qm = hm*um, qp = hp*up;
 
-				float fubis= (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +	ap*am*(qp - qm)) / (ap - am);
+				//float fubis= (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +	ap*am*(qp - qm)) / (ap - am);
 				/*
 				if (ix == 11 && iy == 0)
 				{
@@ -464,8 +461,8 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdel;
 			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdel;
 			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
-			dhu[i] += hi * (g*hi / 2.*dmdl + fG*vv[i]);
-			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
+			dhu[i] += hi * (g*hi / 2.0f*dmdl + fG*vv[i]);
+			dhv[i] += hi * (g*hi / 2.0f*dmdt - fG*uu[i]);
 
 			
 
@@ -483,7 +480,7 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 	float hi;
 
 
-	dtmax = 1 / epsilon;
+	dtmax =(float) (1.0 / epsilon);
 	float dtmaxtmp = dtmax;
 
 	// calculate gradients
@@ -507,9 +504,9 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
 
-			y = yo + iy*delta / Radius*180.0 / pi;
+			y = yo + iy*delta / Radius*180.0f / pi;
 
-			phi = y*(float) pi / 180.0f;
+			phi = y*pi / 180.0f;
 
 			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
 
@@ -619,7 +616,7 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			float hn = hh[ix + yminus*nx];
 			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
-			y = yo + iy*delta/Radius*180.0/pi;
+			y = yo + iy*delta/Radius*180.0f/pi;
 
 			phi = y*pi / 180.0f;
 
@@ -711,8 +708,8 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
 
-			y = yo + iy*delta / Radius*180.0 / pi;
-			float yp = yo + min(iy + 1, ny - 1)*delta / Radius*180.0 / pi;
+			y = yo + iy*delta / Radius*180.0f / pi;
+			float yp = yo + min(iy + 1, ny - 1)*delta / Radius*180.0f / pi;
 
 			phi = y*(float)pi / 180.0f;
 
@@ -747,8 +744,8 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdel;
 			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdel;
 			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
-			dhu[i] += hi * (g*hi / 2.*dmdl + fG*vv[i]);
-			dhv[i] += hi * (g*hi / 2.*dmdt - fG*uu[i]);
+			dhu[i] += hi * (g*hi / 2.0f*dmdl + fG*vv[i]);
+			dhv[i] += hi * (g*hi / 2.0f*dmdt - fG*uu[i]);
 
 
 
@@ -849,12 +846,12 @@ void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, fl
 extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var)
 {
 	int status;
-	int ncid, xx_dim, yy_dim, time_dim, p_dim, tvar_id;
+	int ncid, xx_dim, yy_dim, time_dim,  tvar_id;
 
-	size_t nxx, nyy, ntt;
+	size_t nxx, nyy;
 	static size_t start[] = { 0, 0, 0 }; // start at first value 
 	static size_t count[] = { 1, ny, nx };
-	int time_id, xx_id, yy_id, tt_id;	//
+	int time_id, xx_id, yy_id;	//
 	nxx = nx;
 	nyy = ny;
 
@@ -919,7 +916,7 @@ extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltim
 extern "C" void write2varnc(int nx, int ny, double totaltime, float * var)
 {
 	int status;
-	int ncid, time_dim, recid;
+	int ncid, recid;
 	size_t nxx, nyy;
 	static size_t start[] = { 0, 0, 0 }; // start at first value 
 	static size_t count[] = { 1, ny, nx };
@@ -954,7 +951,7 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, float * var)
 }
 
 // Main loop that actually runs the model
-float FlowCPU(Param XParam, float nextoutputtime)
+double FlowCPU(Param XParam, double nextoutputtime)
 {
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -967,11 +964,11 @@ float FlowCPU(Param XParam, float nextoutputtime)
 
 	if (XParam.spherical == 1)
 	{
-		update_spherical(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.yo, XParam.Radius, hh, zs, uu, vv, dh, dhu, dhv);
+		update_spherical(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, (float)XParam.yo, (float)XParam.Radius, hh, zs, uu, vv, dh, dhu, dhv);
 	}
 	else
 	{
-		update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
+		update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
 	}
 	
 	//printf("dtmax=%f\n", dtmax);
@@ -984,25 +981,25 @@ float FlowCPU(Param XParam, float nextoutputtime)
 	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor
-		advance(nx, ny, XParam.dt*0.5, XParam.eps,  hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+		advance(nx, ny, (float)XParam.dt*0.5f, (float)XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 		//corrector
 		if (XParam.spherical == 1)
 		{
-			update_spherical(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.yo, XParam.Radius, hho, zso, uuo, vvo, dh, dhu, dhv);
+			update_spherical(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, (float)XParam.yo, (float)XParam.Radius, hho, zso, uuo, vvo, dh, dhu, dhv);
 		}
 		else
 		{
-			update(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
+			update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
 		}
 		
 	}
 	//
-	advance(nx, ny, XParam.dt, XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+	advance(nx, ny, (float) XParam.dt, (float) XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	
-	quadfrictionCPU(nx, ny, XParam.dt, XParam.eps, XParam.cf, hh, uu, vv);
+	quadfrictionCPU(nx, ny, (float)XParam.dt, (float) XParam.eps, (float) XParam.cf, hh, uu, vv);
 	//write2varnc(nx, ny, totaltime, hh);
 
 	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
@@ -1026,12 +1023,12 @@ void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, floa
 			int iprev = min(max((int) ceil(iy / (1 / (zsbndvec.size() - 1))),0), (int) zsbndvec.size()-2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(iy - iprev));
+			zsbnd = (float) interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(iy - iprev));
 		}
 		int ix = 0;
 		int i = ix + iy*nx;
 		int xplus;
-		float hhi;
+		
 		if (ix == 0 && iy < ny)
 		{
 			xplus = min(ix + 1, nx - 1);
@@ -1063,12 +1060,12 @@ void rightdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, flo
 			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(iy - iprev));
+			zsbnd = (float) interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(iy - iprev));
 		}
 		int ix = nx-1;
 		int i = ix + iy*nx;
 		int xminus;
-		float hhi;
+		
 		if ( iy < ny)
 		{
 			xminus = max(ix - 1, 0);
@@ -1095,12 +1092,12 @@ void topdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float
 			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
+			zsbnd = (float) interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
 		}
 		int iy = ny - 1;
 		int i = ix + iy*nx;
 		int yminus;
-		float hhi;
+		
 		if (iy < ny)
 		{
 			//xminus = max(ix - 1, 0);
@@ -1132,12 +1129,12 @@ void botdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float
 			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
 			int inext = iprev + 1;
 			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
+			zsbnd = (float) interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
 		}
 		int iy = 0;
 		int i = ix + iy*nx;
 		int yplus;
-		float hhi;
+		
 		if (iy < ny)
 		{
 			//xminus = max(ix - 1, 0);
@@ -1169,7 +1166,7 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 				if (hhi > eps)
 				{
 					normu = uu[i] * uu[i] + vv[i] * vv[i];
-					float frc = (1.0 + dt*cf*(normu) / hhi);
+					float frc = (1.0f + dt*cf*(normu) / hhi);
 					//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 					uu[i] = uu[i] / frc;
 					vv[i] = vv[i] / frc;
@@ -1184,8 +1181,8 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
 {
 	int i,ix;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	int  xplus;
+	
 
 	for (int iy = 0; iy < ny; iy++)
 	{
@@ -1208,8 +1205,8 @@ void noslipbndRightCPU(int nx, int ny, float eps, float *zb, float *zs, float *h
 {
 
 	int i,ix;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	int  xminus;
+	
 
 	for (int iy = 0; iy < ny; iy++)
 	{
@@ -1235,8 +1232,8 @@ void noslipbndTopCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh,
 {
 
 	int i, iy;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	int  yminus;
+	
 
 
 
@@ -1265,8 +1262,8 @@ void noslipbndBotCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh,
 {
 
 	int i, iy;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	int yplus;
+	
 
 	for (int ix = 0; ix < nx; ix++)
 	{
@@ -1294,7 +1291,7 @@ void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, 
 	
 	int i; 
 	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	
 
 	for (int iy = 0; iy < ny; iy++)
 	{
@@ -1366,7 +1363,7 @@ void warmstart(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> righ
 		std::vector<float> leftbnd;
 		for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
 		{
-			leftbnd.push_back(interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
+			leftbnd.push_back((float) interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
 
 		}
 
@@ -1381,12 +1378,12 @@ void warmstart(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> righ
 				int iprev = min(max((int)ceil(iy / (1 / (leftbnd.size() - 1))), 0), (int)leftbnd.size() - 2);
 				int inext = iprev + 1;
 				// here interp time is used to interpolate to the right node rather than in time...
-				zsbnd = interptime(leftbnd[inext], leftbnd[iprev], (float)(inext - iprev), (float)(iy - iprev));
+				zsbnd = (float) interptime(leftbnd[inext], leftbnd[iprev], (float)(inext - iprev), (float)(iy - iprev));
 			}
 			int ix = 0;
 			int i = ix + iy*nx;
-			int xplus;
-			float hhi;
+			
+			
 			if (ix == 0 && iy < ny)
 			{
 

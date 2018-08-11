@@ -39,14 +39,14 @@ __global__ void gradientGPUXY(int nx, int ny, float theta, float delta, float *a
 	//
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int tx = threadIdx.x;
-	int ty = threadIdx.y;
+	//int tx = threadIdx.x;
+	//int ty = threadIdx.y;
 	int i = ix + iy*nx;
 	int  xplus, yplus, xminus, yminus;
 
 	float a_i,a_r, a_l, a_t, a_b;
 
-	__shared__ float a_s[18][18];
+	//__shared__ float a_s[18][18];
 	if (ix < nx && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
@@ -100,7 +100,7 @@ __global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, 
 	__shared__ float a_s[16][16]; // Hard wired stuff Be carefull
 	__shared__ float al_s[16][16];
 	__shared__ float ar_s[16][16];
-	float dadxi;
+	//float dadxi;
 	if (ix < nx && iy < ny)
 	{
 		//
@@ -289,14 +289,14 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 	int i = ix + iy*nx;
 	//int tx = threadIdx.x;
 	//int ty = threadIdx.y;
-	int  xplus, yplus, xminus, yminus;
-
+	//int  xplus, yplus, xminus, yminus;
+	int xminus;
 	if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
+		//xplus = min(ix + 1, nx - 1);
 		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
 
 
 		
@@ -470,16 +470,16 @@ __global__ void updateKurgXSPH(int nx, int ny, float delta, float g, float eps, 
 	int i = ix + iy*nx;
 	//int tx = threadIdx.x;
 	//int ty = threadIdx.y;
-	int  xplus, yplus, xminus, yminus;
-
+	//int  xplus, yplus, xminus, yminus;
+	int xminus;
 	double cm, fmu,y,phi,dphi;
 
 	if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
+		//xplus = min(ix + 1, nx - 1);
 		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
 
 
 
@@ -664,13 +664,13 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 	int i = ix + iy*nx;
 //	int tx = threadIdx.x;
 //	int ty = threadIdx.y;
-	int  xplus, yplus, xminus, yminus;
-
+	//int  xplus, yplus, xminus, yminus;
+	int yminus;
 	if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
 
@@ -796,15 +796,15 @@ __global__ void updateKurgYSPH(int nx, int ny, float delta, float g, float eps, 
 	int i = ix + iy*nx;
 	//	int tx = threadIdx.x;
 	//	int ty = threadIdx.y;
-	int  xplus, yplus, xminus, yminus;
-
+	//int  xplus, yplus, xminus, yminus;
+	int yminus;
 	double cm, fmv, phi, dphi, y;
 
 	if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
 		y = yo + iy*delta / Radius*180.0 / pi;;
@@ -940,14 +940,14 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 	int i = ix + iy*nx;
 //	int tx = threadIdx.x;
 //	int ty = threadIdx.y;
-	int  xplus, yplus, xminus, yminus;
+	int  xplus, yplus;
 
 	if (ix < nx && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
+		//xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//yminus = max(iy - 1, 0);
 
 		float cm = 1.0f;// 0.1;
 		float fmu = 1.0f;
@@ -998,7 +998,7 @@ __global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, floa
 	int i = ix + iy*nx;
 	//	int tx = threadIdx.x;
 	//	int ty = threadIdx.y;
-	int  xplus, yplus, xminus, yminus;
+	int  xplus, yplus;// , xminus, yminus;
 
 	double cm, fmu, fmv, y, phi, dphi,fmvp,fmup;
 
@@ -1006,9 +1006,9 @@ __global__ void updateEVSPH(int nx, int ny, float delta, float g, float yo, floa
 	if (ix < nx && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
+		//xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//yminus = max(iy - 1, 0);
 
 		y = yo + iy*delta / Radius*180.0 / pi;
 		double yp= yo + yplus*delta / Radius*180.0 / pi;
@@ -1339,7 +1339,7 @@ __global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, flo
 	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
 	int xplus;
-	float hhi;
+	//float hhi;
 	float zsbnd;
 	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texLBND, itime+0.5f, itx+0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
@@ -1365,7 +1365,7 @@ __global__ void rightdirichlet(int nx, int ny, int nybnd, float g, float itime, 
 	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
 	int xminus;
-	float hhi;
+	//float hhi;
 	float zsbnd;
 	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texRBND, itime+0.5f, itx+0.5f);
@@ -1386,7 +1386,7 @@ __global__ void topdirichlet(int nx, int ny, int nxbnd, float g, float itime, fl
 	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
 	int yminus;
-	float hhi;
+	//float hhi;
 	float zsbnd;
 	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
@@ -1406,7 +1406,7 @@ __global__ void botdirichlet(int nx, int ny, int nxbnd, float g, float itime, fl
 	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
 	int yplus;
-	float hhi;
+	//float hhi;
 	float zsbnd;
 	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
@@ -1454,7 +1454,7 @@ __global__ void noslipbndall(int nx, int ny, float dt, float eps, float *zb, flo
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
 	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	//float normu, hhi;
 
 	if (ix < nx && iy < ny)
 	{
@@ -1499,15 +1499,13 @@ __global__ void noslipbndLeft(int nx, int ny, float eps, float *zb, float *zs, f
 	int iy = blockIdx.x*blockDim.x + threadIdx.x;
 	int ix = 0;
 	int i = ix + iy*nx;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi,zsp;
+	int  xplus;
+	float zsp;
 
 	if (ix ==0 && iy < ny)
 	{
 		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		
 
 		zsp = zs[xplus + iy*nx];
 
@@ -1526,17 +1524,12 @@ __global__ void noslipbndBot(int nx, int ny, float eps, float *zb, float *zs, fl
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = 0;
 	int i = ix + iy*nx;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
-
+	int yplus;
+	
 	if (iy == 0 && ix < nx)
 	{
-		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
 		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
-
-
+		
 		vv[i] = 0.0f;
 		zs[i] = zs[ix + yplus*nx];
 		hh[i] = max(zs[ix + yplus*nx] - zb[i], eps);
@@ -1553,17 +1546,13 @@ __global__ void noslipbndRight(int nx, int ny, float eps, float *zb, float *zs, 
 	int iy = blockIdx.x*blockDim.x + threadIdx.x;
 	int ix = nx-1;
 	int i = ix + iy*nx;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	int xminus;
+	
 
 	if (ix == nx-1 && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
 		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
-
-
+		
 		uu[i] = 0.0f;
 		zs[i] = zs[xminus + iy*nx];
 		hh[i] = max(zs[xminus + iy*nx] - zb[i], eps);
@@ -1578,14 +1567,11 @@ __global__ void noslipbndTop(int nx, int ny, float eps, float *zb, float *zs, fl
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = ny - 1;
 	int i = ix + iy*nx;
-	int  xplus, yplus, xminus, yminus;
-	float normu, hhi;
+	int yminus;
+	
 
 	if (iy == ny - 1 && ix < nx)
 	{
-		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
 		yminus = max(iy - 1, 0);
 
 

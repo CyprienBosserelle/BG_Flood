@@ -3,9 +3,9 @@
 #define CSVGPU_H
 // includes, system
 
-#define pi 3.14159265
+#define pi 3.14159265f
 
-#define epsilone 1e-30
+#define epsilone 1e-30f
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
@@ -92,8 +92,8 @@ public:
 	
 	//Netcdf parameters
 	int smallnc = 1;//default save as short integer if smallnc=0 then save all variables as float
-	float scalefactor = 0.01;
-	float addoffset = 0.0;
+	float scalefactor = 0.01f;
+	float addoffset = 0.0f;
 
 	// This is controlled by the sanity checker not directly by the user
 	int outhhmax = 0;
@@ -202,7 +202,7 @@ template <class T> const T& min(const T& a, const T& b);
 
 //General CPU functions //Unecessary to declare here?
 void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
-float FlowCPU(Param XParam, float nextoutputtime);
+double FlowCPU(Param XParam, double nextoutputtime);
 //float demoloopCPU(Param XParam);
 
 void update(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
