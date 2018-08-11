@@ -392,11 +392,11 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 }
 
 
-extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
+extern "C" void readnczb(int nx, int ny, const std::string ncfile, float * &zb)
 {
 	int status;
 	int ncid, hh_id;
-	static size_t count[] = { nx, ny };
+	
 	std::string varstr,ncfilestr;
 	std::vector<std::string> nameelements;
 	//by default we expect tab delimitation
@@ -415,13 +415,17 @@ extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
 
 
 	status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
+	if (status != NC_NOERR)	handle_error(status);
 	status = nc_inq_varid(ncid, varstr.c_str(), &hh_id);
+	if (status != NC_NOERR)	handle_error(status);
 	status = nc_get_var_float(ncid, hh_id, zb);
+	if (status != NC_NOERR)	handle_error(status);
 	status = nc_close(ncid);
+	if (status != NC_NOERR)	handle_error(status);
 
 
 }
-void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx)
+void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx)
 {
 	//read the dimentions of grid, levels and time 
 	int status;
@@ -595,7 +599,7 @@ void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx)
 	float dxx, dyy;
 	//check dx
 	dxx = (float) abs(xcoord[0] - xcoord[nx - 1]) / (nx - 1);
-	dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
+	//dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
 
 
 	dx = dxx;
@@ -970,7 +974,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = (int) ddim[0];
+			//nt = (int) ddim[0];
 			ny = (int) ddim[1];
 			nx = (int) ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
