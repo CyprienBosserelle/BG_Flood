@@ -596,7 +596,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx)
 
 	}
 
-	float dxx, dyy;
+	float dxx;
 	//check dx
 	dxx = (float) abs(xcoord[0] - xcoord[nx - 1]) / (nx - 1);
 	//dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);

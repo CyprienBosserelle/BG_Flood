@@ -43,44 +43,24 @@ template <class T> const T& min(const T& a, const T& b) {
 	return !(b<a) ? a : b;     // or: return comp(a,b)?b:a; for version (2)
 }
 
-double minmod2(double s0, double s1, double s2)
-{
-	//theta should be used as a global var 
-	// can be used to tune the limiting (theta=1
-	//gives minmod, the most dissipative limiter and theta = 2 gives
-	//	superbee, the least dissipative).
-	double theta = 1.3;
-	if (s0 < s1 && s1 < s2) {
-		double d1 = theta*(s1 - s0);
-		double d2 = (s2 - s0) / 2.;
-		double d3 = theta*(s2 - s1);
-		if (d2 < d1) d1 = d2;
-		return min(d1, d3);
-	}
-	if (s0 > s1 && s1 > s2) {
-		double d1 = theta*(s1 - s0), d2 = (s2 - s0) / 2., d3 = theta*(s2 - s1);
-		if (d2 > d1) d1 = d2;
-		return max(d1, d3);
-	}
-	return 0.;
-}
-
-float minmod2f(float theta, float s0, float s1, float s2)
+template <class T> T minmod2(T theta, T s0, T s1, T s2)
 {
 	//theta should be used as a global var 
 	// can be used to tune the limiting (theta=1
 	//gives minmod, the most dissipative limiter and theta = 2 gives
 	//	superbee, the least dissipative).
 	//float theta = 1.3f;
+	
+
 	if (s0 < s1 && s1 < s2) {
-		float d1 = theta*(s1 - s0);
-		float d2 = (s2 - s0) / 2.0f;
-		float d3 = theta*(s2 - s1);
+		T d1 = theta*(s1 - s0);
+		T d2 = (s2 - s0) / T(2.0);
+		T d3 = theta*(s2 - s1);
 		if (d2 < d1) d1 = d2;
 		return min(d1, d3);
 	}
 	if (s0 > s1 && s1 > s2) {
-		float d1 = theta*(s1 - s0), d2 = (s2 - s0) / 2.0f, d3 = theta*(s2 - s1);
+		T d1 = theta*(s1 - s0), d2 = (s2 - s0) / T(2.0), d3 = theta*(s2 - s1);
 		if (d2 > d1) d1 = d2;
 		return max(d1, d3);
 	}
@@ -114,7 +94,7 @@ float minmod2f(float theta, float s0, float s1, float s2)
 	}
 	*/
 
-void gradient(int nx, int ny,float theta, float delta, float *a, float *&dadx, float * &dady)
+template <class T> void gradient(int nx, int ny, T theta, T delta, T *a, T *&dadx, T * &dady)
 {
 
 	int i, xplus, yplus, xminus, yminus;
@@ -133,9 +113,9 @@ void gradient(int nx, int ny,float theta, float delta, float *a, float *&dadx, f
 
 
 			//dadx[i] = (a[i] - a[xminus + iy*nx]) / delta;//minmod2(a[xminus+iy*nx], a[i], a[xplus+iy*nx]);
-			dadx[i] = minmod2f(theta,a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
+			dadx[i] = minmod2(theta,a[xminus+iy*nx], a[i], a[xplus+iy*nx])/delta;
 			//dady[i] = (a[i] - a[ix + yminus*nx]) / delta;
-			dady[i] = minmod2f(theta,a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
+			dady[i] = minmod2(theta,a[ix + yminus*nx], a[i], a[ix + yplus*nx])/delta;
 
 
 		}
@@ -143,23 +123,32 @@ void gradient(int nx, int ny,float theta, float delta, float *a, float *&dadx, f
 
 }
 
-void kurganov(double g,double CFL,double hm, double hp, double um, double up, double Delta,	double * fh, double * fq, double * dtmax)
+template <class T> void kurganov(T g, T CFL, T hm, T hp, T um, T up, T Delta, T  *fh, T  *fq, T *dtmax)
 {
-	double cp = sqrt(g*hp), cm = sqrt(g*hm);
-	double ap = max(up + cp, um + cm); ap = max(ap, 0.);
-	double am = min(up - cp, um - cm); am = min(am, 0.);
-	double qm = hm*um, qp = hp*up;
-	double a = max(ap, -am);
-	if (a > epsilon) {
+	
+	T cp, cm, ap, am, qm, qp, a,dt, epsil;
+	epsil = T(1e-30);
+	cp = sqrt(g*hp);
+	cm = sqrt(g*hm);
+	ap = max(up + cp, um + cm);
+	ap = max(ap, T(0.0));
+	am = min(up - cp, um - cm);
+	am = min(am, T(0.0));
+	qm = hm*um;
+	qp = hp*up;
+	a = max(ap, -am);
+
+	if (a > epsil) {
 		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
-		*fq = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
+		*fq = (ap*(qm*um + g*sq(hm) / T(2.0)) - am*(qp*up + g*sq(hp) / T(2.0)) +
 			ap*am*(qp - qm)) / (ap - am);
-		double dt = CFL*Delta / a;
+		dt = CFL*Delta / a;
 		if (dt < *dtmax)
 			*dtmax = dt;
 	}
 	else
-		*fh = *fq = 0.;
+		*fh = T(0.0);
+		*fq = T(0.0);
 }
 void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
 {
@@ -181,6 +170,7 @@ void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float 
 	else
 		*fh = *fq = 0.0f;
 }
+
 
 void neumannbnd(int nx, int ny, double*a)
 {
