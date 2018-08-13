@@ -731,7 +731,7 @@ void FlowGPU()
 	/////////////////////////////////////////////////////
 
 	// copy from GPU and do the reduction on the CPU  ///LAME!
-	
+	/*
 	CUDA_CHECK(cudaMemcpy(dummy, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
 	float mindtmax = 1.0f / 1e-30f;
 	for (int i = 0; i < nx*ny; i++)
@@ -739,7 +739,7 @@ void FlowGPU()
 		mindtmax = min(dummy[i], mindtmax);
 	}
 	dt = mindtmax;
-	
+	*/
 
 
 	//GPU but it doesn't work
@@ -1115,9 +1115,9 @@ int main(int argc, char **argv)
 	{
 		if (GPUDEVICE >= 0)
 		{
-			//mainloopGPU();
+			mainloopGPU();
 			//CUDA_CHECK(cudaMemcpy(hh, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-			checkloopGPU();
+			//checkloopGPU();
 		}
 		else
 		{
