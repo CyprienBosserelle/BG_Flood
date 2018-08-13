@@ -760,8 +760,7 @@ void FlowGPU()
 	float diffdt = arrmin[0] - mindtmax;
 	*/
 
-	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
-	// This was successfully tested with a range of grid size
+	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 
 	//reducemax3 << <gridDimLine, blockDimLine, 64*sizeof(float) >> >(dtmax_g, arrmax_g, nx*ny)
 	int s = nx*ny;
 	int maxThreads = 256;
@@ -800,9 +799,9 @@ void FlowGPU()
 	
 	CUDA_CHECK(cudaMemcpy(dummy, arrmax_g, 32*sizeof(float), cudaMemcpyDeviceToHost));
 	mindtmaxB = dummy[0];
-	/*
+
 	//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
-	
+	/*
 	for (int i = 0; i < 32; i++)
 	{
 		mindtmaxB = min(dummy[i], mindtmaxB);
@@ -812,7 +811,7 @@ void FlowGPU()
 	*/
 	
 
-	float diffdt = mindtmaxB - mindtmax;
+	//float diffdt = mindtmaxB - mindtmax;
 	dt = mindtmaxB;
 
 	printf("dt=%f\n", dt);
