@@ -26,7 +26,7 @@
 class TSnode {
 public:
 	int i, j;
-	float x, y;
+	double x, y;
 };
 
 class Param {
@@ -42,6 +42,8 @@ public:
 	double cf=0.0001; // bottom friction for flow model cf 
 	double Cd=0.002; // Wind drag coeff
 	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
+
+	int doubleprecision = 0;
 
 	//grid parameters
 	double dx=0.0; // grid resolution
@@ -113,8 +115,8 @@ public:
 
 class SLTS {
 public:
-	float time;
-	std::vector<float> wlevs;
+	double time;
+	std::vector<double> wlevs;
 };
 
 class Pointout {
@@ -146,42 +148,71 @@ extern double *x, *y;
 extern double *x_g, *y_g;
 
 extern float *zs, *hh, *zb, *uu, *vv;
+extern double *zs_d, *hh_d, *zb_d, *uu_d, *vv_d; // double array only allocated instead of thge float if requested
 extern float *zs_g, *hh_g, *zb_g, *uu_g, *vv_g; // for GPU
+extern double *zs_gd, *hh_gd, *zb_gd, *uu_gd, *vv_gd; // double array for GPU
 
 extern float *zso, *hho, *uuo, *vvo;
+extern double *zso_d, *hho_d, *uuo_d, *vvo_d;
 extern float *zso_g, *hho_g, *uuo_g, *vvo_g; // for GPU
+extern double *zso_gd, *hho_gd, *uuo_gd, *vvo_gd;
 
 extern float * dhdx, *dhdy, *dudx, *dudy, *dvdx, *dvdy;
 extern float *dzsdx, *dzsdy;
 
+extern double * dhdx_d, *dhdy_d, *dudx_d, *dudy_d, *dvdx_d, *dvdy_d;
+extern double *dzsdx_d, *dzsdy_d;
+
 //GPU
 extern float * dhdx_g, *dhdy_g, *dudx_g, *dudy_g, *dvdx_g, *dvdy_g;
 extern float *dzsdx_g, *dzsdy_g;
+extern double * dhdx_gd, *dhdy_gd, *dudx_gd, *dudy_gd, *dvdx_gd, *dvdy_gd;
+extern double *dzsdx_gd, *dzsdy_gd;
 //double *fmu, *fmv;
 
 extern float *Su, *Sv, *Fqux, *Fquy, *Fqvx, *Fqvy;
 extern float * Fhu, *Fhv;
 extern float * dh, *dhu, *dhv;
 
+extern double *Su_d, *Sv_d, *Fqux_d, *Fquy_d, *Fqvx_d, *Fqvy_d;
+extern double * Fhu_d, *Fhv_d;
+extern double * dh_d, *dhu_d, *dhv_d;
+
 //GPU
 extern float *Su_g, *Sv_g, *Fqux_g, *Fquy_g, *Fqvx_g, *Fqvy_g;
 extern float * Fhu_g, *Fhv_g;
 extern float * dh_g, *dhu_g, *dhv_g;
 
+extern double *Su_gd, *Sv_gd, *Fqux_gd, *Fquy_gd, *Fqvx_gd, *Fqvy_gd;
+extern double * Fhu_gd, *Fhv_gd;
+extern double * dh_gd, *dhu_gd, *dhv_gd;
+
 extern float * hhmean, *uumean, *vvmean, *zsmean;
 extern float * hhmean_g, *uumean_g, *vvmean_g, *zsmean_g;
+
+extern double * hhmean_d, *uumean_d, *vvmean_d, *zsmean_d;
+extern double * hhmean_gd, *uumean_gd, *vvmean_gd, *zsmean_gd;
 
 extern float * hhmax, *uumax, *vvmax, *zsmax;
 extern float * hhmax_g, *uumax_g, *vvmax_g, *zsmax_g;
 
+extern double * hhmax_d, *uumax_d, *vvmax_d, *zsmax_d;
+extern double * hhmax_gd, *uumax_gd, *vvmax_gd, *zsmax_gd;
+
 extern float * vort, *vort_g;// Vorticity output
+extern double * vort_d, *vort_gd;// Vorticity output
 
 extern float dtmax;
 extern float * dtmax_g;
 extern float * TSstore, *TSstore_g;
 extern float * dummy;
 
-//Cuda Array to pre-store Water level boundary on the GOU and interpolate through the texture fetch
+extern double dtmax_d;
+extern double * dtmax_gd;
+extern double * TSstore_d, *TSstore_gd;
+extern double * dummy_d;
+
+//Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch
 extern cudaArray* leftWLS_gp; // Cuda array to pre-store HD vel data before converting to textures
 extern cudaArray* rightWLS_gp;
 extern cudaArray* topWLS_gp;
@@ -196,45 +227,64 @@ extern cudaChannelFormatDesc channelDesctopbnd;// = cudaCreateChannelDesc(32, 0,
 
 
 template <class T> T sq(T a);
-double sqd(double a);
+
 template <class T> const T& max(const T& a, const T& b);
 template <class T> const T& min(const T& a, const T& b);
 
 //General CPU functions //Unecessary to declare here?
 void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
 double FlowCPU(Param XParam, double nextoutputtime);
+double FlowCPUDouble(Param XParam, double nextoutputtime);
+double FlowCPUSpherical(Param XParam, double nextoutputtime);
 //float demoloopCPU(Param XParam);
 
 void update(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
-void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
-void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
-
+//void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
+//void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
+template <class T> void advance(int nx, int ny, T dt, T eps, T*zb, T *hh, T *zs, T *uu, T * vv, T * dh, T *dhu, T *dhv, T * &hho, T *&zso, T *&uuo, T *&vvo);
+template <class T> void cleanup(int nx, int ny, T * hhi, T *zsi, T *uui, T *vvi, T * &hho, T *&zso, T *&uuo, T *&vvo);
 //Bnd functions
 //void neumannbnd(int nx, int ny, double*a);
 
-void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void rightdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void topdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void botdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
 
-void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
-void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
-void noslipbndRightCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
-void noslipbndBotCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
-void noslipbndTopCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv);
+void leftdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
+void rightdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
+void topdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
+void botdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
+
+void noslipbndLCPU(Param XParam);
+void noslipbndRCPU(Param XParam);
+void noslipbndTCPU(Param XParam);
+void noslipbndBCPU(Param XParam);
+
+//template <class T> void noslipbndallCPU(int nx, int ny, T dt, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndLeftCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndRightCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndBotCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndTopCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
 
 
 
 
 
 
-void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv);
+template <class T> void quadfrictionCPU(int nx, int ny, T dt, T eps, T cf, T *hh, T *uu, T *vv);
 // CPU mean max
 void AddmeanCPU(Param XParam);
+void AddmeanCPUD(Param XParam);
 void DivmeanCPU(Param XParam, float nstep);
+void DivmeanCPUD(Param XParam, float nstep);
 void ResetmeanCPU(Param XParam);
+void ResetmeanCPUD(Param XParam);
 void maxallCPU(Param XParam);
+void maxallCPUD(Param XParam);
 void CalcVort(Param XParam);
+void CalcVortD(Param XParam);
+
 //Output functions
 extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var);
 extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
@@ -243,11 +293,14 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
 Param creatncfileUD(Param XParam);
 
 extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
+extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, double * var_d);
 extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
+extern "C" void writencvarstepD(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, double * var_d);
 void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
+int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
 
 // I/O
 extern "C" void readbathy(std::string filename, float *&zb);

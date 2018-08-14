@@ -170,7 +170,26 @@ void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float 
 	else
 		*fh = *fq = 0.0f;
 }
-
+void kurganovd(double g, double CFL, double hm, double hp, double um, double up, double Delta, double * fh, double * fq, double * dtmax)
+{
+	double eps = (double)epsilon; //this epsilon doesn't need to be a gloabl variable
+	double cp = sqrtf(g*hp), cm = sqrtf(g*hm);
+	double ap = max(up + cp, um + cm); ap = max(ap, 0.0);
+	double am = min(up - cp, um - cm); am = min(am, 0.0);
+	double qm = hm*um, qp = hp*up;
+	double a = max(ap, -am);
+	double ad = 1.0f / (ap - am);
+	if (a > eps) {
+		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) *ad; // (4.5) of [1]
+		*fq = (ap*(qm*um + g*sq(hm) / 2.0) - am*(qp*up + g*sq(hp) / 2.0) +
+			ap*am*(qp - qm)) *ad;
+		double dt = CFL*Delta / a;
+		if (dt < *dtmax)
+			*dtmax = dt;
+	}
+	else
+		*fh = *fq = 0.0f;
+}
 
 void neumannbnd(int nx, int ny, double*a)
 {
@@ -462,27 +481,26 @@ void update(int nx, int ny, float theta, float dt, float eps, float g,float CFL,
 		}
 	}
 }
-
-void update_spherical(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta,float yo,float Radius, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv)
+void updateD(int nx, int ny, double theta, double dt, double eps, double g, double CFL, double delta, double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
-	float hi;
+	double hi;
 
 
-	dtmax =(float) (1.0 / epsilon);
-	float dtmaxtmp = dtmax;
+	dtmax = (1.0 / epsilon);
+	double dtmaxtmp = dtmax;
 
 	// calculate gradients
-	gradient(nx, ny, theta, delta, hh, dhdx, dhdy);
-	gradient(nx, ny, theta, delta, zs, dzsdx, dzsdy);
-	gradient(nx, ny, theta, delta, uu, dudx, dudy);
-	gradient(nx, ny, theta, delta, vv, dvdx, dvdy);
+	gradient(nx, ny, theta, delta, hh, dhdx_d, dhdy_d);
+	gradient(nx, ny, theta, delta, zs, dzsdx_d, dzsdy_d);
+	gradient(nx, ny, theta, delta, uu, dudx_d, dudy_d);
+	gradient(nx, ny, theta, delta, vv, dvdx_d, dvdy_d);
 
-	float cm = 1.0;// 0.1;
-	float fmu = 1.0;
-	float fmv = 1.0;
-	float phi, dphi,y;
+	double cm = 1.0;// 0.1;
+	double fmu = 1.0;
+	double fmv = 1.0;
+
 	for (int iy = 0; iy < ny; iy++)
 	{
 		for (int ix = 0; ix < nx; ix++)
@@ -494,67 +512,57 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
 
-			y = yo + iy*delta / Radius*180.0f / pi;
-
-			phi = y*pi / 180.0f;
-
-			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
-
-			cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
-
-			fmu = 1.0f;
-			fmv = cosf(phi);
 
 
-			float hn = hh[xminus + iy*nx];
+			double hn = hh[xminus + iy*nx];
 
 
 			if (hi > eps || hn > eps)
 			{
 
-				float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+				double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 				// along X
-				dx = delta / 2.0f;
+				dx = delta / 2.0;
 				zi = zs[i] - hi;
 
 				//printf("%f\n", zi);
 
 
-				zl = zi - dx*(dzsdx[i] - dhdx[i]);
+				zl = zi - dx*(dzsdx_d[i] - dhdx_d[i]);
 				//printf("%f\n", zl);
 
 				zn = zs[xminus + iy*nx] - hn;
 
 				//printf("%f\n", zn);
-				zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdx[xminus + iy*nx]);
+				zr = zn + dx*(dzsdx_d[xminus + iy*nx] - dhdx_d[xminus + iy*nx]);
 
 
 				zlr = max(zl, zr);
 
-				hl = hi - dx*dhdx[i];
-				up = uu[i] - dx*dudx[i];
-				hp = max(0.f, hl + zl - zlr);
+				hl = hi - dx*dhdx_d[i];
+				up = uu[i] - dx*dudx_d[i];
+				hp = max(0.0, hl + zl - zlr);
 
-				hr = hn + dx*dhdx[xminus + iy*nx];
-				um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
-				hm = max(0.f, hr + zr - zlr);
+				hr = hn + dx*dhdx_d[xminus + iy*nx];
+				um = uu[xminus + iy*nx] + dx*dudx_d[xminus + iy*nx];
+				hm = max(0.0, hr + zr - zlr);
 
 				//// Reimann solver
-				float fh, fu, fv;
-				float dtmaxf = 1.0f / (float)epsilon;
+				double fh, fu, fv;
+				double dtmaxf = 1.0 / epsilon;
 
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganovf(g, CFL, hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
-				fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
-				dtmax = dtmaxf;
-				dtmaxtmp = min(dtmax, dtmaxtmp);
-				//float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
-				//float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
-				//float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
-				//float qm = hm*um, qp = hp*up;
+				kurganovd(g, CFL, hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+				fv = (fh > 0.0 ? vv[xminus + iy*nx] + dx*dvdx_d[xminus + iy*nx] : vv[i] - dx*dvdx_d[i])*fh;
+				dtmax_d = dtmaxf;
+				dtmaxtmp = min(dtmax_d, dtmaxtmp);
+				//double cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
+				//double ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
+				//double am = min(up - cpo, um - cmo); am = min(am, 0.0f);
+				//double qm = hm*um, qp = hp*up;
 
-				//float fubis = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
+				//double fubis= (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +	ap*am*(qp - qm)) / (ap - am);
 				/*
 				if (ix == 11 && iy == 0)
 				{
@@ -571,22 +579,22 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 				In the case of adaptive refinement, care must be taken to ensure
 				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-				float sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
-				float sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+				double sl = g / 2.0*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				double sr = g / 2.0*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
 
 				////Flux update
 
-				Fhu[i] = fmu * fh;
-				Fqux[i] = fmu * (fu - sl);
-				Su[i] = fmu * (fu - sr);
-				Fqvx[i] = fmu * fv;
+				Fhu_d[i] = fmu * fh;
+				Fqux_d[i] = fmu * (fu - sl);
+				Su_d[i] = fmu * (fu - sr);
+				Fqvx_d[i] = fmu * fv;
 			}
 			else
 			{
-				Fhu[i] = 0.0f;
-				Fqux[i] = 0.0f;
-				Su[i] = 0.0f;
-				Fqvx[i] = 0.0f;
+				Fhu_d[i] = 0.0;
+				Fqux_d[i] = 0.0;
+				Su_d[i] = 0.0;
+				Fqvx_d[i] = 0.0;
 			}
 
 		}
@@ -603,20 +611,10 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
 
-			float hn = hh[ix + yminus*nx];
-			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+			double hn = hh[ix + yminus*nx];
+			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
-			y = yo + iy*delta/Radius*180.0f/pi;
 
-			phi = y*pi / 180.0f;
-
-			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
-
-			cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
-
-			fmu = 1.0f;
-			fmv = cosf(phi);
-			
 
 			if (hi > eps || hn > eps)
 			{
@@ -627,29 +625,29 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 				hn = hh[ix + yminus*nx];
 				dx = delta / 2.0f;
 				zi = zs[i] - hi;
-				zl = zi - dx*(dzsdy[i] - dhdy[i]);
+				zl = zi - dx*(dzsdy_d[i] - dhdy_d[i]);
 				zn = zs[ix + yminus*nx] - hn;
-				zr = zn + dx*(dzsdy[ix + yminus*nx] - dhdy[ix + yminus*nx]);
+				zr = zn + dx*(dzsdy_d[ix + yminus*nx] - dhdy_d[ix + yminus*nx]);
 				zlr = max(zl, zr);
 
-				hl = hi - dx*dhdy[i];
-				up = vv[i] - dx*dvdy[i];
-				hp = max(0.f, hl + zl - zlr);
+				hl = hi - dx*dhdy_d[i];
+				up = vv[i] - dx*dvdy_d[i];
+				hp = max(0.0, hl + zl - zlr);
 
-				hr = hn + dx*dhdy[ix + yminus*nx];
-				um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
-				hm = max(0.f, hr + zr - zlr);
+				hr = hn + dx*dhdy_d[ix + yminus*nx];
+				um = vv[ix + yminus*nx] + dx*dvdy_d[ix + yminus*nx];
+				hm = max(0.0, hr + zr - zlr);
 
 				//// Reimann solver
-				float fh, fu, fv;
-				float dtmaxf = 1 / (float)epsilon;
+				double fh, fu, fv;
+				double dtmaxf = 1.0 / epsilon;
 				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
 				//printf("%f\n", hr);
 				//We can now call one of the approximate Riemann solvers to get the fluxes.
-				kurganovf(g, CFL, hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
-				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
-				dtmax = dtmaxf;
-				dtmaxtmp = min(dtmax, dtmaxtmp);
+				kurganovd(g, CFL, hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+				fv = (fh > 0. ? uu[ix + yminus*nx] + dx*dudy_d[ix + yminus*nx] : uu[i] - dx*dudy_d[i])*fh;
+				dtmax_d = dtmaxf;
+				dtmaxtmp = min(dtmax_d, dtmaxtmp);
 				//// Topographic term
 
 				/**
@@ -657,24 +655,292 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 
 				In the case of adaptive refinement, care must be taken to ensure
 				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
-				float sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
-				float sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+				double sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				double sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
 
 				////Flux update
 
-				Fhv[i] = fmv * fh;
-				Fqvy[i] = fmv * (fu - sl);
-				Sv[i] = fmv * (fu - sr);
-				Fquy[i] = fmv* fv;
+				Fhv_d[i] = fmv * fh;
+				Fqvy_d[i] = fmv * (fu - sl);
+				Sv_d[i] = fmv * (fu - sr);
+				Fquy_d[i] = fmv* fv;
 
 				//printf("%f\t%f\t%f\n", x[i], y[i], Fhv[i]);
 			}
 			else
 			{
-				Fhv[i] = 0.0f;
-				Fqvy[i] = 0.0f;
-				Sv[i] = 0.0f;
-				Fquy[i] = 0.0f;
+				Fhv_d[i] = 0.0;
+				Fqvy_d[i] = 0.0;
+				Sv_d[i] = 0.0;
+				Fquy_d[i] = 0.0;
+			}
+
+			//printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
+		}
+	}
+
+	dtmax = dtmaxtmp;
+
+
+	// UPDATES For evolving quantities
+
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+
+			i = ix + iy*nx;
+			xplus = min(ix + 1, nx - 1);
+			xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hi = hh[i];
+			////
+			//vector dhu = vector(updates[1 + dimension*l]);
+			//foreach() {
+			//	double dhl =
+			//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+			//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+			//	foreach_dimension()
+			//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
+			double cm = 1.0;
+			double cmdel = 1.0 / (cm * delta);
+			dh[i] = -1.0*(Fhu_d[xplus + iy*nx] - Fhu_d[i] + Fhv_d[ix + yplus*nx] - Fhv_d[i]) *cmdel;
+			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+			//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+			//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+			double dmdl = (fmu - fmu) *cmdel;// absurd!
+			double dmdt = (fmv - fmv) *cmdel;// absurd!
+			double fG = vv[i] * dmdl - uu[i] * dmdt;
+			dhu[i] = (Fqux_d[i] + Fquy_d[i] - Su_d[xplus + iy*nx] - Fquy_d[ix + yplus*nx]) *cmdel;
+			dhv[i] = (Fqvy_d[i] + Fqvx_d[i] - Sv_d[ix + yplus*nx] - Fqvx_d[xplus + iy*nx]) *cmdel;
+			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+			dhu[i] += hi * (g*hi / 2.0*dmdl + fG*vv[i]);
+			dhv[i] += hi * (g*hi / 2.0*dmdt - fG*uu[i]);
+
+
+
+
+
+
+		}
+	}
+}
+void update_spherical(int nx, int ny, double theta, double dt, double eps, double g, double CFL, double delta,double yo,double Radius, double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
+{
+	int i, xplus, yplus, xminus, yminus;
+
+	double hi;
+
+
+	dtmax =(1.0 / epsilon);
+	double dtmaxtmp = dtmax;
+
+	// calculate gradients
+	gradient(nx, ny, theta, delta, hh, dhdx_d, dhdy_d);
+	gradient(nx, ny, theta, delta, zs, dzsdx_d, dzsdy_d);
+	gradient(nx, ny, theta, delta, uu, dudx_d, dudy_d);
+	gradient(nx, ny, theta, delta, vv, dvdx_d, dvdy_d);
+
+	double cm = 1.0;// 0.1;
+	double fmu = 1.0;
+	double fmv = 1.0;
+	double phi, dphi,y;
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+			i = ix + iy*nx;
+			xplus = min(ix + 1, nx - 1);
+			xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hi = hh[i];
+
+			y = yo + iy*delta / Radius*180.0 / pi;
+
+			phi = y*pi / 180.0;
+
+			dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
+
+			cm = (sin(phi + dphi) - sin(phi - dphi)) / (2.0*dphi);
+
+			fmu = 1.0;
+			fmv = cos(phi);
+
+
+			double hn = hh[xminus + iy*nx];
+
+
+			if (hi > eps || hn > eps)
+			{
+
+				double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+				// along X
+				dx = delta / 2.0;
+				zi = zs[i] - hi;
+
+				//printf("%f\n", zi);
+
+
+				zl = zi - dx*(dzsdx_d[i] - dhdx_d[i]);
+				//printf("%f\n", zl);
+
+				zn = zs[xminus + iy*nx] - hn;
+
+				//printf("%f\n", zn);
+				zr = zn + dx*(dzsdx_d[xminus + iy*nx] - dhdx_d[xminus + iy*nx]);
+
+
+				zlr = max(zl, zr);
+
+				hl = hi - dx*dhdx_d[i];
+				up = uu[i] - dx*dudx_d[i];
+				hp = max(0.0, hl + zl - zlr);
+
+				hr = hn + dx*dhdx_d[xminus + iy*nx];
+				um = uu[xminus + iy*nx] + dx*dudx_d[xminus + iy*nx];
+				hm = max(0.0, hr + zr - zlr);
+
+				//// Reimann solver
+				double fh, fu, fv;
+				double dtmaxf = 1.0 / epsilon;
+
+				//We can now call one of the approximate Riemann solvers to get the fluxes.
+				kurganovd(g, CFL, hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+				fv = (fh > 0.0 ? vv[xminus + iy*nx] + dx*dvdx_d[xminus + iy*nx] : vv[i] - dx*dvdx_d[i])*fh;
+				dtmax_d = dtmaxf;
+				dtmaxtmp = min(dtmax_d, dtmaxtmp);
+				//double cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
+				//double ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
+				//double am = min(up - cpo, um - cmo); am = min(am, 0.0f);
+				//double qm = hm*um, qp = hp*up;
+
+				//double fubis = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
+				/*
+				if (ix == 11 && iy == 0)
+				{
+				printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + g*sq(hm) / 2.0f), -am*(qp*up + g*sq(hp) / 2.0f), (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am),1 / (ap - am));
+				}
+				*/
+				//printf("%f\t%f\t%f\n", x[i], y[i], fh);
+
+
+				//// Topographic term
+
+				/**
+				#### Topographic source term
+
+				In the case of adaptive refinement, care must be taken to ensure
+				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+				double sl = g / 2.0*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				double sr = g / 2.0*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+
+				////Flux update
+
+				Fhu_d[i] = fmu * fh;
+				Fqux_d[i] = fmu * (fu - sl);
+				Su_d[i] = fmu * (fu - sr);
+				Fqvx_d[i] = fmu * fv;
+			}
+			else
+			{
+				Fhu_d[i] = 0.0;
+				Fqux_d[i] = 0.0;
+				Su_d[i] = 0.0;
+				Fqvx_d[i] = 0.0;
+			}
+
+		}
+	}
+	for (int iy = 0; iy < ny; iy++)
+	{
+		for (int ix = 0; ix < nx; ix++)
+		{
+
+			i = ix + iy*nx;
+			xplus = min(ix + 1, nx - 1);
+			xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hi = hh[i];
+
+			double hn = hh[ix + yminus*nx];
+			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+			y = yo + iy*delta/Radius*180.0/pi;
+
+			phi = y*pi / 180.0;
+
+			dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
+
+			cm = (sin(phi + dphi) - sin(phi - dphi)) / (2.0*dphi);
+
+			fmu = 1.0;
+			fmv = cos(phi);
+			
+
+			if (hi > eps || hn > eps)
+			{
+
+
+				//Along Y
+
+				hn = hh[ix + yminus*nx];
+				dx = delta / 2.0;
+				zi = zs[i] - hi;
+				zl = zi - dx*(dzsdy_d[i] - dhdy_d[i]);
+				zn = zs[ix + yminus*nx] - hn;
+				zr = zn + dx*(dzsdy_d[ix + yminus*nx] - dhdy_d[ix + yminus*nx]);
+				zlr = max(zl, zr);
+
+				hl = hi - dx*dhdy_d[i];
+				up = vv[i] - dx*dvdy_d[i];
+				hp = max(0.0, hl + zl - zlr);
+
+				hr = hn + dx*dhdy_d[ix + yminus*nx];
+				um = vv[ix + yminus*nx] + dx*dvdy_d[ix + yminus*nx];
+				hm = max(0.0, hr + zr - zlr);
+
+				//// Reimann solver
+				double fh, fu, fv;
+				double dtmaxf = 1 / (double)epsilon;
+				//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
+				//printf("%f\n", hr);
+				//We can now call one of the approximate Riemann solvers to get the fluxes.
+				kurganovd(g, CFL, hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+				fv = (fh > 0.0 ? uu[ix + yminus*nx] + dx*dudy_d[ix + yminus*nx] : uu[i] - dx*dudy_d[i])*fh;
+				dtmax_d = dtmaxf;
+				dtmaxtmp = min(dtmax_d, dtmaxtmp);
+				//// Topographic term
+
+				/**
+				#### Topographic source term
+
+				In the case of adaptive refinement, care must be taken to ensure
+				well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+				double sl = g / 2.0*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+				double sr = g / 2.0*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+
+				////Flux update
+
+				Fhv_d[i] = fmv * fh;
+				Fqvy_d[i] = fmv * (fu - sl);
+				Sv_d[i] = fmv * (fu - sr);
+				Fquy_d[i] = fmv* fv;
+
+				//printf("%f\t%f\t%f\n", x[i], y[i], Fhv[i]);
+			}
+			else
+			{
+				Fhv_d[i] = 0.0;
+				Fqvy_d[i] = 0.0;
+				Sv_d[i] = 0.0;
+				Fquy_d[i] = 0.0;
 			}
 
 			//printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
@@ -698,18 +964,18 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			yminus = max(iy - 1, 0);
 			hi = hh[i];
 
-			y = yo + iy*delta / Radius*180.0f / pi;
-			float yp = yo + min(iy + 1, ny - 1)*delta / Radius*180.0f / pi;
+			y = yo + iy*delta / Radius*180.0 / pi;
+			double yp = yo + min(iy + 1, ny - 1)*delta / Radius*180.0 / pi;
 
-			phi = y*(float)pi / 180.0f;
+			phi = y*(double)pi / 180.0;
 
-			dphi = delta / (2.0f*Radius);// dy*0.5f*pi/180.0f;
+			dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
 
-			cm = (sinf(phi + dphi) - sinf(phi - dphi)) / (2.0f*dphi);
+			cm = (sin(phi + dphi) - sin(phi - dphi)) / (2.0*dphi);
 
-			fmu = 1.0f;
-			fmv = cosf(phi);
-			float fmvp = cosf(yp*pi/180.0f);
+			fmu = 1.0;
+			fmv = cos(phi);
+			double fmvp = cosf(yp*pi/180.0);
 			////
 			//vector dhu = vector(updates[1 + dimension*l]);
 			//foreach() {
@@ -720,19 +986,19 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 			//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 			
-			float cmdel = 1.0f / (cm * delta);
-			dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdel;
+			double cmdel = 1.0 / (cm * delta);
+			dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdel;
 			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 			//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 			//but fmu is always ==1 event in spherical grids????
 			//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-			float dmdl = (fmu - fmu) *cmdel; 
-			float dmdt = (fmvp - fmv) *cmdel; 
-			float fG = vv[i] * dmdl - uu[i] * dmdt;
-			dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdel;
-			dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdel;
+			double dmdl = (fmu - fmu) *cmdel; 
+			double dmdt = (fmvp - fmv) *cmdel; 
+			double fG = vv[i] * dmdl - uu[i] * dmdt;
+			dhu[i] = (Fqux_d[i] + Fquy_d[i] - Su_d[xplus + iy*nx] - Fquy_d[ix + yplus*nx]) *cmdel;
+			dhv[i] = (Fqvy_d[i] + Fqvx_d[i] - Sv_d[ix + yplus*nx] - Fqvx_d[xplus + iy*nx]) *cmdel;
 			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 			dhu[i] += hi * (g*hi / 2.0f*dmdl + fG*vv[i]);
 			dhv[i] += hi * (g*hi / 2.0f*dmdt - fG*uu[i]);
@@ -747,7 +1013,8 @@ void update_spherical(int nx, int ny, float theta, float dt, float eps, float g,
 }
 
 
-void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo)
+
+template <class T> void advance(int nx, int ny, T dt, T eps, T*zb, T *hh, T *zs, T *uu, T * vv, T * dh, T *dhu, T *dhv, T * &hho, T *&zso, T *&uuo, T *&vvo)
 {
 	//dim3 blockDim(16, 16, 1);
 	//dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
@@ -765,10 +1032,10 @@ void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *u
 		for (int ix = 0; ix < nx; ix++)
 		{
 			int i = ix + iy*nx;
-			float hold = hh[i];
-			float ho, uo, vo;
+			T hold = hh[i];
+			T ho, uo, vo;
 			ho = hold + dt*dh[i];
-			
+
 			zso[i] = zb[i] + ho;
 			if (ho > eps) {
 				//for (int l = 0; l < nl; l++) {
@@ -791,16 +1058,16 @@ void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *u
 			 //for (int l = 0; l < nl; l++) {
 			 //vector uo = vector(output[1 + dimension*l]);
 			 //foreach_dimension()
-				uo = 0.f;
-				vo = 0.f;
+				uo = T();
+				vo = T();
 			}
 
-			
+
 
 			hho[i] = ho;
 			uuo[i] = uo;
 			vvo[i] = vo;
-			
+
 		}
 	}
 
@@ -815,8 +1082,7 @@ void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *u
 
 }
 
-
-void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo)
+template <class T> void cleanup(int nx, int ny, T * hhi, T *zsi, T *uui, T *vvi, T * &hho, T *&zso, T *&uuo, T *&vvo)
 {
 	for (int iy = 0; iy < ny; iy++)
 	{
@@ -952,14 +1218,9 @@ double FlowCPU(Param XParam, double nextoutputtime)
 
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 
-	if (XParam.spherical == 1)
-	{
-		update_spherical(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, (float)XParam.yo, (float)XParam.Radius, hh, zs, uu, vv, dh, dhu, dhv);
-	}
-	else
-	{
-		update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
-	}
+	
+	update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
+	
 	
 	//printf("dtmax=%f\n", dtmax);
 	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
@@ -971,21 +1232,15 @@ double FlowCPU(Param XParam, double nextoutputtime)
 	//if (totaltime>0.0) //Fix this!
 	{
 		//predictor
-		advance(nx, ny, (float)XParam.dt*0.5f, (float)XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+		advance(nx, ny, (float)XParam.dt*0.5f, (float)XParam.eps, zb, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 		//corrector
-		if (XParam.spherical == 1)
-		{
-			update_spherical(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, (float)XParam.yo, (float)XParam.Radius, hho, zso, uuo, vvo, dh, dhu, dhv);
-		}
-		else
-		{
-			update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
-		}
+		update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
+		
 		
 	}
 	//
-	advance(nx, ny, (float) XParam.dt, (float) XParam.eps, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+	advance(nx, ny, (float) XParam.dt, (float) XParam.eps, zb, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
 
 	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	
@@ -997,9 +1252,99 @@ double FlowCPU(Param XParam, double nextoutputtime)
 
 
 }
+double FlowCPUSpherical(Param XParam, double nextoutputtime)
+{
+	//in spherical mode a special correction is made in update and all need to be in double to remove the 
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	//forcing bnd update 
+	//////////////////////////////
+	//flowbnd();
+
+	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
+
+	
+	update_spherical(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.yo, XParam.Radius, hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d);
+	
+
+	//printf("dtmax=%f\n", dtmax);
+	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
+	if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
+	{
+		XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
+	}
+	//printf("dt=%f\n", XParam.dt);
+	//if (totaltime>0.0) //Fix this!
+	{
+		//predictor
+		advance(nx, ny, XParam.dt*0.5, XParam.eps, zb_d,hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d, hho_d, zso_d, uuo_d, vvo_d);
+
+		//corrector
+		update_spherical(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.yo, XParam.Radius, hho_d, zso_d, uuo_d, vvo_d, dh_d, dhu_d, dhv_d);
+		
+
+	}
+	//
+	advance(nx, ny, XParam.dt, XParam.eps, zb_d, hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d, hho_d, zso_d, uuo_d, vvo_d);
+
+	cleanup(nx, ny, hho_d, zso_d, uuo_d, vvo_d, hh_d, zs_d, uu_d, vv_d);
+
+	quadfrictionCPU(nx, ny, XParam.dt, XParam.eps, XParam.cf, hh_d, uu_d, vv_d);
+	//write2varnc(nx, ny, totaltime, hh);
+
+	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
+	return XParam.dt;
+}
+
+double FlowCPUDouble(Param XParam, double nextoutputtime)
+{
+	//in spherical mode a special correction is made in update and all need to be in double to remove the 
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	//forcing bnd update 
+	//////////////////////////////
+	//flowbnd();
+
+	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 
 
-void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+	updateD(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d);
+
+
+	//printf("dtmax=%f\n", dtmax);
+	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
+	if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
+	{
+		XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
+	}
+	//printf("dt=%f\n", XParam.dt);
+	//if (totaltime>0.0) //Fix this!
+	{
+		//predictor
+		advance(nx, ny, XParam.dt*0.5, XParam.eps, zb_d, hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d, hho_d, zso_d, uuo_d, vvo_d);
+
+		//corrector
+		updateD(nx, ny, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, hho_d, zso_d, uuo_d, vvo_d, dh_d, dhu_d, dhv_d);
+
+
+	}
+	//
+	advance(nx, ny, XParam.dt, XParam.eps, zb_d, hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d, hho_d, zso_d, uuo_d, vvo_d);
+
+	cleanup(nx, ny, hho_d, zso_d, uuo_d, vvo_d, hh_d, zs_d, uu_d, vv_d);
+
+	quadfrictionCPU(nx, ny, XParam.dt, XParam.eps, XParam.cf, hh_d, uu_d, vv_d);
+	//write2varnc(nx, ny, totaltime, hh);
+
+	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
+	return XParam.dt;
+
+
+}
+
+void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int iy = 0; iy < ny; iy++)
@@ -1035,8 +1380,46 @@ void leftdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, floa
 	}
 }
 
+void leftdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
+{
+	double zsbnd;
+	for (int iy = 0; iy < ny; iy++)
+	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(iy - iprev));
+		}
+		int ix = 0;
+		int i = ix + iy*nx;
+		int xplus;
 
-void rightdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+		//if (ix == 0 && iy < ny)
+		{
+			xplus = min(ix + 1, nx - 1);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			uu[i] = -2.0*(sqrt(g*max(hh[xplus + iy*nx], 0.0)) - sqrt(g*max(zsbnd - zb[xplus + iy*nx], 0.0))) + uu[xplus + iy*nx];
+			vv[i] = 0.0;
+			//if (iy == 0)
+			//{
+			//	printf("zsbnd=%f\t", zsbnd);
+			//}
+		}
+
+	}
+}
+
+
+
+
+void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int iy = 0; iy < ny; iy++)
@@ -1067,8 +1450,39 @@ void rightdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, flo
 
 	}
 }
+void rightdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
+{
+	double zsbnd;
+	for (int iy = 0; iy < ny; iy++)
+	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(iy - iprev));
+		}
+		int ix = nx - 1;
+		int i = ix + iy*nx;
+		int xminus;
 
-void topdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+		if (iy < ny)
+		{
+			xminus = max(ix - 1, 0);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			uu[i] = +2.0*(sqrt(g*max(hh[xminus + iy*nx], 0.0)) - sqrt(g*max(zsbnd - zb[xminus + iy*nx], 0.0))) + uu[xminus + iy*nx];
+			vv[i] = 0.0;
+		}
+
+	}
+}
+
+void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int ix = 0; ix < nx; ix++)
@@ -1104,8 +1518,43 @@ void topdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float
 	}
 }
 
+void topdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
+{
+	double zsbnd;
+	for (int ix = 0; ix < nx; ix++)
+	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(ix - iprev));
+		}
+		int iy = ny - 1;
+		int i = ix + iy*nx;
+		int yminus;
 
-void botdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+		if (iy < ny)
+		{
+			//xminus = max(ix - 1, 0);
+			//xplus = min(ix + 1, nx - 1);
+			//xminus = max(ix - 1, 0);
+			//yplus = min(iy + 1, ny - 1);
+			yminus = max(iy - 1, 0);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			vv[i] = +2.0*(sqrt(g*max(hh[ix + yminus*nx], 0.0)) - sqrt(g*max(zsbnd - zb[ix + yminus*nx], 0.0))) + vv[ix + yminus*nx];
+			uu[i] = 0.0;
+		}
+
+	}
+}
+
+void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int ix = 0; ix < nx; ix++)
@@ -1141,7 +1590,44 @@ void botdirichletCPU(int nx, int ny, float g, std::vector<float> zsbndvec, float
 	}
 }
 
-void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, float *uu, float *vv)
+void botdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
+{
+	double zsbnd;
+	for (int ix = 0; ix < nx; ix++)
+	{
+		if (zsbndvec.size() == 1)
+		{
+			zsbnd = zsbndvec[0];
+		}
+		else
+		{
+			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+			int inext = iprev + 1;
+			// here interp time is used to interpolate to the right node rather than in time...
+			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(ix - iprev));
+		}
+		int iy = 0;
+		int i = ix + iy*nx;
+		int yplus;
+
+		if (iy < ny)
+		{
+			//xminus = max(ix - 1, 0);
+			//xplus = min(ix + 1, nx - 1);
+			//xminus = max(ix - 1, 0);
+			yplus = min(iy + 1, ny - 1);
+			//yminus = max(iy - 1, 0);
+			hh[i] = zsbnd - zb[i];
+			zs[i] = zsbnd;
+			vv[i] = -2.0*(sqrt(g*max(hh[ix + yplus*nx], 0.0)) - sqrt(g*max(zsbnd - zb[ix + yplus*nx], 0.0))) + vv[ix + yplus*nx];
+			uu[i] = 0.0;
+		}
+
+	}
+}
+
+
+template <class T> void quadfrictionCPU(int nx, int ny, T dt, T eps, T cf, T *hh, T *uu, T *vv)
 {
 	
 
@@ -1154,11 +1640,11 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 			
 
 			
-				float hhi = hh[i];
+				T hhi = hh[i];
 				if (hhi > eps)
 				{
-					float normu = uu[i] * uu[i] + vv[i] * vv[i];
-					float frc = (1.0f + dt*cf*(normu) / hhi);
+					T normu = uu[i] * uu[i] + vv[i] * vv[i];
+					T frc = (1.0f + dt*cf*(normu) / hhi);
 					//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 					uu[i] = uu[i] / frc;
 					vv[i] = vv[i] / frc;
@@ -1170,7 +1656,60 @@ void quadfrictionCPU(int nx, int ny, float dt, float eps, float cf, float *hh, f
 
 }
 
-void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+void noslipbndLCPU(Param XParam)
+{
+	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+	{
+		noslipbndLeftCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+	}
+	else
+	{
+		// Left Wall
+		noslipbndLeftCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+	}
+}
+void noslipbndRCPU(Param XParam)
+{
+	//
+	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+	{
+		noslipbndRightCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+	}
+	else
+	{
+		// Left Wall
+		noslipbndRightCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+	}
+}
+void noslipbndTCPU(Param XParam)
+{
+	//
+	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+	{
+		//
+		noslipbndTopCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+	}
+	else
+	{
+		// Top Wall
+		noslipbndTopCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+	}
+}
+void noslipbndBCPU(Param XParam)
+{
+	//
+	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+	{
+		noslipbndBotCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+	}
+	else
+	{
+		// Bottom Wall
+		noslipbndBotCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+	}
+}
+
+template <class T> void noslipbndLeftCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 	int i,ix;
 	int  xplus;
@@ -1193,7 +1732,7 @@ void noslipbndLeftCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh
 	}
 }
 
-void noslipbndRightCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+template <class T> void noslipbndRightCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
 	int i,ix;
@@ -1220,7 +1759,7 @@ void noslipbndRightCPU(int nx, int ny, float eps, float *zb, float *zs, float *h
 	}
 
 }
-void noslipbndTopCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+template <class T> void noslipbndTopCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
 	int i, iy;
@@ -1250,7 +1789,7 @@ void noslipbndTopCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh,
 
 }
 
-void noslipbndBotCPU(int nx, int ny, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+template <class T> void noslipbndBotCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
 	int i, iy;
@@ -1327,66 +1866,9 @@ void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, 
 	}
 
 }
-void warmstart(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightbnd, std::vector<SLTS> topbnd, std::vector<SLTS> botbnd)
-{
-	int nx = XParam.nx;
-	int ny = XParam.ny;
-	float zsbnd;
 
 
-
-
-	if (!leftWLbnd.empty() && XParam.left == 1)
-	{
-		
-		int SLstepinbnd = 1;
-
-
-
-		// Do this for all the corners
-		//Needs limiter in case WLbnd is empty
-		double difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-		while (difft < 0.0)
-		{
-			SLstepinbnd++;
-			difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
-		}
-		std::vector<float> leftbnd;
-		for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
-		{
-			leftbnd.push_back((float) interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
-
-		}
-
-		for (int iy = 0; iy < ny; iy++)
-		{
-			if (leftbnd.size() == 1)
-			{
-				zsbnd = leftbnd[0];
-			}
-			else
-			{
-				int iprev = min(max((int)ceil(iy / (1 / (leftbnd.size() - 1))), 0), (int)leftbnd.size() - 2);
-				int inext = iprev + 1;
-				// here interp time is used to interpolate to the right node rather than in time...
-				zsbnd = (float) interptime(leftbnd[inext], leftbnd[iprev], (float)(inext - iprev), (float)(iy - iprev));
-			}
-			int ix = 0;
-			int i = ix + iy*nx;
-			
-			
-			if (ix == 0 && iy < ny)
-			{
-
-				hh[i] = zsbnd - zb[i];
-				zs[i] = zsbnd;
-
-			}
-
-		}
-	}
-}
+//Functions below use update global variable so we need two copies for the float and double cases
 
 void AddmeanCPU(Param XParam)
 {
@@ -1438,6 +1920,58 @@ void AddmeanCPU(Param XParam)
 
 
 }
+
+void AddmeanCPUD(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	if (XParam.outhhmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmean_d[i + j*nx] = hhmean_d[i + j*nx] + hh_d[i + j*nx];
+			}
+		}
+	}
+
+	if (XParam.outzsmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmean_d[i + j*nx] = zsmean_d[i + j*nx] + zs_d[i + j*nx];
+			}
+		}
+	}
+
+	if (XParam.outuumean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumean_d[i + j*nx] = uumean_d[i + j*nx] + uu_d[i + j*nx];
+			}
+		}
+	}
+	if (XParam.outvvmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmean_d[i + j*nx] = vvmean_d[i + j*nx] + vv_d[i + j*nx];
+			}
+		}
+	}
+
+
+}
+
 void DivmeanCPU(Param XParam, float nstep)
 {
 	int nx = XParam.nx;
@@ -1482,6 +2016,57 @@ void DivmeanCPU(Param XParam, float nstep)
 			for (int i = 0; i < nx; i++)
 			{
 				vvmean[i + j*nx] = vvmean[i + j*nx] / nstep;
+			}
+		}
+	}
+
+
+}
+
+void DivmeanCPUD(Param XParam, float nstep)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	if (XParam.outhhmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmean_d[i + j*nx] = hhmean_d[i + j*nx] / nstep;
+			}
+		}
+	}
+
+	if (XParam.outzsmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmean_d[i + j*nx] = zsmean_d[i + j*nx] / nstep;
+			}
+		}
+	}
+
+	if (XParam.outuumean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumean_d[i + j*nx] = uumean_d[i + j*nx] / nstep;
+			}
+		}
+	}
+	if (XParam.outvvmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmean_d[i + j*nx] = vvmean_d[i + j*nx] / nstep;
 			}
 		}
 	}
@@ -1540,6 +2125,57 @@ void ResetmeanCPU(Param XParam)
 
 }
 
+void ResetmeanCPUD(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	if (XParam.outhhmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmean_d[i + j*nx] = 0.0;
+			}
+		}
+	}
+
+	if (XParam.outzsmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmean_d[i + j*nx] = 0.0;
+			}
+		}
+	}
+
+	if (XParam.outuumean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumean_d[i + j*nx] = 0.0;
+			}
+		}
+	}
+	if (XParam.outvvmean == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmean_d[i + j*nx] = 0.0;
+			}
+		}
+	}
+
+
+}
+
 void maxallCPU(Param XParam)
 {
 	int nx = XParam.nx;
@@ -1586,6 +2222,54 @@ void maxallCPU(Param XParam)
 		}
 	}
 }
+
+void maxallCPUD(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	if (XParam.outhhmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				hhmax_d[i + j*nx] = max(hhmax_d[i + j*nx], hh_d[i + j*nx]);
+			}
+		}
+	}
+	if (XParam.outzsmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				zsmax_d[i + j*nx] = max(zsmax_d[i + j*nx], zs_d[i + j*nx]);
+			}
+		}
+	}
+	if (XParam.outuumax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				uumax_d[i + j*nx] = max(uumax_d[i + j*nx], uu_d[i + j*nx]);
+			}
+		}
+	}
+	if (XParam.outvvmax == 1)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				vvmax_d[i + j*nx] = max(vvmax_d[i + j*nx], vv_d[i + j*nx]);
+			}
+		}
+	}
+}
+
 void CalcVort(Param XParam)
 {
 	int nx = XParam.nx;
@@ -1595,6 +2279,19 @@ void CalcVort(Param XParam)
 		for (int i = 0; i < nx; i++)
 		{
 			vort[i + j*nx] = dvdy[i + j*nx] - dudx[i + j*nx];
+		}
+	}
+}
+
+void CalcVortD(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+	for (int j = 0; j < ny; j++)
+	{
+		for (int i = 0; i < nx; i++)
+		{
+			vort_d[i + j*nx] = dvdy_d[i + j*nx] - dudx_d[i + j*nx];
 		}
 	}
 }
