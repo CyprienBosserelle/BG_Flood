@@ -3,9 +3,9 @@
 #define CSVGPU_H
 // includes, system
 
-#define pi 3.14159265f
+#define pi 3.14159265
 
-#define epsilone 1e-30f
+#define epsilone 1e-30
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
