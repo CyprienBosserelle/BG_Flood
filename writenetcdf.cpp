@@ -587,20 +587,21 @@ extern "C" void writencvarstepD(std::string outfile, int smallnc, float scalefac
 	start[0] = nrec - 1;
 	count[0] = 1;
 
+	nx = (int)count[ndims - 1];
+	ny = (int)count[ndims - 2];//yuk!
 
 	var = (float *)malloc(nx*ny * sizeof(float));
 	for (int i = 0; i < nx; i++)
 	{
 		for (int j = 0; j < ny; j++)
 		{
-			var[i + nx*j] = float(var_d[i + nx*j]);
+			var[i + nx*j] = (float)var_d[i + nx*j];
 		}
 	}
 
 	if (smallnc > 0)
 	{
-		nx = (int)count[ndims - 1];
-		ny = (int)count[ndims - 2];//yuk!
+		
 
 								   //printf("nx=%d\tny=%d\n", nx, ny);
 								   //If saving as short than we first need to scale and shift the data

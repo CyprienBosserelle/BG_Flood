@@ -987,7 +987,7 @@ void update_spherical(int nx, int ny, double theta, double dt, double eps, doubl
 			//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 			
 			double cmdel = 1.0 / (cm * delta);
-			dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i]) *cmdel;
+			dh[i] = -1.0*(Fhu_d[xplus + iy*nx] - Fhu_d[i] + Fhv_d[ix + yplus*nx] - Fhv_d[i]) *cmdel;
 			//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
@@ -1000,8 +1000,8 @@ void update_spherical(int nx, int ny, double theta, double dt, double eps, doubl
 			dhu[i] = (Fqux_d[i] + Fquy_d[i] - Su_d[xplus + iy*nx] - Fquy_d[ix + yplus*nx]) *cmdel;
 			dhv[i] = (Fqvy_d[i] + Fqvx_d[i] - Sv_d[ix + yplus*nx] - Fqvx_d[xplus + iy*nx]) *cmdel;
 			//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
-			dhu[i] += hi * (g*hi / 2.0f*dmdl + fG*vv[i]);
-			dhv[i] += hi * (g*hi / 2.0f*dmdt - fG*uu[i]);
+			dhu[i] += hi * (g*hi / 2.0*dmdl + fG*vv[i]);
+			dhv[i] += hi * (g*hi / 2.0*dmdt - fG*uu[i]);
 
 
 
