@@ -173,12 +173,12 @@ void kurganovf(float g, float CFL,float hm, float hp, float um, float up, float 
 void kurganovd(double g, double CFL, double hm, double hp, double um, double up, double Delta, double * fh, double * fq, double * dtmax)
 {
 	double eps = (double)epsilon; //this epsilon doesn't need to be a gloabl variable
-	double cp = sqrtf(g*hp), cm = sqrtf(g*hm);
+	double cp = sqrt(g*hp), cm = sqrt(g*hm);
 	double ap = max(up + cp, um + cm); ap = max(ap, 0.0);
 	double am = min(up - cp, um - cm); am = min(am, 0.0);
 	double qm = hm*um, qp = hp*up;
 	double a = max(ap, -am);
-	double ad = 1.0f / (ap - am);
+	double ad = 1.0 / (ap - am);
 	if (a > eps) {
 		*fh = (ap*qm - am*qp + ap*am*(hp - hm)) *ad; // (4.5) of [1]
 		*fq = (ap*(qm*um + g*sq(hm) / 2.0) - am*(qp*up + g*sq(hp) / 2.0) +
@@ -188,7 +188,7 @@ void kurganovd(double g, double CFL, double hm, double hp, double um, double up,
 			*dtmax = dt;
 	}
 	else
-		*fh = *fq = 0.0f;
+		*fh = *fq = 0.0;
 }
 
 void neumannbnd(int nx, int ny, double*a)
