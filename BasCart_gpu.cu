@@ -120,6 +120,7 @@ double * dummy_d;
 std::map<std::string, float *> OutputVarMapCPU;
 std::map<std::string, double *> OutputVarMapCPUD;
 std::map<std::string, float *> OutputVarMapGPU;
+std::map<std::string, double *> OutputVarMapGPUD;
 std::map<std::string, int> OutputVarMaplen;
 
 cudaArray* leftWLS_gp; // Cuda array to pre-store HD vel data before converting to textures
@@ -1536,6 +1537,215 @@ double FlowGPUSpherical(Param XParam, double nextoutputtime)
 }
 
 
+double FlowGPUDouble(Param XParam, double nextoutputtime)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	const int num_streams = 2;
+
+	cudaStream_t streams[num_streams];
+	for (int i = 0; i < num_streams; i++)
+	{
+		CUDA_CHECK(cudaStreamCreate(&streams[i]));
+	}
+
+
+
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+
+
+	dtmax = (float)(1.0 / epsilon);
+	//float dtmaxtmp = dtmax;
+
+	resetdtmax << <gridDim, blockDim, 0, streams[0] >> > (nx, ny, dtmax_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	//update step 1
+
+
+
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, hh_gd, dhdx_gd, dhdy_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, zs_gd, dzsdx_gd, dzsdy_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, uu_gd, dudx_gd, dudy_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, vv_gd, dvdx_gd, dvdy_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
+	
+	
+		
+	updateKurgXD << <gridDim, blockDim, 0, streams[0] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL,  hh_gd, zs_gd, uu_gd, vv_gd, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd, Fhu_gd, Fqux_gd, Fqvx_gd, Su_gd, dtmax_gd);
+
+	updateKurgYD << <gridDim, blockDim, 0, streams[1] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL,  hh_gd, zs_gd, uu_gd, vv_gd, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd, Fhv_gd, Fqvy_gd, Fquy_gd, Sv_gd, dtmax_gd);
+
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
+
+	/////////////////////////////////////////////////////
+	// Reduction of dtmax
+	/////////////////////////////////////////////////////
+
+	// copy from GPU and do the reduction on the CPU  ///LAME!
+
+
+	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
+	// This was successfully tested with a range of grid size
+	//reducemax3 << <gridDimLine, blockDimLine, 64*sizeof(float) >> >(dtmax_g, arrmax_g, nx*ny)
+	int s = nx*ny;
+	int maxThreads = 256;
+	int threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+	int blocks = (s + (threads * 2 - 1)) / (threads * 2);
+	int smemSize = (threads <= 32) ? 2 * threads * sizeof(double) : threads * sizeof(double);
+	dim3 blockDimLine(threads, 1, 1);
+	dim3 gridDimLine(blocks, 1, 1);
+
+	double mindtmaxB;
+
+	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (dtmax_gd, arrmax_gd, nx*ny);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	s = gridDimLine.x;
+	while (s > 1)//cpuFinalThreshold
+	{
+		threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+		blocks = (s + (threads * 2 - 1)) / (threads * 2);
+
+		smemSize = (threads <= 32) ? 2 * threads * sizeof(double) : threads * sizeof(double);
+
+		dim3 blockDimLineS(threads, 1, 1);
+		dim3 gridDimLineS(blocks, 1, 1);
+
+		CUDA_CHECK(cudaMemcpy(dtmax_gd, arrmax_gd, s * sizeof(float), cudaMemcpyDeviceToDevice));
+
+		reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (dtmax_gd, arrmax_gd, s);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		s = (s + (threads * 2 - 1)) / (threads * 2);
+	}
+
+
+	CUDA_CHECK(cudaMemcpy(dummy_d, arrmax_gd, 32 * sizeof(float), cudaMemcpyDeviceToHost));
+	mindtmaxB = dummy_d[0];
+	/*
+	//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
+
+	for (int i = 0; i < 32; i++)
+	{
+	mindtmaxB = min(dummy[i], mindtmaxB);
+	printf("dt=%f\n", dummy[i]);
+
+	}
+	*/
+
+
+	//float diffdt = mindtmaxB - mindtmax;
+	XParam.dt = mindtmaxB;
+	if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
+	{
+		XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
+	}
+	//printf("dt=%f\n", XParam.dt);
+
+	
+		//if spherical corrdinate use this kernel with the right corrections
+	updateEVD << <gridDim, blockDim, 0 >> > (nx, ny, XParam.delta, XParam.g, hh_gd, uu_gd, vv_gd, Fhu_gd, Fhv_gd, Su_gd, Sv_gd, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd, dh_gd, dhu_gd, dhv_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	
+
+
+	//predictor (advance 1/2 dt)
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, XParam.dt*0.5, XParam.eps, hh_gd, zb_gd, uu_gd, vv_gd, dh_gd, dhu_gd, dhv_gd, zso_gd, hho_gd, uuo_gd, vvo_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//corrector setp
+	//update again
+	// calculate gradients
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, hho_g, dhdy_g);
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, hho_gd, dhdx_gd, dhdy_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, zso_g, dzsdy_g);
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, zso_gd, dzsdx_gd, dzsdy_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, uuo_g, dudy_g);
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[0] >> >(nx, ny, XParam.theta, XParam.delta, uuo_gd, dudx_gd, dudy_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdx_g);
+	//gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, XParam.theta, XParam.delta, vvo_g, dvdy_g);
+
+	gradientGPUXY << <gridDim, blockDim, 0, streams[1] >> >(nx, ny, XParam.theta, XParam.delta, vvo_gd, dvdx_gd, dvdy_gd);
+
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	
+	updateKurgXD << <gridDim, blockDim, 0, streams[0] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_gd, zso_gd, uuo_gd, vvo_gd, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd, Fhu_gd, Fqux_gd, Fqvx_gd, Su_gd, dtmax_gd);
+
+	updateKurgYD << <gridDim, blockDim, 0, streams[1] >> > (nx, ny, XParam.delta, XParam.g, XParam.eps, XParam.CFL, hho_gd, zso_gd, uuo_gd, vvo_gd, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd, Fhv_gd, Fqvy_gd, Fquy_gd, Sv_gd, dtmax_gd);
+
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
+	// no reduction of dtmax during the corrector step
+
+
+	
+	
+	updateEVD << <gridDim, blockDim, 0 >> > (nx, ny, XParam.delta, XParam.g,  hho_gd, uuo_gd, vvo_gd, Fhu_gd, Fhv_gd, Su_gd, Sv_gd, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd, dh_gd, dhu_gd, dhv_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	
+
+	//
+	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, XParam.dt, XParam.eps, hh_gd, zb_gd, uu_gd, vv_gd, dh_gd, dhu_gd, dhv_gd, zso_gd, hho_gd, uuo_gd, vvo_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
+	cleanupGPU << <gridDim, blockDim, 0 >> >(nx, ny, hho_gd, zso_gd, uuo_gd, vvo_gd, hh_gd, zs_gd, uu_gd, vv_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//Bottom friction
+	quadfriction << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, XParam.cf, hh_gd, uu_gd, vv_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CUDA_CHECK(cudaStreamDestroy(streams[0]));
+	CUDA_CHECK(cudaStreamDestroy(streams[1]));
+
+	// Impose no slip condition by default
+	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	return XParam.dt;
+}
+
 
 void meanmaxvarGPU(Param XParam)
 {
@@ -1834,7 +2044,15 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		}
 		else
 		{
-			XParam.dt = FlowGPU(XParam, nextoutputtime);
+			if(XParam.doubleprecision==1)
+			{
+				XParam.dt = FlowGPUDouble(XParam, nextoutputtime);
+			}
+			else
+			{
+				XParam.dt = FlowGPU(XParam, nextoutputtime);
+			}
+			
 		}
 		
 		
@@ -1843,7 +2061,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		nstep++;
 		
 		// Do Sum & Max variables Here
-		if (XParam.spherical == 1)
+		if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 		{
 			meanmaxvarGPUD(XParam);
 		}
@@ -1867,7 +2085,15 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 				stepread.vv = 0.0;
 				zsAllout[o].push_back(stepread);
 
-				storeTSout << <gridDim, blockDim, 0 >> > (XParam.nx, XParam.ny, (int) XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, zs_g, hh_g, uu_g, vv_g, TSstore_g);
+				if (XParam.spherical == 1 || XParam.doubleprecision == 1)
+				{
+					storeTSout << <gridDim, blockDim, 0 >> > (XParam.nx, XParam.ny, (int)XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, zs_gd, hh_gd, uu_gd, vv_gd, TSstore_gd);
+				}
+				else
+				{
+					storeTSout << <gridDim, blockDim, 0 >> > (XParam.nx, XParam.ny, (int)XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, zs_g, hh_g, uu_g, vv_g, TSstore_g);
+				}
+				
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			nTSsteps++;
@@ -1875,24 +2101,51 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			if ((nTSsteps+1)*XParam.TSnodesout.size() * 4 > 2048 || XParam.endtime-XParam.totaltime <= XParam.dt*0.00001f)
 			{
 				//Flush
-				CUDA_CHECK(cudaMemcpy(TSstore, TSstore_g, 2048 * sizeof(float), cudaMemcpyDeviceToHost));
-				for (int o = 0; o < XParam.TSnodesout.size(); o++)
+				if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 				{
-					fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
-					for (int n = 0; n < nTSsteps; n++)
+					CUDA_CHECK(cudaMemcpy(TSstore_d, TSstore_gd, 2048 * sizeof(double), cudaMemcpyDeviceToHost));
+					for (int o = 0; o < XParam.TSnodesout.size(); o++)
 					{
-						//
-						
-						
-							fprintf(fsSLTS, "%f\t%.4f\t%.4f\t%.4f\t%.4f\n", zsAllout[o][n].time, TSstore[1 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[0 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[2 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[3 + o * 4 + n*XParam.TSnodesout.size() * 4]);
-						
-						
+						fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
+						for (int n = 0; n < nTSsteps; n++)
+						{
+							//
+
+
+							fprintf(fsSLTS, "%f\t%.4f\t%.4f\t%.4f\t%.4f\n", zsAllout[o][n].time, TSstore_d[1 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore_d[0 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore_d[2 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore_d[3 + o * 4 + n*XParam.TSnodesout.size() * 4]);
+
+
+						}
+						fclose(fsSLTS);
+						//reset zsout
+						zsAllout[o].clear();
 					}
-					fclose(fsSLTS);
-					//reset zsout
-					zsAllout[o].clear();
+					nTSsteps = 0;
 				}
-				nTSsteps = 0;
+				else
+				{
+
+					CUDA_CHECK(cudaMemcpy(TSstore, TSstore_g, 2048 * sizeof(float), cudaMemcpyDeviceToHost));
+					for (int o = 0; o < XParam.TSnodesout.size(); o++)
+					{
+						fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
+						for (int n = 0; n < nTSsteps; n++)
+						{
+							//
+
+
+							fprintf(fsSLTS, "%f\t%.4f\t%.4f\t%.4f\t%.4f\n", zsAllout[o][n].time, TSstore[1 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[0 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[2 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[3 + o * 4 + n*XParam.TSnodesout.size() * 4]);
+
+
+						}
+						fclose(fsSLTS);
+						//reset zsout
+						zsAllout[o].clear();
+					}
+					nTSsteps = 0;
+				}
+
+				
 
 			}
 			
@@ -1901,7 +2154,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 
 		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
 		{
-			if (XParam.spherical == 1)
+			if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 			{
 				DivmeanvarGPUD(XParam, nstep);
 
@@ -1969,16 +2222,24 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			write_text_to_log_file("Writing outputs, totaltime: " + std::to_string(XParam.totaltime) + ", Mean dt= " + std::to_string(XParam.outputtimestep / nstep));
 
 			//.Reset Avg Variables
-			ResetmeanvarGPU(XParam);
+			if (XParam.spherical == 1 || XParam.doubleprecision == 1)
+			{
+				ResetmeanvarGPUD(XParam);
+			}
+			else
+			{
+				ResetmeanvarGPU(XParam);
+			}
+			
 
 
 			//
 
 			// Reset nstep
 			nstep = 0;
-		}
+		} // End of output part
 
-	}
+	} //Main while loop
 }
 
 
@@ -3449,71 +3710,85 @@ int main(int argc, char **argv)
 	OutputVarMapCPU["zb"] = zb;
 	OutputVarMapCPUD["zb"] = zb_d;
 	OutputVarMapGPU["zb"] = zb_g;
+	OutputVarMapGPUD["zb"] = zb_gd;
 	OutputVarMaplen["zb"] = nx*ny;
 
 	OutputVarMapCPU["uu"] = uu;
 	OutputVarMapCPUD["uu"] = uu_d;
 	OutputVarMapGPU["uu"] = uu_g;
+	OutputVarMapGPUD["uu"] = uu_gd;
 	OutputVarMaplen["uu"] = nx*ny;
 
 	OutputVarMapCPU["vv"] = vv;
 	OutputVarMapCPUD["vv"] = vv_d;
 	OutputVarMapGPU["vv"] = vv_g;
+	OutputVarMapGPUD["vv"] = vv_gd;
 	OutputVarMaplen["vv"] = nx*ny;
 
 	OutputVarMapCPU["zs"] = zs;
 	OutputVarMapCPUD["zs"] = zs_d;
 	OutputVarMapGPU["zs"] = zs_g;
+	OutputVarMapGPUD["zs"] = zs_gd;
 	OutputVarMaplen["zs"] = nx*ny;
 
 	OutputVarMapCPU["hh"] = hh;
 	OutputVarMapCPUD["hh"] = hh_d;
 	OutputVarMapGPU["hh"] = hh_g;
+	OutputVarMapGPUD["hh"] = hh_gd;
 	OutputVarMaplen["hh"] = nx*ny;
 
 	OutputVarMapCPU["hhmean"] = hhmean;
 	OutputVarMapCPUD["hhmean"] = hhmean_d;
 	OutputVarMapGPU["hhmean"] = hhmean_g;
+	OutputVarMapGPUD["hhmean"] = hhmean_gd;
 	OutputVarMaplen["hhmean"] = nx*ny;
 
 	OutputVarMapCPU["hhmax"] = hhmax;
 	OutputVarMapCPUD["hhmax"] = hhmax_d;
 	OutputVarMapGPU["hhmax"] = hhmax_g;
+	OutputVarMapGPUD["hhmax"] = hhmax_gd;
 	OutputVarMaplen["hhmax"] = nx*ny;
 
 	OutputVarMapCPU["zsmean"] = zsmean;
 	OutputVarMapCPUD["zsmean"] = zsmean_d;
 	OutputVarMapGPU["zsmean"] = zsmean_g;
+	OutputVarMapGPUD["zsmean"] = zsmean_gd;
 	OutputVarMaplen["zsmean"] = nx*ny;
 
 	OutputVarMapCPU["zsmax"] = zsmax;
 	OutputVarMapCPUD["zsmax"] = zsmax_d;
 	OutputVarMapGPU["zsmax"] = zsmax_g;
+	OutputVarMapGPUD["zsmax"] = zsmax_gd;
 	OutputVarMaplen["zsmax"] = nx*ny;
 
 	OutputVarMapCPU["uumean"] = uumean;
 	OutputVarMapCPUD["uumean"] = uumean_d;
 	OutputVarMapGPU["uumean"] = uumean_g;
+	OutputVarMapGPUD["uumean"] = uumean_gd;
 	OutputVarMaplen["uumean"] = nx*ny;
 
 	OutputVarMapCPU["uumax"] = uumax;
 	OutputVarMapCPUD["uumax"] = uumax_d;
 	OutputVarMapGPU["uumax"] = uumax_g;
+	OutputVarMapGPUD["uumax"] = uumax_gd;
 	OutputVarMaplen["uumax"] = nx*ny;
 
 	OutputVarMapCPU["vvmean"] = vvmean;
 	OutputVarMapCPUD["vvmean"] = vvmean_d;
 	OutputVarMapGPU["vvmean"] = vvmean_g;
+	OutputVarMapGPUD["vvmean"] = vvmean_gd;
 	OutputVarMaplen["vvmean"] = nx*ny;
 
 	OutputVarMapCPU["vvmax"] = vvmax;
 	OutputVarMapCPUD["vvmax"] = vvmax_d;
 	OutputVarMapGPU["vvmax"] = vvmax_g;
+	OutputVarMapGPUD["vvmax"] = vvmax_gd;
 	OutputVarMaplen["vvmax"] = nx*ny;
 
 	OutputVarMapCPU["vort"] = vort;
 	OutputVarMapCPUD["vort"] = vort_d;
 	OutputVarMapGPU["vort"] = vort_g;
+	OutputVarMapGPUD["vort"] = vort_gd;
 	OutputVarMaplen["vort"] = nx*ny;
 
 
