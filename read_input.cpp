@@ -72,7 +72,7 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 			}
 
 
-			slbndline.time = std::stof(lineelements[0]);
+			slbndline.time = std::stod(lineelements[0]);
 
 			for (int n = 1; n < lineelements.size(); n++)
 			{
@@ -254,8 +254,8 @@ Param readparamstr(std::string line, Param param)
 	{
 		std::vector<std::string> nodes = split(parametervalue, ',');
 		TSnode node;
-		node.x = std::stof(nodes[0]);
-		node.y = std::stof(nodes[1]);
+		node.x = std::stod(nodes[0]);
+		node.y = std::stod(nodes[1]);
 
 		//i and j are calculated in the Sanity check
 

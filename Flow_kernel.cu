@@ -2177,7 +2177,7 @@ __global__ void resetmax_var(int nx, int ny, T * Varmax)
 	unsigned int i = ix + iy*nx;
 	if (ix < nx && iy < ny)
 	{
-		Varmax[i] = T(-1.0*epsilone);
+		Varmax[i] = T(-1.0/epsilone);
 	}
 }
 
