@@ -1341,7 +1341,7 @@ double FlowGPUSpherical(Param XParam, double nextoutputtime)
 
 
 	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
-	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	dim3 gridDim(ceil((nx*1.0) / blockDim.x), ceil((ny*1.0) / blockDim.y), 1);
 
 
 	dtmax = (float)(1.0 / epsilon);
@@ -1421,7 +1421,7 @@ double FlowGPUSpherical(Param XParam, double nextoutputtime)
 		dim3 blockDimLineS(threads, 1, 1);
 		dim3 gridDimLineS(blocks, 1, 1);
 
-		CUDA_CHECK(cudaMemcpy(dtmax_gd, arrmax_gd, s * sizeof(float), cudaMemcpyDeviceToDevice));
+		CUDA_CHECK(cudaMemcpy(dtmax_gd, arrmax_gd, s * sizeof(double), cudaMemcpyDeviceToDevice));
 
 		reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (dtmax_gd, arrmax_gd, s);
 		CUDA_CHECK(cudaDeviceSynchronize());
@@ -1430,7 +1430,7 @@ double FlowGPUSpherical(Param XParam, double nextoutputtime)
 	}
 
 
-	CUDA_CHECK(cudaMemcpy(dummy_d, arrmax_gd, 32 * sizeof(float), cudaMemcpyDeviceToHost));
+	CUDA_CHECK(cudaMemcpy(dummy_d, arrmax_gd, 32 * sizeof(double), cudaMemcpyDeviceToHost));
 	mindtmaxB = dummy_d[0];
 	/*
 	//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
