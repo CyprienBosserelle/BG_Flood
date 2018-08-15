@@ -789,10 +789,10 @@ __global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double ep
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
 
-			ap = max(max(up*1.0 + cp*1.0, um*1.0 + cmo*1.0), 0.0);
+			ap = max(max(up + cp, um + cmo), 0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up*1.0 - cp*1.0, um*1.0 - cmo*1.0), 0.0);
+			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
 			qm = hm*um;
@@ -1057,7 +1057,7 @@ __global__ void updateKurgYD(int nx, int ny, double delta, double g, double eps,
 		if (hi > eps || hn > eps)
 		{
 			hn = hh[ix + yminus*nx];
-			dx = delta / 2.;
+			dx = delta / 2.0;
 			zi = zs[i] - hi;
 			zl = zi - dx*(dzsdy[i] - dhdyi);
 			zn = zs[ix + yminus*nx] - hn;
@@ -1228,10 +1228,10 @@ __global__ void updateKurgYSPH(int nx, int ny, double delta, double g, double ep
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
 
-			ap = max(max(up*1.0 + cp*1.0, um*1.0 + cmo*1.0), 0.0);
+			ap = max(max(up + cp, um + cmo), 0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up*1.0 - cp*1.0, um*1.0 - cmo*1.0), 0.0);
+			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
 			qm = hm*um;

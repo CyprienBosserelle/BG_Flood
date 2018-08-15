@@ -1644,7 +1644,7 @@ template <class T> void quadfrictionCPU(int nx, int ny, T dt, T eps, T cf, T *hh
 				if (hhi > eps)
 				{
 					T normu = uu[i] * uu[i] + vv[i] * vv[i];
-					T frc = (1.0f + dt*cf*(normu) / hhi);
+					T frc = (T(1.0) + dt*cf*(normu) / hhi);
 					//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 					uu[i] = uu[i] / frc;
 					vv[i] = vv[i] / frc;
