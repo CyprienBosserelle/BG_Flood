@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 #include "Header.cuh"
-#define pi 3.14159265f
+#define pi 3.14159265
 
 
 void handle_error(int status) {

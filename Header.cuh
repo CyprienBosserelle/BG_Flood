@@ -48,8 +48,10 @@ public:
 	//grid parameters
 	double dx=0.0; // grid resolution
 	double delta; // 
-	int nx=0; // grid size
-	int ny=0; //grid size
+	int nx=0; // Initial grid size
+	int ny=0; //Initial grid size
+	int nblk=0; // number of compute blocks
+	int blksize = 256; //16x16 blocks
 	double xo = 0.0; // grid origin
 	double yo = 0.0; // grid origin
 	double grdalpha=0.0; // grid rotation Y axis from the North input in degrees but later converted to rad

@@ -2790,6 +2790,41 @@ int main(int argc, char **argv)
 	////////////////////////////////////////////////
 	// Rearrange the memory in uniform blocks
 	////////////////////////////////////////////////
+	
+	//max nb of blocks is ceil(nx/16)*ceil(ny/16)
+	int nblk = 0;
+	int nmask = 0;
+	int mloc = 0;
+	for (int nblky = 0; nblky < ceil(ny / 16); nblky++)
+	{
+		for (int nblkx = 0; nblkx < ceil(nx / 16); nblkx++)
+		{
+			nmask = 0;
+			for (int ix = 0; ix < 16; ix++)
+			{
+				for (int iy = 0; iy < 16; iy++)
+				{
+					mloc = ix + 16 * nblkx + iy*nx + nblky * 16 * nx;
+					printf("mloc: %i\n", mloc);
+					if (dummy[mloc] >= XParam.mask)
+						nmask++;
+
+				}
+			}
+			if (nmask < 256)
+				nblk++;
+		}
+	}
+
+	XParam.nblk = nblk;
+
+	printf("Number of blocks: %i\n",nblk);
+
+	////////////////////////////////////////////////
+	///// Allocate and arrange blocks
+	////////////////////////////////////////////////
+
+
 
 
 
@@ -2800,22 +2835,22 @@ int main(int argc, char **argv)
 	printf("Allocate CPU memory...");
 	write_text_to_log_file("Allocate CPU memory...");
 
-	
+	int blksize = XParam.blksize;
 
 
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
 		//allocate double *arrays
-		Allocate1CPU(nx, ny, zb_d);
-		Allocate4CPU(nx, ny, zs_d, hh_d, uu_d, vv_d);
-		Allocate4CPU(nx, ny, zso_d, hho_d, uuo_d, vvo_d);
-		Allocate4CPU(nx, ny, dzsdx_d, dhdx_d, dudx_d, dvdx_d);
-		Allocate4CPU(nx, ny, dzsdy_d, dhdy_d, dudy_d, dvdy_d);
+		Allocate1CPU(nblk, blksize, zb_d);
+		Allocate4CPU(nblk, blksize, zs_d, hh_d, uu_d, vv_d);
+		Allocate4CPU(nblk, blksize, zso_d, hho_d, uuo_d, vvo_d);
+		Allocate4CPU(nblk, blksize, dzsdx_d, dhdx_d, dudx_d, dvdx_d);
+		Allocate4CPU(nblk, blksize, dzsdy_d, dhdy_d, dudy_d, dvdy_d);
 
-		Allocate4CPU(nx, ny, Su_d, Sv_d, Fhu_d, Fhv_d);
-		Allocate4CPU(nx, ny, Fqux_d, Fquy_d, Fqvx_d, Fqvy_d);
+		Allocate4CPU(nblk, blksize, Su_d, Sv_d, Fhu_d, Fhv_d);
+		Allocate4CPU(nblk, blksize, Fqux_d, Fquy_d, Fqvx_d, Fqvy_d);
 
-		Allocate4CPU(nx, ny, dh_d, dhu_d, dhv_d, dummy_d);
+		Allocate4CPU(nblk, blksize, dh_d, dhu_d, dhv_d, dummy_d);
 
 
 		
@@ -2825,100 +2860,100 @@ int main(int argc, char **argv)
 
 		if (XParam.outhhmax == 1)
 		{
-			Allocate1CPU(nx, ny, hhmax_d);
+			Allocate1CPU(nblk, blksize, hhmax_d);
 		}
 		if (XParam.outuumax == 1)
 		{
-			Allocate1CPU(nx, ny, uumax_d);
+			Allocate1CPU(nblk, blksize, uumax_d);
 		}
 		if (XParam.outvvmax == 1)
 		{
-			Allocate1CPU(nx, ny, vvmax_d);
+			Allocate1CPU(nblk, blksize, vvmax_d);
 		}
 		if (XParam.outzsmax == 1)
 		{
-			Allocate1CPU(nx, ny, zsmax_d);
+			Allocate1CPU(nblk, blksize, zsmax_d);
 		}
 
 		if (XParam.outhhmean == 1)
 		{
-			Allocate1CPU(nx, ny, hhmean_d);
+			Allocate1CPU(nblk, blksize, hhmean_d);
 		}
 		if (XParam.outzsmean == 1)
 		{
-			Allocate1CPU(nx, ny, zsmean_d);
+			Allocate1CPU(nblk, blksize, zsmean_d);
 		}
 		if (XParam.outuumean == 1)
 		{
-			Allocate1CPU(nx, ny, uumean_d);
+			Allocate1CPU(nblk, blksize, uumean_d);
 		}
 		if (XParam.outvvmean == 1)
 		{
-			Allocate1CPU(nx, ny, vvmean_d);
+			Allocate1CPU(nblk, blksize, vvmean_d);
 		}
 
 		if (XParam.outvort == 1)
 		{
-			Allocate1CPU(nx, ny, vort);
+			Allocate1CPU(nblk, blksize, vort);
 		}
 
 	}
 	else
 	{
 		// allocate float *arrays (same template functions but different pointers)
-		Allocate1CPU(nx, ny, zb);
-		Allocate4CPU(nx, ny, zs, hh, uu, vv);
-		Allocate4CPU(nx, ny, zso, hho, uuo, vvo);
-		Allocate4CPU(nx, ny, dzsdx, dhdx, dudx, dvdx);
-		Allocate4CPU(nx, ny, dzsdy, dhdy, dudy, dvdy);
+		Allocate1CPU(nblk, blksize, zb);
+		Allocate4CPU(nblk, blksize, zs, hh, uu, vv);
+		Allocate4CPU(nblk, blksize, zso, hho, uuo, vvo);
+		Allocate4CPU(nblk, blksize, dzsdx, dhdx, dudx, dvdx);
+		Allocate4CPU(nblk, blksize, dzsdy, dhdy, dudy, dvdy);
 
-		Allocate4CPU(nx, ny, Su, Sv, Fhu, Fhv);
-		Allocate4CPU(nx, ny, Fqux, Fquy, Fqvx, Fqvy);
+		Allocate4CPU(nblk, blksize, Su, Sv, Fhu, Fhv);
+		Allocate4CPU(nblk, blksize, Fqux, Fquy, Fqvx, Fqvy);
 
 		//Allocate4CPU(nx, ny, dh, dhu, dhv, dummy);
-		Allocate1CPU(nx, ny, dh);
-		Allocate1CPU(nx, ny, dhu);
-		Allocate1CPU(nx, ny, dhv);
+		Allocate1CPU(nblk, blksize, dh);
+		Allocate1CPU(nblk, blksize, dhu);
+		Allocate1CPU(nblk, blksize, dhv);
 
 		//not allocating below may be usefull
 
 		if (XParam.outhhmax == 1)
 		{
-			Allocate1CPU(nx, ny, hhmax);
+			Allocate1CPU(nblk, blksize, hhmax);
 		}
 		if (XParam.outuumax == 1)
 		{
-			Allocate1CPU(nx, ny, uumax);
+			Allocate1CPU(nblk, blksize, uumax);
 		}
 		if (XParam.outvvmax == 1)
 		{
-			Allocate1CPU(nx, ny, vvmax);
+			Allocate1CPU(nblk, blksize, vvmax);
 		}
 		if (XParam.outzsmax == 1)
 		{
-			Allocate1CPU(nx, ny, zsmax);
+			Allocate1CPU(nblk, blksize, zsmax);
 		}
 
 		if (XParam.outhhmean == 1)
 		{
-			Allocate1CPU(nx, ny, hhmean);
+			Allocate1CPU(nblk, blksize, hhmean);
 		}
 		if (XParam.outzsmean == 1)
 		{
-			Allocate1CPU(nx, ny, zsmean);
+			Allocate1CPU(nblk, blksize, zsmean);
 		}
 		if (XParam.outuumean == 1)
 		{
-			Allocate1CPU(nx, ny, uumean);
+			Allocate1CPU(nblk, blksize, uumean);
 		}
 		if (XParam.outvvmean == 1)
 		{
-			Allocate1CPU(nx, ny, vvmean);
+			Allocate1CPU(nblk, blksize, vvmean);
 		}
 
 		if (XParam.outvort == 1)
 		{
-			Allocate1CPU(nx, ny, vort);
+			Allocate1CPU(nblk, blksize, vort);
 		}
 
 	}
@@ -2964,57 +2999,57 @@ int main(int argc, char **argv)
 		write_text_to_log_file("Allocating GPU memory");
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
-			Allocate1GPU(nx, ny, zb_gd);
-			Allocate4GPU(nx, ny, zs_gd, hh_gd, uu_gd, vv_gd);
-			Allocate4GPU(nx, ny, zso_gd, hho_gd, uuo_gd, vvo_gd);
-			Allocate4GPU(nx, ny, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd);
-			Allocate4GPU(nx, ny, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd);
+			Allocate1GPU(nblk, blksize, zb_gd);
+			Allocate4GPU(nblk, blksize, zs_gd, hh_gd, uu_gd, vv_gd);
+			Allocate4GPU(nblk, blksize, zso_gd, hho_gd, uuo_gd, vvo_gd);
+			Allocate4GPU(nblk, blksize, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd);
+			Allocate4GPU(nblk, blksize, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd);
 
-			Allocate4GPU(nx, ny, Su_gd, Sv_gd, Fhu_gd, Fhv_gd);
-			Allocate4GPU(nx, ny, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd);
+			Allocate4GPU(nblk, blksize, Su_gd, Sv_gd, Fhu_gd, Fhv_gd);
+			Allocate4GPU(nblk, blksize, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd);
 
-			Allocate4GPU(nx, ny, dh_gd, dhu_gd, dhv_gd, dtmax_gd);
+			Allocate4GPU(nblk, blksize, dh_gd, dhu_gd, dhv_gd, dtmax_gd);
 
-			arrmin_d = (double *)malloc(nx*ny * sizeof(double));
-			CUDA_CHECK(cudaMalloc((void **)&arrmin_gd, nx*ny * sizeof(double)));
-			CUDA_CHECK(cudaMalloc((void **)&arrmax_gd, nx*ny * sizeof(double)));
+			arrmin_d = (double *)malloc(nblk* blksize * sizeof(double));
+			CUDA_CHECK(cudaMalloc((void **)&arrmin_gd, nblk* blksize * sizeof(double)));
+			CUDA_CHECK(cudaMalloc((void **)&arrmax_gd, nblk* blksize * sizeof(double)));
 
 			if (XParam.outhhmax == 1)
 			{
-				Allocate1GPU(nx, ny, hhmax_gd);
+				Allocate1GPU(nblk, blksize, hhmax_gd);
 			}
 			if (XParam.outzsmax == 1)
 			{
-				Allocate1GPU(nx, ny, zsmax_gd);
+				Allocate1GPU(nblk, blksize, zsmax_gd);
 			}
 			if (XParam.outuumax == 1)
 			{
-				Allocate1GPU(nx, ny, uumax_gd);
+				Allocate1GPU(nblk, blksize, uumax_gd);
 			}
 			if (XParam.outvvmax == 1)
 			{
-				Allocate1GPU(nx, ny, vvmax_gd);
+				Allocate1GPU(nblk, blksize, vvmax_gd);
 			}
 			if (XParam.outhhmean == 1)
 			{
-				Allocate1GPU(nx, ny, hhmean_gd);
+				Allocate1GPU(nblk, blksize, hhmean_gd);
 			}
 			if (XParam.outzsmean == 1)
 			{
-				Allocate1GPU(nx, ny, zsmean_gd);
+				Allocate1GPU(nblk, blksize, zsmean_gd);
 			}
 			if (XParam.outuumean == 1)
 			{
-				Allocate1GPU(nx, ny, uumean_gd);
+				Allocate1GPU(nblk, blksize, uumean_gd);
 			}
 			if (XParam.outvvmean == 1)
 			{
-				Allocate1GPU(nx, ny, vvmean_gd);
+				Allocate1GPU(nblk, blksize, vvmean_gd);
 			}
 
 			if (XParam.outvort == 1)
 			{
-				Allocate1GPU(nx, ny, vort_gd);
+				Allocate1GPU(nblk, blksize, vort_gd);
 			}
 
 			if (XParam.TSnodesout.size() > 0)
@@ -3031,57 +3066,57 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			Allocate1GPU(nx, ny, zb_g);
-			Allocate4GPU(nx, ny, zs_g, hh_g, uu_g, vv_g);
-			Allocate4GPU(nx, ny, zso_g, hho_g, uuo_g, vvo_g);
-			Allocate4GPU(nx, ny, dzsdx_g, dhdx_g, dudx_g, dvdx_g);
-			Allocate4GPU(nx, ny, dzsdy_g, dhdy_g, dudy_g, dvdy_g);
+			Allocate1GPU(nblk, blksize, zb_g);
+			Allocate4GPU(nblk, blksize, zs_g, hh_g, uu_g, vv_g);
+			Allocate4GPU(nblk, blksize, zso_g, hho_g, uuo_g, vvo_g);
+			Allocate4GPU(nblk, blksize, dzsdx_g, dhdx_g, dudx_g, dvdx_g);
+			Allocate4GPU(nblk, blksize, dzsdy_g, dhdy_g, dudy_g, dvdy_g);
 
-			Allocate4GPU(nx, ny, Su_g, Sv_g, Fhu_g, Fhv_g);
-			Allocate4GPU(nx, ny, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g);
+			Allocate4GPU(nblk, blksize, Su_g, Sv_g, Fhu_g, Fhv_g);
+			Allocate4GPU(nblk, blksize, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g);
 
-			Allocate4GPU(nx, ny, dh_g, dhu_g, dhv_g, dtmax_g);
+			Allocate4GPU(nblk, blksize, dh_g, dhu_g, dhv_g, dtmax_g);
 
-			arrmin = (float *)malloc(nx*ny * sizeof(float));
-			CUDA_CHECK(cudaMalloc((void **)&arrmin_g, nx*ny * sizeof(float)));
-			CUDA_CHECK(cudaMalloc((void **)&arrmax_g, nx*ny * sizeof(float)));
+			arrmin = (float *)malloc(nblk*blksize * sizeof(float));
+			CUDA_CHECK(cudaMalloc((void **)&arrmin_g, nblk*blksize * sizeof(float)));
+			CUDA_CHECK(cudaMalloc((void **)&arrmax_g, nblk*blksize * sizeof(float)));
 
 			if (XParam.outhhmax == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&hhmax_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&hhmax_g, nblk*blksize * sizeof(float)));
 			}
 			if (XParam.outzsmax == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&zsmax_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&zsmax_g, nblk*blksize * sizeof(float)));
 			}
 			if (XParam.outuumax == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&uumax_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&uumax_g, nblk*blksize * sizeof(float)));
 			}
 			if (XParam.outvvmax == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&vvmax_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&vvmax_g, nblk*blksize * sizeof(float)));
 			}
 			if (XParam.outhhmean == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&hhmean_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&hhmean_g, nblk*blksize * sizeof(float)));
 			}
 			if (XParam.outzsmean == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&zsmean_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&zsmean_g, nblk*blksize * sizeof(float)));
 			}
 			if (XParam.outuumean == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&uumean_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&uumean_g, nblk*blksize * sizeof(float)));
 			}
 			if (XParam.outvvmean == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&vvmean_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&vvmean_g, nblk*blksize * sizeof(float)));
 			}
 
 			if (XParam.outvort == 1)
 			{
-				CUDA_CHECK(cudaMalloc((void **)&vort_g, nx*ny * sizeof(float)));
+				CUDA_CHECK(cudaMalloc((void **)&vort_g, nblk*blksize * sizeof(float)));
 			}
 
 
