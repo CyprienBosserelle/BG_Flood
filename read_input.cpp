@@ -306,6 +306,14 @@ Param readparamstr(std::string line, Param param)
 		
 	}
 
+	parameterstr = "resetmax";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.resetmax = std::stoi(parametervalue);
+	}
+
+
 	parameterstr = "leftbndfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())

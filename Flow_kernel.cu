@@ -2170,6 +2170,18 @@ __global__ void resetavg_var(int nx, int ny, T * Varmean)
 }
 
 template <class T>
+__global__ void resetmax_var(int nx, int ny, T * Varmax)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+	if (ix < nx && iy < ny)
+	{
+		Varmax[i] = T(-1.0*epsilone);
+	}
+}
+
+template <class T>
 __global__ void max_var(int nx, int ny, T * Varmax, T * Var)
 {
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;

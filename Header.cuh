@@ -98,6 +98,7 @@ public:
 	float addoffset = 0.0f;
 
 	// This is controlled by the sanity checker not directly by the user
+	int resetmax = 0;
 	int outhhmax = 0;
 	int outzsmax = 0;
 	int outuumax = 0;

@@ -1961,6 +1961,9 @@ void ResetmeanvarGPU(Param XParam)
 	}
 }
 
+
+
+
 void ResetmeanvarGPUD(Param XParam)
 {
 	int nx = XParam.nx;
@@ -1995,6 +1998,74 @@ void ResetmeanvarGPUD(Param XParam)
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 }
+void ResetmaxvarGPU(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	if (XParam.outuumax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, uumax_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outvvmax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, vvmax_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outhhmax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, hhmax_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outzsmax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmax_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+}
+void ResetmaxvarGPUD(Param XParam)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	if (XParam.outuumax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, uumax_gd);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outvvmax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, vvmax_gd);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outhhmax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, hhmax_gd);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	}
+	if (XParam.outzsmax == 1)
+	{
+		resetmax_var << <gridDim, blockDim, 0 >> >(nx, ny, zsmax_gd);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+}
 
 // Main loop that actually runs the model
 void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
@@ -2026,8 +2097,17 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		// Add empty row for each output point
 		zsAllout.push_back(std::vector<Pointout>());
 	}
-
-
+	// Reset GPU mean and max arrays
+	if (XParam.spherical == 1 || XParam.doubleprecision == 1)
+	{
+		ResetmeanvarGPUD(XParam);
+		ResetmaxvarGPUD(XParam);
+	}
+	else
+	{
+		ResetmeanvarGPU(XParam);
+		ResetmaxvarGPU(XParam);
+	}
 
 	while (XParam.totaltime < XParam.endtime)
 	{
@@ -2225,10 +2305,18 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 			{
 				ResetmeanvarGPUD(XParam);
+				if (XParam.resetmax == 1)
+				{
+					ResetmaxvarGPUD(XParam);
+				}
 			}
 			else
 			{
 				ResetmeanvarGPU(XParam);
+				if (XParam.resetmax == 1)
+				{
+					ResetmaxvarGPU(XParam);
+				}
 			}
 			
 
@@ -3918,6 +4006,91 @@ int main(int argc, char **argv)
 		{
 			free(vort_d);
 		}
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			cudaFree(hh_gd);
+			cudaFree(uu_gd);
+			cudaFree(vv_gd);
+			cudaFree(zb_gd);
+			cudaFree(zs_gd);
+
+			cudaFree(hho_gd);
+			cudaFree(uuo_gd);
+			cudaFree(vvo_gd);
+			cudaFree(zso_gd);
+
+			cudaFree(dhdx_gd);
+			cudaFree(dhdy_gd);
+			cudaFree(dudx_gd);
+			cudaFree(dudy_gd);
+			cudaFree(dvdx_gd);
+			cudaFree(dvdy_gd);
+
+			cudaFree(dzsdx_gd);
+			cudaFree(dzsdy_gd);
+
+			cudaFree(Su_gd);
+			cudaFree(Sv_gd);
+			cudaFree(Fqux_gd);
+			cudaFree(Fquy_gd);
+			cudaFree(Fqvx_gd);
+			cudaFree(Fqvy_gd);
+			cudaFree(Fhu_gd);
+			cudaFree(Fhv_gd);
+
+			cudaFree(dh_gd);
+			cudaFree(dhu_gd);
+			cudaFree(dhv_gd);
+
+			cudaFree(dtmax_gd);
+
+
+			cudaFree(arrmin_gd);
+			cudaFree(arrmax_gd);
+
+			if (XParam.outhhmax == 1)
+			{
+				cudaFree(hhmax_gd);
+			}
+
+			if (XParam.outzsmax == 1)
+			{
+				cudaFree(zsmax_gd);
+			}
+			if (XParam.outuumax == 1)
+			{
+				cudaFree(uumax_gd);
+			}
+			if (XParam.outvvmax == 1)
+			{
+				cudaFree(vvmax_gd);
+			}
+			if (XParam.outhhmean == 1)
+			{
+				cudaFree(hhmean_gd);
+			}
+			if (XParam.outzsmean == 1)
+			{
+				cudaFree(zsmean_gd);
+			}
+			if (XParam.outuumean == 1)
+			{
+				cudaFree(uumean_gd);
+			}
+			if (XParam.outvvmean == 1)
+			{
+				cudaFree(vvmax_gd);
+			}
+
+			if (XParam.outvort == 1)
+			{
+				cudaFree(vort_gd);
+			}
+
+			cudaDeviceReset();
+
+		}
 	}
 	else
 	{
@@ -3994,92 +4167,93 @@ int main(int argc, char **argv)
 			free(vort);
 		}
 
-	}
 
 
-	if (XParam.GPUDEVICE >= 0)
-	{
-		cudaFree(hh_g);
-		cudaFree(uu_g);
-		cudaFree(vv_g);
-		cudaFree(zb_g);
-		cudaFree(zs_g);
 
-		cudaFree(hho_g);
-		cudaFree(uuo_g);
-		cudaFree(vvo_g);
-		cudaFree(zso_g);
-
-		cudaFree(dhdx_g);
-		cudaFree(dhdy_g);
-		cudaFree(dudx_g);
-		cudaFree(dudy_g);
-		cudaFree(dvdx_g);
-		cudaFree(dvdy_g);
-
-		cudaFree(dzsdx_g);
-		cudaFree(dzsdy_g);
-
-		cudaFree(Su_g);
-		cudaFree(Sv_g);
-		cudaFree(Fqux_g);
-		cudaFree(Fquy_g);
-		cudaFree(Fqvx_g);
-		cudaFree(Fqvy_g);
-		cudaFree(Fhu_g);
-		cudaFree(Fhv_g);
-
-		cudaFree(dh_g);
-		cudaFree(dhu_g);
-		cudaFree(dhv_g);
-
-		cudaFree(dtmax_g);
-
-		
-		cudaFree(arrmin_g);
-		cudaFree(arrmax_g);
-
-		if (XParam.outhhmax == 1)
+		if (XParam.GPUDEVICE >= 0)
 		{
-			cudaFree(hhmax_g);
-		}
+			cudaFree(hh_g);
+			cudaFree(uu_g);
+			cudaFree(vv_g);
+			cudaFree(zb_g);
+			cudaFree(zs_g);
 
-		if (XParam.outzsmax == 1)
-		{
-			cudaFree(zsmax_g);
-		}
-		if (XParam.outuumax == 1)
-		{
-			cudaFree(uumax_g);
-		}
-		if (XParam.outvvmax == 1)
-		{
-			cudaFree(vvmax_g);
-		}
-		if (XParam.outhhmean == 1)
-		{
-			cudaFree(hhmean_g);
-		}
-		if (XParam.outzsmean == 1)
-		{
-			cudaFree(zsmean_g);
-		}
-		if (XParam.outuumean == 1)
-		{
-			cudaFree(uumean_g);
-		}
-		if (XParam.outvvmean == 1)
-		{
-			cudaFree(vvmax_g);
-		}
+			cudaFree(hho_g);
+			cudaFree(uuo_g);
+			cudaFree(vvo_g);
+			cudaFree(zso_g);
 
-		if (XParam.outvort == 1)
-		{
-			cudaFree(vort_g);
+			cudaFree(dhdx_g);
+			cudaFree(dhdy_g);
+			cudaFree(dudx_g);
+			cudaFree(dudy_g);
+			cudaFree(dvdx_g);
+			cudaFree(dvdy_g);
+
+			cudaFree(dzsdx_g);
+			cudaFree(dzsdy_g);
+
+			cudaFree(Su_g);
+			cudaFree(Sv_g);
+			cudaFree(Fqux_g);
+			cudaFree(Fquy_g);
+			cudaFree(Fqvx_g);
+			cudaFree(Fqvy_g);
+			cudaFree(Fhu_g);
+			cudaFree(Fhv_g);
+
+			cudaFree(dh_g);
+			cudaFree(dhu_g);
+			cudaFree(dhv_g);
+
+			cudaFree(dtmax_g);
+
+
+			cudaFree(arrmin_g);
+			cudaFree(arrmax_g);
+
+			if (XParam.outhhmax == 1)
+			{
+				cudaFree(hhmax_g);
+			}
+
+			if (XParam.outzsmax == 1)
+			{
+				cudaFree(zsmax_g);
+			}
+			if (XParam.outuumax == 1)
+			{
+				cudaFree(uumax_g);
+			}
+			if (XParam.outvvmax == 1)
+			{
+				cudaFree(vvmax_g);
+			}
+			if (XParam.outhhmean == 1)
+			{
+				cudaFree(hhmean_g);
+			}
+			if (XParam.outzsmean == 1)
+			{
+				cudaFree(zsmean_g);
+			}
+			if (XParam.outuumean == 1)
+			{
+				cudaFree(uumean_g);
+			}
+			if (XParam.outvvmean == 1)
+			{
+				cudaFree(vvmax_g);
+			}
+
+			if (XParam.outvort == 1)
+			{
+				cudaFree(vort_g);
+			}
+
+			cudaDeviceReset();
+
 		}
-
-		cudaDeviceReset();
-
 	}
 
 
