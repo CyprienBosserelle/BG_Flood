@@ -174,7 +174,12 @@ Param readparamstr(std::string line, Param param)
 		param.Cd = std::stod(parametervalue);
 	}
 
-	
+	parameterstr = "mask";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.mask = std::stod(parametervalue);
+	}
 
 	///////////////////////////////////////////////////////
 	// Timekeeping parameters

@@ -2732,6 +2732,67 @@ int main(int argc, char **argv)
 
 	XParam.dt = 0.0;// Will be resolved in update
 
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+
+
+	////////////////////////////////////////////////
+	// read the bathy file (and store to dummy for now)
+	////////////////////////////////////////////////
+	Allocate1CPU(XParam.nx, XParam.ny, dummy);
+
+	printf("Read Bathy data...");
+	write_text_to_log_file("Read Bathy data");
+
+	if (bathyext.compare("md") == 0)
+	{
+		readbathy(XParam.Bathymetryfile, dummy);
+	}
+	if (bathyext.compare("nc") == 0)
+	{
+		readnczb(XParam.nx, XParam.ny, XParam.Bathymetryfile, dummy);
+	}
+	if (bathyext.compare("bot") == 0 || bathyext.compare("dep") == 0)
+	{
+		readXBbathy(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy);
+	}
+	if (bathyext.compare("asc") == 0)
+	{
+		//
+		readbathyASCzb(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy);
+	}
+
+
+
+	//printf("%f\n", zb[0]);
+	//printf("%f\n", zb[(nx - 1) + (0)*nx]);
+	//printf("%f\n", zb[(0) + (ny-1)*nx]);
+	//printf("%f\n", zb[(nx - 1) + (ny - 1)*nx]);
+
+
+	//init variables
+	if (XParam.posdown == 1)
+	{
+		printf("Bathy data is positive down...correcting ...");
+		write_text_to_log_file("Bathy data is positive down...correcting");
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				dummy[i + j*nx] = dummy[i + j*nx] * -1.0f;
+				//printf("%f\n", zb[i + (j)*nx]);
+
+			}
+		}
+	}
+
+	////////////////////////////////////////////////
+	// Rearrange the memory in uniform blocks
+	////////////////////////////////////////////////
+
+
+
 	////////////////////////////////////////////////
 	///// Allocate memory on CPU
 	////////////////////////////////////////////////
@@ -2739,8 +2800,7 @@ int main(int argc, char **argv)
 	printf("Allocate CPU memory...");
 	write_text_to_log_file("Allocate CPU memory...");
 
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	
 
 
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
@@ -2758,8 +2818,8 @@ int main(int argc, char **argv)
 		Allocate4CPU(nx, ny, dh_d, dhu_d, dhv_d, dummy_d);
 
 
-		//also allocate dummy as a float * to ease some data reading
-		Allocate1CPU(nx, ny, dummy);
+		
+		
 
 		//not allocating below may be usefull
 
@@ -2815,7 +2875,10 @@ int main(int argc, char **argv)
 		Allocate4CPU(nx, ny, Su, Sv, Fhu, Fhv);
 		Allocate4CPU(nx, ny, Fqux, Fquy, Fqvx, Fqvy);
 
-		Allocate4CPU(nx, ny, dh, dhu, dhv, dummy);
+		//Allocate4CPU(nx, ny, dh, dhu, dhv, dummy);
+		Allocate1CPU(nx, ny, dh);
+		Allocate1CPU(nx, ny, dhu);
+		Allocate1CPU(nx, ny, dhv);
 
 		//not allocating below may be usefull
 
@@ -3167,50 +3230,7 @@ int main(int argc, char **argv)
 
 	}
 
-	printf("Read Bathy data...");
-	write_text_to_log_file("Read Bathy data");
-
-	if (bathyext.compare("md") == 0)
-	{
-		readbathy(XParam.Bathymetryfile, dummy);
-	}
-	if (bathyext.compare("nc") == 0)
-	{
-		readnczb(XParam.nx, XParam.ny, XParam.Bathymetryfile, dummy);
-	}
-	if (bathyext.compare("bot") == 0 || bathyext.compare("dep") == 0)
-	{
-		readXBbathy(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy);
-	}
-	if (bathyext.compare("asc") == 0)
-	{
-		//
-		readbathyASCzb(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy);
-	}
-
-
 	
-	//printf("%f\n", zb[0]);
-	//printf("%f\n", zb[(nx - 1) + (0)*nx]);
-	//printf("%f\n", zb[(0) + (ny-1)*nx]);
-	//printf("%f\n", zb[(nx - 1) + (ny - 1)*nx]);
-	
-
-	//init variables
-	if (XParam.posdown == 1)
-	{
-		printf("Bathy data is positive down...correcting ...");
-		write_text_to_log_file("Bathy data is positive down...correcting");
-		for (int j = 0; j < ny; j++)
-		{
-			for (int i = 0; i < nx; i++)
-			{
-				dummy[i + j*nx] = dummy[i + j*nx] * -1.0f;
-				//printf("%f\n", zb[i + (j)*nx]);
-				
-			}
-		}
-	}
 	// Copy dummy to zb
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
