@@ -1344,7 +1344,7 @@ double FlowCPUDouble(Param XParam, double nextoutputtime)
 
 }
 
-void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+void leftdirichletCPU_old(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
 	for (int iy = 0; iy < ny; iy++)
@@ -1380,249 +1380,397 @@ void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, flo
 	}
 }
 
-void leftdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
-{
-	double zsbnd;
-	for (int iy = 0; iy < ny; iy++)
-	{
-		if (zsbndvec.size() == 1)
-		{
-			zsbnd = zsbndvec[0];
-		}
-		else
-		{
-			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-			int inext = iprev + 1;
-			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(iy - iprev));
-		}
-		int ix = 0;
-		int i = ix + iy*nx;
-		int xplus;
-
-		//if (ix == 0 && iy < ny)
-		{
-			xplus = min(ix + 1, nx - 1);
-			hh[i] = zsbnd - zb[i];
-			zs[i] = zsbnd;
-			uu[i] = -2.0*(sqrt(g*max(hh[xplus + iy*nx], 0.0)) - sqrt(g*max(zsbnd - zb[xplus + iy*nx], 0.0))) + uu[xplus + iy*nx];
-			vv[i] = 0.0;
-			//if (iy == 0)
-			//{
-			//	printf("zsbnd=%f\t", zsbnd);
-			//}
-		}
-
-	}
-}
-
-
-
-
-void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+void leftdirichletCPU(int nblk, int blksize, float xo,float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo,float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
-	for (int iy = 0; iy < ny; iy++)
-	{
-		if (zsbndvec.size() == 1)
-		{
-			zsbnd = zsbndvec[0];
-		}
-		else
-		{
-			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-			int inext = iprev + 1;
-			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = (float) interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(iy - iprev));
-		}
-		int ix = nx-1;
-		int i = ix + iy*nx;
-		int xminus;
-		
-		if ( iy < ny)
-		{
-			xminus = max(ix - 1, 0);
-			hh[i] = zsbnd - zb[i];
-			zs[i] = zsbnd;
-			uu[i] = +2.0f*(sqrtf(g*max(hh[xminus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xminus + iy*nx], 0.0f))) + uu[xminus + iy*nx];
-			vv[i] = 0.0f;
-		}
+	float xi, yi,jj,ii;
 
+	for (int ib = 0; ib < nblk; ib++) //scan each block
+	{
+		if (blockxo[ib] == xo)//if block is on the side
+		{
+			int i = 0;
+			for (int j = 0; j < 16; j++)
+			{
+				int n = i + j * 16 + ib * blksize;
+
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
+
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = (float)interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(jj - iprev));
+				}
+				
+
+				//if (ix == 0 && iy < ny)
+				{
+					int nright = i+1 + j * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					uu[n] = -2.0f*(sqrtf(g*max(hh[nright], 0.0f)) - sqrtf(g*max(zsbnd - zb[nright], 0.0f))) + uu[nright];
+					vv[n] = 0.0f;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
 	}
 }
-void rightdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
+
+void leftdirichletCPUD(int nblk, int blksize, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
 	double zsbnd;
-	for (int iy = 0; iy < ny; iy++)
+	double xi, yi, jj, ii;
+
+	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (zsbndvec.size() == 1)
+		if (blockxo[ib] == xo)//if block is on the side
 		{
-			zsbnd = zsbndvec[0];
-		}
-		else
-		{
-			int iprev = min(max((int)ceil(iy / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-			int inext = iprev + 1;
-			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(iy - iprev));
-		}
-		int ix = nx - 1;
-		int i = ix + iy*nx;
-		int xminus;
+			int i = 0;
+			for (int j = 0; j < 16; j++)
+			{
+				int n = i + j * 16 + ib * blksize;
 
-		if (iy < ny)
-		{
-			xminus = max(ix - 1, 0);
-			hh[i] = zsbnd - zb[i];
-			zs[i] = zsbnd;
-			uu[i] = +2.0*(sqrt(g*max(hh[xminus + iy*nx], 0.0)) - sqrt(g*max(zsbnd - zb[xminus + iy*nx], 0.0))) + uu[xminus + iy*nx];
-			vv[i] = 0.0;
-		}
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
 
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (inext - iprev), (jj - iprev));
+				}
+
+
+				//if (ix == 0 && iy < ny)
+				{
+					int nright = i + 1 + j * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					uu[n] = -2.0*(sqrt(g*max(hh[nright], 0.0)) - sqrt(g*max(zsbnd - zb[nright], 0.0))) + uu[nright];
+					vv[n] = 0.0;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
 	}
 }
 
-void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+
+
+void rightdirichletCPU(int nblk, int blksize, int nx, float xo, float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
-	for (int ix = 0; ix < nx; ix++)
-	{
-		if (zsbndvec.size() == 1)
-		{
-			zsbnd = zsbndvec[0];
-		}
-		else
-		{
-			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-			int inext = iprev + 1;
-			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = (float) interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
-		}
-		int iy = ny - 1;
-		int i = ix + iy*nx;
-		int yminus;
-		
-		if (iy < ny)
-		{
-			//xminus = max(ix - 1, 0);
-			//xplus = min(ix + 1, nx - 1);
-			//xminus = max(ix - 1, 0);
-			//yplus = min(iy + 1, ny - 1);
-			yminus = max(iy - 1, 0);
-			hh[i] = zsbnd - zb[i];
-			zs[i] = zsbnd;
-			vv[i] = +2.0f*(sqrtf(g*max(hh[ix + yminus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yminus*nx], 0.0f))) + vv[ix + yminus*nx];
-			uu[i] = 0.0f;
-		}
+	float xi, yi, jj, ii;
 
+	for (int ib = 0; ib < nblk; ib++) //scan each block
+	{
+		if (blockxo[ib] + (15 * dx) == xo + ceil(nx / 16.0)*16.0*dx)//if block is on the side
+		{
+			int i = 15;
+			for (int j = 0; j < 16; j++)
+			{
+				int n = i + j * 16 + ib * blksize;
+
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
+
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (inext - iprev), (jj - iprev));
+				}
+
+
+				//if (ix == 0 && iy < ny)
+				{
+					int nleft = i - 1 + j * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					uu[n] = +2.0f*(sqrtf(g*max(hh[nleft], 0.0f)) - sqrtf(g*max(zsbnd - zb[nleft], 0.0f))) + uu[nleft];
+					vv[n] = 0.0f;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
 	}
 }
 
-void topdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
+void rightdirichletCPUD(int nblk, int blksize,int nx, double xo, double yo, double g, double dx, std::vector<double> zsbndvec,  double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
 	double zsbnd;
-	for (int ix = 0; ix < nx; ix++)
+	double xi, yi, jj, ii;
+
+	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (zsbndvec.size() == 1)
+		if (blockxo[ib] + (15 * dx) == xo + ceil(nx / 16.0)*16.0*dx)//if block is on the side
 		{
-			zsbnd = zsbndvec[0];
-		}
-		else
-		{
-			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-			int inext = iprev + 1;
-			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(ix - iprev));
-		}
-		int iy = ny - 1;
-		int i = ix + iy*nx;
-		int yminus;
+			int i = 15;
+			for (int j = 0; j < 16; j++)
+			{
+				int n = i + j * 16 + ib * blksize;
 
-		if (iy < ny)
-		{
-			//xminus = max(ix - 1, 0);
-			//xplus = min(ix + 1, nx - 1);
-			//xminus = max(ix - 1, 0);
-			//yplus = min(iy + 1, ny - 1);
-			yminus = max(iy - 1, 0);
-			hh[i] = zsbnd - zb[i];
-			zs[i] = zsbnd;
-			vv[i] = +2.0*(sqrt(g*max(hh[ix + yminus*nx], 0.0)) - sqrt(g*max(zsbnd - zb[ix + yminus*nx], 0.0))) + vv[ix + yminus*nx];
-			uu[i] = 0.0;
-		}
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
 
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (inext - iprev), (jj - iprev));
+				}
+
+
+				//if (ix == 0 && iy < ny)
+				{
+					int nleft = i - 1 + j * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					uu[n] = +2.0*(sqrt(g*max(hh[nleft], 0.0)) - sqrt(g*max(zsbnd - zb[nleft], 0.0))) + uu[nleft];
+					vv[n] = 0.0;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
 	}
 }
 
-void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv)
+void topdirichletCPU(int nblk, int blksize, int ny, float xo, float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
-	for (int ix = 0; ix < nx; ix++)
-	{
-		if (zsbndvec.size() == 1)
-		{
-			zsbnd = zsbndvec[0];
-		}
-		else
-		{
-			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-			int inext = iprev + 1;
-			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = (float) interptime(zsbndvec[inext], zsbndvec[iprev], (float)(inext - iprev), (float)(ix - iprev));
-		}
-		int iy = 0;
-		int i = ix + iy*nx;
-		int yplus;
-		
-		if (iy < ny)
-		{
-			//xminus = max(ix - 1, 0);
-			//xplus = min(ix + 1, nx - 1);
-			//xminus = max(ix - 1, 0);
-			yplus = min(iy + 1, ny - 1);
-			//yminus = max(iy - 1, 0);
-			hh[i] = zsbnd - zb[i];
-			zs[i] = zsbnd;
-			vv[i] = -2.0f*(sqrtf(g*max(hh[ix + yplus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yplus*nx], 0.0f))) + vv[ix + yplus*nx];
-			uu[i] = 0.0f;
-		}
+	float xi, yi, jj, ii;
 
+	for (int ib = 0; ib < nblk; ib++) //scan each block
+	{
+		if (blockyo[ib] + (15 * dx) == yo + ceil(ny / 16.0)*16.0*dx)//if block is on the side
+		{
+			int j = 15;
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + ib * blksize;
+
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
+
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (inext - iprev), (ii - iprev));
+				}
+
+
+				//if (ix == 0 && iy < ny)
+				{
+					int nbot = i + (j - 1) * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					vv[n] = +2.0f*(sqrtf(g*max(hh[nbot], 0.0f)) - sqrtf(g*max(zsbnd - zb[nbot], 0.0f))) + vv[nbot];
+					uu[n] = 0.0f;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
 	}
 }
 
-void botdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv)
+void topdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
 	double zsbnd;
-	for (int ix = 0; ix < nx; ix++)
+	double xi, yi, jj, ii;
+
+	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (zsbndvec.size() == 1)
+		if (blockyo[ib] + (15 * dx) == yo + ceil(ny / 16.0)*16.0*dx)//if block is on the side
 		{
-			zsbnd = zsbndvec[0];
-		}
-		else
-		{
-			int iprev = min(max((int)ceil(ix / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-			int inext = iprev + 1;
-			// here interp time is used to interpolate to the right node rather than in time...
-			zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0*(inext - iprev), 1.0*(ix - iprev));
-		}
-		int iy = 0;
-		int i = ix + iy*nx;
-		int yplus;
+			int j = 15;
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + ib * blksize;
 
-		if (iy < ny)
-		{
-			//xminus = max(ix - 1, 0);
-			//xplus = min(ix + 1, nx - 1);
-			//xminus = max(ix - 1, 0);
-			yplus = min(iy + 1, ny - 1);
-			//yminus = max(iy - 1, 0);
-			hh[i] = zsbnd - zb[i];
-			zs[i] = zsbnd;
-			vv[i] = -2.0*(sqrt(g*max(hh[ix + yplus*nx], 0.0)) - sqrt(g*max(zsbnd - zb[ix + yplus*nx], 0.0))) + vv[ix + yplus*nx];
-			uu[i] = 0.0;
-		}
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
 
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(ii/ (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (inext - iprev), (ii - iprev));
+				}
+
+
+				//if (ix == 0 && iy < ny)
+				{
+					int nbot = i  + (j-1) * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					vv[n] = +2.0*(sqrt(g*max(hh[nbot], 0.0)) - sqrt(g*max(zsbnd - zb[nbot], 0.0))) + vv[nbot];
+					uu[n] = 0.0;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
+	}
+}
+
+void botdirichletCPU(int nblk, int blksize, int ny, float xo, float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
+{
+	float zsbnd;
+	float xi, yi, jj, ii;
+
+	for (int ib = 0; ib < nblk; ib++) //scan each block
+	{
+		if (blockyo[ib] == yo)//if block is on the side
+		{
+			int j = 0;
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + ib * blksize;
+
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
+
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (inext - iprev), (ii - iprev));
+				}
+
+
+				//if (ix == 0 && iy < ny)
+				{
+					int ntop = i + (j + 1) * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					vv[n] = -2.0f*(sqrtf(g*max(hh[ntop], 0.0f)) - sqrtf(g*max(zsbnd - zb[ntop], 0.0f))) + vv[ntop];
+					uu[n] = 0.0f;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
+	}
+}
+
+void botdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
+{
+	double zsbnd;
+	double xi, yi, jj, ii;
+
+	for (int ib = 0; ib < nblk; ib++) //scan each block
+	{
+		if (blockyo[ib]  == yo )//if block is on the side
+		{
+			int j = 0;
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + ib * blksize;
+
+				xi = blockxo[ib] + i*dx;
+				yi = blockyo[ib] + j*dx;
+
+				jj = (yi - yo) / dx;
+				ii = (xi - xo) / dx;
+				if (zsbndvec.size() == 1)
+				{
+					zsbnd = zsbndvec[0];
+				}
+				else
+				{
+					int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+					int inext = iprev + 1;
+					// here interp time is used to interpolate to the right node rather than in time...
+					zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], (inext - iprev), (ii - iprev));
+				}
+
+
+				//if (ix == 0 && iy < ny)
+				{
+					int ntop = i + (j + 1) * 16 + ib * blksize;;
+					hh[n] = zsbnd - zb[n];
+					zs[n] = zsbnd;
+					vv[n] = -2.0*(sqrt(g*max(hh[ntop], 0.0)) - sqrt(g*max(zsbnd - zb[ntop], 0.0))) + vv[ntop];
+					uu[n] = 0.0;
+					//if (iy == 0)
+					//{
+					//	printf("zsbnd=%f\t", zsbnd);
+					//}
+				}
+			}
+		}
 	}
 }
 

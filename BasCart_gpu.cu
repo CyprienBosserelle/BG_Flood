@@ -208,7 +208,7 @@ template <class T> void setedges(int nblk, int nx,int ny, double xo,double yo, d
 				zb[i + j * 16 + bl * 256] = zb[i+1 + j * 16 + bl * 256];
 			}
 		}
-		if (blockxo[bl]+(15*dx) == xo+nx*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		if (blockxo[bl]+(15*dx) == xo+ceil(nx/16.0)*16.0*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
 		{
 			int i = 15;
 			for (int j = 0; j < 16; j++)
@@ -226,7 +226,7 @@ template <class T> void setedges(int nblk, int nx,int ny, double xo,double yo, d
 				zb[i + j * 16 + bl * 256] = zb[i  + (j+1) * 16 + bl * 256];
 			}
 		}
-		if (blockyo[bl] + (15 * dx) == yo + ny*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		if (blockyo[bl] + (15 * dx) == yo + ceil(ny / 16.0)*16.0*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
 		{
 			int j = 15;
 			for (int i = 0; i < 16; i++)
@@ -3553,7 +3553,7 @@ int main(int argc, char **argv)
 					{
 						int n = i + j * 16 + bl * blksize;
 						xi = blockxo[bl] + i*XParam.dx;
-						yi = blockxo[bl] + j*XParam.dx;
+						yi = blockyo[bl] + j*XParam.dx;
 
 						disttop = max((XParam.yo + (ny - 1)*XParam.dx - yi) / XParam.dx, 0.1);//max((double)(ny - 1) - j, 0.1);// WTF is that 0.1? // distleft cannot be 0 
 						distbot = max((yi - XParam.yo) / XParam.dx, 0.1);
@@ -4169,7 +4169,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		//mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+		mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 	}
 
 	
