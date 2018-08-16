@@ -115,6 +115,14 @@ double *arrmin_d;
 
 float * dummy;
 double * dummy_d;
+
+// Block info
+double * blockxo, *blockyo;
+int * leftblk, *rightblk, *topblk, *botblk;
+
+double * blockxo_g, *blockyo_g;
+int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
+
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
 std::map<std::string, float *> OutputVarMapCPU;
@@ -187,33 +195,73 @@ template <class T> void Allocate4CPU(int nx, int ny, T *&zs, T *&hh, T *&uu, T *
 	vv = (T *)malloc(nx*ny * sizeof(T));
 }
 
-template <class T> void setedges(int nx, int ny, T *&zb)
+template <class T> void setedges(int nblk, int nx,int ny, double xo,double yo, double dx,double *blockxo, double * blockyo,  T *&zb)
 {
-	for (int j = 0; j < ny; j++)
+	for (int bl = 0; bl < nblk; bl++)
 	{
-
-		for (int i = 0; i < nx; i++)
+		if (blockxo[bl] == xo)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
 		{
-			if (i == 0)
+			int i = 0;
+			for (int j = 0; j < 16; j++)
 			{
-				zb[i + j*nx] = zb[(i + 1) + j*nx];
-			}
-			if (i == nx - 1)
-			{
-				zb[i + j*nx] = zb[(i - 1) + j*nx];
-			}
-			if (j == 0)
-			{
-				zb[i + j*nx] = zb[i + (j + 1)*nx];
-			}
-			if (j == ny - 1)
-			{
-				zb[i + j*nx] = zb[i + (j - 1)*nx];
-			}
 
+				zb[i + j * 16 + bl * 256] = zb[i+1 + j * 16 + bl * 256];
+			}
+		}
+		if (blockxo[bl]+(15*dx) == xo+nx*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		{
+			int i = 15;
+			for (int j = 0; j < 16; j++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i - 1 + j * 16 + bl * 256];
+			}
+		}
+		if (blockyo[bl] == yo)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		{
+			int j = 0;
+			for (int i = 0; i < 16; i++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i  + (j+1) * 16 + bl * 256];
+			}
+		}
+		if (blockyo[bl] + (15 * dx) == yo + ny*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		{
+			int j = 15;
+			for (int i = 0; i < 16; i++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i + (j-1) * 16 + bl * 256];
+			}
 		}
 	}
 }
+
+template <class T> void carttoBUQ(int nblk, int nx,int ny, double xo,double yo, double dx, double* blockxo, double* blockyo,  T * zb, T *&zb_buq)
+{
+	//
+	int ix, iy;
+	T x, y;
+	for (int b = 0; b < nblk; b++)
+	{
+
+		for (int i = 0; i < 16; i++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				x = blockxo[b] + i*dx;
+				y = blockyo[b] + j*dx;
+				ix = min(max((int)round((x-xo) / dx),0),nx-1); // min(max( part is overkill?
+				iy = min(max((int)round((y-yo) / dx), 0), ny - 1);
+				
+				zb_buq[i + j * 16 + b * 256] = zb[ix + iy*nx];
+				//printf("bid=%i\ti=%i\tj=%i\tix=%i\tiy=%i\tzb_buq[n]=%f\n", b,i,j,ix, iy, zb_buq[i + j * 16 + b * 256]);
+			}
+		}
+	}
+}
+
 
 float maxdiff(int nxny, float * ref, float * pred)
 {
@@ -2666,11 +2714,11 @@ int main(int argc, char **argv)
 			}
 		}
 		
+		//XParam.nx = ceil(XParam.nx / 16) * 16;
+		//XParam.ny = ceil(XParam.ny / 16) * 16;
 
 
-
-													//fid = fopen(XParam.Bathymetryfile.c_str(), "r");
-													//fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &XParam.nx, &XParam.ny, &XParam.dx, &XParam.grdalpha);
+		
 		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi,XParam.xo, XParam.yo);
 		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(XParam.xo) + " yo=" + std::to_string(XParam.yo));
 
@@ -2741,6 +2789,7 @@ int main(int argc, char **argv)
 	// read the bathy file (and store to dummy for now)
 	////////////////////////////////////////////////
 	Allocate1CPU(XParam.nx, XParam.ny, dummy);
+	Allocate1CPU(XParam.nx, XParam.ny, dummy_d);
 
 	printf("Read Bathy data...");
 	write_text_to_log_file("Read Bathy data");
@@ -2786,7 +2835,7 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-
+	printf("...done\n");
 	////////////////////////////////////////////////
 	// Rearrange the memory in uniform blocks
 	////////////////////////////////////////////////
@@ -2795,17 +2844,19 @@ int main(int argc, char **argv)
 	int nblk = 0;
 	int nmask = 0;
 	int mloc = 0;
-	for (int nblky = 0; nblky < ceil(ny / 16); nblky++)
+	for (int nblky = 0; nblky <= ceil(ny / 16); nblky++)
 	{
-		for (int nblkx = 0; nblkx < ceil(nx / 16); nblkx++)
+		for (int nblkx = 0; nblkx <= ceil(nx / 16); nblkx++)
 		{
 			nmask = 0;
-			for (int ix = 0; ix < 16; ix++)
+			for (int i = 0; i < 16; i++)
 			{
-				for (int iy = 0; iy < 16; iy++)
+				for (int j = 0; j < 16; j++)
 				{
-					mloc = ix + 16 * nblkx + iy*nx + nblky * 16 * nx;
-					printf("mloc: %i\n", mloc);
+					int ix = min(i + 16 * nblkx, nx-1);
+					int iy = min(j + nblky * 16 , ny-1);
+					mloc = ix + iy*nx ;
+					//printf("mloc: %i\n", mloc);
 					if (dummy[mloc] >= XParam.mask)
 						nmask++;
 
@@ -2823,8 +2874,84 @@ int main(int argc, char **argv)
 	////////////////////////////////////////////////
 	///// Allocate and arrange blocks
 	////////////////////////////////////////////////
+	// Block info
+	//extern double * blockxo, *blockyo;
+	//extern int * leftblk, *rightblk, *topblk, *botblk;
 
+	Allocate1CPU(nblk, 1, blockxo);
+	Allocate1CPU(nblk, 1, blockyo);
+	Allocate4CPU(nblk, 1, leftblk, rightblk, topblk, botblk);
 
+	nmask = 0;
+	mloc = 0;
+	int blkid = 0;
+	for (int nblky = 0; nblky <= ceil(ny / 16); nblky++)
+	{
+		for (int nblkx = 0; nblkx <= ceil(nx / 16); nblkx++)
+		{
+			nmask = 0;
+			for (int i = 0; i < 16; i++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					int ix = min(i + 16 * nblkx, nx - 1);
+					int iy = min(j + nblky * 16, ny - 1);
+					mloc = ix + iy*nx;
+					//printf("mloc: %i\n", mloc);
+					if (dummy[mloc] >= XParam.mask)
+						nmask++;
+
+				}
+			}
+			if (nmask < 256)
+			{
+				//
+				blockxo[blkid] = XParam.xo + nblkx * 16 * XParam.dx;
+				blockyo[blkid] = XParam.yo + nblky * 16 * XParam.dx;
+				blkid++;
+			}
+		}
+	}
+
+	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
+	for (int bl = 0; bl < nblk; bl++)
+	{
+		leftxo = blockxo[bl] - 16 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftyo = blockyo[bl];
+		rightxo = blockxo[bl] + 16 * XParam.dx; 
+		rightyo = blockyo[bl];
+		topxo = blockxo[bl];  
+		topyo = blockyo[bl] + 16 * XParam.dx;
+		botxo = blockxo[bl];
+		botyo = blockyo[bl] - 16 * XParam.dx;
+
+		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour 
+		leftblk[bl] = bl;
+		rightblk[bl] = bl;
+		topblk[bl] = bl;
+		botblk[bl] = bl;
+		for (int blb = 0; blb < nblk; blb++)
+		{
+			//
+			if (blockxo[blb] == leftxo && blockyo[blb] == leftyo)
+			{
+				leftblk[bl] = blb;
+			}
+			if (blockxo[blb] == rightxo && blockyo[blb] == rightyo)
+			{
+				rightblk[bl] = blb;
+			}
+			if (blockxo[blb] == topxo && blockyo[blb] == topyo)
+			{
+				topblk[bl] = blb;
+			}
+			if (blockxo[blb] == botxo && blockyo[blb] == botyo)
+			{
+				botblk[bl] = blb;
+			}
+		}
+
+	}
 
 
 
@@ -2834,6 +2961,7 @@ int main(int argc, char **argv)
 
 	printf("Allocate CPU memory...");
 	write_text_to_log_file("Allocate CPU memory...");
+
 
 	int blksize = XParam.blksize;
 
@@ -2850,8 +2978,10 @@ int main(int argc, char **argv)
 		Allocate4CPU(nblk, blksize, Su_d, Sv_d, Fhu_d, Fhv_d);
 		Allocate4CPU(nblk, blksize, Fqux_d, Fquy_d, Fqvx_d, Fqvy_d);
 
-		Allocate4CPU(nblk, blksize, dh_d, dhu_d, dhv_d, dummy_d);
-
+		//Allocate4CPU(nblk, blksize, dh_d, dhu_d, dhv_d, dummy_d);
+		Allocate1CPU(nblk, blksize, dh_d);
+		Allocate1CPU(nblk, blksize, dhu_d);
+		Allocate1CPU(nblk, blksize, dhv_d);
 
 		
 		
@@ -3273,19 +3403,15 @@ int main(int argc, char **argv)
 		{
 			for (int i = 0; i < nx; i++)
 			{
-				zb_d[i + j*nx] = dummy[i + j*nx] * 1.0;
+				dummy_d[i + j*nx] = dummy[i + j*nx] * 1.0;
 			}
 		}
+
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy_d, zb_d);
 	}
 	else
 	{
-		for (int j = 0; j < ny; j++)
-		{
-			for (int i = 0; i < nx; i++)
-			{
-				zb[i + j*nx] = dummy[i + j*nx];
-			}
-		}
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 	}
 
 
@@ -3293,14 +3419,15 @@ int main(int argc, char **argv)
 	write_text_to_log_file("Done");
 
 	// set grid edges. this is necessary for boundary conditions to work
-	//could be more efficient
+	// Shouldn't this be done after the hotstarts es?
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		setedges(nx, ny, zb_d);
+		//setedges(nx, ny, zb_d);
+		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, zb_d);
 	}
-	else 
+	else
 	{
-		setedges(nx, ny, zb);
+		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, zb);
 	}
 	
 
@@ -3318,11 +3445,11 @@ int main(int argc, char **argv)
 		write_text_to_log_file("Hotstart");
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
-			hotstartsucess = readhotstartfileD(XParam, zs_d, zb_d, hh_d, uu_d, vv_d);
+			hotstartsucess = readhotstartfileD(XParam, blockxo, blockyo, dummy_d, zs_d, zb_d, hh_d, uu_d, vv_d);
 		}
 		else
 		{
-			hotstartsucess = readhotstartfile(XParam, zs, zb, hh, uu, vv);
+			hotstartsucess = readhotstartfile(XParam, blockxo, blockyo, dummy, zs, zb, hh, uu, vv);
 		}
 		
 		if (hotstartsucess == 0)
@@ -3354,49 +3481,54 @@ int main(int argc, char **argv)
 		{
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				for (int j = 0; j < ny; j++)
+				for (int bl = 0; bl < XParam.nblk; bl++)
 				{
-					for (int i = 0; i < nx; i++)
+					for (int j = 0; j < 16; j++)
 					{
+						for (int i = 0; i < 16; i++)
+						{
+							int n = i + j * 16 + bl * blksize;
 
-						uu_d[i + j*nx] = 0.0;
-						vv_d[i + j*nx] = 0.0;
-						//zb[i + j*nx] = 0.0f;
-						zs_d[i + j*nx] = max(XParam.zsinit, zb_d[i + j*nx]);
-						//if (i >= 64 && i < 82)
-						//{
-						//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
-						//}
-						hh_d[i + j*nx] = max(zs_d[i + j*nx] - zb_d[i + j*nx], XParam.eps);
-
+							uu_d[n] = 0.0;
+							vv_d[n] = 0.0;
+							//zb[n] = 0.0f;
+							zs_d[n] = max(XParam.zsinit, zb_d[n]);
+							//if (i >= 64 && i < 82)
+							//{
+							//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);
+							//}
+							hh_d[n] = max(zs_d[n] - zb_d[n], XParam.eps);//0.0?
+						}
 
 					}
 				}
 			}
 			else
 			{
-				for (int j = 0; j < ny; j++)
+				for (int bl = 0; bl < XParam.nblk; bl++)
 				{
-					for (int i = 0; i < nx; i++)
+					for (int j = 0; j < 16; j++)
 					{
-
-						uu[i + j*nx] = 0.0f;
-						vv[i + j*nx] = 0.0f;
-						//zb[i + j*nx] = 0.0f;
-						zs[i + j*nx] = max((float)XParam.zsinit, zb[i + j*nx]);
-						//if (i >= 64 && i < 82)
-						//{
-						//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
-						//}
-						hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
-
+						for (int i = 0; i < 16; i++)
+						{
+							int n = i + j * 16 + bl * blksize;
+							uu[n] = 0.0f;
+							vv[n] = 0.0f;
+							//zb[i + j*nx] = 0.0f;
+							zs[n] = max((float)XParam.zsinit, zb[n]);
+							//if (i >= 64 && i < 82)
+							//{
+							//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
+							//}
+							hh[n] = max(zs[n] - zb[n], (float)XParam.eps);//0.0f?
+						}
 
 					}
 				}
 			}
 
 		}
-		else // lukewarm start i.e. bilinear interpolation of zs
+		else // lukewarm start i.e. bilinear interpolation of zs at bnds // Argggh!
 		{
 			double zsleft = 0.0;
 			double zsright = 0.0;
@@ -3411,201 +3543,193 @@ int main(int argc, char **argv)
 			double tophere = 0.0;
 			double bothere = 0.0;
 
+			double xi, yi, jj, ii;
 
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				disttop = max((double)(ny - 1) - j, 0.1);
-				
-				distbot = max((double) j, 0.1);
-
-				if (XParam.left == 1 && !leftWLbnd.empty())
+				for (int j = 0; j < 16; j++)
 				{
-					lefthere = 1.0;
-					int SLstepinbnd = 1;
-
-
-
-					// Do this for all the corners
-					//Needs limiter in case WLbnd is empty
-					double difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-					while (difft < 0.0)
+					for (int i = 0; i < 16; i++)
 					{
-						SLstepinbnd++;
-						difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
-					}
-					std::vector<double> zsbndvec;
-					for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
-					{
-						zsbndvec.push_back( interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
+						int n = i + j * 16 + bl * blksize;
+						xi = blockxo[bl] + i*XParam.dx;
+						yi = blockxo[bl] + j*XParam.dx;
 
-					}
-					if (zsbndvec.size() == 1)
-					{
-						zsleft = zsbndvec[0];
-					}
-					else
-					{
-						int iprev = min(max((int)ceil(j / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-						int inext = iprev + 1;
-						// here interp time is used to interpolate to the right node rather than in time...
-						zsleft =  interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(j - iprev));
-					}
+						disttop = max((XParam.yo + (ny - 1)*XParam.dx - yi) / XParam.dx, 0.1);//max((double)(ny - 1) - j, 0.1);// WTF is that 0.1? // distleft cannot be 0 
+						distbot = max((yi - XParam.yo) / XParam.dx, 0.1);
+						distleft = max((xi - XParam.xo) / XParam.dx, 0.1);//max((double)i, 0.1);
+						distright = max((XParam.xo + (nx - 1)*XParam.dx - xi) / XParam.dx, 0.1);//max((double)(nx - 1) - i, 0.1);
 
-				}
-				
-				if (XParam.right == 1 && !rightWLbnd.empty())
-				{
-					int SLstepinbnd = 1;
-					righthere = 1.0;
+						jj = (yi - XParam.yo) / XParam.dx;
+						ii = (xi - XParam.xo) / XParam.dx;
 
-
-					// Do this for all the corners
-					//Needs limiter in case WLbnd is empty
-					double difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-					while (difft < 0.0)
-					{
-						SLstepinbnd++;
-						difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
-					}
-					std::vector<double> zsbndvec;
-					for (int n = 0; n < rightWLbnd[SLstepinbnd].wlevs.size(); n++)
-					{
-						zsbndvec.push_back( interptime(rightWLbnd[SLstepinbnd].wlevs[n], rightWLbnd[SLstepinbnd - 1].wlevs[n], rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time, XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time));
-
-					}
-					if (zsbndvec.size() == 1)
-					{
-						zsright = zsbndvec[0];
-					}
-					else
-					{
-						int iprev = min(max((int)ceil(j / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-						int inext = iprev + 1;
-						// here interp time is used to interpolate to the right node rather than in time...
-						zsright = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(j - iprev));
-					}
-
-
-				}
-				
-				
-				
-				
-
-				for (int i = 0; i < nx; i++)
-				{
-					distleft = max((double)i,0.1);
-					distright = max((double)(nx - 1) - i, 0.1);
-
-					if (XParam.bot == 1 && !botWLbnd.empty())
-					{
-						int SLstepinbnd = 1;
-						bothere = 1.0;
-
-
-
-
-						// Do this for all the corners
-						//Needs limiter in case WLbnd is empty
-						double difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-						while (difft < 0.0)
+						if (XParam.left == 1 && !leftWLbnd.empty())
 						{
-							SLstepinbnd++;
-							difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
-						}
-						std::vector<double> zsbndvec;
-						for (int n = 0; n < botWLbnd[SLstepinbnd].wlevs.size(); n++)
-						{
-							zsbndvec.push_back(interptime(botWLbnd[SLstepinbnd].wlevs[n], botWLbnd[SLstepinbnd - 1].wlevs[n], botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time, XParam.totaltime - botWLbnd[SLstepinbnd - 1].time));
+							lefthere = 1.0;
+							int SLstepinbnd = 1;
+
+
+
+							// Do this for all the corners
+							//Needs limiter in case WLbnd is empty
+							double difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+							while (difft < 0.0)
+							{
+								SLstepinbnd++;
+								difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+							}
+							std::vector<double> zsbndvec;
+							for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
+							{
+								zsbndvec.push_back(interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
+
+							}
+							if (zsbndvec.size() == 1)
+							{
+								zsleft = zsbndvec[0];
+							}
+							else
+							{
+								int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+								int inext = iprev + 1;
+								// here interp time is used to interpolate to the right node rather than in time...
+								zsleft = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
+							}
 
 						}
-						if (zsbndvec.size() == 1)
+
+						if (XParam.right == 1 && !rightWLbnd.empty())
 						{
-							zsbot = zsbndvec[0];
+							int SLstepinbnd = 1;
+							righthere = 1.0;
+
+
+							// Do this for all the corners
+							//Needs limiter in case WLbnd is empty
+							double difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+							while (difft < 0.0)
+							{
+								SLstepinbnd++;
+								difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
+							}
+							std::vector<double> zsbndvec;
+							for (int n = 0; n < rightWLbnd[SLstepinbnd].wlevs.size(); n++)
+							{
+								zsbndvec.push_back(interptime(rightWLbnd[SLstepinbnd].wlevs[n], rightWLbnd[SLstepinbnd - 1].wlevs[n], rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time, XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time));
+
+							}
+							if (zsbndvec.size() == 1)
+							{
+								zsright = zsbndvec[0];
+							}
+							else
+							{
+								int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+								int inext = iprev + 1;
+								// here interp time is used to interpolate to the right node rather than in time...
+								zsright = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
+							}
+
+
+						}
+						if (XParam.bot == 1 && !botWLbnd.empty())
+						{
+							int SLstepinbnd = 1;
+							bothere = 1.0;
+
+
+
+
+							// Do this for all the corners
+							//Needs limiter in case WLbnd is empty
+							double difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+							while (difft < 0.0)
+							{
+								SLstepinbnd++;
+								difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
+							}
+							std::vector<double> zsbndvec;
+							for (int n = 0; n < botWLbnd[SLstepinbnd].wlevs.size(); n++)
+							{
+								zsbndvec.push_back(interptime(botWLbnd[SLstepinbnd].wlevs[n], botWLbnd[SLstepinbnd - 1].wlevs[n], botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time, XParam.totaltime - botWLbnd[SLstepinbnd - 1].time));
+
+							}
+							if (zsbndvec.size() == 1)
+							{
+								zsbot = zsbndvec[0];
+							}
+							else
+							{
+								int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+								int inext = iprev + 1;
+								// here interp time is used to interpolate to the right node rather than in time...
+								zsbot = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
+							}
+
+						}
+						if (XParam.top == 1 && !topWLbnd.empty())
+						{
+							int SLstepinbnd = 1;
+							tophere = 1.0;
+
+
+
+
+							// Do this for all the corners
+							//Needs limiter in case WLbnd is empty
+							double difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+							while (difft < 0.0)
+							{
+								SLstepinbnd++;
+								difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
+							}
+							std::vector<double> zsbndvec;
+							for (int n = 0; n < topWLbnd[SLstepinbnd].wlevs.size(); n++)
+							{
+								zsbndvec.push_back(interptime(topWLbnd[SLstepinbnd].wlevs[n], topWLbnd[SLstepinbnd - 1].wlevs[n], topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time, XParam.totaltime - topWLbnd[SLstepinbnd - 1].time));
+
+							}
+							if (zsbndvec.size() == 1)
+							{
+								zstop = zsbndvec[0];
+							}
+							else
+							{
+								int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+								int inext = iprev + 1;
+								// here interp time is used to interpolate to the right node rather than in time...
+								zstop = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
+							}
+
+						}
+
+
+						zsbnd = ((zsleft * 1 / distleft)*lefthere + (zsright * 1 / distright)*righthere + (zstop * 1 / disttop)*tophere + (zsbot * 1 / distbot)*bothere) / ((1 / distleft)*lefthere + (1 / distright)*righthere + (1 / disttop)*tophere + (1 / distbot)*bothere);
+
+
+						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+						{
+							zs_d[n] = max(zsbnd, zb_d[n]);
+							hh_d[n] = max(zs_d[n] - zb_d[n], XParam.eps);
+							uu_d[n] = 0.0;
+							vv_d[n] = 0.0;
 						}
 						else
 						{
-							int iprev = min(max((int)ceil(i / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-							int inext = iprev + 1;
-							// here interp time is used to interpolate to the right node rather than in time...
-							zsbot =  interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(i - iprev));
+							zs[n] = max((float)zsbnd, zb[n]);
+							hh[n] = max(zs[i + j*nx] - zb[n], (float)XParam.eps);
+							uu[n] = 0.0f;
+							vv[n] = 0.0f;
 						}
 
 					}
-					if (XParam.top == 1 && !topWLbnd.empty())
-					{
-						int SLstepinbnd = 1;
-						tophere = 1.0;
-
-
-
-
-						// Do this for all the corners
-						//Needs limiter in case WLbnd is empty
-						double difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-						while (difft < 0.0)
-						{
-							SLstepinbnd++;
-							difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
-						}
-						std::vector<double> zsbndvec;
-						for (int n = 0; n < topWLbnd[SLstepinbnd].wlevs.size(); n++)
-						{
-							zsbndvec.push_back( interptime(topWLbnd[SLstepinbnd].wlevs[n], topWLbnd[SLstepinbnd - 1].wlevs[n], topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time, XParam.totaltime - topWLbnd[SLstepinbnd - 1].time));
-
-						}
-						if (zsbndvec.size() == 1)
-						{
-							zstop = zsbndvec[0];
-						}
-						else
-						{
-							int iprev = min(max((int)ceil(i / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-							int inext = iprev + 1;
-							// here interp time is used to interpolate to the right node rather than in time...
-							zstop =  interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(i - iprev));
-						}
-
-					}
-				
-										
-
-					//if (XParam.top == 1 && !topWLbnd.empty() && XParam.bot == 1 && !botWLbnd.empty() && XParam.left == 1 && !leftWLbnd.empty() && XParam.right == 1 && !rightWLbnd.empty())
-					//{
-					//	zsbnd = (zsleft*(1 / i) + zsright * 1 / (nx - i) + zsbot * 1 / j + zstop * 1 / (ny - j)) / ((1 / i) + 1 / (nx - i) + 1 / j + 1 / (ny - j));
-					//}
-					
-					zsbnd = ((zsleft * 1 / distleft)*lefthere + (zsright * 1 / distright)*righthere + (zstop * 1 / disttop)*tophere + (zsbot * 1 / distbot)*bothere) / ((1 / distleft)*lefthere + (1 / distright)*righthere + (1 / disttop)*tophere + (1 / distbot)*bothere);
-					
-					if (XParam.doubleprecision == 1 || XParam.spherical == 1)
-					{
-						zs_d[i + j*nx] = max(zsbnd, zb_d[i + j*nx]);
-						hh_d[i + j*nx] = max(zs_d[i + j*nx] - zb_d[i + j*nx], XParam.eps);
-						uu_d[i + j*nx] = 0.0;
-						vv_d[i + j*nx] = 0.0;
-					}
-					else
-					{
-						zs[i + j*nx] = max((float)zsbnd, zb[i + j*nx]);
-						hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
-						uu[i + j*nx] = 0.0f;
-						vv[i + j*nx] = 0.0f;
-					}
-
 				}
 			}
-
-
 		}
-
-		
-
-
-
 		
 	}
 	printf("done \n  ");
@@ -3615,96 +3739,132 @@ int main(int argc, char **argv)
 	{
 		if (XParam.outhhmax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					hhmax_d[i + j*nx] = hh_d[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						hhmax_d[n] = hh_d[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outhhmean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					hhmean_d[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						hhmean_d[n] = 0.0;
+					}
 				}
 			}
 		}
 		if (XParam.outzsmax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					zsmax_d[i + j*nx] = zs_d[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						zsmax_d[n] = zs_d[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outzsmean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					zsmean_d[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						zsmean_d[n] = 0.0;
+					}
 				}
 			}
 		}
 
 		if (XParam.outuumax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					uumax_d[i + j*nx] = uu_d[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						uumax_d[n] = uu_d[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outuumean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					uumean_d[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						uumean_d[n] = 0.0;
+					}
 				}
 			}
 		}
 		if (XParam.outvvmax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vvmax_d[i + j*nx] = vv_d[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						vvmax_d[n] = vv_d[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outvvmean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vvmean_d[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						vvmean_d[n] = 0.0;
+					}
 				}
 			}
 		}
 		if (XParam.outvort == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vort_d[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						vort_d[n] = 0.0;
+					}
 				}
 			}
 		}
@@ -3714,96 +3874,132 @@ int main(int argc, char **argv)
 		
 		if (XParam.outhhmax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					hhmax[i + j*nx] = hh[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						hhmax[n] = hh[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outhhmean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					hhmean[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						hhmean[n] = 0.0;
+					}
 				}
 			}
 		}
 		if (XParam.outzsmax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					zsmax[i + j*nx] = zs[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						zsmax[n] = zs[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outzsmean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					zsmean[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						zsmean[n] = 0.0;
+					}
 				}
 			}
 		}
 
 		if (XParam.outuumax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					uumax[i + j*nx] = uu[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						uumax[n] = uu[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outuumean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					uumean[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						uumean[n] = 0.0;
+					}
 				}
 			}
 		}
 		if (XParam.outvvmax == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vvmax[i + j*nx] = vv[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						vvmax[n] = vv[n];
+					}
 				}
 			}
 		}
 
 		if (XParam.outvvmean == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vvmean[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						vvmean[n] = 0.0;
+					}
 				}
 			}
 		}
 		if (XParam.outvort == 1)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vort[i + j*nx] = 0.0;
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * blksize;
+						vort[n] = 0.0;
+					}
 				}
 			}
 		}
@@ -3813,26 +4009,26 @@ int main(int argc, char **argv)
 		printf("Init data on GPU ");
 		write_text_to_log_file("Init data on GPU ");
 
-		dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
-		dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+		dim3 blockDim(16, 16, 1);
+		dim3 gridDim(nblk, 1, 1);
 
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
-			CUDA_CHECK(cudaMemcpy(zb_gd, zb_d, nx*ny * sizeof(double), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(hh_gd, hh_d, nx*ny * sizeof(double), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(uu_gd, uu_d, nx*ny * sizeof(double), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(vv_gd, vv_d, nx*ny * sizeof(double), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(zs_gd, zs_d, nx*ny * sizeof(double), cudaMemcpyHostToDevice));
-			initdtmax << <gridDim, blockDim, 0 >> >(nx, ny, epsilon, dtmax_gd);
+			CUDA_CHECK(cudaMemcpy(zb_gd, zb_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(hh_gd, hh_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(uu_gd, uu_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(vv_gd, vv_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(zs_gd, zs_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
+			initdtmax << <gridDim, blockDim, 0 >> >(epsilon, dtmax_gd);
 		}
 		else
 		{
-			CUDA_CHECK(cudaMemcpy(zb_g, zb, nx*ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(hh_g, hh, nx*ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(uu_g, uu, nx*ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(vv_g, vv, nx*ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(zs_g, zs, nx*ny * sizeof(float), cudaMemcpyHostToDevice));
-			initdtmax << <gridDim, blockDim, 0 >> >(nx, ny, (float)epsilon, dtmax_g);
+			CUDA_CHECK(cudaMemcpy(zb_g, zb, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(hh_g, hh, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(uu_g, uu, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(vv_g, vv, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(zs_g, zs, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
+			initdtmax << <gridDim, blockDim, 0 >> >( (float)epsilon, dtmax_g);
 		}
 		
 
@@ -3944,11 +4140,12 @@ int main(int argc, char **argv)
 		//Create definition for each variable and store it
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
-			defncvarD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
+			//defncvarD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
+			defncvarD(XParam, blockxo, blockyo, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
 		}
 		else
 		{
-			defncvar(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
+			defncvar(XParam, blockxo, blockyo, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
 		}
 		
 	}
@@ -3966,13 +4163,13 @@ int main(int argc, char **argv)
 
 	if (XParam.GPUDEVICE >= 0)
 	{
-		mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
-		//checkloopGPU(XParam);
+		//mainloopGPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+		
 			
 	}
 	else
 	{
-		mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
+		//mainloopCPU(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 	}
 
 	

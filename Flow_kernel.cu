@@ -1534,25 +1534,33 @@ template <class T> __global__ void Advkernel(int nx, int ny, T dt, T eps, T * hh
 
 
 
-template <class T> __global__ void cleanupGPU(int nx, int ny, T * hhi, T *zsi, T *uui, T *vvi, T * hho, T *zso, T *uuo, T *vvo)
+template <class T> __global__ void cleanupGPU(int nx,int ny, T * hhi, T *zsi, T *uui, T *vvi, T * hho, T *zso, T *uuo, T *vvo)
 {
+	
+	
+
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	int i = ix + iy*nx;
-	if (ix < nx && iy < ny)
-	{
-		hho[i] = hhi[i];
-		zso[i] = zsi[i];
-		uuo[i] = uui[i];
-		vvo[i] = vvi[i];
-	}
+	//int ibl = blockIdx.x;
+	//int i = ix + iy * 16 + ibl*blockDim.x;
+	
+	hho[i] = hhi[i];
+	zso[i] = zsi[i];
+	uuo[i] = uui[i];
+	vvo[i] = vvi[i];
+	
 }
 
-template <class T> __global__ void initdtmax(int nx, int ny, T epsi,T *dtmax)
+template <class T> __global__ void initdtmax( T epsi,T *dtmax)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
+	//int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	//int i = ix + iy*nx;
+	int ix =  threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int i = ix + iy * 16 + ibl*(blockDim.x*blockDim.y);
 	
 		dtmax[i] = T(1.0) / epsi;
 	

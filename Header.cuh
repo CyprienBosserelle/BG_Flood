@@ -46,8 +46,8 @@ public:
 	int doubleprecision = 0;
 
 	//grid parameters
-	double dx=0.0; // grid resolution
-	double delta; // 
+	double dx=0.0; // grid resolution in the coordinate system unit. 
+	double delta; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
 	int nblk=0; // number of compute blocks
@@ -216,6 +216,14 @@ extern double * dtmax_gd;
 extern double * TSstore_d, *TSstore_gd;
 extern double * dummy_d;
 
+// Block info
+extern double * blockxo, *blockyo;
+extern int * leftblk, *rightblk, *topblk, *botblk;
+
+extern double * blockxo_g, *blockyo_g;
+extern int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
+
+
 //Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch
 extern cudaArray* leftWLS_gp; // Cuda array to pre-store HD vel data before converting to textures
 extern cudaArray* rightWLS_gp;
@@ -234,6 +242,9 @@ template <class T> T sq(T a);
 
 template <class T> const T& max(const T& a, const T& b);
 template <class T> const T& min(const T& a, const T& b);
+
+template <class T> void carttoBUQ(int nblk, int nx, int ny, double xo, double yo, double dx, double* blockxo, double* blockyo, T * zb, T *&zb_buq);
+
 
 //General CPU functions //Unecessary to declare here?
 void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
@@ -296,15 +307,15 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
 // Netcdf functions
 Param creatncfileUD(Param XParam);
 
-extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var);
-extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, double * var_d);
+extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
+extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, double * var);
 extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
 extern "C" void writencvarstepD(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, double * var_d);
 void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
-int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
-int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
+int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
+int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
 
 // I/O
 extern "C" void readbathy(std::string filename, float *&zb);

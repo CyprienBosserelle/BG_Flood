@@ -37,8 +37,9 @@ void handle_error(int status) {
 Param creatncfileUD(Param XParam)
 {
 	int status;
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	int nx = ceil(XParam.nx / 16.0) * 16.0; // should be (xmax-xo)/dx but xmax is not known yet
+
+	int ny = ceil(XParam.ny / 16.0) * 16.0;
 	//double dx = XParam.dx;
 	size_t nxx, nyy;
 	int ncid, xx_dim, yy_dim, time_dim;
@@ -153,15 +154,22 @@ Param creatncfileUD(Param XParam)
 	
 }
 
-extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, float * var)
+extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var)
 {
+	std::string outfile = XParam.outfile;
+	int smallnc = XParam.smallnc;
+	float scalefactor = XParam.scalefactor;
+	float addoffset = XParam.addoffset;
+	int nx = ceil(XParam.nx / 16) * 16;
+	int ny = ceil(XParam.ny / 16) * 16;;
 	int status;
 	int ncid, var_id;
 	int  var_dimid2D[2];
 	int  var_dimid3D[3];
 	//int  var_dimid4D[4];
 
-	short * var_s;
+	short * var_s,*varblk_s;
+	float * varblk;
 	int recid, xid, yid;
 	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
@@ -189,22 +197,30 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 	short Sfillval = 32767;
 //short fillval = 32767
 	static size_t start2D[] = { 0, 0 }; // start at first value 
-	static size_t count2D[] = { ny, nx };
+	//static size_t count2D[] = { ny, nx };
+	static size_t count2D[] = { 16, 16 };
 
 	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
-	static size_t count3D[] = { 1, ny, nx };
+	//static size_t count3D[] = { 1, ny, nx };
+	static size_t count3D[] = { 1, 16, 16 };
+
+	varblk = (float *)malloc(XParam.blksize * sizeof(float));
 	
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(nx*ny*sizeof(short));
-
-		for (int i = 0; i < nx; i++)
+		var_s = (short *)malloc(XParam.nblk*XParam.blksize *sizeof(short));
+		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int j = 0; j < 16; j++)
 			{
-				// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
-				var_s[i + nx*j] = (short)round((var[i + nx*j] - addoffset) / scalefactor);
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
+					var_s[n] = (short)round((var[n] - addoffset) / scalefactor);
+				}
 			}
 		}
 	}
@@ -226,8 +242,22 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_vara_short(ncid, var_id, start2D, count2D, var_s);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk_s[i + j * 16] = var_s[n];
+					}
+				}
+				//jstart
+				start2D[0] = (size_t) round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start2D[1] = (size_t) round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_short(ncid, var_id, start2D, count2D, varblk_s);
+				if (status != NC_NOERR) handle_error(status);
+			}
 		}
 		else
 		{
@@ -239,8 +269,21 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_vara_float(ncid, var_id, start2D, count2D, var);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk[i + j * 16] = var[n];
+					}
+				}
+				start2D[0] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start2D[1] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_float(ncid, var_id, start2D, count2D, varblk);
+				if (status != NC_NOERR) handle_error(status);
+			}
 		}
 
 		
@@ -261,8 +304,21 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_vara_short(ncid, var_id, start3D, count3D, var_s);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk_s[i + j * 16] = var_s[n];
+					}
+				}
+				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);
+				if (status != NC_NOERR) handle_error(status);
+			}
 
 		}
 		else
@@ -275,33 +331,52 @@ extern "C" void defncvar(std::string outfile, int smallnc, float scalefactor, fl
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-			
-			status = nc_put_vara_float(ncid, var_id, start3D, count3D, var);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk[i + j * 16] = var[n];
+					}
+				}
+				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
+				if (status != NC_NOERR) handle_error(status);
+			}
 		}
 	}
 	
 	if (smallnc > 0)
 	{
 		free(var_s);
+		free(varblk_s);
 	}
+	free(varblk);
 	//close and save new file
 	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_error(status);
 
 }
 
-
-extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, float addoffset, int nx, int ny, std::string varst, int vdim, double * var_d)
+extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, double * var)
 {
+	std::string outfile = XParam.outfile;
+	int smallnc = XParam.smallnc;
+	float scalefactor = XParam.scalefactor;
+	float addoffset = XParam.addoffset;
+	int nx = XParam.nx;
+	int ny = XParam.ny;
 	int status;
 	int ncid, var_id;
 	int  var_dimid2D[2];
 	int  var_dimid3D[3];
 	//int  var_dimid4D[4];
 
-	float * var;
-	short * var_s;
+	short * var_s, *varblk_s;
+	float * varblk;
 	int recid, xid, yid;
 	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
@@ -329,31 +404,30 @@ extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, f
 	short Sfillval = 32767;
 	//short fillval = 32767
 	static size_t start2D[] = { 0, 0 }; // start at first value 
-	static size_t count2D[] = { ny, nx };
+										//static size_t count2D[] = { ny, nx };
+	static size_t count2D[] = { 16, 16 };
 
 	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
-	static size_t count3D[] = { 1, ny, nx };
+										   //static size_t count3D[] = { 1, ny, nx };
+	static size_t count3D[] = { 1, 16, 16 };
 
-	var = (float *)malloc(nx*ny * sizeof(float));
-	for (int i = 0; i < nx; i++)
-	{
-		for (int j = 0; j < ny; j++)
-		{
-			var[i + nx*j] = float(var_d[i + nx*j]);
-		}
-	}
+	varblk = (float *)malloc(XParam.blksize * sizeof(float));
 
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(nx*ny * sizeof(short));
-
-		for (int i = 0; i < nx; i++)
+		var_s = (short *)malloc(XParam.nblk*XParam.blksize * sizeof(short));
+		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int j = 0; j < 16; j++)
 			{
-				// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
-				var_s[i + nx*j] = (short)round((var[i + nx*j] - addoffset) / scalefactor);
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
+					var_s[n] = (short)round((var[n] - addoffset) / scalefactor);
+				}
 			}
 		}
 	}
@@ -375,8 +449,22 @@ extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, f
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_vara_short(ncid, var_id, start2D, count2D, var_s);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk_s[i + j * 16] = var_s[n];
+					}
+				}
+				//jstart
+				start2D[0] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start2D[1] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_short(ncid, var_id, start2D, count2D, varblk_s);
+				if (status != NC_NOERR) handle_error(status);
+			}
 		}
 		else
 		{
@@ -388,8 +476,21 @@ extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, f
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_vara_float(ncid, var_id, start2D, count2D, var);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk[i + j * 16] = var[n];
+					}
+				}
+				start2D[0] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start2D[1] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_float(ncid, var_id, start2D, count2D, varblk);
+				if (status != NC_NOERR) handle_error(status);
+			}
 		}
 
 
@@ -410,8 +511,21 @@ extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, f
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_vara_short(ncid, var_id, start3D, count3D, var_s);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk_s[i + j * 16] = var_s[n];
+					}
+				}
+				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);
+				if (status != NC_NOERR) handle_error(status);
+			}
 
 		}
 		else
@@ -424,17 +538,30 @@ extern "C" void defncvarD(std::string outfile, int smallnc, float scalefactor, f
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_enddef(ncid);
 			if (status != NC_NOERR) handle_error(status);
-
-			status = nc_put_vara_float(ncid, var_id, start3D, count3D, var);
-			if (status != NC_NOERR) handle_error(status);
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * XParam.blksize;
+						varblk[i + j * 16] = var[n];
+					}
+				}
+				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+				start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
+				if (status != NC_NOERR) handle_error(status);
+			}
 		}
 	}
 
 	if (smallnc > 0)
 	{
 		free(var_s);
+		free(varblk_s);
 	}
-	free(var);
+	free(varblk);
 	//close and save new file
 	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_error(status);
@@ -857,14 +984,14 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx)
 
 }
 
-int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
+int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
 {
-	int status, zserror, hherror, uuerror,vverror,zberror, sferr,oferr;
-	int ncid, varid,ndims;
+	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
+	int ncid, varid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
 	int nx, ny, nt;
-	float scalefac = 1.0f;
-	float offset=0.0f;
+	float scalefac = 1.0;
+	float offset = 0.0;
 	size_t  *ddim;
 
 
@@ -888,7 +1015,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		status = nc_inq_vardimid(ncid, varid, dimids);
 		if (status != NC_NOERR) handle_error(status);
 
-		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+		ddim = (size_t *)malloc(ndims * sizeof(size_t));
 
 		//Read dimensions nx_u ny_u 
 		for (int iddim = 0; iddim < ndims; iddim++)
@@ -900,21 +1027,23 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = (int) ddim[0];
-			ny = (int) ddim[1];
-			nx = (int) ddim[2];
-			size_t start[] = {max(XParam.hotstep,nt-1), 0, 0 };
-			size_t count[] = {1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, zb);
+			nt = (int)ddim[0];
+			ny = (int)ddim[1];
+			nx = (int)ddim[2];
+			size_t start[] = { max(XParam.hotstep,nt - 1), 0, 0 };
+			size_t count[] = { 1, ny, nx };
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
+
+
 		}
 		else
 		{
-			ny = (int) ddim[0];
-			nx = (int) ddim[1];
+			ny = (int)ddim[0];
+			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, zb);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -927,14 +1056,14 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					zb[i + j*nx] = zb[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
-		
 
-		
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
+
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
 	}
@@ -950,7 +1079,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		status = nc_inq_vardimid(ncid, varid, dimids);
 		if (status != NC_NOERR) handle_error(status);
 
-		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+		ddim = (size_t *)malloc(ndims * sizeof(size_t));
 
 		//Read dimensions nx_u ny_u 
 		for (int iddim = 0; iddim < ndims; iddim++)
@@ -962,21 +1091,21 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = (int) ddim[0];
-			ny = (int) ddim[1];
-			nx = (int) ddim[2];
+			nt = (int)ddim[0];
+			ny = (int)ddim[1];
+			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, zs);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
 		{
-			ny = (int) ddim[0];
-			nx = (int) ddim[1];
+			ny = (int)ddim[0];
+			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, zs);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -989,21 +1118,28 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					zs[i + j*nx] = zs[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
+
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
+
 		//check sanity
-		for (int j = 0; j < ny; j++)
+		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
-			for (int i = 0; i < nx; i++)
+			for (int j = 0; j < 16; j++)
 			{
-				zs[i + j*nx] = max(zs[i + j*nx], zb[i + j*nx]);
-				//unpacked_value = packed_value * scale_factor + add_offset
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * 256;
+					zs[n] = max(zs[n], zb[n]);
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
 			}
 		}
-		
+
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
 	}
@@ -1031,7 +1167,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		status = nc_inq_vardimid(ncid, varid, dimids);
 		if (status != NC_NOERR) handle_error(status);
 
-		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+		ddim = (size_t *)malloc(ndims * sizeof(size_t));
 
 		//Read dimensions nx_u ny_u 
 		for (int iddim = 0; iddim < ndims; iddim++)
@@ -1043,21 +1179,21 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = (int) ddim[0];
-			ny = (int) ddim[1];
-			nx = (int) ddim[2];
+			nt = (int)ddim[0];
+			ny = (int)ddim[1];
+			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, hh);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
 		{
-			ny = (int) ddim[0];
-			nx = (int) ddim[1];
+			ny = (int)ddim[0];
+			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, hh);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1070,30 +1206,36 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					hh[i + j*nx] = hh[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
+
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 		//if zs was not specified
 		if (zserror == -49)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						zs[n] = zb[n] + hh[n];
+					}
 
 				}
 			}
 		}
 		free(ddim);
-		
+
 
 	}
 	else
 	{
-		if (zserror == -49 && hherror ==-49)
+		if (zserror == -49 && hherror == -49)
 		{
 			//Variable not found
 			//It's ok if hh is specified
@@ -1103,15 +1245,19 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		else
 		{
 			//hherror ==-49
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx], (float)XParam.eps);
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						hh[n] = max(zs[n] - zb[n],(float) XParam.eps);
+					}
 
 				}
 			}
-			
+
 		}
 	}
 
@@ -1126,7 +1272,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		status = nc_inq_vardimid(ncid, varid, dimids);
 		if (status != NC_NOERR) handle_error(status);
 
-		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+		ddim = (size_t *)malloc(ndims * sizeof(size_t));
 
 		//Read dimensions nx_u ny_u 
 		for (int iddim = 0; iddim < ndims; iddim++)
@@ -1138,21 +1284,21 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		}
 		if (ndims > 2)
 		{
-			nt = (int) ddim[0];
-			ny = (int) ddim[1];
-			nx = (int) ddim[2];
+			nt = (int)ddim[0];
+			ny = (int)ddim[1];
+			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, uu);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
 		{
-			ny = (int) ddim[0];
-			nx = (int) ddim[1];
+			ny = (int)ddim[0];
+			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, uu);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1165,26 +1311,31 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					uu[i + j*nx] = uu[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
-		
+
+
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
 		free(ddim);
-		
+
 
 	}
 	else
 	{
 		if (uuerror == -49)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					uu[i + j*nx] = 0.0f;
-					//unpacked_value = packed_value * scale_factor + add_offset
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						uu[n] = 0.0f;
+					}
 				}
 			}
 		}
@@ -1205,7 +1356,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		status = nc_inq_vardimid(ncid, varid, dimids);
 		if (status != NC_NOERR) handle_error(status);
 
-		ddim = (size_t *)malloc(ndims*sizeof(size_t));
+		ddim = (size_t *)malloc(ndims * sizeof(size_t));
 
 		//Read dimensions nx_u ny_u 
 		for (int iddim = 0; iddim < ndims; iddim++)
@@ -1218,20 +1369,20 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 		if (ndims > 2)
 		{
 			//nt = (int) ddim[0];
-			ny = (int) ddim[1];
-			nx = (int) ddim[2];
+			ny = (int)ddim[1];
+			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, vv);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
 		{
-			ny = (int) ddim[0];
-			nx = (int) ddim[1];
+			ny = (int)ddim[0];
+			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, vv);
+			status = nc_get_vara_float(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1244,12 +1395,13 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					vv[i + j*nx] = vv[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
 
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
 		free(ddim);
 
 
@@ -1258,12 +1410,15 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 	{
 		if (vverror == -49)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vv[i + j*nx] = 0.0f;
-					//unpacked_value = packed_value * scale_factor + add_offset
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						vv[n] = 0.0f;
+					}
 				}
 			}
 		}
@@ -1280,7 +1435,7 @@ int readhotstartfile(Param XParam, float * &zs, float * &zb, float * &hh, float 
 
 }
 
-int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv)
+int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv)
 {
 	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
 	int ncid, varid, ndims;
@@ -1328,8 +1483,10 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[2];
 			size_t start[] = { max(XParam.hotstep,nt - 1), 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, zb);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
+
+			
 		}
 		else
 		{
@@ -1337,7 +1494,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, zb);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1350,13 +1507,13 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					zb[i + j*nx] = zb[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
 
-
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
@@ -1390,7 +1547,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, zs);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
@@ -1399,7 +1556,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, zs);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1412,18 +1569,25 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					zs[i + j*nx] = zs[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
+
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
+
 		//check sanity
-		for (int j = 0; j < ny; j++)
+		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
-			for (int i = 0; i < nx; i++)
+			for (int j = 0; j < 16; j++)
 			{
-				zs[i + j*nx] = max(zs[i + j*nx], zb[i + j*nx]);
-				//unpacked_value = packed_value * scale_factor + add_offset
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * 256;
+					zs[n] = max(zs[n], zb[n]);
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
 			}
 		}
 
@@ -1471,7 +1635,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, hh);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
@@ -1480,7 +1644,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, hh);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1493,19 +1657,25 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					hh[i + j*nx] = hh[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
+
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 		//if zs was not specified
 		if (zserror == -49)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					zs[i + j*nx] = zb[i + j*nx] + hh[i + j*nx];
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						zs[n] = zb[n] + hh[n];
+					}
 
 				}
 			}
@@ -1526,11 +1696,15 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 		else
 		{
 			//hherror ==-49
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					hh[i + j*nx] = max(zs[i + j*nx] - zb[i + j*nx], XParam.eps);
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						hh[n] = max(zs[n] - zb[n], XParam.eps);
+					}
 
 				}
 			}
@@ -1566,7 +1740,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, uu);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
@@ -1575,7 +1749,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, uu);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1588,12 +1762,14 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					uu[i + j*nx] = uu[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
 
+
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
 		free(ddim);
 
 
@@ -1602,12 +1778,15 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 	{
 		if (uuerror == -49)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					uu[i + j*nx] = 0.0;
-					//unpacked_value = packed_value * scale_factor + add_offset
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						uu[n] = 0.0;
+					}
 				}
 			}
 		}
@@ -1645,7 +1824,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[2];
 			size_t start[] = { XParam.hotstep, 0, 0 };
 			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, vv);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 		else
@@ -1654,7 +1833,7 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			nx = (int)ddim[1];
 			size_t start[] = { 0, 0 };
 			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, vv);
+			status = nc_get_vara_double(ncid, varid, start, count, dummy);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -1667,12 +1846,13 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					vv[i + j*nx] = vv[i + j*nx] * scalefac + offset;
+					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
 
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
 		free(ddim);
 
 
@@ -1681,12 +1861,15 @@ int readhotstartfileD(Param XParam, double * &zs, double * &zb, double * &hh, do
 	{
 		if (vverror == -49)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
-				for (int i = 0; i < nx; i++)
+				for (int j = 0; j < 16; j++)
 				{
-					vv[i + j*nx] = 0.0;
-					//unpacked_value = packed_value * scale_factor + add_offset
+					for (int i = 0; i < 16; i++)
+					{
+						int n = i + j * 16 + bl * 256;
+						vv[n] = 0.0;
+					}
 				}
 			}
 		}
