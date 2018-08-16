@@ -117,10 +117,12 @@ float * dummy;
 double * dummy_d;
 
 // Block info
-double * blockxo, *blockyo;
+float * blockxo, *blockyo;
+double * blockxo_d, *blockyo_d;
 int * leftblk, *rightblk, *topblk, *botblk;
 
-double * blockxo_g, *blockyo_g;
+double * blockxo_gd, *blockyo_gd;
+float * blockxo_g, *blockyo_g;
 int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
 
 //std::string outfile = "output.nc";
@@ -890,11 +892,14 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 			}
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				leftdirichletCPUD(nx, ny, XParam.g, zsbndleft, zs_d, zb_d, hh_d, uu_d, vv_d);
+
+				leftdirichletCPUD(XParam.nblk, XParam.blksize, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndleft, blockxo_d, blockyo_d, zs_d, zb_d, hh_d, uu_d, vv_d);
 			}
 			else
 			{
-				leftdirichletCPU(nx, ny, (float)XParam.g, zsbndleft, zs, zb, hh, uu, vv);
+				//void leftdirichletCPU(int nblk, int blksize, float xo,float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo,float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
+				//leftdirichletCPU(nx, ny, (float)XParam.g, zsbndleft, zs, zb, hh, uu, vv);
+				leftdirichletCPU(XParam.nblk, XParam.blksize, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndleft, blockxo, blockyo, zs, zb, hh, uu, vv);
 			}
 			
 		}
@@ -977,11 +982,12 @@ void RightFlowBnd(Param XParam, std::vector<SLTS> rightWLbnd)
 			}
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				rightdirichletCPUD(nx, ny, XParam.g, zsbndright, zs_d, zb_d, hh_d, uu_d, vv_d);
+				rightdirichletCPUD(XParam.nblk, XParam.blksize, XParam.nx, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndright, blockxo_d, blockyo_d, zs_d, zb_d, hh_d, uu_d, vv_d);
 			}
 			else
 			{
-				rightdirichletCPU(nx, ny, (float)XParam.g, zsbndright, zs, zb, hh, uu, vv);
+				//rightdirichletCPU(nx, ny, (float)XParam.g, zsbndright, zs, zb, hh, uu, vv);
+				rightdirichletCPU(XParam.nblk, XParam.blksize, XParam.nx, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndright, blockxo, blockyo, zs, zb, hh, uu, vv);
 			}
 		}
 	}
@@ -1062,12 +1068,13 @@ void TopFlowBnd(Param XParam, std::vector<SLTS> topWLbnd)
 			}
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				topdirichletCPUD(nx, ny, XParam.g, zsbndtop, zs_d, zb_d, hh_d, uu_d, vv_d);
+				topdirichletCPUD(XParam.nblk, XParam.blksize, XParam.ny, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndtop, blockxo_d, blockyo_d, zs_d, zb_d, hh_d, uu_d, vv_d);
 			}
 			else
 			{
 
-				topdirichletCPU(nx, ny, (float)XParam.g, zsbndtop, zs, zb, hh, uu, vv);
+				//topdirichletCPU(nx, ny, (float)XParam.g, zsbndtop, zs, zb, hh, uu, vv);
+				topdirichletCPU(XParam.nblk, XParam.blksize, XParam.ny, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndtop, blockxo, blockyo, zs, zb, hh, uu, vv);
 			}
 		}
 	}
@@ -1149,11 +1156,12 @@ void BotFlowBnd(Param XParam, std::vector<SLTS> botWLbnd)
 			}
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				botdirichletCPUD(nx, ny, XParam.g, zsbndbot, zs_d, zb_d, hh_d, uu_d, vv_d);
+				botdirichletCPUD(XParam.nblk, XParam.blksize, XParam.ny, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndbot, blockxo_d, blockyo_d, zs_d, zb_d, hh_d, uu_d, vv_d);
 			}
 			else
 			{
-				botdirichletCPU(nx, ny, (float)XParam.g, zsbndbot, zs, zb, hh, uu, vv);
+				//botdirichletCPU(nx, ny, (float)XParam.g, zsbndbot, zs, zb, hh, uu, vv);
+				botdirichletCPU(XParam.nblk, XParam.blksize, XParam.ny, XParam.xo, XParam.yo, XParam.g, XParam.dx, zsbndbot, blockxo, blockyo, zs, zb, hh, uu, vv);
 			}
 		}
 	}
@@ -2880,6 +2888,8 @@ int main(int argc, char **argv)
 
 	Allocate1CPU(nblk, 1, blockxo);
 	Allocate1CPU(nblk, 1, blockyo);
+	Allocate1CPU(nblk, 1, blockxo_d);
+	Allocate1CPU(nblk, 1, blockyo_d);
 	Allocate4CPU(nblk, 1, leftblk, rightblk, topblk, botblk);
 
 	nmask = 0;
@@ -2906,8 +2916,8 @@ int main(int argc, char **argv)
 			if (nmask < 256)
 			{
 				//
-				blockxo[blkid] = XParam.xo + nblkx * 16 * XParam.dx;
-				blockyo[blkid] = XParam.yo + nblky * 16 * XParam.dx;
+				blockxo_d[blkid] = XParam.xo + nblkx * 16 * XParam.dx;
+				blockyo_d[blkid] = XParam.yo + nblky * 16 * XParam.dx;
 				blkid++;
 			}
 		}
@@ -2916,14 +2926,14 @@ int main(int argc, char **argv)
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 	for (int bl = 0; bl < nblk; bl++)
 	{
-		leftxo = blockxo[bl] - 16 * XParam.dx; // in adaptive this shoulbe be a range 
-		leftyo = blockyo[bl];
-		rightxo = blockxo[bl] + 16 * XParam.dx; 
-		rightyo = blockyo[bl];
-		topxo = blockxo[bl];  
-		topyo = blockyo[bl] + 16 * XParam.dx;
-		botxo = blockxo[bl];
-		botyo = blockyo[bl] - 16 * XParam.dx;
+		leftxo = blockxo_d[bl] - 16 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftyo = blockyo_d[bl];
+		rightxo = blockxo_d[bl] + 16 * XParam.dx;
+		rightyo = blockyo_d[bl];
+		topxo = blockxo_d[bl];
+		topyo = blockyo_d[bl] + 16 * XParam.dx;
+		botxo = blockxo_d[bl];
+		botyo = blockyo_d[bl] - 16 * XParam.dx;
 
 		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour 
 		leftblk[bl] = bl;
@@ -2933,19 +2943,19 @@ int main(int argc, char **argv)
 		for (int blb = 0; blb < nblk; blb++)
 		{
 			//
-			if (blockxo[blb] == leftxo && blockyo[blb] == leftyo)
+			if (blockxo_d[blb] == leftxo && blockyo_d[blb] == leftyo)
 			{
 				leftblk[bl] = blb;
 			}
-			if (blockxo[blb] == rightxo && blockyo[blb] == rightyo)
+			if (blockxo_d[blb] == rightxo && blockyo_d[blb] == rightyo)
 			{
 				rightblk[bl] = blb;
 			}
-			if (blockxo[blb] == topxo && blockyo[blb] == topyo)
+			if (blockxo_d[blb] == topxo && blockyo_d[blb] == topyo)
 			{
 				topblk[bl] = blb;
 			}
-			if (blockxo[blb] == botxo && blockyo[blb] == botyo)
+			if (blockxo_d[blb] == botxo && blockyo_d[blb] == botyo)
 			{
 				botblk[bl] = blb;
 			}
@@ -2953,7 +2963,11 @@ int main(int argc, char **argv)
 
 	}
 
-
+	for (int bl = 0; bl < nblk; bl++)
+	{
+		blockxo[bl] = blockxo_d[bl];
+		blockyo[bl] = blockyo_d[bl];
+	}
 
 	////////////////////////////////////////////////
 	///// Allocate memory on CPU
@@ -3407,11 +3421,11 @@ int main(int argc, char **argv)
 			}
 		}
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy_d, zb_d);
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy_d, zb_d);
 	}
 	else
 	{
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
+		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy, zb);
 	}
 
 
@@ -3423,11 +3437,11 @@ int main(int argc, char **argv)
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
 		//setedges(nx, ny, zb_d);
-		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, zb_d);
+		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, zb_d);
 	}
 	else
 	{
-		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, zb);
+		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, zb);
 	}
 	
 
@@ -3445,11 +3459,11 @@ int main(int argc, char **argv)
 		write_text_to_log_file("Hotstart");
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
-			hotstartsucess = readhotstartfileD(XParam, blockxo, blockyo, dummy_d, zs_d, zb_d, hh_d, uu_d, vv_d);
+			hotstartsucess = readhotstartfileD(XParam, blockxo_d, blockyo_d, dummy_d, zs_d, zb_d, hh_d, uu_d, vv_d);
 		}
 		else
 		{
-			hotstartsucess = readhotstartfile(XParam, blockxo, blockyo, dummy, zs, zb, hh, uu, vv);
+			hotstartsucess = readhotstartfile(XParam, blockxo_d, blockyo_d, dummy, zs, zb, hh, uu, vv);
 		}
 		
 		if (hotstartsucess == 0)
@@ -3552,8 +3566,8 @@ int main(int argc, char **argv)
 					for (int i = 0; i < 16; i++)
 					{
 						int n = i + j * 16 + bl * blksize;
-						xi = blockxo[bl] + i*XParam.dx;
-						yi = blockyo[bl] + j*XParam.dx;
+						xi = blockxo_d[bl] + i*XParam.dx;
+						yi = blockyo_d[bl] + j*XParam.dx;
 
 						disttop = max((XParam.yo + (ny - 1)*XParam.dx - yi) / XParam.dx, 0.1);//max((double)(ny - 1) - j, 0.1);// WTF is that 0.1? // distleft cannot be 0 
 						distbot = max((yi - XParam.yo) / XParam.dx, 0.1);
@@ -4141,11 +4155,11 @@ int main(int argc, char **argv)
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
 			//defncvarD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-			defncvarD(XParam, blockxo, blockyo, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
+			defncvarD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
 		}
 		else
 		{
-			defncvar(XParam, blockxo, blockyo, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
+			defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
 		}
 		
 	}

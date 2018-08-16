@@ -1808,12 +1808,13 @@ void noslipbndLCPU(Param XParam)
 {
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		noslipbndLeftCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		//noslipbndLeftCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		noslipbndLeftCPU(XParam.nblk, XParam.blksize, XParam.xo, XParam.eps, blockxo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
 	}
 	else
 	{
 		// Left Wall
-		noslipbndLeftCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+		noslipbndLeftCPU(XParam.nblk, XParam.blksize, (float)XParam.xo, (float)XParam.eps, blockxo, zb, zs, hh, uu, vv);
 	}
 }
 void noslipbndRCPU(Param XParam)
@@ -1821,12 +1822,13 @@ void noslipbndRCPU(Param XParam)
 	//
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		noslipbndRightCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		//noslipbndRightCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		noslipbndRightCPU(XParam.nblk, XParam.blksize, XParam.nx, XParam.xo, XParam.eps, XParam.dx, blockxo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
 	}
 	else
 	{
-		// Left Wall
-		noslipbndRightCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+		// Right Wall
+		noslipbndRightCPU(XParam.nblk, XParam.blksize, XParam.nx, (float)XParam.xo, (float)XParam.eps, (float)XParam.dx, blockxo, zb, zs, hh, uu, vv);
 	}
 }
 void noslipbndTCPU(Param XParam)
@@ -1835,12 +1837,13 @@ void noslipbndTCPU(Param XParam)
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
 		//
-		noslipbndTopCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		//noslipbndTopCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		noslipbndTopCPU(XParam.nblk, XParam.blksize, XParam.ny, XParam.yo, XParam.eps, XParam.dx, blockyo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
 	}
 	else
 	{
 		// Top Wall
-		noslipbndTopCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+		noslipbndTopCPU(XParam.nblk, XParam.blksize, XParam.ny, (float)XParam.yo, (float)XParam.eps, (float)XParam.dx, blockyo, zb, zs, hh, uu, vv);
 	}
 }
 void noslipbndBCPU(Param XParam)
@@ -1848,87 +1851,93 @@ void noslipbndBCPU(Param XParam)
 	//
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		noslipbndBotCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		//noslipbndBotCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
+		noslipbndBotCPU(XParam.nblk, XParam.blksize, XParam.yo, XParam.eps, blockyo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
 	}
 	else
 	{
 		// Bottom Wall
-		noslipbndBotCPU(XParam.nx, XParam.ny, (float)XParam.eps, zb, zs, hh, uu, vv);
+		noslipbndBotCPU(XParam.nblk, XParam.blksize, (float)XParam.yo, (float)XParam.eps, blockyo, zb, zs, hh, uu, vv);
 	}
 }
 
-template <class T> void noslipbndLeftCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> void noslipbndLeftCPU(int nblk, int blksize, T xo, T eps,T* blockxo,  T *zb, T *zs, T *hh, T *uu, T *vv)
 {
-	int i,ix;
-	int  xplus;
 	
-
-	for (int iy = 0; iy < ny; iy++)
+	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		ix = 0;
-		i = ix + iy*nx;
-		xplus = min(ix + 1, nx - 1);
-		//xminus = max(ix - 1, 0);
-		//yplus = min(iy + 1, ny - 1);
-		//yminus = max(iy - 1, 0);
+		if (blockxo[ib] == xo)//if block is on the side
+		{
+			int i = 0;
+			for (int j = 0; j < 16; j++)
+			{
+				int n = i + j * 16 + ib * blksize;
+				int nplus = i+1 + j * 16 + ib * blksize;
+				//xminus = max(ix - 1, 0);
+				//yplus = min(iy + 1, ny - 1);
+				//yminus = max(iy - 1, 0);
 
+
+				uu[n] = T(0.0);
+				zs[n] = zs[nplus];
+				hh[n] = max(zs[nplus] - zb[n], eps);
+			}
+		}
 		
-			uu[i] = 0.0f;
-			zs[i] = zs[xplus + iy*nx];
-			hh[i] = max(zs[xplus + iy*nx] - zb[i], eps);
-		
 	}
 }
 
-template <class T> void noslipbndRightCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> void noslipbndRightCPU(int nblk, int blksize, int nx, T xo, T eps, T dx, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
-	int i,ix;
-	int  xminus;
+	for (int ib = 0; ib < nblk; ib++) //scan each block
+	{
+		if (blockxo[ib] + (15 * dx) == xo + ceil(nx / 16.0)*16.0*dx)//if block is on the side
+		{
+			int i = 15;
+			for (int j = 0; j < 16; j++)
+			{
+				int n = i + j * 16 + ib * blksize;
+				int xminus = (i-1) + j * 16 + ib * blksize;
+				//xplus = min(ix + 1, nx - 1);
+				
+				//yplus = min(iy + 1, ny - 1);
+				//yminus = max(iy - 1, 0);
+
+
+				uu[n] = T(0.0);
+				zs[n] = zs[xminus];
+				hh[n] = max(zs[xminus] - zb[n], eps);
+			}
+		}
+	}
+			
+
+
 	
 
-	for (int iy = 0; iy < ny; iy++)
-	{
-		ix = nx - 1;
-		i = ix + iy*nx;
-		//xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
-		//yplus = min(iy + 1, ny - 1);
-		//yminus = max(iy - 1, 0);
-
-			
-		uu[i] = 0.0f;
-		zs[i] = zs[xminus + iy*nx];
-		hh[i] = max(zs[xminus + iy*nx] - zb[i], eps);
-
-			
-
-
-	}
-
 }
-template <class T> void noslipbndTopCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T eps, T dx, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
-	int i, iy;
-	int  yminus;
-	
-
-
-
-	for (int ix = 0; ix < nx; ix++)
+	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		iy = ny - 1;
-		i = ix + iy*nx;
-		//xplus = min(ix + 1, nx - 1);
-		//xminus = max(ix - 1, 0);
-		//yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		if (blockyo[ib] + (15 * dx) == yo + ceil(ny / 16.0)*16.0*dx)//if block is on the side
+		{
+			int j = 15;
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + ib * blksize;
+				int yminus = i  + (j - 1)* 16 + ib * blksize;
+				
 
 
-		vv[i] = 0.0f;
-		zs[i] = zs[ix + yminus*nx];
-		hh[i] = max(zs[ix + yminus*nx] - zb[i], eps);
+				vv[n] = T(0.0);
+				zs[n] = zs[ yminus];
+				hh[n] = max(zs[yminus] - zb[n], eps);
+
+			}
+		}
 
 
 
@@ -1937,26 +1946,34 @@ template <class T> void noslipbndTopCPU(int nx, int ny, T eps, T *zb, T *zs, T *
 
 }
 
-template <class T> void noslipbndBotCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> void noslipbndBotCPU(int nblk, int blksize,T yo, T eps, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
-	int i, iy;
+	int n;
 	int yplus;
 	
 
-	for (int ix = 0; ix < nx; ix++)
+	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		iy = 0;
-		i = ix + iy*nx;
-		//xplus = min(ix + 1, nx - 1);
-		//xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		//yminus = max(iy - 1, 0);
+		if (blockyo[ib] == yo)//if block is on the side
+		{
+			int j = 0;
+			for (int i = 0; i < 16; i++)
+			{
+				n = i + j * 16 + ib * blksize;
+				yplus = i + 1 + j * 16 + ib * blksize;
+				
+				//xplus = min(ix + 1, nx - 1);
+				//xminus = max(ix - 1, 0);
+				//yplus = min(iy + 1, ny - 1);
+				//yminus = max(iy - 1, 0);
 
 
-		vv[i] = 0.0f;
-		zs[i] = zs[ix + yplus*nx];
-		hh[i] = max(zs[ix + yplus*nx] - zb[i], eps);
+				vv[n] = T(0.0);
+				zs[n] = zs[yplus];
+				hh[n] = max(zs[yplus] - zb[n], eps);
+			}
+		}
 
 
 

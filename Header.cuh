@@ -217,10 +217,12 @@ extern double * TSstore_d, *TSstore_gd;
 extern double * dummy_d;
 
 // Block info
-extern double * blockxo, *blockyo;
+extern double * blockxo_d, *blockyo_d;
+extern float * blockxo, *blockyo;
 extern int * leftblk, *rightblk, *topblk, *botblk;
 
-extern double * blockxo_g, *blockyo_g;
+extern float * blockxo_g, *blockyo_g;
+extern double * blockxo_gd, *blockyo_gd;
 extern int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
 
 
@@ -261,15 +263,15 @@ template <class T> void cleanup(int nx, int ny, T * hhi, T *zsi, T *uui, T *vvi,
 //Bnd functions
 //void neumannbnd(int nx, int ny, double*a);
 
-void leftdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void rightdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void topdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
-void botdirichletCPU(int nx, int ny, float g, std::vector<double> zsbndvec, float *zs, float *zb, float *hh, float *uu, float *vv);
+void leftdirichletCPU(int nblk, int blksize, float xo, float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv);
+void rightdirichletCPU(int nblk, int blksize, int nx, float xo, float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv);
+void topdirichletCPU(int nblk, int blksize, int ny, float xo, float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv);
+void botdirichletCPU(int nblk, int blksize, int ny, float xo, float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv);
 
-void leftdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
-void rightdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
-void topdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
-void botdirichletCPUD(int nx, int ny, double g, std::vector<double> zsbndvec, double *zs, double *zb, double *hh, double *uu, double *vv);
+void leftdirichletCPUD(int nblk, int blksize, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv);
+void rightdirichletCPUD(int nblk, int blksize, int nx, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv);
+void topdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv);
+void botdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv);
 
 void noslipbndLCPU(Param XParam);
 void noslipbndRCPU(Param XParam);
