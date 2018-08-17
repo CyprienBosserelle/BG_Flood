@@ -197,10 +197,15 @@ template <class T> void Allocate4CPU(int nx, int ny, T *&zs, T *&hh, T *&uu, T *
 	vv = (T *)malloc(nx*ny * sizeof(T));
 }
 
-template <class T> void setedges(int nblk, int nx,int ny, double xo,double yo, double dx,double *blockxo, double * blockyo,  T *&zb)
+template <class T> void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk,  T *&zb)
 {
+	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
+
+	// here the bathy of the outter most cells of the domain are "set" to the same value as the second outter most.
+	// this also applies to the blocks with no neighbour
 	for (int bl = 0; bl < nblk; bl++)
 	{
+		/*
 		if (blockxo[bl] == xo)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
 		{
 			int i = 0;
@@ -210,7 +215,7 @@ template <class T> void setedges(int nblk, int nx,int ny, double xo,double yo, d
 				zb[i + j * 16 + bl * 256] = zb[i+1 + j * 16 + bl * 256];
 			}
 		}
-		if (blockxo[bl]+(15*dx) == xo+ceil(nx/16.0)*16.0*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		if (blockxo[bl]+(15*dx) == xo+ (ceil(nx / 16.0)*16.0 - 1)*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
 		{
 			int i = 15;
 			for (int j = 0; j < 16; j++)
@@ -228,7 +233,7 @@ template <class T> void setedges(int nblk, int nx,int ny, double xo,double yo, d
 				zb[i + j * 16 + bl * 256] = zb[i  + (j+1) * 16 + bl * 256];
 			}
 		}
-		if (blockyo[bl] + (15 * dx) == yo + ceil(ny / 16.0)*16.0*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		if (blockyo[bl] + (15 * dx) == yo + (ceil(ny / 16.0)*16.0 - 1)*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
 		{
 			int j = 15;
 			for (int i = 0; i < 16; i++)
@@ -237,6 +242,44 @@ template <class T> void setedges(int nblk, int nx,int ny, double xo,double yo, d
 				zb[i + j * 16 + bl * 256] = zb[i + (j-1) * 16 + bl * 256];
 			}
 		}
+		*/
+		if (bl == leftblk[bl])//i.e. if a block refers to as it's onwn neighbour then it doesn't have a neighbour/// This also applies to block that are on the edge of the grid so the above is commentted
+		{
+			int i = 0;
+			for (int j = 0; j < 16; j++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i + 1 + j * 16 + bl * 256];
+			}
+		}
+		if (bl == rightblk[bl])
+		{
+			int i = 15;
+			for (int j = 0; j < 16; j++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i - 1 + j * 16 + bl * 256];
+			}
+		}
+		if (bl == topblk[bl])
+		{
+			int j = 15;
+			for (int i = 0; i < 16; i++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i + (j - 1) * 16 + bl * 256];
+			}
+		}
+		if (bl == botblk[bl])
+		{
+			int j = 0;
+			for (int i = 0; i < 16; i++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i + (j + 1) * 16 + bl * 256];
+			}
+		}
+
 	}
 }
 
@@ -3437,11 +3480,12 @@ int main(int argc, char **argv)
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
 		//setedges(nx, ny, zb_d);
-		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, zb_d);
+		//setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, zb_d);
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb_d);
 	}
 	else
 	{
-		setedges(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, zb);
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 	}
 	
 

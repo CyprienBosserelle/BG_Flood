@@ -852,7 +852,7 @@ void updateD(int nblk, int blksize, double theta, double dt, double eps, double 
 		}
 	}
 }
-void update_spherical(int nblk, int blksize, double theta, double dt, double eps, double g, double CFL, double delta,double Radius, double * blockyo, double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
+void update_spherical(int nblk, int blksize, double theta, double dt, double eps, double g, double CFL, double delta,double Radius,double ymax, double * blockyo, double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
 
@@ -1106,7 +1106,18 @@ void update_spherical(int nblk, int blksize, double theta, double dt, double eps
 
 				y = blockyo[ib] + iy*delta / Radius*180.0 / pi;
 				//double yp = yo + min(iy + 1, ny - 1)*delta / Radius*180.0 / pi;
-				double yp = blockyo[ib] + (iy+1)*delta / Radius*180.0 / pi; // Need so make this safer?
+
+				double yp;
+				if ((blockyo[ib] + (15.0 * delta / Radius*180.0 / pi)) == ymax)//if block is on the side
+				{
+					yp = blockyo[ib] + (min(iy+1,15))*delta / Radius*180.0 / pi;
+				}
+				else
+				{
+					yp = blockyo[ib] + (iy + 1)*delta / Radius*180.0 / pi; 
+				}
+					
+				//yp= blockyo[ib] + (iy + 1)*delta / Radius*180.0 / pi; // Need so make this safer?
 
 				phi = y*(double)pi / 180.0;
 
@@ -1414,7 +1425,7 @@ double FlowCPUSpherical(Param XParam, double nextoutputtime)
 	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
 
 	//update_spherical(int nblk, int blksize, double theta, double dt, double eps, double g, double CFL, double delta,double Radius, double * blockyo, double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
-	update_spherical(XParam.nblk, XParam.blksize, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.Radius, blockyo_d, hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d);
+	update_spherical(XParam.nblk, XParam.blksize, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.Radius, (XParam.yo + (ceil(XParam.ny / 16.0)*16.0 - 1)*XParam.dx), blockyo_d, hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d);
 	
 
 	//printf("dtmax=%f\n", dtmax);
@@ -1430,7 +1441,7 @@ double FlowCPUSpherical(Param XParam, double nextoutputtime)
 		advance(XParam.nblk, XParam.blksize, XParam.dt*0.5, XParam.eps, zb_d,hh_d, zs_d, uu_d, vv_d, dh_d, dhu_d, dhv_d, hho_d, zso_d, uuo_d, vvo_d);
 
 		//corrector
-		update_spherical(XParam.nblk, XParam.blksize, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.Radius, blockyo_d, hho_d, zso_d, uuo_d, vvo_d, dh_d, dhu_d, dhv_d);
+		update_spherical(XParam.nblk, XParam.blksize, XParam.theta, XParam.dt, XParam.eps, XParam.g, XParam.CFL, XParam.delta, XParam.Radius, (XParam.yo + (ceil(XParam.ny / 16.0)*16.0 - 1)*XParam.dx), blockyo_d, hho_d, zso_d, uuo_d, vvo_d, dh_d, dhu_d, dhv_d);
 		
 
 	}
@@ -1636,7 +1647,7 @@ void rightdirichletCPU(int nblk, int blksize, int nx, float xo, float yo, float 
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (blockxo[ib] + (15 * dx) == xo + ceil(nx / 16.0)*16.0*dx)//if block is on the side
+		if (blockxo[ib] + (15 * dx) == xo + (ceil(nx / 16.0)*16.0 - 1)*dx)//if block is on the side
 		{
 			int i = 15;
 			for (int j = 0; j < 16; j++)
@@ -1685,7 +1696,7 @@ void rightdirichletCPUD(int nblk, int blksize,int nx, double xo, double yo, doub
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (blockxo[ib] + (15 * dx) == xo + ceil(nx / 16.0)*16.0*dx)//if block is on the side
+		if (blockxo[ib] + (15 * dx) == xo + (ceil(nx / 16.0)*16.0 - 1)*dx)//if block is on the side
 		{
 			int i = 15;
 			for (int j = 0; j < 16; j++)
@@ -1734,7 +1745,7 @@ void topdirichletCPU(int nblk, int blksize, int ny, float xo, float yo, float g,
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (blockyo[ib] + (15 * dx) == yo + ceil(ny / 16.0)*16.0*dx)//if block is on the side
+		if (blockyo[ib] + (15 * dx) == yo + (ceil(ny / 16.0)*16.0 - 1)*dx)//if block is on the side
 		{
 			int j = 15;
 			for (int i = 0; i < 16; i++)
@@ -1783,7 +1794,7 @@ void topdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, doubl
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (blockyo[ib] + (15 * dx) == yo + ceil(ny / 16.0)*16.0*dx)//if block is on the side
+		if (blockyo[ib] + (15 * dx) == yo + (ceil(ny / 16.0)*16.0 - 1)*dx)//if block is on the side
 		{
 			int j = 15;
 			for (int i = 0; i < 16; i++)
@@ -2043,7 +2054,7 @@ template <class T> void noslipbndRightCPU(int nblk, int blksize, int nx, T xo, T
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (blockxo[ib] + (15 * dx) == xo + ceil(nx / 16.0)*16.0*dx)//if block is on the side
+		if (blockxo[ib] + (15 * dx) == xo + (ceil(nx / 16.0)*16.0 - 1)*dx)//if block is on the side
 		{
 			int i = 15;
 			for (int j = 0; j < 16; j++)
@@ -2073,7 +2084,9 @@ template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T e
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if ((blockyo[ib] + (15 * dx)) == (yo + ceil(ny / 16.0)*16.0*dx))//if block is on the side
+		//printf("bymax=%f\tymax=%f\n", blockyo[ib] + (15.0 * dx), yo + (ceil(ny / 16.0)*16.0-1)*dx);
+
+		if ((blockyo[ib] + (15.0 * dx)) == (yo + (ceil(ny / 16.0)*16.0 - 1)*dx))//if block is on the side
 		{
 			int j = 15;
 			for (int i = 0; i < 16; i++)
@@ -2081,11 +2094,13 @@ template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T e
 				int n = i + j * 16 + ib * blksize;
 				int yminus = i  + (j - 1)* 16 + ib * blksize;
 				
-
+				
 
 				vv[n] = T(0.0);
 				zs[n] = zs[ yminus];
 				hh[n] = max(zs[yminus] - zb[n], eps);
+
+				//printf("zs[n]=%f\tzs[yminus]=%f\n", zs[n], zs[yminus]);
 
 			}
 		}
@@ -2112,7 +2127,7 @@ template <class T> void noslipbndBotCPU(int nblk, int blksize,T yo, T eps, T* bl
 			for (int i = 0; i < 16; i++)
 			{
 				n = i + j * 16 + ib * blksize;
-				yplus = i + 1 + j * 16 + ib * blksize;
+				yplus = i  + (j+ 1) * 16 + ib * blksize;
 				
 				//xplus = min(ix + 1, nx - 1);
 				//xminus = max(ix - 1, 0);
