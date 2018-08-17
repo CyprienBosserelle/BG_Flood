@@ -591,16 +591,17 @@ extern "C" void writenctimestep(std::string outfile,  double totaltime)
 	if (status != NC_NOERR) handle_error(status);
 }
 
-extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var)
+extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var)
 {
 	int status, ncid, recid, var_id,ndims;
 	static size_t nrec;
-	short * var_s;
+	short * var_s, *varblk_s;
+	float * varblk;
 	int nx, ny;
 	int dimids[NC_MAX_VAR_DIMS];
 	size_t  *ddim, *start,*count;
 //XParam.outfile.c_str()
-	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
+	status = nc_open(XParam.outfile.c_str(), NC_WRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 	//read id from time dimension
 	status = nc_inq_unlimdim(ncid, &recid);
@@ -632,10 +633,11 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 
 	start[0] = nrec-1;
 	count[0] = 1;
+	count[1] = 16;
+	count[2] = 16;
+	varblk = (float *)malloc(XParam.blksize * sizeof(float));
 
-
-
-	if (smallnc > 0)
+	if (XParam.smallnc > 0)
 	{
 		nx = (int) count[ndims - 1];
 		ny = (int) count[ndims - 2];//yuk!
@@ -643,24 +645,55 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 		//printf("nx=%d\tny=%d\n", nx, ny);
 		//If saving as short than we first need to scale and shift the data
 		var_s = (short *)malloc(nx*ny*sizeof(short));
-
-		for (int i = 0; i < nx; i++)
+		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int j = 0; j < 16; j++)
 			{
-				// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
-				var_s[i + nx*j] = (short) round((var[i + nx*j] - addoffset) / scalefactor);
-				//printf("var=%f\tvar_s=%d\n", var[i + nx*j],var_s[i + nx*j]);
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
+					var_s[n] = (short)round((var[n] - XParam.addoffset) / XParam.scalefactor);
+				}
 			}
 		}
-		status = nc_put_vara_short(ncid, var_id, start, count, var_s);
-		if (status != NC_NOERR) handle_error(status);
+		for (int bl = 0; bl < XParam.nblk; bl++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					varblk_s[i + j * 16] = var_s[n];
+				}
+			}
+			//jstart
+			start[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+			start[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+			status = nc_put_vara_short(ncid, var_id, start, count, varblk_s);
+			if (status != NC_NOERR) handle_error(status);
+		}
 		free(var_s);
+		free(varblk_s);
 	}
 	else
 	{
-		status = nc_put_vara_float(ncid, var_id, start, count, var);
-		if (status != NC_NOERR) handle_error(status);
+		for (int bl = 0; bl < XParam.nblk; bl++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					varblk[i + j * 16] = var[n];
+				}
+			}
+			start[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+			start[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+			status = nc_put_vara_float(ncid, var_id, start, count, varblk);
+			if (status != NC_NOERR) handle_error(status);
+		}
 	}
 	
 	//close and save
@@ -669,19 +702,20 @@ extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefact
 	free(ddim);
 	free(start);
 	free(count);
+	free(varblk);
 }
 
-extern "C" void writencvarstepD(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, double * var_d)
+extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d)
 {
 	int status, ncid, recid, var_id, ndims;
 	static size_t nrec;
-	float * var;
-	short * var_s;
+	short * var_s, *varblk_s;
+	float * varblk;
 	int nx, ny;
 	int dimids[NC_MAX_VAR_DIMS];
 	size_t  *ddim, *start, *count;
 	//XParam.outfile.c_str()
-	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
+	status = nc_open(XParam.outfile.c_str(), NC_WRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 	//read id from time dimension
 	status = nc_inq_unlimdim(ncid, &recid);
@@ -713,44 +747,67 @@ extern "C" void writencvarstepD(std::string outfile, int smallnc, float scalefac
 
 	start[0] = nrec - 1;
 	count[0] = 1;
+	count[1] = 16;
+	count[2] = 16;
+	varblk = (float *)malloc(XParam.blksize * sizeof(float));
 
-	nx = (int)count[ndims - 1];
-	ny = (int)count[ndims - 2];//yuk!
-
-	var = (float *)malloc(nx*ny * sizeof(float));
-	for (int i = 0; i < nx; i++)
+	if (XParam.smallnc > 0)
 	{
-		for (int j = 0; j < ny; j++)
-		{
-			var[i + nx*j] = (float)var_d[i + nx*j];
-		}
-	}
-
-	if (smallnc > 0)
-	{
-		
+		nx = (int)count[ndims - 1];
+		ny = (int)count[ndims - 2];//yuk!
 
 								   //printf("nx=%d\tny=%d\n", nx, ny);
 								   //If saving as short than we first need to scale and shift the data
 		var_s = (short *)malloc(nx*ny * sizeof(short));
-
-		for (int i = 0; i < nx; i++)
+		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
-			for (int j = 0; j < ny; j++)
+			for (int j = 0; j < 16; j++)
 			{
-				// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
-				var_s[i + nx*j] = (short)round((var[i + nx*j] - addoffset) / scalefactor);
-				//printf("var=%f\tvar_s=%d\n", var[i + nx*j],var_s[i + nx*j]);
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
+					var_s[n] = (short)round((var_d[n] - XParam.addoffset) / XParam.scalefactor);
+				}
 			}
 		}
-		status = nc_put_vara_short(ncid, var_id, start, count, var_s);
-		if (status != NC_NOERR) handle_error(status);
+		for (int bl = 0; bl < XParam.nblk; bl++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					varblk_s[i + j * 16] = var_s[n];
+				}
+			}
+			//jstart
+			start[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+			start[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+			status = nc_put_vara_short(ncid, var_id, start, count, varblk_s);
+			if (status != NC_NOERR) handle_error(status);
+		}
 		free(var_s);
+		free(varblk_s);
 	}
 	else
 	{
-		status = nc_put_vara_float(ncid, var_id, start, count, var);
-		if (status != NC_NOERR) handle_error(status);
+		for (int bl = 0; bl < XParam.nblk; bl++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					varblk[i + j * 16] = var_d[n];
+				}
+			}
+			start[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
+			start[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+			status = nc_put_vara_float(ncid, var_id, start, count, varblk);
+			if (status != NC_NOERR) handle_error(status);
+		}
 	}
 
 	//close and save
@@ -759,7 +816,7 @@ extern "C" void writencvarstepD(std::string outfile, int smallnc, float scalefac
 	free(ddim);
 	free(start);
 	free(count);
-	free(var);
+	free(varblk);
 }
 
 extern "C" void readnczb(int nx, int ny, const std::string ncfile, float * &zb)

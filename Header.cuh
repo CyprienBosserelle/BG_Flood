@@ -279,10 +279,10 @@ void noslipbndTCPU(Param XParam);
 void noslipbndBCPU(Param XParam);
 
 //template <class T> void noslipbndallCPU(int nx, int ny, T dt, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
-template <class T> void noslipbndLeftCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
-template <class T> void noslipbndRightCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
-template <class T> void noslipbndBotCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
-template <class T> void noslipbndTopCPU(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndLeftCPU(int nblk, int blksize, T xo, T eps, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndRightCPU(int nblk, int blksize, int nx, T xo, T eps, T dx, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndBotCPU(int nblk, int blksize, T yo, T eps, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T eps, T dx, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv);
 
 
 
@@ -312,8 +312,8 @@ Param creatncfileUD(Param XParam);
 extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
 extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, double * var);
 extern "C" void writenctimestep(std::string outfile, double totaltime);
-extern "C" void writencvarstep(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, float * var);
-extern "C" void writencvarstepD(std::string outfile, int smallnc, float scalefactor, float addoffset, std::string varst, double * var_d);
+extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var);
+extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d);//templating should have been fine here!
 void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);

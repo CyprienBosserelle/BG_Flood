@@ -1011,7 +1011,7 @@ void RightFlowBnd(Param XParam, std::vector<SLTS> rightWLbnd)
 		}
 		else
 		{
-			void noslipbndRCPU(Param XParam);
+			noslipbndRCPU(XParam);
 		}
 	}
 	//else neumann bnd (is already built in the algorithm)
@@ -1098,7 +1098,7 @@ void TopFlowBnd(Param XParam, std::vector<SLTS> topWLbnd)
 		}
 		else
 		{
-			void noslipbndTCPU(Param XParam);
+			noslipbndTCPU(XParam);
 		}
 	}
 	//else neumann bnd (is already built in the algorithm)
@@ -1185,7 +1185,7 @@ void BotFlowBnd(Param XParam, std::vector<SLTS> botWLbnd)
 		}
 		else
 		{
-			void noslipbndBCPU(Param XParam);
+			noslipbndBCPU(XParam);
 		}
 	}
 	//else neumann bnd (is already built in the algorithm)
@@ -2315,7 +2315,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 
 							}
 							//Create definition for each variable and store it
-							writencvarstepD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							writencvarstepD(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 						}
 					}
 				}
@@ -2347,7 +2347,7 @@ void mainloopGPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 
 							}
 							//Create definition for each variable and store it
-							writencvarstep(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 						}
 					}
 				}
@@ -2511,11 +2511,11 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 						//write output step for each variable 
 						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 						{
-							writencvarstepD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							writencvarstepD(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 						}
 						else
 						{
-							writencvarstep(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 						}
 						
 					}
