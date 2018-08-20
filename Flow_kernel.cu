@@ -46,6 +46,61 @@ __device__ T sq(T a)
 	return a*a;
 }
 
+__device__ int findleft(int iy,int leftblk, int ibl)
+{
+	int ileft;
+	if (leftblk != ibl)
+	{
+		ileft = 15 + iy * blockDim.x + leftblk * (blockDim.x*blockDim.y);
+	}
+	else
+	{
+		ileft = 0 + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	}
+	return ileft;
+}
+
+__device__ int findright(int iy, int rightblk, int ibl)
+{
+	int iright;
+	if (rightblk != ibl)
+	{
+		iright = 0 + iy * blockDim.x + rightblk * (blockDim.x*blockDim.y);
+	}
+	else
+	{
+		iright = 15 + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	}
+	return iright;
+}
+
+__device__ int findtop(int ix, int topblk, int ibl)
+{
+	int itop;
+	if (topblk != ibl)
+	{
+		itop = ix + 0 * blockDim.x + topblk * (blockDim.x*blockDim.y);
+	}
+	else
+	{
+		itop = ix + 15 * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	}
+	return itop;
+}
+
+__device__ int findbot(int ix, int botblk, int ibl)
+{
+	int ibot;
+	if (botblk != ibl)
+	{
+		ibot = ix + 15 * blockDim.x + botblk * (blockDim.x*blockDim.y);
+	}
+	else
+	{
+		ibot = ix + 0 * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	}
+	return ibot;
+}
 
 __device__ float minmod2fGPU(float theta,float s0, float s1, float s2)
 {
@@ -142,6 +197,67 @@ template <class T> __global__ void gradientGPUXY(int nx, int ny, T theta, T delt
 		dadx[i] = minmod2GPU(theta, a_l, a_i, a_r) / delta;
 		dady[i] = minmod2GPU(theta, a_b, a_i, a_t) / delta;
 	}
+
+}
+
+
+template <class T> __global__ void gradientGPUXYBUQ(int nx, T theta, T delta,int *leftblk,int *rightblk,int* topblk, int * botblk, T *a, T *dadx, T *dady)
+{
+	//
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ileft, iright, itop, ibot;
+
+	ileft = findleft(iy, leftblk[ibl], ibl);
+	iright = findright(iy, rightblk[ibl], ibl);
+	itop = findtop(ix, topblk[ibl], ibl);
+	iright = findbot(ix, botblk[ibl], ibl);
+
+	
+
+	T a_i, a_r, a_l, a_t, a_b;
+
+	__shared__ float a_s[18][18];
+	
+	
+
+	
+	a_s[tx + 1][ty + 1] = a[i];
+	__syncthreads;
+	//syncthread is needed here ?
+
+
+	// read the halo around the tile
+	if (threadIdx.x == blockDim.x - 1)
+	a_s[tx + 2][ty + 1] = a[iright];
+
+	if (threadIdx.x == 0)
+	a_s[tx][ty + 1] = a[ileft];
+
+	if (threadIdx.y == blockDim.y - 1)
+	a_s[tx + 1][ty + 2] = a[itop];
+
+	if (threadIdx.y == 0)
+	a_s[tx + 1][ty] = a[ibot];
+
+	__syncthreads;
+	/*
+	a_i = a[ix + iy*nx];
+	a_r = a[xplus + iy*nx];
+	a_l = a[xminus + iy*nx];
+	a_t = a[ix + yplus*nx];
+	a_b = a[ix + yminus*nx];
+	*/
+
+	dadx[i] = minmod2GPU(theta, a_s[tx][ty + 1], a_s[tx + 1][ty + 1], a_s[tx + 2][ty + 1]) / delta;
+	dady[i] = minmod2GPU(theta, a_s[tx + 1][ty], a_s[tx + 1][ty + 1], a_s[tx + 1][ty + 2]) / delta;
+
+	//dadx[i] = minmod2GPU(theta, a_l, a_i, a_r) / delta;
+	//dady[i] = minmod2GPU(theta, a_b, a_i, a_t) / delta;
+	
 
 }
 
@@ -2166,8 +2282,9 @@ __global__ void divavg_var(int nx, int ny, T ntdiv, T * Varmean)
 }
 
 template <class T>
-__global__ void resetavg_var(int nx, int ny, T * Varmean)
+__global__ void resetavg_var( T * Varmean)
 {
+	/*
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	unsigned int i = ix + iy*nx;
@@ -2175,11 +2292,18 @@ __global__ void resetavg_var(int nx, int ny, T * Varmean)
 	{
 		Varmean[i] = T(0.0);
 	}
+	*/
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int i = ix + iy * 16 + ibl*(blockDim.x*blockDim.y);
+	Varmean[i] = T(0.0);
 }
 
 template <class T>
-__global__ void resetmax_var(int nx, int ny, T * Varmax)
+__global__ void resetmax_var( T * Varmax)
 {
+	/*
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	unsigned int i = ix + iy*nx;
@@ -2187,6 +2311,12 @@ __global__ void resetmax_var(int nx, int ny, T * Varmax)
 	{
 		Varmax[i] = T(-1.0/epsilone);
 	}
+	*/
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int i = ix + iy * 16 + ibl*(blockDim.x*blockDim.y);
+	Varmax[i] = T(-1.0 / epsilone);
 }
 
 template <class T>

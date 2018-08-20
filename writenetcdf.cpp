@@ -160,8 +160,8 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 	int smallnc = XParam.smallnc;
 	float scalefactor = XParam.scalefactor;
 	float addoffset = XParam.addoffset;
-	int nx = ceil(XParam.nx / 16) * 16;
-	int ny = ceil(XParam.ny / 16) * 16;;
+	int nx = ceil(XParam.nx / 16.0) * 16.0;
+	int ny = ceil(XParam.ny / 16.0) * 16.0;
 	int status;
 	int ncid, var_id;
 	int  var_dimid2D[2];

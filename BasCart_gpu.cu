@@ -2895,9 +2895,9 @@ int main(int argc, char **argv)
 	int nblk = 0;
 	int nmask = 0;
 	int mloc = 0;
-	for (int nblky = 0; nblky <= ceil(ny / 16); nblky++)
+	for (int nblky = 0; nblky < ceil(ny / 16.0); nblky++)
 	{
-		for (int nblkx = 0; nblkx <= ceil(nx / 16); nblkx++)
+		for (int nblkx = 0; nblkx < ceil(nx / 16.0); nblkx++)
 		{
 			nmask = 0;
 			for (int i = 0; i < 16; i++)
@@ -2938,9 +2938,9 @@ int main(int argc, char **argv)
 	nmask = 0;
 	mloc = 0;
 	int blkid = 0;
-	for (int nblky = 0; nblky <= ceil(ny / 16); nblky++)
+	for (int nblky = 0; nblky < ceil(ny / 16.0); nblky++)
 	{
-		for (int nblkx = 0; nblkx <= ceil(nx / 16); nblkx++)
+		for (int nblkx = 0; nblkx < ceil(nx / 16.0); nblkx++)
 		{
 			nmask = 0;
 			for (int i = 0; i < 16; i++)
@@ -2959,7 +2959,7 @@ int main(int argc, char **argv)
 			if (nmask < 256)
 			{
 				//
-				blockxo_d[blkid] = XParam.xo + nblkx * 16 * XParam.dx;
+				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * XParam.dx;
 				blockyo_d[blkid] = XParam.yo + nblky * 16 * XParam.dx;
 				blkid++;
 			}
@@ -2969,14 +2969,14 @@ int main(int argc, char **argv)
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 	for (int bl = 0; bl < nblk; bl++)
 	{
-		leftxo = blockxo_d[bl] - 16 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
-		rightxo = blockxo_d[bl] + 16 * XParam.dx;
+		rightxo = blockxo_d[bl] + 16.0 * XParam.dx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
-		topyo = blockyo_d[bl] + 16 * XParam.dx;
+		topyo = blockyo_d[bl] + 16.0 * XParam.dx;
 		botxo = blockxo_d[bl];
-		botyo = blockyo_d[bl] - 16 * XParam.dx;
+		botyo = blockyo_d[bl] - 16.0 * XParam.dx;
 
 		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour 
 		leftblk[bl] = bl;
