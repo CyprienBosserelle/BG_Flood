@@ -46,58 +46,86 @@ __device__ T sq(T a)
 	return a*a;
 }
 
-__device__ int findleft(int iy,int leftblk, int ibl)
+__device__ int findleftG(int ix,int iy,int leftblk, int ibl, int bdimx)
 {
 	int ileft;
-	if (leftblk != ibl)
+	if (ix == 0)
 	{
-		ileft = 15 + iy * blockDim.x + leftblk * (blockDim.x*blockDim.y);
+		if (leftblk != ibl)
+		{
+			ileft = 15 + iy * bdimx + leftblk * (bdimx*bdimx);
+		}
+		else
+		{
+			ileft = 0 + iy * bdimx + ibl*(bdimx*bdimx);
+		}
 	}
 	else
 	{
-		ileft = 0 + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+		ileft=(ix-1) + iy * bdimx + ibl*(bdimx*bdimx);
 	}
 	return ileft;
 }
 
-__device__ int findright(int iy, int rightblk, int ibl)
+__device__ int findrightG(int ix,int iy, int rightblk, int ibl, int bdimx)
 {
 	int iright;
-	if (rightblk != ibl)
+	if (ix == (bdimx-1))
 	{
-		iright = 0 + iy * blockDim.x + rightblk * (blockDim.x*blockDim.y);
+		if (rightblk != ibl)
+		{
+			iright = 0 + iy * bdimx + rightblk * (bdimx*bdimx);
+		}
+		else
+		{
+			iright = 15 + iy * bdimx + ibl*(bdimx*bdimx);
+		}
 	}
 	else
 	{
-		iright = 15 + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+		iright = (ix+1) + iy * bdimx + ibl*(bdimx*bdimx);
 	}
 	return iright;
 }
 
-__device__ int findtop(int ix, int topblk, int ibl)
+__device__ int findtopG(int ix,int iy, int topblk, int ibl, int bdimx)
 {
 	int itop;
-	if (topblk != ibl)
+	if (iy == (bdimx - 1))
 	{
-		itop = ix + 0 * blockDim.x + topblk * (blockDim.x*blockDim.y);
+		if (topblk != ibl)
+		{
+			itop = ix + 0 * bdimx + topblk * (bdimx*bdimx);
+		}
+		else
+		{
+			itop = ix + 15 * bdimx + ibl*(bdimx*bdimx);
+		}
 	}
 	else
 	{
-		itop = ix + 15 * blockDim.x + ibl*(blockDim.x*blockDim.y);
+		itop = ix + (iy+1) * bdimx + ibl*(bdimx*bdimx);
 	}
 	return itop;
 }
 
-__device__ int findbot(int ix, int botblk, int ibl)
+__device__ int findbotG(int ix,int iy, int botblk, int ibl, int bdimx)
 {
 	int ibot;
-	if (botblk != ibl)
+	if (iy == 0)
 	{
-		ibot = ix + 15 * blockDim.x + botblk * (blockDim.x*blockDim.y);
+		if (botblk != ibl)
+		{
+			ibot = ix + 15 * bdimx + botblk * (bdimx*bdimx);
+		}
+		else
+		{
+			ibot = ix + 0 * bdimx + ibl*(bdimx*bdimx);
+		}
 	}
 	else
 	{
-		ibot = ix + 0 * blockDim.x + ibl*(blockDim.x*blockDim.y);
+		ibot = ix + (iy-1) * bdimx + ibl*(bdimx*bdimx);
 	}
 	return ibot;
 }
@@ -201,62 +229,75 @@ template <class T> __global__ void gradientGPUXY(int nx, int ny, T theta, T delt
 }
 
 
-template <class T> __global__ void gradientGPUXYBUQ(int nx, T theta, T delta,int *leftblk,int *rightblk,int* topblk, int * botblk, T *a, T *dadx, T *dady)
+template <class T> __global__ void gradientGPUXYBUQ(T theta, T delta, int *leftblk, int *rightblk, int* topblk, int * botblk, T *a, T *dadx, T *dady)
 {
-	//
-	int ix = threadIdx.x;
+	//int *leftblk,int *rightblk,int* topblk, int * botblk,
+
+	//int ix = threadIdx.x+1;
+	//int iy = threadIdx.y+1;
+	int ix =  threadIdx.x;
 	int iy = threadIdx.y;
-	int ibl = blockIdx.x;
+	int ibl =  blockIdx.x;
+
+
+
+
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
+	
+	
+	
 	int ileft, iright, itop, ibot;
 
-	ileft = findleft(iy, leftblk[ibl], ibl);
-	iright = findright(iy, rightblk[ibl], ibl);
-	itop = findtop(ix, topblk[ibl], ibl);
-	iright = findbot(ix, botblk[ibl], ibl);
-
-	
-
+	ileft = findleftG(ix,iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix,iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix,iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix,iy, botblk[ibl], ibl, blockDim.x);
+	/*
+	if (blockIdx.x == 0 && threadIdx.x == 0 && threadIdx.y == 0)
+	{
+		printf("i= %i\t ileft=%i\t iright=%i\t itop=%i\t ibot=%i\n", i,ileft,iright,itop,ibot);
+	}
+	*/
 	T a_i, a_r, a_l, a_t, a_b;
-
+	/*
 	__shared__ float a_s[18][18];
 	
 	
 
 	
-	a_s[tx + 1][ty + 1] = a[i];
+	a_s[ix][iy] = a[i];
 	__syncthreads;
 	//syncthread is needed here ?
 
 
 	// read the halo around the tile
 	if (threadIdx.x == blockDim.x - 1)
-	a_s[tx + 2][ty + 1] = a[iright];
+	a_s[ix + 1][iy] = a[iright];
 
 	if (threadIdx.x == 0)
-	a_s[tx][ty + 1] = a[ileft];
+	a_s[ix-1][iy] = a[ileft];
 
 	if (threadIdx.y == blockDim.y - 1)
-	a_s[tx + 1][ty + 2] = a[itop];
+	a_s[ix ][iy + 1] = a[itop];
 
 	if (threadIdx.y == 0)
-	a_s[tx + 1][ty] = a[ibot];
+	a_s[ix ][iy-1] = a[ibot];
 
 	__syncthreads;
-	/*
-	a_i = a[ix + iy*nx];
-	a_r = a[xplus + iy*nx];
-	a_l = a[xminus + iy*nx];
-	a_t = a[ix + yplus*nx];
-	a_b = a[ix + yminus*nx];
 	*/
-
-	dadx[i] = minmod2GPU(theta, a_s[tx][ty + 1], a_s[tx + 1][ty + 1], a_s[tx + 2][ty + 1]) / delta;
-	dady[i] = minmod2GPU(theta, a_s[tx + 1][ty], a_s[tx + 1][ty + 1], a_s[tx + 1][ty + 2]) / delta;
-
-	//dadx[i] = minmod2GPU(theta, a_l, a_i, a_r) / delta;
-	//dady[i] = minmod2GPU(theta, a_b, a_i, a_t) / delta;
+	a_i = a[i];
+	a_r = a[iright];
+	a_l = a[ileft];
+	a_t = a[itop];
+	a_b = a[ibot];
+	
+	/*
+	dadx[i] = minmod2GPU(theta, a_s[ix-1][iy], a_s[ix][iy], a_s[ix + 1][iy]) / delta;
+	dady[i] = minmod2GPU(theta, a_s[ix][iy-1], a_s[ix][iy], a_s[ix][iy + 1]) / delta;
+	*/
+	dadx[i] = minmod2GPU(theta, a_l, a_i, a_r) / delta;
+	dady[i] = minmod2GPU(theta, a_b, a_i, a_t) / delta;
 	
 
 }
@@ -455,19 +496,30 @@ __global__ void gradientGPUY(int nx, int ny,float theta, float delta, float *a, 
 }
 
 
-__global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,float CFL, float * hh, float *zs, float *uu, float * vv, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
+__global__ void updateKurgX( float delta, float g, float eps,float CFL, int *leftblk, float * hh, float *zs, float *uu, float * vv, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	//int tx = threadIdx.x;
-	//int ty = threadIdx.y;
-	//int  xplus, yplus, xminus, yminus;
-	int xminus;
-	if (ix < nx && iy < ny)
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ileft;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//if (ix < nx && iy < ny)
 	{
 		//xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
+		//xminus = max(ix - 1, 0);
 		//yplus = min(iy + 1, ny - 1);
 		//yminus = max(iy - 1, 0);
 
@@ -477,7 +529,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 
 		float dhdxi= dhdx[i];
-		float dhdxmin = dhdx[xminus + iy*nx];
+		float dhdxmin = dhdx[ileft];
 		float cm = 1.0f;// 0.1;
 		float fmu = 1.0f;
 		//float fmv = 1.0;
@@ -485,7 +537,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 		//__shared__ float hi[16][16];
 		float hi = hh[i];
 
-		float hn = hh[xminus + iy*nx];
+		float hn = hh[ileft];
 
 
 		if (hi > eps || hn > eps)
@@ -503,10 +555,10 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			zl = zi - dx*(dzsdx[i] - dhdxi);
 			//printf("%f\n", zl);
 
-			zn = zs[xminus + iy*nx] - hn;
+			zn = zs[ileft] - hn;
 
 			//printf("%f\n", zn);
-			zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdxmin);
+			zr = zn + dx*(dzsdx[ileft] - dhdxmin);
 
 
 			zlr = max(zl, zr);
@@ -517,7 +569,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 			hp = max(0.0f, hl + zl - zlr);
 
 			hr = hn + dx*dhdxmin;
-			um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
+			um = uu[ileft] + dx*dudx[ileft];
 			hm = max(0.0f, hr + zr - zlr);
 
 			float fh, fu, fv;
@@ -590,7 +642,7 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 
 			if (fh > 0.0f)
 			{
-				fv = (vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx])*fh;
+				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
 			}
 			else 
 			{
@@ -635,19 +687,30 @@ __global__ void updateKurgX( int nx, int ny, float delta, float g, float eps,flo
 }
 
 
-__global__ void updateKurgXD(int nx, int ny, double delta, double g, double eps, double CFL, double * hh, double *zs, double *uu, double * vv, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
+__global__ void updateKurgXD( double delta, double g, double eps, double CFL, int *leftblk, double * hh, double *zs, double *uu, double * vv, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	//int tx = threadIdx.x;
-	//int ty = threadIdx.y;
-	//int  xplus, yplus, xminus, yminus;
-	int xminus;
-	if (ix < nx && iy < ny)
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ileft;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//if (ix < nx && iy < ny)
 	{
 		//xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
+		//xminus = max(ix - 1, 0);
 		//yplus = min(iy + 1, ny - 1);
 		//yminus = max(iy - 1, 0);
 
@@ -657,7 +720,7 @@ __global__ void updateKurgXD(int nx, int ny, double delta, double g, double eps,
 
 
 		double dhdxi = dhdx[i];
-		double dhdxmin = dhdx[xminus + iy*nx];
+		double dhdxmin = dhdx[ileft];
 		double cm = 1.0;// 0.1;
 		double fmu = 1.0;
 		//float fmv = 1.0;
@@ -665,7 +728,7 @@ __global__ void updateKurgXD(int nx, int ny, double delta, double g, double eps,
 		//__shared__ float hi[16][16];
 		double hi = hh[i];
 
-		double hn = hh[xminus + iy*nx];
+		double hn = hh[ileft];
 
 
 		if (hi > eps || hn > eps)
@@ -683,10 +746,10 @@ __global__ void updateKurgXD(int nx, int ny, double delta, double g, double eps,
 			zl = zi - dx*(dzsdx[i] - dhdxi);
 			//printf("%f\n", zl);
 
-			zn = zs[xminus + iy*nx] - hn;
+			zn = zs[ileft] - hn;
 
 			//printf("%f\n", zn);
-			zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdxmin);
+			zr = zn + dx*(dzsdx[ileft] - dhdxmin);
 
 
 			zlr = max(zl, zr);
@@ -697,7 +760,7 @@ __global__ void updateKurgXD(int nx, int ny, double delta, double g, double eps,
 			hp = max(0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdxmin;
-			um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
+			um = uu[ileft] + dx*dudx[ileft];
 			hm = max(0.0, hr + zr - zlr);
 
 			double fh, fu, fv;
@@ -770,7 +833,7 @@ __global__ void updateKurgXD(int nx, int ny, double delta, double g, double eps,
 
 			if (fh > 0.0)
 			{
-				fv = (vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx])*fh;
+				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
 			}
 			else
 			{
@@ -814,22 +877,33 @@ __global__ void updateKurgXD(int nx, int ny, double delta, double g, double eps,
 
 }
 
-__global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double eps, double CFL, double yo, double Radius, double * hh, double *zs, double *uu, double * vv, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
+__global__ void updateKurgXSPH( double delta, double g, double eps, double CFL,int *leftblk, double *blockyo, double Radius, double * hh, double *zs, double *uu, double * vv, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
 {
 	//Same as updateKurgX but with Spherical coordinates
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	//int tx = threadIdx.x;
-	//int ty = threadIdx.y;
-	//int  xplus, yplus, xminus, yminus;
-	int xminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ileft;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 	double cm, fmu,y,phi,dphi;
 
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
 		//xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
+		//xminus = max(ix - 1, 0);
 		//yplus = min(iy + 1, ny - 1);
 		//yminus = max(iy - 1, 0);
 
@@ -839,9 +913,9 @@ __global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double ep
 
 
 		double dhdxi = dhdx[i];
-		double dhdxmin = dhdx[xminus + iy*nx];
+		double dhdxmin = dhdx[ileft];
 
-		y = yo + iy*delta / Radius*180.0 / pi;
+		y = blockyo[ibl] + iy*delta / Radius*180.0 / pi;
 
 		phi = y*pi / 180.0;
 
@@ -859,7 +933,7 @@ __global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double ep
 		//__shared__ float hi[16][16];
 		double hi = hh[i];
 
-		double hn = hh[xminus + iy*nx];
+		double hn = hh[ileft];
 
 
 		if (hi > eps || hn > eps)
@@ -877,10 +951,10 @@ __global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double ep
 			zl = zi - dx*(dzsdx[i] - dhdxi);
 			//printf("%f\n", zl);
 
-			zn = zs[xminus + iy*nx] - hn;
+			zn = zs[ileft] - hn;
 
 			//printf("%f\n", zn);
-			zr = zn + dx*(dzsdx[xminus + iy*nx] - dhdxmin);
+			zr = zn + dx*(dzsdx[ileft] - dhdxmin);
 
 
 			zlr = max(zl, zr);
@@ -891,7 +965,7 @@ __global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double ep
 			hp = max(0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdxmin;
-			um = uu[xminus + iy*nx] + dx*dudx[xminus + iy*nx];
+			um = uu[ileft] + dx*dudx[ileft];
 			hm = max(0.0, hr + zr - zlr);
 
 			double fh, fu, fv;
@@ -965,7 +1039,7 @@ __global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double ep
 
 			if (fh > 0.0)
 			{
-				fv = (vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx])*fh;
+				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
 			}
 			else
 			{
@@ -1009,21 +1083,32 @@ __global__ void updateKurgXSPH(int nx, int ny, double delta, double g, double ep
 
 }
 
-__global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, float CFL, float * hh, float *zs, float *uu, float * vv, float *dzsdy, float *dhdy, float * dudy, float *dvdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
+__global__ void updateKurgY(float delta, float g, float eps, float CFL, int *botblk, float * hh, float *zs, float *uu, float * vv, float *dzsdy, float *dhdy, float * dudy, float *dvdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-//	int tx = threadIdx.x;
-//	int ty = threadIdx.y;
-	//int  xplus, yplus, xminus, yminus;
-	int yminus;
-	if (ix < nx && iy < ny)
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//if (ix < nx && iy < ny)
 	{
 		//xplus = min(ix + 1, nx - 1);
 		//xminus = max(ix - 1, 0);
 		//yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//yminus = max(iy - 1, 0);
 
 
 		float cm = 1.0f;// 0.1;
@@ -1032,21 +1117,21 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 
 		//__shared__ float hi[16][16];
 		float dhdyi = dhdy[i];
-		float dhdymin = dhdy[ix + yminus*nx];
+		float dhdymin = dhdy[ibot];
 		float hi = hh[i];
-		float hn = hh[ix + yminus*nx];
+		float hn = hh[ibot];
 		float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 
 
 		if (hi > eps || hn > eps)
 		{
-			hn = hh[ix + yminus*nx];
+			hn = hh[ibot];
 			dx = delta / 2.0f;
 			zi = zs[i] - hi;
 			zl = zi - dx*(dzsdy[i] - dhdyi);
-			zn = zs[ix + yminus*nx] - hn;
-			zr = zn + dx*(dzsdy[ix + yminus*nx] - dhdymin);
+			zn = zs[ibot] - hn;
+			zr = zn + dx*(dzsdy[ibot] - dhdymin);
 			zlr = max(zl, zr);
 
 			hl = hi - dx*dhdyi;
@@ -1054,7 +1139,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 			hp = max(0.f, hl + zl - zlr);
 
 			hr = hn + dx*dhdymin;
-			um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
+			um = vv[ibot] + dx*dvdy[ibot];
 			hm = max(0.f, hr + zr - zlr);
 
 			//// Reimann solver
@@ -1107,7 +1192,7 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 
 			if (fh > 0.0f)
 			{
-				fv = (uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx])*fh;
+				fv = (uu[ibot] + dx*dudy[ibot])*fh;
 			}
 			else
 			{
@@ -1140,21 +1225,32 @@ __global__ void updateKurgY(int nx, int ny, float delta, float g, float eps, flo
 	}
 }
 
-__global__ void updateKurgYD(int nx, int ny, double delta, double g, double eps, double CFL, double * hh, double *zs, double *uu, double * vv, double *dzsdy, double *dhdy, double * dudy, double *dvdy, double *Fhv, double *Fqvy, double *Fquy, double *Sv, double * dtmax)
+__global__ void updateKurgYD( double delta, double g, double eps, double CFL, int *botblk, double * hh, double *zs, double *uu, double * vv, double *dzsdy, double *dhdy, double * dudy, double *dvdy, double *Fhv, double *Fqvy, double *Fquy, double *Sv, double * dtmax)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	//	int tx = threadIdx.x;
-	//	int ty = threadIdx.y;
-	//int  xplus, yplus, xminus, yminus;
-	int yminus;
-	if (ix < nx && iy < ny)
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//if (ix < nx && iy < ny)
 	{
 		//xplus = min(ix + 1, nx - 1);
 		//xminus = max(ix - 1, 0);
 		//yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//yminus = max(iy - 1, 0);
 
 
 		double cm = 1.0;// 0.1;
@@ -1163,21 +1259,21 @@ __global__ void updateKurgYD(int nx, int ny, double delta, double g, double eps,
 
 		//__shared__ float hi[16][16];
 		double dhdyi = dhdy[i];
-		double dhdymin = dhdy[ix + yminus*nx];
+		double dhdymin = dhdy[ibot];
 		double hi = hh[i];
-		double hn = hh[ix + yminus*nx];
+		double hn = hh[ibot];
 		double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 
 
 		if (hi > eps || hn > eps)
 		{
-			hn = hh[ix + yminus*nx];
+			hn = hh[ibot];
 			dx = delta / 2.0;
 			zi = zs[i] - hi;
 			zl = zi - dx*(dzsdy[i] - dhdyi);
-			zn = zs[ix + yminus*nx] - hn;
-			zr = zn + dx*(dzsdy[ix + yminus*nx] - dhdymin);
+			zn = zs[ibot] - hn;
+			zr = zn + dx*(dzsdy[ibot] - dhdymin);
 			zlr = max(zl, zr);
 
 			hl = hi - dx*dhdyi;
@@ -1185,7 +1281,7 @@ __global__ void updateKurgYD(int nx, int ny, double delta, double g, double eps,
 			hp = max(0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdymin;
-			um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
+			um = vv[ibot] + dx*dvdy[ibot];
 			hm = max(0.0, hr + zr - zlr);
 
 			//// Reimann solver
@@ -1238,7 +1334,7 @@ __global__ void updateKurgYD(int nx, int ny, double delta, double g, double eps,
 
 			if (fh > 0.0f)
 			{
-				fv = (uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx])*fh;
+				fv = (uu[ibot] + dx*dudy[ibot])*fh;
 			}
 			else
 			{
@@ -1270,26 +1366,39 @@ __global__ void updateKurgYD(int nx, int ny, double delta, double g, double eps,
 		}
 	}
 }
-__global__ void updateKurgYSPH(int nx, int ny, double delta, double g, double eps, double CFL, double yo, double Radius, double * hh, double *zs, double *uu, double * vv, double *dzsdy, double *dhdy, double * dudy, double *dvdy, double *Fhv, double *Fqvy, double *Fquy, double *Sv, double * dtmax)
+__global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,int *botblk, double * blockyo, double Radius, double * hh, double *zs, double *uu, double * vv, double *dzsdy, double *dhdy, double * dudy, double *dvdy, double *Fhv, double *Fqvy, double *Fquy, double *Sv, double * dtmax)
 {
 	// Same as updateKurgY but with Spherical coordinate corrections
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	//	int tx = threadIdx.x;
-	//	int ty = threadIdx.y;
-	//int  xplus, yplus, xminus, yminus;
-	int yminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+
 	double cm, fmv, phi, dphi, y;
 
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
 		//xplus = min(ix + 1, nx - 1);
 		//xminus = max(ix - 1, 0);
 		//yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//yminus = max(iy - 1, 0);
 
-		y = yo + iy*delta / Radius*180.0 / pi;;
+		y = blockyo[ibl] + iy*delta / Radius*180.0 / pi;
 
 		phi = y*pi / 180.0;
 
@@ -1306,21 +1415,21 @@ __global__ void updateKurgYSPH(int nx, int ny, double delta, double g, double ep
 
 		//__shared__ float hi[16][16];
 		double dhdyi = dhdy[i];
-		double dhdymin = dhdy[ix + yminus*nx];
+		double dhdymin = dhdy[ibot];
 		double hi = hh[i];
-		double hn = hh[ix + yminus*nx];
+		double hn = hh[ibot];
 		double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 
 
 		if (hi > eps || hn > eps)
 		{
-			hn = hh[ix + yminus*nx];
+			hn = hh[ibot];
 			dx = delta / 2.;
 			zi = zs[i] - hi;
 			zl = zi - dx*(dzsdy[i] - dhdyi);
-			zn = zs[ix + yminus*nx] - hn;
-			zr = zn + dx*(dzsdy[ix + yminus*nx] - dhdymin);
+			zn = zs[ibot] - hn;
+			zr = zn + dx*(dzsdy[ibot] - dhdymin);
 			zlr = max(zl, zr);
 
 			hl = hi - dx*dhdyi;
@@ -1328,7 +1437,7 @@ __global__ void updateKurgYSPH(int nx, int ny, double delta, double g, double ep
 			hp = max(0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdymin;
-			um = vv[ix + yminus*nx] + dx*dvdy[ix + yminus*nx];
+			um = vv[ibot] + dx*dvdy[ibot];
 			hm = max(0.0, hr + zr - zlr);
 
 			//// Reimann solver
@@ -1382,7 +1491,7 @@ __global__ void updateKurgYSPH(int nx, int ny, double delta, double g, double ep
 
 			if (fh > 0.0)
 			{
-				fv = (uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx])*fh;
+				fv = (uu[ibot] + dx*dudy[ibot])*fh;
 			}
 			else
 			{
@@ -1415,20 +1524,32 @@ __global__ void updateKurgYSPH(int nx, int ny, double delta, double g, double ep
 	}
 }
 
-__global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+__global__ void updateEV( float delta, float g, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-//	int tx = threadIdx.x;
-//	int ty = threadIdx.y;
-	int  xplus, yplus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
 
-	if (ix < nx && iy < ny)
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright,itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
+		//xplus = min(ix + 1, nx - 1);
 		//xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
+		//yplus = min(iy + 1, ny - 1);
 		//yminus = max(iy - 1, 0);
 
 		float cm = 1.0f;// 0.1;
@@ -1455,7 +1576,7 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 		//float cm = 1.0;
 
-		dh[i] = -1.0f*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i])*cmdinv;
+		dh[i] = -1.0f*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
 		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
@@ -1464,27 +1585,39 @@ __global__ void updateEV(int nx, int ny, float delta, float g, float * hh, float
 		float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
 		float dmdt = (fmv - fmv) / (cm*delta);
 		float fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdinv;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdinv;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
 	}
 }
-__global__ void updateEVD(int nx, int ny, double delta, double g, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
+__global__ void updateEVD( double delta, double g, int *rightblk, int*topblk, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	//	int tx = threadIdx.x;
-	//	int ty = threadIdx.y;
-	int  xplus, yplus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
 
-	if (ix < nx && iy < ny)
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright, itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
+		//xplus = min(ix + 1, nx - 1);
 		//xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
+		//yplus = min(iy + 1, ny - 1);
 		//yminus = max(iy - 1, 0);
 
 		double cm = 1.0;// 0.1;
@@ -1511,7 +1644,7 @@ __global__ void updateEVD(int nx, int ny, double delta, double g, double * hh, d
 		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 		//float cm = 1.0;
 
-		dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i])*cmdinv;
+		dh[i] = -1.0*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
 		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
@@ -1520,35 +1653,58 @@ __global__ void updateEVD(int nx, int ny, double delta, double g, double * hh, d
 		double dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
 		double dmdt = (fmv - fmv) / (cm*delta);
 		double fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdinv;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdinv;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
 	}
 }
-__global__ void updateEVSPH(int nx, int ny, double delta, double g, double yo, double Radius, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
+__global__ void updateEVSPH(double delta, double g, double yo, double ymax, double Radius, int * rightblk, int * topblk, double * blockyo, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
 {
 	// Same as updateEV but with Spherical coordinate corrections
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	//	int tx = threadIdx.x;
-	//	int ty = threadIdx.y;
-	int  xplus, yplus;// , xminus, yminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright, itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 
 	double cm, fmu, fmv, y, phi, dphi,fmvp,fmup;
 
 
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
+		//xplus = min(ix + 1, nx - 1);
 		//xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
+		//yplus = min(iy + 1, ny - 1);
 		//yminus = max(iy - 1, 0);
 
 		y = yo + iy*delta / Radius*180.0 / pi;
-		double yp= yo + yplus*delta / Radius*180.0 / pi;
+
+
+		//double yp= yo + yplus*delta / Radius*180.0 / pi;
+		double yp;
+		if ((blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi)) == ymax)//if block is on the side
+		{
+			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
+		}
+		else
+		{
+			yp = blockyo[ibl] + (iy + 1)*delta / Radius*180.0 / pi;
+		}
 		phi = y*pi / 180.0;
 
 		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
@@ -1583,7 +1739,7 @@ __global__ void updateEVSPH(int nx, int ny, double delta, double g, double yo, d
 		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 		//float cm = 1.0;
 
-		dh[i] = -1.0*(Fhu[xplus + iy*nx] - Fhu[i] + Fhv[ix + yplus*nx] - Fhv[i])*cmdinv;
+		dh[i] = -1.0*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
 		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
@@ -1592,21 +1748,35 @@ __global__ void updateEVSPH(int nx, int ny, double delta, double g, double yo, d
 		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
 		float dmdt = (fmvp - fmv) / (cm*delta);
 		float fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus + iy*nx] - Fquy[ix + yplus*nx]) *cmdinv;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[ix + yplus*nx] - Fqvx[xplus + iy*nx]) *cmdinv;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
 	}
 }
 
-template <class T> __global__ void Advkernel(int nx, int ny, T dt, T eps, T * hh, T *zb, T *uu, T * vv, T *dh, T *dhu, T * dhv, T *zso, T *hho, T *uuo, T *vvo )
+template <class T> __global__ void Advkernel( T dt, T eps, T * hh, T *zb, T *uu, T * vv, T *dh, T *dhu, T * dhv, T *zso, T *hho, T *uuo, T *vvo )
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
 
-	if (ix < nx && iy < ny)
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	//int iright, itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//if (ix < nx && iy < ny)
 	{
 
 		T hold = hh[i];
@@ -1650,14 +1820,19 @@ template <class T> __global__ void Advkernel(int nx, int ny, T dt, T eps, T * hh
 
 
 
-template <class T> __global__ void cleanupGPU(int nx,int ny, T * hhi, T *zsi, T *uui, T *vvi, T * hho, T *zso, T *uuo, T *vvo)
+template <class T> __global__ void cleanupGPU( T * hhi, T *zsi, T *uui, T *vvi, T * hho, T *zso, T *uuo, T *vvo)
 {
 	
 	
 
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 	//int ibl = blockIdx.x;
 	//int i = ix + iy * 16 + ibl*blockDim.x;
 	
@@ -1741,13 +1916,14 @@ __global__ void finalminmaxKernel(float *max, float *min) {
 	}
 }
 template <class T>
-__global__ void resetdtmax(int nx, int ny, T *dtmax)
+__global__ void resetdtmax( T *dtmax)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int i = ix + iy * 16 + ibl*(blockDim.x*blockDim.y);
 	T initdt= T(1.0 / 1e-30);
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
 		dtmax[i] = initdt;
 	}
@@ -1879,23 +2055,39 @@ __global__ void reducemin6(int *g_idata, int *g_odata, unsigned int n)
 }
 */
 
-__global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv )
+__global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, float itime,int * rightblk, float *blockxo, float *blockyo, float *zs, float *zb, float *hh, float *uu, float *vv )
 {
-	int iy = blockIdx.x*blockDim.x + threadIdx.x;
-	int ix = 0;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int xplus;
+	
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//int xplus;
 	//float hhi;
 	float zsbnd;
-	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	float itx = (blockyo[ibl]+iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texLBND, itime+0.5f, itx+0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
-	if (ix == 0 && iy < ny)
+	if (blockxo[ibl] == xo && ix == 0)
 	{
-		xplus = min(ix + 1, nx - 1);
+		//xplus = min(ix + 1, nx - 1);
 		hh[i] = zsbnd-zb[i];
 		zs[i] = zsbnd;
-		uu[i] = -2.0f*(sqrtf(g*max(hh[xplus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xplus + iy*nx], 0.0f))) + uu[xplus + iy*nx];
+		uu[i] = -2.0f*(sqrtf(g*max(hh[iright], 0.0f)) - sqrtf(g*max(zsbnd - zb[iright], 0.0f))) + uu[iright];
 		vv[i] = 0.0f;
 		//if (iy == 0)
 		//{
@@ -1904,23 +2096,37 @@ __global__ void leftdirichlet(int nx, int ny,int nybnd,float g, float itime, flo
 	}
 }
 
-__global__ void leftdirichletD(int nx, int ny, int nybnd, double g, double itime, double *zs, double *zb, double *hh, double *uu, double *vv)
+__global__ void leftdirichletD(int nybnd, double g, double dx, double xo, double ymax, double itime, int * rightblk, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
-	int iy = blockIdx.x*blockDim.x + threadIdx.x;
-	int ix = 0;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int xplus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
 	//float hhi;
 	float zsbnd; //remains a float because this is how it is stored on the texture memory // I don't think it is a big deal
-	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
-	if (ix == 0 && iy < ny)
+	if (blockxo[ibl] == xo && ix == 0)
 	{
-		xplus = min(ix + 1, nx - 1);
+		//xplus = min(ix + 1, nx - 1);
 		hh[i] = zsbnd - zb[i];
 		zs[i] = zsbnd;
-		uu[i] = -2.0*(sqrt(g*max(hh[xplus + iy*nx], 0.0)) - sqrt(g*max(zsbnd - zb[xplus + iy*nx], 0.0))) + uu[xplus + iy*nx];
+		uu[i] = -2.0*(sqrt(g*max(hh[iright], 0.0)) - sqrt(g*max(zsbnd - zb[iright], 0.0))) + uu[iright];
 		vv[i] = 0.0;
 		//if (iy == 0)
 		//{
@@ -1930,140 +2136,199 @@ __global__ void leftdirichletD(int nx, int ny, int nybnd, double g, double itime
 }
 
 
-__global__ void rightdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+__global__ void rightdirichlet( int nybnd, float g, float dx, float xmax, float ymax, float itime,int *leftblk,float *blockxo, float *blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
-	int iy = blockIdx.x*blockDim.x + threadIdx.x;
-	int ix = nx-1;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int xminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ileft;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//int xminus;
 	//float hhi;
 	float zsbnd;
-	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texRBND, itime+0.5f, itx+0.5f);
-	if (ix == nx-1 && iy < ny)
+	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15)
 	{
-		xminus = max(ix - 1, 0);
+		//xminus = max(ix - 1, 0);
 		hh[i] = zsbnd - zb[i];
 		zs[i] = zsbnd;
-		uu[i] = +2.0f*(sqrtf(g*max(hh[xminus + iy*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[xminus + iy*nx], 0.0f))) + uu[xminus + iy*nx];
+		uu[i] = +2.0f*(sqrtf(g*max(hh[ileft], 0.0f)) - sqrtf(g*max(zsbnd - zb[ileft], 0.0f))) + uu[ileft];
 		vv[i] = 0.0f;
 	}
 }
 
-__global__ void rightdirichletD(int nx, int ny, int nybnd, double g, double itime, double *zs, double *zb, double *hh, double *uu, double *vv)
+__global__ void rightdirichletD( int nybnd, double g,double dx,double xmax,double ymax, double itime, int*leftblk, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
-	int iy = blockIdx.x*blockDim.x + threadIdx.x;
-	int ix = nx - 1;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int xminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ileft;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//int xminus;
 	//float hhi;
 	float zsbnd;
-	float itx = (iy*1.0f / ny*1.0f) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f);
-	if (ix == nx - 1 && iy < ny)
+	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15)
 	{
-		xminus = max(ix - 1, 0);
+		//xminus = max(ix - 1, 0);
 		hh[i] = zsbnd - zb[i];
 		zs[i] = zsbnd;
-		uu[i] = +2.0*(sqrt(g*max(hh[xminus + iy*nx], 0.0)) - sqrt(g*max(zsbnd - zb[xminus + iy*nx], 0.0))) + uu[xminus + iy*nx];
+		uu[i] = +2.0*(sqrt(g*max(hh[ileft], 0.0)) - sqrt(g*max(zsbnd - zb[ileft], 0.0))) + uu[ileft];
 		vv[i] = 0.0f;
 	}
 }
 
-__global__ void topdirichlet(int nx, int ny, int nxbnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+__global__ void topdirichlet( int nxbnd, float g,float dx, float xmax, float ymax, float itime,int * botblk, float *blockxo, float *blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = ny-1;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int yminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//int yminus;
 	//float hhi;
 	float zsbnd;
-	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
+	float itx = (blockxo[ibl]+ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
-	if (iy == ny-1 && ix < nx)
+	if ((blockyo[ibl]+15*dx)==ymax && iy == 15)
 	{
-		yminus = max(iy - 1, 0);
+		//yminus = max(iy - 1, 0);
 		hh[i] = zsbnd - zb[i];
 		zs[i] = zsbnd;
-		vv[i] = +2.0f*(sqrtf(g*max(hh[ix + yminus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yminus*nx], 0.0f))) + vv[ix + yminus*nx];
+		vv[i] = +2.0f*(sqrtf(g*max(hh[ibot], 0.0f)) - sqrtf(g*max(zsbnd - zb[ibot], 0.0f))) + vv[ibot];
 		uu[i] = 0.0f;
 	}
 }
 
-__global__ void topdirichletD(int nx, int ny, int nxbnd, double g, double itime, double *zs, double *zb, double *hh, double *uu, double *vv)
+__global__ void topdirichletD( int nxbnd, double g,double dx,double xmax,double ymax, double itime,int * botblk,double *blockxo, double *blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = ny - 1;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int yminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//int yminus;
 	//float hhi;
 	float zsbnd;
-	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
+	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
-	if (iy == ny - 1 && ix < nx)
+	if ((blockyo[ibl] + 15 * dx) == ymax && iy == 15)
 	{
-		yminus = max(iy - 1, 0);
+		//yminus = max(iy - 1, 0);
 		hh[i] = zsbnd - zb[i];
 		zs[i] = zsbnd;
-		vv[i] = +2.0*(sqrt(g*max(hh[ix + yminus*nx], 0.0)) - sqrt(g*max(zsbnd - zb[ix + yminus*nx], 0.0))) + vv[ix + yminus*nx];
+		vv[i] = +2.0*(sqrt(g*max(hh[ibot], 0.0)) - sqrt(g*max(zsbnd - zb[ibot], 0.0))) + vv[ibot];
 		uu[i] = 0.0;
 	}
 }
-__global__ void botdirichlet(int nx, int ny, int nxbnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
+__global__ void botdirichlet( int nxbnd, float g, float dx,float xmax, float yo, float itime,int * topblk,float * blockxo, float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = 0;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int yplus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//int yplus;
 	//float hhi;
 	float zsbnd;
-	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
+	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
-	if (iy == 0 && ix < nx)
+	if (blockyo[ibl]  == yo && iy == 0)
 	{
-		yplus = min(iy + 1, ny-1);
+		//yplus = min(iy + 1, ny-1);
 		hh[i] = zsbnd - zb[i];
 		zs[i] = zsbnd;
-		vv[i] = -2.0f*(sqrtf(g*max(hh[ix + yplus*nx], 0.0f)) - sqrtf(g*max(zsbnd - zb[ix + yplus*nx], 0.0f))) + vv[ix + yplus*nx];
+		vv[i] = -2.0f*(sqrtf(g*max(hh[itop], 0.0f)) - sqrtf(g*max(zsbnd - zb[itop], 0.0f))) + vv[itop];
 		uu[i] = 0.0f;
 	}
 }
 
-__global__ void botdirichletD(int nx, int ny, int nxbnd, double g, double itime, double*zs, double *zb, double *hh, double *uu, double *vv)
+__global__ void botdirichletD( int nxbnd, double g,double dx,double xmax,double yo, double itime,int * topblk,double * blockxo, double * blockyo, double*zs, double *zb, double *hh, double *uu, double *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = 0;
-	//int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int yplus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//int yplus;
 	//float hhi;
 	float zsbnd;
-	float itx = (ix*1.0f / nx*1.0f) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
+	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
-	if (iy == 0 && ix < nx)
+	if (blockyo[ibl] == yo && iy == 0)
 	{
-		yplus = min(iy + 1, ny - 1);
+		//yplus = min(iy + 1, ny - 1);
 		hh[i] = zsbnd - zb[i];
 		zs[i] = zsbnd;
-		vv[i] = -2.0*(sqrt(g*max(hh[ix + yplus*nx], 0.0)) - sqrt(g*max(zsbnd - zb[ix + yplus*nx], 0.0))) + vv[ix + yplus*nx];
+		vv[i] = -2.0*(sqrt(g*max(hh[itop], 0.0)) - sqrt(g*max(zsbnd - zb[itop], 0.0))) + vv[itop];
 		uu[i] = 0.0;
 	}
 }
 
-template <class T> __global__ void quadfriction(int nx, int ny, T dt,T eps, T cf, T *hh, T *uu, T *vv)
+template <class T> __global__ void quadfriction( T dt,T eps, T cf, T *hh, T *uu, T *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	//int itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 	
 	T normu,hhi,uui,vvi;
 	
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
 
 		hhi = hh[i];
@@ -2083,66 +2348,83 @@ template <class T> __global__ void quadfriction(int nx, int ny, T dt,T eps, T cf
 }
 
 
-__global__ void noslipbndall(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
+__global__ void noslipbndall( float dt, float eps,int * leftblk,int*rightblk,int *topblk, int *botblk, float *zb, float *zs, float *hh, float *uu, float *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
-	int  xplus, yplus, xminus, yminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ileft, iright,itop,ibot;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 	//float normu, hhi;
 
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
-		xplus = min(ix + 1, nx - 1);
-		xminus = max(ix - 1, 0);
-		yplus = min(iy + 1, ny - 1);
-		yminus = max(iy - 1, 0);
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
 
-		if (ix == 0 )
+		if (leftblk[ibl] == ibl )
 		{
 			uu[i] = 0.0f;
-			zs[i] = zs[xplus+iy*nx];
-			hh[i] = max(zs[xplus + iy*nx]-zb[i],eps);
+			zs[i] = zs[iright];
+			hh[i] = max(zs[iright]-zb[i],eps);
 		}
-		if ( ix == nx - 1)
+		if ( rightblk[ibl]== ibl)
 		{
 			uu[i] = 0.0f;
-			zs[i] = zs[xminus + iy*nx];
-			hh[i] = max(zs[xminus + iy*nx] - zb[i], eps);
+			zs[i] = zs[ileft];
+			hh[i] = max(zs[ileft] - zb[i], eps);
 
 		}
 
-		if ( iy == 0 )
+		if ( botblk[ibl] == ibl )
 		{
 			vv[i] = 0.0f;
-			zs[i] = zs[ix + yplus*nx];
-			hh[i] = max(zs[ix + yplus*nx] - zb[i], eps);
+			zs[i] = zs[itop];
+			hh[i] = max(zs[itop] - zb[i], eps);
 		}
-		if ( iy == ny - 1)
+		if ( topblk[ibl] == ibl)
 		{
 			vv[i] = 0.0f;
-			zs[i] = zs[ix + yminus*nx];
-			hh[i] = max(zs[ix + yminus*nx] - zb[i], eps);
+			zs[i] = zs[ibot];
+			hh[i] = max(zs[ibot] - zb[i], eps);
 
 		}
 
 	}
 
 }
-template <class T> __global__ void noslipbndLeft(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> __global__ void noslipbndLeft(T xo, T eps, int * rightblk,T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
-	int iy = blockIdx.x*blockDim.x + threadIdx.x;
-	int ix = 0;
-	int i = ix + iy*nx;
-	int  xplus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int iright;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//int  xplus;
 	T zsp;
 
-	if (ix ==0 && iy < ny)
+	if (blockxo[ibl]==xo && ix==0)
 	{
-		xplus = min(ix + 1, nx - 1);
-		
+		//xplus = min(ix + 1, nx - 1);
+		iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
 
-		zsp = zs[xplus + iy*nx];
+		zsp = zs[iright];
 
 		
 		uu[i] = T(0.0);
@@ -2154,20 +2436,29 @@ template <class T> __global__ void noslipbndLeft(int nx, int ny, T eps, T *zb, T
 	}
 
 }
-template <class T> __global__ void noslipbndBot(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> __global__ void noslipbndBot(T yo, T eps,int * topblk,T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = 0;
-	int i = ix + iy*nx;
-	int yplus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//int yplus;
 	
-	if (iy == 0 && ix < nx)
+	if (blockyo[ibl]==yo && iy==0)
 	{
-		yplus = min(iy + 1, ny - 1);
-		
+		//yplus = min(iy + 1, ny - 1);
+		itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
 		vv[i] = T(0.0);
-		zs[i] = zs[ix + yplus*nx];
-		hh[i] = max(zs[ix + yplus*nx] - zb[i], eps);
+		zs[i] = zs[itop];
+		hh[i] = max(zs[itop] - zb[i], eps);
 
 
 
@@ -2176,43 +2467,60 @@ template <class T> __global__ void noslipbndBot(int nx, int ny, T eps, T *zb, T 
 }
 
 
-template <class T> __global__ void noslipbndRight(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> __global__ void noslipbndRight(T dx, T xmax, T eps,int *leftblk,T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
-	int iy = blockIdx.x*blockDim.x + threadIdx.x;
-	int ix = nx-1;
-	int i = ix + iy*nx;
-	int xminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ileft;
+
+	
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//int xminus;
 	
 
-	if (ix == nx-1 && iy < ny)
+	if ((blockxo[ibl]+15*dx) == xmax && ix==15)
 	{
-		xminus = max(ix - 1, 0);
-		
+		//xminus = max(ix - 1, 0);
+		ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
 		uu[i] = T(0.0);
-		zs[i] = zs[xminus + iy*nx];
-		hh[i] = max(zs[xminus + iy*nx] - zb[i], eps);
+		zs[i] = zs[ileft];
+		hh[i] = max(zs[ileft] - zb[i], eps);
 
 
 
 	}
 
 }
-template <class T> __global__ void noslipbndTop(int nx, int ny, T eps, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> __global__ void noslipbndTop(T dx, T ymax, T eps, int * botblk, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = ny - 1;
-	int i = ix + iy*nx;
-	int yminus;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	
 	
 
-	if (iy == ny - 1 && ix < nx)
+	if (blockyo[ibl]+15*dx == ymax && iy==15)
 	{
-		yminus = max(iy - 1, 0);
-
+		//yminus = max(iy - 1, 0);
+		ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 
 		vv[i] = T(0.0);
-		zs[i] = zs[ix + yminus*nx];
-		hh[i] = max(zs[ix + yminus*nx] - zb[i], eps);
+		zs[i] = zs[ibot];
+		hh[i] = max(zs[ibot] - zb[i], eps);
 
 
 
@@ -2221,14 +2529,16 @@ template <class T> __global__ void noslipbndTop(int nx, int ny, T eps, T *zb, T 
 }
 
 template <class T>
-__global__ void storeTSout(int nx, int ny,int noutnodes, int outnode, int istep, int inode,int jnode, T *zs, T *hh, T *uu, T *vv,T * store)
+__global__ void storeTSout(int noutnodes, int outnode, int istep, int inode,int jnode, int blknode, T *zs, T *hh, T *uu, T *vv,T * store)
 {
-	int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	int i = ix + iy*nx;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 	
 
-	if (ix == inode && iy == jnode )
+	if (ibl == blknode && ix == inode && iy == jnode )
 	{
 		store[0 + outnode * 4 + istep*noutnodes * 4] = hh[i];
 		store[1 + outnode * 4 + istep*noutnodes * 4] = zs[i];
@@ -2239,43 +2549,42 @@ __global__ void storeTSout(int nx, int ny,int noutnodes, int outnode, int istep,
 
 
 template <class T>
-__global__ void addavg_var(int nx, int ny, T * Varmean, T * Var)
+__global__ void addavg_var( T * Varmean, T * Var)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
 	__shared__ T mvari[16][16];
 	__shared__ T vari[16][16];
 
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
 
-		mvari[tx][ty] = Varmean[i];
-		vari[tx][ty] = Var[i];
+		mvari[ix][iy] = Varmean[i];
+		vari[ix][iy] = Var[i];
 
-		Varmean[i] = mvari[tx][ty] + vari[tx][ty];
+		Varmean[i] = mvari[ix][iy] + vari[ix][iy];
 	}
 
 
 }
 
 template <class T>
-__global__ void divavg_var(int nx, int ny, T ntdiv, T * Varmean)
+__global__ void divavg_var( T ntdiv, T * Varmean)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
 
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 	__shared__ T mvari[16][16];
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
-		mvari[tx][ty] = Varmean[i];
-		Varmean[i] = mvari[tx][ty] / ntdiv;
+		mvari[ix][iy] = Varmean[i];
+		Varmean[i] = mvari[ix][iy] / ntdiv;
 	}
 
 
@@ -2320,48 +2629,48 @@ __global__ void resetmax_var( T * Varmax)
 }
 
 template <class T>
-__global__ void max_var(int nx, int ny, T * Varmax, T * Var)
+__global__ void max_var(T * Varmax, T * Var)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
 	__shared__ T mvari[16][16];
 	__shared__ T vari[16][16];
 
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
 
-		mvari[tx][ty] = Varmax[i];
-		vari[tx][ty] = Var[i];
+		mvari[ix][iy] = Varmax[i];
+		vari[ix][iy] = Var[i];
 
-		Varmax[i] = max(mvari[tx][ty], vari[tx][ty]);
+		Varmax[i] = max(mvari[ix][iy], vari[ix][iy]);
 	}
 
 
 }
 
 template <class T>
-__global__ void CalcVorticity(int nx, int ny, T * Vort,T * dvdx, T * dudy)
+__global__ void CalcVorticity( T * Vort,T * dvdx, T * dudy)
 {
-	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
-	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
-	unsigned int i = ix + iy*nx;
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
 	__shared__ T dvdxi[16][16];
 	__shared__ T dudyi[16][16];
 
-	if (ix < nx && iy < ny)
+	//if (ix < nx && iy < ny)
 	{
 
-		dvdxi[tx][ty] = dvdx[i];
-		dudyi[tx][ty] = dudy[i];
+		dvdxi[ix][iy] = dvdx[i];
+		dudyi[ix][iy] = dudy[i];
 
-		Vort[i] = dvdxi[tx][ty] - dudyi[tx][ty];
+		Vort[i] = dvdxi[ix][iy] - dudyi[ix][iy];
 	}
 
 

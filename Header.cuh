@@ -25,7 +25,7 @@
 
 class TSnode {
 public:
-	int i, j;
+	int i, j, block;
 	double x, y;
 };
 
@@ -54,6 +54,8 @@ public:
 	int blksize = 256; //16x16 blocks
 	double xo = 0.0; // grid origin
 	double yo = 0.0; // grid origin
+	double ymax = 0.0;
+	double xmax = 0.0;
 	double grdalpha=0.0; // grid rotation Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // flag for bathy input. model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
 	int spherical = 0; // flag for geographical coordinate. can be activated by using teh keyword geographic
@@ -260,6 +262,10 @@ void update(int nx, int ny, float theta, float dt, float eps, float g, float CFL
 //void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
 template <class T> void advance(int nx, int ny, T dt, T eps, T*zb, T *hh, T *zs, T *uu, T * vv, T * dh, T *dhu, T *dhv, T * &hho, T *&zso, T *&uuo, T *&vvo);
 template <class T> void cleanup(int nx, int ny, T * hhi, T *zsi, T *uui, T *vvi, T * &hho, T *&zso, T *&uuo, T *&vvo);
+template <class T> void gradient(int nblk, int blksize, T theta, T delta, int * leftblk, int * rightblk, int * topblk, int * botblk, T *a, T *&dadx, T * &dady);
+
+
+
 //Bnd functions
 //void neumannbnd(int nx, int ny, double*a);
 
