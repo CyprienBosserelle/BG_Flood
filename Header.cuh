@@ -36,8 +36,9 @@ public:
 
 class River {
 public:
-	int i, j, block;
-	double x, y;
+	std::vector<int> i, j, block; // one river can spring across multiple cells
+	double xstart,xend, ystart,yend;
+	std::string Riverflowfile;
 	std::vector<Flowin> flowinput;
 };
 
@@ -92,7 +93,7 @@ public:
 
 
 	//Rivers
-	std::vector<River> River;
+	std::vector<River> River; // empty vector to hold river location and discharge time series
 
 
 	//bnd

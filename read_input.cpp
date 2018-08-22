@@ -330,7 +330,7 @@ Param readparamstr(std::string line, Param param)
 		else
 		{
 			//Failed there should be 5 arguments (comma separated) when inputing a river: filename, xstart,xend,ystart,yend;
-			std::cerr << "River input failed there should be 5 arguments (comma separated) when inputing a river: filename, xstart,xend,ystart,yend;" << std::endl;
+			std::cerr << "River input failed there should be 5 arguments (comma separated) when inputing a river: river = filename, xstart,xend,ystart,yend; see log file for details" << std::endl;
 			
 			write_text_to_log_file("River input below failed there should be 5 arguments (comma separated) when inputing a river: river = filename, xstart,xend,ystart,yend;");
 			write_text_to_log_file(parametervalue);
