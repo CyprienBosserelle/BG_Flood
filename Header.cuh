@@ -29,6 +29,19 @@ public:
 	double x, y;
 };
 
+class Flowin {
+public:
+	double time, q;
+};
+
+class River {
+public:
+	int i, j, block;
+	double x, y;
+	std::vector<Flowin> flowinput;
+};
+
+
 class Param {
 public:
 	//general parameters
@@ -76,6 +89,11 @@ public:
 	std::vector<TSnode> TSnodesout; // vector containing i and j of each variables
 									//Output variables
 	std::vector<std::string> outvars; //list of names of teh variables to output
+
+
+	//Rivers
+	std::vector<River> River;
+
 
 	//bnd
 	// 0:Wall; 1:sealevel dirichlet; 2:neumann (zeros gredient)

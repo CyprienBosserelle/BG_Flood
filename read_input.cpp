@@ -311,6 +311,33 @@ Param readparamstr(std::string line, Param param)
 		
 	}
 
+	parameterstr = "river";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> vars = split(parametervalue, ',');
+		if (vars.size() == 5)
+		{
+			River thisriver;
+			thisriver.Riverflowfile = trim(vars[0], " ");
+			thisriver.xstart= std::stod(vars[1]);
+			thisriver.xend= std::stod(vars[2]);
+			thisriver.ystart = std::stod(vars[3]);
+			thisriver.yend = std::stod(vars[4]);
+
+			param.River.push_back(thisriver);
+		}
+		else
+		{
+			//Failed there should be 5 arguments (comma separated) when inputing a river: filename, xstart,xend,ystart,yend;
+			std::cerr << "River input failed there should be 5 arguments (comma separated) when inputing a river: filename, xstart,xend,ystart,yend;" << std::endl;
+			
+			write_text_to_log_file("River input below failed there should be 5 arguments (comma separated) when inputing a river: river = filename, xstart,xend,ystart,yend;");
+			write_text_to_log_file(parametervalue);
+		}
+	}
+
+
 	parameterstr = "resetmax";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())

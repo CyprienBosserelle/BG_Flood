@@ -3560,11 +3560,58 @@ int main(int argc, char **argv)
 	
 
 	/////////////////////////////////////////////////////
+	// Prep River discharge
+	/////////////////////////////////////////////////////
+	
+	if (XParam.River.size() > 1)
+	{
+		double xx, yy;
+		printf("Preparing rivers ");
+		write_text_to_log_file("Preparing rivers");
+		for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+		{
+
+			std::vector<int> idis, jdis, blockdis;
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						xx = blockxo_d[bl] + i*XParam.dx;
+						yy = blockyo_d[bl] + j*XParam.dx;
+						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+						if (xx >= XParam.River[Rin].xstart && xx <= XParam.River[Rin].xend && yy >= XParam.River[Rin].ystart && yy <= XParam.River[Rin].yend)
+						{
+							
+							// This cell belongs to the river discharge area
+							idis.push_back(i);
+							jdis.push_back(j);
+							blockdis.push_back(bl);
+
+						}
+					}
+				}
+				
+			}
+
+			XParam.River[Rin].i = idis;
+			XParam.River[Rin].j = jdis;
+			XParam.River[Rin].block = blockdis;
+
+			// Now read the discharge input and store to  
+			
+		}
+	}
+
+	/////////////////////////////////////////////////////
 	// Initial Condition
 	/////////////////////////////////////////////////////
 	printf("Initial condition: ");
 	write_text_to_log_file("Initial condition:");
 
+	//move this to a subroutine 
 	int hotstartsucess = 0;
 	if (!XParam.hotstartfile.empty())
 	{
