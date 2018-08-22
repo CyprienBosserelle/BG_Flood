@@ -100,6 +100,85 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
+
+std::vector<Flowin> readFlowfile(std::string Flowfilename)
+{
+	std::vector<Flowin> slbnd;
+
+	std::ifstream fs(Flowfilename);
+
+	if (fs.fail()) {
+		std::cerr << Flowfilename << " Flow file could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: Flow/River file could not be opened ");
+		exit(1);
+	}
+
+	std::string line;
+	std::vector<std::string> lineelements;
+	//std::vector<double> WLS;
+	Flowin slbndline;
+	while (std::getline(fs, line))
+	{
+		//std::cout << line << std::endl;
+
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//Data should be in the format : time,Water level 1,Water level 2,...Water level n
+			//Location where the water level is 0:ny/(nwl-1):ny where nwl i the number of wlevnodes
+
+			//by default we expect tab delimitation
+			lineelements = split(line, '\t');
+			if (lineelements.size() != 2)
+			{
+				// Is it space delimited?
+				lineelements.clear();
+				lineelements = split(line, ' ');
+			}
+
+			if (lineelements.size() != 2)
+			{
+				//Well it has to be comma delimited then
+				lineelements.clear();
+				lineelements = split(line, ',');
+			}
+			if (lineelements.size() != 2)
+			{
+				// Giving up now! Could not read the files
+				//issue a warning and exit
+				std::cerr << Flowfilename << "ERROR flow file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
+				write_text_to_log_file("ERROR:  flow file (" + Flowfilename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
+				write_text_to_log_file(line);
+				exit(1);
+			}
+
+
+			slbndline.time = std::stod(lineelements[0]);
+
+			
+
+
+
+			slbndline.q = std::stod(lineelements[1]);;
+
+
+
+			//slbndline = readBSHline(line);
+			slbnd.push_back(slbndline);
+			//std::cout << line << std::endl;
+			//WLS.clear();
+		}
+
+	}
+	fs.close();
+
+	//std::cout << slbnd[0].wlev << std::endl;
+
+
+	return slbnd;
+}
+
+
 Param readparamstr(std::string line, Param param)
 {
 
@@ -762,7 +841,110 @@ std::string trim(const std::string& str, const std::string& whitespace)
 	return str.substr(strBegin, strRange);
 }
 
-void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
+Param readBathyhead(Param XParam)
+{
+	std::string bathyext;
+
+	//read bathy and perform sanity check
+
+	if (!XParam.Bathymetryfile.empty())
+	{
+		printf("bathy: %s\n", XParam.Bathymetryfile.c_str());
+
+		write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
+
+		std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+
+		std::vector<std::string> nameelements;
+		//by default we expect tab delimitation
+		nameelements = split(extvec.back(), '?');
+		if (nameelements.size() > 1)
+		{
+			//variable name for bathy is not given so it is assumed to be zb
+			bathyext = nameelements[0];
+		}
+		else
+		{
+			bathyext = extvec.back();
+		}
+
+
+		write_text_to_log_file("bathy extension: " + bathyext);
+		if (bathyext.compare("md") == 0)
+		{
+			write_text_to_log_file("Reading 'md' file");
+			readbathyHeadMD(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
+
+		}
+		if (bathyext.compare("nc") == 0)
+		{
+			write_text_to_log_file("Reading bathy netcdf file");
+			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
+			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+
+
+		}
+		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
+		{
+			//XBeach style file
+			write_text_to_log_file("Reading " + bathyext + " file");
+			write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
+		}
+		if (bathyext.compare("asc") == 0)
+		{
+			//
+			write_text_to_log_file("Reading bathy asc file");
+			readbathyASCHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.xo, XParam.yo, XParam.grdalpha);
+			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+		}
+
+		if (XParam.spherical < 1)
+		{
+			XParam.delta = XParam.dx;
+			XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+
+		}
+		else
+		{
+			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+			printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
+			write_text_to_log_file("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
+			if (XParam.grdalpha != 0.0)
+			{
+				printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
+				write_text_to_log_file("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+			}
+		}
+
+		//XParam.nx = ceil(XParam.nx / 16) * 16;
+		//XParam.ny = ceil(XParam.ny / 16) * 16;
+
+
+
+		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.yo);
+		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(XParam.xo) + " yo=" + std::to_string(XParam.yo));
+
+
+		/////////////////////////////////////////////////////
+		////// CHECK PARAMETER SANITY
+		/////////////////////////////////////////////////////
+		XParam = checkparamsanity(XParam);
+
+
+
+
+
+	}
+	else
+	{
+		std::cerr << "Fatal error: No bathymetry file specified. Please specify using 'bathy = Filename.bot'" << std::endl;
+		write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
+		exit(1);
+	}
+	return XParam;
+}
+
+void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
 {
 	
 
@@ -819,7 +1001,8 @@ void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &g
 
 
 
-extern "C" void readbathy(std::string filename, float *&zb)
+
+extern "C" void readbathyMD(std::string filename, float *&zb)
 {
 	//read input data:
 	//printf("bathy: %s\n", filename);

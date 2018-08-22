@@ -345,9 +345,11 @@ int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * d
 int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
 
 // I/O
-extern "C" void readbathy(std::string filename, float *&zb);
-void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
+Param readBathyhead(Param XParam);
+extern "C" void readbathyMD(std::string filename, float *&zb);
+void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
+std::vector<Flowin> readFlowfile(std::string Flowfilename);
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
 extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);

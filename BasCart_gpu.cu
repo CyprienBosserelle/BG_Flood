@@ -358,555 +358,429 @@ void checkGradGPU(Param XParam)
 	}
 }
 
-
-/*
-void checkloopGPU(Param XParam)
+int AllocMemCPU(Param XParam)
 {
-	int nx = XParam.nx;
-	int ny = XParam.ny;
-	
+	//function to allocate the memory on the CPU
+	// Pointers are Global !
+	//Need to add a sucess check for each call to malloc
 
-	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
-	dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+	int nblk = XParam.nblk;
+	int blksize = XParam.blksize;
 
-	dim3 blockDimLine(32, 1, 1);
-	dim3 gridDimLine(ceil((nx*ny*1.0f) / blockDimLine.x), 1, 1);
 
-	
-
-	float maxerr = 1e-11f;//1e-7f
-
-	
-
-	float maxdiffer;
-
-	int imax = 0;
-	int jmax = 0;
-
-	dtmax = (float) (1.0 / epsilon);
-	//float dtmaxtmp = dtmax;
-
-	resetdtmax << <gridDim, blockDim, 0 >> > (nx, ny, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	CUDA_CHECK(cudaMemcpy(dummy, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	float mindtmax = 1.0f / 1e-30f;
-	for (int i = 0; i < nx*ny; i++)
+	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		mindtmax = min(dummy[i], mindtmax);
+		//allocate double *arrays
+		Allocate1CPU(nblk, blksize, zb_d);
+		Allocate4CPU(nblk, blksize, zs_d, hh_d, uu_d, vv_d);
+		Allocate4CPU(nblk, blksize, zso_d, hho_d, uuo_d, vvo_d);
+		Allocate4CPU(nblk, blksize, dzsdx_d, dhdx_d, dudx_d, dvdx_d);
+		Allocate4CPU(nblk, blksize, dzsdy_d, dhdy_d, dudy_d, dvdy_d);
+
+		Allocate4CPU(nblk, blksize, Su_d, Sv_d, Fhu_d, Fhv_d);
+		Allocate4CPU(nblk, blksize, Fqux_d, Fquy_d, Fqvx_d, Fqvy_d);
+
+		//Allocate4CPU(nblk, blksize, dh_d, dhu_d, dhv_d, dummy_d);
+		Allocate1CPU(nblk, blksize, dh_d);
+		Allocate1CPU(nblk, blksize, dhu_d);
+		Allocate1CPU(nblk, blksize, dhv_d);
+
+
+
+
+		//not allocating below may be usefull
+
+		if (XParam.outhhmax == 1)
+		{
+			Allocate1CPU(nblk, blksize, hhmax_d);
+		}
+		if (XParam.outuumax == 1)
+		{
+			Allocate1CPU(nblk, blksize, uumax_d);
+		}
+		if (XParam.outvvmax == 1)
+		{
+			Allocate1CPU(nblk, blksize, vvmax_d);
+		}
+		if (XParam.outzsmax == 1)
+		{
+			Allocate1CPU(nblk, blksize, zsmax_d);
+		}
+
+		if (XParam.outhhmean == 1)
+		{
+			Allocate1CPU(nblk, blksize, hhmean_d);
+		}
+		if (XParam.outzsmean == 1)
+		{
+			Allocate1CPU(nblk, blksize, zsmean_d);
+		}
+		if (XParam.outuumean == 1)
+		{
+			Allocate1CPU(nblk, blksize, uumean_d);
+		}
+		if (XParam.outvvmean == 1)
+		{
+			Allocate1CPU(nblk, blksize, vvmean_d);
+		}
+
+		if (XParam.outvort == 1)
+		{
+			Allocate1CPU(nblk, blksize, vort);
+		}
+
 	}
-
-
-	//update step 1
-
-	// calculate gradients
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, hh_g, dhdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, hh_g, dhdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, zs_g, dzsdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, zs_g, dzsdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, uu_g, dudx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, uu_g, dudy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, vv_g, dvdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, vv_g, dvdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	//update(int nx, int ny, double dt, double eps, double g, double CFL, double delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
-	update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
-
-
-
-	CUDA_CHECK(cudaMemcpy(dummy, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, hh, dummy);
-	if (maxdiffer > maxerr)
+	else
 	{
-		printf("High error in dhdx: %f\n", maxdiffer);
+		// allocate float *arrays (same template functions but different pointers)
+		Allocate1CPU(nblk, blksize, zb);
+		Allocate4CPU(nblk, blksize, zs, hh, uu, vv);
+		Allocate4CPU(nblk, blksize, zso, hho, uuo, vvo);
+		Allocate4CPU(nblk, blksize, dzsdx, dhdx, dudx, dvdx);
+		Allocate4CPU(nblk, blksize, dzsdy, dhdy, dudy, dvdy);
+
+		Allocate4CPU(nblk, blksize, Su, Sv, Fhu, Fhv);
+		Allocate4CPU(nblk, blksize, Fqux, Fquy, Fqvx, Fqvy);
+
+		//Allocate4CPU(nx, ny, dh, dhu, dhv, dummy);
+		Allocate1CPU(nblk, blksize, dh);
+		Allocate1CPU(nblk, blksize, dhu);
+		Allocate1CPU(nblk, blksize, dhv);
+
+		//not allocating below may be usefull
+
+		if (XParam.outhhmax == 1)
+		{
+			Allocate1CPU(nblk, blksize, hhmax);
+		}
+		if (XParam.outuumax == 1)
+		{
+			Allocate1CPU(nblk, blksize, uumax);
+		}
+		if (XParam.outvvmax == 1)
+		{
+			Allocate1CPU(nblk, blksize, vvmax);
+		}
+		if (XParam.outzsmax == 1)
+		{
+			Allocate1CPU(nblk, blksize, zsmax);
+		}
+
+		if (XParam.outhhmean == 1)
+		{
+			Allocate1CPU(nblk, blksize, hhmean);
+		}
+		if (XParam.outzsmean == 1)
+		{
+			Allocate1CPU(nblk, blksize, zsmean);
+		}
+		if (XParam.outuumean == 1)
+		{
+			Allocate1CPU(nblk, blksize, uumean);
+		}
+		if (XParam.outvvmean == 1)
+		{
+			Allocate1CPU(nblk, blksize, vvmean);
+		}
+
+		if (XParam.outvort == 1)
+		{
+			Allocate1CPU(nblk, blksize, vort);
+		}
+
 	}
+	return 1; //Need a real test here
+}
 
+int AllocMemGPU(Param XParam)
+{
+	//function to allocate the memory on the GPU
+	// Also prepare textures
+	// Pointers are Global !
+	//Need to add a sucess check for each call to malloc
 
-	
-	// check gradients
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhdx, dummy);
-	if (maxdiffer > maxerr)
-	{ 
-		printf("High error in dhdx: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhdy, dummy);
-	if (maxdiffer > maxerr)
+	int nblk = XParam.nblk;
+	int blksize = XParam.blksize;
+	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		printf("High error in dhdy: %f\n", maxdiffer);
-	}
+		Allocate1GPU(nblk, blksize, zb_gd);
+		Allocate4GPU(nblk, blksize, zs_gd, hh_gd, uu_gd, vv_gd);
+		Allocate4GPU(nblk, blksize, zso_gd, hho_gd, uuo_gd, vvo_gd);
+		Allocate4GPU(nblk, blksize, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd);
+		Allocate4GPU(nblk, blksize, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd);
 
-	CUDA_CHECK(cudaMemcpy(dummy, dzsdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dzsdx, dummy);
-	if (maxdiffer > maxerr)
+		Allocate4GPU(nblk, blksize, Su_gd, Sv_gd, Fhu_gd, Fhv_gd);
+		Allocate4GPU(nblk, blksize, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd);
+
+		Allocate4GPU(nblk, blksize, dh_gd, dhu_gd, dhv_gd, dtmax_gd);
+
+		Allocate1GPU(nblk, 1, blockxo_gd);
+		Allocate1GPU(nblk, 1, blockyo_gd);
+
+
+
+		arrmin_d = (double *)malloc(nblk* blksize * sizeof(double));
+		CUDA_CHECK(cudaMalloc((void **)&arrmin_gd, nblk* blksize * sizeof(double)));
+		CUDA_CHECK(cudaMalloc((void **)&arrmax_gd, nblk* blksize * sizeof(double)));
+
+		if (XParam.outhhmax == 1)
+		{
+			Allocate1GPU(nblk, blksize, hhmax_gd);
+		}
+		if (XParam.outzsmax == 1)
+		{
+			Allocate1GPU(nblk, blksize, zsmax_gd);
+		}
+		if (XParam.outuumax == 1)
+		{
+			Allocate1GPU(nblk, blksize, uumax_gd);
+		}
+		if (XParam.outvvmax == 1)
+		{
+			Allocate1GPU(nblk, blksize, vvmax_gd);
+		}
+		if (XParam.outhhmean == 1)
+		{
+			Allocate1GPU(nblk, blksize, hhmean_gd);
+		}
+		if (XParam.outzsmean == 1)
+		{
+			Allocate1GPU(nblk, blksize, zsmean_gd);
+		}
+		if (XParam.outuumean == 1)
+		{
+			Allocate1GPU(nblk, blksize, uumean_gd);
+		}
+		if (XParam.outvvmean == 1)
+		{
+			Allocate1GPU(nblk, blksize, vvmean_gd);
+		}
+
+		if (XParam.outvort == 1)
+		{
+			Allocate1GPU(nblk, blksize, vort_gd);
+		}
+
+		if (XParam.TSnodesout.size() > 0)
+		{
+			// Allocate mmemory to store TSoutput in between writing to disk
+			int nTS = 1; // Nb of points
+			int nvts = 1; // NB of variables hh, zs, uu, vv
+			int nstore = 2048; //store up to 2048 pts
+			TSstore_d = (double *)malloc(nTS*nvts*nstore * sizeof(double));
+			CUDA_CHECK(cudaMalloc((void **)&TSstore_gd, nTS*nvts*nstore * sizeof(double)));
+			//Cpu part done differently because there are no latency issue (i.e. none that I care about) 
+
+		}
+	}
+	else
 	{
-		printf("High error in dzsdx: %f\n", maxdiffer);
+		Allocate1GPU(nblk, blksize, zb_g);
+		Allocate4GPU(nblk, blksize, zs_g, hh_g, uu_g, vv_g);
+		Allocate4GPU(nblk, blksize, zso_g, hho_g, uuo_g, vvo_g);
+		Allocate4GPU(nblk, blksize, dzsdx_g, dhdx_g, dudx_g, dvdx_g);
+		Allocate4GPU(nblk, blksize, dzsdy_g, dhdy_g, dudy_g, dvdy_g);
+
+		Allocate4GPU(nblk, blksize, Su_g, Sv_g, Fhu_g, Fhv_g);
+		Allocate4GPU(nblk, blksize, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g);
+
+		Allocate4GPU(nblk, blksize, dh_g, dhu_g, dhv_g, dtmax_g);
+
+
+		Allocate1GPU(nblk, 1, blockxo_g);
+		Allocate1GPU(nblk, 1, blockyo_g);
+
+		arrmin = (float *)malloc(nblk*blksize * sizeof(float));
+		CUDA_CHECK(cudaMalloc((void **)&arrmin_g, nblk*blksize * sizeof(float)));
+		CUDA_CHECK(cudaMalloc((void **)&arrmax_g, nblk*blksize * sizeof(float)));
+
+		if (XParam.outhhmax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&hhmax_g, nblk*blksize * sizeof(float)));
+		}
+		if (XParam.outzsmax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&zsmax_g, nblk*blksize * sizeof(float)));
+		}
+		if (XParam.outuumax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&uumax_g, nblk*blksize * sizeof(float)));
+		}
+		if (XParam.outvvmax == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&vvmax_g, nblk*blksize * sizeof(float)));
+		}
+		if (XParam.outhhmean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&hhmean_g, nblk*blksize * sizeof(float)));
+		}
+		if (XParam.outzsmean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&zsmean_g, nblk*blksize * sizeof(float)));
+		}
+		if (XParam.outuumean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&uumean_g, nblk*blksize * sizeof(float)));
+		}
+		if (XParam.outvvmean == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&vvmean_g, nblk*blksize * sizeof(float)));
+		}
+
+		if (XParam.outvort == 1)
+		{
+			CUDA_CHECK(cudaMalloc((void **)&vort_g, nblk*blksize * sizeof(float)));
+		}
+
+
+		if (XParam.TSnodesout.size() > 0)
+		{
+			// Allocate mmemory to store TSoutput in between writing to disk
+			int nTS = 1; // Nb of points
+			int nvts = 1; // NB of variables hh, zs, uu, vv
+			int nstore = 2048; //store up to 2048 pts
+			TSstore = (float *)malloc(nTS*nvts*nstore * sizeof(float));
+			CUDA_CHECK(cudaMalloc((void **)&TSstore_g, nTS*nvts*nstore * sizeof(float)));
+			//Cpu part done differently because there are no latency issue (i.e. none that I care about) 
+
+		}
 	}
 
-	CUDA_CHECK(cudaMemcpy(dummy, dzsdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dzsdy, dummy);
-	if (maxdiffer > maxerr)
+
+	Allocate4GPU(nblk, 1, leftblk_g, rightblk_g, topblk_g, botblk_g);
+
+	// This below was float by default and probably should remain float as long as fetched floats are readily converted to double as needed
+}
+
+int AllocMemGPUBND(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
+{
+	// Allocate textures and bind arrays for boundary interpolation
+	if (!XParam.leftbndfile.empty())
 	{
-		printf("High error in dzsdy: %f\n", maxdiffer);
-	}
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)leftWLbnd.size();
+		int nbndvec = (int)leftWLbnd[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&leftWLS_gp, &channelDescleftbnd, nbndtimes, nbndvec));
 
-	CUDA_CHECK(cudaMemcpy(dummy, dudx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dudx, dummy);
-	if (maxdiffer > maxerr)
+		float * leftWLS;
+		leftWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				leftWLS[ibndt + ibndv*nbndtimes] = leftWLbnd[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(leftWLS_gp, 0, 0, leftWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texLBND.addressMode[0] = cudaAddressModeClamp;
+		texLBND.addressMode[1] = cudaAddressModeClamp;
+		texLBND.filterMode = cudaFilterModeLinear;
+		texLBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texLBND, leftWLS_gp, channelDescleftbnd));
+		free(leftWLS);
+
+	}
+	if (!XParam.rightbndfile.empty())
 	{
-		printf("High error in dudx: %f\n", maxdiffer);
-	}
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)rightWLbnd.size();
+		int nbndvec = (int)rightWLbnd[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&rightWLS_gp, &channelDescrightbnd, nbndtimes, nbndvec));
 
-	CUDA_CHECK(cudaMemcpy(dummy, dudy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dudy, dummy);
-	if (maxdiffer > maxerr)
+		float * rightWLS;
+		rightWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				rightWLS[ibndt + ibndv*nbndtimes] = rightWLbnd[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(rightWLS_gp, 0, 0, rightWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texRBND.addressMode[0] = cudaAddressModeClamp;
+		texRBND.addressMode[1] = cudaAddressModeClamp;
+		texRBND.filterMode = cudaFilterModeLinear;
+		texRBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texRBND, rightWLS_gp, channelDescrightbnd));
+		free(rightWLS);
+
+	}
+	if (!XParam.topbndfile.empty())
 	{
-		printf("High error in dudy: %f\n", maxdiffer);
-	}
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)topWLbnd.size();
+		int nbndvec = (int)topWLbnd[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&topWLS_gp, &channelDesctopbnd, nbndtimes, nbndvec));
 
-	CUDA_CHECK(cudaMemcpy(dummy, dvdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dvdx, dummy);
-	if (maxdiffer > maxerr)
+		float * topWLS;
+		topWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				topWLS[ibndt + ibndv*nbndtimes] = topWLbnd[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(topWLS_gp, 0, 0, topWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texTBND.addressMode[0] = cudaAddressModeClamp;
+		texTBND.addressMode[1] = cudaAddressModeClamp;
+		texTBND.filterMode = cudaFilterModeLinear;
+		texTBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texTBND, topWLS_gp, channelDesctopbnd));
+		free(topWLS);
+
+	}
+	if (!XParam.botbndfile.empty())
 	{
-		printf("High error in dvdx: %f\n", maxdiffer);
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)botWLbnd.size();
+		int nbndvec = (int)botWLbnd[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&botWLS_gp, &channelDescbotbnd, nbndtimes, nbndvec));
+
+		float * botWLS;
+		botWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				botWLS[ibndt + ibndv*nbndtimes] = botWLbnd[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(botWLS_gp, 0, 0, botWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texBBND.addressMode[0] = cudaAddressModeClamp;
+		texBBND.addressMode[1] = cudaAddressModeClamp;
+		texBBND.filterMode = cudaFilterModeLinear;
+		texBBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texBBND, botWLS_gp, channelDescbotbnd));
+		free(botWLS);
+
 	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dvdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dvdy, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dvdy: %f\n", maxdiffer);
-	}
-
-
-	// All good so far continuing
-
-	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	//maxdiffer = maxdiff(nx*ny, Fhu, dummy);
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fhu, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fhu (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fhv, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fhv (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fqux_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	
-	
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fqux, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fqux (%f) in i=%d, j=%d\n", maxdiffer,imax,jmax);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fqvx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fqvx, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fqvx (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fqvy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fqvy, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fqvy (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fquy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Fquy, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fquy (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Su_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Su, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Su (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Sv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, Sv, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Sv (%f) in i=%d, j=%d\n", maxdiffer, imax, jmax);
-	}
-
-	// All good so far continuing
-	///////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////
-	minmaxKernel << <gridDimLine, blockDimLine, 0 >> >(nx*ny, arrmax_g, arrmin_g, dtmax_g);
-	//CUT_CHECK_ERROR("UpdateZom execution failed\n");
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	finalminmaxKernel << <1, blockDimLine, 0 >> >(arrmax_g, arrmin_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	//CUDA_CHECK(cudaMemcpy(arrmax, arrmax_g, nx*ny*sizeof(DECNUM), cudaMemcpyDeviceToHost));
-	CUDA_CHECK(cudaMemcpy(arrmin, arrmin_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-
-	maxdiffer = abs(dtmax-arrmin[0]);
-
-
-	CUDA_CHECK(cudaMemcpy(dummy, dtmax_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-
-
-	
-	mindtmax=1.0f/1e-30f;
-	for (int i = 0; i < nx*ny; i++)
-	{
-		mindtmax=min(dummy[i], mindtmax);
-	}
-	maxdiffer = abs(dtmax - mindtmax);
-
-	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.delta, (float)XParam.g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	CUDA_CHECK(cudaMemcpy(dummy, dh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dh, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dh: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhu, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dhu: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, dhv, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dhv: %f\n", maxdiffer);
-	}
-
-	// All good so far continuing
-	///////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////
-	XParam.dt = arrmin[0];
-	
-	//predictor (advance 1/2 dt)
-	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.dt*0.5f, (float)XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	//predictor
-	advance(nx, ny, (float)XParam.dt*0.5f, (float)XParam.eps,zb, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
-
-	CUDA_CHECK(cudaMemcpy(dummy, zso_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, zso, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in zso: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, hho_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, hho, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in hho: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, uuo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, uuo, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in uuo: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, vvo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiffID(nx, ny, imax, jmax, vvo, dummy);;
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in vvo: %f\n", maxdiffer);
-	}
-
-	// All good so far continuing
-	///////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////
-
-	//corrector
-	update(nx, ny, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
-
-	//corrector setp
-	//update again
-	// calculate gradients
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, hho_g, dhdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, hho_g, dhdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, zso_g, dzsdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, zso_g, dzsdy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, uuo_g, dudx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, uuo_g, dudy_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, vvo_g, dvdx_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	gradientGPUY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.theta, (float)XParam.delta, vvo_g, dvdy_g);
-	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	// check gradients
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhdx, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dhdx: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhdy, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dhdy: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dzsdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dzsdx, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dzsdx: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dzsdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dzsdy, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dzsdy: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dudx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dudx, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dudx: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dudy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dudy, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dudy: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dvdx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dvdx, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dvdx: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dvdy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dvdy, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dvdy: %f\n", maxdiffer);
-	}
-
-
-
-	updateKurgX << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	updateKurgY << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	// no reduction of dtmax during the corrector step
-
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fhu, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fhu: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fhv, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fhv: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fqux_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fqux, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fqux: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fqvx_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fqvx, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fqvx: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fqvy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fqvy, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fqvy: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Fquy_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Fquy, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Fquy: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Su_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Su, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Su: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, Sv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, Sv, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in Sv: %f\n", maxdiffer);
-	}
-
-
-	updateEV << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.delta, (float)XParam.g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	CUDA_CHECK(cudaMemcpy(dummy, dh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dh, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dh: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhu, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dhu: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, dhv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, dhv, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in dhv: %f\n", maxdiffer);
-	}
-
-
-	advance(nx, ny, (float)XParam.dt, (float)XParam.eps,zb, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
-
-	//
-	Advkernel << <gridDim, blockDim, 0 >> >(nx, ny, (float)XParam.dt, (float)XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	CUDA_CHECK(cudaMemcpy(dummy, zso_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, zso, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in zso: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, hho_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, hho, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in hho: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, uuo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, uuo, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in uuo: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, vvo_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, vvo, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in vvo: %f\n", maxdiffer);
-	}
-
-	cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
-
-	cleanupGPU << <gridDim, blockDim, 0 >> >(nx, ny, hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-
-	CUDA_CHECK(cudaMemcpy(dummy, zs_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, zs, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in zs: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, hh_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, hh, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in hh: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, uu_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, uu, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in uu: %f\n", maxdiffer);
-	}
-
-	CUDA_CHECK(cudaMemcpy(dummy, vv_g, nx*ny * sizeof(float), cudaMemcpyDeviceToHost));
-	maxdiffer = maxdiff(nx*ny, vv, dummy);
-	if (maxdiffer > maxerr)
-	{
-		printf("High error in vv: %f\n", maxdiffer);
-	}
-
 
 }
-*/
-
 
 
 void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
@@ -2729,108 +2603,15 @@ int main(int argc, char **argv)
 		
 	}
 
+	///////////////////////////////////////////
+	//  Read Bathy header
+	///////////////////////////////////////////
 
+	//this sets nx ny dx delta xo yo etc...
 
+	XParam = readBathyhead(XParam);
 
-
-	std::string bathyext;
 	
-	//read bathy and perform sanity check
-		
-	if (!XParam.Bathymetryfile.empty())
-	{
-		printf("bathy: %s\n", XParam.Bathymetryfile.c_str());
-
-		write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
-
-		std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
-
-		std::vector<std::string> nameelements;
-		//by default we expect tab delimitation
-		nameelements = split(extvec.back(), '?');
-		if (nameelements.size() > 1)
-		{
-			//variable name for bathy is not given so it is assumed to be zb
-			bathyext = nameelements[0];
-		}
-		else
-		{
-			bathyext = extvec.back();
-		}
-
-		
-		write_text_to_log_file("bathy extension: " + bathyext);
-		if (bathyext.compare("md") == 0)
-		{
-			write_text_to_log_file("Reading 'md' file");
-			readbathyHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
-			
-		}
-		if (bathyext.compare("nc") == 0)
-		{
-			write_text_to_log_file("Reading bathy netcdf file");
-			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
-			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
-			
-
-		}
-		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
-		{
-			//XBeach style file
-			write_text_to_log_file("Reading " + bathyext + " file");
-			write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
-		}
-		if (bathyext.compare("asc") == 0)
-		{
-			//
-			write_text_to_log_file("Reading bathy asc file");
-			readbathyASCHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.xo, XParam.yo, XParam.grdalpha);
-			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
-		}
-
-		if (XParam.spherical < 1)
-		{
-			XParam.delta = XParam.dx;
-			XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
-			
-		}
-		else
-		{
-			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
-			printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
-			write_text_to_log_file("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
-			if (XParam.grdalpha != 0.0)
-			{
-				printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
-				write_text_to_log_file("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
-			}
-		}
-		
-		//XParam.nx = ceil(XParam.nx / 16) * 16;
-		//XParam.ny = ceil(XParam.ny / 16) * 16;
-
-
-		
-		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi,XParam.xo, XParam.yo);
-		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(XParam.xo) + " yo=" + std::to_string(XParam.yo));
-
-
-		/////////////////////////////////////////////////////
-		////// CHECK PARAMETER SANITY
-		/////////////////////////////////////////////////////
-		XParam = checkparamsanity(XParam);
-
-
-
-
-
-	}
-	else
-	{
-		std::cerr << "Fatal error: No bathymetry file specified. Please specify using 'bathy = Filename.bot'" << std::endl;
-		write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
-		exit(1);
-	}
 
 	//////////////////////////////////////////////////
 	////// Preprare Bnd
@@ -2864,6 +2645,8 @@ int main(int argc, char **argv)
 		botWLbnd = readWLfile(XParam.botbndfile);
 	}
 
+
+	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
 	XParam.endtime = setendtime(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 
 
@@ -2886,9 +2669,30 @@ int main(int argc, char **argv)
 	printf("Read Bathy data...");
 	write_text_to_log_file("Read Bathy data");
 
+
+	// Check bathy extension 
+	std::string bathyext;
+
+	std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		bathyext = nameelements[0];
+	}
+	else
+	{
+		bathyext = extvec.back();
+	}
+
+	//Now choose the right function to read the data
+
 	if (bathyext.compare("md") == 0)
 	{
-		readbathy(XParam.Bathymetryfile, dummy);
+		readbathyMD(XParam.Bathymetryfile, dummy);
 	}
 	if (bathyext.compare("nc") == 0)
 	{
@@ -2960,15 +2764,15 @@ int main(int argc, char **argv)
 	}
 
 	XParam.nblk = nblk;
-
+	
+	int blksize = XParam.blksize; //useful below
 	printf("Number of blocks: %i\n",nblk);
 
 	////////////////////////////////////////////////
 	///// Allocate and arrange blocks
 	////////////////////////////////////////////////
-	// Block info
-	//extern double * blockxo, *blockyo;
-	//extern int * leftblk, *rightblk, *topblk, *botblk;
+	// caluculate the Block xo yo and what are its neighbour
+	
 
 	Allocate1CPU(nblk, 1, blockxo);
 	Allocate1CPU(nblk, 1, blockyo);
@@ -3065,140 +2869,18 @@ int main(int argc, char **argv)
 
 	printf("Allocate CPU memory...");
 	write_text_to_log_file("Allocate CPU memory...");
-
-
-	int blksize = XParam.blksize;
-
-
-	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
-	{
-		//allocate double *arrays
-		Allocate1CPU(nblk, blksize, zb_d);
-		Allocate4CPU(nblk, blksize, zs_d, hh_d, uu_d, vv_d);
-		Allocate4CPU(nblk, blksize, zso_d, hho_d, uuo_d, vvo_d);
-		Allocate4CPU(nblk, blksize, dzsdx_d, dhdx_d, dudx_d, dvdx_d);
-		Allocate4CPU(nblk, blksize, dzsdy_d, dhdy_d, dudy_d, dvdy_d);
-
-		Allocate4CPU(nblk, blksize, Su_d, Sv_d, Fhu_d, Fhv_d);
-		Allocate4CPU(nblk, blksize, Fqux_d, Fquy_d, Fqvx_d, Fqvy_d);
-
-		//Allocate4CPU(nblk, blksize, dh_d, dhu_d, dhv_d, dummy_d);
-		Allocate1CPU(nblk, blksize, dh_d);
-		Allocate1CPU(nblk, blksize, dhu_d);
-		Allocate1CPU(nblk, blksize, dhv_d);
-
-		
-		
-
-		//not allocating below may be usefull
-
-		if (XParam.outhhmax == 1)
-		{
-			Allocate1CPU(nblk, blksize, hhmax_d);
-		}
-		if (XParam.outuumax == 1)
-		{
-			Allocate1CPU(nblk, blksize, uumax_d);
-		}
-		if (XParam.outvvmax == 1)
-		{
-			Allocate1CPU(nblk, blksize, vvmax_d);
-		}
-		if (XParam.outzsmax == 1)
-		{
-			Allocate1CPU(nblk, blksize, zsmax_d);
-		}
-
-		if (XParam.outhhmean == 1)
-		{
-			Allocate1CPU(nblk, blksize, hhmean_d);
-		}
-		if (XParam.outzsmean == 1)
-		{
-			Allocate1CPU(nblk, blksize, zsmean_d);
-		}
-		if (XParam.outuumean == 1)
-		{
-			Allocate1CPU(nblk, blksize, uumean_d);
-		}
-		if (XParam.outvvmean == 1)
-		{
-			Allocate1CPU(nblk, blksize, vvmean_d);
-		}
-
-		if (XParam.outvort == 1)
-		{
-			Allocate1CPU(nblk, blksize, vort);
-		}
-
-	}
-	else
-	{
-		// allocate float *arrays (same template functions but different pointers)
-		Allocate1CPU(nblk, blksize, zb);
-		Allocate4CPU(nblk, blksize, zs, hh, uu, vv);
-		Allocate4CPU(nblk, blksize, zso, hho, uuo, vvo);
-		Allocate4CPU(nblk, blksize, dzsdx, dhdx, dudx, dvdx);
-		Allocate4CPU(nblk, blksize, dzsdy, dhdy, dudy, dvdy);
-
-		Allocate4CPU(nblk, blksize, Su, Sv, Fhu, Fhv);
-		Allocate4CPU(nblk, blksize, Fqux, Fquy, Fqvx, Fqvy);
-
-		//Allocate4CPU(nx, ny, dh, dhu, dhv, dummy);
-		Allocate1CPU(nblk, blksize, dh);
-		Allocate1CPU(nblk, blksize, dhu);
-		Allocate1CPU(nblk, blksize, dhv);
-
-		//not allocating below may be usefull
-
-		if (XParam.outhhmax == 1)
-		{
-			Allocate1CPU(nblk, blksize, hhmax);
-		}
-		if (XParam.outuumax == 1)
-		{
-			Allocate1CPU(nblk, blksize, uumax);
-		}
-		if (XParam.outvvmax == 1)
-		{
-			Allocate1CPU(nblk, blksize, vvmax);
-		}
-		if (XParam.outzsmax == 1)
-		{
-			Allocate1CPU(nblk, blksize, zsmax);
-		}
-
-		if (XParam.outhhmean == 1)
-		{
-			Allocate1CPU(nblk, blksize, hhmean);
-		}
-		if (XParam.outzsmean == 1)
-		{
-			Allocate1CPU(nblk, blksize, zsmean);
-		}
-		if (XParam.outuumean == 1)
-		{
-			Allocate1CPU(nblk, blksize, uumean);
-		}
-		if (XParam.outvvmean == 1)
-		{
-			Allocate1CPU(nblk, blksize, vvmean);
-		}
-
-		if (XParam.outvort == 1)
-		{
-			Allocate1CPU(nblk, blksize, vort);
-		}
-
-	}
+	int check;
 	
-
+	check = AllocMemCPU(XParam);
 
 
 
 	printf("...done!\n");
 	write_text_to_log_file("Done");
 
+	////////////////////////////////////////////////
+	///// Find and prepare GPU device
+	////////////////////////////////////////////////
 
 	if (XParam.GPUDEVICE >= 0)
 	{
@@ -3231,287 +2913,21 @@ int main(int argc, char **argv)
 	{
 		printf("Allocating GPU memory...");
 		write_text_to_log_file("Allocating GPU memory");
-		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
-		{
-			Allocate1GPU(nblk, blksize, zb_gd);
-			Allocate4GPU(nblk, blksize, zs_gd, hh_gd, uu_gd, vv_gd);
-			Allocate4GPU(nblk, blksize, zso_gd, hho_gd, uuo_gd, vvo_gd);
-			Allocate4GPU(nblk, blksize, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd);
-			Allocate4GPU(nblk, blksize, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd);
-
-			Allocate4GPU(nblk, blksize, Su_gd, Sv_gd, Fhu_gd, Fhv_gd);
-			Allocate4GPU(nblk, blksize, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd);
-
-			Allocate4GPU(nblk, blksize, dh_gd, dhu_gd, dhv_gd, dtmax_gd);
-
-			Allocate1GPU(nblk, 1, blockxo_gd);
-			Allocate1GPU(nblk, 1, blockyo_gd);
-
-			
-
-			arrmin_d = (double *)malloc(nblk* blksize * sizeof(double));
-			CUDA_CHECK(cudaMalloc((void **)&arrmin_gd, nblk* blksize * sizeof(double)));
-			CUDA_CHECK(cudaMalloc((void **)&arrmax_gd, nblk* blksize * sizeof(double)));
-
-			if (XParam.outhhmax == 1)
-			{
-				Allocate1GPU(nblk, blksize, hhmax_gd);
-			}
-			if (XParam.outzsmax == 1)
-			{
-				Allocate1GPU(nblk, blksize, zsmax_gd);
-			}
-			if (XParam.outuumax == 1)
-			{
-				Allocate1GPU(nblk, blksize, uumax_gd);
-			}
-			if (XParam.outvvmax == 1)
-			{
-				Allocate1GPU(nblk, blksize, vvmax_gd);
-			}
-			if (XParam.outhhmean == 1)
-			{
-				Allocate1GPU(nblk, blksize, hhmean_gd);
-			}
-			if (XParam.outzsmean == 1)
-			{
-				Allocate1GPU(nblk, blksize, zsmean_gd);
-			}
-			if (XParam.outuumean == 1)
-			{
-				Allocate1GPU(nblk, blksize, uumean_gd);
-			}
-			if (XParam.outvvmean == 1)
-			{
-				Allocate1GPU(nblk, blksize, vvmean_gd);
-			}
-
-			if (XParam.outvort == 1)
-			{
-				Allocate1GPU(nblk, blksize, vort_gd);
-			}
-
-			if (XParam.TSnodesout.size() > 0)
-			{
-				// Allocate mmemory to store TSoutput in between writing to disk
-				int nTS = 1; // Nb of points
-				int nvts = 1; // NB of variables hh, zs, uu, vv
-				int nstore = 2048; //store up to 2048 pts
-				TSstore_d = (double *)malloc(nTS*nvts*nstore * sizeof(double));
-				CUDA_CHECK(cudaMalloc((void **)&TSstore_gd, nTS*nvts*nstore * sizeof(double)));
-				//Cpu part done differently because there are no latency issue (i.e. none that I care about) 
-
-			}
-		}
-		else
-		{
-			Allocate1GPU(nblk, blksize, zb_g);
-			Allocate4GPU(nblk, blksize, zs_g, hh_g, uu_g, vv_g);
-			Allocate4GPU(nblk, blksize, zso_g, hho_g, uuo_g, vvo_g);
-			Allocate4GPU(nblk, blksize, dzsdx_g, dhdx_g, dudx_g, dvdx_g);
-			Allocate4GPU(nblk, blksize, dzsdy_g, dhdy_g, dudy_g, dvdy_g);
-
-			Allocate4GPU(nblk, blksize, Su_g, Sv_g, Fhu_g, Fhv_g);
-			Allocate4GPU(nblk, blksize, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g);
-
-			Allocate4GPU(nblk, blksize, dh_g, dhu_g, dhv_g, dtmax_g);
-
-
-			Allocate1GPU(nblk, 1, blockxo_g);
-			Allocate1GPU(nblk, 1, blockyo_g);
-
-			arrmin = (float *)malloc(nblk*blksize * sizeof(float));
-			CUDA_CHECK(cudaMalloc((void **)&arrmin_g, nblk*blksize * sizeof(float)));
-			CUDA_CHECK(cudaMalloc((void **)&arrmax_g, nblk*blksize * sizeof(float)));
-
-			if (XParam.outhhmax == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&hhmax_g, nblk*blksize * sizeof(float)));
-			}
-			if (XParam.outzsmax == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&zsmax_g, nblk*blksize * sizeof(float)));
-			}
-			if (XParam.outuumax == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&uumax_g, nblk*blksize * sizeof(float)));
-			}
-			if (XParam.outvvmax == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&vvmax_g, nblk*blksize * sizeof(float)));
-			}
-			if (XParam.outhhmean == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&hhmean_g, nblk*blksize * sizeof(float)));
-			}
-			if (XParam.outzsmean == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&zsmean_g, nblk*blksize * sizeof(float)));
-			}
-			if (XParam.outuumean == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&uumean_g, nblk*blksize * sizeof(float)));
-			}
-			if (XParam.outvvmean == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&vvmean_g, nblk*blksize * sizeof(float)));
-			}
-
-			if (XParam.outvort == 1)
-			{
-				CUDA_CHECK(cudaMalloc((void **)&vort_g, nblk*blksize * sizeof(float)));
-			}
-
-
-			if (XParam.TSnodesout.size() > 0)
-			{
-				// Allocate mmemory to store TSoutput in between writing to disk
-				int nTS = 1; // Nb of points
-				int nvts = 1; // NB of variables hh, zs, uu, vv
-				int nstore = 2048; //store up to 2048 pts
-				TSstore = (float *)malloc(nTS*nvts*nstore * sizeof(float));
-				CUDA_CHECK(cudaMalloc((void **)&TSstore_g, nTS*nvts*nstore * sizeof(float)));
-				//Cpu part done differently because there are no latency issue (i.e. none that I care about) 
-
-			}
-		}
-
-
-		Allocate4GPU(nblk, 1, leftblk_g, rightblk_g, topblk_g, botblk_g);
-
-		// This below was float by default and probably should remain float as long as fetched floats are readily converted to double as needed
+		int check;
+		check = AllocMemGPU(XParam);
+		check = AllocMemGPUBND(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd);
 		
-
-		if (!XParam.leftbndfile.empty())
-		{
-			//leftWLbnd = readWLfile(XParam.leftbndfile);
-			//Flatten bnd to copy to cuda array
-			int nbndtimes = (int) leftWLbnd.size();
-			int nbndvec = (int) leftWLbnd[0].wlevs.size();
-			CUDA_CHECK(cudaMallocArray(&leftWLS_gp, &channelDescleftbnd, nbndtimes, nbndvec));
-
-			float * leftWLS;
-			leftWLS=(float *)malloc(nbndtimes * nbndvec * sizeof(float));
-
-			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
-			{
-				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
-				{
-					//
-					leftWLS[ibndt + ibndv*nbndtimes] = leftWLbnd[ibndt].wlevs[ibndv];
-				}
-			}
-			CUDA_CHECK(cudaMemcpyToArray(leftWLS_gp, 0, 0, leftWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
-
-			texLBND.addressMode[0] = cudaAddressModeClamp;
-			texLBND.addressMode[1] = cudaAddressModeClamp;
-			texLBND.filterMode = cudaFilterModeLinear;
-			texLBND.normalized = false;
-
-
-			CUDA_CHECK(cudaBindTextureToArray(texLBND, leftWLS_gp, channelDescleftbnd));
-			free(leftWLS);
-
-		}
-		if (!XParam.rightbndfile.empty())
-		{
-			//leftWLbnd = readWLfile(XParam.leftbndfile);
-			//Flatten bnd to copy to cuda array
-			int nbndtimes = (int) rightWLbnd.size();
-			int nbndvec = (int) rightWLbnd[0].wlevs.size();
-			CUDA_CHECK(cudaMallocArray(&rightWLS_gp, &channelDescrightbnd, nbndtimes, nbndvec));
-
-			float * rightWLS;
-			rightWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
-
-			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
-			{
-				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
-				{
-					//
-					rightWLS[ibndt + ibndv*nbndtimes] = rightWLbnd[ibndt].wlevs[ibndv];
-				}
-			}
-			CUDA_CHECK(cudaMemcpyToArray(rightWLS_gp, 0, 0, rightWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
-
-			texRBND.addressMode[0] = cudaAddressModeClamp;
-			texRBND.addressMode[1] = cudaAddressModeClamp;
-			texRBND.filterMode = cudaFilterModeLinear;
-			texRBND.normalized = false;
-
-
-			CUDA_CHECK(cudaBindTextureToArray(texRBND, rightWLS_gp, channelDescrightbnd));
-			free(rightWLS);
-
-		}
-		if (!XParam.topbndfile.empty())
-		{
-			//leftWLbnd = readWLfile(XParam.leftbndfile);
-			//Flatten bnd to copy to cuda array
-			int nbndtimes = (int) topWLbnd.size();
-			int nbndvec = (int) topWLbnd[0].wlevs.size();
-			CUDA_CHECK(cudaMallocArray(&topWLS_gp, &channelDesctopbnd, nbndtimes, nbndvec));
-
-			float * topWLS;
-			topWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
-
-			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
-			{
-				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
-				{
-					//
-					topWLS[ibndt + ibndv*nbndtimes] = topWLbnd[ibndt].wlevs[ibndv];
-				}
-			}
-			CUDA_CHECK(cudaMemcpyToArray(topWLS_gp, 0, 0, topWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
-
-			texTBND.addressMode[0] = cudaAddressModeClamp;
-			texTBND.addressMode[1] = cudaAddressModeClamp;
-			texTBND.filterMode = cudaFilterModeLinear;
-			texTBND.normalized = false;
-
-
-			CUDA_CHECK(cudaBindTextureToArray(texTBND, topWLS_gp, channelDesctopbnd));
-			free(topWLS);
-
-		}
-		if (!XParam.botbndfile.empty())
-		{
-			//leftWLbnd = readWLfile(XParam.leftbndfile);
-			//Flatten bnd to copy to cuda array
-			int nbndtimes = (int) botWLbnd.size();
-			int nbndvec = (int) botWLbnd[0].wlevs.size();
-			CUDA_CHECK(cudaMallocArray(&botWLS_gp, &channelDescbotbnd, nbndtimes, nbndvec));
-
-			float * botWLS;
-			botWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
-
-			for (int ibndv = 0; ibndv < nbndvec; ibndv++)
-			{
-				for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
-				{
-					//
-					botWLS[ibndt + ibndv*nbndtimes] = botWLbnd[ibndt].wlevs[ibndv];
-				}
-			}
-			CUDA_CHECK(cudaMemcpyToArray(botWLS_gp, 0, 0, botWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
-
-			texBBND.addressMode[0] = cudaAddressModeClamp;
-			texBBND.addressMode[1] = cudaAddressModeClamp;
-			texBBND.filterMode = cudaFilterModeLinear;
-			texBBND.normalized = false;
-
-
-			CUDA_CHECK(cudaBindTextureToArray(texBBND, botWLS_gp, channelDescbotbnd));
-			free(botWLS);
-
-		}
 		printf("Done\n");
 		write_text_to_log_file("Done");
 
 	}
 
 	
+	////////////////////////////////////////
+	//////// Copy initial cartesian bathy array to BUQ array
+	////////////////////////////////////////
+	printf("Copy bathy to BUQ array...");
+	write_text_to_log_file("Copy bathy to BUQ array...");
 	// Copy dummy to zb
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
@@ -3531,18 +2947,15 @@ int main(int argc, char **argv)
 	}
 
 
-	printf("Done\n");
-	write_text_to_log_file("Done");
-
-
 	// free dummy and dummy_d because they are of size nx*ny but we want them nblk*blksize since we can't predict if one is larger then the other I'd rather free and malloc rather the realloc
 	free(dummy);
 	free(dummy_d);
 
-	Allocate1CPU(nblk, blksize, dummy);
-	Allocate1CPU(nblk, blksize, dummy_d);
+	Allocate1CPU(XParam.nblk, XParam.blksize, dummy);
+	Allocate1CPU(XParam.nblk, XParam.blksize, dummy_d);
 
-
+	printf("Done\n");
+	write_text_to_log_file("Done");
 
 
 	// set grid edges. this is necessary for boundary conditions to work
@@ -3568,9 +2981,10 @@ int main(int argc, char **argv)
 		double xx, yy;
 		printf("Preparing rivers ");
 		write_text_to_log_file("Preparing rivers");
+		//For each rivers
 		for (int Rin = 0; Rin < XParam.River.size(); Rin++)
 		{
-
+			// find the cells where the river discharge will be applied
 			std::vector<int> idis, jdis, blockdis;
 			for (int bl = 0; bl < XParam.nblk; bl++)
 			{
@@ -3601,7 +3015,7 @@ int main(int argc, char **argv)
 			XParam.River[Rin].block = blockdis;
 
 			// Now read the discharge input and store to  
-			
+			XParam.River[Rin].flowinput = readFlowfile(XParam.River[Rin].Riverflowfile);
 		}
 	}
 
@@ -3662,7 +3076,7 @@ int main(int argc, char **argv)
 					{
 						for (int i = 0; i < 16; i++)
 						{
-							int n = i + j * 16 + bl * blksize;
+							int n = i + j * 16 + bl * XParam.blksize;
 
 							uu_d[n] = 0.0;
 							vv_d[n] = 0.0;
@@ -3686,7 +3100,7 @@ int main(int argc, char **argv)
 					{
 						for (int i = 0; i < 16; i++)
 						{
-							int n = i + j * 16 + bl * blksize;
+							int n = i + j * 16 + bl * XParam.blksize;
 							uu[n] = 0.0f;
 							vv[n] = 0.0f;
 							//zb[i + j*nx] = 0.0f;
@@ -3726,7 +3140,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						xi = blockxo_d[bl] + i*XParam.dx;
 						yi = blockyo_d[bl] + j*XParam.dx;
 
@@ -3920,7 +3334,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						hhmax_d[n] = hh_d[n];
 					}
 				}
@@ -3935,7 +3349,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						hhmean_d[n] = 0.0;
 					}
 				}
@@ -3949,7 +3363,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						zsmax_d[n] = zs_d[n];
 					}
 				}
@@ -3964,7 +3378,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						zsmean_d[n] = 0.0;
 					}
 				}
@@ -3979,7 +3393,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						uumax_d[n] = uu_d[n];
 					}
 				}
@@ -3994,7 +3408,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						uumean_d[n] = 0.0;
 					}
 				}
@@ -4008,7 +3422,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						vvmax_d[n] = vv_d[n];
 					}
 				}
@@ -4023,7 +3437,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						vvmean_d[n] = 0.0;
 					}
 				}
@@ -4037,7 +3451,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						vort_d[n] = 0.0;
 					}
 				}
@@ -4055,7 +3469,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						hhmax[n] = hh[n];
 					}
 				}
@@ -4070,7 +3484,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						hhmean[n] = 0.0;
 					}
 				}
@@ -4084,7 +3498,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						zsmax[n] = zs[n];
 					}
 				}
@@ -4099,7 +3513,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						zsmean[n] = 0.0;
 					}
 				}
@@ -4114,7 +3528,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						uumax[n] = uu[n];
 					}
 				}
@@ -4129,7 +3543,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						uumean[n] = 0.0;
 					}
 				}
@@ -4143,7 +3557,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						vvmax[n] = vv[n];
 					}
 				}
@@ -4158,7 +3572,7 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						vvmean[n] = 0.0;
 					}
 				}
@@ -4172,13 +3586,15 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * blksize;
+						int n = i + j * 16 + bl * XParam.blksize;
 						vort[n] = 0.0;
 					}
 				}
 			}
 		}
 	}
+	
+
 	if (XParam.GPUDEVICE >= 0)
 	{
 		printf("Init data on GPU ");
