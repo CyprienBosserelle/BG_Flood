@@ -37,9 +37,10 @@ public:
 class River {
 public:
 	std::vector<int> i, j, block; // one river can spring across multiple cells
-	double xstart,xend, ystart,yend;
-	std::string Riverflowfile;
-	std::vector<Flowin> flowinput;
+	double disarea; // discharge area
+	double xstart,xend, ystart,yend; // location of the discharge as a rectangle
+	std::string Riverflowfile; // river flow input time[s] flow in m3/s
+	std::vector<Flowin> flowinput; // vector to store the data of the river flow input file
 };
 
 
@@ -315,6 +316,7 @@ template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T e
 
 
 template <class T> void quadfrictionCPU(int nx, int ny, T dt, T eps, T cf, T *hh, T *uu, T *vv);
+template <class T> void discharge_bnd_v_CPU(Param XParam, T*zs, T*hh);
 // CPU mean max
 void AddmeanCPU(Param XParam);
 void AddmeanCPUD(Param XParam);

@@ -1237,7 +1237,8 @@ template <class T> void advance(int nblk, int blksize, T dt, T eps, T*zb, T *hh,
 
 }
 
-template <class T> void cleanup(int nblk, int blksize, T * hhi, T *zsi, T *uui, T *vvi, T * &hho, T *&zso, T *&uuo, T *&vvo)
+template <class T> 
+void cleanup(int nblk, int blksize, T * hhi, T *zsi, T *uui, T *vvi, T * &hho, T *&zso, T *&uuo, T *&vvo)
 {
 	for (int ib = 0; ib < nblk; ib++)
 	{
@@ -1255,6 +1256,9 @@ template <class T> void cleanup(int nblk, int blksize, T * hhi, T *zsi, T *uui, 
 	}
 
 }
+
+
+
 
 
 extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltime, double *xx, double *yy, float * var)
@@ -1404,7 +1408,10 @@ double FlowCPU(Param XParam, double nextoutputtime)
 	
 	quadfrictionCPU(XParam.nblk, XParam.blksize, (float)XParam.dt, (float) XParam.eps, (float) XParam.cf, hh, uu, vv);
 	//write2varnc(nx, ny, totaltime, hh);
-
+	if (XParam.River.size() > 1)
+	{
+		discharge_bnd_v_CPU(XParam, zs, hh);
+	}
 	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
 	return XParam.dt;
 
@@ -1497,7 +1504,10 @@ double FlowCPUDouble(Param XParam, double nextoutputtime)
 
 	quadfrictionCPU(XParam.nblk, XParam.blksize, XParam.dt, XParam.eps, XParam.cf, hh_d, uu_d, vv_d);
 	//write2varnc(nx, ny, totaltime, hh);
-
+	if (XParam.River.size() > 1)
+	{
+		discharge_bnd_v_CPU(XParam, zs_d, hh_d);
+	}
 	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
 	return XParam.dt;
 
@@ -1935,7 +1945,8 @@ void botdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, doubl
 }
 
 
-template <class T> void quadfrictionCPU(int nblk, int blksize, T dt, T eps, T cf, T *hh, T *uu, T *vv)
+template <class T> 
+void quadfrictionCPU(int nblk, int blksize, T dt, T eps, T cf, T *hh, T *uu, T *vv)
 {
 	
 
@@ -1963,6 +1974,41 @@ template <class T> void quadfrictionCPU(int nblk, int blksize, T dt, T eps, T cf
 			
 		}
 	}
+
+}
+
+template <class T>
+void discharge_bnd_v_CPU(Param XParam,T*zs,T*hh)
+{
+	T qnow;
+	for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+	{
+		
+		//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
+		int bndstep = 0;
+		double difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+		while (difft <= 0.0)
+		{
+			bndstep++;
+			difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+		}
+		
+		qnow = interptime(XParam.River[Rin].flowinput[bndstep].q, XParam.River[Rin].flowinput[max(bndstep-1,0)].q, XParam.River[Rin].flowinput[bndstep].time - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time,XParam.totaltime- XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time);
+		
+		for (int nc = 0; nc < XParam.River[Rin].i.size(); nc++)
+		{
+			int i = XParam.River[Rin].i[nc] + XParam.River[Rin].j[nc] * 16 + XParam.River[Rin].block[nc] *(XParam.blksize);
+			T dzsdt = qnow*XParam.dt / XParam.River[Rin].disarea;
+			zs[i] = zs[i] + dzsdt;
+			// Do hh[i] too although Im not sure it is worth it
+			hh[i] = hh[i] + dzsdt;
+		}
+
+		
+	}
+
+
+	
 
 }
 

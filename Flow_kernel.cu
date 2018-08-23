@@ -2675,3 +2675,69 @@ __global__ void CalcVorticity( T * Vort,T * dvdx, T * dudy)
 
 
 }
+
+template <class T>
+__global__ void discharge_bnd_v( T dt, T qnow, T disarea, int * riverblk,  T* zs, T* hh)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = riverblk[blockIdx.x];
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	float dzsdt = qnow*dt / disarea;
+	zs[i] = zs[i] + dzsdt;
+	// Do hh[i] too although Im not sure it is worth it
+	hh[i] = hh[i] + dzsdt;
+
+
+}
+
+/*
+__global__ void discharge_bnd_h(int nx, int ny, DECNUM dx, DECNUM eps, DECNUM qnow, int istart, int jstart, int iend, int jend, DECNUM *hu, DECNUM *hv, DECNUM *qx, DECNUM *qy, DECNUM * uu, DECNUM *vv)
+{
+	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
+	unsigned int i = ix + iy*nx;
+
+	if (ix >= istart && ix <= iend &&iy >= jstart && iy <= jend)
+	{
+		//discharge should run along the x or y axis
+		//TODO modify the algorithm to alow diagonal discharges
+		if (istart == iend)//discharge on uu along a vertical line
+		{
+			float A = 0.0;
+
+			for (int k = jstart; k <= jend; k++)
+			{
+				A = A + (cbrtf(hu[ix + k*ny])*dx);
+			}
+
+			float cst = qnow / max(A, eps);
+			uu[i] = cst*sqrtf(hu[i]);
+			qx[i] = cst*cbrtf(hu[i]);
+		}
+
+		if (jstart == jend)//discharge on uu along a vertical line
+		{
+			float A = 0.0;
+
+			for (int k = istart; k <= iend; k++)
+			{
+				A = A + (cbrtf(hv[k + iy*ny])*dx);
+			}
+
+			float cst = qnow / max(A, eps);
+			vv[i] = cst*sqrt(hv[i]);
+			qy[i] = cst*cbrtf(hv[i]);
+		}
+
+
+
+
+	}
+
+
+
+}
+*/

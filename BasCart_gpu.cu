@@ -649,7 +649,7 @@ int AllocMemGPU(Param XParam)
 
 	Allocate4GPU(nblk, 1, leftblk_g, rightblk_g, topblk_g, botblk_g);
 
-	// This below was float by default and probably should remain float as long as fetched floats are readily converted to double as needed
+	return 1;
 }
 
 int AllocMemGPUBND(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
@@ -662,7 +662,7 @@ int AllocMemGPUBND(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> 
 		int nbndtimes = (int)leftWLbnd.size();
 		int nbndvec = (int)leftWLbnd[0].wlevs.size();
 		CUDA_CHECK(cudaMallocArray(&leftWLS_gp, &channelDescleftbnd, nbndtimes, nbndvec));
-
+		// This below was float by default and probably should remain float as long as fetched floats are readily converted to double as needed
 		float * leftWLS;
 		leftWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
 
@@ -779,7 +779,7 @@ int AllocMemGPUBND(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> 
 		free(botWLS);
 
 	}
-
+	return 1;
 }
 
 
@@ -3013,6 +3013,7 @@ int main(int argc, char **argv)
 			XParam.River[Rin].i = idis;
 			XParam.River[Rin].j = jdis;
 			XParam.River[Rin].block = blockdis;
+			XParam.River[Rin].disarea = idis.size()*XParam.dx; // That is not valid for spherical grids
 
 			// Now read the discharge input and store to  
 			XParam.River[Rin].flowinput = readFlowfile(XParam.River[Rin].Riverflowfile);
