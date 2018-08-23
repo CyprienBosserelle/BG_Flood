@@ -1987,7 +1987,7 @@ void discharge_bnd_v_CPU(Param XParam,T*zs,T*hh)
 		//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
 		int bndstep = 0;
 		double difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
-		while (difft <= 0.0)
+		while (difft <= 0.0) // danger?
 		{
 			bndstep++;
 			difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;

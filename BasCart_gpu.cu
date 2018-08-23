@@ -1319,6 +1319,34 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	// Impose no slip condition by default
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	if (XParam.River.size() > 1)
+	{
+		//
+		float qnow;
+		for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+		{
+
+			//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
+			int bndstep = 0;
+			double difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+			while (difft <= 0.0) // danger?
+			{
+				bndstep++;
+				difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+			}
+
+			qnow = interptime(XParam.River[Rin].flowinput[bndstep].q, XParam.River[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.River[Rin].flowinput[bndstep].time - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time);
+
+
+
+			discharge_bnd_v << <gridDim, blockDim, 0 >> > ((float)XParam.River[Rin].xstart, (float)XParam.River[Rin].xend, (float)XParam.River[Rin].ystart, (float)XParam.River[Rin].yend, (float)XParam.dx, (float)XParam.dt, qnow, (float)XParam.River[Rin].disarea, blockxo_g, blockyo_g, zs_g, hh_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+	}
+
+
+
 	return XParam.dt;
 }
 
@@ -1741,6 +1769,32 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	// Impose no slip condition by default
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	if (XParam.River.size() > 1)
+	{
+		//
+		double qnow;
+		for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+		{
+
+			//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
+			int bndstep = 0;
+			double difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+			while (difft <= 0.0) // danger?
+			{
+				bndstep++;
+				difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+			}
+
+			qnow = interptime(XParam.River[Rin].flowinput[bndstep].q, XParam.River[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.River[Rin].flowinput[bndstep].time - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time);
+
+
+
+			discharge_bnd_v << <gridDim, blockDim, 0 >> > (XParam.River[Rin].xstart, XParam.River[Rin].xend, XParam.River[Rin].ystart, XParam.River[Rin].yend, XParam.dx, XParam.dt, qnow, XParam.River[Rin].disarea, blockxo_gd, blockyo_gd, zs_gd, hh_gd);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+	}
+
 	return XParam.dt;
 }
 
