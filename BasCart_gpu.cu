@@ -1,6 +1,11 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////
 //						                                                        //
 //Copyright (C) 2018 Bosserelle                                                 //
+// This code contains an adaptation of the St Venant equation from Basilisk		//
+// See																			//
+// http://basilisk.fr/src/saint-venant.h and									//
+// S. Popinet. Quadtree-adaptive tsunami modelling. Ocean Dynamics,				//
+// doi: 61(9) : 1261 - 1285, 2011												//
 //                                                                              //
 //This program is free software: you can redistribute it and/or modify          //
 //it under the terms of the GNU General Public License as published by          //
@@ -1320,27 +1325,27 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	if (XParam.River.size() > 1)
+	if (XParam.Rivers.size() > 1)
 	{
 		//
 		float qnow;
-		for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
 		{
 
 			//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
 			int bndstep = 0;
-			double difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+			double difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
 			while (difft <= 0.0) // danger?
 			{
 				bndstep++;
-				difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+				difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
 			}
 
-			qnow = interptime(XParam.River[Rin].flowinput[bndstep].q, XParam.River[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.River[Rin].flowinput[bndstep].time - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time);
+			qnow = interptime(XParam.Rivers[Rin].flowinput[bndstep].q, XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.Rivers[Rin].flowinput[bndstep].time - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time);
 
 
 
-			discharge_bnd_v << <gridDim, blockDim, 0 >> > ((float)XParam.River[Rin].xstart, (float)XParam.River[Rin].xend, (float)XParam.River[Rin].ystart, (float)XParam.River[Rin].yend, (float)XParam.dx, (float)XParam.dt, qnow, (float)XParam.River[Rin].disarea, blockxo_g, blockyo_g, zs_g, hh_g);
+			discharge_bnd_v << <gridDim, blockDim, 0 >> > ((float)XParam.Rivers[Rin].xstart, (float)XParam.Rivers[Rin].xend, (float)XParam.Rivers[Rin].ystart, (float)XParam.Rivers[Rin].yend, (float)XParam.dx, (float)XParam.dt, qnow, (float)XParam.Rivers[Rin].disarea, blockxo_g, blockyo_g, zs_g, hh_g);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 	}
@@ -1770,27 +1775,27 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	if (XParam.River.size() > 1)
+	if (XParam.Rivers.size() > 1)
 	{
 		//
 		double qnow;
-		for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
 		{
 
 			//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
 			int bndstep = 0;
-			double difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+			double difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
 			while (difft <= 0.0) // danger?
 			{
 				bndstep++;
-				difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+				difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
 			}
 
-			qnow = interptime(XParam.River[Rin].flowinput[bndstep].q, XParam.River[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.River[Rin].flowinput[bndstep].time - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time);
+			qnow = interptime(XParam.Rivers[Rin].flowinput[bndstep].q, XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.Rivers[Rin].flowinput[bndstep].time - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time);
 
 
 
-			discharge_bnd_v << <gridDim, blockDim, 0 >> > (XParam.River[Rin].xstart, XParam.River[Rin].xend, XParam.River[Rin].ystart, XParam.River[Rin].yend, XParam.dx, XParam.dt, qnow, XParam.River[Rin].disarea, blockxo_gd, blockyo_gd, zs_gd, hh_gd);
+			discharge_bnd_v << <gridDim, blockDim, 0 >> > (XParam.Rivers[Rin].xstart, XParam.Rivers[Rin].xend, XParam.Rivers[Rin].ystart, XParam.Rivers[Rin].yend, XParam.dx, XParam.dt, qnow, XParam.Rivers[Rin].disarea, blockxo_gd, blockyo_gd, zs_gd, hh_gd);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 	}
@@ -3030,13 +3035,13 @@ int main(int argc, char **argv)
 	// Prep River discharge
 	/////////////////////////////////////////////////////
 	
-	if (XParam.River.size() > 1)
+	if (XParam.Rivers.size() > 1)
 	{
 		double xx, yy;
 		printf("Preparing rivers ");
 		write_text_to_log_file("Preparing rivers");
 		//For each rivers
-		for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
 		{
 			// find the cells where the river discharge will be applied
 			std::vector<int> idis, jdis, blockdis;
@@ -3050,7 +3055,7 @@ int main(int argc, char **argv)
 						yy = blockyo_d[bl] + j*XParam.dx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-						if (xx >= XParam.River[Rin].xstart && xx <= XParam.River[Rin].xend && yy >= XParam.River[Rin].ystart && yy <= XParam.River[Rin].yend)
+						if (xx >= XParam.Rivers[Rin].xstart && xx <= XParam.Rivers[Rin].xend && yy >= XParam.Rivers[Rin].ystart && yy <= XParam.Rivers[Rin].yend)
 						{
 							
 							// This cell belongs to the river discharge area
@@ -3064,13 +3069,13 @@ int main(int argc, char **argv)
 				
 			}
 
-			XParam.River[Rin].i = idis;
-			XParam.River[Rin].j = jdis;
-			XParam.River[Rin].block = blockdis;
-			XParam.River[Rin].disarea = idis.size()*XParam.dx; // That is not valid for spherical grids
+			XParam.Rivers[Rin].i = idis;
+			XParam.Rivers[Rin].j = jdis;
+			XParam.Rivers[Rin].block = blockdis;
+			XParam.Rivers[Rin].disarea = idis.size()*XParam.dx; // That is not valid for spherical grids
 
 			// Now read the discharge input and store to  
-			XParam.River[Rin].flowinput = readFlowfile(XParam.River[Rin].Riverflowfile);
+			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
 		}
 	}
 

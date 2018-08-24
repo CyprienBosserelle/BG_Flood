@@ -2,7 +2,7 @@
 //						                                                        //
 //Copyright (C) 2017 Bosserelle                                                 //
 //                                                                              //
-// This code is an adaptation of the St Venant equation from Basilisk			//
+// This code contains an adaptation of the St Venant equation from Basilisk		//
 // See																			//
 // http://basilisk.fr/src/saint-venant.h and									//
 // S. Popinet. Quadtree-adaptive tsunami modelling. Ocean Dynamics,				//
@@ -1408,7 +1408,7 @@ double FlowCPU(Param XParam, double nextoutputtime)
 	
 	quadfrictionCPU(XParam.nblk, XParam.blksize, (float)XParam.dt, (float) XParam.eps, (float) XParam.cf, hh, uu, vv);
 	//write2varnc(nx, ny, totaltime, hh);
-	if (XParam.River.size() > 1)
+	if (XParam.Rivers.size() > 1)
 	{
 		discharge_bnd_v_CPU(XParam, zs, hh);
 	}
@@ -1504,7 +1504,7 @@ double FlowCPUDouble(Param XParam, double nextoutputtime)
 
 	quadfrictionCPU(XParam.nblk, XParam.blksize, XParam.dt, XParam.eps, XParam.cf, hh_d, uu_d, vv_d);
 	//write2varnc(nx, ny, totaltime, hh);
-	if (XParam.River.size() > 1)
+	if (XParam.Rivers.size() > 1)
 	{
 		discharge_bnd_v_CPU(XParam, zs_d, hh_d);
 	}
@@ -1582,7 +1582,7 @@ void leftdirichletCPU(int nblk, int blksize, float xo,float yo, float g, float d
 				}
 				
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int nright = i+1 + j * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1631,7 +1631,7 @@ void leftdirichletCPUD(int nblk, int blksize, double xo, double yo, double g, do
 				}
 
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int nright = i + 1 + j * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1682,7 +1682,7 @@ void rightdirichletCPU(int nblk, int blksize, int nx, float xo, float yo, float 
 				}
 
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int nleft = i - 1 + j * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1731,7 +1731,7 @@ void rightdirichletCPUD(int nblk, int blksize,int nx, double xo, double yo, doub
 				}
 
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int nleft = i - 1 + j * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1780,7 +1780,7 @@ void topdirichletCPU(int nblk, int blksize, int ny, float xo, float yo, float g,
 				}
 
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int nbot = i + (j - 1) * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1829,7 +1829,7 @@ void topdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, doubl
 				}
 
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int nbot = i  + (j-1) * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1878,7 +1878,7 @@ void botdirichletCPU(int nblk, int blksize, int ny, float xo, float yo, float g,
 				}
 
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int ntop = i + (j + 1) * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1927,7 +1927,7 @@ void botdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, doubl
 				}
 
 
-				//if (ix == 0 && iy < ny)
+				if (zsbnd>zb[n])
 				{
 					int ntop = i + (j + 1) * 16 + ib * blksize;;
 					hh[n] = zsbnd - zb[n];
@@ -1981,24 +1981,24 @@ template <class T>
 void discharge_bnd_v_CPU(Param XParam,T*zs,T*hh)
 {
 	T qnow;
-	for (int Rin = 0; Rin < XParam.River.size(); Rin++)
+	for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
 	{
 		
 		//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
 		int bndstep = 0;
-		double difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+		double difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
 		while (difft <= 0.0) // danger?
 		{
 			bndstep++;
-			difft = XParam.River[Rin].flowinput[bndstep].time - XParam.totaltime;
+			difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
 		}
 		
-		qnow = interptime(XParam.River[Rin].flowinput[bndstep].q, XParam.River[Rin].flowinput[max(bndstep-1,0)].q, XParam.River[Rin].flowinput[bndstep].time - XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time,XParam.totaltime- XParam.River[Rin].flowinput[max(bndstep - 1, 0)].time);
+		qnow = interptime(XParam.Rivers[Rin].flowinput[bndstep].q, XParam.Rivers[Rin].flowinput[max(bndstep-1,0)].q, XParam.Rivers[Rin].flowinput[bndstep].time - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time,XParam.totaltime- XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time);
 		
-		for (int nc = 0; nc < XParam.River[Rin].i.size(); nc++)
+		for (int nc = 0; nc < XParam.Rivers[Rin].i.size(); nc++)
 		{
-			int i = XParam.River[Rin].i[nc] + XParam.River[Rin].j[nc] * 16 + XParam.River[Rin].block[nc] *(XParam.blksize);
-			T dzsdt = qnow*XParam.dt / XParam.River[Rin].disarea;
+			int i = XParam.Rivers[Rin].i[nc] + XParam.Rivers[Rin].j[nc] * 16 + XParam.Rivers[Rin].block[nc] *(XParam.blksize);
+			T dzsdt = qnow*XParam.dt / XParam.Rivers[Rin].disarea;
 			zs[i] = zs[i] + dzsdt;
 			// Do hh[i] too although Im not sure it is worth it
 			hh[i] = hh[i] + dzsdt;

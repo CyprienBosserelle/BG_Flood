@@ -404,7 +404,7 @@ Param readparamstr(std::string line, Param param)
 			thisriver.ystart = std::stod(vars[3]);
 			thisriver.yend = std::stod(vars[4]);
 
-			param.River.push_back(thisriver);
+			param.Rivers.push_back(thisriver);
 		}
 		else
 		{

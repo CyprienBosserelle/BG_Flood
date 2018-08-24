@@ -1,4 +1,26 @@
-﻿
+﻿//////////////////////////////////////////////////////////////////////////////////
+//						                                                        //
+//Copyright (C) 2018 Bosserelle                                                 //
+// This code contains an adaptation of the St Venant equation from Basilisk		//
+// See																			//
+// http://basilisk.fr/src/saint-venant.h and									//
+// S. Popinet. Quadtree-adaptive tsunami modelling. Ocean Dynamics,				//
+// doi: 61(9) : 1261 - 1285, 2011												//
+//                                                                              //
+//This program is free software: you can redistribute it and/or modify          //
+//it under the terms of the GNU General Public License as published by          //
+//the Free Software Foundation.                                                 //
+//                                                                              //
+//This program is distributed in the hope that it will be useful,               //
+//but WITHOUT ANY WARRANTY; without even the implied warranty of                //    
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 //
+//GNU General Public License for more details.                                  //
+//                                                                              //
+//You should have received a copy of the GNU General Public License             //
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.         //
+//////////////////////////////////////////////////////////////////////////////////
+
+
 // textures have to be declared here...
 texture<float, 2, cudaReadModeElementType> texLBND;
 texture<float, 2, cudaReadModeElementType> texRBND;
@@ -2082,7 +2104,7 @@ __global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, fl
 	float zsbnd;
 	float itx = (blockyo[ibl]+iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texLBND, itime+0.5f, itx+0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
-	if (blockxo[ibl] == xo && ix == 0)
+	if (blockxo[ibl] == xo && ix == 0 && zsbnd>zb[i])
 	{
 		//xplus = min(ix + 1, nx - 1);
 		hh[i] = zsbnd-zb[i];
@@ -2121,7 +2143,7 @@ __global__ void leftdirichletD(int nybnd, double g, double dx, double xo, double
 	float zsbnd; //remains a float because this is how it is stored on the texture memory // I don't think it is a big deal
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
-	if (blockxo[ibl] == xo && ix == 0)
+	if (blockxo[ibl] == xo && ix == 0 && zsbnd>zb[i])
 	{
 		//xplus = min(ix + 1, nx - 1);
 		hh[i] = zsbnd - zb[i];
@@ -2156,7 +2178,7 @@ __global__ void rightdirichlet( int nybnd, float g, float dx, float xmax, float 
 	float zsbnd;
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texRBND, itime+0.5f, itx+0.5f);
-	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15)
+	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15 && zsbnd>zb[i])
 	{
 		//xminus = max(ix - 1, 0);
 		hh[i] = zsbnd - zb[i];
@@ -2186,7 +2208,7 @@ __global__ void rightdirichletD( int nybnd, double g,double dx,double xmax,doubl
 	float zsbnd;
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f);
-	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15)
+	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15 && zsbnd>zb[i])
 	{
 		//xminus = max(ix - 1, 0);
 		hh[i] = zsbnd - zb[i];
@@ -2215,7 +2237,7 @@ __global__ void topdirichlet( int nxbnd, float g,float dx, float xmax, float yma
 	float zsbnd;
 	float itx = (blockxo[ibl]+ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
-	if ((blockyo[ibl]+15*dx)==ymax && iy == 15)
+	if ((blockyo[ibl]+15*dx)==ymax && iy == 15 && zsbnd>zb[i])
 	{
 		//yminus = max(iy - 1, 0);
 		hh[i] = zsbnd - zb[i];
@@ -2244,7 +2266,7 @@ __global__ void topdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
-	if ((blockyo[ibl] + 15 * dx) == ymax && iy == 15)
+	if ((blockyo[ibl] + 15 * dx) == ymax && iy == 15 && zsbnd>zb[i])
 	{
 		//yminus = max(iy - 1, 0);
 		hh[i] = zsbnd - zb[i];
@@ -2272,7 +2294,7 @@ __global__ void botdirichlet( int nxbnd, float g, float dx,float xmax, float yo,
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
-	if (blockyo[ibl]  == yo && iy == 0)
+	if (blockyo[ibl]  == yo && iy == 0 && zsbnd>zb[i])
 	{
 		//yplus = min(iy + 1, ny-1);
 		hh[i] = zsbnd - zb[i];
@@ -2301,7 +2323,7 @@ __global__ void botdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
-	if (blockyo[ibl] == yo && iy == 0)
+	if (blockyo[ibl] == yo && iy == 0 && zsbnd>zb[i])
 	{
 		//yplus = min(iy + 1, ny - 1);
 		hh[i] = zsbnd - zb[i];

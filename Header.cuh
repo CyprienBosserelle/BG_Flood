@@ -94,7 +94,7 @@ public:
 
 
 	//Rivers
-	std::vector<River> River; // empty vector to hold river location and discharge time series
+	std::vector<River> Rivers; // empty vector to hold river location and discharge time series
 
 
 	//bnd
