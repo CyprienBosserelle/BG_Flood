@@ -819,11 +819,13 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time) / (leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time);
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				leftdirichletD << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax,itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax,itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				leftADS1 << <gridDim, blockDim, 0 >> > ((int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else
 			{
-				leftdirichlet << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				//leftdirichlet << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				leftADS1 << <gridDim, blockDim, 0 >> >((int)leftWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}

@@ -2118,6 +2118,55 @@ __global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, fl
 	}
 }
 
+template <class T> __global__ void leftADS1(int nybnd, T g, T dx, T xo, T ymax, T itime, int * rightblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *uu, T *vv)
+{
+
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//int xplus;
+	//float hhi;
+	float zsbnd;
+	T zsright;
+	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
+	if (blockxo[ibl] == xo && ix == 0 && zsbnd>zb[i])
+	{
+		zsright = zs[iright];
+		//xplus = min(ix + 1, nx - 1);
+		//hh[i] = zsbnd - zb[i];
+		//zs[i] = zsbnd;
+		//uu[i] = -2.0f*(sqrtf(g*max(hh[iright], 0.0f)) - sqrtf(g*max(zsbnd - zb[iright], 0.0f))) + uu[iright];
+		//vv[i] = 0.0f;
+		//if (iy == 0)
+		//{
+		//	printf("zsbnd=%f\t", zsbnd);
+		//}
+
+		uu[i] = T(-1.0)*sqrt(g / hh[i])*(zsright - zsbnd)+ uu[i];
+		zs[i] = zsright;
+		vv[i] = vv[iright];
+		hh[i] = hh[iright];
+	}
+}
+
+
 __global__ void leftdirichletD(int nybnd, double g, double dx, double xo, double ymax, double itime, int * rightblk, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
 	int ix = threadIdx.x;
