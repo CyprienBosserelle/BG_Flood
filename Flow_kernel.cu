@@ -2161,7 +2161,7 @@ template <class T> __global__ void leftADS1(int nybnd, T g, T dx, T xo, T ymax, 
 
 		uu[i] = T(-1.0)*sqrt(g / hh[i])*(zsright - zsbnd);
 		zs[i] = zsbnd;
-		vv[i] = vv[iright];
+		vv[i] = vv[iright]*0.1;
 		hh[i] = hh[iright];
 	}
 }
