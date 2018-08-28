@@ -2118,7 +2118,7 @@ __global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, fl
 	}
 }
 
-template <class T> __global__ void ABS1D(int isright, int istop,int nybnd, T g, T dx, T xo, T yo, T xmax,T ymax, T itime, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
+template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T dx, T xo, T yo, T xmax,T ymax, T itime, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
 {
 
 	int ix = threadIdx.x;
@@ -2135,7 +2135,7 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nybnd, T g, 
 
 	T xx,yy;
 	T bnd_c, bnd, sign,umean;
-
+	float itx;
 	
 
 	xx = blockxo[ibl] + ix*dx;
@@ -2144,27 +2144,31 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nybnd, T g, 
 
 	if (isright < 0)
 	{
-		inside= findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		inside= findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
 		bnd_c = xo;
 		bnd = xx;
+		itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
 	}
 	else if (isright > 0)
 	{
-		inside = findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
 		bnd_c = xmax;
 		bnd = xx;
+		itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
 	}
 	else if (istop < 0)//isright must be ==0!
 	{
-		inside= findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		inside= findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
 		bnd_c = yo;
 		bnd = yy;
+		itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 	}
 	else // istop ==1 && isright ==0
 	{
-		inside = findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
 		bnd_c = ymax;
 		bnd = yy;
+		itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 	}
 
 	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
@@ -2182,7 +2186,7 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nybnd, T g, 
 	//float hhi;
 	float zsbnd;
 	T zsinside;
-	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	
 	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
 	
 	umean = T(0.0);
