@@ -793,7 +793,7 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 	//
 	int nx = XParam.nx;
 	int ny = XParam.ny;
-	if (XParam.left == 1 && !leftWLbnd.empty())
+	if (XParam.left > 1 && !leftWLbnd.empty())
 	{
 		int SLstepinbnd = 1;
 
@@ -817,16 +817,28 @@ void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time) / (leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time);
-			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+			if (XParam.left==2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
-				//leftdirichletD << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax,itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
-				leftADS1 << <gridDim, blockDim, 0 >> > ((int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				leftdirichletD << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax,itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
-			else
+			else if (XParam.left == 2)
 			{
-				//leftdirichlet << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
-				leftADS1 << <gridDim, blockDim, 0 >> >((int)leftWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				leftdirichlet << <gridDim, blockDim, 0 >> > ( (int)leftWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
+
+			if (XParam.left == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
+			{
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDim, blockDim, 0 >> > (-1, 0, (int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+			}
+			else if (XParam.left == 3)
+			{
+				ABS1D << <gridDim, blockDim, 0 >> > (-1, 0, (int)leftWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+			}
+
+
+
+
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
@@ -882,7 +894,7 @@ void RightFlowBnd(Param XParam, std::vector<SLTS> rightWLbnd)
 	//
 	int nx = XParam.nx;
 	int ny = XParam.ny;
-	if (XParam.right == 1 && !rightWLbnd.empty())
+	if (XParam.right > 1 && !rightWLbnd.empty())
 	{
 		int SLstepinbnd = 1;
 
@@ -908,15 +920,23 @@ void RightFlowBnd(Param XParam, std::vector<SLTS> rightWLbnd)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time) / (rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time);
-			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+			if (XParam.right == 2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				rightdirichletD << <gridDim, blockDim, 0 >> > ( (int)rightWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.ymax, itime, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
-			else
+			else if (XParam.right == 2)
 			{
 				rightdirichlet << <gridDim, blockDim, 0 >> > ( (int)rightWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.ymax, (float)itime, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
-			
+			else if (XParam.right == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
+			{
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDim, blockDim, 0 >> > (1, 0, (int)rightWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+			}
+			else if (XParam.right == 3)
+			{
+				ABS1D << <gridDim, blockDim, 0 >> > (1, 0, (int)rightWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+			}
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
@@ -969,7 +989,7 @@ void TopFlowBnd(Param XParam, std::vector<SLTS> topWLbnd)
 	//
 	int nx = XParam.nx;
 	int ny = XParam.ny;
-	if (XParam.top == 1 && !topWLbnd.empty())
+	if (XParam.top > 1 && !topWLbnd.empty())
 	{
 		int SLstepinbnd = 1;
 
@@ -994,15 +1014,23 @@ void TopFlowBnd(Param XParam, std::vector<SLTS> topWLbnd)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - topWLbnd[SLstepinbnd - 1].time) / (topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time);
-			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+			if (XParam.top == 2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				topdirichletD << <gridDim, blockDim, 0 >> > ( (int)topWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.ymax, itime, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
-			else
+			else if (XParam.top == 2)
 			{
 				topdirichlet << <gridDim, blockDim, 0 >> > ((int)topWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.ymax, (float)itime, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
-			
+			else if (XParam.top == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
+			{
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDim, blockDim, 0 >> > (0, 1, (int)topWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+			}
+			else if (XParam.top == 3)
+			{
+				ABS1D << <gridDim, blockDim, 0 >> > (0, 1, (int)topWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
+			}
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
@@ -1082,15 +1110,23 @@ void BotFlowBnd(Param XParam, std::vector<SLTS> botWLbnd)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - botWLbnd[SLstepinbnd - 1].time) / (botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time);
-			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+			if (XParam.bot == 2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				botdirichletD << <gridDim, blockDim, 0 >> > ( (int)botWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.yo, itime, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
-			else
+			else if (XParam.bot == 2)
 			{
 				botdirichlet << <gridDim, blockDim, 0 >> > ( (int)botWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.yo, (float)itime, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
-			
+			else if (XParam.bot == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
+			{
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)leftWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDim, blockDim, 0 >> > (0, -1, (int)botWLbnd[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+			}
+			else if (XParam.bot == 3)
+			{
+				ABS1D << <gridDim, blockDim, 0 >> > (0, -1, (int)botWLbnd[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
+			}
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else

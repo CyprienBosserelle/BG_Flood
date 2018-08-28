@@ -98,11 +98,11 @@ public:
 
 
 	//bnd
-	// 0:Wall; 1:sealevel dirichlet; 2:neumann (zeros gredient)
-	int right = 2;
-	int left = 2;
-	int top = 2;
-	int bot = 2;
+	// 0:Wall; 1:neumann (zeros gredient); 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D
+	int right = 1;
+	int left = 1;
+	int top = 1;
+	int bot = 1;
 
 	std::string rightbndfile;
 	std::string leftbndfile;
