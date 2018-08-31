@@ -238,6 +238,12 @@ extern double * dtmax_gd;
 extern double * TSstore_d, *TSstore_gd;
 extern double * dummy_d;
 
+
+extern float * cf;
+extern float * cf_g;
+extern double * cf_d;
+extern double * cf_gd;
+
 // Block info
 extern double * blockxo_d, *blockyo_d;
 extern float * blockxo, *blockyo;

@@ -390,7 +390,7 @@ int AllocMemCPU(Param XParam)
 		Allocate1CPU(nblk, blksize, dhu_d);
 		Allocate1CPU(nblk, blksize, dhv_d);
 
-
+		Allocate1CPU(nblk, blksize, cf_d);
 
 
 		//not allocating below may be usefull
@@ -451,7 +451,7 @@ int AllocMemCPU(Param XParam)
 		Allocate1CPU(nblk, blksize, dh);
 		Allocate1CPU(nblk, blksize, dhu);
 		Allocate1CPU(nblk, blksize, dhv);
-
+		Allocate1CPU(nblk, blksize, cf);
 		//not allocating below may be usefull
 
 		if (XParam.outhhmax == 1)
@@ -518,7 +518,7 @@ int AllocMemGPU(Param XParam)
 		Allocate4GPU(nblk, blksize, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd);
 
 		Allocate4GPU(nblk, blksize, dh_gd, dhu_gd, dhv_gd, dtmax_gd);
-
+		Allocate1GPU(nblk, blksize, cf_gd);
 		Allocate1GPU(nblk, 1, blockxo_gd);
 		Allocate1GPU(nblk, 1, blockyo_gd);
 
@@ -590,7 +590,7 @@ int AllocMemGPU(Param XParam)
 		Allocate4GPU(nblk, blksize, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g);
 
 		Allocate4GPU(nblk, blksize, dh_g, dhu_g, dhv_g, dtmax_g);
-
+		Allocate1GPU(nblk, blksize, cf_g);
 
 		Allocate1GPU(nblk, 1, blockxo_g);
 		Allocate1GPU(nblk, 1, blockyo_g);
@@ -1353,7 +1353,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Bottom friction
-	quadfriction << <gridDim, blockDim, 0 >> > ( (float)XParam.dt, (float)XParam.eps, (float)XParam.cf, hh_g, uu_g, vv_g);
+	quadfriction << <gridDim, blockDim, 0 >> > ( (float)XParam.dt, (float)XParam.eps, cf_g, hh_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaStreamDestroy(streams[0]));
@@ -1592,7 +1592,7 @@ double FlowGPUSpherical(Param XParam, double nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Bottom friction
-	quadfriction << <gridDim, blockDim, 0 >> > ( XParam.dt, XParam.eps, XParam.cf, hh_gd, uu_gd, vv_gd);
+	quadfriction << <gridDim, blockDim, 0 >> > ( XParam.dt, XParam.eps, cf_gd, hh_gd, uu_gd, vv_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaStreamDestroy(streams[0]));
@@ -1803,7 +1803,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Bottom friction
-	quadfriction << <gridDim, blockDim, 0 >> > ( XParam.dt, XParam.eps, XParam.cf, hh_gd, uu_gd, vv_gd);
+	quadfriction << <gridDim, blockDim, 0 >> > ( XParam.dt, XParam.eps, cf_gd, hh_gd, uu_gd, vv_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaStreamDestroy(streams[0]));
@@ -3185,6 +3185,7 @@ int main(int argc, char **argv)
 							//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);
 							//}
 							hh_d[n] = max(zs_d[n] - zb_d[n], XParam.eps);//0.0?
+
 						}
 
 					}
@@ -3411,6 +3412,7 @@ int main(int argc, char **argv)
 							hh[n] = max(zs[i + j*nx] - zb[n], (float)XParam.eps);
 							uu[n] = 0.0f;
 							vv[n] = 0.0f;
+							
 						}
 
 					}
@@ -3421,9 +3423,25 @@ int main(int argc, char **argv)
 	}
 	printf("done \n  ");
 	write_text_to_log_file("Done");
+
+
+	
+
 	// Below is not succint but way faster than one loop that checks the if statemenst each time
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
+		// Set default cf 
+		for (int bl = 0; bl < XParam.nblk; bl++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					cf_d[n] = XParam.cf;
+				}
+			}
+		}
 		if (XParam.outhhmax == 1)
 		{
 			for (int bl = 0; bl < XParam.nblk; bl++)
@@ -3558,6 +3576,18 @@ int main(int argc, char **argv)
 	}
 	else //Using Float *
 	{
+		// Set default cf 
+		for (int bl = 0; bl < XParam.nblk; bl++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				for (int i = 0; i < 16; i++)
+				{
+					int n = i + j * 16 + bl * XParam.blksize;
+					cf[n] = (float)XParam.cf;
+				}
+			}
+		}
 		
 		if (XParam.outhhmax == 1)
 		{
@@ -3708,6 +3738,7 @@ int main(int argc, char **argv)
 			CUDA_CHECK(cudaMemcpy(uu_gd, uu_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(vv_gd, vv_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(zs_gd, zs_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(cf_gd, cf_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockxo_gd, blockxo_d, nblk * sizeof(double), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockyo_gd, blockyo_d, nblk * sizeof(double), cudaMemcpyHostToDevice));
 			
@@ -3720,6 +3751,7 @@ int main(int argc, char **argv)
 			CUDA_CHECK(cudaMemcpy(uu_g, uu, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(vv_g, vv, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(zs_g, zs, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(cf_g, cf, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockxo_g, blockxo, nblk * sizeof(float), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockyo_g, blockyo, nblk * sizeof(float), cudaMemcpyHostToDevice));
 			initdtmax << <gridDim, blockDim, 0 >> >( (float)epsilon, dtmax_g);
