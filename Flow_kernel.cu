@@ -2428,8 +2428,11 @@ __global__ void botdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	}
 }
 
-template <class T> __global__ void quadfriction( T dt,T eps, T cf, T *hh, T *uu, T *vv)
+template <class T> __global__ void quadfriction( T dt,T eps, T* cf, T *hh, T *uu, T *vv)
 {
+	// Shear stress equation:
+	// Taub=cf*rho*U*sqrt(U^2+V^2)
+	// uu=uu-dt*(Tub/(rho*h))
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
@@ -2454,10 +2457,14 @@ template <class T> __global__ void quadfriction( T dt,T eps, T cf, T *hh, T *uu,
 		if (hhi > eps)
 		{
 			normu = uui * uui + vvi * vvi;
-			T frc = (T(1.0) + dt*cf*(normu) / hhi);
+			//T frc = (T(1.0) + dt*cf*(normu) / hhi);
 				//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
-			uu[i] = uui / frc;
-			vv[i] = vvi / frc;
+			//uu[i] = uui / frc;
+			//vv[i] = vvi / frc;
+
+			T tb = cf[i]*sqrt(uui*uui + vvi*vvi)/hhi;
+			uu[i] = uui - dt*(uui*tb);
+			vv[i] = vvi - dt*(vvi*tb);
 		}
 		
 	}
