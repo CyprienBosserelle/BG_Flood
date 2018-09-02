@@ -610,6 +610,14 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.Radius = std::stod(parametervalue);
 	}
+
+	parameterstr = "frictionmodel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.frictionmodel = std::stoi(parametervalue);
+	}
+
 	return param;
 }
 

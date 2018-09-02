@@ -2428,7 +2428,7 @@ __global__ void botdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	}
 }
 
-template <class T> __global__ void quadfriction( T dt,T eps, T* cf, T *hh, T *uu, T *vv)
+template <class T> __global__ void quadfriction(int smart, T dt,T eps, T* cf, T *hh, T *uu, T *vv)
 {
 	// Shear stress equation:
 	// Taub=cf*rho*U*sqrt(U^2+V^2)
@@ -2447,7 +2447,7 @@ template <class T> __global__ void quadfriction( T dt,T eps, T* cf, T *hh, T *uu
 	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 	
 	T normu,hhi,uui,vvi;
-	
+	T ee = T(2.71828182845905);
 	//if (ix < nx && iy < ny)
 	{
 
@@ -2461,8 +2461,22 @@ template <class T> __global__ void quadfriction( T dt,T eps, T* cf, T *hh, T *uu
 				//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 			//uu[i] = uui / frc;
 			//vv[i] = vvi / frc;
+			T cfi = cf[i];
+			if (smart == 1)
+			{
+				T zo = cf[i];
+				if (hhi / zo < ee)
+				{
+					cfi = zo / (T(0.46)*hhi);
+				}
+				else
+				{
+					cfi = T(1.0)/(T(2.5)*(log(hhi / zo) - T(1.0) + T(1.359)*zo / hhi));
+				}
+			}
 
-			T tb = cf[i]*sqrt(uui*uui + vvi*vvi)/hhi;
+
+			T tb = cfi*sqrt(uui*uui + vvi*vvi)/hhi;
 			uu[i] = uui - dt*(uui*tb);
 			vv[i] = vvi - dt*(vvi*tb);
 		}
