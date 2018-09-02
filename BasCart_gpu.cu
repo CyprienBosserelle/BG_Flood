@@ -3756,7 +3756,7 @@ int main(int argc, char **argv)
 			CUDA_CHECK(cudaMemcpy(uu_g, uu, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(vv_g, vv, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(zs_g, zs, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(cf_g, cf, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
+			CUDA_CHECK(cudaMemcpy(cf_g, cf, nblk*blksize * sizeof(float), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockxo_g, blockxo, nblk * sizeof(float), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockyo_g, blockyo, nblk * sizeof(float), cudaMemcpyHostToDevice));
 			initdtmax << <gridDim, blockDim, 0 >> >( (float)epsilon, dtmax_g);
