@@ -644,7 +644,7 @@ extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, 
 
 		//printf("nx=%d\tny=%d\n", nx, ny);
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(nx*ny*sizeof(short));
+		var_s = (short *)malloc(XParam.blksize*XParam.nblk*sizeof(short));
 		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
 		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
