@@ -3163,7 +3163,7 @@ int main(int argc, char **argv)
 		//!leftWLbnd.empty()
 		
 		//case 2b (i.e. zsinint and no boundaries were specified)
-		if ((abs(XParam.zsinit - defaultParam.zsinit) <= epsilon) && (leftWLbnd.empty() && rightWLbnd.empty() && topWLbnd.empty() && botWLbnd.empty()) ) //zsinit is default
+		if ((abs(XParam.zsinit - defaultParam.zsinit) <= epsilon) && (leftWLbnd.empty() && rightWLbnd.empty() && topWLbnd.empty() && botWLbnd.empty() && XParam.right <2 && XParam.left <2 && XParam.bot<2 && XParam.top <2) ) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value
 		}
@@ -3256,7 +3256,7 @@ int main(int argc, char **argv)
 						jj = (yi - XParam.yo) / XParam.dx;
 						ii = (xi - XParam.xo) / XParam.dx;
 
-						if (XParam.left == 1 && !leftWLbnd.empty())
+						if (XParam.left > 1 && !leftWLbnd.empty())
 						{
 							lefthere = 1.0;
 							int SLstepinbnd = 1;
@@ -3292,7 +3292,7 @@ int main(int argc, char **argv)
 
 						}
 
-						if (XParam.right == 1 && !rightWLbnd.empty())
+						if (XParam.right > 1 && !rightWLbnd.empty())
 						{
 							int SLstepinbnd = 1;
 							righthere = 1.0;
@@ -3327,7 +3327,7 @@ int main(int argc, char **argv)
 
 
 						}
-						if (XParam.bot == 1 && !botWLbnd.empty())
+						if (XParam.bot > 1 && !botWLbnd.empty())
 						{
 							int SLstepinbnd = 1;
 							bothere = 1.0;
@@ -3363,7 +3363,7 @@ int main(int argc, char **argv)
 							}
 
 						}
-						if (XParam.top == 1 && !topWLbnd.empty())
+						if (XParam.top > 1 && !topWLbnd.empty())
 						{
 							int SLstepinbnd = 1;
 							tophere = 1.0;
@@ -3401,7 +3401,7 @@ int main(int argc, char **argv)
 						}
 
 
-						zsbnd = ((zsleft * 1 / distleft)*lefthere + (zsright * 1 / distright)*righthere + (zstop * 1 / disttop)*tophere + (zsbot * 1 / distbot)*bothere) / ((1 / distleft)*lefthere + (1 / distright)*righthere + (1 / disttop)*tophere + (1 / distbot)*bothere);
+						zsbnd = ((zsleft * 1.0 / distleft)*lefthere + (zsright * 1.0 / distright)*righthere + (zstop * 1.0 / disttop)*tophere + (zsbot * 1.0 / distbot)*bothere) / ((1.0 / distleft)*lefthere + (1.0 / distright)*righthere + (1.0 / disttop)*tophere + (1.0 / distbot)*bothere);
 
 
 						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
@@ -3414,7 +3414,7 @@ int main(int argc, char **argv)
 						else
 						{
 							zs[n] = max((float)zsbnd, zb[n]);
-							hh[n] = max(zs[i + j*nx] - zb[n], (float)XParam.eps);
+							hh[n] = max(zs[n] - zb[n], (float)XParam.eps);
 							uu[n] = 0.0f;
 							vv[n] = 0.0f;
 							

@@ -2465,13 +2465,14 @@ template <class T> __global__ void quadfriction(int smart, T dt,T eps, T* cf, T 
 			if (smart == 1)
 			{
 				T zo = cf[i];
-				if (hhi / zo < ee)
+				T Hbar = hhi / zo;
+				if ((hhi / zo) < ee)
 				{
-					cfi = zo / (T(0.46)*hhi);
+					cfi = T(1.0) / (T(0.46)*Hbar);
 				}
 				else
 				{
-					cfi = T(1.0)/(T(2.5)*(log(hhi / zo) - T(1.0) + T(1.359)*zo / hhi));
+					cfi = T(1.0)/(T(2.5)*(log(Hbar) - T(1.0) + T(1.359)*zo / hhi));
 				}
 			}
 
