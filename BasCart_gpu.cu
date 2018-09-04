@@ -1358,7 +1358,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Bottom friction
-	quadfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, (float)XParam.dt, (float)XParam.eps, cf_g, hh_g, uu_g, vv_g);
+	bottomfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, (float)XParam.dt, (float)XParam.eps, cf_g, hh_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaStreamDestroy(streams[0]));
@@ -1597,7 +1597,7 @@ double FlowGPUSpherical(Param XParam, double nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Bottom friction
-	quadfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, XParam.dt, XParam.eps, cf_gd, hh_gd, uu_gd, vv_gd);
+	bottomfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, XParam.dt, XParam.eps, cf_gd, hh_gd, uu_gd, vv_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaStreamDestroy(streams[0]));
@@ -1808,7 +1808,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Bottom friction
-	quadfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, XParam.dt, XParam.eps, cf_gd, hh_gd, uu_gd, vv_gd);
+	bottomfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, XParam.dt, XParam.eps, cf_gd, hh_gd, uu_gd, vv_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CUDA_CHECK(cudaStreamDestroy(streams[0]));

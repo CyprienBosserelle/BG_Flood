@@ -1406,7 +1406,7 @@ double FlowCPU(Param XParam, double nextoutputtime)
 
 	cleanup(XParam.nblk, XParam.blksize, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	
-	quadfrictionCPU(XParam.nblk, XParam.blksize, XParam.frictionmodel, (float)XParam.dt, (float) XParam.eps, cf, hh, uu, vv);
+	bottomfrictionCPU(XParam.nblk, XParam.blksize, XParam.frictionmodel, (float)XParam.dt, (float) XParam.eps, cf, hh, uu, vv);
 	//write2varnc(nx, ny, totaltime, hh);
 	if (XParam.Rivers.size() > 1)
 	{
@@ -1457,7 +1457,7 @@ double FlowCPUSpherical(Param XParam, double nextoutputtime)
 
 	cleanup(XParam.nblk, XParam.blksize, hho_d, zso_d, uuo_d, vvo_d, hh_d, zs_d, uu_d, vv_d);
 
-	quadfrictionCPU(XParam.nblk, XParam.blksize, XParam.frictionmodel, XParam.dt, XParam.eps, cf_d, hh_d, uu_d, vv_d);
+	bottomfrictionCPU(XParam.nblk, XParam.blksize, XParam.frictionmodel, XParam.dt, XParam.eps, cf_d, hh_d, uu_d, vv_d);
 	//write2varnc(nx, ny, totaltime, hh);
 
 	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
@@ -1502,7 +1502,7 @@ double FlowCPUDouble(Param XParam, double nextoutputtime)
 
 	cleanup(XParam.nblk, XParam.blksize, hho_d, zso_d, uuo_d, vvo_d, hh_d, zs_d, uu_d, vv_d);
 
-	quadfrictionCPU(XParam.nblk, XParam.blksize, XParam.frictionmodel, XParam.dt, XParam.eps,cf_d, hh_d, uu_d, vv_d);
+	bottomfrictionCPU(XParam.nblk, XParam.blksize, XParam.frictionmodel, XParam.dt, XParam.eps,cf_d, hh_d, uu_d, vv_d);
 	//write2varnc(nx, ny, totaltime, hh);
 	if (XParam.Rivers.size() > 1)
 	{
@@ -1946,7 +1946,7 @@ void botdirichletCPUD(int nblk, int blksize, int ny, double xo, double yo, doubl
 
 
 template <class T> 
-void quadfrictionCPU(int nblk, int blksize, int smart, T dt, T eps, T* cf, T *hh, T *uu, T *vv)
+void bottomfrictionCPU(int nblk, int blksize, int smart, T dt, T eps, T* cf, T *hh, T *uu, T *vv)
 {
 	T ee = T(2.71828182845905);
 
@@ -1978,10 +1978,10 @@ void quadfrictionCPU(int nblk, int blksize, int smart, T dt, T eps, T* cf, T *hh
 						}
 					}
 					T normu = uu[i] * uu[i] + vv[i] * vv[i];
-					T tb = cfi * sqrt(normu) / hhi;
+					T tb = cfi * sqrt(normu) / hhi*dt;
 					//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
-					uu[i] = uu[i] - dt*(uu[i] *tb);
-					vv[i] = vv[i] - dt*(vv[i] *tb);
+					uu[i] = uu[i] / (T(1.0) + tb);
+					vv[i] = vv[i] / (T(1.0) + tb);
 				}
 			}
 			

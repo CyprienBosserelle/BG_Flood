@@ -321,7 +321,7 @@ template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T e
 
 
 
-template <class T> void quadfrictionCPU(int nblk, int blksize, int smart, T dt, T eps, T* cf, T *hh, T *uu, T *vv);
+template <class T> void bottomfrictionCPU(int nblk, int blksize, int smart, T dt, T eps, T* cf, T *hh, T *uu, T *vv);
 template <class T> void discharge_bnd_v_CPU(Param XParam, T*zs, T*hh);
 // CPU mean max
 void AddmeanCPU(Param XParam);
