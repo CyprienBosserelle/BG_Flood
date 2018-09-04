@@ -823,6 +823,202 @@ int coldstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 	return coldstartsucess = 1;
 }
 
+template <class T>
+void warmstart(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
+{
+	double zsleft = 0.0;
+	double zsright = 0.0;
+	double zstop = 0.0;
+	double zsbot = 0.0;
+	T zsbnd = 0.0;
+
+	double distleft, distright, disttop, distbot;
+
+	double lefthere = 0.0;
+	double righthere = 0.0;
+	double tophere = 0.0;
+	double bothere = 0.0;
+
+	double xi, yi, jj, ii;
+
+	for (int bl = 0; bl < XParam.nblk; bl++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + bl * XParam.blksize;
+				xi = blockxo_d[bl] + i*XParam.dx;
+				yi = blockyo_d[bl] + j*XParam.dx;
+
+				disttop = max((XParam.ymax - yi) / XParam.dx, 0.1);//max((double)(ny - 1) - j, 0.1);// WTF is that 0.1? // distleft cannot be 0 //theoretical minumun is 0.5?
+				distbot = max((yi - XParam.yo) / XParam.dx, 0.1);
+				distleft = max((xi - XParam.xo) / XParam.dx, 0.1);//max((double)i, 0.1);
+				distright = max((XParam.xmax - xi) / XParam.dx, 0.1);//max((double)(nx - 1) - i, 0.1);
+
+				jj = (yi - XParam.yo) / XParam.dx;
+				ii = (xi - XParam.xo) / XParam.dx;
+
+				if (XParam.left > 1 && !leftWLbnd.empty())
+				{
+					lefthere = 1.0;
+					int SLstepinbnd = 1;
+
+
+
+					// Do this for all the corners
+					//Needs limiter in case WLbnd is empty
+					double difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+					while (difft < 0.0)
+					{
+						SLstepinbnd++;
+						difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
+					}
+					std::vector<double> zsbndvec;
+					for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
+					{
+						zsbndvec.push_back(interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
+
+					}
+					if (zsbndvec.size() == 1)
+					{
+						zsleft = zsbndvec[0];
+					}
+					else
+					{
+						int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int inext = iprev + 1;
+						// here interp time is used to interpolate to the right node rather than in time...
+						zsleft = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
+					}
+
+				}
+
+				if (XParam.right > 1 && !rightWLbnd.empty())
+				{
+					int SLstepinbnd = 1;
+					righthere = 1.0;
+
+
+					// Do this for all the corners
+					//Needs limiter in case WLbnd is empty
+					double difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+					while (difft < 0.0)
+					{
+						SLstepinbnd++;
+						difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
+					}
+					std::vector<double> zsbndvec;
+					for (int n = 0; n < rightWLbnd[SLstepinbnd].wlevs.size(); n++)
+					{
+						zsbndvec.push_back(interptime(rightWLbnd[SLstepinbnd].wlevs[n], rightWLbnd[SLstepinbnd - 1].wlevs[n], rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time, XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time));
+
+					}
+					if (zsbndvec.size() == 1)
+					{
+						zsright = zsbndvec[0];
+					}
+					else
+					{
+						int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int inext = iprev + 1;
+						// here interp time is used to interpolate to the right node rather than in time...
+						zsright = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
+					}
+
+
+				}
+				if (XParam.bot > 1 && !botWLbnd.empty())
+				{
+					int SLstepinbnd = 1;
+					bothere = 1.0;
+
+
+
+
+					// Do this for all the corners
+					//Needs limiter in case WLbnd is empty
+					double difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+					while (difft < 0.0)
+					{
+						SLstepinbnd++;
+						difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
+					}
+					std::vector<double> zsbndvec;
+					for (int n = 0; n < botWLbnd[SLstepinbnd].wlevs.size(); n++)
+					{
+						zsbndvec.push_back(interptime(botWLbnd[SLstepinbnd].wlevs[n], botWLbnd[SLstepinbnd - 1].wlevs[n], botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time, XParam.totaltime - botWLbnd[SLstepinbnd - 1].time));
+
+					}
+					if (zsbndvec.size() == 1)
+					{
+						zsbot = zsbndvec[0];
+					}
+					else
+					{
+						int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int inext = iprev + 1;
+						// here interp time is used to interpolate to the right node rather than in time...
+						zsbot = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
+					}
+
+				}
+				if (XParam.top > 1 && !topWLbnd.empty())
+				{
+					int SLstepinbnd = 1;
+					tophere = 1.0;
+
+
+
+
+					// Do this for all the corners
+					//Needs limiter in case WLbnd is empty
+					double difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
+
+					while (difft < 0.0)
+					{
+						SLstepinbnd++;
+						difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
+					}
+					std::vector<double> zsbndvec;
+					for (int n = 0; n < topWLbnd[SLstepinbnd].wlevs.size(); n++)
+					{
+						zsbndvec.push_back(interptime(topWLbnd[SLstepinbnd].wlevs[n], topWLbnd[SLstepinbnd - 1].wlevs[n], topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time, XParam.totaltime - topWLbnd[SLstepinbnd - 1].time));
+
+					}
+					if (zsbndvec.size() == 1)
+					{
+						zstop = zsbndvec[0];
+					}
+					else
+					{
+						int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int inext = iprev + 1;
+						// here interp time is used to interpolate to the right node rather than in time...
+						zstop = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
+					}
+
+				}
+
+
+				zsbnd = ((zsleft * 1.0 / distleft)*lefthere + (zsright * 1.0 / distright)*righthere + (zstop * 1.0 / disttop)*tophere + (zsbot * 1.0 / distbot)*bothere) / ((1.0 / distleft)*lefthere + (1.0 / distright)*righthere + (1.0 / disttop)*tophere + (1.0 / distbot)*bothere);
+
+
+				
+					zs[n] = max(zsbnd, zb[n]);
+					hh[n] = max(zs[n] - zb[n], T(XParam.eps));
+					uu[n] = T(0.0);
+					vv[n] = T(0.0);
+
+				
+
+			}
+		}
+	}
+}
 
 void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 {
@@ -3234,230 +3430,41 @@ int main(int argc, char **argv)
 				coldstartsucess = coldstart(XParam, zb, uu, vv, zs, hh);
 				/*for (int bl = 0; bl < XParam.nblk; bl++)
 				{
-					for (int j = 0; j < 16; j++)
-					{
-						for (int i = 0; i < 16; i++)
-						{
-							int n = i + j * 16 + bl * XParam.blksize;
-							uu[n] = 0.0f;
-							vv[n] = 0.0f;
-							//zb[i + j*nx] = 0.0f;
-							zs[n] = max((float)XParam.zsinit, zb[n]);
-							//if (i >= 64 && i < 82)
-							//{
-							//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
-							//}
-							hh[n] = max(zs[n] - zb[n], (float)XParam.eps);//0.0f?
-						}
+				for (int j = 0; j < 16; j++)
+				{
+				for (int i = 0; i < 16; i++)
+				{
+				int n = i + j * 16 + bl * XParam.blksize;
+				uu[n] = 0.0f;
+				vv[n] = 0.0f;
+				//zb[i + j*nx] = 0.0f;
+				zs[n] = max((float)XParam.zsinit, zb[n]);
+				//if (i >= 64 && i < 82)
+				//{
+				//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
+				//}
+				hh[n] = max(zs[n] - zb[n], (float)XParam.eps);//0.0f?
+				}
 
-					}
+				}
 				}*/
 			}
 
 		}
 		else // lukewarm start i.e. bilinear interpolation of zs at bnds // Argggh!
 		{
-			double zsleft = 0.0;
-			double zsright = 0.0;
-			double zstop = 0.0;
-			double zsbot = 0.0;
-			double zsbnd = 0.0;
-
-			double distleft, distright, disttop, distbot;
-
-			double lefthere = 0.0;
-			double righthere = 0.0;
-			double tophere = 0.0;
-			double bothere = 0.0;
-
-			double xi, yi, jj, ii;
-
-			for (int bl = 0; bl < XParam.nblk; bl++)
+			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						xi = blockxo_d[bl] + i*XParam.dx;
-						yi = blockyo_d[bl] + j*XParam.dx;
-
-						disttop = max((XParam.yo + (ny - 1)*XParam.dx - yi) / XParam.dx, 0.1);//max((double)(ny - 1) - j, 0.1);// WTF is that 0.1? // distleft cannot be 0 
-						distbot = max((yi - XParam.yo) / XParam.dx, 0.1);
-						distleft = max((xi - XParam.xo) / XParam.dx, 0.1);//max((double)i, 0.1);
-						distright = max((XParam.xo + (nx - 1)*XParam.dx - xi) / XParam.dx, 0.1);//max((double)(nx - 1) - i, 0.1);
-
-						jj = (yi - XParam.yo) / XParam.dx;
-						ii = (xi - XParam.xo) / XParam.dx;
-
-						if (XParam.left > 1 && !leftWLbnd.empty())
-						{
-							lefthere = 1.0;
-							int SLstepinbnd = 1;
-
-
-
-							// Do this for all the corners
-							//Needs limiter in case WLbnd is empty
-							double difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-							while (difft < 0.0)
-							{
-								SLstepinbnd++;
-								difft = leftWLbnd[SLstepinbnd].time - XParam.totaltime;
-							}
-							std::vector<double> zsbndvec;
-							for (int n = 0; n < leftWLbnd[SLstepinbnd].wlevs.size(); n++)
-							{
-								zsbndvec.push_back(interptime(leftWLbnd[SLstepinbnd].wlevs[n], leftWLbnd[SLstepinbnd - 1].wlevs[n], leftWLbnd[SLstepinbnd].time - leftWLbnd[SLstepinbnd - 1].time, XParam.totaltime - leftWLbnd[SLstepinbnd - 1].time));
-
-							}
-							if (zsbndvec.size() == 1)
-							{
-								zsleft = zsbndvec[0];
-							}
-							else
-							{
-								int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-								int inext = iprev + 1;
-								// here interp time is used to interpolate to the right node rather than in time...
-								zsleft = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
-							}
-
-						}
-
-						if (XParam.right > 1 && !rightWLbnd.empty())
-						{
-							int SLstepinbnd = 1;
-							righthere = 1.0;
-
-
-							// Do this for all the corners
-							//Needs limiter in case WLbnd is empty
-							double difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-							while (difft < 0.0)
-							{
-								SLstepinbnd++;
-								difft = rightWLbnd[SLstepinbnd].time - XParam.totaltime;
-							}
-							std::vector<double> zsbndvec;
-							for (int n = 0; n < rightWLbnd[SLstepinbnd].wlevs.size(); n++)
-							{
-								zsbndvec.push_back(interptime(rightWLbnd[SLstepinbnd].wlevs[n], rightWLbnd[SLstepinbnd - 1].wlevs[n], rightWLbnd[SLstepinbnd].time - rightWLbnd[SLstepinbnd - 1].time, XParam.totaltime - rightWLbnd[SLstepinbnd - 1].time));
-
-							}
-							if (zsbndvec.size() == 1)
-							{
-								zsright = zsbndvec[0];
-							}
-							else
-							{
-								int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-								int inext = iprev + 1;
-								// here interp time is used to interpolate to the right node rather than in time...
-								zsright = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
-							}
-
-
-						}
-						if (XParam.bot > 1 && !botWLbnd.empty())
-						{
-							int SLstepinbnd = 1;
-							bothere = 1.0;
-
-
-
-
-							// Do this for all the corners
-							//Needs limiter in case WLbnd is empty
-							double difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-							while (difft < 0.0)
-							{
-								SLstepinbnd++;
-								difft = botWLbnd[SLstepinbnd].time - XParam.totaltime;
-							}
-							std::vector<double> zsbndvec;
-							for (int n = 0; n < botWLbnd[SLstepinbnd].wlevs.size(); n++)
-							{
-								zsbndvec.push_back(interptime(botWLbnd[SLstepinbnd].wlevs[n], botWLbnd[SLstepinbnd - 1].wlevs[n], botWLbnd[SLstepinbnd].time - botWLbnd[SLstepinbnd - 1].time, XParam.totaltime - botWLbnd[SLstepinbnd - 1].time));
-
-							}
-							if (zsbndvec.size() == 1)
-							{
-								zsbot = zsbndvec[0];
-							}
-							else
-							{
-								int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-								int inext = iprev + 1;
-								// here interp time is used to interpolate to the right node rather than in time...
-								zsbot = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
-							}
-
-						}
-						if (XParam.top > 1 && !topWLbnd.empty())
-						{
-							int SLstepinbnd = 1;
-							tophere = 1.0;
-
-
-
-
-							// Do this for all the corners
-							//Needs limiter in case WLbnd is empty
-							double difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
-
-							while (difft < 0.0)
-							{
-								SLstepinbnd++;
-								difft = topWLbnd[SLstepinbnd].time - XParam.totaltime;
-							}
-							std::vector<double> zsbndvec;
-							for (int n = 0; n < topWLbnd[SLstepinbnd].wlevs.size(); n++)
-							{
-								zsbndvec.push_back(interptime(topWLbnd[SLstepinbnd].wlevs[n], topWLbnd[SLstepinbnd - 1].wlevs[n], topWLbnd[SLstepinbnd].time - topWLbnd[SLstepinbnd - 1].time, XParam.totaltime - topWLbnd[SLstepinbnd - 1].time));
-
-							}
-							if (zsbndvec.size() == 1)
-							{
-								zstop = zsbndvec[0];
-							}
-							else
-							{
-								int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
-								int inext = iprev + 1;
-								// here interp time is used to interpolate to the right node rather than in time...
-								zstop = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
-							}
-
-						}
-
-
-						zsbnd = ((zsleft * 1.0 / distleft)*lefthere + (zsright * 1.0 / distright)*righthere + (zstop * 1.0 / disttop)*tophere + (zsbot * 1.0 / distbot)*bothere) / ((1.0 / distleft)*lefthere + (1.0 / distright)*righthere + (1.0 / disttop)*tophere + (1.0 / distbot)*bothere);
-
-
-						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
-						{
-							zs_d[n] = max(zsbnd, zb_d[n]);
-							hh_d[n] = max(zs_d[n] - zb_d[n], XParam.eps);
-							uu_d[n] = 0.0;
-							vv_d[n] = 0.0;
-						}
-						else
-						{
-							zs[n] = max((float)zsbnd, zb[n]);
-							hh[n] = max(zs[n] - zb[n], (float)XParam.eps);
-							uu[n] = 0.0f;
-							vv[n] = 0.0f;
-							
-						}
-
-					}
-				}
+				warmstart(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd, zb_d, uu_d, vv_d, zs_d, hh_d);
+				
 			}
-		}
+			else
+			{
+				warmstart(XParam, leftWLbnd, rightWLbnd, topWLbnd, botWLbnd, zb, uu, vv, zs, hh);
+				
+
+			}
+		}// end else
 		
 	}
 	printf("done \n  ");
