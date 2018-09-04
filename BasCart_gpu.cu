@@ -793,6 +793,37 @@ int AllocMemGPUBND(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> 
 }
 
 
+template <class T>
+int coldstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
+{
+	int coldstartsucess = 0;
+	for (int bl = 0; bl < XParam.nblk; bl++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + bl * XParam.blksize;
+
+				uu[n] = T(0.0);
+				vv[n] = T(0.0);
+				//zb[n] = 0.0f;
+				zs[n] = max(XParam.zsinit, zb[n]);
+				//if (i >= 64 && i < 82)
+				//{
+				//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);
+				//}
+				hh[n] = max(zs[n] - zb[n], XParam.eps);//0.0?
+
+			}
+
+		}
+	}
+	coldstartsucess = 1;
+	return coldstartsucess = 1;
+}
+
+
 void LeftFlowBnd(Param XParam, std::vector<SLTS> leftWLbnd)
 {
 	//
@@ -3171,9 +3202,11 @@ int main(int argc, char **argv)
 		//case(1)
 		if (abs(XParam.zsinit - defaultParam.zsinit) > epsilon) // apply specified zsinit
 		{
+			int coldstartsucess = 0;
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				for (int bl = 0; bl < XParam.nblk; bl++)
+				coldstartsucess = coldstart(XParam, zb_d, uu_d, vv_d, zs_d, hh_d);
+				/*for (int bl = 0; bl < XParam.nblk; bl++)
 				{
 					for (int j = 0; j < 16; j++)
 					{
@@ -3194,11 +3227,12 @@ int main(int argc, char **argv)
 						}
 
 					}
-				}
+				}*/
 			}
 			else
 			{
-				for (int bl = 0; bl < XParam.nblk; bl++)
+				coldstartsucess = coldstart(XParam, zb, uu, vv, zs, hh);
+				/*for (int bl = 0; bl < XParam.nblk; bl++)
 				{
 					for (int j = 0; j < 16; j++)
 					{
@@ -3217,7 +3251,7 @@ int main(int argc, char **argv)
 						}
 
 					}
-				}
+				}*/
 			}
 
 		}

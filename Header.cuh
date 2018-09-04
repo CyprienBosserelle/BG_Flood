@@ -254,6 +254,10 @@ extern double * blockxo_gd, *blockyo_gd;
 extern int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
 
 
+// GPU only:
+extern int * Riverblk;
+
+
 //Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch
 extern cudaArray* leftWLS_gp; // Cuda array to pre-store HD vel data before converting to textures
 extern cudaArray* rightWLS_gp;
