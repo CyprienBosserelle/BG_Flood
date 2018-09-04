@@ -1251,7 +1251,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 
 	float mindtmaxB;
 
-	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (dtmax_g, arrmax_g, nx*ny);
+	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (dtmax_g, arrmax_g, s);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	
@@ -1278,9 +1278,9 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	
 	CUDA_CHECK(cudaMemcpy(dummy, arrmax_g, 32*sizeof(float), cudaMemcpyDeviceToHost));
 	mindtmaxB = dummy[0];
-	/*
-	//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
 	
+	//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
+	/*
 	for (int i = 0; i < 32; i++)
 	{
 		mindtmaxB = min(dummy[i], mindtmaxB);
