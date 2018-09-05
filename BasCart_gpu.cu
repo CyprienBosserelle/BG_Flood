@@ -1601,6 +1601,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	if (XParam.Rivers.size() > 1)
 	{
 		//
+		dim3 gridDimRiver(XParam.nriverblock, 1, 1);
 		float qnow;
 		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
 		{
@@ -1618,7 +1619,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 
 
 
-			discharge_bnd_v << <gridDim, blockDim, 0 >> > ((float)XParam.Rivers[Rin].xstart, (float)XParam.Rivers[Rin].xend, (float)XParam.Rivers[Rin].ystart, (float)XParam.Rivers[Rin].yend, (float)XParam.dx, (float)XParam.dt, qnow, (float)XParam.Rivers[Rin].disarea, blockxo_g, blockyo_g, zs_g, hh_g);
+			discharge_bnd_v << <gridDimRiver, blockDim, 0 >> > ((float)XParam.Rivers[Rin].xstart, (float)XParam.Rivers[Rin].xend, (float)XParam.Rivers[Rin].ystart, (float)XParam.Rivers[Rin].yend, (float)XParam.dx, (float)XParam.dt, qnow, (float)XParam.Rivers[Rin].disarea,Riverblk_g, blockxo_g, blockyo_g, zs_g, hh_g);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 	}
@@ -2050,6 +2051,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 
 	if (XParam.Rivers.size() > 1)
 	{
+		dim3 gridDimRiver(XParam.nriverblock, 1, 1);
 		//
 		double qnow;
 		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
@@ -2068,7 +2070,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 
 
 
-			discharge_bnd_v << <gridDim, blockDim, 0 >> > (XParam.Rivers[Rin].xstart, XParam.Rivers[Rin].xend, XParam.Rivers[Rin].ystart, XParam.Rivers[Rin].yend, XParam.dx, XParam.dt, qnow, XParam.Rivers[Rin].disarea, blockxo_gd, blockyo_gd, zs_gd, hh_gd);
+			discharge_bnd_v << <gridDimRiver, blockDim, 0 >> > (XParam.Rivers[Rin].xstart, XParam.Rivers[Rin].xend, XParam.Rivers[Rin].ystart, XParam.Rivers[Rin].yend, XParam.dx, XParam.dt, qnow, XParam.Rivers[Rin].disarea, Riverblk_g, blockxo_gd, blockyo_gd, zs_gd, hh_gd);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 	}
@@ -3361,6 +3363,8 @@ int main(int argc, char **argv)
 		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
 		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
 		Allocate1CPU(activeRiverBlk.size(), 1, Riverblk);
+
+		XParam.nriverblock = activeRiverBlk.size();
 
 		for (int b = 0; b < activeRiverBlk.size(); b++)
 		{

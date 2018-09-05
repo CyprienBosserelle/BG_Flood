@@ -2962,11 +2962,14 @@ __global__ void CalcVorticity( T * Vort,T * dvdx, T * dudy)
 }
 
 template <class T>
-__global__ void discharge_bnd_v(T xstart,T xend, T ystart,T yend, T dx, T dt, T qnow, T disarea, T * blockxo, T * blockyo, T* zs, T* hh)
+__global__ void discharge_bnd_v(T xstart,T xend, T ystart,T yend, T dx, T dt, T qnow, T disarea, int * Riverblks, T * blockxo, T * blockyo, T* zs, T* hh)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
-	int ibl = blockIdx.x;
+	int ibl = Riverblks[blockIdx.x];
+
+
+
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
