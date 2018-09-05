@@ -334,7 +334,7 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 
-	// shared array index
+	// shared array index to make the code bit more readable
 	int sx = ix + 1;
 	int sy = iy + 1;
 
@@ -402,8 +402,8 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 	a_b = a[ibot];
 	*/
 	
-	dadx[i] = minmod2GPU(theta, a_s[ix-1][iy], a_s[ix][iy], a_s[ix + 1][iy]) / delta;
-	dady[i] = minmod2GPU(theta, a_s[ix][iy-1], a_s[ix][iy], a_s[ix][iy + 1]) / delta;
+	dadx[i] = minmod2GPU(theta, a_s[sx-1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
+	dady[i] = minmod2GPU(theta, a_s[sx][sy-1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
 	/*
 	dadx[i] = minmod2GPU(theta, a_l, a_i, a_r) / delta;
 	dady[i] = minmod2GPU(theta, a_b, a_i, a_t) / delta;
