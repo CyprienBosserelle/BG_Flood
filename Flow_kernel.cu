@@ -421,7 +421,7 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 
 
 	a_s[sx][sy] = a[i];
-	__syncthreads;
+	//__syncthreads;
 	//syncthread is needed here ?
 
 
