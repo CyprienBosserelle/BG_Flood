@@ -1438,22 +1438,22 @@ double FlowGPU(Param XParam, double nextoutputtime)
 
 	
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[0] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hh_g, dhdx_g, dhdy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hh_g, dhdx_g, dhdy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zs_g, dzsdx_g, dzsdy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zs_g, dzsdx_g, dzsdy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
 
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, uu_g, dudx_g, dudy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, uu_g, dudx_g, dudy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[1] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vv_g, dvdx_g, dvdy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vv_g, dvdx_g, dvdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
@@ -1543,22 +1543,22 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	//update again
 	
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hho_g, dhdx_g, dhdy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hho_g, dhdx_g, dhdy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[1] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zso_g, dzsdx_g, dzsdy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zso_g, dzsdx_g, dzsdy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[0] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, uuo_g, dudx_g, dudy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, uuo_g, dudx_g, dudy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
 
 
-	gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[1] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vvo_g, dvdx_g, dvdy_g);
+	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >( (float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vvo_g, dvdx_g, dvdy_g);
 	
 	CUDA_CHECK(cudaDeviceSynchronize());
 
