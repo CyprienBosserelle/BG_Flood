@@ -324,6 +324,93 @@ template <class T> __global__ void gradientGPUXYBUQ(T theta, T delta, int *leftb
 
 }
 
+template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *leftblk, int *rightblk, int* topblk, int * botblk, T *a, T *dadx, T *dady)
+{
+	//int *leftblk,int *rightblk,int* topblk, int * botblk,
+
+	//int ix = threadIdx.x+1;
+	//int iy = threadIdx.y+1;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	// shared array index
+	int sx = ix + 1;
+	int sy = iy + 1;
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+	
+	int ileft, iright, itop, ibot;
+
+	
+	/*
+	if (blockIdx.x == 0 && threadIdx.x == 0 && threadIdx.y == 0)
+	{
+	printf("i= %i\t ileft=%i\t iright=%i\t itop=%i\t ibot=%i\n", i,ileft,iright,itop,ibot);
+	}
+	*/
+	//T a_i, a_r, a_l, a_t, a_b;
+	
+	__shared__ float a_s[18][18];
+
+
+
+
+	a_s[sx][sy] = a[i];
+	__syncthreads;
+	//syncthread is needed here ?
+
+
+	// read the halo around the tile
+	if (threadIdx.x == blockDim.x - 1)
+	{
+		iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+		a_s[sx + 1][sy] = a[iright];
+	}
+	
+
+	if (threadIdx.x == 0)
+	{
+		ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+		a_s[sx-1][sy] = a[ileft];
+	}
+	
+
+	if (threadIdx.y == blockDim.y - 1)
+	{
+		itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+		a_s[sx][sy + 1] = a[itop];
+	}
+
+	if (threadIdx.y == 0)
+	{
+		ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+		a_s[sx][sy - 1] = a[ibot];
+	}
+
+	__syncthreads;
+	/*
+	a_i = a[i];
+	a_r = a[iright];
+	a_l = a[ileft];
+	a_t = a[itop];
+	a_b = a[ibot];
+	*/
+	
+	dadx[i] = minmod2GPU(theta, a_s[ix-1][iy], a_s[ix][iy], a_s[ix + 1][iy]) / delta;
+	dady[i] = minmod2GPU(theta, a_s[ix][iy-1], a_s[ix][iy], a_s[ix][iy + 1]) / delta;
+	/*
+	dadx[i] = minmod2GPU(theta, a_l, a_i, a_r) / delta;
+	dady[i] = minmod2GPU(theta, a_b, a_i, a_t) / delta;
+	*/
+
+}
+
 __global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, float *dadx)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
