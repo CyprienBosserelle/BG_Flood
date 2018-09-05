@@ -89,6 +89,21 @@ __device__ int findleftG(int ix,int iy,int leftblk, int ibl, int bdimx)
 	return ileft;
 }
 
+__device__ int findleftGSM(int ix, int iy, int leftblk, int ibl, int bdimx)
+{
+	int ileft;
+	if (leftblk != ibl)
+	{
+			ileft = 15 + iy * bdimx + leftblk * (bdimx*bdimx);
+	}
+	else
+	{
+			ileft = 0 + iy * bdimx + ibl*(bdimx*bdimx);
+	}
+	
+	return ileft;
+}
+
 __device__ int findrightG(int ix,int iy, int rightblk, int ibl, int bdimx)
 {
 	int iright;
@@ -107,6 +122,21 @@ __device__ int findrightG(int ix,int iy, int rightblk, int ibl, int bdimx)
 	{
 		iright = (ix+1) + iy * bdimx + ibl*(bdimx*bdimx);
 	}
+	return iright;
+}
+__device__ int findrightGSM(int ix, int iy, int rightblk, int ibl, int bdimx)
+{
+	int iright;
+	
+		if (rightblk != ibl)
+		{
+			iright = 0 + iy * bdimx + rightblk * (bdimx*bdimx);
+		}
+		else
+		{
+			iright = 15 + iy * bdimx + ibl*(bdimx*bdimx);
+		}
+	
 	return iright;
 }
 
@@ -130,6 +160,21 @@ __device__ int findtopG(int ix,int iy, int topblk, int ibl, int bdimx)
 	}
 	return itop;
 }
+__device__ int findtopGSM(int ix, int iy, int topblk, int ibl, int bdimx)
+{
+	int itop;
+	
+		if (topblk != ibl)
+		{
+			itop = ix + 0 * bdimx + topblk * (bdimx*bdimx);
+		}
+		else
+		{
+			itop = ix + 15 * bdimx + ibl*(bdimx*bdimx);
+		}
+	
+	return itop;
+}
 
 __device__ int findbotG(int ix,int iy, int botblk, int ibl, int bdimx)
 {
@@ -151,7 +196,21 @@ __device__ int findbotG(int ix,int iy, int botblk, int ibl, int bdimx)
 	}
 	return ibot;
 }
-
+__device__ int findbotGSM(int ix, int iy, int botblk, int ibl, int bdimx)
+{
+	int ibot;
+	
+		if (botblk != ibl)
+		{
+			ibot = ix + 15 * bdimx + botblk * (bdimx*bdimx);
+		}
+		else
+		{
+			ibot = ix + 0 * bdimx + ibl*(bdimx*bdimx);
+		}
+	
+	return ibot;
+}
 __device__ float minmod2fGPU(float theta,float s0, float s1, float s2)
 {
 	//theta should be used as a global var 
@@ -369,27 +428,27 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 	// read the halo around the tile
 	if (threadIdx.x == blockDim.x - 1)
 	{
-		iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+		iright = findrightGSM(ix, iy, rightblk[ibl], ibl, blockDim.x);
 		a_s[sx + 1][sy] = a[iright];
 	}
 	
 
 	if (threadIdx.x == 0)
 	{
-		ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+		ileft = findleftGSM(ix, iy, leftblk[ibl], ibl, blockDim.x);
 		a_s[sx-1][sy] = a[ileft];
 	}
 	
 
 	if (threadIdx.y == blockDim.y - 1)
 	{
-		itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+		itop = findtopGSM(ix, iy, topblk[ibl], ibl, blockDim.x);
 		a_s[sx][sy + 1] = a[itop];
 	}
 
 	if (threadIdx.y == 0)
 	{
-		ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+		ibot = findbotGSM(ix, iy, botblk[ibl], ibl, blockDim.x);
 		a_s[sx][sy - 1] = a[ibot];
 	}
 
