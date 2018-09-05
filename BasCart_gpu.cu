@@ -135,6 +135,9 @@ double * blockxo_gd, *blockyo_gd;
 float * blockxo_g, *blockyo_g;
 int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
 
+//River stuff
+int * Riverblk, *Riverblk_g;
+
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
 std::map<std::string, float *> OutputVarMapCPU;
@@ -3346,6 +3349,30 @@ int main(int argc, char **argv)
 
 			// Now read the discharge input and store to  
 			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
+		}
+		//Now identify sort unique blocks where rivers are being inserted
+		std::vector<int> activeRiverBlk;
+		
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
+		{
+
+			activeRiverBlk.insert(std::end(activeRiverBlk),std::begin(XParam.Rivers[Rin].block),std::end(XParam.Rivers[Rin].block));
+		}
+		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
+		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
+		Allocate1CPU(activeRiverBlk.size(), 1, Riverblk);
+
+		for (int b = 0; b < activeRiverBlk.size(); b++)
+		{
+			Riverblk[b] = activeRiverBlk[b];
+		}
+
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			Allocate1GPU(activeRiverBlk.size(), 1, Riverblk_g);
+			CUDA_CHECK(cudaMemcpy(Riverblk_g, Riverblk, activeRiverBlk.size() * sizeof(int), cudaMemcpyHostToDevice));
+
 		}
 	}
 

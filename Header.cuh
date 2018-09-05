@@ -18,7 +18,7 @@
 #include <vector>
 #include <map>
 #include <netcdf.h>
-
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -41,6 +41,7 @@ public:
 	double xstart,xend, ystart,yend; // location of the discharge as a rectangle
 	std::string Riverflowfile; // river flow input time[s] flow in m3/s
 	std::vector<Flowin> flowinput; // vector to store the data of the river flow input file
+	
 };
 
 
@@ -95,7 +96,7 @@ public:
 
 	//Rivers
 	std::vector<River> Rivers; // empty vector to hold river location and discharge time series
-
+	int nriverblock = 0;
 
 	//bnd
 	// 0:Wall; 1:neumann (zeros gredient); 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D
@@ -254,8 +255,8 @@ extern double * blockxo_gd, *blockyo_gd;
 extern int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
 
 
-// GPU only:
-extern int * Riverblk;
+// id of blocks with riverinput:
+extern int * Riverblk, *Riverblk_g;
 
 
 //Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch
