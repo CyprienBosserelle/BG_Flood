@@ -210,6 +210,38 @@ template <class T> void Allocate4CPU(int nx, int ny, T *&zs, T *&hh, T *&uu, T *
 	vv = (T *)malloc(nx*ny * sizeof(T));
 }
 
+template <class T> void InitArraySV(int nblk, int blksize, T initval, T * & Arr)
+{
+	//inititiallise array with a single value
+	for (int bl = 0; bl < nblk; bl++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + bl * blksize;
+				Arr[n] = initval;
+			}
+		}
+	}
+}
+
+template <class T> void CopyArray(int nblk, int blksize, T* source, T * & dest)
+{
+	//
+	for (int bl = 0; bl < nblk; bl++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + bl * blksize;
+				dest[n] = source[n];
+			}
+		}
+	}
+}
+
 template <class T> void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk,  T *&zb)
 {
 	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
@@ -3226,16 +3258,23 @@ int main(int argc, char **argv)
 
 		if (XParam.GPUDEVICE > (nDevices - 1))
 		{
-			// 
+			//  if no GPU device are present then use the CPU (GPUDEVICE = -1)
 			XParam.GPUDEVICE = (nDevices - 1);
 		}
 		cudaGetDeviceProperties(&prop, XParam.GPUDEVICE);
 		printf("There are %d GPU devices on this machine\n", nDevices);
-		printf("Using Device : %s\n", prop.name);
-
-
 		write_text_to_log_file("There are " + std::to_string(nDevices) + "GPU devices on this machine");
-		write_text_to_log_file("There are " + std::string(prop.name) + "GPU devices on this machine");
+		
+		if (XParam.GPUDEVICE >= 0)
+		{
+			printf("Using Device : %s\n", prop.name);
+			write_text_to_log_file("Using Device: " + std::string(prop.name));
+		}
+		else
+		{
+			printf("Warning ! No GPU device were detected on this machine... Using CPU instead");
+			write_text_to_log_file("Warning ! No GPU device were detected on this machine... Using CPU instead");
+		}
 
 	}
 
@@ -3433,52 +3472,12 @@ int main(int argc, char **argv)
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
 				coldstartsucess = coldstart(XParam, zb_d, uu_d, vv_d, zs_d, hh_d);
-				/*for (int bl = 0; bl < XParam.nblk; bl++)
-				{
-					for (int j = 0; j < 16; j++)
-					{
-						for (int i = 0; i < 16; i++)
-						{
-							int n = i + j * 16 + bl * XParam.blksize;
 
-							uu_d[n] = 0.0;
-							vv_d[n] = 0.0;
-							//zb[n] = 0.0f;
-							zs_d[n] = max(XParam.zsinit, zb_d[n]);
-							//if (i >= 64 && i < 82)
-							//{
-							//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);
-							//}
-							hh_d[n] = max(zs_d[n] - zb_d[n], XParam.eps);//0.0?
-
-						}
-
-					}
-				}*/
 			}
 			else
 			{
 				coldstartsucess = coldstart(XParam, zb, uu, vv, zs, hh);
-				/*for (int bl = 0; bl < XParam.nblk; bl++)
-				{
-				for (int j = 0; j < 16; j++)
-				{
-				for (int i = 0; i < 16; i++)
-				{
-				int n = i + j * 16 + bl * XParam.blksize;
-				uu[n] = 0.0f;
-				vv[n] = 0.0f;
-				//zb[i + j*nx] = 0.0f;
-				zs[n] = max((float)XParam.zsinit, zb[n]);
-				//if (i >= 64 && i < 82)
-				//{
-				//	zs[i + j*nx] = max(zsbnd+0.2f, zb[i + j*nx]);
-				//}
-				hh[n] = max(zs[n] - zb[n], (float)XParam.eps);//0.0f?
-				}
 
-				}
-				}*/
 			}
 
 		}
@@ -3501,304 +3500,116 @@ int main(int argc, char **argv)
 	printf("done \n  ");
 	write_text_to_log_file("Done");
 
-
+	//////////////////////////////////////////////////////
+	// Init other variables
+	/////////////////////////////////////////////////////
 	
 
 	// Below is not succint but way faster than one loop that checks the if statemenst each time
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		// Set default cf 
-		for (int bl = 0; bl < XParam.nblk; bl++)
-		{
-			for (int j = 0; j < 16; j++)
-			{
-				for (int i = 0; i < 16; i++)
-				{
-					int n = i + j * 16 + bl * XParam.blksize;
-					cf_d[n] = XParam.cf;
-				}
-			}
-		}
+		// Set default cf
+		InitArraySV(XParam.nblk, XParam.blksize, XParam.cf, cf_d);
+		
 		if (XParam.outhhmax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						hhmax_d[n] = hh_d[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, hh_d, hhmax_d);			
 		}
 
 		if (XParam.outhhmean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						hhmean_d[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, hhmean_d);			
 		}
 		if (XParam.outzsmax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						zsmax_d[n] = zs_d[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, zs_d, zsmax_d);			
 		}
 
 		if (XParam.outzsmean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						zsmean_d[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, zsmean_d);			
 		}
 
 		if (XParam.outuumax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						uumax_d[n] = uu_d[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, uu_d, uumax_d);
 		}
 
 		if (XParam.outuumean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						uumean_d[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, uumean_d);			
 		}
 		if (XParam.outvvmax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						vvmax_d[n] = vv_d[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, vv_d, vvmax_d);			
 		}
 
 		if (XParam.outvvmean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						vvmean_d[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, vvmean_d);			
 		}
 		if (XParam.outvort == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						vort_d[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, vort_d);			
 		}
 	}
 	else //Using Float *
 	{
-		// Set default cf 
-		for (int bl = 0; bl < XParam.nblk; bl++)
-		{
-			for (int j = 0; j < 16; j++)
-			{
-				for (int i = 0; i < 16; i++)
-				{
-					int n = i + j * 16 + bl * XParam.blksize;
-					cf[n] = (float)XParam.cf;
-				}
-			}
-		}
-		
+
+		// Set default cf
+		InitArraySV(XParam.nblk, XParam.blksize,(float) XParam.cf, cf);
+
 		if (XParam.outhhmax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						hhmax[n] = hh[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, hh, hhmax);
 		}
 
 		if (XParam.outhhmean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						hhmean[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0f, hhmean);
 		}
 		if (XParam.outzsmax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						zsmax[n] = zs[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, zs, zsmax);
 		}
 
 		if (XParam.outzsmean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						zsmean[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0f, zsmean);
 		}
 
 		if (XParam.outuumax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						uumax[n] = uu[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, uu, uumax);
 		}
 
 		if (XParam.outuumean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						uumean[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0f, uumean);
 		}
 		if (XParam.outvvmax == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						vvmax[n] = vv[n];
-					}
-				}
-			}
+			CopyArray(XParam.nblk, XParam.blksize, vv, vvmax);
 		}
 
 		if (XParam.outvvmean == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						vvmean[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0f, vvmean);
 		}
 		if (XParam.outvort == 1)
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						vort[n] = 0.0;
-					}
-				}
-			}
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0f, vort);
 		}
+		
 	}
 	
+	///////////////////////////////////////////////////
+	// Extrenal forcing and friction maps
+	///////////////////////////////////////////////////
+
+
+
+
 
 	if (XParam.GPUDEVICE >= 0)
 	{
