@@ -1756,8 +1756,8 @@ __global__ void updateEV( float delta, float g, int *rightblk, int*topblk, float
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
-		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
-		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
+		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
+		dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
 	}
 }
 __global__ void updateEVD( double delta, double g, int *rightblk, int*topblk, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
@@ -2574,6 +2574,8 @@ __global__ void botdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	}
 }
 
+
+
 template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, T *hh, T *uu, T *vv)
 {
 	// Shear stress equation:
@@ -2602,7 +2604,7 @@ template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, 
 		vvi = vv[i];
 		if (hhi > eps)
 		{
-			normu = uui * uui + vvi * vvi;
+			normu = sqrt(uui * uui + vvi * vvi);
 			//T frc = (T(1.0) + dt*cf*(normu) / hhi);
 				//u.x[] = h[]>dry ? u.x[] / (1 + dt*cf*norm(u) / h[]) : 0.;
 			//uu[i] = uui / frc;
@@ -2610,7 +2612,7 @@ template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, 
 			T cfi = cf[i];
 			if (smart == 1)
 			{
-				T zo = cf[i];
+				T zo = cfi;
 				T Hbar = hhi / zo;
 				if (Hbar <= ee)
 				{
@@ -2620,10 +2622,11 @@ template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, 
 				{
 					cfi = T(1.0)/(T(2.5)*(log(Hbar) - T(1.0) + T(1.359)/Hbar));
 				}
+				cfi = cfi*cfi; // 
 			}
 
 
-			T tb = cfi*sqrt(normu)/hhi*dt;
+			T tb = cfi*normu/hhi*dt;
 			uu[i] = uui / (T(1.0)+tb);
 			vv[i] = vvi / (T(1.0)+tb);
 		}
