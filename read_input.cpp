@@ -617,9 +617,22 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.frictionmodel = std::stoi(parametervalue);
 	}
+	// Mapped friction
+	parameterstr = "cfmap";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		
+		param.cfmap.inputfile = parametervalue;
+		
+	}
+
+
 
 	return param;
 }
+
+
 
 Param checkparamsanity(Param XParam)
 {
@@ -848,6 +861,73 @@ std::string trim(const std::string& str, const std::string& whitespace)
 
 	return str.substr(strBegin, strRange);
 }
+
+cfmap readcfmaphead(cfmap Roughmap)
+{
+	// Read critical parameter for the roughness map
+	write_text_to_log_file("Rougness map was specified. Checking file... " );
+	std::string fileext;
+	double dummy;
+	std::vector<std::string> extvec = split(Roughmap.inputfile, '.');
+
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+	write_text_to_log_file("cfmap file extension : " + fileext);
+
+	if (fileext.compare("md") == 0)
+	{
+		write_text_to_log_file("Reading 'md' file");
+		readbathyHeadMD(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, dummy);
+		Roughmap.xo = 0.0;
+		Roughmap.yo = 0.0;
+		Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
+		Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
+	}
+	if (fileext.compare("nc") == 0)
+	{
+		write_text_to_log_file("Reading cfmap as netcdf file");
+		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx);
+		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+		Roughmap.xo = 0.0;
+		Roughmap.yo = 0.0;
+		Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
+		Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
+
+	}
+	if (fileext.compare("dep") == 0 || fileext.compare("bot") == 0)
+	{
+		//XBeach style file
+		//write_text_to_log_file("Reading " + bathyext + " file");
+		//write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
+	}
+	if (fileext.compare("asc") == 0)
+	{
+		//
+		write_text_to_log_file("Reading cfmap as asc file");
+		readbathyASCHead(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummy);
+		
+		Roughmap.xmax = Roughmap.xo + (Roughmap.nx - 1)*Roughmap.dx;
+		Roughmap.ymax = Roughmap.yo + (Roughmap.ny - 1)*Roughmap.dx;
+	}
+
+
+
+
+
+
+	return Roughmap;
+}
+
 
 Param readBathyhead(Param XParam)
 {
@@ -1323,5 +1403,22 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 	}
 
 	fs.close();
+}
+
+double BilinearInterpolation(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y)
+{
+	double x2x1, y2y1, x2x, y2y, yy1, xx1;
+	x2x1 = x2 - x1;
+	y2y1 = y2 - y1;
+	x2x = x2 - x;
+	y2y = y2 - y;
+	yy1 = y - y1;
+	xx1 = x - x1;
+	return 1.0 / (x2x1 * y2y1) * (
+		q11 * x2x * y2y +
+		q21 * xx1 * y2y +
+		q12 * x2x * yy1 +
+		q22 * xx1 * yy1
+		);
 }
 

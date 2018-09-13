@@ -44,6 +44,31 @@ public:
 	
 };
 
+class cfmap {
+public:
+	int nx = 0;
+	int ny= 0;
+	double xo = 0.0;
+	double yo = 0.0;
+	double xmax = 0.0;
+	double ymax = 0.0;
+	double dx = 0.0;
+	std::string inputfile;
+};
+
+class forcingmap {
+public:
+	int nx, ny;
+	int nt;
+	double to, tmax;
+	double xo, yo;
+	double xmax, ymax;
+	double dx;
+	double dt;
+
+};
+
+
 
 class Param {
 public:
@@ -137,6 +162,8 @@ public:
 
 	int outvort = 0;
 
+	// info of the mapped cf
+	cfmap cfmap;
 };
 
 
@@ -359,6 +386,7 @@ int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double *
 
 // I/O
 Param readBathyhead(Param XParam);
+cfmap readcfmaphead(cfmap Roughmap);
 extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
@@ -380,6 +408,7 @@ void SaveParamtolog(Param XParam);
 
 //
 double interptime(double next, double prev, double timenext, double time);
+double BilinearInterpolation(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y);
 
 // End of global definition
 #endif

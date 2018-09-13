@@ -352,6 +352,57 @@ template <class T> void carttoBUQ(int nblk, int nx,int ny, double xo,double yo, 
 	}
 }
 
+template <class T> void interp2cf(Param XParam, float * cfin,T* blockxo, T* blockyo, T * &cf)
+{
+	// This function interpolates the values in cfmapin to cf using a bilinear interpolation
+
+	double x, y;
+	int n;
+
+	for (int bl = 0; bl < XParam.nblk; bl++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				n = i + j * 16 + bl * XParam.blksize;
+
+				x = blockxo[bl] + i*XParam.dx;
+				y = blockyo[bl] + j*XParam.dx;
+
+				if (x >= XParam.cfmap.xo && x <= XParam.cfmap.xmax && y >= XParam.cfmap.yo && y <= XParam.cfmap.ymax)
+				{
+					// cells that falls off this domain are assigned 
+					double x1, x2, y1, y2;
+					double q11, q12, q21, q22;
+					int cfi, cfip, cfj, cfjp;
+
+					
+
+					cfi = min(max((int)floor((x - XParam.cfmap.xo) / XParam.cfmap.dx),0), XParam.cfmap.nx-2);
+					cfip = cfi + 1;
+
+					x1 = XParam.cfmap.xo + XParam.cfmap.dx*cfi;
+					x2= XParam.cfmap.xo + XParam.cfmap.dx*cfip;
+					
+					cfj= min(max((int)floor((y - XParam.cfmap.yo) / XParam.cfmap.dx), 0), XParam.cfmap.ny - 2);
+					cfjp = cfj + 1;
+
+					y1= XParam.cfmap.yo + XParam.cfmap.dx*cfj;
+					y2 = XParam.cfmap.yo + XParam.cfmap.dx*cfjp;
+
+					q11 = cfin[cfi + cfj*XParam.cfmap.nx];
+					q12 = cfin[cfi + cfjp*XParam.cfmap.nx];
+					q21 = cfin[cfip + cfj*XParam.cfmap.nx];
+					q22 = cfin[cfip + cfjp*XParam.cfmap.nx];
+
+					cf[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
+				}
+				
+			}
+		}
+	}
+}
 
 float maxdiff(int nxny, float * ref, float * pred)
 {
@@ -3604,12 +3655,88 @@ int main(int argc, char **argv)
 	}
 	
 	///////////////////////////////////////////////////
-	// Extrenal forcing and friction maps
+	// Friction maps
 	///////////////////////////////////////////////////
 
+	if (!XParam.cfmap.inputfile.empty())
+	{
+		// roughness map was specified!
 
+		// read the roughness map header
+		XParam.cfmap = readcfmaphead(XParam.cfmap);
 
+		// Quick Sanity check if nx and ny are not read properly just ignore cfmap
+		if (XParam.cfmap.nx > 0 && XParam.cfmap.ny > 0)
+		{
 
+			// Allocate memory to read roughness map file content
+			float * cfmapinput; // init as a float because the bathy subroutine expect a float
+			Allocate1CPU(XParam.cfmap.nx, XParam.cfmap.ny, cfmapinput);
+
+			// read the roughness map data
+			// Check bathy extension 
+			std::string fileext;
+
+			std::vector<std::string> extvec = split(XParam.cfmap.inputfile, '.');
+
+			std::vector<std::string> nameelements;
+			//by default we expect tab delimitation
+			nameelements = split(extvec.back(), '?');
+			if (nameelements.size() > 1)
+			{
+				//variable name for bathy is not given so it is assumed to be zb
+				fileext = nameelements[0];
+			}
+			else
+			{
+				fileext = extvec.back();
+			}
+
+			//Now choose the right function to read the data
+
+			if (fileext.compare("md") == 0)
+			{
+				readbathyMD(XParam.cfmap.inputfile, cfmapinput);
+			}
+			if (fileext.compare("nc") == 0)
+			{
+				readnczb(XParam.cfmap.nx, XParam.cfmap.ny, XParam.cfmap.inputfile, cfmapinput);
+			}
+			if (fileext.compare("bot") == 0 || bathyext.compare("dep") == 0)
+			{
+				readXBbathy(XParam.cfmap.inputfile, XParam.cfmap.nx, XParam.cfmap.ny, cfmapinput);
+			}
+			if (fileext.compare("asc") == 0)
+			{
+				//
+				readbathyASCzb(XParam.cfmap.inputfile, XParam.cfmap.nx, XParam.cfmap.ny, cfmapinput);
+			}
+			// Interpolate data to the roughness array
+			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+			{
+				//
+				interp2cf(XParam, cfmapinput, blockxo_d, blockyo_d, cf_d);
+			}
+			else
+			{
+				//
+				interp2cf(XParam, cfmapinput, blockxo, blockyo, cf);
+			}
+
+			// cleanup
+			free(cfmapinput);
+		}
+		else
+		{
+			//Error message 
+			printf("Error while reading roughness map. Using constant roughness instead ");
+			write_text_to_log_file("Error while reading roughness map. Using constant roughness instead ");
+		}
+	}
+
+	///////////////////////////////////////////////////
+	// GPU data init
+	///////////////////////////////////////////////////
 
 	if (XParam.GPUDEVICE >= 0)
 	{
