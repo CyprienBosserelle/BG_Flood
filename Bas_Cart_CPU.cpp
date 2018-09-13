@@ -1976,6 +1976,7 @@ void bottomfrictionCPU(int nblk, int blksize, int smart, T dt, T eps, T* cf, T *
 						{
 							cfi = T(1.0) / (T(2.5)*(log(hhi / zo) - T(1.0) + T(1.359)*zo / hhi));
 						}
+						cfi=cfi*cfi;
 					}
 					T normu = uu[i] * uu[i] + vv[i] * vv[i];
 					T tb = cfi * sqrt(normu) / hhi*dt;
