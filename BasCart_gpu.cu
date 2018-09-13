@@ -3437,7 +3437,7 @@ int main(int argc, char **argv)
 			XParam.Rivers[Rin].i = idis;
 			XParam.Rivers[Rin].j = jdis;
 			XParam.Rivers[Rin].block = blockdis;
-			XParam.Rivers[Rin].disarea = idis.size()*XParam.dx; // That is not valid for spherical grids
+			XParam.Rivers[Rin].disarea = idis.size()*XParam.dx*XParam.dx; // That is not valid for spherical grids
 
 			// Now read the discharge input and store to  
 			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);

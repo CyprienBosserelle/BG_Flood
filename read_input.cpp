@@ -635,6 +635,25 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	// wind forcing
+	parameterstr = "windfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		param.roughnessmap.inputfile = parametervalue;
+
+	}
+
+	// atmpress forcing
+	parameterstr = "atmpressfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		param.roughnessmap.inputfile = parametervalue;
+
+	}
 
 	return param;
 }

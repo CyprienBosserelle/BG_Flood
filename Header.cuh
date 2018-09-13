@@ -65,7 +65,7 @@ public:
 	double xmax, ymax;
 	double dx;
 	double dt;
-
+	std::string inputfile;
 };
 
 
@@ -82,6 +82,7 @@ public:
 	int frictionmodel=0; // Not implemented yet 0: cf is a fixed value 1:; 
 	double cf=0.0001; // bottom friction for flow model cf 
 	double Cd=0.002; // Wind drag coeff
+	double Pa2m = 0.00009916;
 	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
 
 	int doubleprecision = 0;
@@ -164,6 +165,11 @@ public:
 
 	// info of the mapped cf
 	cfmap roughnessmap;
+
+	forcingmap windU;
+	forcingmap windV;
+	forcingmap atmP;
+
 };
 
 
