@@ -3783,6 +3783,23 @@ int main(int argc, char **argv)
 
 	}
 
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	// Prep wind and atm forcing
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	if (!XParam.windU.inputfile.empty())
+	{
+		//windfile is present
+
+		//XParam.windU = readforcingmaphead(XParam.windU);
+
+
+	}
+
+
+
+
 	// Here map array to their name as a string. it makes it super easy to convert user define variables to the array it represents.
 	// COul add more to output gradients etc...
 	OutputVarMapCPU["zb"] = zb;

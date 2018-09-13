@@ -636,22 +636,35 @@ Param readparamstr(std::string line, Param param)
 	}
 
 	// wind forcing
-	parameterstr = "windfile";
+	parameterstr = "windfiles";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 
-		param.roughnessmap.inputfile = parametervalue;
+		std::vector<std::string> vars = split(parametervalue, ',');
+		if (vars.size() == 2)
+		{
+			param.windU.inputfile = trim(vars[0], " ");
+			param.windV.inputfile = trim(vars[1], " ");
+		}
+		else
+		{
+			//Failed there should be 5 arguments (comma separated) when inputing a river: filename, xstart,xend,ystart,yend;
+			std::cerr << "Wind input failed there should be 2 arguments (comma separated) when inputing a wind: windfiles = windfile.nc?uwind, windfile.nc?vwind; see log file for details" << std::endl;
+
+			write_text_to_log_file("Wind input failed there should be 2 arguments(comma separated) when inputing a wind : windfiles = windfile.nc ? uwind, windfile.nc ? vwind; see log file for details");
+			write_text_to_log_file(parametervalue);
+		}
 
 	}
 
 	// atmpress forcing
-	parameterstr = "atmpressfile";
+	parameterstr = "atmpfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 
-		param.roughnessmap.inputfile = parametervalue;
+		param.atmP.inputfile = parametervalue;
 
 	}
 
@@ -922,12 +935,12 @@ cfmap readcfmaphead(cfmap Roughmap)
 	if (fileext.compare("nc") == 0)
 	{
 		write_text_to_log_file("Reading cfmap as netcdf file");
-		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx);
+		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, Roughmap.xo, Roughmap.yo, Roughmap.xmax, Roughmap.ymax);
 		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
-		Roughmap.xo = 0.0;
-		Roughmap.yo = 0.0;
-		Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
-		Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
+		//Roughmap.xo = 0.0;
+		//Roughmap.yo = 0.0;
+		//Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
+		//Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
 
 	}
 	if (fileext.compare("dep") == 0 || fileext.compare("bot") == 0)
@@ -954,6 +967,48 @@ cfmap readcfmaphead(cfmap Roughmap)
 	return Roughmap;
 }
 
+forcingmap readforcingmaphead(forcingmap Fmap)
+{
+	// Read critical parameter for the roughness map
+	write_text_to_log_file("Rougness map was specified. Checking file... ");
+	std::string fileext;
+	double dummy;
+	std::vector<std::string> extvec = split(Fmap.inputfile, '.');
+
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+	
+
+	if (fileext.compare("nc") == 0)
+	{
+		write_text_to_log_file("Reading cfmap as netcdf file");
+		//readgridncsize3d(Fmap.inputfile, Fmap.nx, Fmap.ny, Fmap.dx);
+		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+		//Fmap.xo = 0.0;
+		//Fmap.yo = 0.0;
+		//Fmap.xmax = (Fmap.nx - 1)*Fmap.dx;
+		//Fmap.ymax = (Fmap.ny - 1)*Fmap.dx;
+
+	}
+	
+
+
+
+
+
+
+	return Fmap;
+}
 
 Param readBathyhead(Param XParam)
 {
@@ -993,7 +1048,7 @@ Param readBathyhead(Param XParam)
 		if (bathyext.compare("nc") == 0)
 		{
 			write_text_to_log_file("Reading bathy netcdf file");
-			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx);
+			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax);
 			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 

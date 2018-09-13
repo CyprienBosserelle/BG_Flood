@@ -385,7 +385,7 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var);
 extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d);//templating should have been fine here!
-void readgridncsize(std::string ncfile, int &nx, int &ny, double &dx);
+void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx, double &xo, double &yo, double &xmax, double &ymax);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);

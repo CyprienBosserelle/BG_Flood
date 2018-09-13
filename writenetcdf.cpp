@@ -852,7 +852,7 @@ extern "C" void readnczb(int nx, int ny, const std::string ncfile, float * &zb)
 
 
 }
-void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx)
+void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx, double &xo, double &yo, double &xmax, double &ymax)
 {
 	//read the dimentions of grid, levels and time 
 	int status;
@@ -1030,6 +1030,12 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx)
 
 
 	dx = dxx;
+
+	xo = xcoord[0];
+	xmax = xcoord[nx - 1];
+	yo= ycoord[0];
+	ymax= ycoord[ny - 1];
+
 
 
 	status = nc_close(ncid);
