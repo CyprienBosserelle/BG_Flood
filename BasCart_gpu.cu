@@ -370,7 +370,7 @@ template <class T> void interp2cf(Param XParam, float * cfin,T* blockxo, T* bloc
 				x = blockxo[bl] + i*XParam.dx;
 				y = blockyo[bl] + j*XParam.dx;
 
-				if (x >= XParam.cfmap.xo && x <= XParam.cfmap.xmax && y >= XParam.cfmap.yo && y <= XParam.cfmap.ymax)
+				if (x >= XParam.roughnessmap.xo && x <= XParam.roughnessmap.xmax && y >= XParam.roughnessmap.yo && y <= XParam.roughnessmap.ymax)
 				{
 					// cells that falls off this domain are assigned 
 					double x1, x2, y1, y2;
@@ -379,22 +379,22 @@ template <class T> void interp2cf(Param XParam, float * cfin,T* blockxo, T* bloc
 
 					
 
-					cfi = min(max((int)floor((x - XParam.cfmap.xo) / XParam.cfmap.dx),0), XParam.cfmap.nx-2);
+					cfi = min(max((int)floor((x - XParam.roughnessmap.xo) / XParam.roughnessmap.dx),0), XParam.roughnessmap.nx-2);
 					cfip = cfi + 1;
 
-					x1 = XParam.cfmap.xo + XParam.cfmap.dx*cfi;
-					x2= XParam.cfmap.xo + XParam.cfmap.dx*cfip;
+					x1 = XParam.roughnessmap.xo + XParam.roughnessmap.dx*cfi;
+					x2= XParam.roughnessmap.xo + XParam.roughnessmap.dx*cfip;
 					
-					cfj= min(max((int)floor((y - XParam.cfmap.yo) / XParam.cfmap.dx), 0), XParam.cfmap.ny - 2);
+					cfj= min(max((int)floor((y - XParam.roughnessmap.yo) / XParam.roughnessmap.dx), 0), XParam.roughnessmap.ny - 2);
 					cfjp = cfj + 1;
 
-					y1= XParam.cfmap.yo + XParam.cfmap.dx*cfj;
-					y2 = XParam.cfmap.yo + XParam.cfmap.dx*cfjp;
+					y1= XParam.roughnessmap.yo + XParam.roughnessmap.dx*cfj;
+					y2 = XParam.roughnessmap.yo + XParam.roughnessmap.dx*cfjp;
 
-					q11 = cfin[cfi + cfj*XParam.cfmap.nx];
-					q12 = cfin[cfi + cfjp*XParam.cfmap.nx];
-					q21 = cfin[cfip + cfj*XParam.cfmap.nx];
-					q22 = cfin[cfip + cfjp*XParam.cfmap.nx];
+					q11 = cfin[cfi + cfj*XParam.roughnessmap.nx];
+					q12 = cfin[cfi + cfjp*XParam.roughnessmap.nx];
+					q21 = cfin[cfip + cfj*XParam.roughnessmap.nx];
+					q22 = cfin[cfip + cfjp*XParam.roughnessmap.nx];
 
 					cf[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 				}
@@ -3658,26 +3658,26 @@ int main(int argc, char **argv)
 	// Friction maps
 	///////////////////////////////////////////////////
 
-	if (!XParam.cfmap.inputfile.empty())
+	if (!XParam.roughnessmap.inputfile.empty())
 	{
 		// roughness map was specified!
 
 		// read the roughness map header
-		XParam.cfmap = readcfmaphead(XParam.cfmap);
+		XParam.roughnessmap = readcfmaphead(XParam.roughnessmap);
 
 		// Quick Sanity check if nx and ny are not read properly just ignore cfmap
-		if (XParam.cfmap.nx > 0 && XParam.cfmap.ny > 0)
+		if (XParam.roughnessmap.nx > 0 && XParam.roughnessmap.ny > 0)
 		{
 
 			// Allocate memory to read roughness map file content
 			float * cfmapinput; // init as a float because the bathy subroutine expect a float
-			Allocate1CPU(XParam.cfmap.nx, XParam.cfmap.ny, cfmapinput);
+			Allocate1CPU(XParam.roughnessmap.nx, XParam.roughnessmap.ny, cfmapinput);
 
 			// read the roughness map data
 			// Check bathy extension 
 			std::string fileext;
 
-			std::vector<std::string> extvec = split(XParam.cfmap.inputfile, '.');
+			std::vector<std::string> extvec = split(XParam.roughnessmap.inputfile, '.');
 
 			std::vector<std::string> nameelements;
 			//by default we expect tab delimitation
@@ -3696,20 +3696,20 @@ int main(int argc, char **argv)
 
 			if (fileext.compare("md") == 0)
 			{
-				readbathyMD(XParam.cfmap.inputfile, cfmapinput);
+				readbathyMD(XParam.roughnessmap.inputfile, cfmapinput);
 			}
 			if (fileext.compare("nc") == 0)
 			{
-				readnczb(XParam.cfmap.nx, XParam.cfmap.ny, XParam.cfmap.inputfile, cfmapinput);
+				readnczb(XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.inputfile, cfmapinput);
 			}
 			if (fileext.compare("bot") == 0 || bathyext.compare("dep") == 0)
 			{
-				readXBbathy(XParam.cfmap.inputfile, XParam.cfmap.nx, XParam.cfmap.ny, cfmapinput);
+				readXBbathy(XParam.roughnessmap.inputfile, XParam.roughnessmap.nx, XParam.roughnessmap.ny, cfmapinput);
 			}
 			if (fileext.compare("asc") == 0)
 			{
 				//
-				readbathyASCzb(XParam.cfmap.inputfile, XParam.cfmap.nx, XParam.cfmap.ny, cfmapinput);
+				readbathyASCzb(XParam.roughnessmap.inputfile, XParam.roughnessmap.nx, XParam.roughnessmap.ny, cfmapinput);
 			}
 			// Interpolate data to the roughness array
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)

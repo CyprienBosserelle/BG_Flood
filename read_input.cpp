@@ -623,10 +623,17 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		
-		param.cfmap.inputfile = parametervalue;
+		param.roughnessmap.inputfile = parametervalue;
 		
 	}
+	parameterstr = "roughnessmap";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
 
+		param.roughnessmap.inputfile = parametervalue;
+
+	}
 
 
 	return param;

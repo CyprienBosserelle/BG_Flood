@@ -163,7 +163,7 @@ public:
 	int outvort = 0;
 
 	// info of the mapped cf
-	cfmap cfmap;
+	cfmap roughnessmap;
 };
 
 
