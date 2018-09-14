@@ -852,12 +852,12 @@ extern "C" void readnczb(int nx, int ny, const std::string ncfile, float * &zb)
 
 
 }
-void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx, double &xo, double &yo, double &xmax, double &ymax)
+void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax)
 {
 	//read the dimentions of grid, levels and time 
 	int status;
 	int ncid, ndimshh, ndims;
-	double *xcoord, *ycoord;
+	double *xcoord, *ycoord, *tcoord;
 	int varid;
 
 	//int ndimsp, nvarsp, nattsp, unlimdimidp;
@@ -918,11 +918,14 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx, doub
 
 	if (ndimshh > 2)
 	{
+		nt = (int) ddimhh[0];
 		ny = (int) ddimhh[1];
 		nx = (int) ddimhh[2];
+
 	}
 	else
 	{
+		nt = 0;
 		ny = (int) ddimhh[0];
 		nx = (int) ddimhh[1];
 	}
@@ -933,10 +936,11 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx, doub
 
 	//inquire variable name for x dimension
 	//aka x dim of hh
-	int ycovar, xcovar;
+	int ycovar, xcovar, tcovar;
 
 	if (ndimshh > 2)
 	{
+		tcovar = dimids[0];
 		ycovar = dimids[1];
 		xcovar = dimids[2];
 	}
@@ -1029,12 +1033,46 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx, doub
 	//dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
 
 
+	//Read time dimension if any
+	if (nt > 0)
+	{
+		//read dimension name
+		status = nc_inq_dimname(ncid, tcovar, coordname);
+		if (status != NC_NOERR) handle_error(status);
+
+		//inquire variable id 
+		status = nc_inq_varid(ncid, coordname, &varid);
+		if (status != NC_NOERR) handle_error(status);
+
+		// read the dimension of time variable // yes it should be == 1
+		status = nc_inq_varndims(ncid, varid, &ndims);
+		if (status != NC_NOERR) handle_error(status);
+
+		//allocate temporary array and read time vector
+		double * ttempvar;
+		ttempvar = (double *)malloc(nt * sizeof(double));
+		size_t start[] = { 0 };
+		size_t count[] = { nt };
+		status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
+
+		to = ttempvar[0];
+		tmax= ttempvar[nt-1];
+		
+		free(ttempvar);
+	}
+	else
+	{
+		//this is a 2d file so assign dummy values
+		to = 0.0;
+		tmax = 0.0;
+	}
+
 	dx = dxx;
 
 	xo = xcoord[0];
 	xmax = xcoord[nx - 1];
 	yo= ycoord[0];
-	ymax= ycoord[ny - 1];
+	ymax= ycoord[(ny - 1)*nx];
 
 
 
@@ -1947,4 +1985,117 @@ int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double *
 
 	return 1;
 
+}
+
+
+void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo)
+{
+	//
+	int status;
+	int ncid;
+	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
+	int uu_id, vv_id;
+	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
+	// right now the model will catch anexception 
+	printf("Reading Wind data step: %d ...", steptoread);
+	//size_t startl[]={hdstep-1,lev,0,0};
+	//size_t countlu[]={1,1,netau,nxiu};
+	//size_t countlv[]={1,1,netav,nxiv};
+	size_t startl[] = { steptoread, 0, 0 };
+	size_t countlu[] = { 1, WNDUmap.ny, WNDUmap.nx };
+	size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
+
+	//static ptrdiff_t stridel[]={1,1,1,1};
+	static ptrdiff_t stridel[] = { 1, 1, 1 };
+
+	std::string ncfilestrU, ncfilestrV;
+	std::string Uvarstr, Vvarstr;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(WNDUmap.inputfile, '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		ncfilestrU = nameelements[0];
+		Uvarstr = nameelements[1];
+	}
+	else
+	{
+		ncfilestrU = ncfilestrU;
+		Uvarstr = "uwnd";
+	}
+
+	nameelements = split(WNDVmap.inputfile, '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		ncfilestrV = nameelements[0];
+		Vvarstr = nameelements[1];
+	}
+	else
+	{
+		ncfilestrV = ncfilestrU;
+		Vvarstr = "vwnd";
+	}
+
+
+	//Open NC file
+
+	status = nc_open(ncfilestrU.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	//status = nc_inq_varid (ncid, "u", &uu_id);
+	status = nc_inq_varid(ncid, Uvarstr.c_str(), &uu_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_get_vara_float(ncid, uu_id, startl, countlu, Uo);
+	if (status != NC_NOERR) handle_error(status);
+
+	//status = nc_get_att_float(ncid, uu_id, "_FillValue", &NanValU);
+	//if (status != NC_NOERR) handle_error(status);
+
+	status = nc_close(ncid);
+
+
+	status = nc_open(ncfilestrV.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+	//status = nc_inq_varid (ncid, "v", &vv_id);
+	status = nc_inq_varid(ncid, Vvarstr.c_str(), &vv_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_get_vara_float(ncid, vv_id, startl, countlv, Vo);
+	if (status != NC_NOERR) handle_error(status);
+
+	//status = nc_get_att_float(ncid, vv_id, "_FillValue", &NanValV);
+	//if (status != NC_NOERR) handle_error(status);
+
+	status = nc_close(ncid);
+
+	printf("Done!\n");
+	
+}
+
+void InterpstepCPU(int nx, int ny,  int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un)
+{
+	float fac = 1.0;
+	float Uxo, Uxn;
+
+	/*Ums[tx]=Umask[ix];*/
+
+
+
+
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			Uxo = Uo[i + nx*j];
+			Uxn = Un[i + nx*j];
+
+			Ux[i + nx*j] = Uxo + (totaltime - hddt*hdstep)*(Uxn - Uxo) / hddt;
+		}
+	}
 }

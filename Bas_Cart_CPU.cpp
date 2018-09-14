@@ -183,6 +183,40 @@ template <class T> T minmod2(T theta, T s0, T s1, T s2)
 	}
 	*/
 
+template <class T> T interp2wnd(int wndnx, int wndny, T wnddx, T wndxo, T wndyo, T x, T y, float * U)
+{
+	// This function interpolates the values in cfmapin to cf using a bilinear interpolation
+
+	
+
+	// cells that falls off this domain are assigned 
+	double x1, x2, y1, y2;
+	double q11, q12, q21, q22;
+	int cfi, cfip, cfj, cfjp;
+
+
+
+	cfi = min(max((int)floor((x - wndxo) / wnddx), 0), wndnx - 2);
+	cfip = cfi + 1;
+
+	x1 = wndxo + wnddx*cfi;
+	x2 = wndxo + wnddx*cfip;
+
+	cfj = min(max((int)floor((y - wndyo) / wnddx), 0), wndny - 2);
+	cfjp = cfj + 1;
+
+	y1 = wndyo + wnddx*cfj;
+	y2 = wndyo + wnddx*cfjp;
+
+	q11 = U[cfi + cfj*wndnx];
+	q12 = U[cfi + cfjp*wndnx];
+	q21 = U[cfip + cfj*wndnx];
+	q22 = U[cfip + cfjp*wndnx];
+
+	return T(BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y));
+				
+}
+
 template <class T> void gradient(int nblk, int blksize, T theta, T delta, int * leftblk, int * rightblk, int * topblk, int * botblk, T *a, T *&dadx, T * &dady)
 {
 
@@ -591,6 +625,283 @@ void update(int nblk, int blksize, float theta, float dt, float eps, float g,flo
 		}
 	}
 }
+
+
+void updateATM(int nblk, int blksize,int windnx,int windny,float winddx, float windxo, float windyo, float theta, float dt, float eps, float g, float CFL, float delta,float Cd, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv, float * Uwnd, float * Vwnd)
+{
+	int i, xplus, yplus, xminus, yminus;
+
+	float hi;
+
+
+	dtmax = (float)(1.0 / epsilon);
+	float dtmaxtmp = dtmax;
+
+	// calculate gradients
+	gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, hh, dhdx, dhdy);
+	gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, zs, dzsdx, dzsdy);
+	gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, uu, dudx, dudy);
+	gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, vv, dvdx, dvdy);
+
+	float cm = 1.0;// 0.1;
+	float fmu = 1.0;
+	float fmv = 1.0;
+
+	for (int ib = 0; ib < nblk; ib++)
+	{
+		for (int iy = 0; iy < 16; iy++)
+		{
+			for (int ix = 0; ix < 16; ix++)
+			{
+				i = ix + iy * 16 + ib * blksize;
+
+				xplus = findright(blksize, ix, iy, ib, rightblk[ib]);
+
+				xminus = findleft(blksize, ix, iy, ib, leftblk[ib]);
+				yplus = findtop(blksize, ix, iy, ib, topblk[ib]);
+				yminus = findbot(blksize, ix, iy, ib, botblk[ib]);
+				hi = hh[i];
+
+
+
+				float hn = hh[xminus];
+
+
+				if (hi > eps || hn > eps)
+				{
+
+					float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+					// along X
+					dx = delta / 2.0f;
+					zi = zs[i] - hi;
+
+					//printf("%f\n", zi);
+
+
+					zl = zi - dx*(dzsdx[i] - dhdx[i]);
+					//printf("%f\n", zl);
+
+					zn = zs[xminus] - hn;
+
+					//printf("%f\n", zn);
+					zr = zn + dx*(dzsdx[xminus] - dhdx[xminus]);
+
+
+					zlr = max(zl, zr);
+
+					hl = hi - dx*dhdx[i];
+					up = uu[i] - dx*dudx[i];
+					hp = max(0.f, hl + zl - zlr);
+
+					hr = hn + dx*dhdx[xminus];
+					um = uu[xminus] + dx*dudx[xminus];
+					hm = max(0.f, hr + zr - zlr);
+
+					//// Reimann solver
+					float fh, fu, fv;
+					float dtmaxf = 1.0f / (float)epsilon;
+
+					//We can now call one of the approximate Riemann solvers to get the fluxes.
+					kurganovf(g, CFL, hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+					fv = (fh > 0.f ? vv[xminus] + dx*dvdx[xminus] : vv[i] - dx*dvdx[i])*fh;
+					dtmax = dtmaxf;
+					dtmaxtmp = min(dtmax, dtmaxtmp);
+					//float cpo = sqrtf(g*hp), cmo = sqrtf(g*hm);
+					//float ap = max(up + cpo, um + cmo); ap = max(ap, 0.0f);
+					//float am = min(up - cpo, um - cmo); am = min(am, 0.0f);
+					//float qm = hm*um, qp = hp*up;
+
+					//float fubis= (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) +	ap*am*(qp - qm)) / (ap - am);
+					/*
+					if (ix == 11 && iy == 0)
+					{
+					printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + g*sq(hm) / 2.0f), -am*(qp*up + g*sq(hp) / 2.0f), (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am),1 / (ap - am));
+					}
+					*/
+					//printf("%f\t%f\t%f\n", x[i], y[i], fh);
+
+
+					//// Topographic term
+
+					/**
+					#### Topographic source term
+
+					In the case of adaptive refinement, care must be taken to ensure
+					well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+					float sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+					float sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+
+					////Flux update
+
+					Fhu[i] = fmu * fh;
+					Fqux[i] = fmu * (fu - sl);
+					Su[i] = fmu * (fu - sr);
+					Fqvx[i] = fmu * fv;
+				}
+				else
+				{
+					Fhu[i] = 0.0f;
+					Fqux[i] = 0.0f;
+					Su[i] = 0.0f;
+					Fqvx[i] = 0.0f;
+				}
+
+			}
+		}
+	}
+	for (int ib = 0; ib < nblk; ib++)
+	{
+		for (int iy = 0; iy < 16; iy++)
+		{
+			for (int ix = 0; ix < 16; ix++)
+			{
+				i = ix + iy * 16 + ib * blksize;
+
+				xplus = findright(blksize, ix, iy, ib, rightblk[ib]);
+
+				xminus = findleft(blksize, ix, iy, ib, leftblk[ib]);
+				yplus = findtop(blksize, ix, iy, ib, topblk[ib]);
+				yminus = findbot(blksize, ix, iy, ib, botblk[ib]);
+
+
+				hi = hh[i];
+
+				float hn = hh[yminus];
+				float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+
+
+				if (hi > eps || hn > eps)
+				{
+
+
+					//Along Y
+
+					hn = hh[yminus];
+					dx = delta / 2.0f;
+					zi = zs[i] - hi;
+					zl = zi - dx*(dzsdy[i] - dhdy[i]);
+					zn = zs[yminus] - hn;
+					zr = zn + dx*(dzsdy[yminus] - dhdy[yminus]);
+					zlr = max(zl, zr);
+
+					hl = hi - dx*dhdy[i];
+					up = vv[i] - dx*dvdy[i];
+					hp = max(0.f, hl + zl - zlr);
+
+					hr = hn + dx*dhdy[yminus];
+					um = vv[yminus] + dx*dvdy[yminus];
+					hm = max(0.f, hr + zr - zlr);
+
+					//// Reimann solver
+					float fh, fu, fv;
+					float dtmaxf = 1 / (float)epsilon;
+					//printf("%f\t%f\t%f\n", x[i], y[i], dhdy[i]);
+					//printf("%f\n", hr);
+					//We can now call one of the approximate Riemann solvers to get the fluxes.
+					kurganovf(g, CFL, hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+					fv = (fh > 0. ? uu[yminus] + dx*dudy[yminus] : uu[i] - dx*dudy[i])*fh;
+					dtmax = dtmaxf;
+					dtmaxtmp = min(dtmax, dtmaxtmp);
+					//// Topographic term
+
+					/**
+					#### Topographic source term
+
+					In the case of adaptive refinement, care must be taken to ensure
+					well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+					float sl = g / 2.0f*(hp*hp - hl*hl + (hl + hi)*(zi - zl));
+					float sr = g / 2.0f*(hm*hm - hr*hr + (hr + hn)*(zn - zr));
+
+					////Flux update
+
+					Fhv[i] = fmv * fh;
+					Fqvy[i] = fmv * (fu - sl);
+					Sv[i] = fmv * (fu - sr);
+					Fquy[i] = fmv* fv;
+
+					//printf("%f\t%f\t%f\n", x[i], y[i], Fhv[i]);
+				}
+				else
+				{
+					Fhv[i] = 0.0f;
+					Fqvy[i] = 0.0f;
+					Sv[i] = 0.0f;
+					Fquy[i] = 0.0f;
+				}
+			}
+
+			//printf("%f\t%f\t%f\n", x[i], y[i], Fquy[i]);
+		}
+	}
+
+	dtmax = dtmaxtmp;
+
+
+	// UPDATES For evolving quantities
+
+	for (int ib = 0; ib < nblk; ib++)
+	{
+		for (int iy = 0; iy < 16; iy++)
+		{
+			for (int ix = 0; ix < 16; ix++)
+			{
+				i = ix + iy * 16 + ib * blksize;
+
+				xplus = findright(blksize, ix, iy, ib, rightblk[ib]);
+
+				xminus = findleft(blksize, ix, iy, ib, leftblk[ib]);
+				yplus = findtop(blksize, ix, iy, ib, topblk[ib]);
+				yminus = findbot(blksize, ix, iy, ib, botblk[ib]);
+
+
+				hi = hh[i];
+				////
+				//vector dhu = vector(updates[1 + dimension*l]);
+				//foreach() {
+				//	double dhl =
+				//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+				//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+				//	foreach_dimension()
+				//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+				//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
+				float cm = 1.0f;
+				float cmdel = 1.0f / (cm * delta);
+				dh[i] = -1.0f*(Fhu[xplus] - Fhu[i] + Fhv[yplus] - Fhv[i]) *cmdel;
+				//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+				//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+				//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+				float dmdl = (fmu - fmu) *cmdel;// absurd!
+				float dmdt = (fmv - fmv) *cmdel;// absurd!
+				float fG = vv[i] * dmdl - uu[i] * dmdt;
+
+				//int windnx,int windny,float winddx, float windxo, float windyo,
+				float x = blockxo[ib] + ix*delta;
+				float y = blockyo[ib] + iy*delta;
+
+
+				float Uwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Uwnd);
+				float Vwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Vwnd);
+
+				dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus] - Fquy[yplus]) *cmdel + 0.00121951*Cd*Uwndi*abs(Uwndi);
+				dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[yplus] - Fqvx[xplus]) *cmdel + 0.00121951*Cd*Vwndi*abs(Vwndi);
+				//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+				dhu[i] += hi * (g*hi / 2.0f*dmdl + fG*vv[i]);
+				dhv[i] += hi * (g*hi / 2.0f*dmdt - fG*uu[i]);
+
+
+
+			}
+
+
+		}
+	}
+}
+
+
 void updateD(int nblk, int blksize, double theta, double dt, double eps, double g, double CFL, double delta, double *hh, double *zs, double *uu, double *vv, double *&dh, double *&dhu, double *&dhv)
 {
 	int i, xplus, yplus, xminus, yminus;
@@ -1382,7 +1693,7 @@ double FlowCPU(Param XParam, double nextoutputtime)
 
 	
 	update(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
-	
+	//updateATM(int nblk, int blksize,int windnx,int windny,float winddx, float windxo, float windyo, float theta, float dt, float eps, float g, float CFL, float delta,float Cd, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv, float * Uwnd, float * Vwnd)
 	
 	//printf("dtmax=%f\n", dtmax);
 	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
@@ -1417,6 +1728,57 @@ double FlowCPU(Param XParam, double nextoutputtime)
 
 
 }
+
+double FlowCPUATM(Param XParam, double nextoutputtime)
+{
+	int nx = XParam.nx;
+	int ny = XParam.ny;
+
+	//forcing bnd update 
+	//////////////////////////////
+	//flowbnd();
+
+	//update(int nx, int ny, double dt, double eps,double *hh, double *zs, double *uu, double *vv, double *dh, double *dhu, double *dhv)
+
+
+	//update(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
+	updateATM(XParam.nblk, XParam.blksize, XParam.windU.nx, XParam.windU.ny, XParam.windU.dx, XParam.windU.xo, XParam.windU.yo, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta,(float)XParam.Cd, hh, zs, uu, vv, dh, dhu, dhv, Uwind, Vwind);
+
+	//printf("dtmax=%f\n", dtmax);
+	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
+	if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
+	{
+		XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
+	}
+	//printf("dt=%f\n", XParam.dt);
+	//if (totaltime>0.0) //Fix this!
+	{
+		//predictor
+		advance(XParam.nblk, XParam.blksize, (float)XParam.dt*0.5f, (float)XParam.eps, zb, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+
+		//corrector
+		//update(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
+		updateATM(XParam.nblk, XParam.blksize, XParam.windU.nx, XParam.windU.ny, XParam.windU.dx, XParam.windU.xo, XParam.windU.yo, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, (float)XParam.Cd, hho, zso, uuo, vvo, dh, dhu, dhv, Uwind, Vwind);
+
+
+	}
+	//
+	advance(XParam.nblk, XParam.blksize, (float)XParam.dt, (float)XParam.eps, zb, hh, zs, uu, vv, dh, dhu, dhv, hho, zso, uuo, vvo);
+
+	cleanup(XParam.nblk, XParam.blksize, hho, zso, uuo, vvo, hh, zs, uu, vv);
+
+	bottomfrictionCPU(XParam.nblk, XParam.blksize, XParam.frictionmodel, (float)XParam.dt, (float)XParam.eps, cf, hh, uu, vv);
+	//write2varnc(nx, ny, totaltime, hh);
+	if (XParam.Rivers.size() > 1)
+	{
+		discharge_bnd_v_CPU(XParam, zs, hh);
+	}
+	//noslipbndallCPU(nx, ny, XParam.dt, XParam.eps, zb, zs, hh, uu, vv);
+	return XParam.dt;
+
+
+}
+
 double FlowCPUSpherical(Param XParam, double nextoutputtime)
 {
 	//in spherical mode a special correction is made in update and all need to be in double to remove the 

@@ -27,6 +27,9 @@ texture<float, 2, cudaReadModeElementType> texRBND;
 texture<float, 2, cudaReadModeElementType> texTBND;
 texture<float, 2, cudaReadModeElementType> texBBND;
 
+texture<float, 2, cudaReadModeElementType> texUWND;
+texture<float, 2, cudaReadModeElementType> texVWND;
+
 template<class T>
 struct SharedMemory
 {

@@ -934,8 +934,10 @@ cfmap readcfmaphead(cfmap Roughmap)
 	}
 	if (fileext.compare("nc") == 0)
 	{
+		int dummy;
+		double dummya, dummyb;
 		write_text_to_log_file("Reading cfmap as netcdf file");
-		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, Roughmap.xo, Roughmap.yo, Roughmap.xmax, Roughmap.ymax);
+		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny,dummy, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummya, Roughmap.xmax, Roughmap.ymax, dummyb);
 		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		//Roughmap.xo = 0.0;
 		//Roughmap.yo = 0.0;
@@ -991,20 +993,16 @@ forcingmap readforcingmaphead(forcingmap Fmap)
 
 	if (fileext.compare("nc") == 0)
 	{
-		write_text_to_log_file("Reading cfmap as netcdf file");
-		//readgridncsize3d(Fmap.inputfile, Fmap.nx, Fmap.ny, Fmap.dx);
-		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
-		//Fmap.xo = 0.0;
-		//Fmap.yo = 0.0;
-		//Fmap.xmax = (Fmap.nx - 1)*Fmap.dx;
-		//Fmap.ymax = (Fmap.ny - 1)*Fmap.dx;
+		write_text_to_log_file("Reading Forcing file as netcdf file");
+		readgridncsize(Fmap.inputfile, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
+		
 
 	}
+	else
+	{
+		write_text_to_log_file("Forcing file needs to be a .nc file you also need to specify the netcdf variable name like this ncfile.nc?myvar");
+	}
 	
-
-
-
-
 
 
 	return Fmap;
@@ -1047,8 +1045,10 @@ Param readBathyhead(Param XParam)
 		}
 		if (bathyext.compare("nc") == 0)
 		{
+			int dummy;
+			double dummya, dummyb, dummyc;
 			write_text_to_log_file("Reading bathy netcdf file");
-			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax);
+			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy, XParam.dx, XParam.xo, XParam.yo, dummyb, XParam.xmax, XParam.ymax, dummyc);
 			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 

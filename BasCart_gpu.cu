@@ -138,6 +138,10 @@ int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
 //River stuff
 int * Riverblk, *Riverblk_g;
 
+// Wind arrays
+float * Uwind, *Uwbef, *Uwaft;
+float * Vwind, *Vwbef, *Vwaft;
+
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
 std::map<std::string, float *> OutputVarMapCPU;
@@ -151,10 +155,17 @@ cudaArray* rightWLS_gp;
 cudaArray* topWLS_gp;
 cudaArray* botWLS_gp;
 
+// store wind data in cuda array before sending to texture memory
+cudaArray* Uwind_gp;
+cudaArray* Vwind_gp;
+
 cudaChannelFormatDesc channelDescleftbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescrightbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescbotbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDesctopbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+
+cudaChannelFormatDesc channelDescUwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescVwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
 #include "Flow_kernel.cu"
 
@@ -2771,6 +2782,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 
 	int nTSstep = 0;
 
+	int windstep = 1;
 
 	std::vector<Pointout> zsout;
 
@@ -2799,6 +2811,31 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 		TopFlowBnd(XParam, topWLbnd);
 		BotFlowBnd(XParam, botWLbnd);
 
+		// Interpolate to wind step if needed
+		if (!XParam.windU.inputfile.empty())
+		{
+			int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
+
+			if (readfirststep + 1 > windstep)
+			{
+				// Need to read a new step from the file
+				for (int iw = 0; iw < XParam.windU.nx*XParam.windU.ny; iw++)
+				{
+					//
+					Uwbef[iw] = Uwaft[iw];
+					
+				}
+
+				readWNDstep(XParam.windU, XParam.windV, readfirststep + 1, Uwaft, Vwaft);
+				windstep = readfirststep + 1;
+			}
+
+			
+
+			InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
+			InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
+
+		}
 
 		// Run the model step
 		if (XParam.spherical == 1)
@@ -2813,7 +2850,16 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 			}
 			else
 			{
-				XParam.dt = FlowCPU(XParam, nextoutputtime);
+				
+				if (!XParam.windU.inputfile.empty())
+				{
+					XParam.dt = FlowCPUATM(XParam, nextoutputtime);
+				}
+				else
+				{
+					XParam.dt = FlowCPU(XParam, nextoutputtime);
+				}
+				
 			}
 		}
 
@@ -3792,7 +3838,62 @@ int main(int argc, char **argv)
 	{
 		//windfile is present
 
-		//XParam.windU = readforcingmaphead(XParam.windU);
+		// read parameters fro the size of wind input
+		XParam.windU = readforcingmaphead(XParam.windU);
+		XParam.windV = readforcingmaphead(XParam.windV);
+
+		Allocate1CPU(XParam.windU.nx, XParam.windU.ny, Uwind);
+		Allocate1CPU(XParam.windU.nx, XParam.windU.ny, Vwind);
+
+		Allocate4CPU(XParam.windU.nx, XParam.windU.ny, Uwbef, Uwaft, Vwbef, Vwaft);
+		
+		XParam.windU.dt= abs(XParam.windU.to - XParam.windU.tmax) / (XParam.windU.nt - 1);
+		XParam.windV.dt = abs(XParam.windV.to - XParam.windV.tmax) / (XParam.windV.nt - 1);
+
+		int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
+
+
+
+		readWNDstep(XParam.windU, XParam.windV, readfirststep, Uwbef, Vwbef);
+		readWNDstep(XParam.windU, XParam.windV, readfirststep+1, Uwaft, Vwaft);
+
+		InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
+		InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
+
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//setup GPU texture to streamline interpolation between the two array
+
+			//U-wind
+			CUDA_CHECK(cudaMallocArray(&Uwind_gp, &channelDescUwind, XParam.windU.nx, XParam.windU.ny));
+
+			
+			CUDA_CHECK(cudaMemcpyToArray(Uwind_gp, 0, 0, Uwind, XParam.windU.nx * XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+
+			texBBND.addressMode[0] = cudaAddressModeClamp;
+			texBBND.addressMode[1] = cudaAddressModeClamp;
+			texBBND.filterMode = cudaFilterModeLinear;
+			texBBND.normalized = false;
+
+
+			CUDA_CHECK(cudaBindTextureToArray(texUWND, Uwind_gp, channelDescUwind));
+
+			//V-wind
+			CUDA_CHECK(cudaMallocArray(&Vwind_gp, &channelDescVwind, XParam.windV.nx, XParam.windV.ny));
+
+
+			CUDA_CHECK(cudaMemcpyToArray(Vwind_gp, 0, 0, Vwind, XParam.windV.nx * XParam.windV.ny * sizeof(float), cudaMemcpyHostToDevice));
+
+			texBBND.addressMode[0] = cudaAddressModeClamp;
+			texBBND.addressMode[1] = cudaAddressModeClamp;
+			texBBND.filterMode = cudaFilterModeLinear;
+			texBBND.normalized = false;
+
+
+			CUDA_CHECK(cudaBindTextureToArray(texVWND, Vwind_gp, channelDescVwind));
+			
+		}
 
 
 	}
@@ -3801,7 +3902,7 @@ int main(int argc, char **argv)
 
 
 	// Here map array to their name as a string. it makes it super easy to convert user define variables to the array it represents.
-	// COul add more to output gradients etc...
+	// One could add more to output gradients etc...
 	OutputVarMapCPU["zb"] = zb;
 	OutputVarMapCPUD["zb"] = zb_d;
 	OutputVarMapGPU["zb"] = zb_g;

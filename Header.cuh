@@ -278,6 +278,12 @@ extern float * cf_g;
 extern double * cf_d;
 extern double * cf_gd;
 
+// wind array storage
+extern float * Uwind, *Uwbef, *Uwaft;
+extern float * Vwind, *Vwbef, *Vwaft;
+
+
+
 // Block info
 extern double * blockxo_d, *blockyo_d;
 extern float * blockxo, *blockyo;
@@ -298,13 +304,19 @@ extern cudaArray* rightWLS_gp;
 extern cudaArray* topWLS_gp;
 extern cudaArray* botWLS_gp;
 
+// store wind data in cuda array before sending to texture memory
+extern cudaArray* Uwind_gp;
+extern cudaArray* Vwind_gp;
+
+
 // Below create channels between cuda arrays (see above) and textures
 extern cudaChannelFormatDesc channelDescleftbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 extern cudaChannelFormatDesc channelDescrightbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 extern cudaChannelFormatDesc channelDescbotbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 extern cudaChannelFormatDesc channelDesctopbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
-
+extern cudaChannelFormatDesc channelDescUwind; 
+extern cudaChannelFormatDesc channelDescVwind; 
 
 template <class T> T sq(T a);
 
@@ -319,6 +331,7 @@ void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> ri
 double FlowCPU(Param XParam, double nextoutputtime);
 double FlowCPUDouble(Param XParam, double nextoutputtime);
 double FlowCPUSpherical(Param XParam, double nextoutputtime);
+double FlowCPUATM(Param XParam, double nextoutputtime);
 //float demoloopCPU(Param XParam);
 
 void update(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
@@ -385,14 +398,19 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 extern "C" void writenctimestep(std::string outfile, double totaltime);
 extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var);
 extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d);//templating should have been fine here!
-void readgridncsize(const std::string ncfile, int &nx, int &ny, double &dx, double &xo, double &yo, double &xmax, double &ymax);
+void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
+void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo);
+void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
+
+
 
 // I/O
 Param readBathyhead(Param XParam);
 cfmap readcfmaphead(cfmap Roughmap);
+forcingmap readforcingmaphead(forcingmap Fmap);
 extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
