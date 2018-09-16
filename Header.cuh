@@ -68,7 +68,21 @@ public:
 	std::string inputfile;
 };
 
+class SLTS {
+public:
+	double time;
+	std::vector<double> wlevs;
 
+
+};
+
+class bndparam {
+public:
+	std::vector<SLTS> data;
+	bool on = false;
+	int type = 1;
+	std::string inputfile;
+};
 
 class Param {
 public:
@@ -126,15 +140,14 @@ public:
 
 	//bnd
 	// 0:Wall; 1:neumann (zeros gredient); 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D
-	int right = 1;
-	int left = 1;
-	int top = 1;
-	int bot = 1;
+	
+	bndparam rightbnd;
+	bndparam leftbnd;
+	bndparam topbnd;
+	bndparam botbnd;
+	
 
-	std::string rightbndfile;
-	std::string leftbndfile;
-	std::string topbndfile;
-	std::string botbndfile;
+
 	//hot start
 	double zsinit = -999.0; //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
 
@@ -173,11 +186,9 @@ public:
 };
 
 
-class SLTS {
-public:
-	double time;
-	std::vector<double> wlevs;
-};
+
+
+
 
 class Pointout {
 public:
@@ -426,7 +437,7 @@ std::vector<std::string> split(const std::string &s, char delim);
 std::string trim(const std::string& str, const std::string& whitespace);
 
 Param checkparamsanity(Param XParam);
-double setendtime(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
+double setendtime(Param XParam);
 void write_text_to_log_file(std::string text);
 void SaveParamtolog(Param XParam);
 

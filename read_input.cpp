@@ -429,7 +429,8 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.leftbndfile = parametervalue;
+		param.leftbnd.inputfile = parametervalue;
+		param.leftbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -437,21 +438,24 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.rightbndfile = parametervalue;
+		param.rightbnd.inputfile = parametervalue;
+		param.rightbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 	parameterstr = "topbndfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.topbndfile = parametervalue;
+		param.topbnd.inputfile = parametervalue;
+		param.topbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 	parameterstr = "botbndfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.botbndfile = parametervalue;
+		param.botbnd.inputfile = parametervalue;
+		param.botbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -459,25 +463,25 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.left = std::stoi(parametervalue);
+		param.leftbnd.type = std::stoi(parametervalue);
 	}
 	parameterstr = "right";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.right = std::stoi(parametervalue);
+		param.rightbnd.type = std::stoi(parametervalue);
 	}
 	parameterstr = "top";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.top = std::stoi(parametervalue);
+		param.topbnd.type = std::stoi(parametervalue);
 	}
 	parameterstr = "bot";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.bot = std::stoi(parametervalue);
+		param.botbnd.type = std::stoi(parametervalue);
 	}
 
 	parameterstr = "nx";
@@ -809,30 +813,30 @@ Param checkparamsanity(Param XParam)
 	return XParam;
 }
 
-double setendtime(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
+double setendtime(Param XParam)
 {
 	//endtime cannot be bigger thn the smallest time set in a boundary
 	SLTS tempSLTS;
 	double endtime = XParam.endtime;
-	if (!leftWLbnd.empty() && XParam.left == 1)
+	if (XParam.leftbnd.on)
 	{
-		tempSLTS = leftWLbnd.back();
+		tempSLTS = XParam.leftbnd.data.back();
 		endtime = min( endtime, tempSLTS.time);
 		
 	}
-	if (!rightWLbnd.empty() && XParam.right == 1)
+	if (XParam.rightbnd.on)
 	{
-		tempSLTS = rightWLbnd.back();
+		tempSLTS = XParam.rightbnd.data.back();
 		endtime = min(endtime, tempSLTS.time);
 	}
-	if (!topWLbnd.empty() && XParam.top == 1)
+	if (XParam.topbnd.on)
 	{
-		tempSLTS = topWLbnd.back();
+		tempSLTS = XParam.topbnd.data.back();
 		endtime = min(endtime, tempSLTS.time);
 	}
-	if (!botWLbnd.empty() && XParam.bot == 1)
+	if (XParam.botbnd.on)
 	{
-		tempSLTS = botWLbnd.back();
+		tempSLTS = XParam.botbnd.data.back();
 		endtime = min(endtime, tempSLTS.time);
 	}
 
@@ -1309,19 +1313,19 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Boundaries");
 	write_text_to_log_file("# 0:wall; 1:Dirichlet (zs); 2: Neumann (Default)");
-	write_text_to_log_file("right = " + std::to_string(XParam.right) + ";");
-	write_text_to_log_file("left = " + std::to_string(XParam.left) + ";");
-	write_text_to_log_file("top = " + std::to_string(XParam.top) + ";");
-	write_text_to_log_file("bot = " + std::to_string(XParam.bot) + ";");
+	write_text_to_log_file("right = " + std::to_string(XParam.rightbnd.type) + ";");
+	write_text_to_log_file("left = " + std::to_string(XParam.leftbnd.type) + ";");
+	write_text_to_log_file("top = " + std::to_string(XParam.topbnd.type) + ";");
+	write_text_to_log_file("bot = " + std::to_string(XParam.botbnd.type) + ";");
 	
-	if (!XParam.rightbndfile.empty())
-		write_text_to_log_file("rightbndfile = " + XParam.rightbndfile + ";");
-	if (!XParam.leftbndfile.empty())
-		write_text_to_log_file("leftbndfile = " + XParam.leftbndfile + ";");
-	if (!XParam.topbndfile.empty())
-		write_text_to_log_file("topbndfile = " + XParam.topbndfile + ";");
-	if (!XParam.botbndfile.empty())
-		write_text_to_log_file("botbndfile = " + XParam.botbndfile + ";");
+	if (!XParam.rightbnd.inputfile.empty())
+		write_text_to_log_file("rightbndfile = " + XParam.rightbnd.inputfile + ";");
+	if (!XParam.leftbnd.inputfile.empty())
+		write_text_to_log_file("leftbndfile = " + XParam.leftbnd.inputfile + ";");
+	if (!XParam.topbnd.inputfile.empty())
+		write_text_to_log_file("topbndfile = " + XParam.topbnd.inputfile + ";");
+	if (!XParam.botbnd.inputfile.empty())
+		write_text_to_log_file("botbndfile = " + XParam.botbnd.inputfile + ";");
 
 	/*
 	std::string rightbndfile;
