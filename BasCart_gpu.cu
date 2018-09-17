@@ -4328,12 +4328,7 @@ int main(int argc, char **argv)
 	}
 
 
-	// free dummy and dummy_d because they are of size nx*ny but we want them nblk*blksize since we can't predict if one is larger then the other I'd rather free and malloc rather the realloc
-	free(dummy);
-	free(dummy_d);
-
-	Allocate1CPU(XParam.nblk, XParam.blksize, dummy);
-	Allocate1CPU(XParam.nblk, XParam.blksize, dummy_d);
+	
 
 	printf("Done\n");
 	write_text_to_log_file("Done");
@@ -4515,7 +4510,17 @@ int main(int argc, char **argv)
 	//////////////////////////////////////////////////////
 	// Init other variables
 	/////////////////////////////////////////////////////
-	
+	// free dummy and dummy_d because they are of size nx*ny but we want them nblk*blksize since we can't predict if one is larger then the other I'd rather free and malloc rather the realloc
+	free(dummy);
+	free(dummy_d);
+
+	Allocate1CPU(XParam.nblk, XParam.blksize, dummy);
+	Allocate1CPU(XParam.nblk, XParam.blksize, dummy_d);
+
+
+
+
+
 
 	// Below is not succint but way faster than one loop that checks the if statemenst each time
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
