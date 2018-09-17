@@ -1085,7 +1085,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 
 }
 
-int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
+int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
 {
 	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
 	int ncid, varid, ndims;
@@ -1164,6 +1164,10 @@ int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * d
 		}
 
 		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
+		
+		//because we set the edges around empty blocks we need the set the edges for zs too 
+		// otherwise we create some gitantic waves at the edges of empty blocks
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
@@ -1226,6 +1230,9 @@ int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * d
 		}
 
 		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
+		//because we set the edges around empty blocks we need the set the edges for zs too 
+		// otherwise we create some gitantic waves at the edges of empty blocks
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
 
 		//check sanity
 		for (int bl = 0; bl < XParam.nblk; bl++)
@@ -1314,6 +1321,10 @@ int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * d
 		}
 
 		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
+		
+		//because we set the edges around empty blocks we need the set the edges for zs too 
+		// otherwise we create some gitantic waves at the edges of empty blocks
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, hh);
 		//if zs was not specified
 		if (zserror == -49)
 		{
@@ -1536,7 +1547,7 @@ int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * d
 
 }
 
-int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv)
+int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv)
 {
 	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
 	int ncid, varid, ndims;
@@ -1615,7 +1626,7 @@ int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double *
 		}
 
 		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
-
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
 	}
@@ -1677,7 +1688,9 @@ int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double *
 		}
 
 		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
-
+		//because we set the edges around empty blocks we need the set the edges for zs too 
+		// otherwise we create some gitantic waves at the edges of empty blocks
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
 		//check sanity
 		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
@@ -1765,6 +1778,10 @@ int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double *
 		}
 
 		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
+		//because we set the edges around empty blocks we need the set the edges for zs too 
+		// otherwise we create some gitantic waves at the edges of empty blocks
+		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, hh);
+
 		//if zs was not specified
 		if (zserror == -49)
 		{

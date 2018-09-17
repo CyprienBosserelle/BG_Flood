@@ -362,6 +362,9 @@ double FlowCPUSpherical(Param XParam, double nextoutputtime);
 double FlowCPUATM(Param XParam, double nextoutputtime);
 //float demoloopCPU(Param XParam);
 
+void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, double *&zb);
+void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, float *&zb);
+
 void update(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
 //void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);
 //void cleanup(int nx, int ny, float * hhi, float *zsi, float *uui, float *vvi, float * &hho, float *&zso, float *&uuo, float *&vvo);
@@ -428,8 +431,8 @@ extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, 
 extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d);//templating should have been fine here!
 void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
-int readhotstartfile(Param XParam, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
-int readhotstartfileD(Param XParam, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
+int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
+int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo);
 void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
 
@@ -439,11 +442,11 @@ void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, floa
 Param readBathyhead(Param XParam);
 cfmap readcfmaphead(cfmap Roughmap);
 forcingmap readforcingmaphead(forcingmap Fmap);
+std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
 std::vector<Flowin> readFlowfile(std::string Flowfilename);
-std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
 extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);

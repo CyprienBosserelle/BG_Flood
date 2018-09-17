@@ -256,7 +256,7 @@ template <class T> void CopyArray(int nblk, int blksize, T* source, T * & dest)
 	}
 }
 
-template <class T> void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk,  T *&zb)
+void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk,  double *&zb)
 {
 	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
 
@@ -264,17 +264,17 @@ template <class T> void setedges(int nblk, int * leftblk, int *rightblk, int * t
 	// this also applies to the blocks with no neighbour
 	for (int bl = 0; bl < nblk; bl++)
 	{
-		/*
-		if (blockxo[bl] == xo)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		
+		if (bl == leftblk[bl])//i.e. if a block refers to as it's onwn neighbour then it doesn't have a neighbour/// This also applies to block that are on the edge of the grid so the above is commentted
 		{
 			int i = 0;
 			for (int j = 0; j < 16; j++)
 			{
 
-				zb[i + j * 16 + bl * 256] = zb[i+1 + j * 16 + bl * 256];
+				zb[i + j * 16 + bl * 256] = zb[i + 1 + j * 16 + bl * 256];
 			}
 		}
-		if (blockxo[bl]+(15*dx) == xo+ (ceil(nx / 16.0)*16.0 - 1)*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		if (bl == rightblk[bl])
 		{
 			int i = 15;
 			for (int j = 0; j < 16; j++)
@@ -283,25 +283,37 @@ template <class T> void setedges(int nblk, int * leftblk, int *rightblk, int * t
 				zb[i + j * 16 + bl * 256] = zb[i - 1 + j * 16 + bl * 256];
 			}
 		}
-		if (blockyo[bl] == yo)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
-		{
-			int j = 0;
-			for (int i = 0; i < 16; i++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i  + (j+1) * 16 + bl * 256];
-			}
-		}
-		if (blockyo[bl] + (15 * dx) == yo + (ceil(ny / 16.0)*16.0 - 1)*dx)//safe? in adaptive this should be xo-x+0.5dx*(2^lev-1) <= tiny
+		if (bl == topblk[bl])
 		{
 			int j = 15;
 			for (int i = 0; i < 16; i++)
 			{
 
-				zb[i + j * 16 + bl * 256] = zb[i + (j-1) * 16 + bl * 256];
+				zb[i + j * 16 + bl * 256] = zb[i + (j - 1) * 16 + bl * 256];
 			}
 		}
-		*/
+		if (bl == botblk[bl])
+		{
+			int j = 0;
+			for (int i = 0; i < 16; i++)
+			{
+
+				zb[i + j * 16 + bl * 256] = zb[i + (j + 1) * 16 + bl * 256];
+			}
+		}
+
+	}
+}
+
+void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, float *&zb)
+{
+	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
+
+	// here the bathy of the outter most cells of the domain are "set" to the same value as the second outter most.
+	// this also applies to the blocks with no neighbour
+	for (int bl = 0; bl < nblk; bl++)
+	{
+
 		if (bl == leftblk[bl])//i.e. if a block refers to as it's onwn neighbour then it doesn't have a neighbour/// This also applies to block that are on the edge of the grid so the above is commentted
 		{
 			int i = 0;
@@ -4437,11 +4449,11 @@ int main(int argc, char **argv)
 		write_text_to_log_file("Hotstart");
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
-			hotstartsucess = readhotstartfileD(XParam, blockxo_d, blockyo_d, dummy_d, zs_d, zb_d, hh_d, uu_d, vv_d);
+			hotstartsucess = readhotstartfileD(XParam, leftblk, rightblk,topblk, botblk, blockxo_d, blockyo_d, dummy_d, zs_d, zb_d, hh_d, uu_d, vv_d);
 		}
 		else
 		{
-			hotstartsucess = readhotstartfile(XParam, blockxo_d, blockyo_d, dummy, zs, zb, hh, uu, vv);
+			hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk,  botblk, blockxo_d, blockyo_d, dummy, zs, zb, hh, uu, vv);
 		}
 		
 		if (hotstartsucess == 0)
