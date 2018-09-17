@@ -293,7 +293,8 @@ extern double * cf_gd;
 extern float * Uwind, *Uwbef, *Uwaft;
 extern float * Vwind, *Vwbef, *Vwaft;
 
-
+extern float * Uwind_g, *Uwbef_g, *Uwaft_g;
+extern float * Vwind_g, *Vwbef_g, *Vwaft_g;
 
 // Block info
 extern double * blockxo_d, *blockyo_d;
