@@ -177,7 +177,96 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 
 	return slbnd;
 }
+std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
+{
+	// Warning grdapha is expected in radian here
+	std::vector<Windin> wndinput;
 
+	std::ifstream fs(filename);
+
+	if (fs.fail()) {
+		std::cerr << filename << "ERROR: Wind file could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: Wind file could not be opened ");
+		exit(1);
+	}
+
+	std::string line;
+	std::vector<std::string> lineelements;
+	std::vector<double> WLS;
+	Windin wndline;
+	while (std::getline(fs, line))
+	{
+		//std::cout << line << std::endl;
+
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//Data should be in the format : time,wind speed, wind dir, uwind vwind
+			//Location where the water level is 0:ny/(nwl-1):ny where nwl i the number of wlevnodes
+
+			//by default we expect tab delimitation
+			lineelements = split(line, '\t');
+			if (lineelements.size() < 3)
+			{
+				// Is it space delimited?
+				lineelements.clear();
+				lineelements = split(line, ' ');
+			}
+
+			if (lineelements.size() < 3)
+			{
+				//Well it has to be comma delimited then
+				lineelements.clear();
+				lineelements = split(line, ',');
+			}
+			if (lineelements.size() < 3)
+			{
+				// Giving up now! Could not read the files
+				//issue a warning and exit
+				std::cerr << filename << "ERROR Wind  file format error. only " << lineelements.size() << " where at least 3 were expected. Exiting." << std::endl;
+				write_text_to_log_file("ERROR:  Wind file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 3 were expected. Exiting.");
+				write_text_to_log_file(line);
+				exit(1);
+			}
+
+
+			wndline.time = std::stod(lineelements[0]);
+			if (lineelements.size() == 5)
+			{
+				// U and v are explicitelly stated
+				wndline.wspeed = std::stod(lineelements[1]); // Actually his is a dummy 
+				wndline.wdirection= std::stod(lineelements[2]); // Actually his is a dummy
+				wndline.uwind = std::stod(lineelements[3]);
+				wndline.vwind = std::stod(lineelements[4]);
+			}
+			else
+			{
+				// read speed and direction and directly convert to u and v
+				wndline.wspeed = std::stod(lineelements[1]); // Actually his is a dummy 
+				wndline.wdirection = std::stod(lineelements[2]);
+				double theta = (1.5*pi - grdalpha) - wndline.wdirection*pi / 180;
+
+				wndline.uwind = wndline.wspeed*cos(theta);
+				wndline.vwind = wndline.wspeed*sin(theta);
+			}
+			//slbndline.wlevs = WLS;
+
+
+
+			//slbndline = readBSHline(line);
+			wndinput.push_back(wndline);
+			//std::cout << line << std::endl;
+			
+		}
+
+	}
+	fs.close();
+
+	//std::cout << slbnd[0].wlev << std::endl;
+
+
+	return wndinput;
+}
 
 Param readparamstr(std::string line, Param param)
 {
@@ -648,8 +737,18 @@ Param readparamstr(std::string line, Param param)
 		std::vector<std::string> vars = split(parametervalue, ',');
 		if (vars.size() == 2)
 		{
+			// If 2 parameters (files) are given then 1st file is U wind and second is V wind.
+			// This is for variable winds no rotation of the data is performed
 			param.windU.inputfile = trim(vars[0], " ");
 			param.windV.inputfile = trim(vars[1], " ");
+		}
+		else if (vars.size() == 1)
+		{
+			// if 1 parameter(file) is given then a 3 column file is expected showing time windspeed and direction
+			// wind direction is rotated (later) to the grid direction (via grdalfa)
+			param.windU.inputfile = parametervalue;
+			param.windU.uniform = 1;
+			//apply the same for Vwind? seem unecessary but need to be careful later in the code
 		}
 		else
 		{

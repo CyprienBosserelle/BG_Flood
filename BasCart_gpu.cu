@@ -4757,80 +4757,91 @@ int main(int argc, char **argv)
 	if (!XParam.windU.inputfile.empty())
 	{
 		//windfile is present
+		if (XParam.windU.uniform == 1)
+		{
+			// grid uniform time varying wind input
+			// wlevs[0] is wind speed and wlev[1] is direction
+			XParam.windU.data = readWNDfileUNI(XParam.windU.inputfile, XParam.grdalpha);
+		}
+		else
+		{
+			// grid and time varying wind input
+			// read parameters fro the size of wind input
+			XParam.windU = readforcingmaphead(XParam.windU);
+			XParam.windV = readforcingmaphead(XParam.windV);
 
-		// read parameters fro the size of wind input
-		XParam.windU = readforcingmaphead(XParam.windU);
-		XParam.windV = readforcingmaphead(XParam.windV);
+			Allocate1CPU(XParam.windU.nx, XParam.windU.ny, Uwind);
+			Allocate1CPU(XParam.windU.nx, XParam.windU.ny, Vwind);
 
-		Allocate1CPU(XParam.windU.nx, XParam.windU.ny, Uwind);
-		Allocate1CPU(XParam.windU.nx, XParam.windU.ny, Vwind);
+			Allocate4CPU(XParam.windU.nx, XParam.windU.ny, Uwbef, Uwaft, Vwbef, Vwaft);
 
-		Allocate4CPU(XParam.windU.nx, XParam.windU.ny, Uwbef, Uwaft, Vwbef, Vwaft);
 
+
+			XParam.windU.dt = abs(XParam.windU.to - XParam.windU.tmax) / (XParam.windU.nt - 1);
+			XParam.windV.dt = abs(XParam.windV.to - XParam.windV.tmax) / (XParam.windV.nt - 1);
+
+			int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
+
+
+
+			readWNDstep(XParam.windU, XParam.windV, readfirststep, Uwbef, Vwbef);
+			readWNDstep(XParam.windU, XParam.windV, readfirststep + 1, Uwaft, Vwaft);
+
+			InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
+			InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
+
+
+			if (XParam.GPUDEVICE >= 0)
+			{
+				//setup GPU texture to streamline interpolation between the two array
+				Allocate1GPU(XParam.windU.nx, XParam.windU.ny, Uwind_g);
+				Allocate1GPU(XParam.windU.nx, XParam.windU.ny, Vwind_g);
+
+				Allocate4GPU(XParam.windU.nx, XParam.windU.ny, Uwbef_g, Uwaft_g, Vwbef_g, Vwaft_g);
+
+
+				CUDA_CHECK(cudaMemcpy(Uwind_g, Uwind, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+				CUDA_CHECK(cudaMemcpy(Vwind_g, Vwind, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+				CUDA_CHECK(cudaMemcpy(Uwbef_g, Uwbef, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+				CUDA_CHECK(cudaMemcpy(Vwbef_g, Vwbef, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+				CUDA_CHECK(cudaMemcpy(Uwaft_g, Uwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+				CUDA_CHECK(cudaMemcpy(Vwaft_g, Vwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+
+				//U-wind
+				CUDA_CHECK(cudaMallocArray(&Uwind_gp, &channelDescUwind, XParam.windU.nx, XParam.windU.ny));
+
+
+				CUDA_CHECK(cudaMemcpyToArray(Uwind_gp, 0, 0, Uwind, XParam.windU.nx * XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+
+				texUWND.addressMode[0] = cudaAddressModeClamp;
+				texUWND.addressMode[1] = cudaAddressModeClamp;
+				texUWND.filterMode = cudaFilterModeLinear;
+				texUWND.normalized = false;
+
+
+				CUDA_CHECK(cudaBindTextureToArray(texUWND, Uwind_gp, channelDescUwind));
+
+				//V-wind
+				CUDA_CHECK(cudaMallocArray(&Vwind_gp, &channelDescVwind, XParam.windV.nx, XParam.windV.ny));
+
+
+				CUDA_CHECK(cudaMemcpyToArray(Vwind_gp, 0, 0, Vwind, XParam.windV.nx * XParam.windV.ny * sizeof(float), cudaMemcpyHostToDevice));
+
+				texVWND.addressMode[0] = cudaAddressModeClamp;
+				texVWND.addressMode[1] = cudaAddressModeClamp;
+				texVWND.filterMode = cudaFilterModeLinear;
+				texVWND.normalized = false;
+
+
+				CUDA_CHECK(cudaBindTextureToArray(texVWND, Vwind_gp, channelDescVwind));
+
+
+
+
+			}
+		}
 
 		
-		XParam.windU.dt= abs(XParam.windU.to - XParam.windU.tmax) / (XParam.windU.nt - 1);
-		XParam.windV.dt = abs(XParam.windV.to - XParam.windV.tmax) / (XParam.windV.nt - 1);
-
-		int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
-
-
-
-		readWNDstep(XParam.windU, XParam.windV, readfirststep, Uwbef, Vwbef);
-		readWNDstep(XParam.windU, XParam.windV, readfirststep+1, Uwaft, Vwaft);
-
-		InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
-		InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
-
-
-		if (XParam.GPUDEVICE >= 0)
-		{
-			//setup GPU texture to streamline interpolation between the two array
-			Allocate1GPU(XParam.windU.nx, XParam.windU.ny, Uwind_g);
-			Allocate1GPU(XParam.windU.nx, XParam.windU.ny, Vwind_g);
-
-			Allocate4GPU(XParam.windU.nx, XParam.windU.ny, Uwbef_g, Uwaft_g, Vwbef_g, Vwaft_g);
-
-
-			CUDA_CHECK(cudaMemcpy(Uwind_g, Uwind, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(Vwind_g, Vwind, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(Uwbef_g, Uwbef, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(Vwbef_g, Vwbef, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(Uwaft_g, Uwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-			CUDA_CHECK(cudaMemcpy(Vwaft_g, Vwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-
-			//U-wind
-			CUDA_CHECK(cudaMallocArray(&Uwind_gp, &channelDescUwind, XParam.windU.nx, XParam.windU.ny));
-
-			
-			CUDA_CHECK(cudaMemcpyToArray(Uwind_gp, 0, 0, Uwind, XParam.windU.nx * XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-
-			texUWND.addressMode[0] = cudaAddressModeClamp;
-			texUWND.addressMode[1] = cudaAddressModeClamp;
-			texUWND.filterMode = cudaFilterModeLinear;
-			texUWND.normalized = false;
-
-
-			CUDA_CHECK(cudaBindTextureToArray(texUWND, Uwind_gp, channelDescUwind));
-
-			//V-wind
-			CUDA_CHECK(cudaMallocArray(&Vwind_gp, &channelDescVwind, XParam.windV.nx, XParam.windV.ny));
-
-
-			CUDA_CHECK(cudaMemcpyToArray(Vwind_gp, 0, 0, Vwind, XParam.windV.nx * XParam.windV.ny * sizeof(float), cudaMemcpyHostToDevice));
-
-			texVWND.addressMode[0] = cudaAddressModeClamp;
-			texVWND.addressMode[1] = cudaAddressModeClamp;
-			texVWND.filterMode = cudaFilterModeLinear;
-			texVWND.normalized = false;
-
-
-			CUDA_CHECK(cudaBindTextureToArray(texVWND, Vwind_gp, channelDescVwind));
-			
-
-
-
-		}
 
 
 	}

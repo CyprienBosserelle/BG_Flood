@@ -56,18 +56,6 @@ public:
 	std::string inputfile;
 };
 
-class forcingmap {
-public:
-	int nx, ny;
-	int nt;
-	double to, tmax;
-	double xo, yo;
-	double xmax, ymax;
-	double dx;
-	double dt;
-	std::string inputfile;
-};
-
 class SLTS {
 public:
 	double time;
@@ -75,6 +63,34 @@ public:
 
 
 };
+
+class Windin {
+public:
+	double time;
+	double wspeed;
+	double wdirection;
+	double uwind;
+	double vwind;
+
+
+};
+
+class forcingmap {
+public:
+	int nx, ny;
+	int nt;
+	int uniform = 0;
+	double to, tmax;
+	double xo, yo;
+	double xmax, ymax;
+	double dx;
+	double dt;
+	std::string inputfile;
+	std::vector<Windin> data; // only used if uniform forcing
+
+};
+
+
 
 class bndparam {
 public:
@@ -427,6 +443,7 @@ extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
 std::vector<Flowin> readFlowfile(std::string Flowfilename);
+std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
 extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);
