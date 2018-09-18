@@ -446,7 +446,8 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo);
 void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po);
 void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
-
+float interp2wnd(int wndnx, int wndny, float wnddx, float wndxo, float wndyo, float x, float y, float * U);
+double interp2wnd(int wndnx, int wndny, double wnddx, double wndxo, double wndyo, double x, double y, float * U);
 
 
 // I/O
