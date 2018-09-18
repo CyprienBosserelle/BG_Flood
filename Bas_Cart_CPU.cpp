@@ -183,7 +183,7 @@ template <class T> T minmod2(T theta, T s0, T s1, T s2)
 	}
 	*/
 
-template <class T> T interp2wnd(int wndnx, int wndny, T wnddx, T wndxo, T wndyo, T x, T y, float * U)
+float interp2wnd(int wndnx, int wndny, float wnddx, float wndxo, float wndyo, float x, float y, float * U)
 {
 	// This function interpolates the values in cfmapin to cf using a bilinear interpolation
 
@@ -213,8 +213,41 @@ template <class T> T interp2wnd(int wndnx, int wndny, T wnddx, T wndxo, T wndyo,
 	q21 = U[cfip + cfj*wndnx];
 	q22 = U[cfip + cfjp*wndnx];
 
-	return T(BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y));
+	return (float)BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 				
+}
+double interp2wnd(int wndnx, int wndny, double wnddx, double wndxo, double wndyo, double x, double y, float * U)
+{
+	// This function interpolates the values in cfmapin to cf using a bilinear interpolation
+
+
+
+	// cells that falls off this domain are assigned 
+	double x1, x2, y1, y2;
+	double q11, q12, q21, q22;
+	int cfi, cfip, cfj, cfjp;
+
+
+
+	cfi = min(max((int)floor((x - wndxo) / wnddx), 0), wndnx - 2);
+	cfip = cfi + 1;
+
+	x1 = wndxo + wnddx*cfi;
+	x2 = wndxo + wnddx*cfip;
+
+	cfj = min(max((int)floor((y - wndyo) / wnddx), 0), wndny - 2);
+	cfjp = cfj + 1;
+
+	y1 = wndyo + wnddx*cfj;
+	y2 = wndyo + wnddx*cfjp;
+
+	q11 = U[cfi + cfj*wndnx];
+	q12 = U[cfi + cfjp*wndnx];
+	q21 = U[cfip + cfj*wndnx];
+	q22 = U[cfip + cfjp*wndnx];
+
+	return BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
+
 }
 
 template <class T> void gradient(int nblk, int blksize, T theta, T delta, int * leftblk, int * rightblk, int * topblk, int * botblk, T *a, T *&dadx, T * &dady)

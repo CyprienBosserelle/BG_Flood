@@ -4124,7 +4124,19 @@ void mainloopCPU(Param XParam)
 		{
 			if (XParam.atmP.uniform == 1)
 			{
-				// Do Nothing
+				//zeros
+				for (int ib = 0; ib < XParam.nblk; ib++)
+				{
+					for (int iy = 0; iy < 16; iy++)
+					{
+						for (int ix = 0; ix < 16; ix++)
+						{
+							int i = ix + iy * 16 + ib * XParam.blksize;
+							Patm[i] = 0.0;
+						}
+					}
+				}
+
 			}
 			else
 			{
@@ -4146,7 +4158,31 @@ void mainloopCPU(Param XParam)
 				}
 				InterpstepCPU(XParam.atmP.nx, XParam.atmP.ny, readfirststep, XParam.totaltime, XParam.atmP.dt, PatmX, Patmbef, Patmaft);
 
+				for (int ib = 0; ib < XParam.nblk; ib++)
+				{
+					for (int iy = 0; iy < 16; iy++)
+					{
+						for (int ix = 0; ix < 16; ix++)
+						{
+							int i = ix + iy * 16 + ib * XParam.blksize;
+							float x = blockxo[ib] + ix*XParam.delta;
+							float y = blockyo[ib] + iy*XParam.delta;
+							Patm[i] = interp2wnd((float)XParam.atmP.nx, (float)XParam.atmP.ny, (float)XParam.atmP.dx, (float)XParam.atmP.xo, (float)XParam.atmP.yo, x, y, PatmX)-XParam.Paref;
+						}
+					}
+				}
+				//float x = blockxo[ib] + ix*delta;
+				//float y = blockyo[ib] + iy*delta;
+
+
+				//float Uwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Uwnd);
+
+				
 			}
+
+			
+
+
 		}
 		// Interpolate to wind step if needed
 		if (!XParam.windU.inputfile.empty())
@@ -4170,6 +4206,8 @@ void mainloopCPU(Param XParam)
 
 				uwinduni = interptime(XParam.windU.data[Wstepinbnd].uwind, XParam.windU.data[Wstepinbnd - 1].uwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
 				vwinduni = interptime(XParam.windU.data[Wstepinbnd].vwind, XParam.windU.data[Wstepinbnd - 1].vwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
+				
+			
 			}
 			else
 			{
@@ -4211,7 +4249,7 @@ void mainloopCPU(Param XParam)
 			else
 			{
 				
-				if (!XParam.windU.inputfile.empty())
+				if (!XParam.windU.inputfile.empty() || !XParam.atmP.inputfile.empty())
 				{
 					XParam.dt = FlowCPUATM(XParam, nextoutputtime);
 				}
@@ -4355,6 +4393,8 @@ int main(int argc, char **argv)
 	//Model starts Here//
 	Param XParam;
 	//The main function setups all the init of the model and then calls the mainloop to actually run the model
+
+	// Theire are many (12) mainloops depending whether the model runs on the GPU/CPU and whether the implementation is float/double or spherical coordinate (double only) 
 
 
 	//First part reads the inputs to the model 
