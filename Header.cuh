@@ -112,7 +112,8 @@ public:
 	int frictionmodel=0; // Not implemented yet 0: cf is a fixed value 1:; 
 	double cf=0.0001; // bottom friction for flow model cf 
 	double Cd=0.002; // Wind drag coeff
-	double Pa2m = 0.00009916;
+	double Pa2m = 0.00009916; // if unit is hPa then user should use 0.009916;
+	double Paref = 101300.0; // if unit is hPa then user should use 1013.0 
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
 
@@ -309,9 +310,16 @@ extern double * cf_gd;
 // wind array storage
 extern float * Uwind, *Uwbef, *Uwaft;
 extern float * Vwind, *Vwbef, *Vwaft;
+extern float *PatmX, *Patmbef, *Patmaft;
+extern float * Patm, *dPdx, *dPdy;
+extern double * Patm_d, *dPdx_d, *dPdy_d;
 
 extern float * Uwind_g, *Uwbef_g, *Uwaft_g;
 extern float * Vwind_g, *Vwbef_g, *Vwaft_g;
+extern float * PatmX_g, *Patmbef_g, *Patmaft_g;
+
+extern float * Patm_g, *dPdx_g, *dPdy_g;
+extern double * Patm_gd, *dPdx_gd, *dPdy_gd;
 
 // Block info
 extern double * blockxo_d, *blockyo_d;
@@ -336,7 +344,7 @@ extern cudaArray* botWLS_gp;
 // store wind data in cuda array before sending to texture memory
 extern cudaArray* Uwind_gp;
 extern cudaArray* Vwind_gp;
-
+extern cudaArray* Patm_gp;
 
 // Below create channels between cuda arrays (see above) and textures
 extern cudaChannelFormatDesc channelDescleftbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
@@ -346,6 +354,7 @@ extern cudaChannelFormatDesc channelDesctopbnd;// = cudaCreateChannelDesc(32, 0,
 
 extern cudaChannelFormatDesc channelDescUwind; 
 extern cudaChannelFormatDesc channelDescVwind; 
+extern cudaChannelFormatDesc channelDescPatm;
 
 template <class T> T sq(T a);
 
@@ -435,6 +444,7 @@ extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo);
+void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po);
 void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
 
 

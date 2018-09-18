@@ -29,6 +29,7 @@ texture<float, 2, cudaReadModeElementType> texBBND;
 
 texture<float, 2, cudaReadModeElementType> texUWND;
 texture<float, 2, cudaReadModeElementType> texVWND;
+texture<float, 2, cudaReadModeElementType> texPATM;
 
 template<class T>
 struct SharedMemory
@@ -473,6 +474,26 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 
 }
 
+template <class T>
+__global__ void interp2ATMP(float xoatm,float yoatm,float dxatm,T delta, T Pref,T*blockxo, T *blockyo,  T * P)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	T x = blockxo[ibl] + ix*delta;
+	T y = blockyo[ibl] + iy*delta;
+
+	float Pw;
+
+	Pw = tex2D(texPATM, (x - xoatm) / dxatm + 0.5, (y - yoatm) / dxatm + 0.5);
+
+	P[i] = Pw - Pref;
+	
+
+}
 __global__ void gradientGPUX(int nx, int ny,float theta, float delta, float *a, float *dadx)
 {
 	int ix = blockIdx.x*blockDim.x + threadIdx.x;
@@ -856,7 +877,195 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 
 
 }
+__global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float Pa2m, int *leftblk, float * hh, float *zs, float *uu, float * vv, float *Patm, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *dpdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
 
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ileft;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//if (ix < nx && iy < ny)
+	{
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+
+
+		
+
+
+		float dhdxi = dhdx[i];
+		float dhdxmin = dhdx[ileft];
+		float cm = 1.0f;// 0.1;
+		float fmu = 1.0f;
+		//float fmv = 1.0;
+
+		//__shared__ float hi[16][16];
+		float hi = hh[i];
+
+		float hn = hh[ileft];
+
+
+		if (hi > eps || hn > eps)
+		{
+			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
+
+			// along X
+			dx = delta*0.5f;
+			zi = zs[i] - hi + Pa2m * Patm[i];
+
+			//printf("%f\n", zi);
+
+
+			//zl = zi - dx*(dzsdx[i] - dhdx[i]);
+			zl = zi - dx*(dzsdx[i] - dhdxi + Pa2m*dpdx[i]);
+			//printf("%f\n", zl);
+
+			zn = zs[ileft] - hn + Pa2m * Patm[ileft];
+
+			//printf("%f\n", zn);
+			zr = zn + dx*(dzsdx[ileft] - dhdxmin + Pa2m*dpdx[ileft]);
+
+
+			zlr = max(zl, zr);
+
+			//hl = hi - dx*dhdx[i];
+			hl = hi - dx*dhdxi;
+			up = uu[i] - dx*dudx[i];
+			hp = max(0.0f, hl + zl - zlr);
+
+			hr = hn + dx*dhdxmin;
+			um = uu[ileft] + dx*dudx[ileft];
+			hm = max(0.0f, hr + zr - zlr);
+
+			float fh, fu, fv;
+			//float dtmaxf = 1 / 1e-30f;
+
+			//We can now call one of the approximate Riemann solvers to get the fluxes.
+			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			float epsi = 1e-30f;
+
+			cp = sqrtf(g*hp);
+			cmo = sqrtf(g*hm);
+
+			ap = max(max(up + cp, um + cmo), 0.0f);
+			//ap = max(ap, 0.0f);
+
+			am = min(min(up - cp, um - cmo), 0.0f);
+			//am = min(am, 0.0f);
+			ad = 1.0f / (ap - am);
+			qm = hm*um;
+			qp = hp*up;
+
+			a = max(ap, -am);
+
+			dlt = delta*cm / fmu;
+			hm2 = sq(hm);
+			hp2 = sq(hp);
+			ga = g*0.5f;
+			apm = ap*am;
+
+			if (a > epsi)
+			{
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
+				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
+				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
+				float dt = CFL*dlt / a;
+				if (dt < dtmax[i])
+				{
+					dtmax[i] = dt;
+				}
+				//	*dtmax = dt;
+
+
+			}
+			else
+			{
+				fh = 0.0f;
+				fu = 0.0f;
+				dtmax[i] = 1.0f / 1e-30f;
+			}
+			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+
+			/*
+			void kurganovf(float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
+			float eps = epsilon;
+			float cp = sqrtf(g*hp), cm = sqrtf(g*hm);
+			float ap = max(up + cp, um + cm); ap = max(ap, 0.0f);
+			float am = min(up - cp, um - cm); am = min(am, 0.0f);
+			float qm = hm*um, qp = hp*up;
+			float a = max(ap, -am);
+			if (a > eps) {
+			*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
+			*fq = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
+			ap*am*(qp - qm)) / (ap - am);
+			float dt = CFL*Delta / a;
+			if (dt < *dtmax)
+			*dtmax = dt;
+			}
+			else
+			*fh = *fq = 0.;*/
+
+			if (fh > 0.0f)
+			{
+				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
+			}
+			else
+			{
+				fv = (vv[i] - dx*dvdx[i])*fh;
+			}
+			//fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+			//dtmax needs to be stored in an array and reduced at the end
+			//dtmax = dtmaxf;
+			//dtmaxtmp = min(dtmax, dtmaxtmp);
+			/*if (ix == 11 && iy == 0)
+			{
+			printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + ga*hm2), -am*(qp*up + ga*hp2),( ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm) ) *ad/100.0f, ad);
+			}
+			*/
+			/*
+			#### Topographic source term
+
+			In the case of adaptive refinement, care must be taken to ensure
+			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+			sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
+			sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
+
+			////Flux update
+
+			Fhu[i] = fmu * fh;
+			Fqux[i] = fmu * (fu - sl);
+			Su[i] = fmu * (fu - sr);
+			Fqvx[i] = fmu * fv;
+		}
+		else
+		{
+			dtmax[i] = 1.0f / 1e-30f;
+			Fhu[i] = 0.0f;
+			Fqux[i] = 0.0f;
+			Su[i] = 0.0f;
+			Fqvx[i] = 0.0f;
+		}
+
+	}
+
+
+}
 
 __global__ void updateKurgXD( double delta, double g, double eps, double CFL, int *leftblk, double * hh, double *zs, double *uu, double * vv, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
 {
@@ -1345,6 +1554,148 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 			{
 				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
 				fu = (ap*(qm*um + ga*hm2 ) - am*(qp*up + ga*hp2) +	apm*(qp - qm)) *ad;
+				float dt = CFL*dlt / a;
+				if (dt < dtmax[i])
+				{
+					dtmax[i] = dt;
+				}
+				//	*dtmax = dt;
+
+
+			}
+			else
+			{
+				fh = 0.0f;
+				fu = 0.0f;
+				dtmax[i] = 1.0f / 1e-30f;
+			}
+
+			if (fh > 0.0f)
+			{
+				fv = (uu[ibot] + dx*dudy[ibot])*fh;
+			}
+			else
+			{
+				fv = (uu[i] - dx*dudy[i])*fh;
+			}
+			//fv = (fh > 0.f ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+			/**
+			#### Topographic source term
+
+			In the case of adaptive refinement, care must be taken to ensure
+			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+			sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
+			sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
+
+			////Flux update
+
+			Fhv[i] = fmv * fh;
+			Fqvy[i] = fmv * (fu - sl);
+			Sv[i] = fmv * (fu - sr);
+			Fquy[i] = fmv* fv;
+		}
+		else
+		{
+			dtmax[i] = 1.0f / 1e-30f;
+			Fhv[i] = 0.0f;
+			Fqvy[i] = 0.0f;
+			Sv[i] = 0.0f;
+			Fquy[i] = 0.0f;
+		}
+	}
+}
+
+__global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float Pa2m, int *botblk, float * hh, float *zs, float *uu, float * vv, float *Patm, float *dzsdy, float *dhdy, float * dudy, float *dvdy,float *dpdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	//if (ix < nx && iy < ny)
+	{
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+
+		float cm = 1.0f;// 0.1;
+						//float fmu = 1.0;
+		float fmv = 1.0f;
+
+		//__shared__ float hi[16][16];
+		float dhdyi = dhdy[i];
+		float dhdymin = dhdy[ibot];
+		float hi = hh[i];
+		float hn = hh[ibot];
+		float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+
+
+		if (hi > eps || hn > eps)
+		{
+			hn = hh[ibot];
+			dx = delta / 2.0f;
+			zi = zs[i] - hi + Pa2m * Patm[i];
+			zl = zi - dx*(dzsdy[i] - dhdyi+Pa2m *dpdy[i]);
+			zn = zs[ibot] - hn + Pa2m * Patm[ibot];
+			zr = zn + dx*(dzsdy[ibot] - dhdymin + Pa2m *dpdy[ibot]);
+			zlr = max(zl, zr);
+
+			hl = hi - dx*dhdyi;
+			up = vv[i] - dx*dvdy[i];
+			hp = max(0.f, hl + zl - zlr);
+
+			hr = hn + dx*dhdymin;
+			um = vv[ibot] + dx*dvdy[ibot];
+			hm = max(0.f, hr + zr - zlr);
+
+			//// Reimann solver
+			float fh, fu, fv, sl, sr;
+			//float dtmaxf = 1.0f / 1e-30f;
+			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+			//We can now call one of the approximate Riemann solvers to get the fluxes.
+			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			float epsi = 1e-30f;
+
+			cp = sqrtf(g*hp);
+			cmo = sqrtf(g*hm);
+
+			ap = max(max(up + cp, um + cmo), 0.0f);
+			//ap = max(ap, 0.0f);
+
+			am = min(min(up - cp, um - cmo), 0.0f);
+			//am = min(am, 0.0f);
+			ad = 1.0f / (ap - am);
+			qm = hm*um;
+			qp = hp*up;
+
+			hm2 = sq(hm);
+			hp2 = sq(hp);
+			a = max(ap, -am);
+			ga = g*0.5f;
+			apm = ap*am;
+			dlt = delta*cm / fmv;
+
+			if (a > epsi)
+			{
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
+				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
 				float dt = CFL*dlt / a;
 				if (dt < dtmax[i])
 				{

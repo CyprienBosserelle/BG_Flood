@@ -2095,6 +2095,68 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	
 }
 
+void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
+{
+	//
+	int status;
+	int ncid;
+	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
+	int uu_id, vv_id;
+	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
+	// right now the model will catch anexception 
+	printf("Reading atm pressure data. step: %d ...", steptoread);
+	//size_t startl[]={hdstep-1,lev,0,0};
+	//size_t countlu[]={1,1,netau,nxiu};
+	//size_t countlv[]={1,1,netav,nxiv};
+	size_t startl[] = { steptoread, 0, 0 };
+	size_t countlu[] = { 1, ATMPmap.ny, ATMPmap.nx };
+	//size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
+
+	//static ptrdiff_t stridel[]={1,1,1,1};
+	static ptrdiff_t stridel[] = { 1, 1, 1 };
+
+	std::string ncfilestr;
+	std::string atmpvarstr;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(ATMPmap.inputfile, '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		ncfilestr = nameelements[0];
+		atmpvarstr = nameelements[1];
+	}
+	else
+	{
+		ncfilestr = ncfilestr;
+		atmpvarstr = "atmP";
+	}
+
+
+	//Open NC file
+
+	status = nc_open(ncfilestr.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	//status = nc_inq_varid (ncid, "u", &uu_id);
+	status = nc_inq_varid(ncid, atmpvarstr.c_str(), &uu_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_get_vara_float(ncid, uu_id, startl, countlu, Po);
+	if (status != NC_NOERR) handle_error(status);
+
+	//status = nc_get_att_float(ncid, uu_id, "_FillValue", &NanValU);
+	//if (status != NC_NOERR) handle_error(status);
+
+	status = nc_close(ncid);
+
+	printf("Done!\n");
+
+}
+
 void InterpstepCPU(int nx, int ny,  int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un)
 {
 	float fac = 1.0;
