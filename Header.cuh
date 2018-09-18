@@ -113,6 +113,7 @@ public:
 	double cf=0.0001; // bottom friction for flow model cf 
 	double Cd=0.002; // Wind drag coeff
 	double Pa2m = 0.00009916;
+	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
 
 	int doubleprecision = 0;

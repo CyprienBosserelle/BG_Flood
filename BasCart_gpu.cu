@@ -1637,7 +1637,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	//printf("dt=%f\n", XParam.dt);
 
 	
-	updateEV << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, rightblk_g, topblk_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+	updateEV << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.lat*pi / 21600.0f, rightblk_g, topblk_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	
@@ -1682,7 +1682,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	// no reduction of dtmax during the corrector step
 
 	
-	updateEV << <gridDim, blockDim, 0 >> > ( (float)XParam.delta, (float)XParam.g, rightblk_g, topblk_g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+	updateEV << <gridDim, blockDim, 0 >> > ( (float)XParam.delta, (float)XParam.g, (float)XParam.lat*pi / 21600.0f, rightblk_g, topblk_g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	
@@ -1861,7 +1861,7 @@ double FlowGPUATM(Param XParam, double nextoutputtime)
 
 
 	//updateEV << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, rightblk_g, topblk_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
-	updateEVATM << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.windU.xo, (float)XParam.windU.yo, (float)XParam.windU.dx, (float)XParam.Cd, rightblk_g, topblk_g, blockxo_g, blockyo_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+	updateEVATM << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.lat*pi / 21600.0f, (float)XParam.windU.xo, (float)XParam.windU.yo, (float)XParam.windU.dx, (float)XParam.Cd, rightblk_g, topblk_g, blockxo_g, blockyo_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
@@ -1907,7 +1907,7 @@ double FlowGPUATM(Param XParam, double nextoutputtime)
 
 
 	//updateEV << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, rightblk_g, topblk_g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
-	updateEVATM << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.windU.xo, (float)XParam.windU.yo, (float)XParam.windU.dx, (float)XParam.Cd, rightblk_g, topblk_g, blockxo_g, blockyo_g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+	updateEVATM << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.lat*pi / 21600.0f, (float)XParam.windU.xo, (float)XParam.windU.yo, (float)XParam.windU.dx, (float)XParam.Cd, rightblk_g, topblk_g, blockxo_g, blockyo_g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
 
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -2306,7 +2306,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 
 	
 		//if spherical corrdinate use this kernel with the right corrections
-	updateEVD << <gridDim, blockDim, 0 >> > ( XParam.delta, XParam.g, rightblk_g, topblk_g, hh_gd, uu_gd, vv_gd, Fhu_gd, Fhv_gd, Su_gd, Sv_gd, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd, dh_gd, dhu_gd, dhv_gd);
+	updateEVD << <gridDim, blockDim, 0 >> > ( XParam.delta, XParam.g, XParam.lat*pi / 21600.0, rightblk_g, topblk_g, hh_gd, uu_gd, vv_gd, Fhu_gd, Fhv_gd, Su_gd, Sv_gd, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd, dh_gd, dhu_gd, dhv_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 
@@ -2361,7 +2361,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 
 	
 	
-	updateEVD << <gridDim, blockDim, 0 >> > ( XParam.delta, XParam.g, rightblk_g, topblk_g, hho_gd, uuo_gd, vvo_gd, Fhu_gd, Fhv_gd, Su_gd, Sv_gd, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd, dh_gd, dhu_gd, dhv_gd);
+	updateEVD << <gridDim, blockDim, 0 >> > ( XParam.delta, XParam.g, XParam.lat*pi / 21600.0, rightblk_g, topblk_g, hho_gd, uuo_gd, vvo_gd, Fhu_gd, Fhv_gd, Su_gd, Sv_gd, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd, dh_gd, dhu_gd, dhv_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 
@@ -3228,6 +3228,10 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 	int nTSsteps = 0;
 
 	int windstep = 1;
+
+	float uwinduni = 0.0f;
+	float vwinduni = 0.0f;
+
 	std::vector<Pointout> zsout;
 
 	std::vector< std::vector< Pointout > > zsAllout;
@@ -3269,47 +3273,300 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		TopFlowBnd(XParam);
 		BotFlowBnd(XParam);
 
-		// Atm forcing part
-		if (!XParam.windU.inputfile.empty())
+		
+
+
+		// Core engine
+		//XParam.dt = FlowGPUATM(XParam, nextoutputtime);
+
+		const int num_streams = 2;
+
+		cudaStream_t streams[num_streams];
+		for (int i = 0; i < num_streams; i++)
 		{
-			int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
+			CUDA_CHECK(cudaStreamCreate(&streams[i]));
+		}
 
-			if (readfirststep + 1 > windstep)
+
+
+		//dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+		//dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
+		dim3 blockDim(16, 16, 1);
+		dim3 gridDim(XParam.nblk, 1, 1);
+
+		dtmax = (float)(1.0 / epsilon);
+		//float dtmaxtmp = dtmax;
+
+		resetdtmax << <gridDim, blockDim, 0, streams[0] >> > (dtmax_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//update step 1
+
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hh_g, dhdx_g, dhdy_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zs_g, dzsdx_g, dzsdy_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, uu_g, dudx_g, dudy_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vv_g, dvdx_g, dvdy_g);
+
+
+		// Check the wind forcing at the same time here
+		
+		if (!XParam.windU.inputfile.empty())// this is should be true here so not necessary (?)
+		{
+			if (XParam.windU.uniform == 1)
 			{
-				// Need to read a new step from the file
-				NextHDstep << <gridDimWND, blockDimWND, 0 >> >(XParam.windU.nx, XParam.windU.ny, Uwbef_g, Uwaft_g);
-				
+				//
+				int Wstepinbnd = 1;
 
-				NextHDstep << <gridDimWND, blockDimWND, 0 >> >(XParam.windV.nx, XParam.windV.ny, Vwbef_g, Vwaft_g);
+
+
+				// Do this for all the corners
+				//Needs limiter in case WLbnd is empty
+				double difft = XParam.windU.data[Wstepinbnd].time - XParam.totaltime;
+
+				while (difft < 0.0)
+				{
+					Wstepinbnd++;
+					difft = XParam.windU.data[Wstepinbnd].time - XParam.totaltime;
+				}
+
+				uwinduni = interptime(XParam.windU.data[Wstepinbnd].uwind, XParam.windU.data[Wstepinbnd - 1].uwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
+				vwinduni = interptime(XParam.windU.data[Wstepinbnd].vwind, XParam.windU.data[Wstepinbnd - 1].vwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
+			}
+			else
+			{
+				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
+
+				if (readfirststep + 1 > windstep)
+				{
+					// Need to read a new step from the file
+					NextHDstep << <gridDimWND, blockDimWND, 0 >> > (XParam.windU.nx, XParam.windU.ny, Uwbef_g, Uwaft_g);
+
+
+					NextHDstep << <gridDimWND, blockDimWND, 0 >> > (XParam.windV.nx, XParam.windV.ny, Vwbef_g, Vwaft_g);
+					CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+
+					readWNDstep(XParam.windU, XParam.windV, readfirststep + 1, Uwaft, Vwaft);
+					CUDA_CHECK(cudaMemcpy(Uwaft_g, Uwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+					CUDA_CHECK(cudaMemcpy(Vwaft_g, Vwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
+
+					windstep = readfirststep + 1;
+				}
+
+				HD_interp << < gridDimWND, blockDimWND, 0 >> > (XParam.windU.nx, XParam.windU.ny, 0, windstep - 1, XParam.totaltime, XParam.windU.dt, Uwbef_g, Uwaft_g, Uwind_g);
+
+
+				HD_interp << <gridDimWND, blockDimWND, 0 >> > (XParam.windV.nx, XParam.windV.ny, 0, windstep - 1, XParam.totaltime, XParam.windU.dt, Vwbef_g, Vwaft_g, Vwind_g);
 				CUDA_CHECK(cudaDeviceSynchronize());
 
-
-
-
-				readWNDstep(XParam.windU, XParam.windV, readfirststep + 1, Uwaft, Vwaft);
-				CUDA_CHECK(cudaMemcpy(Uwaft_g, Uwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-				CUDA_CHECK(cudaMemcpy(Vwaft_g, Vwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-
-				windstep = readfirststep + 1;
+				//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
+				//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
+				CUDA_CHECK(cudaMemcpyToArray(Uwind_gp, 0, 0, Uwind_g, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyDeviceToDevice));
+				CUDA_CHECK(cudaMemcpyToArray(Vwind_gp, 0, 0, Vwind_g, XParam.windV.nx*XParam.windV.ny * sizeof(float), cudaMemcpyDeviceToDevice));
 			}
-
-			HD_interp << < gridDimWND, blockDimWND, 0 >> >(XParam.windU.nx, XParam.windU.ny, 0, windstep-1, XParam.totaltime, XParam.windU.dt, Uwbef_g, Uwaft_g, Uwind_g);
-			
-
-			HD_interp << <gridDimWND, blockDimWND, 0 >> >(XParam.windV.nx, XParam.windV.ny, 0, windstep-1, XParam.totaltime, XParam.windU.dt, Vwbef_g, Vwaft_g, Vwind_g);
-			CUDA_CHECK(cudaDeviceSynchronize());
-
-			//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
-			//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
-			CUDA_CHECK(cudaMemcpyToArray(Uwind_gp, 0, 0, Uwind_g, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpyToArray(Vwind_gp, 0, 0, Vwind_g, XParam.windV.nx*XParam.windV.ny * sizeof(float), cudaMemcpyDeviceToDevice));
-
 
 		}
 
 
-		// Core engine
-		XParam.dt = FlowGPUATM(XParam, nextoutputtime);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
+		//normal cartesian case
+		updateKurgX << <gridDim, blockDim, 0, streams[0] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, leftblk_g, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		//CUDA_CHECK(cudaStreamSynchronize(streams[1]));
+		updateKurgY << <gridDim, blockDim, 0, streams[1] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, botblk_g, hh_g, zs_g, uu_g, vv_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
+		// This was successfully tested with a range of grid size
+		//reducemax3 << <gridDimLine, blockDimLine, 64*sizeof(float) >> >(dtmax_g, arrmax_g, nx*ny)
+		int s = XParam.nblk*XParam.blksize;
+		int maxThreads = 256;
+		int threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+		int blocks = (s + (threads * 2 - 1)) / (threads * 2);
+		int smemSize = (threads <= 32) ? 2 * threads * sizeof(float) : threads * sizeof(float);
+		dim3 blockDimLine(threads, 1, 1);
+		dim3 gridDimLine(blocks, 1, 1);
+
+		float mindtmaxB;
+
+		reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (dtmax_g, arrmax_g, s);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		s = gridDimLine.x;
+		while (s > 1)//cpuFinalThreshold
+		{
+			threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+			blocks = (s + (threads * 2 - 1)) / (threads * 2);
+
+			smemSize = (threads <= 32) ? 2 * threads * sizeof(float) : threads * sizeof(float);
+
+			dim3 blockDimLineS(threads, 1, 1);
+			dim3 gridDimLineS(blocks, 1, 1);
+
+			CUDA_CHECK(cudaMemcpy(dtmax_g, arrmax_g, s * sizeof(float), cudaMemcpyDeviceToDevice));
+
+			reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (dtmax_g, arrmax_g, s);
+			CUDA_CHECK(cudaDeviceSynchronize());
+
+			s = (s + (threads * 2 - 1)) / (threads * 2);
+		}
+
+
+		CUDA_CHECK(cudaMemcpy(dummy, arrmax_g, 32 * sizeof(float), cudaMemcpyDeviceToHost));
+		mindtmaxB = dummy[0];
+
+		//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
+		/*
+		for (int i = 0; i < 32; i++)
+		{
+		mindtmaxB = min(dummy[i], mindtmaxB);
+		printf("dt=%f\n", dummy[i]);
+
+		}
+		*/
+
+
+		//float diffdt = mindtmaxB - mindtmax;
+		XParam.dt = mindtmaxB;
+		if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
+		{
+			XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
+		}
+		//printf("dt=%f\n", XParam.dt);
+
+
+		if (XParam.windU.uniform == 1)
+		{
+			// simpler input if wind is uniform
+			updateEVATMWUNI << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.lat*pi / 21600.0f, uwinduni, vwinduni, (float)XParam.Cd, rightblk_g, topblk_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+
+		}
+		else
+		{
+			//updateEV << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, rightblk_g, topblk_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+			updateEVATM << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.lat*pi/21600.0f, (float)XParam.windU.xo, (float)XParam.windU.yo, (float)XParam.windU.dx, (float)XParam.Cd, rightblk_g, topblk_g, blockxo_g, blockyo_g, hh_g, uu_g, vv_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+
+		}
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+
+		//predictor (advance 1/2 dt)
+		Advkernel << <gridDim, blockDim, 0 >> >((float)XParam.dt*0.5f, (float)XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//corrector setp
+		//update again
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hho_g, dhdx_g, dhdy_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zso_g, dzsdx_g, dzsdy_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, uuo_g, dudx_g, dudy_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vvo_g, dvdx_g, dvdy_g);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		updateKurgX << <gridDim, blockDim, 0, streams[0] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, leftblk_g, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+		updateKurgY << <gridDim, blockDim, 0, streams[1] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, botblk_g, hho_g, zso_g, uuo_g, vvo_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		// no reduction of dtmax during the corrector step
+
+
+		//updateEV << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, rightblk_g, topblk_g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+		updateEVATM << <gridDim, blockDim, 0 >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.lat*pi / 21600.0f, (float)XParam.windU.xo, (float)XParam.windU.yo, (float)XParam.windU.dx, (float)XParam.Cd, rightblk_g, topblk_g, blockxo_g, blockyo_g, hho_g, uuo_g, vvo_g, Fhu_g, Fhv_g, Su_g, Sv_g, Fqux_g, Fquy_g, Fqvx_g, Fqvy_g, dh_g, dhu_g, dhv_g);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+		//
+		Advkernel << <gridDim, blockDim, 0 >> >((float)XParam.dt, (float)XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
+		cleanupGPU << <gridDim, blockDim, 0 >> >(hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//Bottom friction
+		bottomfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, (float)XParam.dt, (float)XParam.eps, cf_g, hh_g, uu_g, vv_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		CUDA_CHECK(cudaStreamDestroy(streams[0]));
+		CUDA_CHECK(cudaStreamDestroy(streams[1]));
+
+		// Impose no slip condition by default
+		//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		if (XParam.Rivers.size() > 1)
+		{
+			//
+			dim3 gridDimRiver(XParam.nriverblock, 1, 1);
+			float qnow;
+			for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
+			{
+
+				//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
+				int bndstep = 0;
+				double difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
+				while (difft <= 0.0) // danger?
+				{
+					bndstep++;
+					difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
+				}
+
+				qnow = interptime(XParam.Rivers[Rin].flowinput[bndstep].q, XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.Rivers[Rin].flowinput[bndstep].time - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time);
+
+
+
+				discharge_bnd_v << <gridDimRiver, blockDim, 0 >> > ((float)XParam.Rivers[Rin].xstart, (float)XParam.Rivers[Rin].xend, (float)XParam.Rivers[Rin].ystart, (float)XParam.Rivers[Rin].yend, (float)XParam.dx, (float)XParam.dt, qnow, (float)XParam.Rivers[Rin].disarea, Riverblk_g, blockxo_g, blockyo_g, zs_g, hh_g);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+		}
+
 
 
 		//Time keeping
@@ -3708,6 +3965,8 @@ void mainloopCPU(Param XParam)
 
 	int windstep = 1;
 
+	float uwinduni, vwinduni;
+
 	std::vector<Pointout> zsout;
 
 	std::vector< std::vector< Pointout > > zsAllout;
@@ -3738,28 +3997,50 @@ void mainloopCPU(Param XParam)
 		// Interpolate to wind step if needed
 		if (!XParam.windU.inputfile.empty())
 		{
-			int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
-
-			if (readfirststep + 1 > windstep)
+			if (XParam.windU.uniform == 1)
 			{
-				// Need to read a new step from the file
-				for (int iw = 0; iw < XParam.windU.nx*XParam.windU.ny; iw++)
+				//
+				int Wstepinbnd = 1;
+
+
+
+				// Do this for all the corners
+				//Needs limiter in case WLbnd is empty
+				double difft = XParam.windU.data[Wstepinbnd].time - XParam.totaltime;
+
+				while (difft < 0.0)
 				{
-					//
-					Uwbef[iw] = Uwaft[iw];
-					Vwbef[iw] = Vwaft[iw];
-					
+					Wstepinbnd++;
+					difft = XParam.windU.data[Wstepinbnd].time - XParam.totaltime;
 				}
 
-				readWNDstep(XParam.windU, XParam.windV, readfirststep + 1, Uwaft, Vwaft);
-				windstep = readfirststep + 1;
+				uwinduni = interptime(XParam.windU.data[Wstepinbnd].uwind, XParam.windU.data[Wstepinbnd - 1].uwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
+				vwinduni = interptime(XParam.windU.data[Wstepinbnd].vwind, XParam.windU.data[Wstepinbnd - 1].vwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
 			}
+			else
+			{
+				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
 
-			
+				if (readfirststep + 1 > windstep)
+				{
+					// Need to read a new step from the file
+					for (int iw = 0; iw < XParam.windU.nx*XParam.windU.ny; iw++)
+					{
+						//
+						Uwbef[iw] = Uwaft[iw];
+						Vwbef[iw] = Vwaft[iw];
 
-			InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
-			InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
+					}
 
+					readWNDstep(XParam.windU, XParam.windV, readfirststep + 1, Uwaft, Vwaft);
+					windstep = readfirststep + 1;
+				}
+
+
+
+				InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
+				InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
+			}
 		}
 
 		// Run the model step

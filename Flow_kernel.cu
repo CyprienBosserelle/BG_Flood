@@ -1695,7 +1695,7 @@ __global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,i
 	}
 }
 
-__global__ void updateEV( float delta, float g, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+__global__ void updateEV( float delta, float g, float fc, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -1756,8 +1756,8 @@ __global__ void updateEV( float delta, float g, int *rightblk, int*topblk, float
 		float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
 		float dmdt = (fmv - fmv) / (cm*delta);
 		float fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + fc*hi*vvi;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv - fc*hi*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
@@ -1766,7 +1766,7 @@ __global__ void updateEV( float delta, float g, int *rightblk, int*topblk, float
 
 
 
-__global__ void updateEVATM(float delta, float g, float xowind, float yowind ,float dxwind, float Cd, int *rightblk, int*topblk, float * blockxo, float* blockyo, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+__global__ void updateEVATM(float delta, float g, float fc, float xowind, float yowind ,float dxwind, float Cd, int *rightblk, int*topblk, float * blockxo, float* blockyo, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -1830,17 +1830,87 @@ __global__ void updateEVATM(float delta, float g, float xowind, float yowind ,fl
 	float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
 	float dmdt = (fmv - fmv) / (cm*delta);
 	float fG = vvi * dmdl - uui * dmdt;
-	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw);
-	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw);
+	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*hi*vvi;
+	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*hi*uui;
 	//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 	dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
 	dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
 	
 }
 
+__global__ void updateEVATMWUNI(float delta, float g, float fc, float uwind, float vwind, float Cd, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	float Uw = 0.0f;
+	float Vw = 0.0f;
 
 
-__global__ void updateEVD( double delta, double g, int *rightblk, int*topblk, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	//float x = blockxo[ibl] + ix*delta;
+	//float y = blockyo[ibl] + iy*delta;
+
+
+	int iright, itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	Uw = uwind;// tex2D(texUWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+	Vw = vwind;// tex2D(texVWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+
+	//xplus = min(ix + 1, nx - 1);
+	//xminus = max(ix - 1, 0);
+	//yplus = min(iy + 1, ny - 1);
+	//yminus = max(iy - 1, 0);
+
+	float cm = 1.0f;// 0.1;
+	float fmu = 1.0f;
+	float fmv = 1.0f;
+
+	float hi = hh[i];
+	float uui = uu[i];
+	float vvi = vv[i];
+
+
+	float cmdinv, ga;
+
+	cmdinv = 1.0f / (cm*delta);
+	ga = 0.5f*g;
+	////
+	//vector dhu = vector(updates[1 + dimension*l]);
+	//foreach() {
+	//	double dhl =
+	//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+	//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+	//	foreach_dimension()
+	//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+	//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
+	//float cm = 1.0;
+
+	dh[i] = -1.0f*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
+	//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+	//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+	float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
+	float dmdt = (fmv - fmv) / (cm*delta);
+	float fG = vvi * dmdl - uui * dmdt;
+	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*hi*vvi;
+	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*hi*uui;
+	//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+	dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
+	dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
+
+}
+
+__global__ void updateEVD( double delta, double g, double fc, int *rightblk, int*topblk, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -1901,8 +1971,8 @@ __global__ void updateEVD( double delta, double g, int *rightblk, int*topblk, do
 		double dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
 		double dmdt = (fmv - fmv) / (cm*delta);
 		double fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + fc*hi*vvi;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv - fc*hi*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
@@ -1916,7 +1986,7 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 	int ibl = blockIdx.x;
 
 
-
+	
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
@@ -1931,6 +2001,8 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 
 	double cm, fmu, fmv, y, phi, dphi,fmvp,fmup;
+
+	double fc = pi / 21600.0; // 2*(2*pi/24/3600)
 
 
 	//if (ix < nx && iy < ny)
@@ -1996,8 +2068,8 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
 		float dmdt = (fmvp - fmv) / (cm*delta);
 		float fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + fc*sin(phi)*vvi;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv - fc*sin(phi)*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
