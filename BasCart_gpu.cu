@@ -4091,7 +4091,11 @@ void mainloopCPU(Param XParam)
 
 	int windstep = 1;
 	int atmpstep = 1;
-	float uwinduni, vwinduni;
+	float uwinduni = 0.0f;
+	float vwinduni = 0.0f;
+
+	int cstwind = 1;
+	int cstpress = 1;
 
 	std::vector<Pointout> zsout;
 
@@ -4133,6 +4137,8 @@ void mainloopCPU(Param XParam)
 						{
 							int i = ix + iy * 16 + ib * XParam.blksize;
 							Patm[i] = 0.0;
+							dPdx[i] = 0.0;
+							dPdy[i] = 0.0;
 						}
 					}
 				}
@@ -4140,6 +4146,7 @@ void mainloopCPU(Param XParam)
 			}
 			else
 			{
+				cstpress = 0;
 				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.atmP.to) / XParam.atmP.dt), 0), XParam.atmP.nt - 2);
 
 				if (readfirststep + 1 > atmpstep)
@@ -4211,6 +4218,7 @@ void mainloopCPU(Param XParam)
 			}
 			else
 			{
+				cstwind = 0;
 				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
 
 				if (readfirststep + 1 > windstep)
@@ -4251,7 +4259,7 @@ void mainloopCPU(Param XParam)
 				
 				if (!XParam.windU.inputfile.empty() || !XParam.atmP.inputfile.empty())
 				{
-					XParam.dt = FlowCPUATM(XParam, nextoutputtime);
+					XParam.dt = FlowCPUATM(XParam, nextoutputtime, cstwind, cstpress, uwinduni, uwinduni);
 				}
 				else
 				{

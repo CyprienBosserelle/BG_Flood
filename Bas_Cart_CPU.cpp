@@ -660,7 +660,7 @@ void update(int nblk, int blksize, float theta, float dt, float eps, float g,flo
 }
 
 
-void updateATM(int nblk, int blksize,int windnx,int windny,float winddx, float windxo, float windyo, float theta, float dt, float eps, float g, float CFL, float delta,float Cd, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv, float * Uwnd, float * Vwnd)
+void updateATM(int nblk, int blksize, int cstwind, int cstpress, int windnx, int windny, float winddx, float windxo, float windyo, float Uwndi, float Vwndi, float theta, float dt, float eps, float g, float CFL, float delta, float Cd, float Pa2m, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv, float * Uwnd, float * Vwnd, float * Patm)
 {
 	int i, xplus, yplus, xminus, yminus;
 
@@ -675,6 +675,11 @@ void updateATM(int nblk, int blksize,int windnx,int windny,float winddx, float w
 	gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, zs, dzsdx, dzsdy);
 	gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, uu, dudx, dudy);
 	gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, vv, dvdx, dvdy);
+
+	if (cstpress == 0)
+	{
+		gradient(nblk, blksize, theta, delta, leftblk, rightblk, topblk, botblk, Patm, dPdx, dPdy);
+	}
 
 	float cm = 1.0;// 0.1;
 	float fmu = 1.0;
@@ -707,18 +712,18 @@ void updateATM(int nblk, int blksize,int windnx,int windny,float winddx, float w
 
 					// along X
 					dx = delta / 2.0f;
-					zi = zs[i] - hi;
+					zi = zs[i] - hi+Pa2m*Patm[i];
 
 					//printf("%f\n", zi);
 
 
-					zl = zi - dx*(dzsdx[i] - dhdx[i]);
+					zl = zi - dx*(dzsdx[i] - dhdx[i] + Pa2m*dPdx[i]);
 					//printf("%f\n", zl);
 
-					zn = zs[xminus] - hn;
+					zn = zs[xminus] - hn + Pa2m * dPdx[xminus];
 
 					//printf("%f\n", zn);
-					zr = zn + dx*(dzsdx[xminus] - dhdx[xminus]);
+					zr = zn + dx*(dzsdx[xminus] - dhdx[xminus] + Pa2m*dPdx[xminus]);
 
 
 					zlr = max(zl, zr);
@@ -813,10 +818,10 @@ void updateATM(int nblk, int blksize,int windnx,int windny,float winddx, float w
 
 					hn = hh[yminus];
 					dx = delta / 2.0f;
-					zi = zs[i] - hi;
-					zl = zi - dx*(dzsdy[i] - dhdy[i]);
-					zn = zs[yminus] - hn;
-					zr = zn + dx*(dzsdy[yminus] - dhdy[yminus]);
+					zi = zs[i] - hi+ Pa2m*Patm[i];
+					zl = zi - dx*(dzsdy[i] - dhdy[i]+Pa2m*dPdy[i]);
+					zn = zs[yminus] - hn + Pa2m * Patm[yminus];
+					zr = zn + dx*(dzsdy[yminus] - dhdy[yminus] + Pa2m * dPdy[yminus]);
 					zlr = max(zl, zr);
 
 					hl = hi - dx*dhdy[i];
@@ -915,10 +920,11 @@ void updateATM(int nblk, int blksize,int windnx,int windny,float winddx, float w
 				float x = blockxo[ib] + ix*delta;
 				float y = blockyo[ib] + iy*delta;
 
-
-				float Uwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Uwnd);
-				float Vwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Vwnd);
-
+				if (cstwind == 0)
+				{
+					Uwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Uwnd);
+					Vwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Vwnd);
+				}
 				dhu[i] = (Fqux[i] + Fquy[i] - Su[xplus] - Fquy[yplus]) *cmdel + 0.00121951*Cd*Uwndi*abs(Uwndi);
 				dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[yplus] - Fqvx[xplus]) *cmdel + 0.00121951*Cd*Vwndi*abs(Vwndi);
 				//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
@@ -1762,7 +1768,7 @@ double FlowCPU(Param XParam, double nextoutputtime)
 
 }
 
-double FlowCPUATM(Param XParam, double nextoutputtime)
+double FlowCPUATM(Param XParam, double nextoutputtime, int cstwind,int cstpress,float Uwindi, float Vwindi)
 {
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -1775,7 +1781,7 @@ double FlowCPUATM(Param XParam, double nextoutputtime)
 
 
 	//update(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hh, zs, uu, vv, dh, dhu, dhv);
-	updateATM(XParam.nblk, XParam.blksize, XParam.windU.nx, XParam.windU.ny, XParam.windU.dx, XParam.windU.xo, XParam.windU.yo, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta,(float)XParam.Cd, hh, zs, uu, vv, dh, dhu, dhv, Uwind, Vwind);
+	updateATM(XParam.nblk, XParam.blksize,cstwind,cstpress, XParam.windU.nx, XParam.windU.ny, XParam.windU.dx, XParam.windU.xo, XParam.windU.yo, Uwindi, Vwindi, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta,(float)XParam.Cd, (float)XParam.Pa2m, hh, zs, uu, vv, dh, dhu, dhv, Uwind, Vwind,Patm);
 
 	//printf("dtmax=%f\n", dtmax);
 	XParam.dt = dtmax;// dtnext(totaltime, totaltime + dt, dtmax);
@@ -1791,7 +1797,7 @@ double FlowCPUATM(Param XParam, double nextoutputtime)
 
 		//corrector
 		//update(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, hho, zso, uuo, vvo, dh, dhu, dhv);
-		updateATM(XParam.nblk, XParam.blksize, XParam.windU.nx, XParam.windU.ny, XParam.windU.dx, XParam.windU.xo, XParam.windU.yo, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, (float)XParam.Cd, hho, zso, uuo, vvo, dh, dhu, dhv, Uwind, Vwind);
+		updateATM(XParam.nblk, XParam.blksize, cstwind, cstpress, XParam.windU.nx, XParam.windU.ny, XParam.windU.dx, XParam.windU.xo, XParam.windU.yo, Uwindi, Vwindi, (float)XParam.theta, (float)XParam.dt, (float)XParam.eps, (float)XParam.g, (float)XParam.CFL, (float)XParam.delta, (float)XParam.Cd, (float)XParam.Pa2m, hho, zso, uuo, vvo, dh, dhu, dhv, Uwind, Vwind, Patm);
 
 
 	}

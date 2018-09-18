@@ -365,11 +365,11 @@ template <class T> void carttoBUQ(int nblk, int nx, int ny, double xo, double yo
 
 
 //General CPU functions //Unecessary to declare here?
-void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
+//void mainloopCPU(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd);
 double FlowCPU(Param XParam, double nextoutputtime);
 double FlowCPUDouble(Param XParam, double nextoutputtime);
 double FlowCPUSpherical(Param XParam, double nextoutputtime);
-double FlowCPUATM(Param XParam, double nextoutputtime);
+double FlowCPUATM(Param XParam, double nextoutputtime, int cstwind, int cstpress, float Uwindi, float Vwindi);
 //float demoloopCPU(Param XParam);
 
 void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, double *&zb);
