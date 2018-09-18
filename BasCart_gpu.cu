@@ -4090,7 +4090,7 @@ void mainloopCPU(Param XParam)
 	int nTSstep = 0;
 
 	int windstep = 1;
-
+	int atmpstep = 1;
 	float uwinduni, vwinduni;
 
 	std::vector<Pointout> zsout;
@@ -4120,6 +4120,34 @@ void mainloopCPU(Param XParam)
 		TopFlowBnd(XParam);
 		BotFlowBnd(XParam);
 
+		if (!XParam.atmP.inputfile.empty())
+		{
+			if (XParam.atmP.uniform == 1)
+			{
+				// Do Nothing
+			}
+			else
+			{
+				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.atmP.to) / XParam.atmP.dt), 0), XParam.atmP.nt - 2);
+
+				if (readfirststep + 1 > atmpstep)
+				{
+					// Need to read a new step from the file
+					for (int iw = 0; iw < XParam.atmP.nx*XParam.atmP.ny; iw++)
+					{
+						//
+						Patmbef[iw] = Patmaft[iw];
+
+
+					}
+
+					readATMstep(XParam.atmP, readfirststep + 1, Patmaft);
+					atmpstep = readfirststep + 1;
+				}
+				InterpstepCPU(XParam.atmP.nx, XParam.atmP.ny, readfirststep, XParam.totaltime, XParam.atmP.dt, PatmX, Patmbef, Patmaft);
+
+			}
+		}
 		// Interpolate to wind step if needed
 		if (!XParam.windU.inputfile.empty())
 		{
