@@ -712,19 +712,37 @@ void updateATM(int nblk, int blksize, int cstwind, int cstpress, int windnx, int
 
 					// along X
 					dx = delta / 2.0f;
-					zi = zs[i] - hi+Pa2m*Patm[i];
 
-					//printf("%f\n", zi);
+					if (cstpress == 0)
+					{
+						zi = zs[i] - hi + Pa2m*Patm[i];
+
+						//printf("%f\n", zi);
 
 
-					zl = zi - dx*(dzsdx[i] - dhdx[i] + Pa2m*dPdx[i]);
-					//printf("%f\n", zl);
+						zl = zi - dx*(dzsdx[i] - dhdx[i] + Pa2m*dPdx[i]);
+						//printf("%f\n", zl);
 
-					zn = zs[xminus] - hn + Pa2m * dPdx[xminus];
+						zn = zs[xminus] - hn + Pa2m * dPdx[xminus];
 
-					//printf("%f\n", zn);
-					zr = zn + dx*(dzsdx[xminus] - dhdx[xminus] + Pa2m*dPdx[xminus]);
+						//printf("%f\n", zn);
+						zr = zn + dx*(dzsdx[xminus] - dhdx[xminus] + Pa2m*dPdx[xminus]);
+					}
+					else
+					{
+						zi = zs[i] - hi ;
 
+						//printf("%f\n", zi);
+
+
+						zl = zi - dx*(dzsdx[i] - dhdx[i] );
+						//printf("%f\n", zl);
+
+						zn = zs[xminus] - hn ;
+
+						//printf("%f\n", zn);
+						zr = zn + dx*(dzsdx[xminus] - dhdx[xminus] );
+					}
 
 					zlr = max(zl, zr);
 
@@ -818,10 +836,22 @@ void updateATM(int nblk, int blksize, int cstwind, int cstpress, int windnx, int
 
 					hn = hh[yminus];
 					dx = delta / 2.0f;
-					zi = zs[i] - hi+ Pa2m*Patm[i];
-					zl = zi - dx*(dzsdy[i] - dhdy[i]+Pa2m*dPdy[i]);
-					zn = zs[yminus] - hn + Pa2m * Patm[yminus];
-					zr = zn + dx*(dzsdy[yminus] - dhdy[yminus] + Pa2m * dPdy[yminus]);
+
+					if (cstpress == 0)
+					{
+						zi = zs[i] - hi + Pa2m*Patm[i];
+						zl = zi - dx*(dzsdy[i] - dhdy[i] + Pa2m*dPdy[i]);
+						zn = zs[yminus] - hn + Pa2m * Patm[yminus];
+						zr = zn + dx*(dzsdy[yminus] - dhdy[yminus] + Pa2m * dPdy[yminus]);
+					}
+					else
+					{
+						zi = zs[i] - hi ;
+						zl = zi - dx*(dzsdy[i] - dhdy[i] );
+						zn = zs[yminus] - hn ;
+						zr = zn + dx*(dzsdy[yminus] - dhdy[yminus] );
+					}
+
 					zlr = max(zl, zr);
 
 					hl = hi - dx*dhdy[i];

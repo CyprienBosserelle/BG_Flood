@@ -96,7 +96,7 @@ class bndparam {
 public:
 	std::vector<SLTS> data;
 	bool on = false;
-	int type = 1;
+	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gredient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
 	std::string inputfile;
 };
 
@@ -157,7 +157,7 @@ public:
 	int nriverblock = 0;
 
 	//bnd
-	// 0:Wall; 1:neumann (zeros gredient); 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D
+	
 	
 	bndparam rightbnd;
 	bndparam leftbnd;
