@@ -342,6 +342,20 @@ Param readparamstr(std::string line, Param param)
 		param.Cd = std::stod(parametervalue);
 	}
 
+	parameterstr = "Pa2m";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.Pa2m = std::stod(parametervalue);
+	}
+
+	parameterstr = "Paref";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.Paref = std::stod(parametervalue);
+	}
+
 	parameterstr = "mask";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
