@@ -618,9 +618,9 @@ void update(int nblk, int blksize, float theta, float dt, float eps, float g,flo
 
 				xplus = findright(blksize, ix, iy, ib, rightblk[ib]);
 
-				xminus = findleft(blksize, ix, iy, ib, leftblk[ib]);
+				//xminus = findleft(blksize, ix, iy, ib, leftblk[ib]);
 				yplus = findtop(blksize, ix, iy, ib, topblk[ib]);
-				yminus = findbot(blksize, ix, iy, ib, botblk[ib]);
+				//yminus = findbot(blksize, ix, iy, ib, botblk[ib]);
 
 
 				hi = hh[i];
@@ -1751,8 +1751,8 @@ extern "C" void write2varnc(int nx, int ny, double totaltime, float * var)
 // Main loop that actually runs the model
 double FlowCPU(Param XParam, double nextoutputtime)
 {
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	//int nx = XParam.nx;
+	//int ny = XParam.ny;
 
 	//forcing bnd update 
 	//////////////////////////////
@@ -1851,11 +1851,11 @@ double FlowCPUATM(Param XParam, double nextoutputtime, int cstwind,int cstpress,
 double FlowCPUSpherical(Param XParam, double nextoutputtime)
 {
 	//in spherical mode a special correction is made in update and all need to be in double to remove the 
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	//int nx = XParam.nx;
+	//int ny = XParam.ny;
 
-	int nblk = XParam.nblk;
-	int blksize = XParam.blksize;
+	//int nblk = XParam.nblk;
+	//int blksize = XParam.blksize;
 	//forcing bnd update 
 	//////////////////////////////
 	//flowbnd();
@@ -1984,7 +1984,7 @@ void leftdirichletCPU_old(int nx, int ny, float g, std::vector<double> zsbndvec,
 void leftdirichletCPU(int nblk, int blksize, float xo,float yo, float g, float dx, std::vector<double> zsbndvec, float * blockxo,float * blockyo, float *zs, float *zb, float *hh, float *uu, float *vv)
 {
 	float zsbnd;
-	float xi, yi,jj,ii;
+	float xi, yi,jj;
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
@@ -1999,7 +1999,7 @@ void leftdirichletCPU(int nblk, int blksize, float xo,float yo, float g, float d
 				yi = blockyo[ib] + j*dx;
 
 				jj = (yi - yo) / dx;
-				ii = (xi - xo) / dx;
+				//ii = (xi - xo) / dx;
 				if (zsbndvec.size() == 1)
 				{
 					zsbnd = zsbndvec[0];
@@ -2033,7 +2033,7 @@ void leftdirichletCPU(int nblk, int blksize, float xo,float yo, float g, float d
 void leftdirichletCPUD(int nblk, int blksize, double xo, double yo, double g, double dx, std::vector<double> zsbndvec, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
 	double zsbnd;
-	double xi, yi, jj, ii;
+	double xi, yi, jj;
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
@@ -2048,7 +2048,7 @@ void leftdirichletCPUD(int nblk, int blksize, double xo, double yo, double g, do
 				yi = blockyo[ib] + j*dx;
 
 				jj = (yi - yo) / dx;
-				ii = (xi - xo) / dx;
+				//ii = (xi - xo) / dx;
 				if (zsbndvec.size() == 1)
 				{
 					zsbnd = zsbndvec[0];

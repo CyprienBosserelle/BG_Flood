@@ -160,8 +160,8 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 	int smallnc = XParam.smallnc;
 	float scalefactor = XParam.scalefactor;
 	float addoffset = XParam.addoffset;
-	int nx = ceil(XParam.nx / 16.0) * 16.0;
-	int ny = ceil(XParam.ny / 16.0) * 16.0;
+	//int nx = ceil(XParam.nx / 16.0) * 16.0;
+	//int ny = ceil(XParam.ny / 16.0) * 16.0;
 	int status;
 	int ncid, var_id;
 	int  var_dimid2D[2];
@@ -367,8 +367,8 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 	int smallnc = XParam.smallnc;
 	float scalefactor = XParam.scalefactor;
 	float addoffset = XParam.addoffset;
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	//int nx = XParam.nx;
+	//int ny = XParam.ny;
 	int status;
 	int ncid, var_id;
 	int  var_dimid2D[2];
@@ -639,8 +639,8 @@ extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, 
 
 	if (XParam.smallnc > 0)
 	{
-		nx = (int) count[ndims - 1];
-		ny = (int) count[ndims - 2];//yuk!
+		//nx = (int) count[ndims - 1];
+		//ny = (int) count[ndims - 2];//yuk!
 
 		//printf("nx=%d\tny=%d\n", nx, ny);
 		//If saving as short than we first need to scale and shift the data
@@ -2041,7 +2041,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	}
 	else
 	{
-		ncfilestrU = ncfilestrU;
+		ncfilestrU = WNDUmap.inputfile;
 		Uvarstr = "uwnd";
 	}
 
@@ -2054,7 +2054,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	}
 	else
 	{
-		ncfilestrV = ncfilestrU;
+		ncfilestrV = WNDVmap.inputfile;
 		Vvarstr = "vwnd";
 	}
 
@@ -2075,7 +2075,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	//if (status != NC_NOERR) handle_error(status);
 
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 
 	status = nc_open(ncfilestrV.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
@@ -2090,7 +2090,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	//if (status != NC_NOERR) handle_error(status);
 
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_error(status);
 	printf("Done!\n");
 	
 }
@@ -2131,7 +2131,7 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 	}
 	else
 	{
-		ncfilestr = ncfilestr;
+		ncfilestr = ATMPmap.inputfile;
 		atmpvarstr = "atmP";
 	}
 
@@ -2159,7 +2159,7 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 
 void InterpstepCPU(int nx, int ny,  int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un)
 {
-	float fac = 1.0;
+	//float fac = 1.0;
 	float Uxo, Uxn;
 
 	/*Ums[tx]=Umask[ix];*/
