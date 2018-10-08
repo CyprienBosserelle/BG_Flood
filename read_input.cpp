@@ -100,6 +100,174 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
+
+std::vector<Flowin> readFlowfile(std::string Flowfilename)
+{
+	std::vector<Flowin> slbnd;
+
+	std::ifstream fs(Flowfilename);
+
+	if (fs.fail()) {
+		std::cerr << Flowfilename << " Flow file could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: Flow/River file could not be opened ");
+		exit(1);
+	}
+
+	std::string line;
+	std::vector<std::string> lineelements;
+	//std::vector<double> WLS;
+	Flowin slbndline;
+	while (std::getline(fs, line))
+	{
+		//std::cout << line << std::endl;
+
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//Data should be in the format : time,Water level 1,Water level 2,...Water level n
+			//Location where the water level is 0:ny/(nwl-1):ny where nwl i the number of wlevnodes
+
+			//by default we expect tab delimitation
+			lineelements = split(line, '\t');
+			if (lineelements.size() != 2)
+			{
+				// Is it space delimited?
+				lineelements.clear();
+				lineelements = split(line, ' ');
+			}
+
+			if (lineelements.size() != 2)
+			{
+				//Well it has to be comma delimited then
+				lineelements.clear();
+				lineelements = split(line, ',');
+			}
+			if (lineelements.size() != 2)
+			{
+				// Giving up now! Could not read the files
+				//issue a warning and exit
+				std::cerr << Flowfilename << "ERROR flow file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
+				write_text_to_log_file("ERROR:  flow file (" + Flowfilename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
+				write_text_to_log_file(line);
+				exit(1);
+			}
+
+
+			slbndline.time = std::stod(lineelements[0]);
+
+			
+
+
+
+			slbndline.q = std::stod(lineelements[1]);;
+
+
+
+			//slbndline = readBSHline(line);
+			slbnd.push_back(slbndline);
+			//std::cout << line << std::endl;
+			//WLS.clear();
+		}
+
+	}
+	fs.close();
+
+	//std::cout << slbnd[0].wlev << std::endl;
+
+
+	return slbnd;
+}
+std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
+{
+	// Warning grdapha is expected in radian here
+	std::vector<Windin> wndinput;
+
+	std::ifstream fs(filename);
+
+	if (fs.fail()) {
+		std::cerr << filename << "ERROR: Wind file could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: Wind file could not be opened ");
+		exit(1);
+	}
+
+	std::string line;
+	std::vector<std::string> lineelements;
+	std::vector<double> WLS;
+	Windin wndline;
+	while (std::getline(fs, line))
+	{
+		//std::cout << line << std::endl;
+
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//Data should be in the format : time,wind speed, wind dir, uwind vwind
+			//Location where the water level is 0:ny/(nwl-1):ny where nwl i the number of wlevnodes
+
+			//by default we expect tab delimitation
+			lineelements = split(line, '\t');
+			if (lineelements.size() < 3)
+			{
+				// Is it space delimited?
+				lineelements.clear();
+				lineelements = split(line, ' ');
+			}
+
+			if (lineelements.size() < 3)
+			{
+				//Well it has to be comma delimited then
+				lineelements.clear();
+				lineelements = split(line, ',');
+			}
+			if (lineelements.size() < 3)
+			{
+				// Giving up now! Could not read the files
+				//issue a warning and exit
+				std::cerr << filename << "ERROR Wind  file format error. only " << lineelements.size() << " where at least 3 were expected. Exiting." << std::endl;
+				write_text_to_log_file("ERROR:  Wind file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 3 were expected. Exiting.");
+				write_text_to_log_file(line);
+				exit(1);
+			}
+
+
+			wndline.time = std::stod(lineelements[0]);
+			if (lineelements.size() == 5)
+			{
+				// U and v are explicitelly stated
+				wndline.wspeed = std::stod(lineelements[1]); // Actually his is a dummy 
+				wndline.wdirection= std::stod(lineelements[2]); // Actually his is a dummy
+				wndline.uwind = std::stod(lineelements[3]);
+				wndline.vwind = std::stod(lineelements[4]);
+			}
+			else
+			{
+				// read speed and direction and directly convert to u and v
+				wndline.wspeed = std::stod(lineelements[1]); // Actually his is a dummy 
+				wndline.wdirection = std::stod(lineelements[2]);
+				double theta = (1.5*pi - grdalpha) - wndline.wdirection*pi / 180;
+
+				wndline.uwind = wndline.wspeed*cos(theta);
+				wndline.vwind = wndline.wspeed*sin(theta);
+			}
+			//slbndline.wlevs = WLS;
+
+
+
+			//slbndline = readBSHline(line);
+			wndinput.push_back(wndline);
+			//std::cout << line << std::endl;
+			
+		}
+
+	}
+	fs.close();
+
+	//std::cout << slbnd[0].wlev << std::endl;
+
+
+	return wndinput;
+}
+
 Param readparamstr(std::string line, Param param)
 {
 
@@ -174,7 +342,26 @@ Param readparamstr(std::string line, Param param)
 		param.Cd = std::stod(parametervalue);
 	}
 
-	
+	parameterstr = "Pa2m";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.Pa2m = std::stod(parametervalue);
+	}
+
+	parameterstr = "Paref";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.Paref = std::stod(parametervalue);
+	}
+
+	parameterstr = "mask";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.mask = std::stod(parametervalue);
+	}
 
 	///////////////////////////////////////////////////////
 	// Timekeeping parameters
@@ -306,6 +493,33 @@ Param readparamstr(std::string line, Param param)
 		
 	}
 
+	parameterstr = "river";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> vars = split(parametervalue, ',');
+		if (vars.size() == 5)
+		{
+			River thisriver;
+			thisriver.Riverflowfile = trim(vars[0], " ");
+			thisriver.xstart= std::stod(vars[1]);
+			thisriver.xend= std::stod(vars[2]);
+			thisriver.ystart = std::stod(vars[3]);
+			thisriver.yend = std::stod(vars[4]);
+
+			param.Rivers.push_back(thisriver);
+		}
+		else
+		{
+			//Failed there should be 5 arguments (comma separated) when inputing a river: filename, xstart,xend,ystart,yend;
+			std::cerr << "River input failed there should be 5 arguments (comma separated) when inputing a river: river = filename, xstart,xend,ystart,yend; see log file for details" << std::endl;
+			
+			write_text_to_log_file("River input below failed there should be 5 arguments (comma separated) when inputing a river: river = filename, xstart,xend,ystart,yend;");
+			write_text_to_log_file(parametervalue);
+		}
+	}
+
+
 	parameterstr = "resetmax";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -318,7 +532,8 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.leftbndfile = parametervalue;
+		param.leftbnd.inputfile = parametervalue;
+		param.leftbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -326,21 +541,24 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.rightbndfile = parametervalue;
+		param.rightbnd.inputfile = parametervalue;
+		param.rightbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 	parameterstr = "topbndfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.topbndfile = parametervalue;
+		param.topbnd.inputfile = parametervalue;
+		param.topbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 	parameterstr = "botbndfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.botbndfile = parametervalue;
+		param.botbnd.inputfile = parametervalue;
+		param.botbnd.on = 1;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -348,25 +566,25 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.left = std::stoi(parametervalue);
+		param.leftbnd.type = std::stoi(parametervalue);
 	}
 	parameterstr = "right";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.right = std::stoi(parametervalue);
+		param.rightbnd.type = std::stoi(parametervalue);
 	}
 	parameterstr = "top";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.top = std::stoi(parametervalue);
+		param.topbnd.type = std::stoi(parametervalue);
 	}
 	parameterstr = "bot";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.bot = std::stoi(parametervalue);
+		param.botbnd.type = std::stoi(parametervalue);
 	}
 
 	parameterstr = "nx";
@@ -499,8 +717,78 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.Radius = std::stod(parametervalue);
 	}
+
+	parameterstr = "frictionmodel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.frictionmodel = std::stoi(parametervalue);
+	}
+	// Mapped friction
+	parameterstr = "cfmap";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		
+		param.roughnessmap.inputfile = parametervalue;
+		
+	}
+	parameterstr = "roughnessmap";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		param.roughnessmap.inputfile = parametervalue;
+
+	}
+
+	// wind forcing
+	parameterstr = "windfiles";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		std::vector<std::string> vars = split(parametervalue, ',');
+		if (vars.size() == 2)
+		{
+			// If 2 parameters (files) are given then 1st file is U wind and second is V wind.
+			// This is for variable winds no rotation of the data is performed
+			param.windU.inputfile = trim(vars[0], " ");
+			param.windV.inputfile = trim(vars[1], " ");
+		}
+		else if (vars.size() == 1)
+		{
+			// if 1 parameter(file) is given then a 3 column file is expected showing time windspeed and direction
+			// wind direction is rotated (later) to the grid direction (via grdalfa)
+			param.windU.inputfile = parametervalue;
+			param.windU.uniform = 1;
+			//apply the same for Vwind? seem unecessary but need to be careful later in the code
+		}
+		else
+		{
+			//Failed there should be 5 arguments (comma separated) when inputing a river: filename, xstart,xend,ystart,yend;
+			std::cerr << "Wind input failed there should be 2 arguments (comma separated) when inputing a wind: windfiles = windfile.nc?uwind, windfile.nc?vwind; see log file for details" << std::endl;
+
+			write_text_to_log_file("Wind input failed there should be 2 arguments(comma separated) when inputing a wind : windfiles = windfile.nc ? uwind, windfile.nc ? vwind; see log file for details");
+			write_text_to_log_file(parametervalue);
+		}
+
+	}
+
+	// atmpress forcing
+	parameterstr = "atmpfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		param.atmP.inputfile = parametervalue;
+
+	}
+
 	return param;
 }
+
+
 
 Param checkparamsanity(Param XParam)
 {
@@ -638,30 +926,30 @@ Param checkparamsanity(Param XParam)
 	return XParam;
 }
 
-double setendtime(Param XParam, std::vector<SLTS> leftWLbnd, std::vector<SLTS> rightWLbnd, std::vector<SLTS> topWLbnd, std::vector<SLTS> botWLbnd)
+double setendtime(Param XParam)
 {
 	//endtime cannot be bigger thn the smallest time set in a boundary
 	SLTS tempSLTS;
 	double endtime = XParam.endtime;
-	if (!leftWLbnd.empty() && XParam.left == 1)
+	if (XParam.leftbnd.on)
 	{
-		tempSLTS = leftWLbnd.back();
+		tempSLTS = XParam.leftbnd.data.back();
 		endtime = min( endtime, tempSLTS.time);
 		
 	}
-	if (!rightWLbnd.empty() && XParam.right == 1)
+	if (XParam.rightbnd.on)
 	{
-		tempSLTS = rightWLbnd.back();
+		tempSLTS = XParam.rightbnd.data.back();
 		endtime = min(endtime, tempSLTS.time);
 	}
-	if (!topWLbnd.empty() && XParam.top == 1)
+	if (XParam.topbnd.on)
 	{
-		tempSLTS = topWLbnd.back();
+		tempSLTS = XParam.topbnd.data.back();
 		endtime = min(endtime, tempSLTS.time);
 	}
-	if (!botWLbnd.empty() && XParam.bot == 1)
+	if (XParam.botbnd.on)
 	{
-		tempSLTS = botWLbnd.back();
+		tempSLTS = XParam.botbnd.data.back();
 		endtime = min(endtime, tempSLTS.time);
 	}
 
@@ -730,7 +1018,219 @@ std::string trim(const std::string& str, const std::string& whitespace)
 	return str.substr(strBegin, strRange);
 }
 
-void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
+cfmap readcfmaphead(cfmap Roughmap)
+{
+	// Read critical parameter for the roughness map
+	write_text_to_log_file("Rougness map was specified. Checking file... " );
+	std::string fileext;
+	double dummy;
+	std::vector<std::string> extvec = split(Roughmap.inputfile, '.');
+
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+	write_text_to_log_file("cfmap file extension : " + fileext);
+
+	if (fileext.compare("md") == 0)
+	{
+		write_text_to_log_file("Reading 'md' file");
+		readbathyHeadMD(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, dummy);
+		Roughmap.xo = 0.0;
+		Roughmap.yo = 0.0;
+		Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
+		Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
+	}
+	if (fileext.compare("nc") == 0)
+	{
+		int dummy;
+		double dummya, dummyb;
+		write_text_to_log_file("Reading cfmap as netcdf file");
+		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny,dummy, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummya, Roughmap.xmax, Roughmap.ymax, dummyb);
+		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+		//Roughmap.xo = 0.0;
+		//Roughmap.yo = 0.0;
+		//Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
+		//Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
+
+	}
+	if (fileext.compare("dep") == 0 || fileext.compare("bot") == 0)
+	{
+		//XBeach style file
+		//write_text_to_log_file("Reading " + bathyext + " file");
+		//write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
+	}
+	if (fileext.compare("asc") == 0)
+	{
+		//
+		write_text_to_log_file("Reading cfmap as asc file");
+		readbathyASCHead(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummy);
+		
+		Roughmap.xmax = Roughmap.xo + (Roughmap.nx - 1)*Roughmap.dx;
+		Roughmap.ymax = Roughmap.yo + (Roughmap.ny - 1)*Roughmap.dx;
+	}
+
+
+
+
+
+
+	return Roughmap;
+}
+
+forcingmap readforcingmaphead(forcingmap Fmap)
+{
+	// Read critical parameter for the roughness map
+	write_text_to_log_file("Rougness map was specified. Checking file... ");
+	std::string fileext;
+	double dummy;
+	std::vector<std::string> extvec = split(Fmap.inputfile, '.');
+
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+	
+
+	if (fileext.compare("nc") == 0)
+	{
+		write_text_to_log_file("Reading Forcing file as netcdf file");
+		readgridncsize(Fmap.inputfile, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
+		
+
+	}
+	else
+	{
+		write_text_to_log_file("Forcing file needs to be a .nc file you also need to specify the netcdf variable name like this ncfile.nc?myvar");
+	}
+	
+
+
+	return Fmap;
+}
+
+Param readBathyhead(Param XParam)
+{
+	std::string bathyext;
+
+	//read bathy and perform sanity check
+
+	if (!XParam.Bathymetryfile.empty())
+	{
+		printf("bathy: %s\n", XParam.Bathymetryfile.c_str());
+
+		write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
+
+		std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+
+		std::vector<std::string> nameelements;
+		//by default we expect tab delimitation
+		nameelements = split(extvec.back(), '?');
+		if (nameelements.size() > 1)
+		{
+			//variable name for bathy is not given so it is assumed to be zb
+			bathyext = nameelements[0];
+		}
+		else
+		{
+			bathyext = extvec.back();
+		}
+
+
+		write_text_to_log_file("bathy extension: " + bathyext);
+		if (bathyext.compare("md") == 0)
+		{
+			write_text_to_log_file("Reading 'md' file");
+			readbathyHeadMD(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
+
+		}
+		if (bathyext.compare("nc") == 0)
+		{
+			int dummy;
+			double dummya, dummyb, dummyc;
+			write_text_to_log_file("Reading bathy netcdf file");
+			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy, XParam.dx, XParam.xo, XParam.yo, dummyb, XParam.xmax, XParam.ymax, dummyc);
+			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+
+
+		}
+		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
+		{
+			//XBeach style file
+			write_text_to_log_file("Reading " + bathyext + " file");
+			write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
+		}
+		if (bathyext.compare("asc") == 0)
+		{
+			//
+			write_text_to_log_file("Reading bathy asc file");
+			readbathyASCHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.xo, XParam.yo, XParam.grdalpha);
+			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+		}
+
+		if (XParam.spherical < 1)
+		{
+			XParam.delta = XParam.dx;
+			XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+
+		}
+		else
+		{
+			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+			printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
+			write_text_to_log_file("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
+			if (XParam.grdalpha != 0.0)
+			{
+				printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
+				write_text_to_log_file("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+			}
+		}
+
+		//XParam.nx = ceil(XParam.nx / 16) * 16;
+		//XParam.ny = ceil(XParam.ny / 16) * 16;
+
+
+
+		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.yo);
+		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(XParam.xo) + " yo=" + std::to_string(XParam.yo));
+
+
+		/////////////////////////////////////////////////////
+		////// CHECK PARAMETER SANITY
+		/////////////////////////////////////////////////////
+		XParam = checkparamsanity(XParam);
+
+
+
+
+
+	}
+	else
+	{
+		std::cerr << "Fatal error: No bathymetry file specified. Please specify using 'bathy = Filename.bot'" << std::endl;
+		write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
+		exit(1);
+	}
+	return XParam;
+}
+
+void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
 {
 	
 
@@ -787,7 +1287,8 @@ void readbathyHead(std::string filename, int &nx, int &ny, double &dx, double &g
 
 
 
-extern "C" void readbathy(std::string filename, float *&zb)
+
+extern "C" void readbathyMD(std::string filename, float *&zb)
 {
 	//read input data:
 	//printf("bathy: %s\n", filename);
@@ -925,19 +1426,19 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Boundaries");
 	write_text_to_log_file("# 0:wall; 1:Dirichlet (zs); 2: Neumann (Default)");
-	write_text_to_log_file("right = " + std::to_string(XParam.right) + ";");
-	write_text_to_log_file("left = " + std::to_string(XParam.left) + ";");
-	write_text_to_log_file("top = " + std::to_string(XParam.top) + ";");
-	write_text_to_log_file("bot = " + std::to_string(XParam.bot) + ";");
+	write_text_to_log_file("right = " + std::to_string(XParam.rightbnd.type) + ";");
+	write_text_to_log_file("left = " + std::to_string(XParam.leftbnd.type) + ";");
+	write_text_to_log_file("top = " + std::to_string(XParam.topbnd.type) + ";");
+	write_text_to_log_file("bot = " + std::to_string(XParam.botbnd.type) + ";");
 	
-	if (!XParam.rightbndfile.empty())
-		write_text_to_log_file("rightbndfile = " + XParam.rightbndfile + ";");
-	if (!XParam.leftbndfile.empty())
-		write_text_to_log_file("leftbndfile = " + XParam.leftbndfile + ";");
-	if (!XParam.topbndfile.empty())
-		write_text_to_log_file("topbndfile = " + XParam.topbndfile + ";");
-	if (!XParam.botbndfile.empty())
-		write_text_to_log_file("botbndfile = " + XParam.botbndfile + ";");
+	if (!XParam.rightbnd.inputfile.empty())
+		write_text_to_log_file("rightbndfile = " + XParam.rightbnd.inputfile + ";");
+	if (!XParam.leftbnd.inputfile.empty())
+		write_text_to_log_file("leftbndfile = " + XParam.leftbnd.inputfile + ";");
+	if (!XParam.topbnd.inputfile.empty())
+		write_text_to_log_file("topbndfile = " + XParam.topbnd.inputfile + ";");
+	if (!XParam.botbnd.inputfile.empty())
+		write_text_to_log_file("botbndfile = " + XParam.botbnd.inputfile + ";");
 
 	/*
 	std::string rightbndfile;
@@ -1100,5 +1601,22 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 	}
 
 	fs.close();
+}
+
+double BilinearInterpolation(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y)
+{
+	double x2x1, y2y1, x2x, y2y, yy1, xx1;
+	x2x1 = x2 - x1;
+	y2y1 = y2 - y1;
+	x2x = x2 - x;
+	y2y = y2 - y;
+	yy1 = y - y1;
+	xx1 = x - x1;
+	return 1.0 / (x2x1 * y2y1) * (
+		q11 * x2x * y2y +
+		q21 * xx1 * y2y +
+		q12 * x2x * yy1 +
+		q22 * xx1 * yy1
+		);
 }
 
