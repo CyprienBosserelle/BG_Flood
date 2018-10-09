@@ -5000,7 +5000,7 @@ int main(int argc, char **argv)
 		}// end else
 		
 	}
-	printf("done \n  ");
+	printf("done \n");
 	write_text_to_log_file("Done");
 
 	//////////////////////////////////////////////////////
@@ -5240,7 +5240,7 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMemcpy(rightblk_g, rightblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(topblk_g, topblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(botblk_g, botblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		printf("...Done\n ");
+		printf("...Done\n");
 		write_text_to_log_file("Done ");
 
 	}
@@ -5562,14 +5562,14 @@ int main(int argc, char **argv)
 	}
 	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
-	printf("done \n ");
+	printf("done \n");
 	write_text_to_log_file("Done ");
 
 	
 	SaveParamtolog(XParam);
 
 
-	printf("Starting Model.\n ");
+	printf("\n###################################\n   Starting Model.\n###################################\n \n");
 	write_text_to_log_file("Starting Model. ");
 
 	if (XParam.GPUDEVICE >= 0)
