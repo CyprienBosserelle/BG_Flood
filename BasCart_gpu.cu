@@ -1713,7 +1713,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	if (XParam.Rivers.size() > 1)
+	if (XParam.Rivers.size() > 0)
 	{
 		//
 		dim3 gridDimRiver(XParam.nriverblock, 1, 1);
@@ -1939,7 +1939,7 @@ double FlowGPUATM(Param XParam, double nextoutputtime)
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	if (XParam.Rivers.size() > 1)
+	if (XParam.Rivers.size() > 0)
 	{
 		//
 		dim3 gridDimRiver(XParam.nriverblock, 1, 1);
@@ -2391,7 +2391,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	if (XParam.Rivers.size() > 1)
+	if (XParam.Rivers.size() > 0)
 	{
 		dim3 gridDimRiver(XParam.nriverblock, 1, 1);
 		//
@@ -4850,7 +4850,7 @@ int main(int argc, char **argv)
 	if (XParam.Rivers.size() > 0)
 	{
 		double xx, yy;
-		printf("Preparing rivers ");
+		printf("Preparing rivers... ");
 		write_text_to_log_file("Preparing rivers");
 		//For each rivers
 		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
@@ -4915,6 +4915,7 @@ int main(int argc, char **argv)
 			CUDA_CHECK(cudaMemcpy(Riverblk_g, Riverblk, activeRiverBlk.size() * sizeof(int), cudaMemcpyHostToDevice));
 
 		}
+		printf("Done\n");
 	}
 
 	/////////////////////////////////////////////////////
