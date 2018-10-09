@@ -4847,7 +4847,7 @@ int main(int argc, char **argv)
 	// Prep River discharge
 	/////////////////////////////////////////////////////
 	
-	if (XParam.Rivers.size() > 1)
+	if (XParam.Rivers.size() > 0)
 	{
 		double xx, yy;
 		printf("Preparing rivers ");
