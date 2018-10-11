@@ -150,6 +150,12 @@ float * Vwind_g, *Vwbef_g, *Vwaft_g;
 float * PatmX_g, *Patmbef_g, *Patmaft_g;
 float * Patm_g, *dPdx_g, *dPdy_g;
 double * Patm_gd, *dPdx_gd, *dPdy_gd;
+
+//rain on grid
+float *Rain, *Rainbef, *Rainaft;
+float *Rain_gd, *Rainbef_gd, *Rainaft_gd;
+
+
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
 std::map<std::string, float *> OutputVarMapCPU;
@@ -167,6 +173,7 @@ cudaArray* botWLS_gp;
 cudaArray* Uwind_gp;
 cudaArray* Vwind_gp;
 cudaArray* Patm_gp;
+cudaArray* Rain_gp;
 
 cudaChannelFormatDesc channelDescleftbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescrightbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
@@ -176,6 +183,7 @@ cudaChannelFormatDesc channelDesctopbnd = cudaCreateChannelDesc(32, 0, 0, 0, cud
 cudaChannelFormatDesc channelDescUwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescVwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescPatm = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
 #include "Flow_kernel.cu"
 
@@ -4474,6 +4482,23 @@ int main(int argc, char **argv)
 		
 	}
 
+
+	//////////////////////////////////////////////////////
+	/////             Sanity check                   /////
+	//////////////////////////////////////////////////////
+
+	//put this  in separate function
+
+	//force double for Rain on grid cases
+	if (!XParam.Rainongrid.inputfile.empty())
+	{
+		XParam.doubleprecision = 1;
+	}
+
+
+
+
+
 	///////////////////////////////////////////
 	//  Read Bathy header
 	///////////////////////////////////////////
@@ -5247,7 +5272,7 @@ int main(int argc, char **argv)
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	// Prep wind and atm forcing
+	// Prep wind  / atm forcing
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	if (!XParam.windU.inputfile.empty())
@@ -5371,8 +5396,8 @@ int main(int argc, char **argv)
 		if (XParam.atmP.uniform == 1)
 		{
 			// grid uniform time varying wind input
-			// wlevs[0] is wind speed and wlev[1] is direction
-			XParam.atmP.data = readWNDfileUNI(XParam.windU.inputfile, XParam.grdalpha);
+			//This is pointless?
+			XParam.atmP.data = readINfileUNI(XParam.atmP.inputfile);;
 		}
 		else
 		{
@@ -5453,6 +5478,82 @@ int main(int argc, char **argv)
 
 
 		}
+	}
+
+	////////////////////////////////////////
+	//           Rain on grid         //////
+	////////////////////////////////////////
+	if (!XParam.Rainongrid.inputfile.empty())
+	{
+		//windfile is present
+		if (XParam.Rainongrid.uniform == 1)
+		{
+			// grid uniform time varying wind input
+			// wlevs[0] is wind speed and wlev[1] is direction
+			XParam.Rainongrid.data = readINfileUNI(XParam.Rainongrid.inputfile);
+		}
+		else
+		{
+			// grid and time varying wind input
+			// read parameters fro the size of wind input
+			XParam.Rainongrid = readforcingmaphead(XParam.Rainongrid);
+			
+			Allocate1CPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rain);
+			Allocate1CPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef);
+			Allocate1CPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainaft);
+			
+			XParam.Rainongrid.dt = abs(XParam.Rainongrid.to - XParam.Rainongrid.tmax) / (XParam.Rainongrid.nt - 1);
+			
+
+			int readfirststep = min(max((int)floor((XParam.totaltime - XParam.Rainongrid.to) / XParam.Rainongrid.dt), 0), XParam.Rainongrid.nt - 2);
+
+
+
+			readATMstep(XParam.Rainongrid, readfirststep, Rainbef);
+			readATMstep(XParam.Rainongrid, readfirststep + 1, Rainaft);
+
+			InterpstepCPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, readfirststep, XParam.totaltime, XParam.Rainongrid.dt, Rain, Rainbef, Rainaft);
+
+
+			if (XParam.GPUDEVICE >= 0)
+			{
+				//setup GPU texture to streamline interpolation between the two array
+				Allocate1GPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rain_g);
+				Allocate1GPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g);
+				Allocate1GPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainaft_g);
+				
+
+
+				CUDA_CHECK(cudaMemcpy(Rain_g, Rain, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
+				CUDA_CHECK(cudaMemcpy(Rainaft_g, Rainaft, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
+				CUDA_CHECK(cudaMemcpy(Rainbef_g, Rainbef, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
+				
+
+				//U-wind
+				CUDA_CHECK(cudaMallocArray(&Rain_gp, &channelDescRain, XParam.Rainongrid.nx, XParam.Rainongrid.ny));
+
+
+				CUDA_CHECK(cudaMemcpyToArray(Rain_gp, 0, 0, Rain, XParam.Rainongrid.nx * XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
+
+				texRAIN.addressMode[0] = cudaAddressModeClamp;
+				texRAIN.addressMode[1] = cudaAddressModeClamp;
+				texRAIN.filterMode = cudaFilterModeLinear;
+				texRAIN.normalized = false;
+
+
+				CUDA_CHECK(cudaBindTextureToArray(texRAIN, Rain_gp, channelDescRain));
+
+				
+
+
+
+
+			}
+		}
+
+
+
+
 	}
 
 	// Here map array to their name as a string. it makes it super easy to convert user define variables to the array it represents.
@@ -5567,6 +5668,11 @@ int main(int argc, char **argv)
 
 	
 	SaveParamtolog(XParam);
+
+	/////////////////////////////////////
+	////      STARTING MODEL     ////////
+	/////////////////////////////////////
+
 
 
 	printf("\n###################################\n   Starting Model.\n###################################\n \n");

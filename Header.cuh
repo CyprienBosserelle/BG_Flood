@@ -200,7 +200,7 @@ public:
 	forcingmap windU;
 	forcingmap windV;
 	forcingmap atmP;
-
+	forcingmap Rainongrid;
 };
 
 
@@ -321,6 +321,11 @@ extern float * PatmX_g, *Patmbef_g, *Patmaft_g;
 extern float * Patm_g, *dPdx_g, *dPdy_g;
 extern double * Patm_gd, *dPdx_gd, *dPdy_gd;
 
+//rain on grid
+// Need double for computation but not for input if it is in mm/hrs rather than m/s as expected if we were to respect IS units
+extern float *Rain, *Rainbef, *Rainaft;
+extern float *Rain_g, *Rainbef_g, *Rainaft_g;
+
 // Block info
 extern double * blockxo_d, *blockyo_d;
 extern float * blockxo, *blockyo;
@@ -345,6 +350,7 @@ extern cudaArray* botWLS_gp;
 extern cudaArray* Uwind_gp;
 extern cudaArray* Vwind_gp;
 extern cudaArray* Patm_gp;
+extern cudaArray* Rain_gp;
 
 // Below create channels between cuda arrays (see above) and textures
 extern cudaChannelFormatDesc channelDescleftbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
@@ -355,6 +361,7 @@ extern cudaChannelFormatDesc channelDesctopbnd;// = cudaCreateChannelDesc(32, 0,
 extern cudaChannelFormatDesc channelDescUwind; 
 extern cudaChannelFormatDesc channelDescVwind; 
 extern cudaChannelFormatDesc channelDescPatm;
+extern cudaChannelFormatDesc channelDescRain;
 
 template <class T> T sq(T a);
 
@@ -459,6 +466,7 @@ extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readWLfile(std::string WLfilename);
 std::vector<Flowin> readFlowfile(std::string Flowfilename);
+std::vector<Windin> readINfileUNI(std::string filename);
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
 extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);

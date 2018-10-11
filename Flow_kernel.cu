@@ -30,6 +30,7 @@ texture<float, 2, cudaReadModeElementType> texBBND;
 texture<float, 2, cudaReadModeElementType> texUWND;
 texture<float, 2, cudaReadModeElementType> texVWND;
 texture<float, 2, cudaReadModeElementType> texPATM;
+texture<float, 2, cudaReadModeElementType> texRAIN;
 
 template<class T>
 struct SharedMemory

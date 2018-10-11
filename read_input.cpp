@@ -177,6 +177,69 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 
 	return slbnd;
 }
+std::vector<Windin> readINfileUNI(std::string filename)
+{
+	std::vector<Windin> wndinput;
+
+	std::ifstream fs(filename);
+
+	if (fs.fail()) {
+		std::cerr << filename << "ERROR: Atm presssure / Rainfall file could not be opened" << std::endl;
+		write_text_to_log_file("ERROR: Atm presssure / Rainfall file could not be opened ");
+		exit(1);
+	}
+
+	std::string line;
+	std::vector<std::string> lineelements;
+	std::vector<double> WLS;
+	Windin wndline;
+	while (std::getline(fs, line))
+	{
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//Data should be in the format : time,wind speed, wind dir, uwind vwind
+			//Location where the water level is 0:ny/(nwl-1):ny where nwl i the number of wlevnodes
+
+			//by default we expect tab delimitation
+			lineelements = split(line, '\t');
+			if (lineelements.size() < 2)
+			{
+				// Is it space delimited?
+				lineelements.clear();
+				lineelements = split(line, ' ');
+			}
+
+			if (lineelements.size() < 2)
+			{
+				//Well it has to be comma delimited then
+				lineelements.clear();
+				lineelements = split(line, ',');
+			}
+			if (lineelements.size() < 2)
+			{
+				// Giving up now! Could not read the files
+				//issue a warning and exit
+				std::cerr << filename << "ERROR Atm presssure / Rainfall  file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
+				write_text_to_log_file("ERROR:  Atm presssure / Rainfall file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
+				write_text_to_log_file(line);
+				exit(1);
+			}
+
+
+			wndline.time = std::stod(lineelements[0]);
+			wndline.wspeed = std::stod(lineelements[1]);
+			
+			wndinput.push_back(wndline);
+			
+
+		}
+
+	}
+	fs.close();
+
+	return wndinput;
+}
 std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 {
 	// Warning grdapha is expected in radian here
