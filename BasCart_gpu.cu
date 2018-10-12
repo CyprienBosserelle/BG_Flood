@@ -153,7 +153,7 @@ double * Patm_gd, *dPdx_gd, *dPdy_gd;
 
 //rain on grid
 float *Rain, *Rainbef, *Rainaft;
-float *Rain_gd, *Rainbef_gd, *Rainaft_gd;
+float *Rain_g, *Rainbef_g, *Rainaft_g;
 
 
 //std::string outfile = "output.nc";
@@ -2425,6 +2425,15 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 		}
 	}
 
+
+
+	//Add rain on grid
+	if (!XParam.Rainongrid.inputfile.empty())
+	{
+		//XParam.Rainongrid.xo
+		Rain_on_grid << <gridDim, blockDim, 0 >> > (XParam.Rainongrid.xo, XParam.Rainongrid.yo, XParam.Rainongrid.dx,  XParam.dx, blockxo_gd, blockyo_gd, XParam.dt, zs_gd, hh_gd);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 	return XParam.dt;
 }
 
@@ -2774,7 +2783,9 @@ void mainloopGPUDB(Param XParam)
 	double nextoutputtime = XParam.outputtimestep;
 	int nstep = 0;
 	int nTSsteps = 0;
+	int rainstep = 1;
 
+	double rainuni = 0.0;
 	std::vector<Pointout> zsout;
 
 	std::vector< std::vector< Pointout > > zsAllout;
@@ -2782,6 +2793,11 @@ void mainloopGPUDB(Param XParam)
 	Pointout stepread;
 
 	FILE * fsSLTS;
+
+
+	dim3 blockDimRain(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
+	//dim3 gridDim(ceil((XParam.nx*1.0) / blockDim.x), ceil((XParam.ny*1.0) / blockDim.y), 1);
+	dim3 gridDimRain((int)ceil((float)XParam.Rainongrid.nx / (float)blockDimRain.x), (int)ceil((float)XParam.Rainongrid.ny / (float)blockDimRain.y), 1);
 
 	dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 							 //dim3 gridDim(ceil((XParam.nx*1.0) / blockDim.x), ceil((XParam.ny*1.0) / blockDim.y), 1);
@@ -2806,6 +2822,64 @@ void mainloopGPUDB(Param XParam)
 		RightFlowBnd(XParam);
 		TopFlowBnd(XParam);
 		BotFlowBnd(XParam);
+
+
+		// External forcing
+		if (!XParam.Rainongrid.inputfile.empty())
+		{
+			if (XParam.Rainongrid.uniform == 1)
+			{
+				//
+				int Rstepinbnd = 1;
+
+
+
+				// Do this for all the corners
+				//Needs limiter in case WLbnd is empty
+				double difft = XParam.Rainongrid.data[Rstepinbnd].time - XParam.totaltime;
+
+				while (difft < 0.0)
+				{
+					Rstepinbnd++;
+					difft = XParam.Rainongrid.data[Rstepinbnd].time - XParam.totaltime;
+				}
+
+				rainuni = interptime(XParam.Rainongrid.data[Rstepinbnd].wspeed, XParam.Rainongrid.data[Rstepinbnd - 1].wspeed, XParam.Rainongrid.data[Rstepinbnd].time - XParam.Rainongrid.data[Rstepinbnd - 1].time, XParam.totaltime - XParam.Rainongrid.data[Rstepinbnd - 1].time);
+				
+			}
+			else
+			{
+				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.Rainongrid.to) / XParam.Rainongrid.dt), 0), XParam.Rainongrid.nt - 2);
+
+				if (readfirststep + 1 > rainstep)
+				{
+					// Need to read a new step from the file
+					NextHDstep << <gridDimRain, blockDimRain, 0 >> > (XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g, Rainaft_g);
+					CUDA_CHECK(cudaDeviceSynchronize());
+
+					
+					readATMstep(XParam.Rainongrid,  readfirststep + 1, Rainaft);
+					CUDA_CHECK(cudaMemcpy(Rainaft_g, Rainaft, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
+					
+
+					rainstep = readfirststep + 1;
+				}
+
+				HD_interp << < gridDimRain, blockDimRain, 0 >> > (XParam.Rainongrid.nx, XParam.Rainongrid.ny, 0, rainstep - 1, XParam.totaltime, XParam.Rainongrid.dt, Rainbef_g, Rainaft_g, Rain_g);
+				CUDA_CHECK(cudaDeviceSynchronize());
+
+
+				//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
+				//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
+
+				//below should be async so other streams can keep going
+				CUDA_CHECK(cudaMemcpyToArray(Rain_gp, 0, 0, Rain_g, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyDeviceToDevice));
+				
+			}
+
+		}
+
+
 
 		// Core
 		XParam.dt = FlowGPUDouble(XParam, nextoutputtime);
