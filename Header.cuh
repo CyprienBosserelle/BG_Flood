@@ -44,7 +44,7 @@ public:
 	
 };
 
-class cfmap {
+class inputmap {
 public:
 	int nx = 0;
 	int ny= 0;
@@ -53,6 +53,7 @@ public:
 	double xmax = 0.0;
 	double ymax = 0.0;
 	double dx = 0.0;
+	double grdalpha=0.0;
 	std::string inputfile;
 };
 
@@ -137,7 +138,8 @@ public:
 
 	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
 	//files
-	std::string Bathymetryfile;// bathymetry file name
+	//std::string Bathymetryfile;// bathymetry file name
+	inputmap Bathymetry;
 	std::string outfile="Output.nc"; // netcdf output file name
 	
 	//Timekeeping
@@ -195,7 +197,7 @@ public:
 	int outvort = 0;
 
 	// info of the mapped cf
-	cfmap roughnessmap;
+	inputmap roughnessmap;
 
 	forcingmap windU;
 	forcingmap windV;
@@ -458,8 +460,8 @@ double interp2wnd(int wndnx, int wndny, double wnddx, double wndxo, double wndyo
 
 
 // I/O
-Param readBathyhead(Param XParam);
-cfmap readcfmaphead(cfmap Roughmap);
+inputmap readBathyhead(inputmap Bathy);
+inputmap readcfmaphead(inputmap Roughmap);
 forcingmap readforcingmaphead(forcingmap Fmap);
 std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 extern "C" void readbathyMD(std::string filename, float *&zb);

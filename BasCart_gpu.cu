@@ -4579,9 +4579,60 @@ int main(int argc, char **argv)
 
 	//this sets nx ny dx delta xo yo etc...
 
-	XParam = readBathyhead(XParam);
+	XParam.Bathymetry = readBathyhead(XParam.Bathymetry);
 
-	
+	//Here if xo, xmax, yo, ymax dx and grdalfa ahave not been set by the user use the values specified by the grid
+	if (XParam.xo == XParam.xmax)
+	{
+		XParam.xo = XParam.Bathymetry.xo;
+		XParam.xmax = XParam.Bathymetry.xmax;
+	}
+
+	if (XParam.yo == XParam.ymax)
+	{
+		XParam.yo = XParam.Bathymetry.yo;
+		XParam.ymax = XParam.Bathymetry.ymax;
+	}
+
+	if (XParam.dx == 0.0)
+	{
+		XParam.dx = XParam.Bathymetry.dx;
+		
+	}
+	if (XParam.grdalpha == 0.0) // This default value sucks because 0.0 should be enforcable from the input parameter file
+	{
+		XParam.grdalpha = XParam.Bathymetry.grdalpha;
+
+	}
+
+	XParam.nx = (XParam.xmax - XParam.xo) / XParam.dx + 1; 
+	XParam.ny = (XParam.ymax - XParam.yo) / XParam.dx + 1; //+1?
+
+	if (XParam.spherical < 1)
+	{
+		XParam.delta = XParam.dx;
+		XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+
+	}
+	else
+	{
+		XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+		printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
+		write_text_to_log_file("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
+		if (XParam.grdalpha != 0.0)
+		{
+			printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
+			write_text_to_log_file("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+		}
+	}
+
+
+
+	/////////////////////////////////////////////////////
+	////// CHECK PARAMETER SANITY
+	/////////////////////////////////////////////////////
+	XParam = checkparamsanity(XParam);
+
 
 	//////////////////////////////////////////////////
 	////// Preprare Bnd
@@ -4631,8 +4682,8 @@ int main(int argc, char **argv)
 	////////////////////////////////////////////////
 	// read the bathy file (and store to dummy for now)
 	////////////////////////////////////////////////
-	Allocate1CPU(XParam.nx, XParam.ny, dummy);
-	Allocate1CPU(XParam.nx, XParam.ny, dummy_d);
+	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy);
+	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy_d);
 
 	printf("Read Bathy data...");
 	write_text_to_log_file("Read Bathy data");
@@ -4641,7 +4692,7 @@ int main(int argc, char **argv)
 	// Check bathy extension 
 	std::string bathyext;
 
-	std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+	std::vector<std::string> extvec = split(XParam.Bathymetry.inputfile, '.');
 
 	std::vector<std::string> nameelements;
 	//by default we expect tab delimitation
@@ -4660,22 +4711,23 @@ int main(int argc, char **argv)
 
 	if (bathyext.compare("md") == 0)
 	{
-		readbathyMD(XParam.Bathymetryfile, dummy);
+		readbathyMD(XParam.Bathymetry.inputfile, dummy);
 	}
 	if (bathyext.compare("nc") == 0)
 	{
-		readnczb(XParam.nx, XParam.ny, XParam.Bathymetryfile, dummy);
+		readnczb(XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.inputfile, dummy);
 	}
 	if (bathyext.compare("bot") == 0 || bathyext.compare("dep") == 0)
 	{
-		readXBbathy(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy);
+		readXBbathy(XParam.Bathymetry.inputfile, XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy);
 	}
 	if (bathyext.compare("asc") == 0)
 	{
 		//
-		readbathyASCzb(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy);
+		readbathyASCzb(XParam.Bathymetry.inputfile, XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy);
 	}
 
+	
 
 
 	//printf("%f\n", zb[0]);
@@ -4689,11 +4741,11 @@ int main(int argc, char **argv)
 	{
 		printf("Bathy data is positive down...correcting ...");
 		write_text_to_log_file("Bathy data is positive down...correcting");
-		for (int j = 0; j < ny; j++)
+		for (int j = 0; j <XParam.Bathymetry.ny; j++)
 		{
-			for (int i = 0; i < nx; i++)
+			for (int i = 0; i < XParam.Bathymetry.nx; i++)
 			{
-				dummy[i + j*nx] = dummy[i + j*nx] * -1.0f;
+				dummy[i + j*XParam.Bathymetry.nx] = dummy[i + j*XParam.Bathymetry.nx] * -1.0f;
 				//printf("%f\n", zb[i + (j)*nx]);
 
 			}

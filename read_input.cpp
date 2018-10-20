@@ -343,7 +343,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.Bathymetryfile = parametervalue;
+		param.Bathymetry.inputfile = parametervalue;
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 	
@@ -352,7 +352,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.Bathymetryfile = parametervalue;
+		param.Bathymetry.inputfile = parametervalue;
 	}
 		
 	
@@ -682,14 +682,28 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.grdalpha = std::stod(parametervalue);
+		param.xo = std::stod(parametervalue);
 	}
 
 	parameterstr = "yo";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.grdalpha = std::stod(parametervalue);
+		param.yo = std::stod(parametervalue);
+	}
+
+	parameterstr = "xmax";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.xmax = std::stod(parametervalue);
+	}
+
+	parameterstr = "ymax";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.ymax = std::stod(parametervalue);
 	}
 
 	parameterstr = "g";
@@ -861,7 +875,7 @@ Param checkparamsanity(Param XParam)
 
 	//Check Bathy input type
 	std::string bathyext;
-	std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+	std::vector<std::string> extvec = split(XParam.Bathymetry.inputfile, '.');
 	bathyext = extvec.back();
 	if (bathyext.compare("nc") == 0)
 	{
@@ -1081,7 +1095,7 @@ std::string trim(const std::string& str, const std::string& whitespace)
 	return str.substr(strBegin, strRange);
 }
 
-cfmap readcfmaphead(cfmap Roughmap)
+inputmap readcfmaphead(inputmap Roughmap)
 {
 	// Read critical parameter for the roughness map
 	write_text_to_log_file("Rougness map was specified. Checking file... " );
@@ -1188,19 +1202,19 @@ forcingmap readforcingmaphead(forcingmap Fmap)
 	return Fmap;
 }
 
-Param readBathyhead(Param XParam)
+inputmap readBathyhead(inputmap BathyParam)
 {
 	std::string bathyext;
 
 	//read bathy and perform sanity check
 
-	if (!XParam.Bathymetryfile.empty())
+	if (!BathyParam.inputfile.empty())
 	{
-		printf("bathy: %s\n", XParam.Bathymetryfile.c_str());
+		printf("bathy: %s\n", BathyParam.inputfile.c_str());
 
-		write_text_to_log_file("bathy: " + XParam.Bathymetryfile);
+		write_text_to_log_file("bathy: " + BathyParam.inputfile);
 
-		std::vector<std::string> extvec = split(XParam.Bathymetryfile, '.');
+		std::vector<std::string> extvec = split(BathyParam.inputfile, '.');
 
 		std::vector<std::string> nameelements;
 		//by default we expect tab delimitation
@@ -1220,7 +1234,7 @@ Param readBathyhead(Param XParam)
 		if (bathyext.compare("md") == 0)
 		{
 			write_text_to_log_file("Reading 'md' file");
-			readbathyHeadMD(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha);
+			readbathyHeadMD(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha);
 
 		}
 		if (bathyext.compare("nc") == 0)
@@ -1228,7 +1242,7 @@ Param readBathyhead(Param XParam)
 			int dummy;
 			double dummya, dummyb, dummyc;
 			write_text_to_log_file("Reading bathy netcdf file");
-			readgridncsize(XParam.Bathymetryfile, XParam.nx, XParam.ny, dummy, XParam.dx, XParam.xo, XParam.yo, dummyb, XParam.xmax, XParam.ymax, dummyc);
+			readgridncsize(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, dummy, BathyParam.dx, BathyParam.xo, BathyParam.yo, dummyb, BathyParam.xmax, BathyParam.ymax, dummyc);
 			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 
@@ -1243,41 +1257,20 @@ Param readBathyhead(Param XParam)
 		{
 			//
 			write_text_to_log_file("Reading bathy asc file");
-			readbathyASCHead(XParam.Bathymetryfile, XParam.nx, XParam.ny, XParam.dx, XParam.xo, XParam.yo, XParam.grdalpha);
+			readbathyASCHead(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.xo, BathyParam.yo, BathyParam.grdalpha);
 			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
-		if (XParam.spherical < 1)
-		{
-			XParam.delta = XParam.dx;
-			XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
-
-		}
-		else
-		{
-			XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
-			printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
-			write_text_to_log_file("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
-			if (XParam.grdalpha != 0.0)
-			{
-				printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
-				write_text_to_log_file("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
-			}
-		}
+		
 
 		//XParam.nx = ceil(XParam.nx / 16) * 16;
 		//XParam.ny = ceil(XParam.ny / 16) * 16;
 
 
 
-		printf("nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.yo);
-		write_text_to_log_file("nx=" + std::to_string(XParam.nx) + " ny=" + std::to_string(XParam.ny) + " dx=" + std::to_string(XParam.dx) + " grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(XParam.xo) + " yo=" + std::to_string(XParam.yo));
+		printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo);
+		write_text_to_log_file("Bathymetry grid info: nx=" + std::to_string(BathyParam.nx) + " ny=" + std::to_string(BathyParam.ny) + " dx=" + std::to_string(BathyParam.dx) + " grdalpha=" + std::to_string(BathyParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(BathyParam.xo) + " yo=" + std::to_string(BathyParam.yo));
 
-
-		/////////////////////////////////////////////////////
-		////// CHECK PARAMETER SANITY
-		/////////////////////////////////////////////////////
-		XParam = checkparamsanity(XParam);
 
 
 
@@ -1290,7 +1283,7 @@ Param readBathyhead(Param XParam)
 		write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
 		exit(1);
 	}
-	return XParam;
+	return BathyParam;
 }
 
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
@@ -1425,7 +1418,7 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("### Summary of model parameters ###");
 	write_text_to_log_file("###################################");
 	write_text_to_log_file("# Bathymetry file");
-	write_text_to_log_file("bathy = " + XParam.Bathymetryfile + ";");
+	write_text_to_log_file("bathy = " + XParam.Bathymetry.inputfile + ";");
 	write_text_to_log_file("posdown = " + std::to_string(XParam.posdown) + ";");
 	write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
 	write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");
