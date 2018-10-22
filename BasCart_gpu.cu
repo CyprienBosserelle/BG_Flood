@@ -393,6 +393,57 @@ template <class T> void carttoBUQ(int nblk, int nx,int ny, double xo,double yo, 
 	}
 }
 
+template <class T> void interp2BUQ(int nblk, double blksize,  double blkdx, double* blockxo, double* blockyo, int nx, int ny, double xo, double xmax, double yo,double ymax, double dx,T * zb, T *&zb_buq)
+{
+	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
+
+	double x, y;
+	int n;
+
+	for (int bl = 0; bl < nblk; bl++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				n = i + j * 16 + bl * blksize;
+				x = blockxo[bl] + i*blkdx;
+				y = blockyo[bl] + j*blkdx;
+
+				if (x >= xo && x <= xmax && y >= yo && y <= ymax)
+				{
+					// cells that falls off this domain are assigned 
+					double x1, x2, y1, y2;
+					double q11, q12, q21, q22;
+					int cfi, cfip, cfj, cfjp;
+
+
+
+					cfi = min(max((int)floor((x - xo) / dx), 0), nx - 2);
+					cfip = cfi + 1;
+
+					x1 = xo + dx*cfi;
+					x2 = xo + dx*cfip;
+
+					cfj = min(max((int)floor((y - yo) / dx), 0), ny - 2);
+					cfjp = cfj + 1;
+
+					y1 = yo + dx*cfj;
+					y2 = yo + dx*cfjp;
+
+					q11 = zb[cfi + cfj*nx];
+					q12 = zb[cfi + cfjp*nx];
+					q21 = zb[cfip + cfj*nx];
+					q22 = zb[cfip + cfjp*nx];
+
+					zb_buq[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
+				}
+
+			}
+		}
+	}
+}
+
 template <class T> void interp2cf(Param XParam, float * cfin,T* blockxo, T* blockyo, T * &cf)
 {
 	// This function interpolates the values in cfmapin to cf using a bilinear interpolation
@@ -4825,7 +4876,7 @@ int main(int argc, char **argv)
 			{
 				//
 				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * XParam.dx;
-				blockyo_d[blkid] = XParam.yo + nblky * 16 * XParam.dx;
+				blockyo_d[blkid] = XParam.yo + nblky * 16.0 * XParam.dx;
 				blkid++;
 			}
 		}
@@ -4965,12 +5016,15 @@ int main(int argc, char **argv)
 				dummy_d[i + j*nx] = dummy[i + j*nx] * 1.0;
 			}
 		}
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy_d, zb_d);
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy_d, zb_d);
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy_d, zb_d);
 	}
 	else
 	{
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy, zb);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
+
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy, zb);
 	}
 
 

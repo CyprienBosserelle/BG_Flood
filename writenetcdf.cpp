@@ -1162,8 +1162,9 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 				}
 			}
 		}
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 		
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
@@ -1229,7 +1230,10 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 			}
 		}
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zs);
+
+
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
@@ -1320,7 +1324,9 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 			}
 		}
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, hh);
+
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 		
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
@@ -1429,8 +1435,9 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 			}
 		}
 
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, uu);
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
 		free(ddim);
 
 
@@ -1513,7 +1520,10 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 			}
 		}
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, vv);
+
+
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
 		free(ddim);
 
 
@@ -1625,7 +1635,9 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 			}
 		}
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
+
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
@@ -1686,8 +1698,10 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 				}
 			}
 		}
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zs);
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
+
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
@@ -1777,7 +1791,10 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 			}
 		}
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, hh);
+
+
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, hh);
@@ -1886,8 +1903,9 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 			}
 		}
 
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, uu);
 
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
 		free(ddim);
 
 
@@ -1969,8 +1987,8 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 				}
 			}
 		}
-
-		carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockxo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, vv);
+		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
 		free(ddim);
 
 
