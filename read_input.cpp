@@ -983,6 +983,16 @@ Param checkparamsanity(Param XParam)
 		{
 			XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XParam.xo) / XParam.dx), 0), XParam.nx - 1);
 			XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XParam.yo) / XParam.dx), 0), XParam.ny - 1);
+
+			//find the block where point belongs
+			for (int blk = 0; blk < XParam.nblk; blk++)
+			{
+				//
+				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
+				{
+					XParam.TSnodesout[o].block = blk;
+				}
+			}
 			
 		}
 

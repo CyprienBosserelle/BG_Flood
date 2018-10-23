@@ -380,9 +380,9 @@ double FlowCPUDouble(Param XParam, double nextoutputtime);
 double FlowCPUSpherical(Param XParam, double nextoutputtime);
 double FlowCPUATM(Param XParam, double nextoutputtime, int cstwind, int cstpress, float Uwindi, float Vwindi);
 //float demoloopCPU(Param XParam);
-
-void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, double *&zb);
-void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, float *&zb);
+template <class T>  void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, T *&zb);
+//void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, double *&zb);
+//void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, float *&zb);
 
 void update(int nx, int ny, float theta, float dt, float eps, float g, float CFL, float delta, float *hh, float *zs, float *uu, float *vv, float *&dh, float *&dhu, float *&dhv);
 //void advance(int nx, int ny, float dt, float eps, float *hh, float *zs, float *uu, float * vv, float * dh, float *dhu, float *dhv, float * &hho, float *&zso, float *&uuo, float *&vvo);

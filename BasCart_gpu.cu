@@ -271,7 +271,7 @@ template <class T> void CopyArray(int nblk, int blksize, T* source, T * & dest)
 	}
 }
 
-void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk,  double *&zb)
+template <class T>  void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, T *&zb)
 {
 	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
 
@@ -280,55 +280,6 @@ void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk,
 	for (int bl = 0; bl < nblk; bl++)
 	{
 		
-		if (bl == leftblk[bl])//i.e. if a block refers to as it's onwn neighbour then it doesn't have a neighbour/// This also applies to block that are on the edge of the grid so the above is commentted
-		{
-			int i = 0;
-			for (int j = 0; j < 16; j++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + 1 + j * 16 + bl * 256];
-			}
-		}
-		if (bl == rightblk[bl])
-		{
-			int i = 15;
-			for (int j = 0; j < 16; j++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i - 1 + j * 16 + bl * 256];
-			}
-		}
-		if (bl == topblk[bl])
-		{
-			int j = 15;
-			for (int i = 0; i < 16; i++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + (j - 1) * 16 + bl * 256];
-			}
-		}
-		if (bl == botblk[bl])
-		{
-			int j = 0;
-			for (int i = 0; i < 16; i++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + (j + 1) * 16 + bl * 256];
-			}
-		}
-
-	}
-}
-
-void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, float *&zb)
-{
-	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
-
-	// here the bathy of the outter most cells of the domain are "set" to the same value as the second outter most.
-	// this also applies to the blocks with no neighbour
-	for (int bl = 0; bl < nblk; bl++)
-	{
-
 		if (bl == leftblk[bl])//i.e. if a block refers to as it's onwn neighbour then it doesn't have a neighbour/// This also applies to block that are on the edge of the grid so the above is commentted
 		{
 			int i = 0;
