@@ -388,7 +388,7 @@ template <class T> void interp2BUQ(int nblk, double blksize,  double blkdx, doub
 					q22 = zb[cfip + cfjp*nx];
 
 					zb_buq[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-					printf("zb_buq[n] = %f\n", zb_buq[n]);
+					//printf("zb_buq[n] = %f\n", zb_buq[n]);
 				}
 
 			}
@@ -4885,6 +4885,10 @@ int main(int argc, char **argv)
 	//xo + (ceil(nx / 16.0)*16.0 - 1)*dx
 	XParam.xmax = XParam.xo + (ceil(nx / 16.0) * 16.0 - 1)*XParam.dx;
 	XParam.ymax = XParam.yo + (ceil(ny / 16.0) * 16.0 - 1)*XParam.dx;
+
+
+
+
 
 	////////////////////////////////////////////////
 	///// Allocate memory on CPU
