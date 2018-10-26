@@ -4619,6 +4619,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
+		//Geo grid
 		XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
 		printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
 		write_text_to_log_file("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
@@ -4666,6 +4667,12 @@ int main(int argc, char **argv)
 		XParam.botbnd.data = readWLfile(XParam.botbnd.inputfile);
 		XParam.botbnd.on = 1;
 	}
+
+
+
+	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
+
+
 
 
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
