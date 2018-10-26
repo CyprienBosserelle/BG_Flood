@@ -388,6 +388,7 @@ template <class T> void interp2BUQ(int nblk, double blksize,  double blkdx, doub
 					q22 = zb[cfip + cfjp*nx];
 
 					zb_buq[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
+					printf("zb_buq[n] = %f\n", zb_buq[n]);
 				}
 
 			}
