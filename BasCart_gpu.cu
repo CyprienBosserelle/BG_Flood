@@ -353,6 +353,7 @@ template <class T> void interp2BUQ(int nblk, double blksize,  double blkdx, doub
 
 	for (int bl = 0; bl < nblk; bl++)
 	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		for (int j = 0; j < 16; j++)
 		{
 			for (int i = 0; i < 16; i++)
@@ -388,7 +389,7 @@ template <class T> void interp2BUQ(int nblk, double blksize,  double blkdx, doub
 					q22 = zb[cfip + cfjp*nx];
 
 					zb_buq[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-					//printf("zb_buq[n] = %f\n", zb_buq[n]);
+					//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
 				}
 
 			}
@@ -4584,7 +4585,7 @@ int main(int argc, char **argv)
 
 	XParam.Bathymetry = readBathyhead(XParam.Bathymetry);
 
-	//Here if xo, xmax, yo, ymax dx and grdalfa ahave not been set by the user use the values specified by the grid
+	//Here if xo, xmax, yo, ymax dx and grdalfa have not been set by the user use the values specified by the bathymetry grid
 	if (XParam.xo == XParam.xmax)
 	{
 		XParam.xo = XParam.Bathymetry.xo;
@@ -4608,8 +4609,8 @@ int main(int argc, char **argv)
 
 	}
 
-	XParam.nx = (XParam.xmax - XParam.xo) / XParam.dx + 1; 
-	XParam.ny = (XParam.ymax - XParam.yo) / XParam.dx + 1; //+1?
+	XParam.nx = (XParam.xmax - XParam.xo) / XParam.dx+1; 
+	XParam.ny = (XParam.ymax - XParam.yo) / XParam.dx+1; //+1?
 
 	if (XParam.spherical < 1)
 	{
@@ -4836,6 +4837,7 @@ int main(int argc, char **argv)
 				//
 				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * XParam.dx;
 				blockyo_d[blkid] = XParam.yo + nblky * 16.0 * XParam.dx;
+				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;
 			}
 		}

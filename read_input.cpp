@@ -1247,8 +1247,8 @@ inputmap readBathyhead(inputmap BathyParam)
 			readbathyHeadMD(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha);
 			BathyParam.xo = 0.0;
 			BathyParam.yo = 0.0;
-			BathyParam.xmax = BathyParam.xo + BathyParam.nx*BathyParam.dx;
-			BathyParam.ymax = BathyParam.yo + BathyParam.ny*BathyParam.dx;
+			BathyParam.xmax = BathyParam.xo + (BathyParam.nx - 1)*BathyParam.dx;
+			BathyParam.ymax = BathyParam.yo + (BathyParam.ny - 1)*BathyParam.dx;
 
 		}
 		if (bathyext.compare("nc") == 0)
@@ -1272,8 +1272,8 @@ inputmap readBathyhead(inputmap BathyParam)
 			//
 			write_text_to_log_file("Reading bathy asc file");
 			readbathyASCHead(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.xo, BathyParam.yo, BathyParam.grdalpha);
-			BathyParam.xmax = BathyParam.xo + BathyParam.nx*BathyParam.dx;
-			BathyParam.ymax = BathyParam.yo + BathyParam.ny*BathyParam.dx;
+			BathyParam.xmax = BathyParam.xo + (BathyParam.nx-1)*BathyParam.dx;
+			BathyParam.ymax = BathyParam.yo + (BathyParam.ny-1)*BathyParam.dx;
 			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
