@@ -4792,13 +4792,13 @@ int main(int argc, char **argv)
 
 
 
-						cfi = min(max((int)floor((x - XParam.Bathymetry.xo) / XParam.Bathymetry.dx), 0), nx - 2);
+						cfi = min(max((int)floor((x - XParam.Bathymetry.xo) / XParam.Bathymetry.dx), 0), XParam.Bathymetry.nx - 2);
 						cfip = cfi + 1;
 
 						x1 = XParam.Bathymetry.xo + XParam.Bathymetry.dx*cfi;
 						x2 = XParam.Bathymetry.xo + XParam.Bathymetry.dx*cfip;
 
-						cfj = min(max((int)floor((y - XParam.Bathymetry.yo) / XParam.Bathymetry.dx), 0), ny - 2);
+						cfj = min(max((int)floor((y - XParam.Bathymetry.yo) / XParam.Bathymetry.dx), 0), XParam.Bathymetry.ny - 2);
 						cfjp = cfj + 1;
 
 						y1 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfj;
@@ -4869,13 +4869,13 @@ int main(int argc, char **argv)
 
 
 
-						cfi = min(max((int)floor((x - XParam.Bathymetry.xo) / XParam.Bathymetry.dx), 0), nx - 2);
+						cfi = min(max((int)floor((x - XParam.Bathymetry.xo) / XParam.Bathymetry.dx), 0), XParam.Bathymetry.nx - 2);
 						cfip = cfi + 1;
 
 						x1 = XParam.Bathymetry.xo + XParam.Bathymetry.dx*cfi;
 						x2 = XParam.Bathymetry.xo + XParam.Bathymetry.dx*cfip;
 
-						cfj = min(max((int)floor((y - XParam.Bathymetry.yo) / XParam.Bathymetry.dx), 0), ny - 2);
+						cfj = min(max((int)floor((y - XParam.Bathymetry.yo) / XParam.Bathymetry.dx), 0), XParam.Bathymetry.ny - 2);
 						cfjp = cfj + 1;
 
 						y1 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfj;
@@ -4887,7 +4887,7 @@ int main(int argc, char **argv)
 						q22 = dummy[cfip + cfjp*nx];
 
 						q = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-						//printf("zb_buq[n] = %f\n", zb_buq[n]);
+						//printf("q = %f\t q11=%f\t, q12=%f\t, q21=%f\t, q22=%f\t, x1=%f\t, x2=%f\t, y1=%f\t, y2=%f\t, x=%f\t, y=%f\t\n", q, q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 						//printf("mloc: %i\n", mloc);
 						if (q >= XParam.mask)
 							nmask++;
