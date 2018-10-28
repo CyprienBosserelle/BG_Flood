@@ -352,6 +352,8 @@ void kurganovd(double g, double CFL, double hm, double hp, double um, double up,
 		*fh = *fq = 0.0;
 }
 
+
+/*
 void neumannbnd(int nx, int ny, double*a)
 {
 	//
@@ -390,7 +392,7 @@ void neumannbnd(int nx, int ny, double*a)
 	}
 
 }
-
+*/
 
 //Warning all the g, dt etc shouyld all be float so the compiler does the conversion before running the 
 
@@ -1800,8 +1802,8 @@ double FlowCPU(Param XParam, double nextoutputtime)
 
 double FlowCPUATM(Param XParam, double nextoutputtime, int cstwind,int cstpress,float Uwindi, float Vwindi)
 {
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	//int nx = XParam.nx;
+	//int ny = XParam.ny;
 
 	//forcing bnd update 
 	//////////////////////////////
@@ -1898,8 +1900,8 @@ double FlowCPUSpherical(Param XParam, double nextoutputtime)
 double FlowCPUDouble(Param XParam, double nextoutputtime)
 {
 	//in spherical mode a special correction is made in update and all need to be in double to remove the 
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	//int nx = XParam.nx;
+	//int ny = XParam.ny;
 
 	//forcing bnd update 
 	//////////////////////////////
@@ -2476,12 +2478,12 @@ void noslipbndRCPU(Param XParam)
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
 		//noslipbndRightCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
-		noslipbndRightCPU(XParam.nblk, XParam.blksize, XParam.nx, XParam.xo, XParam.eps, XParam.dx, blockxo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
+		noslipbndRightCPU(XParam.nblk, XParam.blksize, XParam.xo, XParam.xmax, XParam.eps, XParam.dx, blockxo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
 	}
 	else
 	{
 		// Right Wall
-		noslipbndRightCPU(XParam.nblk, XParam.blksize, XParam.nx, (float)XParam.xo, (float)XParam.eps, (float)XParam.dx, blockxo, zb, zs, hh, uu, vv);
+		noslipbndRightCPU(XParam.nblk, XParam.blksize, (float)XParam.xo, (float)XParam.xmax, (float)XParam.eps, (float)XParam.dx, blockxo, zb, zs, hh, uu, vv);
 	}
 }
 void noslipbndTCPU(Param XParam)
@@ -2491,12 +2493,12 @@ void noslipbndTCPU(Param XParam)
 	{
 		//
 		//noslipbndTopCPU(XParam.nx, XParam.ny, XParam.eps, zb_d, zs_d, hh_d, uu_d, vv_d);
-		noslipbndTopCPU(XParam.nblk, XParam.blksize, XParam.ny, XParam.yo, XParam.eps, XParam.dx, blockyo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
+		noslipbndTopCPU(XParam.nblk, XParam.blksize, XParam.yo, XParam.ymax, XParam.eps, XParam.dx, blockyo_d, zb_d, zs_d, hh_d, uu_d, vv_d);
 	}
 	else
 	{
 		// Top Wall
-		noslipbndTopCPU(XParam.nblk, XParam.blksize, XParam.ny, (float)XParam.yo, (float)XParam.eps, (float)XParam.dx, blockyo, zb, zs, hh, uu, vv);
+		noslipbndTopCPU(XParam.nblk, XParam.blksize, (float)XParam.yo, (float)XParam.ymax, (float)XParam.eps, (float)XParam.dx, blockyo, zb, zs, hh, uu, vv);
 	}
 }
 void noslipbndBCPU(Param XParam)
@@ -2540,12 +2542,12 @@ template <class T> void noslipbndLeftCPU(int nblk, int blksize, T xo, T eps,T* b
 	}
 }
 
-template <class T> void noslipbndRightCPU(int nblk, int blksize, int nx, T xo, T eps, T dx, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> void noslipbndRightCPU(int nblk, int blksize, T xo, T xmax, T eps, T dx, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
-		if (blockxo[ib] + (15 * dx) == xo + (ceil(nx / 16.0)*16.0 - 1)*dx)//if block is on the side
+		if (blockxo[ib] + (15 * dx) == xmax)//if block is on the side
 		{
 			int i = 15;
 			for (int j = 0; j < 16; j++)
@@ -2570,14 +2572,14 @@ template <class T> void noslipbndRightCPU(int nblk, int blksize, int nx, T xo, T
 	
 
 }
-template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T eps, T dx, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
+template <class T> void noslipbndTopCPU(int nblk, int blksize, T yo, T ymax, T eps, T dx, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 
 	for (int ib = 0; ib < nblk; ib++) //scan each block
 	{
 		//printf("bymax=%f\tymax=%f\n", blockyo[ib] + (15.0 * dx), yo + (ceil(ny / 16.0)*16.0-1)*dx);
 
-		if ((blockyo[ib] + (15.0 * dx)) == (yo + (ceil(ny / 16.0)*16.0 - 1)*dx))//if block is on the side
+		if ((blockyo[ib] + (15.0 * dx)) == ymax)//if block is on the side
 		{
 			int j = 15;
 			for (int i = 0; i < 16; i++)
@@ -2638,7 +2640,7 @@ template <class T> void noslipbndBotCPU(int nblk, int blksize,T yo, T eps, T* bl
 	}
 
 }
-
+/*
 void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, float *hh, float *uu, float *vv)
 {
 	
@@ -2688,7 +2690,7 @@ void noslipbndallCPU(int nx, int ny, float dt, float eps, float *zb, float *zs, 
 	}
 
 }
-
+*/
 
 //Functions below use update global variable so we need two copies for the float and double cases
 
@@ -2895,8 +2897,8 @@ void DivmeanCPU(Param XParam, float nstep)
 
 void DivmeanCPUD(Param XParam, float nstep)
 {
-	int nblk = XParam.nx;
-	int blksize = XParam.ny;
+	int nblk = XParam.nblk;
+	int blksize = XParam.blksize;
 
 	if (XParam.outhhmean == 1)
 	{

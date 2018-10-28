@@ -413,9 +413,9 @@ void noslipbndBCPU(Param XParam);
 
 //template <class T> void noslipbndallCPU(int nx, int ny, T dt, T eps, T *zb, T *zs, T *hh, T *uu, T *vv);
 template <class T> void noslipbndLeftCPU(int nblk, int blksize, T xo, T eps, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv);
-template <class T> void noslipbndRightCPU(int nblk, int blksize, int nx, T xo, T eps, T dx, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndRightCPU(int nblk, int blksize, T xo, T xmax,T eps, T dx, T* blockxo, T *zb, T *zs, T *hh, T *uu, T *vv);
 template <class T> void noslipbndBotCPU(int nblk, int blksize, T yo, T eps, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv);
-template <class T> void noslipbndTopCPU(int nblk, int blksize, int ny, T yo, T eps, T dx, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv);
+template <class T> void noslipbndTopCPU(int nblk, int blksize, T yo, T ymax, T eps, T dx, T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv);
 
 
 
