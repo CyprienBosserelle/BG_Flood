@@ -4670,12 +4670,6 @@ int main(int argc, char **argv)
 	}
 
 
-
-	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
-
-
-
-
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
 	XParam.endtime = setendtime(XParam);
 
@@ -4687,6 +4681,8 @@ int main(int argc, char **argv)
 
 	int nx = XParam.nx;
 	int ny = XParam.ny;
+
+	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
 
 
 
@@ -4804,13 +4800,13 @@ int main(int argc, char **argv)
 						y1 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfj;
 						y2 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfjp;
 
-						q11 = dummy[cfi + cfj*nx];
-						q12 = dummy[cfi + cfjp*nx];
-						q21 = dummy[cfip + cfj*nx];
-						q22 = dummy[cfip + cfjp*nx];
+						q11 = dummy[cfi + cfj*XParam.Bathymetry.nx];
+						q12 = dummy[cfi + cfjp*XParam.Bathymetry.nx];
+						q21 = dummy[cfip + cfj*XParam.Bathymetry.nx];
+						q22 = dummy[cfip + cfjp*XParam.Bathymetry.nx];
 
 						q = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-						//printf("zb_buq[n] = %f\n", zb_buq[n]);
+						//printf("q = %f\n", q);
 						//printf("mloc: %i\n", mloc);
 						if (q >= XParam.mask)
 							nmask++;
@@ -4881,10 +4877,10 @@ int main(int argc, char **argv)
 						y1 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfj;
 						y2 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfjp;
 
-						q11 = dummy[cfi + cfj*nx];
-						q12 = dummy[cfi + cfjp*nx];
-						q21 = dummy[cfip + cfj*nx];
-						q22 = dummy[cfip + cfjp*nx];
+						q11 = dummy[cfi + cfj*XParam.Bathymetry.nx];
+						q12 = dummy[cfi + cfjp*XParam.Bathymetry.nx];
+						q21 = dummy[cfip + cfj*XParam.Bathymetry.nx];
+						q22 = dummy[cfip + cfjp*XParam.Bathymetry.nx];
 
 						q = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 						//printf("q = %f\t q11=%f\t, q12=%f\t, q21=%f\t, q22=%f\t, x1=%f\t, x2=%f\t, y1=%f\t, y2=%f\t, x=%f\t, y=%f\t\n", q, q11, q12, q21, q22, x1, x2, y1, y2, x, y);
