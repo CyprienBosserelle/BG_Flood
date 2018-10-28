@@ -4780,12 +4780,46 @@ int main(int argc, char **argv)
 			{
 				for (int j = 0; j < 16; j++)
 				{
-					int ix = min(i + 16 * nblkx, nx-1);
-					int iy = min(j + nblky * 16 , ny-1);
-					mloc = ix + iy*nx ;
-					//printf("mloc: %i\n", mloc);
-					if (dummy[mloc] >= XParam.mask)
+					double x = XParam.xo + (i + 16 * nblkx)*XParam.dx;
+					double y = XParam.yo + (j + 16 * nblky)*XParam.dx;
+
+					if (x >= XParam.Bathymetry.xo && x <= XParam.Bathymetry.xmax && y >= XParam.Bathymetry.yo && y <= XParam.Bathymetry.ymax)
+					{
+						// cells that falls off this domain are assigned 
+						double x1, x2, y1, y2;
+						double q11, q12, q21, q22, q;
+						int cfi, cfip, cfj, cfjp;
+
+
+
+						cfi = min(max((int)floor((x - XParam.Bathymetry.xo) / XParam.Bathymetry.dx), 0), nx - 2);
+						cfip = cfi + 1;
+
+						x1 = XParam.Bathymetry.xo + XParam.Bathymetry.dx*cfi;
+						x2 = XParam.Bathymetry.xo + XParam.Bathymetry.dx*cfip;
+
+						cfj = min(max((int)floor((y - XParam.Bathymetry.yo) / XParam.Bathymetry.dx), 0), ny - 2);
+						cfjp = cfj + 1;
+
+						y1 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfj;
+						y2 = XParam.Bathymetry.yo + XParam.Bathymetry.dx*cfjp;
+
+						q11 = dummy[cfi + cfj*nx];
+						q12 = dummy[cfi + cfjp*nx];
+						q21 = dummy[cfip + cfj*nx];
+						q22 = dummy[cfip + cfjp*nx];
+
+						q = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
+						//printf("zb_buq[n] = %f\n", zb_buq[n]);
+						//printf("mloc: %i\n", mloc);
+						if (q >= XParam.mask)
+							nmask++;
+					}
+					else
+					{
+						//computational domnain is outside of the bathy domain
 						nmask++;
+					}
 
 				}
 			}
