@@ -4956,8 +4956,8 @@ int main(int argc, char **argv)
 
 	// Also recalculate xmax and ymax here
 	//xo + (ceil(nx / 16.0)*16.0 - 1)*dx
-	XParam.xmax = XParam.xo + (ceil(nx / 16.0) * 16.0 - 1)*XParam.dx;
-	XParam.ymax = XParam.yo + (ceil(ny / 16.0) * 16.0 - 1)*XParam.dx;
+	XParam.xmax = XParam.xo + (ceil(XParam.nx / 16.0) * 16.0 - 1)*XParam.dx;
+	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*XParam.dx;
 
 
 
@@ -5038,11 +5038,11 @@ int main(int argc, char **argv)
 	// Copy dummy to zb
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
-		for (int j = 0; j < ny; j++)
+		for (int j = 0; j < XParam.Bathymetry.ny; j++)
 		{
-			for (int i = 0; i < nx; i++)
+			for (int i = 0; i < XParam.Bathymetry.nx; i++)
 			{
-				dummy_d[i + j*nx] = dummy[i + j*nx] * 1.0;
+				dummy_d[i + j*XParam.Bathymetry.nx] = dummy[i + j*XParam.Bathymetry.nx] * 1.0;
 			}
 		}
 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy_d, zb_d);
