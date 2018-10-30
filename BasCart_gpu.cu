@@ -4910,7 +4910,7 @@ int main(int argc, char **argv)
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 	for (int bl = 0; bl < nblk; bl++)
 	{
-		double espdist = 0.00000001;
+		double espdist = 0.00000001;///WARMING
 		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 16.0 * XParam.dx;
