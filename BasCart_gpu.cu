@@ -4928,25 +4928,25 @@ int main(int argc, char **argv)
 		for (int blb = 0; blb < nblk; blb++)
 		{
 			//
-			if ((blockxo_d[blb] - leftxo) < espdist  && (blockyo_d[blb] - leftyo) < espdist)
+			if (abs(blockxo_d[blb] - leftxo) < espdist  && abs(blockyo_d[blb] - leftyo) < espdist)
 			{
 				leftblk[bl] = blb;
 			}
-			if ((blockxo_d[blb] - rightxo)  < espdist && (blockyo_d[blb] - rightyo) < espdist)
+			if (abs(blockxo_d[blb] - rightxo)  < espdist && abs(blockyo_d[blb] - rightyo) < espdist)
 			{
 				rightblk[bl] = blb;
 			}
-			if ((blockxo_d[blb] - topxo) < espdist && (blockyo_d[blb] - topyo) < espdist)
+			if (abs(blockxo_d[blb] - topxo) < espdist && abs(blockyo_d[blb] - topyo) < espdist)
 			{
 				topblk[bl] = blb;
 				
 			}
-			if ((blockxo_d[blb] - botxo) < espdist && (blockyo_d[blb] - botyo) < espdist)
+			if (abs(blockxo_d[blb] - botxo) < espdist && abs(blockyo_d[blb] - botyo) < espdist)
 			{
 				botblk[bl] = blb;
 			}
 		}
-		printf("blk=%d\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
+		//printf("blk=%d\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
 
 
 	}
