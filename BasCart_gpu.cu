@@ -4910,7 +4910,7 @@ int main(int argc, char **argv)
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 	for (int bl = 0; bl < nblk; bl++)
 	{
-		double espdist = epsilon*10.0;
+		double espdist = 0.00000001;
 		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 16.0 * XParam.dx;
@@ -4946,7 +4946,8 @@ int main(int argc, char **argv)
 				botblk[bl] = blb;
 			}
 		}
-		//printf("blk=%d\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
+		//printf("leftxo=%f\t leftyo=%f\t rightxo=%f\t rightyo=%f\t botxo=%f\t botyo=%f\t topxo=%f\t topyo=%f\n", leftxo, leftyo, rightxo, rightyo, botxo, botyo, topxo, topyo);
+		//printf("blk=%d\t blockxo=%f\t blockyo=%f\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, blockxo_d[bl], blockyo_d[bl], leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
 
 
 	}
