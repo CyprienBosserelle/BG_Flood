@@ -2420,8 +2420,8 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
 		float dmdt = (fmvp - fmv) / (cm*delta);
 		float fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + fc*sin(phi)*vvi;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv - fc*sin(phi)*uui;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;// +fc*sin(phi)*vvi;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;// -fc*sin(phi)*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
