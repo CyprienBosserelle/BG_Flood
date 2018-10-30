@@ -150,7 +150,7 @@ __device__ int findtopG(int ix,int iy, int topblk, int ibl, int bdimx)
 	int itop;
 	if (iy == (bdimx - 1))
 	{
-		if (topblk != ibl)
+		if (topblk != ibl)// if it not refering to itself it has top neighbour
 		{
 			itop = ix + 0 * bdimx + topblk * (bdimx*bdimx);
 		}

@@ -4910,6 +4910,7 @@ int main(int argc, char **argv)
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 	for (int bl = 0; bl < nblk; bl++)
 	{
+		double espdist = epsilon*10.0;
 		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 16.0 * XParam.dx;
@@ -4927,23 +4928,26 @@ int main(int argc, char **argv)
 		for (int blb = 0; blb < nblk; blb++)
 		{
 			//
-			if (blockxo_d[blb] == leftxo && blockyo_d[blb] == leftyo)
+			if ((blockxo_d[blb] - leftxo) < espdist  && (blockyo_d[blb] - leftyo) < espdist)
 			{
 				leftblk[bl] = blb;
 			}
-			if (blockxo_d[blb] == rightxo && blockyo_d[blb] == rightyo)
+			if ((blockxo_d[blb] - rightxo)  < espdist && (blockyo_d[blb] - rightyo) < espdist)
 			{
 				rightblk[bl] = blb;
 			}
-			if (blockxo_d[blb] == topxo && blockyo_d[blb] == topyo)
+			if ((blockxo_d[blb] - topxo) < espdist && (blockyo_d[blb] - topyo) < espdist)
 			{
 				topblk[bl] = blb;
+				
 			}
-			if (blockxo_d[blb] == botxo && blockyo_d[blb] == botyo)
+			if ((blockxo_d[blb] - botxo) < espdist && (blockyo_d[blb] - botyo) < espdist)
 			{
 				botblk[bl] = blb;
 			}
 		}
+		printf("blk=%d\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
+
 
 	}
 
