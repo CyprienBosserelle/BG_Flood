@@ -684,8 +684,20 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.xo = std::stod(parametervalue);
 	}
+	parameterstr = "xmin";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.xo = std::stod(parametervalue);
+	}
 
 	parameterstr = "yo";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.yo = std::stod(parametervalue);
+	}
+	parameterstr = "ymin";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
@@ -894,15 +906,15 @@ Param checkparamsanity(Param XParam)
 			exit(1);
 		}
 	}
-
+	/*
 	if (XParam.nx <= 0 || XParam.ny <= 0 || XParam.dx < tiny)
 	{
-		std::cerr << "FATAL ERROR: nx or ny or dx could not specified." << std::endl;
-		write_text_to_log_file("FATAL ERROR: nx or ny or dx could not specified.");
+		std::cerr << "FATAL ERROR: nx or ny or dx were not specified." << std::endl;
+		write_text_to_log_file("FATAL ERROR: nx or ny or dx were not specified.");
 		exit(1);
 	}
 
-
+	*/
 	// Check whether endtime was specified by the user
 	//No; i.e. endtimne =0.0
 	//so the following conditions are useless
