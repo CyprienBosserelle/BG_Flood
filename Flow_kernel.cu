@@ -2369,7 +2369,7 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 
 		//double yp= yo + yplus*delta / Radius*180.0 / pi;
 		double yp;
-		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax)<0.00000001)//if block is on the top side
+		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-16)//if block is on the top side
 		{
 			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
 		}
@@ -2754,7 +2754,7 @@ __global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, fl
 	float zsbnd;
 	float itx = (blockyo[ibl]+iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texLBND, itime+0.5f, itx+0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
-	if (blockxo[ibl] == xo && ix == 0 && zsbnd>zb[i])
+	if (abs(blockxo[ibl] - xo) <= 1.0e-16 && ix == 0 && zsbnd>zb[i])
 	{
 		//xplus = min(ix + 1, nx - 1);
 		hh[i] = zsbnd-zb[i];
@@ -2893,7 +2893,7 @@ __global__ void leftdirichletD(int nybnd, double g, double dx, double xo, double
 	float zsbnd; //remains a float because this is how it is stored on the texture memory // I don't think it is a big deal
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
-	if (blockxo[ibl] == xo && ix == 0 && zsbnd>zb[i])
+	if (abs(blockxo[ibl] - xo) <= 1.0e-16 && ix == 0 && zsbnd>zb[i])
 	{
 		//xplus = min(ix + 1, nx - 1);
 		hh[i] = zsbnd - zb[i];
@@ -2929,7 +2929,7 @@ __global__ void rightdirichlet( int nybnd, float g, float dx, float xmax, float 
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texRBND, itime+0.5f, itx+0.5f);
 
-	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15 && zsbnd>zb[i])
+	if (abs(blockxo[ibl] + 15 * dx - xmax) <= 1.0e-16 && ix == 15 && zsbnd>zb[i])
 	{
 		//xminus = max(ix - 1, 0);
 		//printf("zsbnd=%f\n", zsbnd);
@@ -2960,7 +2960,7 @@ __global__ void rightdirichletD( int nybnd, double g,double dx,double xmax,doubl
 	float zsbnd;
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f);
-	if ((blockxo[ibl] + 15 * dx) == xmax && ix == 15 && zsbnd>zb[i])
+	if (abs(blockxo[ibl] + 15 * dx - xmax) <= 1.0e-16 && ix == 15 && zsbnd>zb[i])
 	{
 		//xminus = max(ix - 1, 0);
 		hh[i] = zsbnd - zb[i];
@@ -2989,7 +2989,7 @@ __global__ void topdirichlet( int nxbnd, float g,float dx, float xmax, float yma
 	float zsbnd;
 	float itx = (blockxo[ibl]+ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
-	if ((blockyo[ibl]+15*dx)==ymax && iy == 15 && zsbnd>zb[i])
+	if (abs(blockyo[ibl]+15*dx-ymax)<=1.0e-16 && iy == 15 && zsbnd>zb[i])
 	{
 		//yminus = max(iy - 1, 0);
 		hh[i] = zsbnd - zb[i];
@@ -3018,7 +3018,7 @@ __global__ void topdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
-	if ((blockyo[ibl] + 15 * dx) == ymax && iy == 15 && zsbnd>zb[i])
+	if (abs(blockyo[ibl] + 15 * dx - ymax) <= 1.0e-16 && iy == 15 && zsbnd>zb[i])
 	{
 		//yminus = max(iy - 1, 0);
 		hh[i] = zsbnd - zb[i];
@@ -3046,7 +3046,7 @@ __global__ void botdirichlet( int nxbnd, float g, float dx,float xmax, float yo,
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
-	if (blockyo[ibl]  == yo && iy == 0 && zsbnd>zb[i])
+	if (abs(blockyo[ibl] - yo) <= 1.0e-16 && iy == 0 && zsbnd>zb[i])
 	{
 		//yplus = min(iy + 1, ny-1);
 		hh[i] = zsbnd - zb[i];
@@ -3075,7 +3075,7 @@ __global__ void botdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
 	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
-	if (blockyo[ibl] == yo && iy == 0 && zsbnd>zb[i])
+	if (abs(blockyo[ibl] - yo) <= 1.0e-16 && iy == 0 && zsbnd>zb[i])
 	{
 		//yplus = min(iy + 1, ny - 1);
 		hh[i] = zsbnd - zb[i];
