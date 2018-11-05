@@ -186,6 +186,7 @@ cudaChannelFormatDesc channelDescPatm = cudaCreateChannelDesc(32, 0, 0, 0, cudaC
 cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
 #include "Flow_kernel.cu"
+#include "Init.cpp"
 
 void CUDA_CHECK(cudaError CUDerr)
 {
@@ -213,31 +214,8 @@ unsigned int nextPow2(unsigned int x)
 	return ++x;
 }
 
-template <class T> void Allocate1GPU(int nx, int ny, T *&zb_g)
-{
-	CUDA_CHECK(cudaMalloc((void **)&zb_g, nx*ny * sizeof(T)));
-}
-template <class T> void Allocate4GPU(int nx, int ny, T *&zs_g, T *&hh_g, T *&uu_g, T *&vv_g)
-{
-	CUDA_CHECK(cudaMalloc((void **)&zs_g, nx*ny * sizeof(T)));
-	CUDA_CHECK(cudaMalloc((void **)&hh_g, nx*ny * sizeof(T)));
-	CUDA_CHECK(cudaMalloc((void **)&uu_g, nx*ny * sizeof(T)));
-	CUDA_CHECK(cudaMalloc((void **)&vv_g, nx*ny * sizeof(T)));
-}
 
-template <class T> void Allocate1CPU(int nx, int ny, T *&zb)
-{
-	zb = (T *)malloc(nx*ny * sizeof(T));
-}
 
-template <class T> void Allocate4CPU(int nx, int ny, T *&zs, T *&hh, T *&uu, T *&vv)
-{
-	
-	zs = (T *)malloc(nx*ny * sizeof(T));
-	hh = (T *)malloc(nx*ny * sizeof(T));
-	uu = (T *)malloc(nx*ny * sizeof(T));
-	vv = (T *)malloc(nx*ny * sizeof(T));
-}
 
 template <class T> void InitArraySV(int nblk, int blksize, T initval, T * & Arr)
 {
@@ -4965,7 +4943,29 @@ int main(int argc, char **argv)
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*XParam.dx;
 
 
+	//Chaeck that if timeseries output nodes are specified that they are within nx and ny
+	if (XParam.TSnodesout.size() > 0)
+	{
+		for (int o = 0; o < XParam.TSnodesout.size(); o++)
+		{
 
+
+			//find the block where point belongs
+			for (int blk = 0; blk < XParam.nblk; blk++)
+			{
+				//
+				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
+				{
+					XParam.TSnodesout[o].block = blk;
+					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / XParam.dx), 0), 15);
+					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / XParam.dx), 0), 15);
+					break;
+				}
+			}
+
+		}
+
+	}
 
 
 	////////////////////////////////////////////////

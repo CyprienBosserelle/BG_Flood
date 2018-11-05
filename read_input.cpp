@@ -988,29 +988,7 @@ Param checkparamsanity(Param XParam)
 		XParam.TSnodesout.resize(minsize);
 	}
 
-	//Chaeck that if timeseries output nodes are specified that they are within nx and ny
-	if (XParam.TSnodesout.size() > 0)
-	{
-		for (int o = 0; o < XParam.TSnodesout.size(); o++)
-		{
-			
-
-			//find the block where point belongs
-			for (int blk = 0; blk < XParam.nblk; blk++)
-			{
-				//
-				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
-				{
-					XParam.TSnodesout[o].block = blk;
-					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / XParam.dx), 0), 15);
-					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / XParam.dx), 0), 15);
-					break;
-				}
-			}
-			
-		}
-
-	}
+	
 
 	if (XParam.outvars.empty() && XParam.outputtimestep > 0)
 	{
