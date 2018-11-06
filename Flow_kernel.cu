@@ -3546,7 +3546,7 @@ __global__ void Rain_on_gridUNI(double rainuni, double dt, T * zs, T *hh)
 	//Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
 	Rainhh = rainuni / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
 	
-	printf("%f\n", Rainhh);
+	//printf("%f\n", Rainhh);
 	zs[i] = Rainhh + zzi;
 	hh[i] = Rainhh + hhi;
 
