@@ -241,65 +241,22 @@ void mainloopGPUDB(Param XParam)
 		// External forcing
 		if (!XParam.Rainongrid.inputfile.empty())
 		{
-			if (XParam.Rainongrid.uniform == 1)
-			{
-				//
-				int Rstepinbnd = 1;
-
-
-
-				// Do this for all the corners
-				//Needs limiter in case WLbnd is empty
-				double difft = XParam.Rainongrid.data[Rstepinbnd].time - XParam.totaltime;
-
-				while (difft < 0.0)
-				{
-					Rstepinbnd++;
-					difft = XParam.Rainongrid.data[Rstepinbnd].time - XParam.totaltime;
-				}
-
-				rainuni = interptime(XParam.Rainongrid.data[Rstepinbnd].wspeed, XParam.Rainongrid.data[Rstepinbnd - 1].wspeed, XParam.Rainongrid.data[Rstepinbnd].time - XParam.Rainongrid.data[Rstepinbnd - 1].time, XParam.totaltime - XParam.Rainongrid.data[Rstepinbnd - 1].time);
-				
-
-
-			}
-			else
-			{
-				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.Rainongrid.to) / XParam.Rainongrid.dt), 0), XParam.Rainongrid.nt - 2);
-
-				if (readfirststep + 1 > rainstep)
-				{
-					// Need to read a new step from the file
-					NextHDstep << <gridDimRain, blockDimRain, 0 >> > (XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g, Rainaft_g);
-					CUDA_CHECK(cudaDeviceSynchronize());
-
-					
-					readATMstep(XParam.Rainongrid,  readfirststep + 1, Rainaft);
-					CUDA_CHECK(cudaMemcpy(Rainaft_g, Rainaft, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
-					
-
-					rainstep = readfirststep + 1;
-				}
-
-				HD_interp << < gridDimRain, blockDimRain, 0 >> > (XParam.Rainongrid.nx, XParam.Rainongrid.ny, 0, rainstep - 1, XParam.totaltime, XParam.Rainongrid.dt, Rainbef_g, Rainaft_g, Rain_g);
-				CUDA_CHECK(cudaDeviceSynchronize());
-
-
-				//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
-				//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
-
-				//below should be async so other streams can keep going
-				CUDA_CHECK(cudaMemcpyToArray(Rain_gp, 0, 0, Rain_g, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyDeviceToDevice));
-				
-			}
-
+			//(Param XParam, dim3 gridDimRain, dim3 blockDimRain, int & rainstep, double rainuni)
+			rainuni = Rainthisstep(XParam, gridDimRain, blockDimRain, rainstep, rainuni);
+			
 		}
 
 
 
 		// Core
 		XParam.dt = FlowGPUDouble(XParam, nextoutputtime);
-		
+		//add rivers
+
+		if (XParam.Rivers.size() > 0)
+		{
+			RiverSourceD(XParam);
+		}
+
 		// add rain
 		if (!XParam.Rainongrid.inputfile.empty())
 		{
@@ -620,6 +577,11 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 		// Core engine
 		XParam.dt = FlowGPU(XParam, nextoutputtime);
 		
+		// River
+		if (XParam.Rivers.size() > 0)
+		{
+			RiverSource(XParam);
+		}
 		
 		//Time keeping
 		XParam.totaltime = XParam.totaltime + XParam.dt;
@@ -1182,31 +1144,12 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
-		if (XParam.Rivers.size() > 1)
+		// River
+		if (XParam.Rivers.size() > 0)
 		{
-			//
-			dim3 gridDimRiver(XParam.nriverblock, 1, 1);
-			float qnow;
-			for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
-			{
-
-				//qnow = interptime(slbnd[SLstepinbnd].wlev0, slbnd[SLstepinbnd - 1].wlev0, slbnd[SLstepinbnd].time - slbnd[SLstepinbnd - 1].time, totaltime - slbnd[SLstepinbnd - 1].time);
-				int bndstep = 0;
-				double difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
-				while (difft <= 0.0) // danger?
-				{
-					bndstep++;
-					difft = XParam.Rivers[Rin].flowinput[bndstep].time - XParam.totaltime;
-				}
-
-				qnow = interptime(XParam.Rivers[Rin].flowinput[bndstep].q, XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].q, XParam.Rivers[Rin].flowinput[bndstep].time - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time, XParam.totaltime - XParam.Rivers[Rin].flowinput[max(bndstep - 1, 0)].time);
-
-
-
-				discharge_bnd_v << <gridDimRiver, blockDim, 0 >> > ((float)XParam.Rivers[Rin].xstart, (float)XParam.Rivers[Rin].xend, (float)XParam.Rivers[Rin].ystart, (float)XParam.Rivers[Rin].yend, (float)XParam.dx, (float)XParam.dt, qnow, (float)XParam.Rivers[Rin].disarea, Riverblk_g, blockxo_g, blockyo_g, zs_g, hh_g);
-				CUDA_CHECK(cudaDeviceSynchronize());
-			}
+			RiverSource(XParam);
 		}
+		
 
 
 
