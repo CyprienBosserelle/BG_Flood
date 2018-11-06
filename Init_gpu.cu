@@ -1464,7 +1464,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 		dim3 blockDimLineS(threads, 1, 1);
 		dim3 gridDimLineS(blocks, 1, 1);
 
-		CUDA_CHECK(cudaMemcpy(dtmax_gd, arrmax_gd, s * sizeof(float), cudaMemcpyDeviceToDevice));
+		CUDA_CHECK(cudaMemcpy(dtmax_gd, arrmax_gd, s * sizeof(double), cudaMemcpyDeviceToDevice));
 
 		reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (dtmax_gd, arrmax_gd, s);
 		CUDA_CHECK(cudaDeviceSynchronize());
@@ -1473,7 +1473,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	}
 
 
-	CUDA_CHECK(cudaMemcpy(dummy_d, arrmax_gd, 32 * sizeof(float), cudaMemcpyDeviceToHost));
+	CUDA_CHECK(cudaMemcpy(dummy_d, arrmax_gd, 32 * sizeof(double), cudaMemcpyDeviceToHost));
 	mindtmaxB = dummy_d[0];
 	/*
 	//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
