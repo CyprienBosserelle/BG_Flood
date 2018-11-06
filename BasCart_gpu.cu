@@ -260,6 +260,8 @@ void mainloopGPUDB(Param XParam)
 
 				rainuni = interptime(XParam.Rainongrid.data[Rstepinbnd].wspeed, XParam.Rainongrid.data[Rstepinbnd - 1].wspeed, XParam.Rainongrid.data[Rstepinbnd].time - XParam.Rainongrid.data[Rstepinbnd - 1].time, XParam.totaltime - XParam.Rainongrid.data[Rstepinbnd - 1].time);
 				
+
+
 			}
 			else
 			{
@@ -298,6 +300,23 @@ void mainloopGPUDB(Param XParam)
 		// Core
 		XParam.dt = FlowGPUDouble(XParam, nextoutputtime);
 		
+		// add rain
+		if (!XParam.Rainongrid.inputfile.empty())
+		{
+			if (XParam.Rainongrid.uniform == 1)
+			{
+				Rain_on_gridUNI << <gridDim, blockDim, 0 >> > (rainuni, XParam.dt, zs_gd, hh_gd);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			else
+			{
+				//(int unirain, float xorain, float yorain, float dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
+				Rain_on_grid << <gridDim, blockDim, 0 >> > (XParam.Rainongrid.xo, XParam.Rainongrid.yo, XParam.Rainongrid.dx, XParam.delta, blockxo_d, blockyo_d, XParam.dt, zs_gd, hh_gd);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+		}
+
+
 
 		//Time keeping
 		XParam.totaltime = XParam.totaltime + XParam.dt;
@@ -2918,7 +2937,7 @@ int main(int argc, char **argv)
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////
-	// Prep wind  / atm forcing
+	// Prep wind  / atm / rain forcing
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	if (!XParam.windU.inputfile.empty())
@@ -3131,7 +3150,7 @@ int main(int argc, char **argv)
 	////////////////////////////////////////
 	if (!XParam.Rainongrid.inputfile.empty())
 	{
-		//windfile is present
+		//rain file is present
 		if (XParam.Rainongrid.uniform == 1)
 		{
 			// grid uniform time varying wind input

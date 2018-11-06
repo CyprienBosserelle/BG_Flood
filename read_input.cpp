@@ -869,8 +869,50 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		// needs to be a netcdf file 
 
 		param.atmP.inputfile = parametervalue;
+
+	}
+
+	// atmpress forcing
+	parameterstr = "rainfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		// netcdf file == Variable spatially
+		// txt file (other than .nc) == spatially cst (txt file with 2 col time and mmm/h )
+		param.Rainongrid.inputfile = parametervalue;
+
+		std::string fileext;
+
+		std::vector<std::string> extvec = split(parametervalue, '.');
+
+		std::vector<std::string> nameelements;
+		//by default we expect tab delimitation
+		nameelements = split(extvec.back(), '?');
+		if (nameelements.size() > 1)
+		{
+			//variable name is not given so it is assumed to be z
+			fileext = nameelements[0];
+		}
+		else
+		{
+			fileext = extvec.back();
+		}
+
+		//set the expected type of input
+
+		if (fileext.compare("nc") == 0)
+		{
+			param.Rainongrid.uniform = 0;
+		}
+		else
+		{
+			param.Rainongrid.uniform = 1;
+		}
+
+
 
 	}
 
