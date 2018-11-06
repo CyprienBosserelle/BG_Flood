@@ -3504,7 +3504,7 @@ __global__ void discharge_bnd_v(T xstart,T xend, T ystart,T yend, T dx, T dt, T 
 
 // template not needed here
 template <class T> 
-__global__ void Rain_on_grid(double maskzs, float xorain, float yorain, float dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
+__global__ void Rain_on_grid(double maskzs, double xorain, double yorain, double dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
