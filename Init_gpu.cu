@@ -1628,13 +1628,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 
 
 
-	//Add rain on grid
-	if (!XParam.Rainongrid.inputfile.empty())
-	{
-		//XParam.Rainongrid.xo
-		Rain_on_grid << <gridDim, blockDim, 0 >> > (XParam.Rainongrid.xo, XParam.Rainongrid.yo, XParam.Rainongrid.dx, XParam.dx, blockxo_gd, blockyo_gd, XParam.dt, zs_gd, hh_gd);
-		CUDA_CHECK(cudaDeviceSynchronize());
-	}
+	
 	return XParam.dt;
 }
 
