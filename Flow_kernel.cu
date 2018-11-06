@@ -3504,7 +3504,7 @@ __global__ void discharge_bnd_v(T xstart,T xend, T ystart,T yend, T dx, T dt, T 
 
 // template not needed here
 template <class T> 
-__global__ void Rain_on_grid(float xorain, float yorain, float dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
+__global__ void Rain_on_grid(double maskzs, float xorain, float yorain, float dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -3519,16 +3519,18 @@ __global__ void Rain_on_grid(float xorain, float yorain, float dxrain, double de
 	T zzi = zs[i];
 	T hhi = hh[i];
 
-	
-	Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
-	Rainhh = Rainhh / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
-	zs[i] = Rainhh + zzi;
-	hh[i] = Rainhh + hhi;
+	if (zzi < maskzs)
+	{
+		Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
+		Rainhh = Rainhh / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
 
+		zs[i] = Rainhh + zzi;
+		hh[i] = Rainhh + hhi;
+	}
 }
 
 template <class T>
-__global__ void Rain_on_gridUNI(double rainuni, double dt, T * zs, T *hh)
+__global__ void Rain_on_gridUNI(double maskzs, double rainuni, double dt, T * zs, T *hh)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -3545,10 +3547,12 @@ __global__ void Rain_on_gridUNI(double rainuni, double dt, T * zs, T *hh)
 
 	//Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
 	Rainhh = rainuni / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
-	
-	//printf("%f\n", Rainhh);
-	zs[i] = Rainhh + zzi;
-	hh[i] = Rainhh + hhi;
+	if (zzi < maskzs)
+	{
+		//printf("%f\n", Rainhh);
+		zs[i] = Rainhh + zzi;
+		hh[i] = Rainhh + hhi;
+	}
 
 }
 

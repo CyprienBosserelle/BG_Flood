@@ -305,13 +305,13 @@ void mainloopGPUDB(Param XParam)
 		{
 			if (XParam.Rainongrid.uniform == 1)
 			{
-				Rain_on_gridUNI << <gridDim, blockDim, 0 >> > (rainuni, XParam.dt, zs_gd, hh_gd);
+				Rain_on_gridUNI << <gridDim, blockDim, 0 >> > (XParam.mask, rainuni, XParam.dt, zs_gd, hh_gd);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			else
 			{
 				//(int unirain, float xorain, float yorain, float dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
-				Rain_on_grid << <gridDim, blockDim, 0 >> > (XParam.Rainongrid.xo, XParam.Rainongrid.yo, XParam.Rainongrid.dx, XParam.delta, blockxo_d, blockyo_d, XParam.dt, zs_gd, hh_gd);
+				Rain_on_grid << <gridDim, blockDim, 0 >> > (XParam.mask, XParam.Rainongrid.xo, XParam.Rainongrid.yo, XParam.Rainongrid.dx, XParam.delta, blockxo_d, blockyo_d, XParam.dt, zs_gd, hh_gd);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 		}
