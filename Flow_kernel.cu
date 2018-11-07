@@ -3606,8 +3606,8 @@ __global__ void discharge_bnd_h(int nx, int ny, DECNUM dx, DECNUM eps, DECNUM qn
 */
 
 
-
-__global__ void NextHDstep(int nx, int ny, float * Uold, float * Unew)
+template <class T>
+__global__ void NextHDstep(int nx, int ny, T * Uold, T * Unew)
 {
 	//int ix = blockIdx.x * blockDim.x * blockDim.y + blockDim.x * threadIdx.y + threadIdx.x;
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
@@ -3620,26 +3620,26 @@ __global__ void NextHDstep(int nx, int ny, float * Uold, float * Unew)
 	}
 }
 
-
-__global__ void HD_interp(int nx, int ny, int backswitch, int nhdstp, float totaltime, float hddt, float * Uold, float * Unew, float * UU)
+template <class T>
+__global__ void HD_interp(int nx, int ny, int backswitch, int nhdstp, T totaltime, T hddt, T * Uold, T * Unew, T * UU)
 {
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	unsigned int tx = threadIdx.x;
 	unsigned int ty = threadIdx.y;
 
-	__shared__ float Uxo[16][16];
-	__shared__ float Uxn[16][16];
+	__shared__ T Uxo[16][16];
+	__shared__ T Uxn[16][16];
 	//	__shared__ float Ums[16];
 
 
-	float fac = 1.0;
+	T fac =(T) 1.0;
 	/*Ums[tx]=Umask[ix];*/
 
 
 	if (backswitch>0)
 	{
-		fac = -1.0f;
+		fac = (T)-1.0;
 	}
 
 

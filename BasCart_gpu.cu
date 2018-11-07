@@ -242,7 +242,7 @@ void mainloopGPUDB(Param XParam)
 		if (!XParam.Rainongrid.inputfile.empty())
 		{
 			//(Param XParam, dim3 gridDimRain, dim3 blockDimRain, int & rainstep, double rainuni)
-			rainuni = Rainthisstep(XParam, gridDimRain, blockDimRain, rainstep, rainuni);
+			rainuni = Rainthisstep(XParam, gridDimRain, blockDimRain, rainstep);
 			
 		}
 
@@ -781,59 +781,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 		// Core engine
 
-		// Check the atm Pressure forcing before starting
-
-		if (!XParam.atmP.inputfile.empty())
-		{
-			if (XParam.atmP.uniform == 1)
-			{
-				// don't do nothing
-				/*
-				int Wstepinbnd = 1;
-
-
-
-				// Do this for all the corners
-				//Needs limiter in case WLbnd is empty
-				double difft = XParam.atmP.data[Wstepinbnd].time - XParam.totaltime;
-
-				while (difft < 0.0)
-				{
-					Wstepinbnd++;
-					difft = XParam.atmP.data[Wstepinbnd].time - XParam.totaltime;
-				}
-
-				atmpuni = interptime(XParam.atmP.data[Wstepinbnd].uwind, XParam.atmP.data[Wstepinbnd - 1].uwind, XParam.atmP.data[Wstepinbnd].time - XParam.atmP.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.atmP.data[Wstepinbnd - 1].time);
-				*/
-			}
-			else
-			{
-				//
-				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.atmP.to) / XParam.atmP.dt), 0), XParam.atmP.nt - 2);
-
-				if (readfirststep + 1 > atmpstep)
-				{
-					// Need to read a new step from the file
-					NextHDstep << <gridDimATM, blockDimATM, 0 >> > (XParam.atmP.nx, XParam.atmP.ny, Patmbef_g, Patmaft_g);
-					CUDA_CHECK(cudaDeviceSynchronize());
-
-
-
-
-					readATMstep(XParam.atmP,  readfirststep + 1, Patmaft);
-					CUDA_CHECK(cudaMemcpy(Patmaft_g, Patmaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-					
-
-					atmpstep = atmpstep + 1;
-				}
-
-				HD_interp << < gridDimATM, blockDimATM, 0 >> > (XParam.atmP.nx, XParam.atmP.ny, 0, atmpstep - 1, XParam.totaltime, XParam.atmP.dt, Patmbef_g, Patmaft_g, PatmX_g);
-				CUDA_CHECK(cudaDeviceSynchronize());
-
-				CUDA_CHECK(cudaMemcpyToArray(Patm_gp, 0, 0, PatmX_g, XParam.atmP.nx*XParam.atmP.ny * sizeof(float), cudaMemcpyDeviceToDevice));
-				
-			}
-		}
+		
 			
 		
 
@@ -857,8 +805,22 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		dtmax = (float)(1.0 / epsilon);
 		//float dtmaxtmp = dtmax;
 
-		interp2ATMP << <gridDim, blockDim, 0 >> > ((float)XParam.atmP.xo, (float)XParam.atmP.yo, (float)XParam.atmP.dx, (float)XParam.delta, (float)XParam.Paref, blockxo_g, blockyo_g, Patm_g);
-		CUDA_CHECK(cudaDeviceSynchronize());
+
+
+		// Check the atm Pressure forcing before starting
+
+		if (!XParam.atmP.inputfile.empty() && atmpuniform == 1) //this is a gven 
+		{
+
+			//
+			AtmPthisstep(XParam, gridDimATM, blockDimATM, atmpstep);
+
+			interp2ATMP << <gridDim, blockDim, 0 >> > ((float)XParam.atmP.xo, (float)XParam.atmP.yo, (float)XParam.atmP.dx, (float)XParam.delta, (float)XParam.Paref, blockxo_g, blockyo_g, Patm_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+
+
+		}
+		
 
 
 		resetdtmax << <gridDim, blockDim, 0, streams[0] >> > (dtmax_g);
@@ -893,63 +855,8 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		
 		if (!XParam.windU.inputfile.empty())
 		{
-			if (XParam.windU.uniform == 1)
-			{
-				//
-				int Wstepinbnd = 1;
-
-
-
-				// Do this for all the corners
-				//Needs limiter in case WLbnd is empty
-				double difft = XParam.windU.data[Wstepinbnd].time - XParam.totaltime;
-
-				while (difft < 0.0)
-				{
-					Wstepinbnd++;
-					difft = XParam.windU.data[Wstepinbnd].time - XParam.totaltime;
-				}
-
-				uwinduni = interptime(XParam.windU.data[Wstepinbnd].uwind, XParam.windU.data[Wstepinbnd - 1].uwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
-				vwinduni = interptime(XParam.windU.data[Wstepinbnd].vwind, XParam.windU.data[Wstepinbnd - 1].vwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
-			}
-			else
-			{
-				int readfirststep = min(max((int)floor((XParam.totaltime - XParam.windU.to) / XParam.windU.dt), 0), XParam.windU.nt - 2);
-
-				if (readfirststep + 1 > windstep)
-				{
-					// Need to read a new step from the file
-					NextHDstep << <gridDimWND, blockDimWND, 0, streams[2] >> > (XParam.windU.nx, XParam.windU.ny, Uwbef_g, Uwaft_g);
-
-
-					NextHDstep << <gridDimWND, blockDimWND, 0, streams[2] >> > (XParam.windV.nx, XParam.windV.ny, Vwbef_g, Vwaft_g);
-					CUDA_CHECK(cudaStreamSynchronize(streams[2]));
-
-
-
-
-					readWNDstep(XParam.windU, XParam.windV, readfirststep + 1, Uwaft, Vwaft);
-					CUDA_CHECK(cudaMemcpy(Uwaft_g, Uwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-					CUDA_CHECK(cudaMemcpy(Vwaft_g, Vwaft, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyHostToDevice));
-
-					windstep = readfirststep + 1;
-				}
-
-				HD_interp << < gridDimWND, blockDimWND, 0, streams[2] >> > (XParam.windU.nx, XParam.windU.ny, 0, windstep - 1, XParam.totaltime, XParam.windU.dt, Uwbef_g, Uwaft_g, Uwind_g);
-
-
-				HD_interp << <gridDimWND, blockDimWND, 0, streams[2] >> > (XParam.windV.nx, XParam.windV.ny, 0, windstep - 1, XParam.totaltime, XParam.windU.dt, Vwbef_g, Vwaft_g, Vwind_g);
-				CUDA_CHECK(cudaStreamSynchronize(streams[2]));
-
-				//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
-				//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
-
-				//below should be async so other streams can keep going
-				CUDA_CHECK(cudaMemcpyToArray(Uwind_gp, 0, 0, Uwind_g, XParam.windU.nx*XParam.windU.ny * sizeof(float), cudaMemcpyDeviceToDevice));
-				CUDA_CHECK(cudaMemcpyToArray(Vwind_gp, 0, 0, Vwind_g, XParam.windV.nx*XParam.windV.ny * sizeof(float), cudaMemcpyDeviceToDevice));
-			}
-
+			
+			Windthisstep(XParam, gridDimWND, blockDimWND, streams[2], windstep, uwinduni, vwinduni);
 		}
 
 
@@ -1166,56 +1073,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		//Check for TSoutput
 		if (XParam.TSnodesout.size() > 0)
 		{
-			for (int o = 0; o < XParam.TSnodesout.size(); o++)
-			{
-				//
-				stepread.time = XParam.totaltime;
-				stepread.zs = 0.0;// a bit useless this
-				stepread.hh = 0.0;
-				stepread.uu = 0.0;
-				stepread.vv = 0.0;
-				zsAllout[o].push_back(stepread);
-
-				if (XParam.spherical == 1 || XParam.doubleprecision == 1)
-				{
-					storeTSout << <gridDim, blockDim, 0 >> > ((int)XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, zs_gd, hh_gd, uu_gd, vv_gd, TSstore_gd);
-				}
-				else
-				{
-					storeTSout << <gridDim, blockDim, 0 >> > ((int)XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, zs_g, hh_g, uu_g, vv_g, TSstore_g);
-				}
-
-				CUDA_CHECK(cudaDeviceSynchronize());
-			}
-			nTSsteps++;
-
-			if ((nTSsteps + 1)*XParam.TSnodesout.size() * 4 > 2048 || XParam.endtime - XParam.totaltime <= XParam.dt*0.00001f)
-			{
-				//Flush
-				CUDA_CHECK(cudaMemcpy(TSstore, TSstore_g, 2048 * sizeof(float), cudaMemcpyDeviceToHost));
-				for (int o = 0; o < XParam.TSnodesout.size(); o++)
-				{
-					fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
-					for (int n = 0; n < nTSsteps; n++)
-					{
-						//
-
-
-						fprintf(fsSLTS, "%f\t%.4f\t%.4f\t%.4f\t%.4f\n", zsAllout[o][n].time, TSstore[1 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[0 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[2 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore[3 + o * 4 + n*XParam.TSnodesout.size() * 4]);
-
-
-					}
-					fclose(fsSLTS);
-					//reset zsout
-					zsAllout[o].clear();
-				}
-				nTSsteps = 0;
-
-
-
-
-			}
-
+			pointoutputstep(XParam, gridDim, blockDim, nTSsteps,zsAllout);
 
 		}
 
