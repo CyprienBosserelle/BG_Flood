@@ -242,6 +242,7 @@ void mainloopGPUDB(Param XParam)
 		if (!XParam.Rainongrid.inputfile.empty())
 		{
 			//(Param XParam, dim3 gridDimRain, dim3 blockDimRain, int & rainstep, double rainuni)
+			//this function moves in the forcing file for both inuform and variable input
 			rainuni = Rainthisstep(XParam, gridDimRain, blockDimRain, rainstep);
 			
 		}
