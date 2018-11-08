@@ -3523,8 +3523,9 @@ __global__ void Rain_on_grid(double maskzs, double xorain, double yorain, double
 
 	if (zzi < maskzs)
 	{
-		printf("%f\n", zzi);
+		//printf("%f\n", zzi);
 		Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
+		//Rainhh = 1 * (xorain) / dxrain + 0.5;
 		Rainhh = Rainhh / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
 
 		zs[i] = Rainhh + zzi;

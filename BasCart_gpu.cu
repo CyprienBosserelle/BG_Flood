@@ -268,7 +268,7 @@ void mainloopGPUDB(Param XParam)
 			else
 			{
 				//(int unirain, float xorain, float yorain, float dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
-				Rain_on_grid << <gridDim, blockDim, 0 >> > (XParam.mask, XParam.Rainongrid.xo, XParam.Rainongrid.yo, XParam.Rainongrid.dx, XParam.delta, blockxo_d, blockyo_d, XParam.dt, zs_gd, hh_gd);
+				Rain_on_grid << <gridDim, blockDim, 0 >> > (XParam.mask, XParam.Rainongrid.xo, XParam.Rainongrid.yo, XParam.Rainongrid.dx, XParam.delta, blockxo_gd, blockyo_gd, XParam.dt, zs_gd, hh_gd);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 		}
@@ -2995,7 +2995,7 @@ int main(int argc, char **argv)
 				CUDA_CHECK(cudaMemcpy(Rainbef_g, Rainbef, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
 				
 
-				//U-wind
+				//
 				CUDA_CHECK(cudaMallocArray(&Rain_gp, &channelDescRain, XParam.Rainongrid.nx, XParam.Rainongrid.ny));
 
 
