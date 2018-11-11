@@ -2063,7 +2063,8 @@ double Rainthisstep(Param XParam, dim3 gridDimRain, dim3 blockDimRain, int & rai
 	return rainuni;
 }
 
-void Windthisstep(Param XParam, dim3 gridDimWND, dim3 blockDimWND, cudaStream_t stream, int & windstep, float & uwinduni, float & vwinduni)
+template <class T>
+void Windthisstep(Param XParam, dim3 gridDimWND, dim3 blockDimWND, cudaStream_t stream, int & windstep, T & uwinduni, T & vwinduni)
 {
 	//
 	if (XParam.windU.uniform == 1)
@@ -2190,7 +2191,15 @@ void pointoutputstep(Param XParam, dim3 gridDim, dim3 blockDim, int & nTSsteps, 
 	if ((nTSsteps + 1)*XParam.TSnodesout.size() * 4 > 2048 || XParam.endtime - XParam.totaltime <= XParam.dt*0.00001f)
 	{
 		//Flush
-		CUDA_CHECK(cudaMemcpy(TSstore, TSstore_g, 2048 * sizeof(float), cudaMemcpyDeviceToHost));
+		if (XParam.spherical == 1 || XParam.doubleprecision == 1)
+		{
+			CUDA_CHECK(cudaMemcpy(TSstore, TSstore_gd, 2048 * sizeof(double), cudaMemcpyDeviceToHost));
+		}
+		else
+		{
+			CUDA_CHECK(cudaMemcpy(TSstore, TSstore_g, 2048 * sizeof(float), cudaMemcpyDeviceToHost));
+		}
+		
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)
 		{
 			fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
