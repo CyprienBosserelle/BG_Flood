@@ -3334,6 +3334,26 @@ __global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, fl
 	}
 }
 
+template <class T> __global__ void DRYBND(int isright, int istop, T eps, T *zb, T *zs,T *hh,T *uu, T *vv)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	// left || right || bot || top
+	if ((isright < 0 && ix == 0) || (isright > 0 && ix == 15) || (istop < 0 && iy == 0) || (istop > 0 && iy == 15))
+	{
+		uu[i] = (T) 0.0;
+		vv[i] = (T) 0.0;
+		hh[i] = eps;
+		zs[i] = zb[i] + eps;
+
+	}
+	
+
+}
+
 template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T dx, T xo, T yo, T xmax,T ymax, T itime, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
 {
 
