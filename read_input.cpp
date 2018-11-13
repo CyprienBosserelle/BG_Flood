@@ -444,6 +444,13 @@ Param readparamstr(std::string line, Param param)
 		param.CFL = std::stod(parametervalue);
 
 	}
+	parameterstr = "theta";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.theta = std::stod(parametervalue);
+
+	}
 
 	
 	parameterstr = "outputtimestep";

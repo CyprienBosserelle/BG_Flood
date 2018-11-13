@@ -110,7 +110,7 @@ public:
 	double dt=0.0; // Model time step in s.
 	double CFL=0.5; // Current Freidrich Limiter
 	double theta=1.3; // minmod limiter can be used to tune the momentum dissipation (theta=1 gives minmod, the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
-	int frictionmodel=0; // Not implemented yet 0: cf is a fixed value 1:; 
+	int frictionmodel=0; // 
 	double cf=0.0001; // bottom friction for flow model cf 
 	double Cd=0.002; // Wind drag coeff
 	double Pa2m = 0.00009916; // if unit is hPa then user should use 0.009916;
