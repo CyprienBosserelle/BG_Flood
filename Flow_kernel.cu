@@ -878,7 +878,9 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 
 
 }
-__global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float Pa2m, int *leftblk, float * hh, float *zs, float *uu, float * vv, float *Patm, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *dpdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
+
+template <class T>
+__global__ void updateKurgXATM(T delta, T g, T eps, T CFL, T Pa2m, int *leftblk, T * hh, T *zs, T *uu, T * vv, T *Patm, T *dzsdx, T *dhdx, T * dudx, T *dvdx, T *dpdx, T *Fhu, T *Fqux, T *Fqvx, T *Su, T * dtmax)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -910,24 +912,24 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 		
 
 
-		float dhdxi = dhdx[i];
-		float dhdxmin = dhdx[ileft];
-		float cm = 1.0f;// 0.1;
-		float fmu = 1.0f;
+		T dhdxi = dhdx[i];
+		T dhdxmin = dhdx[ileft];
+		T cm = (T)1.0;// 0.1;
+		T fmu = (T)1.0;
 		//float fmv = 1.0;
 
 		//__shared__ float hi[16][16];
-		float hi = hh[i];
+		T hi = hh[i];
 
-		float hn = hh[ileft];
+		T hn = hh[ileft];
 
 
 		if (hi > eps || hn > eps)
 		{
-			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
+			T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
 			// along X
-			dx = delta*0.5f;
+			dx = delta*T(0.5);
 			zi = zs[i] - hi + Pa2m * Patm[i];
 
 			//printf("%f\n", zi);
@@ -948,28 +950,28 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			//hl = hi - dx*dhdx[i];
 			hl = hi - dx*dhdxi;
 			up = uu[i] - dx*dudx[i];
-			hp = max(0.0f, hl + zl - zlr);
+			hp = max((T)0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdxmin;
 			um = uu[ileft] + dx*dudx[ileft];
-			hm = max(0.0f, hr + zr - zlr);
+			hm = max((T)0.0, hr + zr - zlr);
 
-			float fh, fu, fv;
+			T fh, fu, fv;
 			//float dtmaxf = 1 / 1e-30f;
 
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
-			float epsi = 1e-30f;
+			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			T epsi = (T)1e-30;
 
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
 
-			ap = max(max(up + cp, um + cmo), 0.0f);
+			ap = max(max(up + cp, um + cmo), (T)0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo), 0.0f);
+			am = min(min(up - cp, um - cmo), (T)0.0);
 			//am = min(am, 0.0f);
-			ad = 1.0f / (ap - am);
+			ad = T(1.0) / (ap - am);
 			qm = hm*um;
 			qp = hp*up;
 
@@ -978,7 +980,7 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			dlt = delta*cm / fmu;
 			hm2 = sq(hm);
 			hp2 = sq(hp);
-			ga = g*0.5f;
+			ga = g*T(0.5);
 			apm = ap*am;
 
 			if (a > epsi)
@@ -986,7 +988,7 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
 				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
 				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
-				float dt = CFL*dlt / a;
+				T dt = CFL*dlt / a;
 				if (dt < dtmax[i])
 				{
 					dtmax[i] = dt;
@@ -997,9 +999,9 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			}
 			else
 			{
-				fh = 0.0f;
-				fu = 0.0f;
-				dtmax[i] = 1.0f / 1e-30f;
+				fh = (T)0.0;
+				fu = (T)0.0;
+				dtmax[i] = (T)1.0 / (T)1e-30;
 			}
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 
@@ -1022,7 +1024,7 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			else
 			*fh = *fq = 0.;*/
 
-			if (fh > 0.0f)
+			if (fh > (T)0.0)
 			{
 				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
 			}
@@ -1056,17 +1058,18 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 		}
 		else
 		{
-			dtmax[i] = 1.0f / 1e-30f;
-			Fhu[i] = 0.0f;
-			Fqux[i] = 0.0f;
-			Su[i] = 0.0f;
-			Fqvx[i] = 0.0f;
+			dtmax[i] = (T)1.0 / (T) 1e-30;
+			Fhu[i] = (T) 0.0;
+			Fqux[i] = (T) 0.0;
+			Su[i] = (T) 0.0;
+			Fqvx[i] = (T) 0.0;
 		}
 
 	}
 
 
 }
+
 
 __global__ void updateKurgXD( double delta, double g, double eps, double CFL, int *leftblk, double * hh, double *zs, double *uu, double * vv, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
 {
@@ -1812,7 +1815,8 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 	}
 }
 
-__global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float Pa2m, int *botblk, float * hh, float *zs, float *uu, float * vv, float *Patm, float *dzsdy, float *dhdy, float * dudy, float *dvdy,float *dpdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
+template <class T>
+__global__ void updateKurgYATM(T delta, T g, T eps, T CFL, T Pa2m, int *botblk, T * hh, T *zs, T *uu, T * vv, T *Patm, T *dzsdy, T *dhdy, T * dudy, T *dvdy,T *dpdy, T *Fhv, T *Fqvy, T *Fquy, T *Sv, T * dtmax)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -1840,23 +1844,23 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 		//yminus = max(iy - 1, 0);
 
 
-		float cm = 1.0f;// 0.1;
+		T cm = (T) 1.0;// 0.1;
 						//float fmu = 1.0;
-		float fmv = 1.0f;
+		T fmv = (T) 1.0f;
 
 		//__shared__ float hi[16][16];
-		float dhdyi = dhdy[i];
-		float dhdymin = dhdy[ibot];
-		float hi = hh[i];
-		float hn = hh[ibot];
-		float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+		T dhdyi = dhdy[i];
+		T dhdymin = dhdy[ibot];
+		T hi = hh[i];
+		T hn = hh[ibot];
+		T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 
 
 		if (hi > eps || hn > eps)
 		{
 			hn = hh[ibot];
-			dx = delta / 2.0f;
+			dx = delta / ((T) 2.0);
 			zi = zs[i] - hi + Pa2m * Patm[i];
 			zl = zi - dx*(dzsdy[i] - dhdyi+Pa2m *dpdy[i]);
 			zn = zs[ibot] - hn + Pa2m * Patm[ibot];
@@ -1865,28 +1869,28 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 
 			hl = hi - dx*dhdyi;
 			up = vv[i] - dx*dvdy[i];
-			hp = max(0.f, hl + zl - zlr);
+			hp = max((T) 0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdymin;
 			um = vv[ibot] + dx*dvdy[ibot];
-			hm = max(0.f, hr + zr - zlr);
+			hm = max((T) 0.0, hr + zr - zlr);
 
 			//// Reimann solver
-			float fh, fu, fv, sl, sr;
+			T fh, fu, fv, sl, sr;
 			//float dtmaxf = 1.0f / 1e-30f;
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
-			float epsi = 1e-30f;
+			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			T epsi = (T)1e-30;
 
-			cp = sqrtf(g*hp);
-			cmo = sqrtf(g*hm);
+			cp = sqrt(g*hp);/// how to enforce sqrtf when T is float ?
+			cmo = sqrt(g*hm);
 
-			ap = max(max(up + cp, um + cmo), 0.0f);
+			ap = max(max(up + cp, um + cmo), (T) 0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo), 0.0f);
+			am = min(min(up - cp, um - cmo), (T) 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
 			qm = hm*um;
@@ -1895,7 +1899,7 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 			hm2 = sq(hm);
 			hp2 = sq(hp);
 			a = max(ap, -am);
-			ga = g*0.5f;
+			ga = g*T(0.5);
 			apm = ap*am;
 			dlt = delta*cm / fmv;
 
@@ -1914,12 +1918,12 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 			}
 			else
 			{
-				fh = 0.0f;
-				fu = 0.0f;
-				dtmax[i] = 1.0f / 1e-30f;
+				fh = (T) 0.0;
+				fu = (T) 0.0;
+				dtmax[i] = (T) 1.0 / ((T) 1e-30);
 			}
 
-			if (fh > 0.0f)
+			if (fh > (T)0.0)
 			{
 				fv = (uu[ibot] + dx*dudy[ibot])*fh;
 			}
@@ -1945,11 +1949,11 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 		}
 		else
 		{
-			dtmax[i] = 1.0f / 1e-30f;
-			Fhv[i] = 0.0f;
-			Fqvy[i] = 0.0f;
-			Sv[i] = 0.0f;
-			Fquy[i] = 0.0f;
+			dtmax[i] = (T)1.0 / ((T) 1e-30);
+			Fhv[i] = (T)0.0;
+			Fqvy[i] = (T) 0.0;
+			Sv[i] = (T)0.0;
+			Fquy[i] = (T)0.0;
 		}
 	}
 }
@@ -2481,21 +2485,21 @@ __global__ void updateEV( float delta, float g, float fc, int *rightblk, int*top
 }
 
 
-
-__global__ void updateEVATM(float delta, float g, float fc, float xowind, float yowind ,float dxwind, float Cd, int *rightblk, int*topblk, float * blockxo, float* blockyo, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+template <class T>
+__global__ void updateEVATM(T delta, T g, T fc, T xowind, T yowind ,T dxwind, T Cd, int *rightblk, int*topblk, T * blockxo, T* blockyo, T * hh, T *uu, T * vv, T * Fhu, T *Fhv, T * Su, T *Sv, T *Fqux, T *Fquy, T *Fqvx, T *Fqvy, T *dh, T *dhu, T *dhv)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 
-	float Uw = 0.0f;
-	float Vw = 0.0f;
+	T Uw = 0.0;
+	T Vw = 0.0;
 
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
-	float x = blockxo[ibl] + ix*delta;
-	float y = blockyo[ibl] + iy*delta;
+	T x = blockxo[ibl] + ix*delta;
+	T y = blockyo[ibl] + iy*delta;
 
 
 	int iright, itop;
@@ -2505,27 +2509,27 @@ __global__ void updateEVATM(float delta, float g, float fc, float xowind, float 
 	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
 	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 
-	Uw= tex2D(texUWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
-	Vw = tex2D(texVWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+	Uw=(T) tex2D(texUWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5); //tex2d return a float always!
+	Vw = (T) tex2D(texVWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
 	
 	//xplus = min(ix + 1, nx - 1);
 	//xminus = max(ix - 1, 0);
 	//yplus = min(iy + 1, ny - 1);
 	//yminus = max(iy - 1, 0);
 
-	float cm = 1.0f;// 0.1;
-	float fmu = 1.0f;
-	float fmv = 1.0f;
+	T cm = (T) 1.0;// 0.1;
+	T fmu = (T) 1.0;
+	T fmv = (T) 1.0;
 
-	float hi = hh[i];
-	float uui = uu[i];
-	float vvi = vv[i];
+	T hi = hh[i];
+	T uui = uu[i];
+	T vvi = vv[i];
 
 
-	float cmdinv, ga;
+	T cmdinv, ga;
 
-	cmdinv = 1.0f / (cm*delta);
-	ga = 0.5f*g;
+	cmdinv = (T) 1.0 / (cm*delta);
+	ga = (T) 0.5*g;
 	////
 	//vector dhu = vector(updates[1 + dimension*l]);
 	//foreach() {
@@ -2537,31 +2541,33 @@ __global__ void updateEVATM(float delta, float g, float fc, float xowind, float 
 	//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 	//float cm = 1.0;
 
-	dh[i] = -1.0f*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
+	dh[i] = T(-1.0)*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
 	//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 	//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-	float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
-	float dmdt = (fmv - fmv) / (cm*delta);
-	float fG = vvi * dmdl - uui * dmdt;
-	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*hi*vvi;
-	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*hi*uui;
+	T dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
+	T dmdt = (fmv - fmv) / (cm*delta);
+	T fG = vvi * dmdl - uui * dmdt;
+	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + T(0.00121951)*Cd*Uw*abs(Uw) + fc*hi*vvi;
+	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + T(0.00121951)*Cd*Vw*abs(Vw) - fc*hi*uui;
 	//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 	dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
 	dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
 	
 }
 
-__global__ void updateEVATMWUNI(float delta, float g, float fc, float uwind, float vwind, float Cd, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+
+template <class T>
+__global__ void updateEVATMWUNI(T delta, T g, T fc, T uwind, T vwind, T Cd, int *rightblk, int*topblk, T * hh, T *uu, T * vv, T * Fhu, T *Fhv, T * Su, T *Sv, T *Fqux, T *Fquy, T *Fqvx, T *Fqvy, T *dh, T *dhu, T *dhv)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 
-	float Uw = 0.0f;
-	float Vw = 0.0f;
+	T Uw = T(0.0);
+	T Vw = T(0.0);
 
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
@@ -2585,19 +2591,19 @@ __global__ void updateEVATMWUNI(float delta, float g, float fc, float uwind, flo
 	//yplus = min(iy + 1, ny - 1);
 	//yminus = max(iy - 1, 0);
 
-	float cm = 1.0f;// 0.1;
-	float fmu = 1.0f;
-	float fmv = 1.0f;
+	T cm = T(1.0);// 0.1;
+	T fmu = T(1.0);
+	T fmv = T(1.0);
 
-	float hi = hh[i];
-	float uui = uu[i];
-	float vvi = vv[i];
+	T hi = hh[i];
+	T uui = uu[i];
+	T vvi = vv[i];
 
 
-	float cmdinv, ga;
+	T cmdinv, ga;
 
-	cmdinv = 1.0f / (cm*delta);
-	ga = 0.5f*g;
+	cmdinv = T(1.0) / (cm*delta);
+	ga = T(0.5)*g;
 	////
 	//vector dhu = vector(updates[1 + dimension*l]);
 	//foreach() {
@@ -2609,17 +2615,17 @@ __global__ void updateEVATMWUNI(float delta, float g, float fc, float uwind, flo
 	//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 	//float cm = 1.0;
 
-	dh[i] = -1.0f*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
+	dh[i] = T(-1.0)*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
 	//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 	//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-	float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
-	float dmdt = (fmv - fmv) / (cm*delta);
-	float fG = vvi * dmdl - uui * dmdt;
-	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*hi*vvi;
-	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*hi*uui;
+	T dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
+	T dmdt = (fmv - fmv) / (cm*delta);
+	T fG = vvi * dmdl - uui * dmdt;
+	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + T(0.00121951)*Cd*Uw*abs(Uw) + fc*hi*vvi;
+	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + T(0.00121951)*Cd*Vw*abs(Vw) - fc*hi*uui;
 	//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 	dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
 	dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
