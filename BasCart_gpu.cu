@@ -350,8 +350,8 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 	int rainstep = 1;
 
 	double rainuni = 0.0;
-	double uwinduni = 0.0f;
-	double vwinduni = 0.0f;
+	double uwinduni = 0.0;
+	double vwinduni = 0.0;
 	double atmpuni = XParam.Paref;
 	std::vector<Pointout> zsout;
 
