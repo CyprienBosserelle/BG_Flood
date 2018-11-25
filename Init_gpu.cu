@@ -211,6 +211,136 @@ int AllocMemGPU(Param XParam)
 }
 
 
+int AllocMemGPUBND(Param XParam)
+{
+	// Allocate textures and bind arrays for boundary interpolation
+	if (XParam.leftbnd.on)
+	{
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)XParam.leftbnd.data.size();
+		int nbndvec = (int)XParam.leftbnd.data[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&leftWLS_gp, &channelDescleftbnd, nbndtimes, nbndvec));
+		// This below was float by default and probably should remain float as long as fetched floats are readily converted to double as needed
+		float * leftWLS;
+		leftWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				leftWLS[ibndt + ibndv*nbndtimes] = XParam.leftbnd.data[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(leftWLS_gp, 0, 0, leftWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texLBND.addressMode[0] = cudaAddressModeClamp;
+		texLBND.addressMode[1] = cudaAddressModeClamp;
+		texLBND.filterMode = cudaFilterModeLinear;
+		texLBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texLBND, leftWLS_gp, channelDescleftbnd));
+		free(leftWLS);
+
+	}
+	if (XParam.rightbnd.on)
+	{
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)XParam.rightbnd.data.size();
+		int nbndvec = (int)XParam.rightbnd.data[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&rightWLS_gp, &channelDescrightbnd, nbndtimes, nbndvec));
+
+		float * rightWLS;
+		rightWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				rightWLS[ibndt + ibndv*nbndtimes] = XParam.rightbnd.data[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(rightWLS_gp, 0, 0, rightWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texRBND.addressMode[0] = cudaAddressModeClamp;
+		texRBND.addressMode[1] = cudaAddressModeClamp;
+		texRBND.filterMode = cudaFilterModeLinear;
+		texRBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texRBND, rightWLS_gp, channelDescrightbnd));
+		free(rightWLS);
+
+	}
+	if (XParam.topbnd.on)
+	{
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)XParam.topbnd.data.size();
+		int nbndvec = (int)XParam.topbnd.data[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&topWLS_gp, &channelDesctopbnd, nbndtimes, nbndvec));
+
+		float * topWLS;
+		topWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				topWLS[ibndt + ibndv*nbndtimes] = XParam.topbnd.data[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(topWLS_gp, 0, 0, topWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texTBND.addressMode[0] = cudaAddressModeClamp;
+		texTBND.addressMode[1] = cudaAddressModeClamp;
+		texTBND.filterMode = cudaFilterModeLinear;
+		texTBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texTBND, topWLS_gp, channelDesctopbnd));
+		free(topWLS);
+
+	}
+	if (XParam.botbnd.on)
+	{
+		//leftWLbnd = readWLfile(XParam.leftbndfile);
+		//Flatten bnd to copy to cuda array
+		int nbndtimes = (int)XParam.botbnd.data.size();
+		int nbndvec = (int)XParam.botbnd.data[0].wlevs.size();
+		CUDA_CHECK(cudaMallocArray(&botWLS_gp, &channelDescbotbnd, nbndtimes, nbndvec));
+
+		float * botWLS;
+		botWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				botWLS[ibndt + ibndv*nbndtimes] = XParam.botbnd.data[ibndt].wlevs[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(botWLS_gp, 0, 0, botWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		texBBND.addressMode[0] = cudaAddressModeClamp;
+		texBBND.addressMode[1] = cudaAddressModeClamp;
+		texBBND.filterMode = cudaFilterModeLinear;
+		texBBND.normalized = false;
+
+
+		CUDA_CHECK(cudaBindTextureToArray(texBBND, botWLS_gp, channelDescbotbnd));
+		free(botWLS);
+
+	}
+	return 1;
+}
+
 
 
 void LeftFlowBnd(Param XParam)
