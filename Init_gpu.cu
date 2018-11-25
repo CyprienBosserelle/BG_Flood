@@ -216,6 +216,8 @@ int AllocMemGPUBND(Param XParam)
 	// Allocate textures and bind arrays for boundary interpolation
 	if (XParam.leftbnd.on)
 	{
+		Allocate1GPU(XParam.leftbnd.nblk, 1, bndleftblk_g);
+
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
 		int nbndtimes = (int)XParam.leftbnd.data.size();
@@ -247,6 +249,7 @@ int AllocMemGPUBND(Param XParam)
 	}
 	if (XParam.rightbnd.on)
 	{
+		Allocate1GPU(XParam.rightbnd.nblk, 1, bndrightblk_g);
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
 		int nbndtimes = (int)XParam.rightbnd.data.size();
@@ -278,6 +281,7 @@ int AllocMemGPUBND(Param XParam)
 	}
 	if (XParam.topbnd.on)
 	{
+		Allocate1GPU(XParam.topbnd.nblk, 1, bndtopblk_g);
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
 		int nbndtimes = (int)XParam.topbnd.data.size();
@@ -309,6 +313,7 @@ int AllocMemGPUBND(Param XParam)
 	}
 	if (XParam.botbnd.on)
 	{
+		Allocate1GPU(XParam.botbnd.nblk, 1, bndbotblk_g);
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
 		int nbndtimes = (int)XParam.botbnd.data.size();

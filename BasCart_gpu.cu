@@ -130,10 +130,12 @@ double * cf_gd;
 float * blockxo, *blockyo;
 double * blockxo_d, *blockyo_d;
 int * leftblk, *rightblk, *topblk, *botblk;
+int * bndleftblk, *bndrightblk, *bndtopblk, *bndbotblk;
 
 double * blockxo_gd, *blockyo_gd;
 float * blockxo_g, *blockyo_g;
 int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
+int * bndleftblk_g, *bndrightblk_g, *bndtopblk_g, *bndbotblk_g;
 
 //River stuff
 int * Riverblk, *Riverblk_g;
@@ -2940,6 +2942,7 @@ int main(int argc, char **argv)
 				botblk[bl] = blb;
 			}
 		}
+		
 		//printf("leftxo=%f\t leftyo=%f\t rightxo=%f\t rightyo=%f\t botxo=%f\t botyo=%f\t topxo=%f\t topyo=%f\n", leftxo, leftyo, rightxo, rightyo, botxo, botyo, topxo, topyo);
 		//printf("blk=%d\t blockxo=%f\t blockyo=%f\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, blockxo_d[bl], blockyo_d[bl], leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
 
@@ -2959,7 +2962,110 @@ int main(int argc, char **argv)
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*XParam.dx;
 
 
-	//Chaeck that if timeseries output nodes are specified that they are within nx and ny
+	// Find how many blocks are on each bnds
+	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
+	for (int bl = 0; bl < nblk; bl++)
+	{
+		double espdist = 0.00000001;///WARMING
+		
+		leftxo = blockxo_d[bl] - 15.0 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftyo = blockyo_d[bl];
+		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
+		rightyo = blockyo_d[bl];
+		topxo = blockxo_d[bl];
+		topyo = blockyo_d[bl] + 15.0 * XParam.dx;
+		botxo = blockxo_d[bl];
+		botyo = blockyo_d[bl] - 15.0 * XParam.dx;
+
+		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
+		{
+			//
+			blbr++;
+			//bndrightblk[blbr] = bl;
+
+		}
+
+		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
+		{
+			//
+			blbt++;
+			//bndtopblk[blbt] = bl;
+
+		}
+		if ((XParam.yo-botyo ) < (XParam.dx))
+		{
+			//
+			blbb++;
+			//bndbotblk[blbb] = bl;
+
+		}
+		if ((XParam.xo-leftxo ) < (1.0*XParam.dx))
+		{
+			//
+			blbl++;
+			//bndleftblk[blbl] = bl;
+
+		}
+	}
+
+	//
+	XParam.leftbnd.nblk = blbl;
+	XParam.rightbnd.nblk = blbr;
+	XParam.topbnd.nblk = blbt;
+	XParam.botbnd.nblk = blbb;
+
+	//
+	Allocate1CPU(blbl, 1, bndleftblk);
+	Allocate1CPU(blbr, 1, bndrightblk);
+	Allocate1CPU(blbt, 1, bndtopblk);
+	Allocate1CPU(blbb, 1, bndbotblk);
+
+	blbr = blbb = blbl = blbt = 0;
+	for (int bl = 0; bl < nblk; bl++)
+	{
+		double espdist = 0.00000001;///WARMING
+
+		leftxo = blockxo_d[bl] - 15.0 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftyo = blockyo_d[bl];
+		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
+		rightyo = blockyo_d[bl];
+		topxo = blockxo_d[bl];
+		topyo = blockyo_d[bl] + 15.0 * XParam.dx;
+		botxo = blockxo_d[bl];
+		botyo = blockyo_d[bl] - 15.0 * XParam.dx;
+
+		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
+		{
+			//
+			blbr++;
+			bndrightblk[blbr] = bl;
+
+		}
+
+		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
+		{
+			//
+			blbt++;
+			bndtopblk[blbt] = bl;
+
+		}
+		if ((XParam.yo - botyo) < (XParam.dx))
+		{
+			//
+			blbb++;
+			bndbotblk[blbb] = bl;
+
+		}
+		if ((XParam.xo - leftxo) < (1.0*XParam.dx))
+		{
+			//
+			blbl++;
+			bndleftblk[blbl] = bl;
+
+		}
+	}
+
+	//Check that if timeseries output nodes are specified that they are within nx and ny
 	if (XParam.TSnodesout.size() > 0)
 	{
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)

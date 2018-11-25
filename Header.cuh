@@ -99,6 +99,8 @@ public:
 	bool on = false;
 	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gredient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
 	std::string inputfile;
+	int nblk = 0; //number of blocks where this bnd applies
+	int side = 0; // 0: top bnd, 1: rightbnd, 2: bot bnd, 3, Left bnd
 };
 
 class Param {
@@ -332,11 +334,12 @@ extern float *Rain_g, *Rainbef_g, *Rainaft_g;
 extern double * blockxo_d, *blockyo_d;
 extern float * blockxo, *blockyo;
 extern int * leftblk, *rightblk, *topblk, *botblk;
+extern int * bndleftblk, *bndrightblk, *bndtopblk, *bndbotblk;
 
 extern float * blockxo_g, *blockyo_g;
 extern double * blockxo_gd, *blockyo_gd;
 extern int * leftblk_g, *rightblk_g, *topblk_g, *botblk_g;
-
+extern int * bndleftblk_g, *bndrightblk_g, *bndtopblk_g, *bndbotblk_g;
 
 // id of blocks with riverinput:
 extern int * Riverblk, *Riverblk_g;
