@@ -2852,6 +2852,8 @@ int main(int argc, char **argv)
 					double x = XParam.xo + (i + 16 * nblkx)*XParam.dx;
 					double y = XParam.yo + (j + 16 * nblky)*XParam.dx;
 
+					//x = max(min(x, XParam.Bathymetry.xmax), XParam.Bathymetry.xo);
+					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
 					if (x >= XParam.Bathymetry.xo && x <= XParam.Bathymetry.xmax && y >= XParam.Bathymetry.yo && y <= XParam.Bathymetry.ymax)
 					{
 						// cells that falls off this domain are assigned 

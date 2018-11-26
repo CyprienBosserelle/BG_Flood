@@ -184,8 +184,11 @@ template <class T> void interp2BUQ(int nblk, double blksize, double blkdx, doubl
 				x = blockxo[bl] + i*blkdx;
 				y = blockyo[bl] + j*blkdx;
 
-				if (x >= xo && x <= xmax && y >= yo && y <= ymax)
+				//if (x >= xo && x <= xmax && y >= yo && y <= ymax)
 				{
+					//this is safer!
+					x = max(min(x, xmax), xo);
+					y = max(min(y, ymax), yo);
 					// cells that falls off this domain are assigned 
 					double x1, x2, y1, y2;
 					double q11, q12, q21, q22;
