@@ -3360,12 +3360,127 @@ template <class T> __global__ void DRYBND(int isright, int istop, T eps, T *zb, 
 
 }
 
-template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T dx, T xo, T yo, T xmax,T ymax, T itime, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
+template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T g, T dx, T xo, T xmax, T yo, T ymax, T itime, int *bndblk, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
 {
 
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
-	int ibl = blockIdx.x;
+	int ib = blockIdx.x;
+
+	int ibl = bndblk[ib];
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	int inside;
+
+
+	T xx, yy;
+	int bnd, bnd_c;
+	T sign, umean;
+	float itx;
+
+	sign = T(isright) + T(istop);
+
+
+
+
+	//int xplus;
+	//float hhi;
+	float zsbnd;
+	T zsinside;
+
+	xx = blockxo[ibl] + ix*dx;
+	yy = blockyo[ibl] + iy*dx;
+
+
+	if (isright < 0)
+	{
+		inside = findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
+	}
+	else if (isright > 0)
+	{
+		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+		zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+	}
+	else if (istop < 0)//isright must be ==0!
+	{
+		inside = findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
+		zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+	}
+	else // istop ==1 && isright ==0
+	{
+		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
+		zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+	}
+
+	if (bnd == bnd_c && zsbnd>zb[i])
+	{
+		zsinside = zs[inside];
+		un[i] = sign*T(2.0)*(sqrt(g*max(hh[inside], T(0.0))) - sqrt(g*max(zsbnd - zb[inside], T(0.0)))) + un[inside];
+		ut[i] = T(0.0);
+		zs[i] = zsinside;
+		//ut[i] = ut[inside];
+		hh[i] = hh[inside];
+	}
+
+
+	
+
+
+	/*
+
+	int iright;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//int xplus;
+	//float hhi;
+	float zsbnd;
+	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
+	if (abs(blockxo[ibl] - xo) <= 1.0e-16 && ix == 0 && zsbnd>zb[i])
+	{
+		//xplus = min(ix + 1, nx - 1);
+		hh[i] = zsbnd - zb[i];
+		zs[i] = zsbnd;
+		uu[i] = -2.0f*(sqrtf(g*max(hh[iright], 0.0f)) - sqrtf(g*max(zsbnd - zb[iright], 0.0f))) + uu[iright];
+		vv[i] = 0.0f;
+		//if (iy == 0)
+		//{
+		//	printf("zsbnd=%f\t", zsbnd);
+		//}
+	}
+
+	*/
+}
+
+template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T dx, T xo, T yo, T xmax,T ymax, T itime, int * bndblck, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
+{
+
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ib = blockIdx.x;
+
+	int ibl = bndblck[ib];
 	
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 	int inside;
@@ -3376,7 +3491,8 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 	// top bnd: isright = 0; istop=1;
 
 	T xx,yy;
-	T bnd_c, bnd, sign,umean;
+	int bnd, bnd_c;
+	T  sign,umean;
 	float itx;
 	
 	sign = T(isright) + T(istop);
@@ -3396,33 +3512,39 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 	if (isright < 0)
 	{
 		inside= findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = xo;
-		bnd = xx;
-		itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		bnd_c = 0;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+
 		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
 	}
 	else if (isright > 0)
 	{
 		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = xmax;
-		bnd = xx;
-		itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		bnd_c = 15;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		itx = (yy - yo) / (ymax - yo)*nbnd;
 		zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else if (istop < 0)//isright must be ==0!
 	{
 		inside= findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = yo;
-		bnd = yy;
-		itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		bnd_c = 0;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
 		zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else // istop ==1 && isright ==0
 	{
 		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = ymax;
-		bnd = yy;
-		itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		bnd_c = 15;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
 		zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 

@@ -373,36 +373,33 @@ void LeftFlowBnd(Param XParam)
 
 		dim3 blockDim(16, 16, 1);
 		dim3 gridDim(XParam.nblk, 1, 1);
+		dim3 gridDimLBND(XParam.leftbnd.nblk, 1, 1);
 		if (XParam.GPUDEVICE >= 0)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - XParam.leftbnd.data[SLstepinbnd - 1].time) / (XParam.leftbnd.data[SLstepinbnd].time - XParam.leftbnd.data[SLstepinbnd - 1].time);
 			if (XParam.leftbnd.type == 2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
-				leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				dirichlet << <gridDimLBND, blockDim, 0 >> > (-1, 0, (int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax, itime, bndleftblk_g, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else if (XParam.leftbnd.type == 2)
 			{
-				leftdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				dirichlet << <gridDimLBND, blockDim, 0 >> > (-1, 0, (int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.xmax, (float)XParam.yo, (float)XParam.ymax, (float)itime, bndleftblk_g, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+
+				//leftdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
 
 			if (XParam.leftbnd.type == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
-				ABS1D << <gridDim, blockDim, 0 >> > (-1, 0, (int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDimLBND, blockDim, 0 >> > (-1, 0, (int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndrightblk_g,rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else if (XParam.leftbnd.type == 3)
 			{
-				ABS1D << <gridDim, blockDim, 0 >> > (-1, 0, (int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				ABS1D << <gridDimLBND, blockDim, 0 >> > (-1, 0, (int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndrightblk_g, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
-			if (XParam.leftbnd.type == -1 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (-1, 0, XParam.eps, zb_gd, zs_gd, hh_gd, uu_gd, vv_gd);
-			}
-			else if (XParam.leftbnd.type == -1)
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (-1, 0, (float)XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
-			}
+			
 
 
 			CUDA_CHECK(cudaDeviceSynchronize());
@@ -481,35 +478,33 @@ void RightFlowBnd(Param XParam)
 
 		dim3 blockDim(16, 16, 1);
 		dim3 gridDim(XParam.nblk, 1, 1);
+		dim3 gridDimRBND(XParam.rightbnd.nblk, 1, 1);
 		if (XParam.GPUDEVICE >= 0)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - XParam.rightbnd.data[SLstepinbnd - 1].time) / (XParam.rightbnd.data[SLstepinbnd].time - XParam.rightbnd.data[SLstepinbnd - 1].time);
 			if (XParam.rightbnd.type == 2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
-				rightdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.rightbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.ymax, itime, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				dirichlet << <gridDimRBND, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax, itime, bndrightblk_g, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+
+				//rightdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.rightbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.ymax, itime, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else if (XParam.rightbnd.type == 2)
 			{
-				rightdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.rightbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.ymax, (float)itime, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				dirichlet << <gridDimRBND, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.xmax, (float)XParam.yo, (float)XParam.ymax, (float)itime, bndrightblk_g, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+
+				//rightdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.rightbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.ymax, (float)itime, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
 			else if (XParam.rightbnd.type == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
-				ABS1D << <gridDim, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDimRBND, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndrightblk_g, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else if (XParam.rightbnd.type == 3)
 			{
-				ABS1D << <gridDim, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				ABS1D << <gridDimRBND, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndrightblk_g, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
-			if (XParam.rightbnd.type == -1 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (1, 0, XParam.eps, zb_gd, zs_gd, hh_gd, uu_gd, vv_gd);
-			}
-			else if (XParam.rightbnd.type == -1)
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (1, 0, (float)XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
-			}
+			
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
@@ -583,35 +578,33 @@ void TopFlowBnd(Param XParam)
 
 		dim3 blockDim(16, 16, 1);
 		dim3 gridDim(XParam.nblk, 1, 1);
+		dim3 gridDimTBND(XParam.topbnd.nblk, 1, 1);
 		if (XParam.GPUDEVICE >= 0)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - XParam.topbnd.data[SLstepinbnd - 1].time) / (XParam.topbnd.data[SLstepinbnd].time - XParam.topbnd.data[SLstepinbnd - 1].time);
 			if (XParam.topbnd.type == 2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
-				topdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.ymax, itime, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				dirichlet << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax, itime, bndtopblk_g, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, vv_gd, uu_gd);
+
+				//topdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.ymax, itime, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else if (XParam.topbnd.type == 2)
 			{
-				topdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.ymax, (float)itime, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				dirichlet << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.xmax, (float)XParam.yo, (float)XParam.ymax, (float)itime, bndtopblk_g, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
+
+				//topdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.ymax, (float)itime, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
 			else if (XParam.topbnd.type == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
-				ABS1D << <gridDim, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndtopblk_g, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else if (XParam.topbnd.type == 3)
 			{
-				ABS1D << <gridDim, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
+				ABS1D << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndtopblk_g, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
 			}
-			if (XParam.topbnd.type == -1 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (0, 1, XParam.eps, zb_gd, zs_gd, hh_gd, uu_gd, vv_gd);
-			}
-			else if (XParam.topbnd.type == -1)
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (0, 1, (float)XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
-			}
+			
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
@@ -687,35 +680,33 @@ void BotFlowBnd(Param XParam)
 
 		dim3 blockDim(16, 16, 1);
 		dim3 gridDim(XParam.nblk, 1, 1);
+		dim3 gridDimBBND(XParam.botbnd.nblk, 1, 1);
 		if (XParam.GPUDEVICE >= 0)
 		{
 			//leftdirichlet(int nx, int ny, int nybnd, float g, float itime, float *zs, float *zb, float *hh, float *uu, float *vv)
 			double itime = SLstepinbnd - 1.0 + (XParam.totaltime - XParam.botbnd.data[SLstepinbnd - 1].time) / (XParam.botbnd.data[SLstepinbnd].time - XParam.botbnd.data[SLstepinbnd - 1].time);
 			if (XParam.botbnd.type == 2 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
-				botdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.yo, itime, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				dirichlet << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax, itime, bndbotblk_g, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, vv_gd, uu_gd);
+
+				//botdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xmax, XParam.yo, itime, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else if (XParam.botbnd.type == 2)
 			{
-				botdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.yo, (float)itime, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				dirichlet << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.xmax, (float)XParam.yo, (float)XParam.ymax, (float)itime, bndbotblk_g, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
+
+				//botdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xmax, (float)XParam.yo, (float)itime, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
 			else if (XParam.botbnd.type == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
-				ABS1D << <gridDim, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1D << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndbotblk_g, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, vv_gd, uu_gd);
 			}
 			else if (XParam.botbnd.type == 3)
 			{
-				ABS1D << <gridDim, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
+				ABS1D << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndbotblk_g, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
 			}
-			if (XParam.botbnd.type == -1 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (0, -1, XParam.eps, zb_gd, zs_gd, hh_gd, uu_gd, vv_gd);
-			}
-			else if (XParam.botbnd.type == -1)
-			{
-				DRYBND << <gridDim, blockDim, 0 >> > (0, -1, (float)XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
-			}
+			
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
