@@ -3581,7 +3581,61 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 	}
 }
 
+template <class T> __global__ void noslipbnd(int isright, int istop, int * bndblck, int * neighbourblk, T *zs, T *hh, T *un)
+{
+	//
 
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ib = blockIdx.x;
+
+	int ibl = bndblck[ib];
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	int inside;
+
+	int bnd, bnd_c;
+
+	if (isright < 0)
+	{
+		inside = findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = ix;
+		
+	}
+	else if (isright > 0)
+	{
+		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = ix;
+		
+	}
+	else if (istop < 0)//isright must be ==0!
+	{
+		inside = findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = iy;
+		
+	}
+	else // istop ==1 && isright ==0
+	{
+		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = iy;
+		
+	}
+
+	if (bnd == bnd_c)
+	{
+		 
+		
+		un[i] = T(0.0);
+		zs[i] = zs[inside];
+		//ut[i] = ut[inside];
+		hh[i] = hh[inside];
+	}
+
+}
 __global__ void leftdirichletD(int nybnd, double g, double dx, double xo, double ymax, double itime, int * rightblk, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
 	int ix = threadIdx.x;
@@ -3949,6 +4003,9 @@ template <class T> __global__ void noslipbndLeft(T xo, T eps, int * rightblk,T* 
 	}
 
 }
+
+
+
 template <class T> __global__ void noslipbndBot(T yo, T eps,int * topblk,T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 	int ix = threadIdx.x;

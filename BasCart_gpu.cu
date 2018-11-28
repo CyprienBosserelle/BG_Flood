@@ -3604,22 +3604,12 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMemcpy(topblk_g, topblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(botblk_g, botblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
 
-		if (XParam.leftbnd.on)
-		{
-			CUDA_CHECK(cudaMemcpy(bndleftblk_g, bndleftblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		}
-		if (XParam.rightbnd.on)
-		{
-			CUDA_CHECK(cudaMemcpy(bndrightblk_g, bndrightblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		}
-		if (XParam.topbnd.on)
-		{
-			CUDA_CHECK(cudaMemcpy(bndtopblk_g, bndtopblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		}
-		if (XParam.botbnd.on)
-		{
-			CUDA_CHECK(cudaMemcpy(bndbotblk_g, bndbotblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		}
+		
+		CUDA_CHECK(cudaMemcpy(bndleftblk_g, bndleftblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(bndrightblk_g, bndrightblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(bndtopblk_g, bndtopblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(bndbotblk_g, bndbotblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
+		
 
 
 		printf("...Done\n");
