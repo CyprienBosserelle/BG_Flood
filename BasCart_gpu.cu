@@ -2635,45 +2635,6 @@ int main(int argc, char **argv)
 	XParam = checkparamsanity(XParam);
 
 
-	//////////////////////////////////////////////////
-	////// Preprare Bnd
-	//////////////////////////////////////////////////
-
-	// So far bnd are limited to be cst along an edge
-	// Read Bnd file if/where needed
-	printf("Reading and preparing Boundaries...");
-	write_text_to_log_file("Reading and preparing Boundaries");
-
-	if (!XParam.leftbnd.inputfile.empty())
-	{
-		XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);
-		XParam.leftbnd.on = 1; // redundant?
-	}
-	if (!XParam.rightbnd.inputfile.empty())
-	{
-		XParam.rightbnd.data = readWLfile(XParam.rightbnd.inputfile);
-		XParam.rightbnd.on = 1;
-	}
-	if (!XParam.topbnd.inputfile.empty())
-	{
-		XParam.topbnd.data = readWLfile(XParam.topbnd.inputfile);
-		XParam.topbnd.on = 1;
-	}
-	if (!XParam.botbnd.inputfile.empty())
-	{
-		XParam.botbnd.data = readWLfile(XParam.botbnd.inputfile);
-		XParam.botbnd.on = 1;
-	}
-
-
-	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
-	XParam.endtime = setendtime(XParam);
-
-
-	printf("...done!\n");
-	write_text_to_log_file("Done Reading and preparing Boundaries");
-
-	XParam.dt = 0.0;// Will be resolved in update
 
 	int nx = XParam.nx;
 	int ny = XParam.ny;
@@ -2964,6 +2925,50 @@ int main(int argc, char **argv)
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*XParam.dx;
 
 
+
+
+
+	//////////////////////////////////////////////////
+	////// Preprare Bnd
+	//////////////////////////////////////////////////
+
+	// So far bnd are limited to be cst along an edge
+	// Read Bnd file if/where needed
+	printf("Reading and preparing Boundaries...");
+	write_text_to_log_file("Reading and preparing Boundaries");
+
+	if (!XParam.leftbnd.inputfile.empty())
+	{
+		XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);
+		XParam.leftbnd.on = 1; // redundant?
+	}
+	if (!XParam.rightbnd.inputfile.empty())
+	{
+		XParam.rightbnd.data = readWLfile(XParam.rightbnd.inputfile);
+		XParam.rightbnd.on = 1;
+	}
+	if (!XParam.topbnd.inputfile.empty())
+	{
+		XParam.topbnd.data = readWLfile(XParam.topbnd.inputfile);
+		XParam.topbnd.on = 1;
+	}
+	if (!XParam.botbnd.inputfile.empty())
+	{
+		XParam.botbnd.data = readWLfile(XParam.botbnd.inputfile);
+		XParam.botbnd.on = 1;
+	}
+
+
+	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
+	XParam.endtime = setendtime(XParam);
+
+
+	printf("...done!\n");
+	write_text_to_log_file("Done Reading and preparing Boundaries");
+
+	XParam.dt = 0.0;// Will be resolved in update
+
+
 	// Find how many blocks are on each bnds
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
 	for (int bl = 0; bl < nblk; bl++)
@@ -3067,29 +3072,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	//Check that if timeseries output nodes are specified that they are within nx and ny
-	if (XParam.TSnodesout.size() > 0)
-	{
-		for (int o = 0; o < XParam.TSnodesout.size(); o++)
-		{
-
-
-			//find the block where point belongs
-			for (int blk = 0; blk < XParam.nblk; blk++)
-			{
-				//
-				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
-				{
-					XParam.TSnodesout[o].block = blk;
-					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / XParam.dx), 0), 15);
-					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / XParam.dx), 0), 15);
-					break;
-				}
-			}
-
-		}
-
-	}
+	
 
 
 	////////////////////////////////////////////////
@@ -3900,6 +3883,35 @@ int main(int argc, char **argv)
 
 
 
+
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////
+	// Prepare various model outputs
+	///////////////////////////////////////////////////////////////////////////////////
+
+
+	//Check that if timeseries output nodes are specified that they are within nx and ny
+	if (XParam.TSnodesout.size() > 0)
+	{
+		for (int o = 0; o < XParam.TSnodesout.size(); o++)
+		{
+
+
+			//find the block where point belongs
+			for (int blk = 0; blk < XParam.nblk; blk++)
+			{
+				//
+				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
+				{
+					XParam.TSnodesout[o].block = blk;
+					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / XParam.dx), 0), 15);
+					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / XParam.dx), 0), 15);
+					break;
+				}
+			}
+
+		}
 
 	}
 
