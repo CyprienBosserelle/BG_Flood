@@ -1477,12 +1477,14 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("# Bathymetry file");
 	write_text_to_log_file("bathy = " + XParam.Bathymetry.inputfile + ";");
 	write_text_to_log_file("posdown = " + std::to_string(XParam.posdown) + ";");
-	write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
-	write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");
+	//write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
+	//write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");
 	write_text_to_log_file("dx = " + std::to_string(XParam.dx) + ";");
 	write_text_to_log_file("grdalpha = " + std::to_string(XParam.grdalpha*180.0/pi) + ";");
 	write_text_to_log_file("xo = " + std::to_string(XParam.xo) + ";");
 	write_text_to_log_file("yo = " + std::to_string(XParam.yo) + ";");
+	write_text_to_log_file("xmax = " + std::to_string(XParam.xo) + ";");
+	write_text_to_log_file("ymax = " + std::to_string(XParam.yo) + ";");
 	write_text_to_log_file("\n");
 
 
@@ -1538,7 +1540,7 @@ void SaveParamtolog(Param XParam)
 	}
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Boundaries");
-	write_text_to_log_file("# 0:wall; 1:Dirichlet (zs); 2: Neumann (Default)");
+	write_text_to_log_file("# 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d ");
 	write_text_to_log_file("right = " + std::to_string(XParam.rightbnd.type) + ";");
 	write_text_to_log_file("left = " + std::to_string(XParam.leftbnd.type) + ";");
 	write_text_to_log_file("top = " + std::to_string(XParam.topbnd.type) + ";");
