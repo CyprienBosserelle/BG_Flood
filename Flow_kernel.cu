@@ -3360,7 +3360,7 @@ template <class T> __global__ void DRYBND(int isright, int istop, T eps, T *zb, 
 
 }
 
-template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T g, T dx, T xo, T xmax, T yo, T ymax, T itime, int *bndblk, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
+template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T g, T dx, T xo, T xmax, T yo, T ymax, T itime, int * bndblk, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
 {
 
 	int ix = threadIdx.x;

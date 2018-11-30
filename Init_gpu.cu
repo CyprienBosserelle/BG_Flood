@@ -358,8 +358,8 @@ int AllocMemGPUBND(Param XParam)
 void LeftFlowBnd(Param XParam)
 {
 	//
-	int nx = XParam.nx;
-	int ny = XParam.ny;
+	//int nx = XParam.nx;
+	//int ny = XParam.ny;
 
 	dim3 blockDim(16, 16, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
@@ -395,8 +395,8 @@ void LeftFlowBnd(Param XParam)
 			else if (XParam.leftbnd.type == 2)
 			{
 				dirichlet << <gridDimLBND, blockDim, 0 >> > (-1, 0, (int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.xmax, (float)XParam.yo, (float)XParam.ymax, (float)itime, bndleftblk_g, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
-
-				//leftdirichlet << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				
+				//leftdirichlet << <gridDimLBND, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.ymax, (float)itime, rightblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
 
 			if (XParam.leftbnd.type == 3 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
