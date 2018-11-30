@@ -2975,14 +2975,14 @@ int main(int argc, char **argv)
 	{
 		double espdist = 0.00000001;///WARMING
 		
-		leftxo = blockxo_d[bl] - 15.0 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftxo = blockxo_d[bl]; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
 		topyo = blockyo_d[bl] + 15.0 * XParam.dx;
 		botxo = blockxo_d[bl];
-		botyo = blockyo_d[bl] - 15.0 * XParam.dx;
+		botyo = blockyo_d[bl];
 
 		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
 		{
@@ -2999,14 +2999,14 @@ int main(int argc, char **argv)
 			//bndtopblk[blbt] = bl;
 
 		}
-		if ((XParam.yo-botyo ) < (XParam.dx))
+		if ((XParam.yo-botyo ) > (-1.0*XParam.dx))
 		{
 			//
 			blbb++;
 			//bndbotblk[blbb] = bl;
 
 		}
-		if ((XParam.xo-leftxo ) < (1.0*XParam.dx))
+		if ((XParam.xo-leftxo ) > (-1.0*XParam.dx))
 		{
 			//
 			blbl++;
@@ -3079,8 +3079,8 @@ int main(int argc, char **argv)
 	///// Allocate memory on CPU
 	////////////////////////////////////////////////
 
-	printf("Allocate CPU memory...");
-	write_text_to_log_file("Allocate CPU memory...");
+	//printf("Allocate CPU memory...");
+	//write_text_to_log_file("Allocate CPU memory...");
 	int check;
 	
 	check = AllocMemCPU(XParam);
@@ -3588,10 +3588,10 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMemcpy(botblk_g, botblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
 
 		
-		CUDA_CHECK(cudaMemcpy(bndleftblk_g, bndleftblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		CUDA_CHECK(cudaMemcpy(bndrightblk_g, bndrightblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		CUDA_CHECK(cudaMemcpy(bndtopblk_g, bndtopblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
-		CUDA_CHECK(cudaMemcpy(bndbotblk_g, bndbotblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(bndleftblk_g, bndleftblk, XParam.leftbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(bndrightblk_g, bndrightblk, XParam.rightbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(bndtopblk_g, bndtopblk, XParam.topbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
+		CUDA_CHECK(cudaMemcpy(bndbotblk_g, bndbotblk, XParam.botbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
 		
 
 
