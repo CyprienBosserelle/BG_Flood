@@ -3367,6 +3367,8 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 	int iy = threadIdx.y;
 	int ib = blockIdx.x;
 
+
+	//printf("ibl=%d\n", bndblk[ib]);
 	int ibl = bndblk[ib];
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
@@ -3432,7 +3434,7 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 	if (bnd == bnd_c && zsbnd>zb[i])
 	{
 		zsinside = zs[inside];
-		un[i] = sign*T(2.0)*(sqrt(g*max(hh[inside], T(0.0))) - sqrt(g*max(zsbnd - zb[inside], T(0.0)))) + un[inside];
+		un[i] =  sign*T(2.0)*(sqrt(g*max(hh[inside], T(0.0))) - sqrt(g*max(zsbnd - zb[inside], T(0.0)))) + un[inside];
 		ut[i] = T(0.0);
 		zs[i] = zsinside;
 		//ut[i] = ut[inside];

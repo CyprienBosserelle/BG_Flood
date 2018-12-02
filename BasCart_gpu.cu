@@ -3044,30 +3044,35 @@ int main(int argc, char **argv)
 		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
 		{
 			//
-			blbr++;
+			
 			bndrightblk[blbr] = bl;
+			blbr++;
 
 		}
 
 		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
 		{
 			//
-			blbt++;
+			
 			bndtopblk[blbt] = bl;
+			blbt++;
 
 		}
 		if ((XParam.yo - botyo) > (-1.0*XParam.dx))
 		{
 			//
-			blbb++;
+			
 			bndbotblk[blbb] = bl;
+			blbb++;
 
 		}
 		if ((XParam.xo - leftxo) > (-1.0*XParam.dx))
 		{
 			//
-			blbl++;
+			
 			bndleftblk[blbl] = bl;
+			blbl++;
+			//printf("bl_left=%d\n", bl);
 
 		}
 	}

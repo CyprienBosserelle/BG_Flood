@@ -442,8 +442,8 @@ void LeftFlowBnd(Param XParam)
 		if (XParam.GPUDEVICE >= 0)
 		{
 			//
-			dim3 blockDim(16, 16, 1);
-			dim3 gridDim(XParam.nblk, 1, 1);
+			//dim3 blockDim(16, 16, 1);
+			//dim3 gridDim(XParam.nblk, 1, 1);
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
 				noslipbnd << <gridDimLBND, blockDim, 0 >> >(-1, 0, bndleftblk_g, rightblk_g, zs_gd, hh_gd, uu_gd);
