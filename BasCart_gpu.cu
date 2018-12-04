@@ -3528,12 +3528,27 @@ int main(int argc, char **argv)
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
 				//
-				interp2cf(XParam, cfmapinput, blockxo_d, blockyo_d, cf_d);
+				double * cfmapinput_d; // init as a float because the bathy subroutine expect a float
+				Allocate1CPU(XParam.roughnessmap.nx, XParam.roughnessmap.ny, cfmapinput_d);
+				for (int j = 0; j < XParam.roughnessmap.ny; j++)
+				{
+					for (int i = 0; i < XParam.roughnessmap.nx; i++)
+					{
+						cfmapinput_d[i + j*XParam.roughnessmap.nx] = cfmapinput[i + j*XParam.roughnessmap.nx] * 1.0;
+					}
+				}
+
+				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput_d, cf_d);
+
+				//interp2cf(XParam, cfmapinput, blockxo_d, blockyo_d, cf_d);
+				free(cfmapinput_d);
 			}
 			else
 			{
 				//
-				interp2cf(XParam, cfmapinput, blockxo, blockyo, cf);
+				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput, cf);
+
+				//interp2cf(XParam, cfmapinput, blockxo, blockyo, cf);
 			}
 
 			// cleanup

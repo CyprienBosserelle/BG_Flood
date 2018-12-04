@@ -3393,7 +3393,10 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 	xx = blockxo[ibl] + ix*dx;
 	yy = blockyo[ibl] + iy*dx;
 
-
+	//if (ix == 0 && iy == 0)
+	//{
+	//	printf("ib=%d\tibl=%d\txx=%f\tyy=%f\n", ib, ibl, xx, yy);
+	//}
 	if (isright < 0)
 	{
 		inside = findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
@@ -3401,7 +3404,13 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 		bnd = ix;
 		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
 		itx = (yy - yo) / (ymax - yo)*nbnd;
-		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
+		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		
+		//if (ix == 0 && iy == 0)
+		//{
+		//	printf("yy=%f\titx=%f\tzsbnd=%f\n", yy, itx, zsbnd);
+		//}
+		//printf("yy=%f\titx=%f\tzsbnd=%f\n", yy, itx, zsbnd);
 	}
 	else if (isright > 0)
 	{
