@@ -2741,7 +2741,7 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 		double yp;
 		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-7)//if block is on the top side
 		{
-			printf("Top Block\n");
+			//printf("Top Block\n");
 			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
 		}
 		else
@@ -2840,7 +2840,7 @@ __global__ void updateEVSPHATMUNI(double delta, double g, double yo, double ymax
 
 		//double yp= yo + yplus*delta / Radius*180.0 / pi;
 		double yp;
-		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-16)//if block is on the top side
+		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-7)//if block is on the top side
 		{
 			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
 		}
@@ -2942,7 +2942,7 @@ __global__ void updateEVSPHATM(double delta, double g, double yo, double ymax, d
 
 		//double yp= yo + yplus*delta / Radius*180.0 / pi;
 		double yp;
-		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-16)//if block is on the top side
+		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-7)//if block is on the top side
 		{
 			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
 		}
