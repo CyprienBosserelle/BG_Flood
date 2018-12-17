@@ -2739,14 +2739,14 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 
 		//double yp= yo + yplus*delta / Radius*180.0 / pi;
 		double yp;
-		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-16)//if block is on the top side
-		{
-			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
-		}
-		else
-		{
+		//if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-16)//if block is on the top side
+		//{
+		//	yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
+		//}
+		//else
+		//{
 			yp = blockyo[ibl] + (iy + 1)*delta / Radius*180.0 / pi;
-		}
+		//}
 		phi = y*pi / 180.0;
 
 		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;

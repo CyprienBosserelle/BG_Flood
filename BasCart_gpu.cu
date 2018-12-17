@@ -2639,7 +2639,7 @@ int main(int argc, char **argv)
 	int nx = XParam.nx;
 	int ny = XParam.ny;
 
-	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
+	//printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
 
 
 
@@ -2924,6 +2924,8 @@ int main(int argc, char **argv)
 	XParam.xmax = XParam.xo + (ceil(XParam.nx / 16.0) * 16.0 - 1)*XParam.dx;
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*XParam.dx;
 
+
+	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
 
 
 
