@@ -2235,16 +2235,36 @@ void pointoutputstep(Param XParam, dim3 gridDim, dim3 blockDim, int & nTSsteps, 
 		//Flush
 		if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 		{
-			CUDA_CHECK(cudaMemcpy(TSstore, TSstore_gd, 2048 * sizeof(double), cudaMemcpyDeviceToHost));
+			CUDA_CHECK(cudaMemcpy(TSstore_d, TSstore_gd, 2048 * sizeof(double), cudaMemcpyDeviceToHost));
+			for (int o = 0; o < XParam.TSnodesout.size(); o++)
+			{
+				fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
+
+
+				for (int n = 0; n < nTSsteps; n++)
+				{
+					//
+
+
+					fprintf(fsSLTS, "%f\t%.4f\t%.4f\t%.4f\t%.4f\n", zsAllout[o][n].time, TSstore_d[1 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore_d[0 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore_d[2 + o * 4 + n*XParam.TSnodesout.size() * 4], TSstore_d[3 + o * 4 + n*XParam.TSnodesout.size() * 4]);
+
+
+				}
+				fclose(fsSLTS);
+				//reset zsout
+				zsAllout[o].clear();
+			}
 		}
 		else
 		{
 			CUDA_CHECK(cudaMemcpy(TSstore, TSstore_g, 2048 * sizeof(float), cudaMemcpyDeviceToHost));
-		}
+		
 		
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)
 		{
 			fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "a");
+
+
 			for (int n = 0; n < nTSsteps; n++)
 			{
 				//
@@ -2257,6 +2277,7 @@ void pointoutputstep(Param XParam, dim3 gridDim, dim3 blockDim, int & nTSsteps, 
 			fclose(fsSLTS);
 			//reset zsout
 			zsAllout[o].clear();
+		}
 		}
 		nTSsteps = 0;
 
