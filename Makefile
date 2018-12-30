@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= /usr/local/cuda-8.0
+CUDA_PATH ?=
 
 ##############################
 # start deprecated interface #
@@ -148,7 +148,7 @@ else ifneq ($(TARGET_ARCH),$(HOST_ARCH))
     endif
 endif
 HOST_COMPILER ?= g++
-NVCC          := $(CUDA_PATH)/bin/nvcc -ccbin $(HOST_COMPILER)
+NVCC          := nvcc -ccbin $(HOST_COMPILER)
 
 # internal flags
 NVCCFLAGS   := -m${TARGET_SIZE} -std=c++11
@@ -210,7 +210,7 @@ LIBRARIES :=
 ################################################################################
 
 # Gencode arguments
-SMS ?= 20 30 35 37 50 52 60
+SMS ?= 30 35 37 50 52 60
 #SMS ?= 20 30 35
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)

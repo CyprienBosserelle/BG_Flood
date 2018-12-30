@@ -444,6 +444,13 @@ Param readparamstr(std::string line, Param param)
 		param.CFL = std::stod(parametervalue);
 
 	}
+	parameterstr = "theta";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.theta = std::stod(parametervalue);
+
+	}
 
 	
 	parameterstr = "outputtimestep";
@@ -869,8 +876,50 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		// needs to be a netcdf file 
 
 		param.atmP.inputfile = parametervalue;
+
+	}
+
+	// atmpress forcing
+	parameterstr = "rainfile";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		// netcdf file == Variable spatially
+		// txt file (other than .nc) == spatially cst (txt file with 2 col time and mmm/h )
+		param.Rainongrid.inputfile = parametervalue;
+
+		std::string fileext;
+
+		std::vector<std::string> extvec = split(parametervalue, '.');
+
+		std::vector<std::string> nameelements;
+		//by default we expect tab delimitation
+		nameelements = split(extvec.back(), '?');
+		if (nameelements.size() > 1)
+		{
+			//variable name is not given so it is assumed to be z
+			fileext = nameelements[0];
+		}
+		else
+		{
+			fileext = extvec.back();
+		}
+
+		//set the expected type of input
+
+		if (fileext.compare("nc") == 0)
+		{
+			param.Rainongrid.uniform = 0;
+		}
+		else
+		{
+			param.Rainongrid.uniform = 1;
+		}
+
+
 
 	}
 
@@ -988,27 +1037,7 @@ Param checkparamsanity(Param XParam)
 		XParam.TSnodesout.resize(minsize);
 	}
 
-	//Chaeck that if timeseries output nodes are specified that they are within nx and ny
-	if (XParam.TSnodesout.size() > 0)
-	{
-		for (int o = 0; o < XParam.TSnodesout.size(); o++)
-		{
-			XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XParam.xo) / XParam.dx), 0), XParam.nx - 1);
-			XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XParam.yo) / XParam.dx), 0), XParam.ny - 1);
-
-			//find the block where point belongs
-			for (int blk = 0; blk < XParam.nblk; blk++)
-			{
-				//
-				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
-				{
-					XParam.TSnodesout[o].block = blk;
-				}
-			}
-			
-		}
-
-	}
+	
 
 	if (XParam.outvars.empty() && XParam.outputtimestep > 0)
 	{
@@ -1448,12 +1477,14 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("# Bathymetry file");
 	write_text_to_log_file("bathy = " + XParam.Bathymetry.inputfile + ";");
 	write_text_to_log_file("posdown = " + std::to_string(XParam.posdown) + ";");
-	write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
-	write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");
+	//write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
+	//write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");
 	write_text_to_log_file("dx = " + std::to_string(XParam.dx) + ";");
 	write_text_to_log_file("grdalpha = " + std::to_string(XParam.grdalpha*180.0/pi) + ";");
 	write_text_to_log_file("xo = " + std::to_string(XParam.xo) + ";");
 	write_text_to_log_file("yo = " + std::to_string(XParam.yo) + ";");
+	write_text_to_log_file("xmax = " + std::to_string(XParam.xo) + ";");
+	write_text_to_log_file("ymax = " + std::to_string(XParam.yo) + ";");
 	write_text_to_log_file("\n");
 
 
@@ -1509,7 +1540,7 @@ void SaveParamtolog(Param XParam)
 	}
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Boundaries");
-	write_text_to_log_file("# 0:wall; 1:Dirichlet (zs); 2: Neumann (Default)");
+	write_text_to_log_file("# 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d ");
 	write_text_to_log_file("right = " + std::to_string(XParam.rightbnd.type) + ";");
 	write_text_to_log_file("left = " + std::to_string(XParam.leftbnd.type) + ";");
 	write_text_to_log_file("top = " + std::to_string(XParam.topbnd.type) + ";");

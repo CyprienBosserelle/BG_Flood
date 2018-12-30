@@ -420,7 +420,7 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 	*/
 	//T a_i, a_r, a_l, a_t, a_b;
 	
-	__shared__ float a_s[18][18];
+	__shared__ T a_s[18][18];
 
 
 
@@ -878,7 +878,9 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 
 
 }
-__global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float Pa2m, int *leftblk, float * hh, float *zs, float *uu, float * vv, float *Patm, float *dzsdx, float *dhdx, float * dudx, float *dvdx, float *dpdx, float *Fhu, float *Fqux, float *Fqvx, float *Su, float * dtmax)
+
+template <class T>
+__global__ void updateKurgXATM(T delta, T g, T eps, T CFL, T Pa2m, int *leftblk, T * hh, T *zs, T *uu, T * vv, T *Patm, T *dzsdx, T *dhdx, T * dudx, T *dvdx, T *dpdx, T *Fhu, T *Fqux, T *Fqvx, T *Su, T * dtmax)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -910,24 +912,24 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 		
 
 
-		float dhdxi = dhdx[i];
-		float dhdxmin = dhdx[ileft];
-		float cm = 1.0f;// 0.1;
-		float fmu = 1.0f;
+		T dhdxi = dhdx[i];
+		T dhdxmin = dhdx[ileft];
+		T cm = (T)1.0;// 0.1;
+		T fmu = (T)1.0;
 		//float fmv = 1.0;
 
 		//__shared__ float hi[16][16];
-		float hi = hh[i];
+		T hi = hh[i];
 
-		float hn = hh[ileft];
+		T hn = hh[ileft];
 
 
 		if (hi > eps || hn > eps)
 		{
-			float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
+			T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
 			// along X
-			dx = delta*0.5f;
+			dx = delta*T(0.5);
 			zi = zs[i] - hi + Pa2m * Patm[i];
 
 			//printf("%f\n", zi);
@@ -948,28 +950,28 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			//hl = hi - dx*dhdx[i];
 			hl = hi - dx*dhdxi;
 			up = uu[i] - dx*dudx[i];
-			hp = max(0.0f, hl + zl - zlr);
+			hp = max((T)0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdxmin;
 			um = uu[ileft] + dx*dudx[ileft];
-			hm = max(0.0f, hr + zr - zlr);
+			hm = max((T)0.0, hr + zr - zlr);
 
-			float fh, fu, fv;
+			T fh, fu, fv;
 			//float dtmaxf = 1 / 1e-30f;
 
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
-			float epsi = 1e-30f;
+			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			T epsi = (T)1e-30;
 
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
 
-			ap = max(max(up + cp, um + cmo), 0.0f);
+			ap = max(max(up + cp, um + cmo), (T)0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo), 0.0f);
+			am = min(min(up - cp, um - cmo), (T)0.0);
 			//am = min(am, 0.0f);
-			ad = 1.0f / (ap - am);
+			ad = T(1.0) / (ap - am);
 			qm = hm*um;
 			qp = hp*up;
 
@@ -978,7 +980,7 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			dlt = delta*cm / fmu;
 			hm2 = sq(hm);
 			hp2 = sq(hp);
-			ga = g*0.5f;
+			ga = g*T(0.5);
 			apm = ap*am;
 
 			if (a > epsi)
@@ -986,7 +988,7 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
 				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
 				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
-				float dt = CFL*dlt / a;
+				T dt = CFL*dlt / a;
 				if (dt < dtmax[i])
 				{
 					dtmax[i] = dt;
@@ -997,9 +999,9 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			}
 			else
 			{
-				fh = 0.0f;
-				fu = 0.0f;
-				dtmax[i] = 1.0f / 1e-30f;
+				fh = (T)0.0;
+				fu = (T)0.0;
+				dtmax[i] = (T)1.0 / (T)1e-30;
 			}
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 
@@ -1022,7 +1024,7 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 			else
 			*fh = *fq = 0.;*/
 
-			if (fh > 0.0f)
+			if (fh > (T)0.0)
 			{
 				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
 			}
@@ -1056,17 +1058,18 @@ __global__ void updateKurgXATM(float delta, float g, float eps, float CFL, float
 		}
 		else
 		{
-			dtmax[i] = 1.0f / 1e-30f;
-			Fhu[i] = 0.0f;
-			Fqux[i] = 0.0f;
-			Su[i] = 0.0f;
-			Fqvx[i] = 0.0f;
+			dtmax[i] = (T)1.0 / (T) 1e-30;
+			Fhu[i] = (T) 0.0;
+			Fqux[i] = (T) 0.0;
+			Su[i] = (T) 0.0;
+			Fqvx[i] = (T) 0.0;
 		}
 
 	}
 
 
 }
+
 
 __global__ void updateKurgXD( double delta, double g, double eps, double CFL, int *leftblk, double * hh, double *zs, double *uu, double * vv, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
 {
@@ -1464,6 +1467,212 @@ __global__ void updateKurgXSPH( double delta, double g, double eps, double CFL,i
 
 }
 
+__global__ void updateKurgXSPHATM(double delta, double g, double eps, double CFL, double Pa2m, int *leftblk, double *blockyo, double Radius, double * hh, double *zs, double *uu, double * vv, double *Patm, double *dzsdx, double *dhdx, double * dudx, double *dvdx, double *dpdx, double *Fhu, double *Fqux, double *Fqvx, double *Su, double * dtmax)
+{
+	//Same as updateKurgX but with Spherical coordinates
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ileft;
+
+	ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+	double cm, fmu, y, phi, dphi;
+
+	//if (ix < nx && iy < ny)
+	{
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+
+
+
+
+
+		double dhdxi = dhdx[i];
+		double dhdxmin = dhdx[ileft];
+
+		y = blockyo[ibl] + iy*delta / Radius*180.0 / pi;
+
+		phi = y*pi / 180.0;
+
+		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
+
+		cm = (sin(phi + dphi) - sin(phi - dphi)) / (2.0*dphi);
+
+		fmu = 1.0;
+		//fmv = cosf(phi);
+
+		//float cm = 1.0f;// 0.1;
+		//float fmu = 1.0f;
+		//float fmv = 1.0;
+
+		//__shared__ float hi[16][16];
+		double hi = hh[i];
+
+		double hn = hh[ileft];
+
+
+		if (hi > eps || hn > eps)
+		{
+			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
+
+			// along X
+			dx = delta*0.5;
+			zi = zs[i] - hi + Pa2m * Patm[i];
+
+			//printf("%f\n", zi);
+
+
+			//zl = zi - dx*(dzsdx[i] - dhdx[i]);
+			zl = zi - dx*(dzsdx[i] - dhdxi + Pa2m*dpdx[i]);
+			//printf("%f\n", zl);
+
+			zn = zs[ileft] - hn + Pa2m * Patm[ileft];
+
+			//printf("%f\n", zn);
+			zr = zn + dx*(dzsdx[ileft] - dhdxmin + Pa2m*dpdx[ileft]);
+
+
+			zlr = max(zl, zr);
+
+			//hl = hi - dx*dhdx[i];
+			hl = hi - dx*dhdxi;
+			up = uu[i] - dx*dudx[i];
+			hp = max(0.0, hl + zl - zlr);
+
+			hr = hn + dx*dhdxmin;
+			um = uu[ileft] + dx*dudx[ileft];
+			hm = max(0.0, hr + zr - zlr);
+
+			double fh, fu, fv;
+			//float dtmaxf = 1 / 1e-30f;
+
+			//We can now call one of the approximate Riemann solvers to get the fluxes.
+			double cp, cmo, qm, qp, a, dlt, hm2, hp2, ga, apm;
+			double ap, am, ad;
+			double epsi = 1e-30;
+
+			cp = sqrt(g*hp);
+			cmo = sqrt(g*hm);
+
+			ap = max(max(up + cp, um + cmo), 0.0);
+			//ap = max(ap, 0.0f);
+
+			am = min(min(up - cp, um - cmo), 0.0);
+			//am = min(am, 0.0f);
+			ad = 1.0 / (ap - am);
+			qm = hm*um;
+			qp = hp*up;
+
+			a = max(ap, -am);
+
+			dlt = delta*cm / fmu;
+			hm2 = sq(hm);
+			hp2 = sq(hp);
+			ga = g*0.5;
+			apm = ap*am;
+
+			if (a > epsi)
+			{
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
+				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
+				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
+				double dt = CFL*dlt / a;
+				if (dt < dtmax[i])
+				{
+					dtmax[i] = dt;
+				}
+				//	*dtmax = dt;
+
+
+			}
+			else
+			{
+				fh = 0.0;
+				fu = 0.0;
+				dtmax[i] = 1.0 / 1e-30;
+			}
+			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+
+			/*
+			void kurganovf(float hm, float hp, float um, float up, float Delta, float * fh, float * fq, float * dtmax)
+			float eps = epsilon;
+			float cp = sqrtf(g*hp), cm = sqrtf(g*hm);
+			float ap = max(up + cp, um + cm); ap = max(ap, 0.0f);
+			float am = min(up - cp, um - cm); am = min(am, 0.0f);
+			float qm = hm*um, qp = hp*up;
+			float a = max(ap, -am);
+			if (a > eps) {
+			*fh = (ap*qm - am*qp + ap*am*(hp - hm)) / (ap - am); // (4.5) of [1]
+			*fq = (ap*(qm*um + g*sq(hm) / 2.) - am*(qp*up + g*sq(hp) / 2.) +
+			ap*am*(qp - qm)) / (ap - am);
+			float dt = CFL*Delta / a;
+			if (dt < *dtmax)
+			*dtmax = dt;
+			}
+			else
+			*fh = *fq = 0.;*/
+
+			if (fh > 0.0)
+			{
+				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
+			}
+			else
+			{
+				fv = (vv[i] - dx*dvdx[i])*fh;
+			}
+			//fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+			//dtmax needs to be stored in an array and reduced at the end
+			//dtmax = dtmaxf;
+			//dtmaxtmp = min(dtmax, dtmaxtmp);
+			/*if (ix == 11 && iy == 0)
+			{
+			printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + ga*hm2), -am*(qp*up + ga*hp2),( ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm) ) *ad/100.0f, ad);
+			}
+			*/
+			/*
+			#### Topographic source term
+
+			In the case of adaptive refinement, care must be taken to ensure
+			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+			sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
+			sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
+
+			////Flux update
+
+			Fhu[i] = fmu * fh;
+			Fqux[i] = fmu * (fu - sl);
+			Su[i] = fmu * (fu - sr);
+			Fqvx[i] = fmu * fv;
+		}
+		else
+		{
+			dtmax[i] = 1.0 / 1e-30;
+			Fhu[i] = 0.0;
+			Fqux[i] = 0.0;
+			Su[i] = 0.0;
+			Fqvx[i] = 0.0;
+		}
+
+	}
+
+
+}
+
 __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *botblk, float * hh, float *zs, float *uu, float * vv, float *dzsdy, float *dhdy, float * dudy, float *dvdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
 {
 	int ix = threadIdx.x;
@@ -1606,7 +1815,8 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 	}
 }
 
-__global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float Pa2m, int *botblk, float * hh, float *zs, float *uu, float * vv, float *Patm, float *dzsdy, float *dhdy, float * dudy, float *dvdy,float *dpdy, float *Fhv, float *Fqvy, float *Fquy, float *Sv, float * dtmax)
+template <class T>
+__global__ void updateKurgYATM(T delta, T g, T eps, T CFL, T Pa2m, int *botblk, T * hh, T *zs, T *uu, T * vv, T *Patm, T *dzsdy, T *dhdy, T * dudy, T *dvdy,T *dpdy, T *Fhv, T *Fqvy, T *Fquy, T *Sv, T * dtmax)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -1634,23 +1844,23 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 		//yminus = max(iy - 1, 0);
 
 
-		float cm = 1.0f;// 0.1;
+		T cm = (T) 1.0;// 0.1;
 						//float fmu = 1.0;
-		float fmv = 1.0f;
+		T fmv = (T) 1.0f;
 
 		//__shared__ float hi[16][16];
-		float dhdyi = dhdy[i];
-		float dhdymin = dhdy[ibot];
-		float hi = hh[i];
-		float hn = hh[ibot];
-		float dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+		T dhdyi = dhdy[i];
+		T dhdymin = dhdy[ibot];
+		T hi = hh[i];
+		T hn = hh[ibot];
+		T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
 
 
 
 		if (hi > eps || hn > eps)
 		{
 			hn = hh[ibot];
-			dx = delta / 2.0f;
+			dx = delta / ((T) 2.0);
 			zi = zs[i] - hi + Pa2m * Patm[i];
 			zl = zi - dx*(dzsdy[i] - dhdyi+Pa2m *dpdy[i]);
 			zn = zs[ibot] - hn + Pa2m * Patm[ibot];
@@ -1659,28 +1869,28 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 
 			hl = hi - dx*dhdyi;
 			up = vv[i] - dx*dvdy[i];
-			hp = max(0.f, hl + zl - zlr);
+			hp = max((T) 0.0, hl + zl - zlr);
 
 			hr = hn + dx*dhdymin;
 			um = vv[ibot] + dx*dvdy[ibot];
-			hm = max(0.f, hr + zr - zlr);
+			hm = max((T) 0.0, hr + zr - zlr);
 
 			//// Reimann solver
-			float fh, fu, fv, sl, sr;
+			T fh, fu, fv, sl, sr;
 			//float dtmaxf = 1.0f / 1e-30f;
 			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
 			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
-			float cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
-			float epsi = 1e-30f;
+			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
+			T epsi = (T)1e-30;
 
-			cp = sqrtf(g*hp);
-			cmo = sqrtf(g*hm);
+			cp = sqrt(g*hp);/// how to enforce sqrtf when T is float ?
+			cmo = sqrt(g*hm);
 
-			ap = max(max(up + cp, um + cmo), 0.0f);
+			ap = max(max(up + cp, um + cmo), (T) 0.0);
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo), 0.0f);
+			am = min(min(up - cp, um - cmo), (T) 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
 			qm = hm*um;
@@ -1689,7 +1899,7 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 			hm2 = sq(hm);
 			hp2 = sq(hp);
 			a = max(ap, -am);
-			ga = g*0.5f;
+			ga = g*T(0.5);
 			apm = ap*am;
 			dlt = delta*cm / fmv;
 
@@ -1708,12 +1918,12 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 			}
 			else
 			{
-				fh = 0.0f;
-				fu = 0.0f;
-				dtmax[i] = 1.0f / 1e-30f;
+				fh = (T) 0.0;
+				fu = (T) 0.0;
+				dtmax[i] = (T) 1.0 / ((T) 1e-30);
 			}
 
-			if (fh > 0.0f)
+			if (fh > (T)0.0)
 			{
 				fv = (uu[ibot] + dx*dudy[ibot])*fh;
 			}
@@ -1739,11 +1949,11 @@ __global__ void updateKurgYATM(float delta, float g, float eps, float CFL, float
 		}
 		else
 		{
-			dtmax[i] = 1.0f / 1e-30f;
-			Fhv[i] = 0.0f;
-			Fqvy[i] = 0.0f;
-			Sv[i] = 0.0f;
-			Fquy[i] = 0.0f;
+			dtmax[i] = (T)1.0 / ((T) 1e-30);
+			Fhv[i] = (T)0.0;
+			Fqvy[i] = (T) 0.0;
+			Sv[i] = (T)0.0;
+			Fquy[i] = (T)0.0;
 		}
 	}
 }
@@ -2047,6 +2257,164 @@ __global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,i
 	}
 }
 
+__global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL, double Pa2m, int *botblk, double * blockyo, double Radius, double * hh, double *zs, double *uu, double * vv, double *Patm, double *dzsdy, double *dhdy, double * dudy, double *dvdy, double *dpdy, double *Fhv, double *Fqvy, double *Fquy, double *Sv, double * dtmax)
+{
+	// Same as updateKurgY but with Spherical coordinate corrections
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int ibot;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+
+	double cm, fmv, phi, dphi, y;
+
+	//if (ix < nx && iy < ny)
+	{
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+		y = blockyo[ibl] + iy*delta / Radius*180.0 / pi;
+
+		phi = y*pi / 180.0;
+
+		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
+
+		cm = (sin(phi + dphi) - sin(phi - dphi)) / (2.0*dphi);
+
+		//fmu = 1.0f;
+		fmv = cos(phi);
+
+		//float cm = 1.0f;// 0.1;
+		//float fmu = 1.0;
+		//float fmv = 1.0f;
+
+		//__shared__ float hi[16][16];
+		double dhdyi = dhdy[i];
+		double dhdymin = dhdy[ibot];
+		double hi = hh[i];
+		double hn = hh[ibot];
+		double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm;
+
+
+
+		if (hi > eps || hn > eps)
+		{
+			hn = hh[ibot];
+			dx = delta / 2.;
+			zi = zs[i] - hi + Pa2m * Patm[i];
+			zl = zi - dx*(dzsdy[i] - dhdyi + Pa2m *dpdy[i]);
+			zn = zs[ibot] - hn + Pa2m * Patm[ibot];
+			zr = zn + dx*(dzsdy[ibot] - dhdymin + Pa2m *dpdy[ibot]);
+			zlr = max(zl, zr);
+
+			hl = hi - dx*dhdyi;
+			up = vv[i] - dx*dvdy[i];
+			hp = max(0.0, hl + zl - zlr);
+
+			hr = hn + dx*dhdymin;
+			um = vv[ibot] + dx*dvdy[ibot];
+			hm = max(0.0, hr + zr - zlr);
+
+			//// Reimann solver
+			double fh, fu, fv, sl, sr;
+			//float dtmaxf = 1.0f / 1e-30f;
+			//kurganovf(hm, hp, um, up, delta*cm / fmu, &fh, &fu, &dtmaxf);
+			//kurganovf(hm, hp, um, up, delta*cm / fmv, &fh, &fu, &dtmaxf);
+			//We can now call one of the approximate Riemann solvers to get the fluxes.
+			double cp, cmo, qm, qp, a, dlt, hm2, hp2, ga, apm;
+			double ap, am, ad;
+			double epsi = 1e-30;
+
+			cp = sqrt(g*hp);
+			cmo = sqrt(g*hm);
+
+			ap = max(max(up + cp, um + cmo), 0.0);
+			//ap = max(ap, 0.0f);
+
+			am = min(min(up - cp, um - cmo), 0.0);
+			//am = min(am, 0.0f);
+			ad = 1.0 / (ap - am);
+			qm = hm*um;
+			qp = hp*up;
+
+			hm2 = sq(hm);
+			hp2 = sq(hp);
+			a = max(ap, -am);
+			ga = g*0.5;
+			apm = ap*am;
+			dlt = delta*cm / fmv;
+
+			if (a > epsi)
+			{
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
+				fu = (ap*(qm*um + ga*hm2) - am*(qp*up + ga*hp2) + apm*(qp - qm)) *ad;
+				double dt = CFL*dlt / a;
+				if (dt < dtmax[i])
+				{
+					dtmax[i] = dt;
+				}
+				//	*dtmax = dt;
+
+
+			}
+			else
+			{
+				fh = 0.0;
+				fu = 0.0;
+				dtmax[i] = 1.0 / 1e-30;
+			}
+
+			if (fh > 0.0)
+			{
+				fv = (uu[ibot] + dx*dudy[ibot])*fh;
+			}
+			else
+			{
+				fv = (uu[i] - dx*dudy[i])*fh;
+			}
+			//fv = (fh > 0.f ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+			/**
+			#### Topographic source term
+
+			In the case of adaptive refinement, care must be taken to ensure
+			well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+			sl = ga*(hp2 - sq(hl) + (hl + hi)*(zi - zl));
+			sr = ga*(hm2 - sq(hr) + (hr + hn)*(zn - zr));
+
+			////Flux update
+
+			Fhv[i] = fmv * fh;
+			Fqvy[i] = fmv * (fu - sl);
+			Sv[i] = fmv * (fu - sr);
+			Fquy[i] = fmv* fv;
+		}
+		else
+		{
+			dtmax[i] = 1.0 / 1e-30;
+			Fhv[i] = 0.0;
+			Fqvy[i] = 0.0;
+			Sv[i] = 0.0;
+			Fquy[i] = 0.0;
+		}
+	}
+}
+
 __global__ void updateEV( float delta, float g, float fc, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
 {
 	int ix = threadIdx.x;
@@ -2117,21 +2485,21 @@ __global__ void updateEV( float delta, float g, float fc, int *rightblk, int*top
 }
 
 
-
-__global__ void updateEVATM(float delta, float g, float fc, float xowind, float yowind ,float dxwind, float Cd, int *rightblk, int*topblk, float * blockxo, float* blockyo, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+template <class T>
+__global__ void updateEVATM(T delta, T g, T fc, T xowind, T yowind ,T dxwind, T Cd, int *rightblk, int*topblk, T * blockxo, T* blockyo, T * hh, T *uu, T * vv, T * Fhu, T *Fhv, T * Su, T *Sv, T *Fqux, T *Fquy, T *Fqvx, T *Fqvy, T *dh, T *dhu, T *dhv)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 
-	float Uw = 0.0f;
-	float Vw = 0.0f;
+	T Uw = 0.0;
+	T Vw = 0.0;
 
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
-	float x = blockxo[ibl] + ix*delta;
-	float y = blockyo[ibl] + iy*delta;
+	T x = blockxo[ibl] + ix*delta;
+	T y = blockyo[ibl] + iy*delta;
 
 
 	int iright, itop;
@@ -2141,27 +2509,27 @@ __global__ void updateEVATM(float delta, float g, float fc, float xowind, float 
 	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
 	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
 
-	Uw= tex2D(texUWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
-	Vw = tex2D(texVWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+	Uw=(T) tex2D(texUWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5); //tex2d return a float always!
+	Vw = (T) tex2D(texVWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
 	
 	//xplus = min(ix + 1, nx - 1);
 	//xminus = max(ix - 1, 0);
 	//yplus = min(iy + 1, ny - 1);
 	//yminus = max(iy - 1, 0);
 
-	float cm = 1.0f;// 0.1;
-	float fmu = 1.0f;
-	float fmv = 1.0f;
+	T cm = (T) 1.0;// 0.1;
+	T fmu = (T) 1.0;
+	T fmv = (T) 1.0;
 
-	float hi = hh[i];
-	float uui = uu[i];
-	float vvi = vv[i];
+	T hi = hh[i];
+	T uui = uu[i];
+	T vvi = vv[i];
 
 
-	float cmdinv, ga;
+	T cmdinv, ga;
 
-	cmdinv = 1.0f / (cm*delta);
-	ga = 0.5f*g;
+	cmdinv = (T) 1.0 / (cm*delta);
+	ga = (T) 0.5*g;
 	////
 	//vector dhu = vector(updates[1 + dimension*l]);
 	//foreach() {
@@ -2173,31 +2541,33 @@ __global__ void updateEVATM(float delta, float g, float fc, float xowind, float 
 	//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 	//float cm = 1.0;
 
-	dh[i] = -1.0f*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
+	dh[i] = T(-1.0)*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
 	//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 	//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-	float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
-	float dmdt = (fmv - fmv) / (cm*delta);
-	float fG = vvi * dmdl - uui * dmdt;
-	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*hi*vvi;
-	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*hi*uui;
+	T dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
+	T dmdt = (fmv - fmv) / (cm*delta);
+	T fG = vvi * dmdl - uui * dmdt;
+	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + T(0.00121951)*Cd*Uw*abs(Uw) + fc*hi*vvi;
+	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + T(0.00121951)*Cd*Vw*abs(Vw) - fc*hi*uui;
 	//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 	dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
 	dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
 	
 }
 
-__global__ void updateEVATMWUNI(float delta, float g, float fc, float uwind, float vwind, float Cd, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
+
+template <class T>
+__global__ void updateEVATMWUNI(T delta, T g, T fc, T uwind, T vwind, T Cd, int *rightblk, int*topblk, T * hh, T *uu, T * vv, T * Fhu, T *Fhv, T * Su, T *Sv, T *Fqux, T *Fquy, T *Fqvx, T *Fqvy, T *dh, T *dhu, T *dhv)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 
-	float Uw = 0.0f;
-	float Vw = 0.0f;
+	T Uw = T(0.0);
+	T Vw = T(0.0);
 
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
@@ -2221,19 +2591,19 @@ __global__ void updateEVATMWUNI(float delta, float g, float fc, float uwind, flo
 	//yplus = min(iy + 1, ny - 1);
 	//yminus = max(iy - 1, 0);
 
-	float cm = 1.0f;// 0.1;
-	float fmu = 1.0f;
-	float fmv = 1.0f;
+	T cm = T(1.0);// 0.1;
+	T fmu = T(1.0);
+	T fmv = T(1.0);
 
-	float hi = hh[i];
-	float uui = uu[i];
-	float vvi = vv[i];
+	T hi = hh[i];
+	T uui = uu[i];
+	T vvi = vv[i];
 
 
-	float cmdinv, ga;
+	T cmdinv, ga;
 
-	cmdinv = 1.0f / (cm*delta);
-	ga = 0.5f*g;
+	cmdinv = T(1.0) / (cm*delta);
+	ga = T(0.5)*g;
 	////
 	//vector dhu = vector(updates[1 + dimension*l]);
 	//foreach() {
@@ -2245,17 +2615,17 @@ __global__ void updateEVATMWUNI(float delta, float g, float fc, float uwind, flo
 	//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
 	//float cm = 1.0;
 
-	dh[i] = -1.0f*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
+	dh[i] = T(-1.0)*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
 	//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
 
 
 	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 	//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-	float dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
-	float dmdt = (fmv - fmv) / (cm*delta);
-	float fG = vvi * dmdl - uui * dmdt;
-	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*hi*vvi;
-	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*hi*uui;
+	T dmdl = (fmu - fmu) / (cm*delta);// absurd if not spherical!
+	T dmdt = (fmv - fmv) / (cm*delta);
+	T fG = vvi * dmdl - uui * dmdt;
+	dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + T(0.00121951)*Cd*Uw*abs(Uw) + fc*hi*vvi;
+	dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + T(0.00121951)*Cd*Vw*abs(Vw) - fc*hi*uui;
 	//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 	dhu[i] += hi * (ga*hi *dmdl + fG*vvi);// This term is == 0 so should be commented here
 	dhv[i] += hi * (ga*hi *dmdt - fG*uui);// Need double checking before doing that
@@ -2369,8 +2739,9 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 
 		//double yp= yo + yplus*delta / Radius*180.0 / pi;
 		double yp;
-		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-16)//if block is on the top side
+		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-7)//if block is on the top side
 		{
+			//printf("Top Block\n");
 			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
 		}
 		else
@@ -2422,6 +2793,208 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 		float fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv +fc*sin(phi)*vvi;
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv -fc*sin(phi)*uui;
+		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
+		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
+	}
+}
+
+__global__ void updateEVSPHATMUNI(double delta, double g, double yo, double ymax, double Radius, double uwind, float vwind, float Cd, int * rightblk, int * topblk, double * blockyo, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
+{
+	// Same as updateEV but with Spherical coordinate corrections
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	double Uw = 0.0f;
+	double Vw = 0.0f;
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright, itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	double cm, fmu, fmv, y, phi, dphi, fmvp, fmup;
+
+	double fc = pi / 21600.0; // 2*(2*pi/24/3600)
+
+	Uw = uwind;// tex2D(texUWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+	Vw = vwind;// tex2D(texVWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+	//if (ix < nx && iy < ny)
+	{
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+		y = blockyo[ibl] + iy*delta / Radius*180.0 / pi;
+
+
+		//double yp= yo + yplus*delta / Radius*180.0 / pi;
+		double yp;
+		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-7)//if block is on the top side
+		{
+			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
+		}
+		else
+		{
+			yp = blockyo[ibl] + (iy + 1)*delta / Radius*180.0 / pi;
+		}
+		phi = y*pi / 180.0;
+
+		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
+
+		cm = (sin(phi + dphi) - sin(phi - dphi)) / (2.0*dphi);
+
+		fmu = 1.0;
+		fmup = 1.0;
+		fmv = cos(phi);
+		fmvp = cos(yp*pi / 180.0);
+		//float cm = 1.0f;// 0.1;
+		//float fmu = 1.0f;
+		//float fmv = 1.0f;
+
+		double hi = hh[i];
+		double uui = uu[i];
+		double vvi = vv[i];
+
+
+		float cmdinv, ga;
+
+		cmdinv = 1.0 / (cm*delta);
+		ga = 0.5*g;
+		////
+		//vector dhu = vector(updates[1 + dimension*l]);
+		//foreach() {
+		//	double dhl =
+		//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+		//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+		//	foreach_dimension()
+		//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
+		//float cm = 1.0;
+
+		dh[i] = -1.0*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
+		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		float dmdt = (fmvp - fmv) / (cm*delta);
+		float fG = vvi * dmdl - uui * dmdt;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*sin(phi)*vvi; // why not fc*sin(phi)*hi*vvi ??
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*sin(phi)*uui;
+		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
+		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
+	}
+}
+
+__global__ void updateEVSPHATM(double delta, double g, double yo, double ymax, double Radius, double xowind, double yowind, double dxwind, double Cd, int * rightblk, int * topblk, double * blockxo, double * blockyo, double * hh, double *uu, double * vv, double * Fhu, double *Fhv, double * Su, double *Sv, double *Fqux, double *Fquy, double *Fqvx, double *Fqvy, double *dh, double *dhu, double *dhv)
+{
+	// Same as updateEV but with Spherical coordinate corrections
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	double Uw = 0.0f;
+	double Vw = 0.0f;
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+
+
+
+	int iright, itop;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	double cm, fmu, fmv,x, y, phi, dphi, fmvp, fmup;
+
+	double fc = pi / 21600.0; // 2*(2*pi/24/3600)
+
+	
+	//if (ix < nx && iy < ny)
+	{
+		//xplus = min(ix + 1, nx - 1);
+		//xminus = max(ix - 1, 0);
+		//yplus = min(iy + 1, ny - 1);
+		//yminus = max(iy - 1, 0);
+
+		y = blockyo[ibl] + iy*delta / Radius*180.0 / pi;
+		x = blockxo[ibl] + ix*delta / Radius*180.0 / pi;
+
+		Uw = tex2D(texUWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+		Vw = tex2D(texVWND, (x - xowind) / dxwind + 0.5, (y - yowind) / dxwind + 0.5);
+
+		//double yp= yo + yplus*delta / Radius*180.0 / pi;
+		double yp;
+		if (abs(blockyo[ibl] + (15.0 * delta / Radius*180.0 / pi) - ymax) < 1.0e-7)//if block is on the top side
+		{
+			yp = blockyo[ibl] + (min(iy + 1, 15))*delta / Radius*180.0 / pi;
+		}
+		else
+		{
+			yp = blockyo[ibl] + (iy + 1)*delta / Radius*180.0 / pi;
+		}
+		phi = y*pi / 180.0;
+
+		dphi = delta / (2.0*Radius);// dy*0.5f*pi/180.0f;
+
+		cm = (sin(phi + dphi) - sin(phi - dphi)) / (2.0*dphi);
+
+		fmu = 1.0;
+		fmup = 1.0;
+		fmv = cos(phi);
+		fmvp = cos(yp*pi / 180.0);
+		//float cm = 1.0f;// 0.1;
+		//float fmu = 1.0f;
+		//float fmv = 1.0f;
+
+		double hi = hh[i];
+		double uui = uu[i];
+		double vvi = vv[i];
+
+
+		float cmdinv, ga;
+
+		cmdinv = 1.0 / (cm*delta);
+		ga = 0.5*g;
+		////
+		//vector dhu = vector(updates[1 + dimension*l]);
+		//foreach() {
+		//	double dhl =
+		//		layer[l] * (Fh.x[1, 0] - Fh.x[] + Fh.y[0, 1] - Fh.y[]) / (cm[] * Δ);
+		//	dh[] = -dhl + (l > 0 ? dh[] : 0.);
+		//	foreach_dimension()
+		//		dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
+		//		dhu.y[] = (Fq.y.y[] + Fq.y.x[] - S.y[0,1] - Fq.y.x[1,0])/(cm[]*Delta);
+		//float cm = 1.0;
+
+		dh[i] = -1.0*(Fhu[iright] - Fhu[i] + Fhv[itop] - Fhv[i])*cmdinv;
+		//printf("%f\t%f\t%f\n", x[i], y[i], dh[i]);
+
+
+		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
+		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
+		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		float dmdt = (fmvp - fmv) / (cm*delta);
+		float fG = vvi * dmdl - uui * dmdt;
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*sin(phi)*vvi; // why not fc*sin(phi)*hi*vvi ??
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*sin(phi)*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
@@ -2768,12 +3341,158 @@ __global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, fl
 	}
 }
 
-template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T dx, T xo, T yo, T xmax,T ymax, T itime, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
+template <class T> __global__ void DRYBND(int isright, int istop, T eps, T *zb, T *zs,T *hh,T *uu, T *vv)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	// left || right || bot || top
+	if ((isright < 0 && ix == 0) || (isright > 0 && ix == 15) || (istop < 0 && iy == 0) || (istop > 0 && iy == 15))
+	{
+		uu[i] = (T) 0.0;
+		vv[i] = (T) 0.0;
+		hh[i] = eps;
+		zs[i] = zb[i] + eps;
+
+	}
+	
+
+}
+
+template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T g, T dx, T xo, T xmax, T yo, T ymax, T itime, int * bndblk, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
 {
 
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
-	int ibl = blockIdx.x;
+	int ib = blockIdx.x;
+
+
+	//printf("ibl=%d\n", bndblk[ib]);
+	int ibl = bndblk[ib];
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	int inside;
+
+
+	T xx, yy;
+	int bnd, bnd_c;
+	T sign, umean;
+	float itx;
+
+	sign = T(isright) + T(istop);
+
+
+
+
+	//int xplus;
+	//float hhi;
+	float zsbnd;
+	T zsinside;
+
+	xx = blockxo[ibl] + ix*dx;
+	yy = blockyo[ibl] + iy*dx;
+
+	//if (ix == 0 && iy == 0)
+	//{
+	//	printf("ib=%d\tibl=%d\txx=%f\tyy=%f\n", ib, ibl, xx, yy);
+	//}
+	if (isright < 0)
+	{
+		inside = findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		
+		//if (ix == 0 && iy == 0)
+		//{
+		//	printf("yy=%f\titx=%f\tzsbnd=%f\n", yy, itx, zsbnd);
+		//}
+		//printf("yy=%f\titx=%f\tzsbnd=%f\n", yy, itx, zsbnd);
+	}
+	else if (isright > 0)
+	{
+		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+		zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+	}
+	else if (istop < 0)//isright must be ==0!
+	{
+		inside = findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
+		zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+	}
+	else // istop ==1 && isright ==0
+	{
+		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
+		zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+	}
+
+	if (bnd == bnd_c && zsbnd>zb[i])
+	{
+		zsinside = zs[inside];
+		un[i] =  sign*T(2.0)*(sqrt(g*max(hh[inside], T(0.0))) - sqrt(g*max(zsbnd - zb[inside], T(0.0)))) + un[inside];
+		ut[i] = T(0.0);
+		zs[i] = zsinside;
+		//ut[i] = ut[inside];
+		hh[i] = hh[inside];
+	}
+
+
+	
+
+
+	/*
+
+	int iright;
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+	//int xplus;
+	//float hhi;
+	float zsbnd;
+	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
+	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
+	if (abs(blockxo[ibl] - xo) <= 1.0e-16 && ix == 0 && zsbnd>zb[i])
+	{
+		//xplus = min(ix + 1, nx - 1);
+		hh[i] = zsbnd - zb[i];
+		zs[i] = zsbnd;
+		uu[i] = -2.0f*(sqrtf(g*max(hh[iright], 0.0f)) - sqrtf(g*max(zsbnd - zb[iright], 0.0f))) + uu[iright];
+		vv[i] = 0.0f;
+		//if (iy == 0)
+		//{
+		//	printf("zsbnd=%f\t", zsbnd);
+		//}
+	}
+
+	*/
+}
+
+template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T dx, T xo, T yo, T xmax,T ymax, T itime, int * bndblck, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
+{
+
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ib = blockIdx.x;
+
+	int ibl = bndblck[ib];
 	
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 	int inside;
@@ -2784,7 +3503,8 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 	// top bnd: isright = 0; istop=1;
 
 	T xx,yy;
-	T bnd_c, bnd, sign,umean;
+	int bnd, bnd_c;
+	T  sign,umean;
 	float itx;
 	
 	sign = T(isright) + T(istop);
@@ -2804,33 +3524,39 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 	if (isright < 0)
 	{
 		inside= findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = xo;
-		bnd = xx;
-		itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		bnd_c = 0;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+
 		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
 	}
 	else if (isright > 0)
 	{
 		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = xmax;
-		bnd = xx;
-		itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		bnd_c = 15;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		itx = (yy - yo) / (ymax - yo)*nbnd;
 		zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else if (istop < 0)//isright must be ==0!
 	{
 		inside= findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = yo;
-		bnd = yy;
-		itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		bnd_c = 0;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
 		zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else // istop ==1 && isright ==0
 	{
 		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
-		bnd_c = ymax;
-		bnd = yy;
-		itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		bnd_c = 15;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
 		zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 
@@ -2867,7 +3593,61 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 	}
 }
 
+template <class T> __global__ void noslipbnd(int isright, int istop, int * bndblck, int * neighbourblk, T *zs, T *hh, T *un)
+{
+	//
 
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ib = blockIdx.x;
+
+	int ibl = bndblck[ib];
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	int inside;
+
+	int bnd, bnd_c;
+
+	if (isright < 0)
+	{
+		inside = findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = ix;
+		
+	}
+	else if (isright > 0)
+	{
+		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = ix;
+		
+	}
+	else if (istop < 0)//isright must be ==0!
+	{
+		inside = findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = iy;
+		
+	}
+	else // istop ==1 && isright ==0
+	{
+		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = iy;
+		
+	}
+
+	if (bnd == bnd_c)
+	{
+		 
+		
+		un[i] = T(0.0);
+		zs[i] = zs[inside];
+		//ut[i] = ut[inside];
+		hh[i] = hh[inside];
+	}
+
+}
 __global__ void leftdirichletD(int nybnd, double g, double dx, double xo, double ymax, double itime, int * rightblk, double * blockxo, double * blockyo, double *zs, double *zb, double *hh, double *uu, double *vv)
 {
 	int ix = threadIdx.x;
@@ -3235,6 +4015,9 @@ template <class T> __global__ void noslipbndLeft(T xo, T eps, int * rightblk,T* 
 	}
 
 }
+
+
+
 template <class T> __global__ void noslipbndBot(T yo, T eps,int * topblk,T* blockyo, T *zb, T *zs, T *hh, T *uu, T *vv)
 {
 	int ix = threadIdx.x;
@@ -3504,7 +4287,7 @@ __global__ void discharge_bnd_v(T xstart,T xend, T ystart,T yend, T dx, T dt, T 
 
 // template not needed here
 template <class T> 
-__global__ void Rain_on_grid(float xorain, float yorain, float dxrain, double delta, double*blockxo, double *blockyo, double dt, T * zs, T *hh)
+__global__ void Rain_on_grid(double maskzs, double xorain, double yorain, double dxrain, double delta, double*blockxo, double *blockyo, double dt,  T * zs, T *hh)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -3520,10 +4303,43 @@ __global__ void Rain_on_grid(float xorain, float yorain, float dxrain, double de
 	T hhi = hh[i];
 
 
-	Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
-	Rainhh = Rainhh / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
-	zs[i] = Rainhh + zzi;
-	hh[i] = Rainhh + hhi;
+
+	if (zzi < maskzs)
+	{
+		//printf("%f\n", zzi);
+		Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
+		//Rainhh = 1 * (xorain) / dxrain + 0.5;
+		Rainhh = Rainhh / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
+
+		zs[i] = Rainhh + zzi;
+		hh[i] = Rainhh + hhi;
+	}
+}
+
+template <class T>
+__global__ void Rain_on_gridUNI(double maskzs, double rainuni, double dt, T * zs, T *hh)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	
+	double Rainhh;
+	
+	double zzi = zs[i];
+	double hhi = hh[i];
+
+
+	//Rainhh = tex2D(texRAIN, (x - xorain) / dxrain + 0.5, (y - yorain) / dxrain + 0.5);
+	Rainhh = rainuni / 1000.0 / 3600.0*dt; // convert from mm/hrs to m/s and to cumulated rain height within a step
+	if (zzi < maskzs)
+	{
+		//printf("%f\n", Rainhh);
+		zs[i] = Rainhh + zzi;
+		hh[i] = Rainhh + hhi;
+	}
 
 }
 
@@ -3577,8 +4393,8 @@ __global__ void discharge_bnd_h(int nx, int ny, DECNUM dx, DECNUM eps, DECNUM qn
 */
 
 
-
-__global__ void NextHDstep(int nx, int ny, float * Uold, float * Unew)
+template <class T>
+__global__ void NextHDstep(int nx, int ny, T * Uold, T * Unew)
 {
 	//int ix = blockIdx.x * blockDim.x * blockDim.y + blockDim.x * threadIdx.y + threadIdx.x;
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
@@ -3591,26 +4407,26 @@ __global__ void NextHDstep(int nx, int ny, float * Uold, float * Unew)
 	}
 }
 
-
-__global__ void HD_interp(int nx, int ny, int backswitch, int nhdstp, float totaltime, float hddt, float * Uold, float * Unew, float * UU)
+template <class T>
+__global__ void HD_interp(int nx, int ny, int backswitch, int nhdstp, T totaltime, T hddt, T * Uold, T * Unew, T * UU)
 {
 	unsigned int ix = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y*blockDim.y + threadIdx.y;
 	unsigned int tx = threadIdx.x;
 	unsigned int ty = threadIdx.y;
 
-	__shared__ float Uxo[16][16];
-	__shared__ float Uxn[16][16];
+	__shared__ T Uxo[16][16];
+	__shared__ T Uxn[16][16];
 	//	__shared__ float Ums[16];
 
 
-	float fac = 1.0;
+	T fac =(T) 1.0;
 	/*Ums[tx]=Umask[ix];*/
 
 
 	if (backswitch>0)
 	{
-		fac = -1.0f;
+		fac = (T)-1.0;
 	}
 
 
