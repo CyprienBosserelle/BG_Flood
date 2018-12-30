@@ -157,6 +157,8 @@ double * Patm_gd, *dPdx_gd, *dPdy_gd;
 float *Rain, *Rainbef, *Rainaft;
 float *Rain_g, *Rainbef_g, *Rainaft_g;
 
+// Adaptivity
+int * level, level_g;
 
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
@@ -2605,8 +2607,9 @@ int main(int argc, char **argv)
 
 	}
 
-	XParam.nx = (XParam.xmax - XParam.xo) / XParam.dx+1; 
-	XParam.ny = (XParam.ymax - XParam.yo) / XParam.dx+1; //+1?
+	double fac = 1 << XParam.initlevel;
+	XParam.nx = (XParam.xmax - XParam.xo) / (XParam.dx*fac)+1; 
+	XParam.ny = (XParam.ymax - XParam.yo) / (XParam.dx*fac)+1; //+1?
 
 	if (XParam.spherical < 1)
 	{
@@ -2798,6 +2801,8 @@ int main(int argc, char **argv)
 	Allocate1CPU(nblk, 1, blockyo_d);
 	Allocate4CPU(nblk, 1, leftblk, rightblk, topblk, botblk);
 
+	Allocate1CPU(nblk, 1, level);
+
 	nmask = 0;
 	mloc = 0;
 	int blkid = 0;
@@ -2916,6 +2921,7 @@ int main(int argc, char **argv)
 	{
 		blockxo[bl] = blockxo_d[bl];
 		blockyo[bl] = blockyo_d[bl];
+		level[bl] = XParam.initlevel;
 	}
 
 

@@ -138,6 +138,11 @@ public:
 	int spherical = 0; // flag for geographical coordinate. can be activated by using teh keyword geographic
 	double Radius = 6371220.; //Earth radius [m]
 
+	//Adaptation
+	int initlevel = 0;
+	int maxlevel = 0;
+	int minlevel = 0;
+
 	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
 	//files
 	//std::string Bathymetryfile;// bathymetry file name
@@ -343,6 +348,10 @@ extern int * bndleftblk_g, *bndrightblk_g, *bndtopblk_g, *bndbotblk_g;
 
 // id of blocks with riverinput:
 extern int * Riverblk, *Riverblk_g;
+
+
+// Adaptivity
+extern int * level, level_g;
 
 
 //Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch
