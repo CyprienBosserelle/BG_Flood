@@ -2607,9 +2607,11 @@ int main(int argc, char **argv)
 
 	}
 
-	double fac = 1 << XParam.initlevel;
-	XParam.nx = (XParam.xmax - XParam.xo) / (XParam.dx*fac)+1; 
-	XParam.ny = (XParam.ymax - XParam.yo) / (XParam.dx*fac)+1; //+1?
+	double levdx = XParam.dx*(1 << XParam.initlevel);// true grid resolution as in dx*2^(initlevel)
+
+
+	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
+	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?
 
 	if (XParam.spherical < 1)
 	{
@@ -2736,8 +2738,8 @@ int main(int argc, char **argv)
 			{
 				for (int j = 0; j < 16; j++)
 				{
-					double x = XParam.xo + (i + 16 * nblkx)*XParam.dx;
-					double y = XParam.yo + (j + 16 * nblky)*XParam.dx;
+					double x = XParam.xo + (i + 16 * nblkx)*levdx;
+					double y = XParam.yo + (j + 16 * nblky)*levdx;
 
 					if (x >= XParam.Bathymetry.xo && x <= XParam.Bathymetry.xmax && y >= XParam.Bathymetry.yo && y <= XParam.Bathymetry.ymax)
 					{
@@ -2815,8 +2817,8 @@ int main(int argc, char **argv)
 			{
 				for (int j = 0; j < 16; j++)
 				{
-					double x = XParam.xo + (i + 16 * nblkx)*XParam.dx;
-					double y = XParam.yo + (j + 16 * nblky)*XParam.dx;
+					double x = XParam.xo + (i + 16 * nblkx)*levdx;
+					double y = XParam.yo + (j + 16 * nblky)*levdx;
 
 					//x = max(min(x, XParam.Bathymetry.xmax), XParam.Bathymetry.xo);
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
@@ -2863,8 +2865,8 @@ int main(int argc, char **argv)
 			if (nmask < 256)
 			{
 				//
-				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * XParam.dx;
-				blockyo_d[blkid] = XParam.yo + nblky * 16.0 * XParam.dx;
+				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * levdx;
+				blockyo_d[blkid] = XParam.yo + nblky * 16.0 * levdx;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;
 			}
@@ -2875,14 +2877,14 @@ int main(int argc, char **argv)
 	for (int bl = 0; bl < nblk; bl++)
 	{
 		double espdist = 0.00000001;///WARMING
-		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftxo = blockxo_d[bl] - 16.0 * levdx; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
-		rightxo = blockxo_d[bl] + 16.0 * XParam.dx;
+		rightxo = blockxo_d[bl] + 16.0 * levdx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
-		topyo = blockyo_d[bl] + 16.0 * XParam.dx;
+		topyo = blockyo_d[bl] + 16.0 * levdx;
 		botxo = blockxo_d[bl];
-		botyo = blockyo_d[bl] - 16.0 * XParam.dx;
+		botyo = blockyo_d[bl] - 16.0 * levdx;
 
 		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour 
 		leftblk[bl] = bl;
@@ -2927,8 +2929,8 @@ int main(int argc, char **argv)
 
 	// Also recalculate xmax and ymax here
 	//xo + (ceil(nx / 16.0)*16.0 - 1)*dx
-	XParam.xmax = XParam.xo + (ceil(XParam.nx / 16.0) * 16.0 - 1)*XParam.dx;
-	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*XParam.dx;
+	XParam.xmax = XParam.xo + (ceil(XParam.nx / 16.0) * 16.0 - 1)*levdx;
+	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*levdx;
 
 
 	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
@@ -2985,14 +2987,14 @@ int main(int argc, char **argv)
 		
 		leftxo = blockxo_d[bl]; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
-		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
+		rightxo = blockxo_d[bl] + 15.0 * levdx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
-		topyo = blockyo_d[bl] + 15.0 * XParam.dx;
+		topyo = blockyo_d[bl] + 15.0 * levdx;
 		botxo = blockxo_d[bl];
 		botyo = blockyo_d[bl];
 
-		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
+		if ((rightxo - XParam.xmax) > (-1.0*levdx))
 		{
 			//
 			blbr++;
@@ -3000,21 +3002,21 @@ int main(int argc, char **argv)
 
 		}
 
-		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
+		if ((topyo - XParam.ymax) > (-1.0*levdx))
 		{
 			//
 			blbt++;
 			//bndtopblk[blbt] = bl;
 
 		}
-		if ((XParam.yo-botyo ) > (-1.0*XParam.dx))
+		if ((XParam.yo - botyo) > (-1.0*levdx))
 		{
 			//
 			blbb++;
 			//bndbotblk[blbb] = bl;
 
 		}
-		if ((XParam.xo-leftxo ) > (-1.0*XParam.dx))
+		if ((XParam.xo - leftxo) > (-1.0*levdx))
 		{
 			//
 			blbl++;
@@ -3042,14 +3044,14 @@ int main(int argc, char **argv)
 
 		leftxo = blockxo_d[bl] ; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
-		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
+		rightxo = blockxo_d[bl] + 15.0 * levdx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
-		topyo = blockyo_d[bl] + 15.0 * XParam.dx;
+		topyo = blockyo_d[bl] + 15.0 * levdx;
 		botxo = blockxo_d[bl];
 		botyo = blockyo_d[bl];
 
-		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
+		if ((rightxo - XParam.xmax) > (-1.0*levdx))
 		{
 			//
 			
@@ -3058,7 +3060,7 @@ int main(int argc, char **argv)
 
 		}
 
-		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
+		if ((topyo - XParam.ymax) > (-1.0*levdx))
 		{
 			//
 			
@@ -3066,7 +3068,7 @@ int main(int argc, char **argv)
 			blbt++;
 
 		}
-		if ((XParam.yo - botyo) > (-1.0*XParam.dx))
+		if ((XParam.yo - botyo) > (-1.0*levdx))
 		{
 			//
 			
@@ -3074,7 +3076,7 @@ int main(int argc, char **argv)
 			blbb++;
 
 		}
-		if ((XParam.xo - leftxo) > (-1.0*XParam.dx))
+		if ((XParam.xo - leftxo) > (-1.0*levdx))
 		{
 			//
 			
@@ -3170,13 +3172,13 @@ int main(int argc, char **argv)
 				dummy_d[i + j*XParam.Bathymetry.nx] = dummy[i + j*XParam.Bathymetry.nx] * 1.0;
 			}
 		}
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy_d, zb_d);
+		interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy_d, zb_d);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy_d, zb_d);
 	}
 	else
 	{
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
+		interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy, zb);
 	}
@@ -3222,8 +3224,8 @@ int main(int argc, char **argv)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						xx = blockxo_d[bl] + i*XParam.dx;
-						yy = blockyo_d[bl] + j*XParam.dx;
+						xx = blockxo_d[bl] + i*levdx;
+						yy = blockyo_d[bl] + j*levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
 						if (xx >= XParam.Rivers[Rin].xstart && xx <= XParam.Rivers[Rin].xend && yy >= XParam.Rivers[Rin].ystart && yy <= XParam.Rivers[Rin].yend)
@@ -3243,7 +3245,7 @@ int main(int argc, char **argv)
 			XParam.Rivers[Rin].i = idis;
 			XParam.Rivers[Rin].j = jdis;
 			XParam.Rivers[Rin].block = blockdis;
-			XParam.Rivers[Rin].disarea = idis.size()*XParam.dx*XParam.dx; // That is not valid for spherical grids
+			XParam.Rivers[Rin].disarea = idis.size()*levdx*levdx; // That is not valid for spherical grids
 
 			// Now read the discharge input and store to  
 			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
@@ -3546,7 +3548,7 @@ int main(int argc, char **argv)
 					}
 				}
 
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput_d, cf_d);
+				interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput_d, cf_d);
 
 				//interp2cf(XParam, cfmapinput, blockxo_d, blockyo_d, cf_d);
 				free(cfmapinput_d);
@@ -3554,7 +3556,7 @@ int main(int argc, char **argv)
 			else
 			{
 				//
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput, cf);
+				interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput, cf);
 
 				//interp2cf(XParam, cfmapinput, blockxo, blockyo, cf);
 			}
@@ -3930,11 +3932,11 @@ int main(int argc, char **argv)
 			for (int blk = 0; blk < XParam.nblk; blk++)
 			{
 				//
-				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
+				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*levdx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*levdx))
 				{
 					XParam.TSnodesout[o].block = blk;
-					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / XParam.dx), 0), 15);
-					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / XParam.dx), 0), 15);
+					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / levdx), 0), 15);
+					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / levdx), 0), 15);
 					break;
 				}
 			}
