@@ -158,7 +158,7 @@ float *Rain, *Rainbef, *Rainaft;
 float *Rain_g, *Rainbef_g, *Rainaft_g;
 
 // Adaptivity
-int * level, level_g;
+int * level, *level_g,*newlevel,*newlevel_g;
 
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
@@ -192,7 +192,7 @@ cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaC
 #include "Flow_kernel.cu"
 #include "Init.cpp" // excluded from direct buil to move the template out of the main source
 #include "Init_gpu.cu"
-
+#include "Adapt_gpu.cu"
 
 
 // Main loop that actually runs the model.
@@ -2804,6 +2804,7 @@ int main(int argc, char **argv)
 	Allocate4CPU(nblk, 1, leftblk, rightblk, topblk, botblk);
 
 	Allocate1CPU(nblk, 1, level);
+	Allocate1CPU(nblk, 1, newlevel);
 
 	nmask = 0;
 	mloc = 0;
@@ -3204,80 +3205,7 @@ int main(int argc, char **argv)
 	}
 	
 
-	/////////////////////////////////////////////////////
-	// Prep River discharge
-	/////////////////////////////////////////////////////
 	
-	if (XParam.Rivers.size() > 0)
-	{
-		double xx, yy;
-		printf("Preparing rivers... ");
-		write_text_to_log_file("Preparing rivers");
-		//For each rivers
-		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
-		{
-			// find the cells where the river discharge will be applied
-			std::vector<int> idis, jdis, blockdis;
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						xx = blockxo_d[bl] + i*levdx;
-						yy = blockyo_d[bl] + j*levdx;
-						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
-						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-						if (xx >= XParam.Rivers[Rin].xstart && xx <= XParam.Rivers[Rin].xend && yy >= XParam.Rivers[Rin].ystart && yy <= XParam.Rivers[Rin].yend)
-						{
-							
-							// This cell belongs to the river discharge area
-							idis.push_back(i);
-							jdis.push_back(j);
-							blockdis.push_back(bl);
-
-						}
-					}
-				}
-				
-			}
-
-			XParam.Rivers[Rin].i = idis;
-			XParam.Rivers[Rin].j = jdis;
-			XParam.Rivers[Rin].block = blockdis;
-			XParam.Rivers[Rin].disarea = idis.size()*levdx*levdx; // That is not valid for spherical grids
-
-			// Now read the discharge input and store to  
-			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
-		}
-		//Now identify sort unique blocks where rivers are being inserted
-		std::vector<int> activeRiverBlk;
-		
-		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
-		{
-
-			activeRiverBlk.insert(std::end(activeRiverBlk),std::begin(XParam.Rivers[Rin].block),std::end(XParam.Rivers[Rin].block));
-		}
-		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
-		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
-		Allocate1CPU(activeRiverBlk.size(), 1, Riverblk);
-
-		XParam.nriverblock = activeRiverBlk.size();
-
-		for (int b = 0; b < activeRiverBlk.size(); b++)
-		{
-			Riverblk[b] = activeRiverBlk[b];
-		}
-
-
-		if (XParam.GPUDEVICE >= 0)
-		{
-			Allocate1GPU(activeRiverBlk.size(), 1, Riverblk_g);
-			CUDA_CHECK(cudaMemcpy(Riverblk_g, Riverblk, activeRiverBlk.size() * sizeof(int), cudaMemcpyHostToDevice));
-
-		}
-		printf("Done\n");
-	}
 
 	/////////////////////////////////////////////////////
 	// Initial Condition
@@ -3572,6 +3500,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	
+
 	///////////////////////////////////////////////////
 	// GPU data init
 	///////////////////////////////////////////////////
@@ -3634,6 +3564,86 @@ int main(int argc, char **argv)
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Prep wind  / atm / rain forcing
 	/////////////////////////////////////////////////////////////////////////////////////////
+
+
+	/////////////////////////////////////////////////////
+	// Prep River discharge
+	/////////////////////////////////////////////////////
+
+	if (XParam.Rivers.size() > 0)
+	{
+		double xx, yy;
+		printf("Preparing rivers... ");
+		write_text_to_log_file("Preparing rivers");
+		//For each rivers
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
+		{
+			// find the cells where the river discharge will be applied
+			std::vector<int> idis, jdis, blockdis;
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						xx = blockxo_d[bl] + i*levdx;
+						yy = blockyo_d[bl] + j*levdx;
+						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+						if (xx >= XParam.Rivers[Rin].xstart && xx <= XParam.Rivers[Rin].xend && yy >= XParam.Rivers[Rin].ystart && yy <= XParam.Rivers[Rin].yend)
+						{
+
+							// This cell belongs to the river discharge area
+							idis.push_back(i);
+							jdis.push_back(j);
+							blockdis.push_back(bl);
+
+						}
+					}
+				}
+
+			}
+
+			XParam.Rivers[Rin].i = idis;
+			XParam.Rivers[Rin].j = jdis;
+			XParam.Rivers[Rin].block = blockdis;
+			XParam.Rivers[Rin].disarea = idis.size()*levdx*levdx; // That is not valid for spherical grids
+
+			// Now read the discharge input and store to  
+			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
+		}
+		//Now identify sort unique blocks where rivers are being inserted
+		std::vector<int> activeRiverBlk;
+
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
+		{
+
+			activeRiverBlk.insert(std::end(activeRiverBlk), std::begin(XParam.Rivers[Rin].block), std::end(XParam.Rivers[Rin].block));
+		}
+		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
+		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
+		Allocate1CPU(activeRiverBlk.size(), 1, Riverblk);
+
+		XParam.nriverblock = activeRiverBlk.size();
+
+		for (int b = 0; b < activeRiverBlk.size(); b++)
+		{
+			Riverblk[b] = activeRiverBlk[b];
+		}
+
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			Allocate1GPU(activeRiverBlk.size(), 1, Riverblk_g);
+			CUDA_CHECK(cudaMemcpy(Riverblk_g, Riverblk, activeRiverBlk.size() * sizeof(int), cudaMemcpyHostToDevice));
+
+		}
+		printf("Done\n");
+	}
+
+	/////////////////////////////////////////////////////
+	// Prep Wind input
+	/////////////////////////////////////////////////////
 	
 	if (!XParam.windU.inputfile.empty())
 	{
@@ -3915,6 +3925,14 @@ int main(int argc, char **argv)
 
 
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	// Initial adaptation
+	//////////////////////////////////////////////////////////////////////////////////
+	//wetdryadapt();
+
+
+
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Prepare various model outputs
