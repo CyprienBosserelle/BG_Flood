@@ -5,7 +5,7 @@
 
 int wetdryadapt(Param XParam)
 {
-	int sucess = 0;
+	int success = 0;
 	int i;
 	int tl, tr, lt, lb, bl, br, rb, rt;//boundary neighbour (max of 8)
 	//Coarsen dry blocks and refine wet ones
@@ -44,25 +44,35 @@ int wetdryadapt(Param XParam)
 			newlevel[ib] = -1;
 		}
 	}
+
+	for (int ib = 0; ib < XParam.nblk; ib++)
+	{
+		if (newlevel[ib] == 1 && level[ib] == XParam.maxlevel)
+		{
+			newlevel[ib] = 0;
+		}
+	}
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		//check whether neighbour need refinement
-		if ((level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]) < -1);
+		
+		if ((level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]) < -1)
 		{
-			newlevel[topblk[ib]] = newlevel[topblk[ib]] + 1;
+			printf("level diff=%d\n", level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]);
+			newlevel[topblk[ib]] = min(newlevel[topblk[ib]] + 1,1);
 			newlevel[rightblk[topblk[ib]]] = newlevel[rightblk[topblk[ib]]] + 1; // is this necessary?
 		}
-		if ((level[botblk[ib]] + newlevel[botblk[ib]] - newlevel[ib] - level[ib]) < -1);
+		if ((level[botblk[ib]] + newlevel[botblk[ib]] - newlevel[ib] - level[ib]) < -1)
 		{
 			newlevel[botblk[ib]] = newlevel[botblk[ib]] + 1;
 			newlevel[rightblk[botblk[ib]]] = newlevel[rightblk[botblk[ib]]] + 1; // is this necessary?
 		}
-		if ((level[leftblk[ib]] + newlevel[leftblk[ib]] - newlevel[ib] - level[ib]) < -1);
+		if ((level[leftblk[ib]] + newlevel[leftblk[ib]] - newlevel[ib] - level[ib]) < -1)
 		{
 			newlevel[leftblk[ib]] = newlevel[leftblk[ib]]+1;
 			newlevel[topblk[leftblk[ib]]] = newlevel[topblk[leftblk[ib]]]+1; // is this necessary?
 		}
-		if ((level[rightblk[ib]] + newlevel[rightblk[ib]] - newlevel[ib] - level[ib]) < -1);
+		if ((level[rightblk[ib]] + newlevel[rightblk[ib]] - newlevel[ib] - level[ib]) < -1)
 		{
 			newlevel[rightblk[ib]] = newlevel[rightblk[ib]]+1;
 			newlevel[topblk[rightblk[ib]]] = newlevel[topblk[rightblk[ib]]]+1; // is this necessary?
@@ -71,6 +81,8 @@ int wetdryadapt(Param XParam)
 		
 
 	}
+
+
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		if (newlevel[ib]>0)

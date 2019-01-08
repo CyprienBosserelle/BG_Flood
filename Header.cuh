@@ -140,8 +140,8 @@ public:
 
 	//Adaptation
 	int initlevel = 0;
-	int maxlevel = 0;
-	int minlevel = 0;
+	int maxlevel = 1;
+	int minlevel = -1;
 
 	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
 	//files
