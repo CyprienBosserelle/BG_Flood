@@ -158,7 +158,7 @@ float *Rain, *Rainbef, *Rainaft;
 float *Rain_g, *Rainbef_g, *Rainaft_g;
 
 // Adaptivity
-int * level, *level_g,*newlevel,*newlevel_g;
+int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, *activeblk_g, *availblk_g, *csumblk, *csumblk_g;
 
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
@@ -2787,7 +2787,8 @@ int main(int argc, char **argv)
 	}
 
 	XParam.nblk = nblk;
-	
+	XParam.nblkmem = (int)ceil(nblk*XParam.membuffer); //5% buffer on the memory for adaptation 
+
 	int blksize = XParam.blksize; //useful below
 	printf("Number of blocks: %i\n",nblk);
 
@@ -2797,14 +2798,17 @@ int main(int argc, char **argv)
 	// caluculate the Block xo yo and what are its neighbour
 	
 
-	Allocate1CPU(nblk, 1, blockxo);
-	Allocate1CPU(nblk, 1, blockyo);
-	Allocate1CPU(nblk, 1, blockxo_d);
-	Allocate1CPU(nblk, 1, blockyo_d);
-	Allocate4CPU(nblk, 1, leftblk, rightblk, topblk, botblk);
+	Allocate1CPU(XParam.nblkmem, 1, blockxo);
+	Allocate1CPU(XParam.nblkmem, 1, blockyo);
+	Allocate1CPU(XParam.nblkmem, 1, blockxo_d);
+	Allocate1CPU(XParam.nblkmem, 1, blockyo_d);
+	Allocate4CPU(XParam.nblkmem, 1, leftblk, rightblk, topblk, botblk);
 
-	Allocate1CPU(nblk, 1, level);
-	Allocate1CPU(nblk, 1, newlevel);
+	Allocate1CPU(XParam.nblkmem, 1, level);
+	Allocate1CPU(XParam.nblkmem, 1, newlevel);
+	Allocate1CPU(XParam.nblkmem, 1, activeblk);
+	Allocate1CPU(XParam.nblkmem, 1, availblk);
+	Allocate1CPU(XParam.nblkmem, 1, csumblk);
 
 	nmask = 0;
 	mloc = 0;
@@ -2868,6 +2872,7 @@ int main(int argc, char **argv)
 				//
 				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * levdx;
 				blockyo_d[blkid] = XParam.yo + nblky * 16.0 * levdx;
+				activeblk[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;
 			}
@@ -2875,8 +2880,9 @@ int main(int argc, char **argv)
 	}
 
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
+		int bl = activeblk[ibl];
 		double espdist = 0.00000001;///WARMING
 		leftxo = blockxo_d[bl] - 16.0 * levdx; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
@@ -2892,9 +2898,11 @@ int main(int argc, char **argv)
 		rightblk[bl] = bl;
 		topblk[bl] = bl;
 		botblk[bl] = bl;
-		for (int blb = 0; blb < nblk; blb++)
+		for (int iblb = 0; iblb < nblk; iblb++)
 		{
 			//
+			int blb = activeblk[iblb];
+
 			if (abs(blockxo_d[blb] - leftxo) < espdist  && abs(blockyo_d[blb] - leftyo) < espdist)
 			{
 				leftblk[bl] = blb;
@@ -2920,11 +2928,21 @@ int main(int argc, char **argv)
 
 	}
 
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
+		int bl = activeblk[ibl];
 		blockxo[bl] = blockxo_d[bl];
 		blockyo[bl] = blockyo_d[bl];
 		level[bl] = XParam.initlevel;
+		
+	}
+
+	for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
+	{
+		
+		availblk[ibl] = XParam.nblk + ibl;
+		XParam.navailblk++;
+
 	}
 
 
@@ -2982,10 +3000,10 @@ int main(int argc, char **argv)
 
 	// Find how many blocks are on each bnds
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
 		double espdist = 0.00000001;///WARMING
-		
+		int bl = activeblk[ibl];
 		leftxo = blockxo_d[bl]; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 15.0 * levdx;
@@ -3039,9 +3057,10 @@ int main(int argc, char **argv)
 	Allocate1CPU(blbb, 1, bndbotblk);
 
 	blbr = blbb = blbl = blbt = 0;
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
 		double espdist = 0.00000001;///WARMING
+		int bl = activeblk[ibl];
 
 		leftxo = blockxo_d[bl] ; // in adaptive this shoulbe be a range 
 		leftyo = blockyo_d[bl];

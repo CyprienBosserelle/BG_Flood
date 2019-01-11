@@ -142,6 +142,9 @@ public:
 	int initlevel = 0;
 	int maxlevel = 1;
 	int minlevel = -1;
+	int nblkmem = 0;
+	int navailblk = 0;
+	double membuffer = 1.05; //needs toallocate more memory than initially needed so adaptation can happen without memory reallocation
 
 	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
 	//files
@@ -351,7 +354,7 @@ extern int * Riverblk, *Riverblk_g;
 
 
 // Adaptivity
-extern int * level, *level_g, *newlevel, *newlevel_g;
+extern int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, *activeblk_g, *availblk_g, *csumblk, *csumblk_g;
 
 
 //Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch
