@@ -1,6 +1,15 @@
 ﻿// This file contains functions for the model adaptivity.
 
+bool isPow2(int x)
+{
+	//Greg Hewgill great explenation here:
+	//https://stackoverflow.com/questions/600293/how-to-check-if-a-number-is-a-power-of-2
+	//Note, this function will report true for 0, which is not a power of 2 but it is handiy for us here
 
+	return (x & (x - 1)) == 0;
+
+
+}
 
 
 int wetdryadapt(Param XParam)
@@ -42,20 +51,6 @@ int wetdryadapt(Param XParam)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
-		// if all the neighbour are not wet then coarsen if possible
-		if (newlevel[ib] == 0 && newlevel[topblk[ib]] == 0 && newlevel[rightblk[ib]] == 0 && newlevel[rightblk[topblk[ib]]] == 0 && level[ib]>XParam.minlevel)
-		{
-			newlevel[ib] = -1;
-			newlevel[topblk[ib]] = -1;
-			newlevel[rightblk[ib]] = -1;
-			newlevel[rightblk[topblk[ib]]] = -1;
-				
-		}
-	}
-
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
 		if (newlevel[ib] == 1 && level[ib] == XParam.maxlevel)
 		{
 			newlevel[ib] = 0;
@@ -66,33 +61,78 @@ int wetdryadapt(Param XParam)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
-		//check whether neighbour need refinement
+		// if all the neighbour are not wet then coarsen if possible
+		double dxfac = (2 << (level[ib] - 1))*XParam.dx;
+
+		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 		
-		if ((level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]) < -1)
+			if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))
+			{
+
+
+				if (newlevel[topblk[ib]] == 0 && newlevel[rightblk[ib]] == 0 && newlevel[rightblk[topblk[ib]]] == 0 && level[ib] > XParam.minlevel)
+				{
+					newlevel[ib] = -1;
+					newlevel[topblk[ib]] = -1;
+					newlevel[rightblk[ib]] = -1;
+					newlevel[rightblk[topblk[ib]]] = -1;
+
+				}
+				
+			}
+		
+	}
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		//check whether neighbour need refinement
+
+		if ((level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]) > 1)
 		{
-			printf("level diff=%d\n", level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]);
-			newlevel[topblk[ib]] = min(newlevel[topblk[ib]] + 1,1);
-			newlevel[rightblk[topblk[ib]]] = newlevel[rightblk[topblk[ib]]] + 1; // is this necessary?
+			//printf("level diff=%d\n", level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]);
+			newlevel[ib] = min(newlevel[ib] + 1, 1);
+
 		}
-		if ((level[botblk[ib]] + newlevel[botblk[ib]] - newlevel[ib] - level[ib]) < -1)
+		if ((level[botblk[ib]] + newlevel[botblk[ib]] - newlevel[ib] - level[ib]) > 1)
 		{
-			newlevel[botblk[ib]] = newlevel[botblk[ib]] + 1;
-			newlevel[rightblk[botblk[ib]]] = newlevel[rightblk[botblk[ib]]] + 1; // is this necessary?
+			newlevel[ib] = min(newlevel[ib] + 1, 1);
+
 		}
-		if ((level[leftblk[ib]] + newlevel[leftblk[ib]] - newlevel[ib] - level[ib]) < -1)
+		if ((level[leftblk[ib]] + newlevel[leftblk[ib]] - newlevel[ib] - level[ib]) > 1)
 		{
-			newlevel[leftblk[ib]] = newlevel[leftblk[ib]]+1;
-			newlevel[topblk[leftblk[ib]]] = newlevel[topblk[leftblk[ib]]]+1; // is this necessary?
+			newlevel[ib] = min(newlevel[ib] + 1, 1);// is this necessary?
 		}
-		if ((level[rightblk[ib]] + newlevel[rightblk[ib]] - newlevel[ib] - level[ib]) < -1)
+		if ((level[rightblk[ib]] + newlevel[rightblk[ib]] - newlevel[ib] - level[ib]) > 1)
 		{
-			newlevel[rightblk[ib]] = newlevel[rightblk[ib]]+1;
-			newlevel[topblk[rightblk[ib]]] = newlevel[topblk[rightblk[ib]]]+1; // is this necessary?
+			newlevel[ib] = min(newlevel[ib] + 1, 1); // is this necessary?
 		}
 
-		
+
 
 	}
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		// if all the neighbour are not wet then coarsen if possible
+		double dxfac = (2 << (level[ib] - 1))*XParam.dx;
+
+		//only check for coarsening if the block analysed is a lower left corner block of the lower level
+
+		if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))
+		{
+			if (newlevel[ib] < 0  && (newlevel[topblk[ib]] >= 0 || newlevel[rightblk[ib]] >= 0 || newlevel[rightblk[topblk[ib]]] >= 0))
+			{
+				newlevel[ib] = 0;
+				newlevel[topblk[ib]] = 0;
+				newlevel[rightblk[ib]] = 0;
+				newlevel[rightblk[topblk[ib]]] = 0;
+
+			}
+		}
+	}
+	
+	
 	//Calc cumsum that will determine where the new cell will be located in the memory
 
 	int csum = 0;
@@ -149,7 +189,7 @@ int wetdryadapt(Param XParam)
 						ii = ix * 2 + (iy * 2) * 16 + ib * XParam.blksize;
 						ir = (ix * 2+1) + (iy * 2) * 16 + ib * XParam.blksize;
 						it = (ix) * 2 + (iy * 2 + 1 ) * 16 + ib * XParam.blksize;
-						itr = (ix * 2 +1) + (iy*2+1) * 16 + ib * XParam.blksize;
+						itr = (ix * 2 + 1 ) + (iy * 2 + 1) * 16 + ib * XParam.blksize;
 					}
 					if (ix >= 8 && iy < 8)
 					{
@@ -172,6 +212,9 @@ int wetdryadapt(Param XParam)
 						it = (ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
 						itr = ((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
 					}
+
+
+
 					hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it], hho[itr]);
 					//zs, zb, uu,vv
 
