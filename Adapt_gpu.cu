@@ -119,7 +119,7 @@ int wetdryadapt(Param XParam)
 
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 
-		if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))
+		if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))// Beware of round off error
 		{
 			if (newlevel[ib] < 0  && (newlevel[topblk[ib]] >= 0 || newlevel[rightblk[ib]] >= 0 || newlevel[rightblk[topblk[ib]]] >= 0))
 			{
@@ -131,6 +131,7 @@ int wetdryadapt(Param XParam)
 			}
 		}
 	}
+	
 	
 	
 	//Calc cumsum that will determine where the new cell will be located in the memory
@@ -147,7 +148,7 @@ int wetdryadapt(Param XParam)
 		if (newlevel[ib]>0)
 		{
 			nrefineblk++;
-			csum = csum + newlevel[ib] * 3;
+			csum = csum + 3;
 		}
 		if (newlevel[ib] < 0)
 		{
@@ -157,7 +158,7 @@ int wetdryadapt(Param XParam)
 		csumblk[ib] = csum;
 
 	}
-	nnewblk = csum - ncoarsenlk/4*3;
+	nnewblk = 3*(nrefineblk - ncoarsenlk);
 
 	printf("%d blocks to be refiled, %d blocks to be coarsen; %d new blocks will be created\n", nrefineblk, ncoarsenlk, nnewblk);
 
@@ -179,54 +180,71 @@ int wetdryadapt(Param XParam)
 		int i, ii, ir , it , itr;
 		if (newlevel[ib] < 0)
 		{
-			for (int iy = 0; iy < 16; iy++)
+			double dxfac = (2 << (level[ib] - 1))*XParam.dx;
+			if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))
 			{
-				for (int ix = 0; ix < 16; ix++)
+				for (int iy = 0; iy < 16; iy++)
 				{
-					i = ix + iy * 16 + ib * XParam.blksize;
-					if (ix < 8 && iy < 8)
+					for (int ix = 0; ix < 16; ix++)
 					{
-						ii = ix * 2 + (iy * 2) * 16 + ib * XParam.blksize;
-						ir = (ix * 2+1) + (iy * 2) * 16 + ib * XParam.blksize;
-						it = (ix) * 2 + (iy * 2 + 1 ) * 16 + ib * XParam.blksize;
-						itr = (ix * 2 + 1 ) + (iy * 2 + 1) * 16 + ib * XParam.blksize;
+						i = ix + iy * 16 + ib * XParam.blksize;
+						if (ix < 8 && iy < 8)
+						{
+							ii = ix * 2 + (iy * 2) * 16 + ib * XParam.blksize;
+							ir = (ix * 2 + 1) + (iy * 2) * 16 + ib * XParam.blksize;
+							it = (ix)* 2 + (iy * 2 + 1) * 16 + ib * XParam.blksize;
+							itr = (ix * 2 + 1) + (iy * 2 + 1) * 16 + ib * XParam.blksize;
+						}
+						if (ix >= 8 && iy < 8)
+						{
+							ii = ((ix - 8) * 2) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+							ir = ((ix - 8) * 2 + 1) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+							it = ((ix - 8)) * 2 + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+							itr = ((ix - 8) * 2 + 1) + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+						}
+						if (ix < 8 && iy >= 8)
+						{
+							ii = ix * 2 + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+							ir = (ix * 2 + 1) + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+							it = (ix)* 2 + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+							itr = (ix * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+						}
+						if (ix >= 8 && iy >= 8)
+						{
+							ii = (ix - 8) * 2 + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+							ir = ((ix - 8) * 2 + 1) + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+							it = (ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+							itr = ((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						}
+
+
+
+						hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it], hho[itr]);
+						//zs, zb, uu,vv
+
+						//update neighbour blk and neighbours' neighbours
+
+						
+
+
 					}
-					if (ix >= 8 && iy < 8)
-					{
-						ii = ((ix - 8) * 2) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
-						ir = ((ix - 8) * 2 + 1) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
-						it = ((ix - 8)) * 2 + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
-						itr = ((ix - 8) * 2 + 1) + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
-					}
-					if (ix < 8 && iy >= 8)
-					{
-						ii = ix * 2 + ((iy-8) * 2) * 16 + topblk[ib] * XParam.blksize;
-						ir = (ix * 2 + 1) + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
-						it = (ix)* 2 + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
-						itr = (ix * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
-					}
-					if (ix >= 8 && iy >= 8)
-					{
-						ii = (ix - 8) * 2 + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						ir = ((ix - 8) * 2 + 1) + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						it = (ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						itr = ((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-					}
-
-
-
-					hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it], hho[itr]);
-					//zs, zb, uu,vv
-
-					//update neighbour blk and neighbours' neighbours
-					rightblk[ib] = rightblk[rightblk[ib]];
-					topblk[ib] = topblk[topblk[ib]];
-
-
 				}
+				//check neighbour's
+				//Need more?
+				rightblk[ib] = rightblk[rightblk[ib]];
+				topblk[ib] = topblk[topblk[ib]];
+
+
+
 			}
 		}
 
+		int newblkid = 0;
+
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		{
+			//
+		}
 
 
 	}
