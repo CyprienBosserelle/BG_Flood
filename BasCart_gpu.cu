@@ -2879,6 +2879,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	
+
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 	for (int ibl = 0; ibl < nblk; ibl++)
 	{

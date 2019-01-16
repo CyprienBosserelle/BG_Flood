@@ -164,7 +164,7 @@ int wetdryadapt(Param XParam)
 
 	if (nnewblk>XParam.navailblk)
 	{
-		//reallocate memory to nmake more room
+		//reallocate memory to make more room
 	}
 
 
@@ -220,17 +220,34 @@ int wetdryadapt(Param XParam)
 
 
 						hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it], hho[itr]);
+						zs[i] = 0.25*(zso[ii] + zso[ir] + zso[it], zso[itr]);
+						uu[i] = 0.25*(uuo[ii] + uuo[ir] + uuo[it], uuo[itr]);
+						vv[i] = 0.25*(vvo[ii] + vvo[ir] + vvo[it], vvo[itr]);
 						//zs, zb, uu,vv
 
-						//update neighbour blk and neighbours' neighbours
+						
 
 						
 
 
 					}
 				}
-				//check neighbour's
+				
 				//Need more?
+				
+				
+				availblk[XParam.navailblk] = rightblk[ib];
+				availblk[XParam.navailblk+1] = topblk[ib];
+				availblk[XParam.navailblk+2] = rightblk[topblk[ib]];
+
+				XParam.navailblk = XParam.navailblk + 3;
+
+
+				activeblk[rightblk[ib]] = -1;
+				activeblk[topblk[ib]] = -1;
+				activeblk[rightblk[topblk[ib]]] = -1;
+
+				//check neighbour's
 				rightblk[ib] = rightblk[rightblk[ib]];
 				topblk[ib] = topblk[topblk[ib]];
 
@@ -239,16 +256,37 @@ int wetdryadapt(Param XParam)
 			}
 		}
 
-		int newblkid = 0;
-
-		for (int ibl = 0; ibl < XParam.nblk; ibl++)
-		{
-			//
-		}
-
-
 	}
 
+
+	//
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//
+		int ib = activeblk[ibl];
+		int o,i,ii,iii;
+		if (newlevel[ib] > 0)
+		{
+			//
+			for (int iy = 0; iy < 16; iy++)
+			{
+				for (int ix = 0; ix < 16; ix++)
+				{
+					//
+					o = ix + iy * 16 + ib * XParam.blksize;
+					i = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
+					ii = ix + iy * 16 + availblk[csumblk[ibl]+1] * XParam.blksize;
+					iii = ix + iy * 16 + availblk[csumblk[ibl]+2] * XParam.blksize;
+
+
+					//hh[o] = hho[o];
+
+		
+				}
+			}
+		}
+
+	}
 
 
 	return 0;
