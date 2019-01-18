@@ -1,0 +1,43 @@
+
+
+#################################
+# Bathymetry file
+bathy = topo.asc;
+posdown=0;
+mask = 0.09; 
+
+
+
+rainfile = cstRain-test1.txt;
+
+# Model controls
+gpudevice = 0;
+doubleprecision = 1;
+
+theta=1.14;
+
+# Flow parameters
+eps = 0.00000100;
+cf=0.000004;#last best 0.000001 
+frictionmodel = 1
+
+
+# Timekeeping parameters
+CFL = 0.500000;
+outputtimestep = 1.000000;
+outvars = zs,hh,uu,vv,zb,hhmax,zsmax;
+endtime = 150.0;
+
+smallnc=0
+
+# Files
+
+outfile = Test3_rain.nc;
+
+
+zsinit = -0.5;
+
+bot = 1;
+#botbndfile = botbnd.txt
+
+
