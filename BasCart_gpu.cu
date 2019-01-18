@@ -2607,7 +2607,7 @@ int main(int argc, char **argv)
 
 	}
 
-	double levdx = XParam.dx*(1 << XParam.initlevel);// true grid resolution as in dx*2^(initlevel)
+	double levdx = XParam.dx/(1 << XParam.initlevel);// true grid resolution as in dx/2^(initlevel)
 
 
 	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;

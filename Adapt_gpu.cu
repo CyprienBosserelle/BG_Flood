@@ -62,7 +62,7 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		// if all the neighbour are not wet then coarsen if possible
-		double dxfac = (2 << (level[ib] - 1))*XParam.dx;
+		double dxfac = XParam.dx/(1 << (level[ib] - 1));
 
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 		
@@ -115,7 +115,7 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		// if all the neighbour are not wet then coarsen if possible
-		double dxfac = (2 << (level[ib] - 1))*XParam.dx;
+		double dxfac = XParam.dx/(1 << (level[ib] - 1));
 
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 
@@ -180,7 +180,7 @@ int wetdryadapt(Param XParam)
 		int i, ii, ir , it , itr;
 		if (newlevel[ib] < 0)
 		{
-			double dxfac = (2 << (level[ib] - 1))*XParam.dx;
+			double dxfac = 1.0/(1 << (level[ib] - 1))*XParam.dx;
 			if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))
 			{
 				for (int iy = 0; iy < 16; iy++)
@@ -251,6 +251,10 @@ int wetdryadapt(Param XParam)
 				rightblk[ib] = rightblk[rightblk[ib]];
 				topblk[ib] = topblk[topblk[ib]];
 
+				blockxo_d[ib] = blockxo_d[ib] + XParam.dx / (1 << (level[ib] + 1));
+				blockyo_d[ib] = blockyo_d[ib] + XParam.dx / (1 << (level[ib] + 1));
+
+
 
 
 			}
@@ -264,9 +268,14 @@ int wetdryadapt(Param XParam)
 	{
 		//
 		int ib = activeblk[ibl];
-		int o,i,ii,iii;
+		int o,ot,or,otr,i,ir,it,itr,ii,iit,iir,iitr,iii,iiir,iiit,iitr;
 		if (newlevel[ib] > 0)
 		{
+
+			double xoblk = blockxo_d[ib] - XParam.dx / (1 << (level[ib] + 1));
+			double yoblk = blockyo_d[ib] - XParam.dx / (1 << (level[ib] + 1));
+			
+
 			//
 			for (int iy = 0; iy < 16; iy++)
 			{
@@ -274,12 +283,17 @@ int wetdryadapt(Param XParam)
 				{
 					//
 					o = ix + iy * 16 + ib * XParam.blksize;
+					or = (ix+1) + iy * 16 + ib * XParam.blksize;
+					ot = ix + (iy+1) * 16 + ib * XParam.blksize;
+					otr = (ix+1) + (iy+1) * 16 + ib * XParam.blksize;
+					
 					i = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
 					ii = ix + iy * 16 + availblk[csumblk[ibl]+1] * XParam.blksize;
 					iii = ix + iy * 16 + availblk[csumblk[ibl]+2] * XParam.blksize;
 
 
-					//hh[o] = hho[o];
+					//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
+
 
 		
 				}
