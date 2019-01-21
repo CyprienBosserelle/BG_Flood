@@ -462,6 +462,8 @@ Param creatncfileBUQ(Param XParam)
 	status = nc_put_var1_double(ncid, time_id, tst, &XParam.totaltime);
 	if (status != NC_NOERR) handle_error(status);
 
+	std::string xxname, yyname;
+
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
 		double ddx = XParam.dx / (1 << lev);
@@ -491,7 +493,7 @@ Param creatncfileBUQ(Param XParam)
 		}
 
 
-		std::string xxname, yyname;
+		
 
 		xxname = "xx_" + std::to_string(lev);
 		yyname = "yy_" + std::to_string(lev);
@@ -534,7 +536,7 @@ extern "C" void defncvarBUQ(Param XParam, double * blockxo, double *blockyo, std
 	int  var_dimid3D[3];
 	//int  var_dimid4D[4];
 
-	short * var_s, *varblk_s;
+	short *varblk_s;
 	float * varblk;
 	int recid, xid, yid;
 	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
@@ -550,8 +552,20 @@ extern "C" void defncvarBUQ(Param XParam, double * blockxo, double *blockyo, std
 	//static size_t count3D[] = { 1, ny, nx };
 	static size_t count3D[] = { 1, 16, 16 };
 
-	varblk = (float *)malloc(XParam.blksize * sizeof(float));
+	nc_type VarTYPE;
 
+	if (smallnc > 0)
+	{
+		VarTYPE = NC_SHORT;
+	}
+	else
+	{
+		VarTYPE = NC_FLOAT;
+	}
+	
+
+
+	
 	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 	status = nc_redef(ncid);
@@ -559,169 +573,151 @@ extern "C" void defncvarBUQ(Param XParam, double * blockxo, double *blockyo, std
 	//Inquire dimensions ids
 	status = nc_inq_unlimdim(ncid, &recid);//time
 	if (status != NC_NOERR) handle_error(status);
-	
-	
-	status = nc_inq_dimid(ncid, "xx", &xid);
-	if (status != NC_NOERR) handle_error(status);
-	status = nc_inq_dimid(ncid, "yy", &yid);
-	if (status != NC_NOERR) handle_error(status);
-
-
-	var_dimid2D[0] = yid;
-	var_dimid2D[1] = xid;
-
-	var_dimid3D[0] = recid;
-	var_dimid3D[1] = yid;
-	var_dimid3D[2] = xid;
 
 	
-
+	varblk = (float *)malloc(XParam.blksize * sizeof(float));
 	if (smallnc > 0)
 	{
-		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(XParam.nblk*XParam.blksize *sizeof(short));
+
 		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
-		for (int bl = 0; bl < XParam.nblk; bl++)
-		{
-			for (int j = 0; j < 16; j++)
-			{
-				for (int i = 0; i < 16; i++)
-				{
-					int n = i + j * 16 + bl * XParam.blksize;
-					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
-					var_s[n] = (short)round((var[n] - addoffset) / scalefactor);
-				}
-			}
-		}
 	}
 
-	if (vdim == 2)
+
+	std::string xxname, yyname, varname;
+
+	//generate a different variable name for each level and add attribute as necessary
+	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
+
+		xxname = "xx_" + std::to_string(lev);
+		yyname = "yy_" + std::to_string(lev);
+
+		varname = varst + "_" + std::to_string(lev);
+
+		status = nc_inq_dimid(ncid, xxname.c_str(), &xid);
+		if (status != NC_NOERR) handle_error(status);
+		status = nc_inq_dimid(ncid, yyname.c_str(), &yid);
+		if (status != NC_NOERR) handle_error(status);
+
+
+		var_dimid2D[0] = yid;
+		var_dimid2D[1] = xid;
+
+		var_dimid3D[0] = recid;
+		var_dimid3D[1] = yid;
+		var_dimid3D[2] = xid;
+
+		if (vdim == 2)
+		{
+			status = nc_def_var(ncid, varname.c_str(), VarTYPE, vdim, var_dimid2D, &var_id);
+			if (status != NC_NOERR) handle_error(status);
+		}
+		else if(vdim == 3)
+		{
+			status = nc_def_var(ncid, varst.c_str(), VarTYPE, vdim, var_dimid3D, &var_id);
+			if (status != NC_NOERR) handle_error(status);
+		}
+
+		status = nc_put_att_short(ncid, var_id, "_FillValue", VarTYPE, 1, &Sfillval);
+		if (status != NC_NOERR) handle_error(status);
+		status = nc_put_att_short(ncid, var_id, "missingvalue", VarTYPE, 1, &Sfillval);
+		if (status != NC_NOERR) handle_error(status);
+
 		if (smallnc > 0)
 		{
-
-			status = nc_def_var(ncid, varst.c_str(), NC_SHORT, vdim, var_dimid2D, &var_id);
-			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
 			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_short(ncid, var_id, "_FillValue", NC_SHORT, 1, &Sfillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_short(ncid, var_id, "missingvalue", NC_SHORT, 1, &Sfillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_enddef(ncid);
-			if (status != NC_NOERR) handle_error(status);
-			for (int bl = 0; bl < XParam.nblk; bl++)
+		}
+		
+
+
+
+	}
+	// End definition
+	status = nc_enddef(ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	// Now write the initial value of the Variable out
+	int lev,bl;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		bl = activeblk[ibl];
+		lev = level[bl];
+		xxname = "xx_" + std::to_string(lev);
+		yyname = "yy_" + std::to_string(lev);
+
+		varname = varst + "_" + std::to_string(lev);
+
+		status = nc_inq_dimid(ncid, xxname.c_str(), &xid);
+		if (status != NC_NOERR) handle_error(status);
+		status = nc_inq_dimid(ncid, yyname.c_str(), &yid);
+		if (status != NC_NOERR) handle_error(status);
+		status = nc_inq_varid(ncid, varname.c_str(), &var_id);
+		if (status != NC_NOERR) handle_error(status);
+
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
 			{
-				for (int j = 0; j < 16; j++)
+				int n = i + j * 16 + bl * XParam.blksize;
+				int r = i + j * 16;
+				if (smallnc > 0)
 				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						varblk_s[i + j * 16] = var_s[n];
-					}
+					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
+					varblk_s[r] = (short)round((var[n] - addoffset) / scalefactor);
 				}
-				//jstart
-				start2D[0] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
-				start2D[1] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
+				else
+				{
+					varblk[r] = var[n];
+				}
+			}
+		}
+
+		if (vdim == 2)
+		{
+			start2D[0] = (size_t)round((blockyo[bl] - XParam.yo) / (XParam.dx / (1 << lev)));
+			start2D[1] = (size_t)round((blockxo[bl] - XParam.xo) / (XParam.dx / (1 << lev)));
+
+			if (smallnc > 0)
+			{
+				
+
 				status = nc_put_vara_short(ncid, var_id, start2D, count2D, varblk_s);
 				if (status != NC_NOERR) handle_error(status);
 			}
-		}
-		else
-		{
-			status = nc_def_var(ncid, varst.c_str(), NC_FLOAT, vdim, var_dimid2D, &var_id);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_enddef(ncid);
-			if (status != NC_NOERR) handle_error(status);
-			for (int bl = 0; bl < XParam.nblk; bl++)
+			else
 			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						varblk[i + j * 16] = var[n];
-					}
-				}
-				start2D[0] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
-				start2D[1] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
 				status = nc_put_vara_float(ncid, var_id, start2D, count2D, varblk);
 				if (status != NC_NOERR) handle_error(status);
 			}
 		}
-
-
-	}
-	if (vdim == 3)
-	{
-		if (smallnc > 0)
+		else if (vdim == 3)
 		{
-			status = nc_def_var(ncid, varst.c_str(), NC_SHORT, vdim, var_dimid3D, &var_id);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_short(ncid, var_id, "_FillValue", NC_SHORT, 1, &Sfillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_short(ncid, var_id, "missingvalue", NC_SHORT, 1, &Sfillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_enddef(ncid);
-			if (status != NC_NOERR) handle_error(status);
-			for (int bl = 0; bl < XParam.nblk; bl++)
+			//
+			start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / (XParam.dx / (1 << lev)));
+			start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / (XParam.dx / (1 << lev)));
+			if (smallnc > 0)
 			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						varblk_s[i + j * 16] = var_s[n];
-					}
-				}
-				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
-				start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
 				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);
 				if (status != NC_NOERR) handle_error(status);
 			}
-
-		}
-		else
-		{
-			status = nc_def_var(ncid, varst.c_str(), NC_FLOAT, vdim, var_dimid3D, &var_id);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
-			if (status != NC_NOERR) handle_error(status);
-			status = nc_enddef(ncid);
-			if (status != NC_NOERR) handle_error(status);
-			for (int bl = 0; bl < XParam.nblk; bl++)
+			else
 			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * XParam.blksize;
-						varblk[i + j * 16] = var[n];
-					}
-				}
-				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
-				start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / XParam.dx);
 				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
 				if (status != NC_NOERR) handle_error(status);
 			}
+
 		}
+
 	}
+
+	
 
 	if (smallnc > 0)
 	{
-		free(var_s);
+		
 		free(varblk_s);
 	}
 	free(varblk);
