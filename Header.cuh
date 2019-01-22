@@ -456,13 +456,21 @@ extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltim
 extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
 
 // Netcdf functions
-Param creatncfileUD(Param XParam);
+void handle_error(int status);
+//functions moved to new file that is directly included in BasCart_gpu so that templates cna be used to simplify the code
+//Param creatncfileUD(Param XParam);
 
-extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
-extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, double * var);
-extern "C" void writenctimestep(std::string outfile, double totaltime);
-extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var);
-extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d);//templating should have been fine here!
+
+
+ 
+//extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
+
+//extern "C" void writenctimestep(std::string outfile, double totaltime);
+//extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var);
+
+
+
+
 void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);

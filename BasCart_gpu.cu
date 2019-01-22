@@ -189,10 +189,14 @@ cudaChannelFormatDesc channelDescVwind = cudaCreateChannelDesc(32, 0, 0, 0, cuda
 cudaChannelFormatDesc channelDescPatm = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
+
+// Below file are included rather than compiled separately because this allow to use Template for function
+// Otherwise I would need to keep a double and a single precision copy of almost most function wich would be impossible to manage
 #include "Flow_kernel.cu"
 #include "Init.cpp" // excluded from direct buil to move the template out of the main source
 #include "Init_gpu.cu"
 #include "Adapt_gpu.cu"
+#include "write_output.cu"
 
 
 // Main loop that actually runs the model.
@@ -320,7 +324,7 @@ void mainloopGPUDB(Param XParam)
 
 						}
 						//Create definition for each variable and store it
-						writencvarstepD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -900,7 +904,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 
 						}
 						//Create definition for each variable and store it
-						writencvarstepD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1321,7 +1325,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 
 						}
 						//Create definition for each variable and store it
-						writencvarstepD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -2092,7 +2096,7 @@ void mainloopGPUold(Param XParam)
 
 							}
 							//Create definition for each variable and store it
-							writencvarstepD(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							writencvarstep(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 						}
 					}
 				}
@@ -2422,7 +2426,7 @@ void mainloopCPU(Param XParam)
 						//write output step for each variable 
 						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 						{
-							writencvarstepD(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							writencvarstep(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 						}
 						else
 						{
@@ -4081,7 +4085,7 @@ int main(int argc, char **argv)
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
 			//defncvarD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-			defncvarD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
+			defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
 		}
 		else
 		{

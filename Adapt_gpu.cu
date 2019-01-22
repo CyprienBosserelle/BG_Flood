@@ -2,9 +2,9 @@
 
 bool isPow2(int x)
 {
-	//Greg Hewgill great explenation here:
+	//Greg Hewgill great explanation here:
 	//https://stackoverflow.com/questions/600293/how-to-check-if-a-number-is-a-power-of-2
-	//Note, this function will report true for 0, which is not a power of 2 but it is handiy for us here
+	//Note, this function will report true for 0, which is not a power of 2 but it is handy for us here
 
 	return (x & (x - 1)) == 0;
 
@@ -268,7 +268,7 @@ int wetdryadapt(Param XParam)
 	{
 		//
 		int ib = activeblk[ibl];
-		int o,ot,or,otr,i,ir,it,itr,ii,iit,iir,iitr,iii,iiir,iiit,iitr;
+		int o,ot,or,otr,i,ir,it,itr,ii,iit,iir,iitr,iii,iiir,iiit,iiitr;
 		if (newlevel[ib] > 0)
 		{
 
