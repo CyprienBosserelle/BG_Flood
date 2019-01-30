@@ -460,9 +460,6 @@ void handle_error(int status);
 //functions moved to new file that is directly included in BasCart_gpu so that templates cna be used to simplify the code
 //Param creatncfileUD(Param XParam);
 
-
-
- 
 //extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
 
 //extern "C" void writenctimestep(std::string outfile, double totaltime);

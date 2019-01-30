@@ -263,12 +263,13 @@ int wetdryadapt(Param XParam)
 	}
 
 
-	//
+	//refine
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		//
 		int ib = activeblk[ibl];
-		int o,ot,or,otr,i,ir,it,itr,ii,iit,iir,iitr,iii,iiir,iiit,iiitr;
+		int o, oo, ooo, oooo;
+		int i, ii, iii, iiii;
 		if (newlevel[ib] > 0)
 		{
 
@@ -282,19 +283,24 @@ int wetdryadapt(Param XParam)
 				for (int ix = 0; ix < 16; ix++)
 				{
 					//
-					o = ix + iy * 16 + ib * XParam.blksize;
-					or = (ix+1) + iy * 16 + ib * XParam.blksize;
-					ot = ix + (iy+1) * 16 + ib * XParam.blksize;
-					otr = (ix+1) + (iy+1) * 16 + ib * XParam.blksize;
 					
-					i = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
-					ii = ix + iy * 16 + availblk[csumblk[ibl]+1] * XParam.blksize;
-					iii = ix + iy * 16 + availblk[csumblk[ibl]+2] * XParam.blksize;
+					o = ix + iy * 16 + activeblk[ibl] * XParam.blksize;
+					i = round(ix*0.5) + round(iy*0.5) * 16 + activeblk[ibl] * XParam.blksize;
+					oo = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
+					ii = (round(ix*0.5)+8) + round(iy*0.5) * 16 + activeblk[ibl] * XParam.blksize;
+					ooo = ix + iy * 16 + availblk[csumblk[ibl]+1] * XParam.blksize;
+					iii = round(ix*0.5) + (round(iy*0.5) + 8) * 16 + activeblk[ibl] * XParam.blksize;
+					oooo = ix + iy * 16 + availblk[csumblk[ibl]+2] * XParam.blksize;
+					iiii = (round(ix*0.5) + 8) + (round(iy*0.5) + 8) * 16 + activeblk[ibl] * XParam.blksize;
 
 
 					//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
-
-
+					//flat interpolation // need to replace with simplify bilinear
+					//zs needs to be interpolated from texture
+					hh[o] = hho[i];
+					hh[oo] = hho[ii];
+					hh[ooo] = hho[iii];
+					hh[oooo] = hho[iiii];
 		
 				}
 			}
