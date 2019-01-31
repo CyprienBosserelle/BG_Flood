@@ -273,9 +273,16 @@ int wetdryadapt(Param XParam)
 		if (newlevel[ib] > 0)
 		{
 
-			double xoblk = blockxo_d[ib] - XParam.dx / (1 << (level[ib] + 1));
-			double yoblk = blockyo_d[ib] - XParam.dx / (1 << (level[ib] + 1));
+			double delx = XParam.dx / (1 << (level[ib] + 1));
+			double xoblk = blockxo_d[ib] - 0.5*delx;
+			double yoblk = blockyo_d[ib] - 0.5*delx;
 			
+			int oldtop, oldleft, oldright, oldbot;
+
+			oldtop = topblk[ib];
+			oldbot = botblk[ib];
+			oldright = rightblk[ib];
+			oldleft = leftblk[ib];
 
 			//
 			for (int iy = 0; iy < 16; iy++)
@@ -304,6 +311,55 @@ int wetdryadapt(Param XParam)
 		
 				}
 			}
+
+			// sort out block info
+
+			activeblk[XParam.nblk] = availblk[csumblk[ibl]];
+			activeblk[XParam.nblk + 1] = availblk[csumblk[ibl] + 1];
+			activeblk[XParam.nblk + 2] = availblk[csumblk[ibl] + 2];
+
+			blockxo_d[ib] = xoblk;
+			blockyo_d[ib] = yoblk;
+
+			//bottom right blk
+			blockxo_d[availblk[csumblk[ibl]]] = xoblk + 16 * delx;
+			blockyo_d[availblk[csumblk[ibl]]] = yoblk;
+			//top left blk
+			blockxo_d[availblk[csumblk[ibl] + 1]] = xoblk;
+			blockyo_d[availblk[csumblk[ibl] + 1]] = yoblk + 16 * delx;
+			//top right blk
+			blockxo_d[availblk[csumblk[ibl] + 2]] = xoblk + 16 * delx;
+			blockyo_d[availblk[csumblk[ibl] + 2]] = yoblk + 16 * delx;
+
+			
+			//sort out blocks neighbour
+			
+			topblk[ib] = availblk[csumblk[ibl] + 1];
+			topblk[availblk[csumblk[ibl] + 1]] = oldtop;
+			topblk[availblk[csumblk[ibl]]] = availblk[csumblk[ibl] + 2];
+			//
+			if (level[oldtop] + newlevel[oldtop] <= level[ib] + newlevel[ib])
+			{
+				topblk[availblk[csumblk[ibl] + 2]] = oldtop;
+			}
+			else
+			{
+				topblk[availblk[csumblk[ibl] + 2]] = rightblk[oldtop]; //No there is a chicken and egg situation here...
+			}
+			
+
+
+			rightblk[ib] = availblk[csumblk[ibl]];
+			rightblk[availblk[csumblk[ibl] + 1]] = availblk[csumblk[ibl] + 2];
+			rightblk[availblk[csumblk[ibl]]] = oldright;
+
+			botblk[availblk[csumblk[ibl] + 1]] = ib;
+			botblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl]];
+
+			leftblk[availblk[csumblk[ibl]]] = ib;
+			leftblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl] + 1];
+
+
 		}
 
 	}
