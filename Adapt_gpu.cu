@@ -337,18 +337,7 @@ int wetdryadapt(Param XParam)
 			topblk[ib] = availblk[csumblk[ibl] + 1];
 			topblk[availblk[csumblk[ibl] + 1]] = oldtop;
 			topblk[availblk[csumblk[ibl]]] = availblk[csumblk[ibl] + 2];
-			//
-			if (level[oldtop] + newlevel[oldtop] <= level[ib] + newlevel[ib])
-			{
-				topblk[availblk[csumblk[ibl] + 2]] = oldtop;
-			}
-			else
-			{
-				topblk[availblk[csumblk[ibl] + 2]] = rightblk[oldtop]; //No there is a chicken and egg situation here...
-			}
 			
-
-
 			rightblk[ib] = availblk[csumblk[ibl]];
 			rightblk[availblk[csumblk[ibl] + 1]] = availblk[csumblk[ibl] + 2];
 			rightblk[availblk[csumblk[ibl]]] = oldright;
@@ -363,8 +352,29 @@ int wetdryadapt(Param XParam)
 		}
 
 	}
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//
+		int oldtop, oldleft, oldright, oldbot;
+		int ib = activeblk[ibl];
+		int o, oo, ooo, oooo;
+		int i, ii, iii, iiii;
+		if (newlevel[ib] > 0)
+		{
+			////
+			oldtop = topblk[topblk[ib]];
+			if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
+			{
+				topblk[availblk[csumblk[ibl] + 2]] = oldtop;
+			}
+			else
+			{
+				topblk[availblk[csumblk[ibl] + 2]] = rightblk[oldtop]; 
+			}
 
-
+			
+		}
+	}
 	return 0;
 }
 
