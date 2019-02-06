@@ -4078,20 +4078,21 @@ int main(int argc, char **argv)
 	printf("Create netCDF output file ");
 	write_text_to_log_file("Create netCDF output file ");
 	//create nc file with no variables
-	XParam=creatncfileUD(XParam);
-	//XParam = creatncfileBUQ(XParam);
+	//XParam=creatncfileUD(XParam);
+	XParam = creatncfileBUQ(XParam);
 	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 	{
 		//Create definition for each variable and store it
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
 			//defncvarD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-			defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-			//defncvarBUQ(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, T * var)
+			//defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
+			defncvarBUQ(XParam, activeblk,level,blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
 		}
 		else
 		{
-			defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
+			//defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
+			defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
 		}
 		
 	}

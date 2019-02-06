@@ -291,15 +291,16 @@ int wetdryadapt(Param XParam)
 				{
 					//
 					
-					o = ix + iy * 16 + activeblk[ibl] * XParam.blksize;
-					i = round(ix*0.5) + round(iy*0.5) * 16 + activeblk[ibl] * XParam.blksize;
+					o = ix + iy * 16 + ib * XParam.blksize;
+					i = round(ix*0.5) + round(iy*0.5) * 16 + ib * XParam.blksize;
 					oo = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
-					ii = (round(ix*0.5)+8) + round(iy*0.5) * 16 + activeblk[ibl] * XParam.blksize;
+					ii = (round(ix*0.5)+8) + round(iy*0.5) * 16 + ib * XParam.blksize;
 					ooo = ix + iy * 16 + availblk[csumblk[ibl]+1] * XParam.blksize;
-					iii = round(ix*0.5) + (round(iy*0.5) + 8) * 16 + activeblk[ibl] * XParam.blksize;
+					iii = round(ix*0.5) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
 					oooo = ix + iy * 16 + availblk[csumblk[ibl]+2] * XParam.blksize;
-					iiii = (round(ix*0.5) + 8) + (round(iy*0.5) + 8) * 16 + activeblk[ibl] * XParam.blksize;
+					iiii = (round(ix*0.5) + 8) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
 
+					printf("ib=%d; i=%d; o=%d; ii=%d; oo=%d; iii=%d; ooo=%d; iiii=%d; oooo=%d;\n",ib,i,o,ii,oo,iii,ooo,iiii,oooo);
 
 					//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
 					//flat interpolation // need to replace with simplify bilinear
@@ -409,6 +410,9 @@ int wetdryadapt(Param XParam)
 			
 		}
 	}
+
+	// Reorder activeblk
+
 	return 0;
 }
 

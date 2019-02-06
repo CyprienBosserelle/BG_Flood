@@ -503,7 +503,7 @@ Param creatncfileBUQ(Param XParam)
 
 }
 
-template <class T> void defncvarBUQ(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, T * var)
+template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, double * blockxo, double *blockyo, std::string varst, int vdim, T * var)
 {
 	std::string outfile = XParam.outfile;
 	int smallnc = XParam.smallnc;
