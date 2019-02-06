@@ -363,6 +363,11 @@ int wetdryadapt(Param XParam)
 		{
 			////
 			oldtop = topblk[topblk[ib]];
+			oldright = rightblk[rightblk[ib]];
+			oldleft = leftblk[ib];
+			oldbot = botblk[ib];
+
+
 			if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
 			{
 				topblk[availblk[csumblk[ibl] + 2]] = oldtop;
@@ -372,6 +377,35 @@ int wetdryadapt(Param XParam)
 				topblk[availblk[csumblk[ibl] + 2]] = rightblk[oldtop]; 
 			}
 
+			/////
+			if (level[oldright] + newlevel[oldright] < level[ib] + newlevel[ib])
+			{
+				rightblk[availblk[csumblk[ibl] + 2]] = oldright;
+			}
+			else
+			{
+				rightblk[availblk[csumblk[ibl] + 2]] = topblk[oldright];
+			}
+
+			/////
+			if (level[oldleft] + newlevel[oldleft] < level[ib] + newlevel[ib])
+			{
+				leftblk[availblk[csumblk[ibl] + 1]] = oldleft;
+			}
+			else
+			{
+				leftblk[availblk[csumblk[ibl] + 1]] = topblk[oldleft];
+			}
+
+			/////
+			if (level[oldbot] + newlevel[oldbot] < level[ib] + newlevel[ib])
+			{
+				botblk[availblk[csumblk[ibl] ]] = oldbot;
+			}
+			else
+			{
+				botblk[availblk[csumblk[ibl]]] = rightblk[oldbot];
+			}
 			
 		}
 	}
