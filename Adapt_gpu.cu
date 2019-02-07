@@ -264,92 +264,102 @@ int wetdryadapt(Param XParam)
 
 
 	//refine
+	int nblk = XParam.nblk;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		//
+		
 		int ib = activeblk[ibl];
 		int o, oo, ooo, oooo;
 		int i, ii, iii, iiii;
-		if (newlevel[ib] > 0)
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
-
-			double delx = XParam.dx / (1 << (level[ib] + 1));
-			double xoblk = blockxo_d[ib] - 0.5*delx;
-			double yoblk = blockyo_d[ib] - 0.5*delx;
-			
-			int oldtop, oldleft, oldright, oldbot;
-
-			oldtop = topblk[ib];
-			oldbot = botblk[ib];
-			oldright = rightblk[ib];
-			oldleft = leftblk[ib];
-
-			//
-			for (int iy = 0; iy < 16; iy++)
+			if (newlevel[ib] > 0)
 			{
-				for (int ix = 0; ix < 16; ix++)
+
+				double delx = XParam.dx / (1 << (level[ib] + 1));
+				double xoblk = blockxo_d[ib] - 0.5*delx;
+				double yoblk = blockyo_d[ib] - 0.5*delx;
+
+				int oldtop, oldleft, oldright, oldbot;
+
+				oldtop = topblk[ib];
+				oldbot = botblk[ib];
+				oldright = rightblk[ib];
+				oldleft = leftblk[ib];
+
+				//
+				for (int iy = 0; iy < 16; iy++)
 				{
-					//
-					
-					o = ix + iy * 16 + ib * XParam.blksize;
-					i = round(ix*0.5) + round(iy*0.5) * 16 + ib * XParam.blksize;
-					oo = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
-					ii = (round(ix*0.5)+8) + round(iy*0.5) * 16 + ib * XParam.blksize;
-					ooo = ix + iy * 16 + availblk[csumblk[ibl]+1] * XParam.blksize;
-					iii = round(ix*0.5) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
-					oooo = ix + iy * 16 + availblk[csumblk[ibl]+2] * XParam.blksize;
-					iiii = (round(ix*0.5) + 8) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
+					for (int ix = 0; ix < 16; ix++)
+					{
+						//
 
-					printf("ib=%d; i=%d; o=%d; ii=%d; oo=%d; iii=%d; ooo=%d; iiii=%d; oooo=%d;\n",ib,i,o,ii,oo,iii,ooo,iiii,oooo);
+						o = ix + iy * 16 + ib * XParam.blksize;
+						i = round(ix*0.5) + round(iy*0.5) * 16 + ib * XParam.blksize;
+						oo = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
+						ii = (round(ix*0.5) + 8) + round(iy*0.5) * 16 + ib * XParam.blksize;
+						ooo = ix + iy * 16 + availblk[csumblk[ibl] + 1] * XParam.blksize;
+						iii = round(ix*0.5) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
+						oooo = ix + iy * 16 + availblk[csumblk[ibl] + 2] * XParam.blksize;
+						iiii = (round(ix*0.5) + 8) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
 
-					//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
-					//flat interpolation // need to replace with simplify bilinear
-					//zs needs to be interpolated from texture
-					hh[o] = hho[i];
-					hh[oo] = hho[ii];
-					hh[ooo] = hho[iii];
-					hh[oooo] = hho[iiii];
-		
+						//printf("ib=%d; i=%d; o=%d; ii=%d; oo=%d; iii=%d; ooo=%d; iiii=%d; oooo=%d;\n", ib, i, o, ii, oo, iii, ooo, iiii, oooo);
+						//printf("availblk[csumblk[ibl] + 2]=%d\t
+
+
+						//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
+						//flat interpolation // need to replace with simplify bilinear
+						//zs needs to be interpolated from texture
+						hh[o] = hho[i];
+						hh[oo] = hho[ii];
+						hh[ooo] = hho[iii];
+						hh[oooo] = hho[iiii];
+
+					}
 				}
+
+				// sort out block info
+
+				activeblk[nblk] = availblk[csumblk[ibl]];
+				activeblk[nblk + 1] = availblk[csumblk[ibl] + 1];
+				activeblk[nblk + 2] = availblk[csumblk[ibl] + 2];
+
+				nblk = nblk + 3;
+
+
+				blockxo_d[ib] = xoblk;
+				blockyo_d[ib] = yoblk;
+
+				//bottom right blk
+				blockxo_d[availblk[csumblk[ibl]]] = xoblk + 16 * delx;
+				blockyo_d[availblk[csumblk[ibl]]] = yoblk;
+				//top left blk
+				blockxo_d[availblk[csumblk[ibl] + 1]] = xoblk;
+				blockyo_d[availblk[csumblk[ibl] + 1]] = yoblk + 16 * delx;
+				//top right blk
+				blockxo_d[availblk[csumblk[ibl] + 2]] = xoblk + 16 * delx;
+				blockyo_d[availblk[csumblk[ibl] + 2]] = yoblk + 16 * delx;
+
+
+				//sort out blocks neighbour
+
+				topblk[ib] = availblk[csumblk[ibl] + 1];
+				topblk[availblk[csumblk[ibl] + 1]] = oldtop;
+				topblk[availblk[csumblk[ibl]]] = availblk[csumblk[ibl] + 2];
+
+				rightblk[ib] = availblk[csumblk[ibl]];
+				rightblk[availblk[csumblk[ibl] + 1]] = availblk[csumblk[ibl] + 2];
+				rightblk[availblk[csumblk[ibl]]] = oldright;
+
+				botblk[availblk[csumblk[ibl] + 1]] = ib;
+				botblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl]];
+
+				leftblk[availblk[csumblk[ibl]]] = ib;
+				leftblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl] + 1];
+
+
 			}
-
-			// sort out block info
-
-			activeblk[XParam.nblk] = availblk[csumblk[ibl]];
-			activeblk[XParam.nblk + 1] = availblk[csumblk[ibl] + 1];
-			activeblk[XParam.nblk + 2] = availblk[csumblk[ibl] + 2];
-
-			blockxo_d[ib] = xoblk;
-			blockyo_d[ib] = yoblk;
-
-			//bottom right blk
-			blockxo_d[availblk[csumblk[ibl]]] = xoblk + 16 * delx;
-			blockyo_d[availblk[csumblk[ibl]]] = yoblk;
-			//top left blk
-			blockxo_d[availblk[csumblk[ibl] + 1]] = xoblk;
-			blockyo_d[availblk[csumblk[ibl] + 1]] = yoblk + 16 * delx;
-			//top right blk
-			blockxo_d[availblk[csumblk[ibl] + 2]] = xoblk + 16 * delx;
-			blockyo_d[availblk[csumblk[ibl] + 2]] = yoblk + 16 * delx;
-
-			
-			//sort out blocks neighbour
-			
-			topblk[ib] = availblk[csumblk[ibl] + 1];
-			topblk[availblk[csumblk[ibl] + 1]] = oldtop;
-			topblk[availblk[csumblk[ibl]]] = availblk[csumblk[ibl] + 2];
-			
-			rightblk[ib] = availblk[csumblk[ibl]];
-			rightblk[availblk[csumblk[ibl] + 1]] = availblk[csumblk[ibl] + 2];
-			rightblk[availblk[csumblk[ibl]]] = oldright;
-
-			botblk[availblk[csumblk[ibl] + 1]] = ib;
-			botblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl]];
-
-			leftblk[availblk[csumblk[ibl]]] = ib;
-			leftblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl] + 1];
-
-
 		}
 
 	}
@@ -360,60 +370,106 @@ int wetdryadapt(Param XParam)
 		int ib = activeblk[ibl];
 		int o, oo, ooo, oooo;
 		int i, ii, iii, iiii;
-		if (newlevel[ib] > 0)
+		if (ib >=0) // ib can be -1 for newly inactive blocks
 		{
-			////
-			oldtop = topblk[topblk[ib]];
-			oldright = rightblk[rightblk[ib]];
-			oldleft = leftblk[ib];
-			oldbot = botblk[ib];
+			if (newlevel[ib] > 0)
+			{
+				////
+				oldtop = topblk[topblk[ib]];
+				oldright = rightblk[rightblk[ib]];
+				oldleft = leftblk[ib];
+				oldbot = botblk[ib];
 
 
-			if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
-			{
-				topblk[availblk[csumblk[ibl] + 2]] = oldtop;
-			}
-			else
-			{
-				topblk[availblk[csumblk[ibl] + 2]] = rightblk[oldtop]; 
-			}
+				if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
+				{
+					topblk[availblk[csumblk[ibl] + 2]] = oldtop;
+				}
+				else
+				{
+					topblk[availblk[csumblk[ibl] + 2]] = rightblk[oldtop];
+				}
 
-			/////
-			if (level[oldright] + newlevel[oldright] < level[ib] + newlevel[ib])
-			{
-				rightblk[availblk[csumblk[ibl] + 2]] = oldright;
-			}
-			else
-			{
-				rightblk[availblk[csumblk[ibl] + 2]] = topblk[oldright];
-			}
+				/////
+				if (level[oldright] + newlevel[oldright] < level[ib] + newlevel[ib])
+				{
+					rightblk[availblk[csumblk[ibl] + 2]] = oldright;
+				}
+				else
+				{
+					rightblk[availblk[csumblk[ibl] + 2]] = topblk[oldright];
+				}
 
-			/////
-			if (level[oldleft] + newlevel[oldleft] < level[ib] + newlevel[ib])
-			{
-				leftblk[availblk[csumblk[ibl] + 1]] = oldleft;
-			}
-			else
-			{
-				leftblk[availblk[csumblk[ibl] + 1]] = topblk[oldleft];
-			}
+				/////
+				if (level[oldleft] + newlevel[oldleft] < level[ib] + newlevel[ib])
+				{
+					leftblk[availblk[csumblk[ibl] + 1]] = oldleft;
+				}
+				else
+				{
+					leftblk[availblk[csumblk[ibl] + 1]] = topblk[oldleft];
+				}
 
-			/////
-			if (level[oldbot] + newlevel[oldbot] < level[ib] + newlevel[ib])
-			{
-				botblk[availblk[csumblk[ibl] ]] = oldbot;
+				/////
+				if (level[oldbot] + newlevel[oldbot] < level[ib] + newlevel[ib])
+				{
+					botblk[availblk[csumblk[ibl]]] = oldbot;
+				}
+				else
+				{
+					botblk[availblk[csumblk[ibl]]] = rightblk[oldbot];
+				}
+
+
+				level[availblk[csumblk[ibl]]] = level[ib];
+				level[availblk[csumblk[ibl]+1]] = level[ib];
+				level[availblk[csumblk[ibl]+2]] = level[ib];
+
+				newlevel[availblk[csumblk[ibl]]] = newlevel[ib];
+				newlevel[availblk[csumblk[ibl] + 1]] = newlevel[ib];
+				newlevel[availblk[csumblk[ibl] + 2]] = newlevel[ib];
 			}
-			else
-			{
-				botblk[availblk[csumblk[ibl]]] = rightblk[oldbot];
-			}
-			
+		}
+	}
+
+	//update level
+	for (int ibl = 0; ibl < nblk; ibl++)
+	{
+		//
+		int oldlevel;
+		int ib = activeblk[ibl];
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
+		{
+			oldlevel = level[ib];
+			level[ib] = oldlevel + newlevel[ib];
 		}
 	}
 
 	// Reorder activeblk
+	for (int ibl = 0; ibl < nblk; ibl++)
+	{
+		//reuse newlevel as temporary storage for activeblk
+		newlevel[ibl] = activeblk[ibl];
+	}
 
-	return 0;
+	int ib = 0;
+	for (int ibl = 0; ibl < nblk; ibl++)
+	{
+		if (newlevel[ibl] >= 0)//i.e. old activeblk
+		{
+			activeblk[ib] = newlevel[ibl];
+			ib++;
+		}
+	}
+
+	for (int ibl = 0; ibl < nblk; ibl++)
+	{
+		//reuse newlevel as temporary storage for activeblk
+		newlevel[ibl] = 0;
+	}
+
+
+	return XParam.nblk+nnewblk;
 }
 
 

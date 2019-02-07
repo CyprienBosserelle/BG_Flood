@@ -2814,6 +2814,13 @@ int main(int argc, char **argv)
 	Allocate1CPU(XParam.nblkmem, 1, availblk);
 	Allocate1CPU(XParam.nblkmem, 1, csumblk);
 
+
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		activeblk[ibl] = -1;
+	}
+
+
 	nmask = 0;
 	mloc = 0;
 	int blkid = 0;
@@ -3954,7 +3961,7 @@ int main(int argc, char **argv)
 	//////////////////////////////////////////////////////////////////////////////////
 	// Initial adaptation
 	//////////////////////////////////////////////////////////////////////////////////
-	wetdryadapt(XParam);
+	XParam.nblk=wetdryadapt(XParam);
 
 
 
