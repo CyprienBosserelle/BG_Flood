@@ -158,10 +158,10 @@ int wetdryadapt(Param XParam)
 		csumblk[ib] = csum;
 
 	}
-	nnewblk = 3*(nrefineblk - ncoarsenlk);
+	nnewblk = 3*nrefineblk - ncoarsenlk;
 
-	printf("%d blocks to be refiled, %d blocks to be coarsen; %d new blocks will be created\n", nrefineblk, ncoarsenlk, nnewblk);
-
+	printf("%d blocks to be refiled, %d blocks to be coarsen; %d new blocks will be created (%d are already available)\n", nrefineblk, ncoarsenlk, nnewblk, XParam.navailblk);
+	//printf("csunblk[end]=%d; navailblk=%d\n", csumblk[XParam.nblk - 1], XParam.navailblk);
 	if (nnewblk>XParam.navailblk)
 	{
 		//reallocate memory to make more room
