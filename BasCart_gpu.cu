@@ -2612,7 +2612,7 @@ int main(int argc, char **argv)
 	}
 
 	double levdx = XParam.dx/(1 << XParam.initlevel);// true grid resolution as in dx/2^(initlevel)
-
+	printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, 1 << -1);
 
 	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
 	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?

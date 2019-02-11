@@ -419,6 +419,8 @@ Param creatncfileBUQ(Param XParam)
 		xxname = "xx_" + std::to_string(lev);
 		yyname = "yy_" + std::to_string(lev);
 
+		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+		printf("ddx=%f; nxx=%d;\n", ddx, nxx);
 		status = nc_def_dim(ncid, xxname.c_str(), nxx, &xx_dim);
 		if (status != NC_NOERR) handle_error(status);
 		status = nc_def_dim(ncid, yyname.c_str(), nyy, &yy_dim);

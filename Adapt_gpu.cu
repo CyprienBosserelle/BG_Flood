@@ -321,11 +321,7 @@ int wetdryadapt(Param XParam)
 
 				// sort out block info
 
-				activeblk[nblk] = availblk[csumblk[ibl]];
-				activeblk[nblk + 1] = availblk[csumblk[ibl] + 1];
-				activeblk[nblk + 2] = availblk[csumblk[ibl] + 2];
-
-				nblk = nblk + 3;
+				
 
 
 				blockxo_d[ib] = xoblk;
@@ -348,6 +344,8 @@ int wetdryadapt(Param XParam)
 				topblk[availblk[csumblk[ibl] + 1]] = oldtop;
 				topblk[availblk[csumblk[ibl]]] = availblk[csumblk[ibl] + 2];
 
+				printf("topblk[ib]=%d; oldtop=%d; topblk[availblk[csumblk[ibl] + 1]]=%d; topblk[availblk[csumblk[ibl]]]=%d; \n ", availblk[csumblk[ibl] + 1], oldtop, topblk[availblk[csumblk[ibl] + 1]], topblk[availblk[csumblk[ibl]]]);
+
 				rightblk[ib] = availblk[csumblk[ibl]];
 				rightblk[availblk[csumblk[ibl] + 1]] = availblk[csumblk[ibl] + 2];
 				rightblk[availblk[csumblk[ibl]]] = oldright;
@@ -358,7 +356,7 @@ int wetdryadapt(Param XParam)
 				leftblk[availblk[csumblk[ibl]]] = ib;
 				leftblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl] + 1];
 
-
+				
 			}
 		}
 
@@ -380,6 +378,7 @@ int wetdryadapt(Param XParam)
 				oldleft = leftblk[ib];
 				oldbot = botblk[ib];
 
+				printf("ib=%d; oldtop=%d; oldright=%d; oldleft=%d; oldbot=%d\n ");
 
 				if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
 				{
@@ -428,6 +427,12 @@ int wetdryadapt(Param XParam)
 				newlevel[availblk[csumblk[ibl]]] = newlevel[ib];
 				newlevel[availblk[csumblk[ibl] + 1]] = newlevel[ib];
 				newlevel[availblk[csumblk[ibl] + 2]] = newlevel[ib];
+
+				activeblk[nblk] = availblk[csumblk[ibl]];
+				activeblk[nblk + 1] = availblk[csumblk[ibl] + 1];
+				activeblk[nblk + 2] = availblk[csumblk[ibl] + 2];
+
+				nblk = nblk + 3;
 			}
 		}
 	}
@@ -464,8 +469,11 @@ int wetdryadapt(Param XParam)
 
 	for (int ibl = 0; ibl < nblk; ibl++)
 	{
-		//reuse newlevel as temporary storage for activeblk
+		//reset
 		newlevel[ibl] = 0;
+		ib = activeblk[ibl];
+		printf("ib=%d; l=%d; xo=%f; yo=%f\n", activeblk[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
+
 	}
 
 
