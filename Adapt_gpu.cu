@@ -11,6 +11,10 @@ bool isPow2(int x)
 
 }
 
+template <class T> double calcres(T dx, int level)
+{
+	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
+}
 
 int wetdryadapt(Param XParam)
 {
@@ -62,11 +66,11 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		// if all the neighbour are not wet then coarsen if possible
-		double dxfac = XParam.dx/(1 << (level[ib] - 1));
-
+		double dxfac = calcres(XParam.dx, level[ib] - 1);
+		printf("dxfac=%f, ispow2(6)=%d\t", dxfac,isPow2(6));
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 		
-			if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))
+		if (!(int((blockxo_d[ib] - XParam.xo + dxfac) / dxfac) % 2) && !(int((blockyo_d[ib] - XParam.yo + dxfac) / dxfac) % 2))
 			{
 
 
@@ -115,11 +119,11 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		// if all the neighbour are not wet then coarsen if possible
-		double dxfac = XParam.dx/(1 << (level[ib] - 1));
+		double dxfac = calcres(XParam.dx, level[ib] - 1);
 
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 
-		if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))// Beware of round off error
+		if (!(int((blockxo_d[ib] - XParam.xo + dxfac) / dxfac) % 2) && !(int((blockyo_d[ib] - XParam.yo + dxfac) / dxfac) % 2))// Beware of round off error
 		{
 			if (newlevel[ib] < 0  && (newlevel[topblk[ib]] >= 0 || newlevel[rightblk[ib]] >= 0 || newlevel[rightblk[topblk[ib]]] >= 0))
 			{
@@ -180,8 +184,8 @@ int wetdryadapt(Param XParam)
 		int i, ii, ir , it , itr;
 		if (newlevel[ib] < 0)
 		{
-			double dxfac = 1.0/(1 << (level[ib] - 1))*XParam.dx;
-			if (isPow2((blockxo_d[ib] - XParam.xo + dxfac) / dxfac))
+			double dxfac = calcres(XParam.dx, level[ib] - 1);
+			if (!(int((blockxo_d[ib] - XParam.xo + dxfac) / dxfac) % 2) && !(int((blockyo_d[ib] - XParam.yo + dxfac) / dxfac) % 2))
 			{
 				for (int iy = 0; iy < 16; iy++)
 				{
@@ -251,8 +255,8 @@ int wetdryadapt(Param XParam)
 				rightblk[ib] = rightblk[rightblk[ib]];
 				topblk[ib] = topblk[topblk[ib]];
 
-				blockxo_d[ib] = blockxo_d[ib] + XParam.dx / (1 << (level[ib] + 1));
-				blockyo_d[ib] = blockyo_d[ib] + XParam.dx / (1 << (level[ib] + 1));
+				blockxo_d[ib] = blockxo_d[ib] + calcres(XParam.dx, level[ib] + 1);
+				blockyo_d[ib] = blockyo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 
 
 
@@ -277,7 +281,7 @@ int wetdryadapt(Param XParam)
 			if (newlevel[ib] > 0)
 			{
 
-				double delx = XParam.dx / (1 << (level[ib] + 1));
+				double delx = calcres(XParam.dx, level[ib] + 1);
 				double xoblk = blockxo_d[ib] - 0.5*delx;
 				double yoblk = blockyo_d[ib] - 0.5*delx;
 
