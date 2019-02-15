@@ -2947,6 +2947,7 @@ int main(int argc, char **argv)
 		blockxo[bl] = blockxo_d[bl];
 		blockyo[bl] = blockyo_d[bl];
 		level[bl] = XParam.initlevel;
+		newlevel[bl] = 0;
 		
 	}
 

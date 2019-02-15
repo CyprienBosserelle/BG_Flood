@@ -66,11 +66,11 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		// if all the neighbour are not wet then coarsen if possible
-		double dxfac = calcres(XParam.dx, level[ib] - 1);
-		printf("dxfac=%f, ispow2(6)=%d\t", dxfac,isPow2(6));
+		double dxfac = calcres(XParam.dx, level[ib]);
+		printf("dxfac=%f, 6%2=%d\t", dxfac,6%2);
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
-		
-		if (!(int((blockxo_d[ib] - XParam.xo + dxfac) / dxfac) % 2) && !(int((blockyo_d[ib] - XParam.yo + dxfac) / dxfac) % 2))
+		//need to prevent coarsenning if the block is on the model edges...
+		if ((int((blockxo_d[ib] - XParam.xo ) / dxfac) % 2)==0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2)==0)
 			{
 
 
@@ -119,11 +119,11 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		// if all the neighbour are not wet then coarsen if possible
-		double dxfac = calcres(XParam.dx, level[ib] - 1);
+		double dxfac = calcres(XParam.dx, level[ib]);
 
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 
-		if (!(int((blockxo_d[ib] - XParam.xo + dxfac) / dxfac) % 2) && !(int((blockyo_d[ib] - XParam.yo + dxfac) / dxfac) % 2))// Beware of round off error
+		if ((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0)// Beware of round off error
 		{
 			if (newlevel[ib] < 0  && (newlevel[topblk[ib]] >= 0 || newlevel[rightblk[ib]] >= 0 || newlevel[rightblk[topblk[ib]]] >= 0))
 			{
@@ -184,8 +184,8 @@ int wetdryadapt(Param XParam)
 		int i, ii, ir , it , itr;
 		if (newlevel[ib] < 0)
 		{
-			double dxfac = calcres(XParam.dx, level[ib] - 1);
-			if (!(int((blockxo_d[ib] - XParam.xo + dxfac) / dxfac) % 2) && !(int((blockyo_d[ib] - XParam.yo + dxfac) / dxfac) % 2))
+			double dxfac = calcres(XParam.dx, level[ib]);
+			if ((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0)
 			{
 				for (int iy = 0; iy < 16; iy++)
 				{
@@ -243,6 +243,8 @@ int wetdryadapt(Param XParam)
 				availblk[XParam.navailblk] = rightblk[ib];
 				availblk[XParam.navailblk+1] = topblk[ib];
 				availblk[XParam.navailblk+2] = rightblk[topblk[ib]];
+				printf("availblk[XParam.navailblk]=%d; availblk[XParam.navailblk + 1]=%d; availblk[XParam.navailblk + 2]=%d; \n ", availblk[XParam.navailblk], availblk[XParam.navailblk + 1], availblk[XParam.navailblk + 2]);
+
 
 				XParam.navailblk = XParam.navailblk + 3;
 
@@ -291,6 +293,9 @@ int wetdryadapt(Param XParam)
 				oldbot = botblk[ib];
 				oldright = rightblk[ib];
 				oldleft = leftblk[ib];
+
+				//printf("ib=%d; availblk[csumblk[ibl]]=%d; availblk[csumblk[ibl] + 1]=%d; availblk[csumblk[ibl] + 2]=%d; \n ", ib, availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
+
 
 				//
 				for (int iy = 0; iy < 16; iy++)
@@ -382,8 +387,8 @@ int wetdryadapt(Param XParam)
 				oldleft = leftblk[ib];
 				oldbot = botblk[ib];
 
-				printf("ib=%d; oldtop=%d; oldright=%d; oldleft=%d; oldbot=%d\n ");
-
+				//printf("ib=%d; oldtop=%d; oldright=%d; oldleft=%d; oldbot=%d\n ", ib,oldtop,oldright,oldleft,oldbot);
+				printf("availblk[csumblk[ibl]]=%d, availblk[csumblk[ibl]+1] = %d, availblk[csumblk[ibl]+2]=%d\n", availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
 				if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
 				{
 					topblk[availblk[csumblk[ibl] + 2]] = oldtop;
@@ -423,7 +428,7 @@ int wetdryadapt(Param XParam)
 					botblk[availblk[csumblk[ibl]]] = rightblk[oldbot];
 				}
 
-
+				printf("level=%d\n", level[ib]);
 				level[availblk[csumblk[ibl]]] = level[ib];
 				level[availblk[csumblk[ibl]+1]] = level[ib];
 				level[availblk[csumblk[ibl]+2]] = level[ib];
@@ -450,7 +455,8 @@ int wetdryadapt(Param XParam)
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 			oldlevel = level[ib];
-			level[ib] = oldlevel + newlevel[ib];
+			printf("oldlevel=%d, newlevel=%d, level=%d\n", oldlevel, newlevel[ib], oldlevel + min(newlevel[ib], 1));
+			level[ib] = oldlevel + min(newlevel[ib],1); // WARNING how ould this be >1????
 		}
 	}
 
