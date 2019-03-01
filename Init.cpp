@@ -310,7 +310,7 @@ int AllocMemCPU(Param XParam)
 	// Pointers are Global !
 	//Need to add a sucess check for each call to malloc
 
-	int nblk = XParam.nblk;
+	int nblk = XParam.nblkmem;
 	int blksize = XParam.blksize;
 
 

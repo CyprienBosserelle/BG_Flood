@@ -419,7 +419,7 @@ Param creatncfileBUQ(Param XParam)
 		xxname = "xx_" + std::to_string(lev);
 		yyname = "yy_" + std::to_string(lev);
 
-		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+		printf("lev=%d; xxname=%s; yynam e=%s;\n", lev, xxname.c_str(), yyname.c_str());
 		printf("ddx=%f; nxx=%d;\n", ddx, nxx);
 		status = nc_def_dim(ncid, xxname.c_str(), nxx, &xx_dim);
 		if (status != NC_NOERR) handle_error(status);
@@ -441,10 +441,183 @@ Param creatncfileBUQ(Param XParam)
 	status = nc_enddef(ncid);
 	if (status != NC_NOERR) handle_error(status);
 
+	//status = nc_close(ncid);
+	//if (status != NC_NOERR) handle_error(status);
 
-	status = nc_put_var1_double(ncid, time_id, tst, &XParam.totaltime);
+
+	//status = nc_put_var1_double(ncid, time_id, tst, &XParam.totaltime);
+	//if (status != NC_NOERR) handle_error(status);
+	
+	std::string xxname, yyname;
+
+	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
+	{
+		double ddx = calcres(XParam.dx, lev);
+
+		nx = (XParam.xmax - XParam.xo) / ddx;
+		ny = (XParam.ymax - XParam.yo) / ddx;
+
+		static size_t xcount[] = { nx };
+		static size_t ycount[] = { ny };
+
+		static size_t xstart[] = { 0 }; // start at first value
+		static size_t ystart[] = { 0 }; // start at first value
+		static size_t thstart[] = { 0 };
+
+		//Recreat the x, y
+		xval = (float *)malloc(nx*sizeof(float));
+		yval = (float *)malloc(ny*sizeof(float));
+
+
+		for (int i = 0; i < nx; i++)
+		{
+			xval[i] = (float)(XParam.xo + i*ddx);
+		}
+		for (int i = 0; i < ny; i++)
+		{
+			yval[i] = (float)(XParam.yo + i*ddx);
+		}
+
+
+
+
+		xxname = "xx_" + std::to_string(lev);
+		yyname = "yy_" + std::to_string(lev);
+
+		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+
+		status = nc_inq_varid(ncid, xxname.c_str(), &xx_id);
+		if (status != NC_NOERR) handle_error(status);
+		status = nc_inq_varid(ncid, yyname.c_str(), &yy_id);
+		if (status != NC_NOERR) handle_error(status);
+
+		//Provide values for variables
+
+		status = nc_put_vara_float(ncid, xx_id, xstart, xcount, xval);
+		if (status != NC_NOERR) handle_error(status);
+		status = nc_put_vara_float(ncid, yy_id, ystart, ycount, yval);
+		if (status != NC_NOERR) handle_error(status);
+
+		free(xval);
+		free(yval);
+	}
+	
+	//close and save new file
+	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_error(status);
 
+	return XParam;
+
+
+	//return XParam;
+}
+
+Param creatncfileBUQO(Param XParam)
+{
+	int status;
+	int nx, ny;
+	//double dx = XParam.dx;
+	size_t nxx, nyy;
+	int ncid, xx_dim, yy_dim, time_dim;
+	float * xval, *yval;
+	// create the netcdf datasetXParam.outfile.c_str()
+	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
+	if (status != NC_NOERR)
+	{
+		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
+		{
+			printf("Warning! Outut file name already exist  ");
+			write_text_to_log_file("Warning! Outut file name already exist   ");
+			int fileinc = 1;
+			std::vector<std::string> extvec = split(XParam.outfile, '.');
+			std::string bathyext = extvec.back();
+			std::string newname;
+
+			while (status == NC_EEXIST)
+			{
+				newname = extvec[0];
+				for (int nstin = 1; nstin < extvec.size() - 1; nstin++)
+				{
+					// This is in case there are "." in the file name that do not relate to the file extension"
+					newname = newname + "." + extvec[nstin];
+				}
+				newname = newname + "(" + std::to_string(fileinc) + ")" + "." + bathyext;
+				XParam.outfile = newname;
+				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
+				fileinc++;
+			}
+			printf("New file name: %s  ", XParam.outfile.c_str());
+			write_text_to_log_file("New file name: " + XParam.outfile);
+
+		}
+		else
+		{
+			// Other error
+			handle_error(status);
+		}
+	}
+
+	// status could be a new error after renaming the file
+	if (status != NC_NOERR) handle_error(status);
+
+	// Define time variable 
+	//status = nc_def_dim(ncid, "time", NC_UNLIMITED, &time_dim);
+	//if (status != NC_NOERR) handle_error(status);
+
+	int time_id, xx_id, yy_id;
+	int tdim[] = { time_dim };
+	static size_t tst[] = { 0 };
+	//status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
+	//if (status != NC_NOERR) handle_error(status);
+
+	// For each level Define xx yy 
+	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
+	{
+
+		double ddx = calcres(XParam.dx, lev);
+
+		nx = (XParam.xmax - XParam.xo) / ddx;
+		ny = (XParam.ymax - XParam.yo) / ddx;
+
+
+		nxx = nx;
+		nyy = ny;
+
+		//Define dimensions: Name and length
+		std::string xxname, yyname;
+
+		xxname = "xx_" + std::to_string(lev);
+		yyname = "yy_" + std::to_string(lev);
+
+		printf("lev=%d; xxname=%s; yynam e=%s;\n",lev, xxname.c_str(), yyname.c_str());
+		printf("ddx=%f; nxx=%d;\n", ddx, nxx);
+		//status = nc_def_dim(ncid, xxname.c_str(), nxx, &xx_dim);
+		//if (status != NC_NOERR) handle_error(status);
+		//status = nc_def_dim(ncid, yyname.c_str(), nyy, &yy_dim);
+		//if (status != NC_NOERR) handle_error(status);
+		//status = nc_def_dim(ncid, "npart",nnpart,&p_dim);
+
+		int xdim[] = { xx_dim };
+		int ydim[] = { yy_dim };
+
+
+
+		//status = nc_def_var(ncid, xxname.c_str(), NC_FLOAT, 1, xdim, &xx_id);
+		//if (status != NC_NOERR) handle_error(status);
+		//status = nc_def_var(ncid, yyname.c_str(), NC_FLOAT, 1, ydim, &yy_id);
+		//if (status != NC_NOERR) handle_error(status);
+		//End definitions: leave define mode
+	}
+	status = nc_enddef(ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	//status = nc_close(ncid);
+	//if (status != NC_NOERR) handle_error(status);
+
+	
+	//status = nc_put_var1_double(ncid, time_id, tst, &XParam.totaltime);
+	//if (status != NC_NOERR) handle_error(status);
+	/*
 	std::string xxname, yyname;
 
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
@@ -481,22 +654,24 @@ Param creatncfileBUQ(Param XParam)
 		xxname = "xx_" + std::to_string(lev);
 		yyname = "yy_" + std::to_string(lev);
 
-		status = nc_inq_dimid(ncid, xxname.c_str(), &xx_id);
-		if (status != NC_NOERR) handle_error(status);
-		status = nc_inq_dimid(ncid, yyname.c_str(), &yy_id);
-		if (status != NC_NOERR) handle_error(status);
+		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+
+		//status = nc_inq_varid(ncid, xxname.c_str(), &xx_id);
+		//if (status != NC_NOERR) handle_error(status);
+		//status = nc_inq_varid(ncid, yyname.c_str(), &yy_id);
+		//if (status != NC_NOERR) handle_error(status);
 
 		//Provide values for variables
 
-		status = nc_put_vara_float(ncid, xx_id, xstart, xcount, xval);
-		if (status != NC_NOERR) handle_error(status);
-		status = nc_put_vara_float(ncid, yy_id, ystart, ycount, yval);
-		if (status != NC_NOERR) handle_error(status);
+		//status = nc_put_vara_float(ncid, xx_id, xstart, xcount, xval);
+		//if (status != NC_NOERR) handle_error(status);
+		//status = nc_put_vara_float(ncid, yy_id, ystart, ycount, yval);
+		//if (status != NC_NOERR) handle_error(status);
 
 		free(xval);
 		free(yval);
 	}
-
+	*/
 	//close and save new file
 	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_error(status);
@@ -577,6 +752,8 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 		varname = varst + "_" + std::to_string(lev);
 
+
+		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
 		status = nc_inq_dimid(ncid, xxname.c_str(), &xid);
 		if (status != NC_NOERR) handle_error(status);
 		status = nc_inq_dimid(ncid, yyname.c_str(), &yid);
@@ -597,7 +774,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		}
 		else if (vdim == 3)
 		{
-			status = nc_def_var(ncid, varst.c_str(), VarTYPE, vdim, var_dimid3D, &var_id);
+			status = nc_def_var(ncid, varname.c_str(), VarTYPE, vdim, var_dimid3D, &var_id);
 			if (status != NC_NOERR) handle_error(status);
 		}
 
@@ -679,8 +856,11 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		else if (vdim == 3)
 		{
 			//
+			printf("blockxo=%f\tblockyo=%f\n", blockxo[bl], ((blockyo[bl] - XParam.yo) / calcres(XParam.dx, lev)));
 			start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / calcres(XParam.dx, lev));
 			start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / calcres(XParam.dx, lev));
+
+
 			if (smallnc > 0)
 			{
 				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);

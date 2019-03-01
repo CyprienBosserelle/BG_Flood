@@ -245,7 +245,7 @@ int wetdryadapt(Param XParam)
 				availblk[XParam.navailblk] = rightblk[ib];
 				availblk[XParam.navailblk+1] = topblk[ib];
 				availblk[XParam.navailblk+2] = rightblk[topblk[ib]];
-				printf("availblk[XParam.navailblk]=%d; availblk[XParam.navailblk + 1]=%d; availblk[XParam.navailblk + 2]=%d; \n ", availblk[XParam.navailblk], availblk[XParam.navailblk + 1], availblk[XParam.navailblk + 2]);
+				//printf("availblk[XParam.navailblk]=%d; availblk[XParam.navailblk + 1]=%d; availblk[XParam.navailblk + 2]=%d; \n ", availblk[XParam.navailblk], availblk[XParam.navailblk + 1], availblk[XParam.navailblk + 2]);
 
 
 				XParam.navailblk = XParam.navailblk + 3;
@@ -316,7 +316,7 @@ int wetdryadapt(Param XParam)
 						iiii = (round(ix*0.5) + 8) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
 
 						//printf("ib=%d; i=%d; o=%d; ii=%d; oo=%d; iii=%d; ooo=%d; iiii=%d; oooo=%d;\n", ib, i, o, ii, oo, iii, ooo, iiii, oooo);
-						//printf("availblk[csumblk[ibl] + 2]=%d\t
+						//printf("csumblk[ibl]=%d\tavailblk[csumblk[ibl]]=%d\tavailblk[csumblk[ibl]+1]=%d\tavailblk[csumblk[ibl]+2]=%d\n", csumblk[ibl], availblk[csumblk[ibl]], availblk[csumblk[ibl]+1], availblk[csumblk[ibl]+2]);
 
 
 						//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
@@ -390,7 +390,7 @@ int wetdryadapt(Param XParam)
 				oldbot = botblk[ib];
 
 				//printf("ib=%d; oldtop=%d; oldright=%d; oldleft=%d; oldbot=%d\n ", ib,oldtop,oldright,oldleft,oldbot);
-				printf("availblk[csumblk[ibl]]=%d, availblk[csumblk[ibl]+1] = %d, availblk[csumblk[ibl]+2]=%d\n", availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
+				//printf("availblk[csumblk[ibl]]=%d, availblk[csumblk[ibl]+1] = %d, availblk[csumblk[ibl]+2]=%d\n", availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
 				if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
 				{
 					topblk[availblk[csumblk[ibl] + 2]] = oldtop;
@@ -430,7 +430,7 @@ int wetdryadapt(Param XParam)
 					botblk[availblk[csumblk[ibl]]] = rightblk[oldbot];
 				}
 
-				printf("level=%d\n", level[ib]);
+				//printf("level=%d\n", level[ib]);
 				level[availblk[csumblk[ibl]]] = level[ib];
 				level[availblk[csumblk[ibl]+1]] = level[ib];
 				level[availblk[csumblk[ibl]+2]] = level[ib];
@@ -457,7 +457,7 @@ int wetdryadapt(Param XParam)
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 			oldlevel = level[ib];
-			printf("oldlevel=%d, newlevel=%d, level=%d\n", oldlevel, newlevel[ib], oldlevel + min(newlevel[ib], 1));
+			//printf("oldlevel=%d, newlevel=%d, level=%d\n", oldlevel, newlevel[ib], oldlevel + min(newlevel[ib], 1));
 			level[ib] = oldlevel + min(newlevel[ib],1); // WARNING how ould this be >1????
 		}
 	}
@@ -487,7 +487,7 @@ int wetdryadapt(Param XParam)
 		newlevel[ibl] = 0;
 		ib = activeblk[ibl];
 
-		if (level[ib]>1)
+		//if (level[ib]>1)
 		{
 			printf("ib=%d; l=%d; xo=%f; yo=%f\n", activeblk[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
 		}

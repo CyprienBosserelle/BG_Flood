@@ -3203,7 +3203,7 @@ int main(int argc, char **argv)
 		{
 			for (int i = 0; i < XParam.Bathymetry.nx; i++)
 			{
-				dummy_d[i + j*XParam.Bathymetry.nx] = dummy[i + j*XParam.Bathymetry.nx] * 1.0;
+				dummy_d[i + j*XParam.Bathymetry.nx] = dummy[i + j*XParam.Bathymetry.nx] * 1.0; //*1.0 elevates to double safely
 			}
 		}
 		interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy_d, zb_d);
@@ -3332,15 +3332,16 @@ int main(int argc, char **argv)
 	free(dummy);
 	free(dummy_d);
 
-	Allocate1CPU(XParam.nblk, XParam.blksize, dummy);
-	Allocate1CPU(XParam.nblk, XParam.blksize, dummy_d);
+	Allocate1CPU(XParam.nblkmem, XParam.blksize, dummy);
+	Allocate1CPU(XParam.nblkmem, XParam.blksize, dummy_d);
 
 
 
 
 
 
-	// Below is not succint but way faster than one loop that checks the if statemenst each time
+	// Below is not succint but way faster than one loop that checks the if statemenst each time 
+	// relocate this to the Allocate CPU part?
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
 		// Set default cf
@@ -3819,18 +3820,18 @@ int main(int argc, char **argv)
 
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				Allocate1CPU(XParam.nblk, XParam.blksize, Patm_d);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdx_d);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdy_d);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, Patm_d);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdx_d);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdy_d);
 				
 
 
 			}
 			else
 			{
-				Allocate1CPU(XParam.nblk, XParam.blksize, Patm);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdx);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdy);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, Patm);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdx);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdy);
 			}
 
 			// read the first 2 stepd of the data
@@ -3852,16 +3853,16 @@ int main(int argc, char **argv)
 				Allocate1GPU(XParam.atmP.nx, XParam.atmP.ny, Patmaft_g);
 				if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 				{
-					Allocate1GPU(XParam.nblk, XParam.blksize, Patm_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdx_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdy_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, Patm_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdx_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdy_gd);
 				}
 				else
 				{
 
-					Allocate1GPU(XParam.nblk, XParam.blksize, Patm_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdx_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdy_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, Patm_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdx_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdy_gd);
 
 				}
 				CUDA_CHECK(cudaMallocArray(&Patm_gp, &channelDescPatm, XParam.atmP.nx, XParam.atmP.ny));
@@ -4088,6 +4089,7 @@ int main(int argc, char **argv)
 	//create nc file with no variables
 	//XParam=creatncfileUD(XParam);
 	XParam = creatncfileBUQ(XParam);
+	//creatncfileBUQ(XParam);
 	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 	{
 		//Create definition for each variable and store it
