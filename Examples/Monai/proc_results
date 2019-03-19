@@ -36,6 +36,7 @@ gmt gmtmath g1_resamp.tmp mean_meas.txt SUB ABS = bmeandiff.tmp
 WC1=`gmt gmtmath gauge1-data.txt mean_meas.txt SUB ABS bmeandiff.tmp ADD 2 POW SUM UPPER INV Will_numer.tmp MUL -1 MUL 1 ADD -S -o1 =`
 
 #BSS
+#BSS
 gmt gmtmath g2_resamp.tmp gauge2-data.txt SUB VAR = var_diff.tmp
 gmt gmtmath gauge2-data.txt MEAN = mean_meas.txt
 BSS2=`gmt gmtmath mean_meas.txt -1 MUL gauge2-data.txt ADD VAR INV var_diff.tmp MUL -1 MUL 1 ADD -S -o1 =`
@@ -60,6 +61,6 @@ WC3=`gmt gmtmath gauge3-data.txt mean_meas.txt SUB ABS bmeandiff.tmp ADD 2 POW S
 
 printf "Monai\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" $RMS1 $RMS2 $RMS3 $BSS1 $BSS2 $BSS3 $WC1 $WC2 $WC3 > allResults.txt
 
-awk '{printf("Monai\t%f\t%f\t%f\n",($1+$2+$3)/3,($4+$5+$6)/3,($7+$8+$9)/3)}' allResults.txt > Results.txt
+awk '{printf("Monai\t%f\t%f\t%f\n",($2+$3+$4)/3,($5+$6+$7)/3,($8+$9+$10)/3)}' allResults.txt > Results.txt
 
 rm  *.tmp
