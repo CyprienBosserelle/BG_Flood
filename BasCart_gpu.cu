@@ -26,6 +26,9 @@
 #include "Header.cuh"
 
 
+#ifdef USE_CATALYST
+#include "catalyst_adaptor.h"
+#endif
 
 //double phi = (1.0f + sqrt(5.0f)) / 2;
 //double aphi = 1 / (phi + 1);
@@ -2198,6 +2201,15 @@ void mainloopCPU(Param XParam)
 		zsAllout.push_back(std::vector<Pointout>());
 	}
 
+#ifdef USE_CATALYST
+        // Retrieve adaptor and add new grid patch with ID=0 and refinement level=0
+        catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+        if (adaptor.addPatch(0, 0, XParam.nx, XParam.ny, XParam.dx, XParam.dx, XParam.xo, XParam.yo))
+        {
+                fprintf(stderr, "catalystAdaptor addPatch failed");
+        }
+#endif
+
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
@@ -2383,6 +2395,39 @@ void mainloopCPU(Param XParam)
 			nTSstep++;
 
 		}
+
+#ifdef USE_CATALYST
+                // Create VTK data arrays for each simulation field
+                // IMPORTANT: This just passes pointers ("zero copy"), so data fields
+                // need to be in scope and consistent when the coprocessor runs!
+		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+		{
+			if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
+			{
+				int adaptorStatus = 0;
+				if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+				{
+                                        adaptorStatus = adaptor.addFieldDouble(0, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+				}
+				else
+				{
+                                        adaptorStatus = adaptor.addFieldSingle(0, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+				}
+                                if (adaptorStatus)
+                                {
+                                        fprintf(stderr, "catalystAdaptor addField failed");
+				}
+			}
+		}
+                // Run visualisation/VTK output pipeline
+                // This method will return immediately if this timestep/simulation time
+                // has not been earmarked for output
+                if (adaptor.runCoprocessor(XParam.totaltime, nstep))
+                {
+                        fprintf(stderr, "catalystAdaptor runCoprocessor failed");
+                }
+#endif
+
 		// CHeck for grid output
 		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
 		{
@@ -4049,6 +4094,15 @@ int main(int argc, char **argv)
 
 	
 	SaveParamtolog(XParam);
+
+#ifdef USE_CATALYST
+        // Retrieve adaptor and initialise visualisation/VTK output pipeline
+        catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+        if (adaptor.initialiseVTKOutput(5,""))
+        {
+                fprintf(stderr, "catalystAdaptor initialiseVTKOutput failed");
+        }
+#endif
 
 	/////////////////////////////////////
 	////      STARTING MODEL     ////////
