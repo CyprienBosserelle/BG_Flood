@@ -30,6 +30,9 @@ right = 0;
 top = 0;
 bot = 0;
 
+# ParaView Catalyst
+use_catalyst = 1;
+
 # Time series output
 TSOfile = gauge1-newbathy3.txt
 TSnode = 4.521, 1.196; #Note these are x, y values converted to the nearest i,j

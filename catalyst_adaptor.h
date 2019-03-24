@@ -2,7 +2,7 @@
 #define CATALYST_ADAPTOR_H
 
 #include <vtkUniformGrid.h>
-#include <vtkUniformGridAMR.h>
+#include <vtkNonOverlappingAMR.h>
 #include <vtkCPProcessor.h>
 #include <vtkSmartPointer.h>
 
@@ -17,8 +17,9 @@ struct gridPatch
 };
 
 // This class is implemented using the "singleton" design pattern,
-// we need to make sure that only one instance of a Catalyst
-// processor can be created
+// to make sure that Catalyst is only initialised in a single
+// instance (it is unclear if multiple instances are supported),
+// and to get global access to this instance
 class catalystAdaptor
 {
  public:
@@ -46,16 +47,19 @@ class catalystAdaptor
   // Remove patch with given ID
   const int removePatch(const int patchId);
 
-  // Add simulation data - must be called in each time step and before
+  // Update simulation data - must be called in each time step and before
   // running the coprocessor
   // IMPORTANT: These methods use "zero copy", Catalyst will access the
   // original data array for visualisation. "data" must therefore still
   // be in scope and in consistent state!
-  const int addFieldSingle(const int patchId, const std::string& name, float* data);
-  const int addFieldDouble(const int patchId, const std::string& name, double* data);
+  const int updateFieldSingle(const int patchId, const std::string& name, float* data);
+  const int updateFieldDouble(const int patchId, const std::string& name, double* data);
+
+  // Check if coprocessor should be run at this time/time step
+  const bool requestDataDescription(const double time, const unsigned int timeStep);
 
   // Run the visualisation pipeline
-  const int runCoprocessor(const double time, const unsigned int timeStep);
+  const int runCoprocessor();
 
   // Prevent copying and moving
   catalystAdaptor(const catalystAdaptor&) = delete;
@@ -69,7 +73,7 @@ class catalystAdaptor
   catalystAdaptor();
 
   // Construct VTK AMR grid container out of the grid patches
-  void setAMRPatches(vtkSmartPointer<vtkUniformGridAMR> AMRGrid);
+  void setAMRPatches(vtkSmartPointer<vtkNonOverlappingAMR> AMRGrid);
 
   // Stores grid patches, to avoid having to reconstruct them in every
   // refinement step

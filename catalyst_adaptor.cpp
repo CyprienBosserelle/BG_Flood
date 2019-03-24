@@ -44,13 +44,13 @@ const int catalystAdaptor::initialiseWithPython(const std::string& scriptName)
 {
   if (this->Processor != nullptr)
   {
-    vtkGenericWarningMacro("catalystAdaptor: Processor is already initialised." << endl);
+    vtkGenericWarningMacro("catalystAdaptor::initialiseWithPython Processor is already initialised." << endl);
     return 1;
   }
 
   if (scriptName.empty())
   {
-    vtkGenericWarningMacro("catalystAdaptor: No filename provided for Python script." << endl);
+    vtkGenericWarningMacro("catalystAdaptor::initialiseWithPython No filename provided for Python script." << endl);
     return 1;
   }
 
@@ -77,13 +77,13 @@ const int catalystAdaptor::initialiseVTKOutput(const int frequency, const std::s
 {
   if (this->Processor != nullptr)
   {
-    vtkGenericWarningMacro("catalystAdaptor: Processor is already initialised." << endl);
+    vtkGenericWarningMacro("catalystAdaptor::initialiseVTKOutput Processor is already initialised." << endl);
     return 1;
   }
 
   if (frequency < 1)
   {
-    vtkGenericWarningMacro("catalystAdaptor: VTK output frequency must >0." << endl);
+    vtkGenericWarningMacro("catalystAdaptor::initialiseVTKOutput VTK output frequency must >0." << endl);
     return 1;
   }
 
@@ -150,7 +150,7 @@ const int catalystAdaptor::removePatch(const int patchId)
 
 //------------------------------------------------------
 
-void catalystAdaptor::setAMRPatches(vtkSmartPointer<vtkUniformGridAMR> AMRGrid)
+void catalystAdaptor::setAMRPatches(vtkSmartPointer<vtkNonOverlappingAMR> AMRGrid)
 {
   // Work out how many levels we have in the AMR grid
   int numberOfLevels = 0;
@@ -187,7 +187,7 @@ void catalystAdaptor::setAMRPatches(vtkSmartPointer<vtkUniformGridAMR> AMRGrid)
 
 //------------------------------------------------------
 
-const int catalystAdaptor::addFieldSingle(const int patchId, const std::string& name, float* data)
+const int catalystAdaptor::updateFieldSingle(const int patchId, const std::string& name, float* data)
 {
   // Check if a patch with this ID exists
   std::unordered_map<int,gridPatch>::const_iterator it = this->patches.find(patchId);
@@ -216,7 +216,7 @@ const int catalystAdaptor::addFieldSingle(const int patchId, const std::string& 
 
 //------------------------------------------------------
 
-const int catalystAdaptor::addFieldDouble(const int patchId, const std::string& name, double* data)
+const int catalystAdaptor::updateFieldDouble(const int patchId, const std::string& name, double* data)
 {
   std::unordered_map<int,gridPatch>::const_iterator it = this->patches.find(patchId);
   if (it == this->patches.end())
@@ -238,35 +238,48 @@ const int catalystAdaptor::addFieldDouble(const int patchId, const std::string& 
 
 //------------------------------------------------------
 
-const int catalystAdaptor::runCoprocessor(const double time, const unsigned int timeStep)
+const bool catalystAdaptor::requestDataDescription(const double time, const unsigned int timeStep)
+{
+  if (this->dataDescription == nullptr)
+  {
+    vtkGenericWarningMacro("catalystAdaptor::requestDataDescription DataDescription not initialised.");
+    return false;
+  }
+  // Tell coprocessor what time it is and check if we need to do anything
+  this->dataDescription->SetTimeData(time, timeStep);
+  if (this->Processor->RequestDataDescription(this->dataDescription))
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+//------------------------------------------------------
+
+const int catalystAdaptor::runCoprocessor()
 {
   if (this->Processor == nullptr)
   {
-    vtkGenericWarningMacro("runCoprocessor: Processor not initialised.");
+    vtkGenericWarningMacro("catalystAdaptor::runCoprocessor Processor not initialised.");
     return 1;
   }
   if (this->dataDescription == nullptr)
   {
-    vtkGenericWarningMacro("runCoprocessor: DataDescription not initialised.");
+    vtkGenericWarningMacro("catalystAdaptor::runCoprocessor DataDescription not initialised.");
     return 1;
   }
 
-  // Tell coprocessor what time it is and check if we need to do anything
-  this->dataDescription->SetTimeData(time, timeStep);
-  int coProcessorStatus = 1;
-  if (this->Processor->RequestDataDescription(dataDescription))
-  {
-    // Recreate VTK AMR grid container from list of grid patches
-    vtkSmartPointer<vtkUniformGridAMR> AMRGrid = vtkSmartPointer<vtkUniformGridAMR>::New();
-    setAMRPatches(AMRGrid);
-    this->dataDescription->GetInputDescription(0)->SetGrid(AMRGrid);
+  // Recreate VTK AMR grid container from list of grid patches
+  vtkSmartPointer<vtkNonOverlappingAMR> AMRGrid = vtkSmartPointer<vtkNonOverlappingAMR>::New();
+  setAMRPatches(AMRGrid);
+  this->dataDescription->GetInputDescription(0)->SetGrid(AMRGrid);
 
-    coProcessorStatus = this->Processor->CoProcess(this->dataDescription);
-  }
-
-  if (coProcessorStatus != 1)
+  if (this->Processor->CoProcess(this->dataDescription) != 1)
   {
-    vtkGenericWarningMacro("coprocessor_coprocess: Processor reported failure.");
+    vtkGenericWarningMacro("catalystAdaptor::runCoprocessor Coprocessor reported failure.");
     return 1;
   }
   else
