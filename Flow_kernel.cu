@@ -3901,7 +3901,7 @@ template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, 
 			//uu[i] = uui / frc;
 			//vv[i] = vvi / frc;
 			T cfi = cf[i];
-			if (smart == 1)
+			if (smart == 1)//Smart friction formulation
 			{
 				T zo = cfi;
 				T Hbar = hhi / zo;
@@ -3915,7 +3915,12 @@ template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, 
 				}
 				cfi = cfi*cfi; // 
 			}
+			if (smart == -1)// Manning friction formulation
+			{
+				T n = cfi;
+				cfi = T(9.81)*n*n / cbrt(hhi);
 
+			}
 
 			T tb = cfi*normu/hhi*dt;
 			uu[i] = uui / (T(1.0)+tb);
