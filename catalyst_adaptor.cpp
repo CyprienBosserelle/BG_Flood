@@ -1,6 +1,7 @@
 #include "catalyst_adaptor.h"
 
-#include <vtkCPXMLPWriterPipeline.h>
+#include "vtkCPVTKOutputPipeline.h"
+
 #include <vtkCPPythonScriptPipeline.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
@@ -73,7 +74,7 @@ const int catalystAdaptor::initialiseWithPython(const std::string& scriptName)
 
 //------------------------------------------------------
 
-const int catalystAdaptor::initialiseVTKOutput(const int frequency, const std::string& filePath)
+const int catalystAdaptor::initialiseVTKOutput(const int frequency, const std::string& fileName)
 {
   if (this->Processor != nullptr)
   {
@@ -91,9 +92,9 @@ const int catalystAdaptor::initialiseVTKOutput(const int frequency, const std::s
   this->Processor->Initialize();
 
   // Initialise VTK output pipeline
-  vtkSmartPointer<vtkCPXMLPWriterPipeline> pipeline = vtkSmartPointer<vtkCPXMLPWriterPipeline>::New();
+  vtkSmartPointer<vtkCPVTKOutputPipeline> pipeline = vtkSmartPointer<vtkCPVTKOutputPipeline>::New();
   pipeline->SetOutputFrequency(frequency);
-  if (!filePath.empty()) pipeline->SetPath(filePath);
+  if (!fileName.empty()) pipeline->SetFileName(fileName);
   this->Processor->AddPipeline(pipeline);
 
   this->dataDescription = vtkCPDataDescription::New();

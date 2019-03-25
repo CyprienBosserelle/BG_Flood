@@ -33,7 +33,7 @@ class catalystAdaptor
   // or just output in VTK file format. Note that only one can be used
   // in a given simulation run.
   const int initialiseWithPython(const std::string& scriptName);
-  const int initialiseVTKOutput(const int frequency, const std::string& filePath);
+  const int initialiseVTKOutput(const int frequency, const std::string& fileName);
 
   // Add a new vtkUniformGrid patch with given parameters
   // Patch IDs must be handled by the simulation program
