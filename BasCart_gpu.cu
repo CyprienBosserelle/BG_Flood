@@ -1367,7 +1367,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 	{
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
-		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o].c_str());
+		fprintf(fsSLTS, "# x=%f\ty=%f\tblk=%d\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o].c_str());
 		fclose(fsSLTS);
 
 		// Add empty row for each output point
@@ -2191,7 +2191,7 @@ void mainloopCPU(Param XParam)
 	{
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
-		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o].c_str());
+		fprintf(fsSLTS, "# x=%f\ty=%f\tblk=%d\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o].c_str());
 		fclose(fsSLTS);
 
 		// Add empty row for each output point
@@ -2373,10 +2373,10 @@ void mainloopCPU(Param XParam)
 			{
 				//
 				stepread.time = XParam.totaltime;
-				stepread.zs = zs[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
-				stepread.hh = hh[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
-				stepread.uu = uu[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
-				stepread.vv = vv[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*XParam.nx];
+				stepread.zs = zs[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j*16 +XParam.TSnodesout[o].block*XParam.blksize];
+				stepread.hh = hh[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j* 16 + XParam.TSnodesout[o].block*XParam.blksize];
+				stepread.uu = uu[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j* 16 + XParam.TSnodesout[o].block*XParam.blksize];
+				stepread.vv = vv[XParam.TSnodesout[o].i + XParam.TSnodesout[o].j* 16 + XParam.TSnodesout[o].block*XParam.blksize];
 				zsAllout[o].push_back(stepread);
 
 			}
