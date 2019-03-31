@@ -65,6 +65,8 @@ int wetdryadapt(Param XParam)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
+
+		//printf("ib=%d\n", ib);
 		// if all the neighbour are not wet then coarsen if possible
 		double dxfac = calcres(XParam.dx, level[ib]);
 		//printf("dxfac=%f, 6%2=%d\t", dxfac,6%2);
@@ -189,6 +191,8 @@ int wetdryadapt(Param XParam)
 			double dxfac = calcres(XParam.dx, level[ib]);
 			if (((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
 			{
+
+				//printf("blockxo_d[ib]=%f\tib=%d\trightblk[ib]=%d\ttopblk[ib]=%d\trightblk[topblk[ib]]=%d\n", blockxo_d[ib], ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
 				for (int iy = 0; iy < 16; iy++)
 				{
 					for (int ix = 0; ix < 16; ix++)
@@ -280,6 +284,11 @@ int wetdryadapt(Param XParam)
 		int ib = activeblk[ibl];
 		int o, oo, ooo, oooo;
 		int i, ii, iii, iiii;
+
+
+		//printf("ib=%d\n", ib);
+
+
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 			if (newlevel[ib] > 0)
@@ -355,7 +364,7 @@ int wetdryadapt(Param XParam)
 				topblk[availblk[csumblk[ibl] + 1]] = oldtop;
 				topblk[availblk[csumblk[ibl]]] = availblk[csumblk[ibl] + 2];
 
-				printf("topblk[ib]=%d; oldtop=%d; topblk[availblk[csumblk[ibl] + 1]]=%d; topblk[availblk[csumblk[ibl]]]=%d; \n ", availblk[csumblk[ibl] + 1], oldtop, topblk[availblk[csumblk[ibl] + 1]], topblk[availblk[csumblk[ibl]]]);
+				//printf("topblk[ib]=%d; oldtop=%d; topblk[availblk[csumblk[ibl] + 1]]=%d; topblk[availblk[csumblk[ibl]]]=%d; \n ", availblk[csumblk[ibl] + 1], oldtop, topblk[availblk[csumblk[ibl] + 1]], topblk[availblk[csumblk[ibl]]]);
 
 				rightblk[ib] = availblk[csumblk[ibl]];
 				rightblk[availblk[csumblk[ibl] + 1]] = availblk[csumblk[ibl] + 2];
@@ -379,6 +388,8 @@ int wetdryadapt(Param XParam)
 		int ib = activeblk[ibl];
 		int o, oo, ooo, oooo;
 		int i, ii, iii, iiii;
+
+		//printf("ib=%d\n", ib);
 		if (ib >=0) // ib can be -1 for newly inactive blocks
 		{
 			if (newlevel[ib] > 0)
@@ -443,6 +454,9 @@ int wetdryadapt(Param XParam)
 				activeblk[nblk + 1] = availblk[csumblk[ibl] + 1];
 				activeblk[nblk + 2] = availblk[csumblk[ibl] + 2];
 
+				//printf("ib=%d; ib_right=%d; ib_top=%d; ib_TR=%d\n", ib, activeblk[nblk], activeblk[nblk + 1], activeblk[nblk + 2]);
+
+
 				nblk = nblk + 3;
 			}
 		}
@@ -454,27 +468,38 @@ int wetdryadapt(Param XParam)
 		//
 		int oldlevel;
 		int ib = activeblk[ibl];
+
+		//printf("ib=%d; l=%d; xo=%f; yo=%f\n", ib, level[ib], blockxo_d[ib], blockyo_d[ib]);
+		
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 			oldlevel = level[ib];
 			//printf("oldlevel=%d, newlevel=%d, level=%d\n", oldlevel, newlevel[ib], oldlevel + min(newlevel[ib], 1));
 			level[ib] = oldlevel + min(newlevel[ib],1); // WARNING how ould this be >1????
+
+
+			{
+				//printf("ib=%d; l=%d; xo=%f; yo=%f\n", ib, level[ib], blockxo_d[ib], blockyo_d[ib]);
+			}
 		}
 	}
 
 	// Reorder activeblk
-	for (int ibl = 0; ibl < nblk; ibl++)
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		//reuse newlevel as temporary storage for activeblk
 		newlevel[ibl] = activeblk[ibl];
+
+		//printf("ibl=%d; activeblk[ibl]=%d; newlevel[ibl]=%d;\n", ibl, activeblk[ibl], newlevel[ibl]);
 	}
 
 	int ib = 0;
-	for (int ibl = 0; ibl < nblk; ibl++)
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
-		if (newlevel[ibl] >= 0)//i.e. old activeblk
+		if (newlevel[ibl] != -1)//i.e. old activeblk
 		{
 			activeblk[ib] = newlevel[ibl];
+			printf("ib=%d; l=%d; xo=%f; yo=%f\n", activeblk[ib], level[activeblk[ib]], blockxo_d[activeblk[ib]], blockyo_d[activeblk[ib]]);
 			ib++;
 		}
 	}
@@ -489,7 +514,7 @@ int wetdryadapt(Param XParam)
 
 		//if (level[ib]>1)
 		{
-			printf("ib=%d; l=%d; xo=%f; yo=%f\n", activeblk[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
+			//printf("ib=%d; l=%d; xo=%f; yo=%f\n", ib, level[ib], blockxo_d[ib], blockyo_d[ib]);
 		}
 
 		

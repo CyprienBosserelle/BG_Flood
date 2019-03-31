@@ -406,9 +406,19 @@ Param creatncfileBUQ(Param XParam)
 
 		double ddx = calcres(XParam.dx, lev);
 
-		nx = (XParam.xmax - XParam.xo) / ddx;
-		ny = (XParam.ymax - XParam.yo) / ddx;
+		double xxmax, xxmin, yymax, yymin;
 
+		xxmax = XParam.xmax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+
+		xxmin = XParam.xo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+
+		nx = (xxmax - xxmin) / ddx + 1;
+		ny = (yymax - yymin) / ddx + 1;
+
+		printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
+		printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
 
 		nxx = nx;
 		nyy = ny;
@@ -454,8 +464,16 @@ Param creatncfileBUQ(Param XParam)
 	{
 		double ddx = calcres(XParam.dx, lev);
 
-		nx = (XParam.xmax - XParam.xo) / ddx;
-		ny = (XParam.ymax - XParam.yo) / ddx;
+		double xxmax, xxmin, yymax, yymin;
+
+		xxmax = XParam.xmax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+
+		xxmin = XParam.xo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+
+		nx = (xxmax - xxmin) / ddx;
+		ny = (yymax - yymin) / ddx;
 
 		static size_t xcount[] = { nx };
 		static size_t ycount[] = { ny };
@@ -471,11 +489,11 @@ Param creatncfileBUQ(Param XParam)
 
 		for (int i = 0; i < nx; i++)
 		{
-			xval[i] = (float)(XParam.xo + i*ddx);
+			xval[i] = (float)(xxmin + i*ddx);
 		}
 		for (int i = 0; i < ny; i++)
 		{
-			yval[i] = (float)(XParam.yo + i*ddx);
+			yval[i] = (float)(yymin + i*ddx);
 		}
 
 
@@ -805,6 +823,18 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	{
 		bl = activeblk[ibl];
 		lev = level[bl];
+
+
+		double xxmax, xxmin, yymax, yymin;
+
+		xxmax = XParam.xmax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+
+		xxmin = XParam.xo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+
+
+
 		xxname = "xx_" + std::to_string(lev);
 		yyname = "yy_" + std::to_string(lev);
 
@@ -837,8 +867,10 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 		if (vdim == 2)
 		{
-			start2D[0] = (size_t)round((blockyo[bl] - XParam.yo) / calcres(XParam.dx, lev));
-			start2D[1] = (size_t)round((blockxo[bl] - XParam.xo) / calcres(XParam.dx, lev));
+
+
+			start2D[0] = (size_t)round((blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start2D[1] = (size_t)round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 
 			if (smallnc > 0)
 			{
@@ -856,9 +888,9 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		else if (vdim == 3)
 		{
 			//
-			printf("blockxo=%f\tblockyo=%f\n", blockxo[bl], ((blockyo[bl] - XParam.yo) / calcres(XParam.dx, lev)));
-			start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / calcres(XParam.dx, lev));
-			start3D[2] = (size_t)round((blockxo[bl] - XParam.xo) / calcres(XParam.dx, lev));
+			printf("lev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
+			start3D[1] = (size_t)round((blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start3D[2] = (size_t)round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 
 
 			if (smallnc > 0)

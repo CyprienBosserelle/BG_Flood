@@ -139,9 +139,9 @@ public:
 	double Radius = 6371220.; //Earth radius [m]
 
 	//Adaptation
-	int initlevel = 1;
-	int maxlevel = 2;
-	int minlevel = 0;
+	int initlevel = 0;
+	int maxlevel = 1;
+	int minlevel = -1;
 	int nblkmem = 0;
 	int navailblk = 0;
 	double membuffer = 1.05; //needs toallocate more memory than initially needed so adaptation can happen without memory reallocation
