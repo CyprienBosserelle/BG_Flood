@@ -1,9 +1,64 @@
-cmake_minimum_required(VERSION 3.12.2)
+# CMake build for BasCGPU
+# Based on: https://devblogs.nvidia.com/building-cuda-applications-cmake/
 
-project(bggpu CXX CUDA)
+cmake_minimum_required(VERSION 3.9.1 FATAL_ERROR)
+project(bggpu LANGUAGES CXX CUDA)
 
-set(USE_CATALYST ON CACHE BOOL "Link with Catalyst")
+# option to use Catalyst (disable with cmake option "-DUSE_CATALYST=OFF")
+option(USE_CATALYST "Link with Catalyst" ON)
 
+# C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CUDA_STANDARD 11)
+set(CMAKE_CUDA_STANDARD_REQUIRED YES)
+
+# default to a release (optimised) build
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+endif()
+
+# double precision on gpu
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -m64")
+
+# There isn't a really good way to find NetCDF with CMake
+# This should automatically find NetCDF on NeSI platforms (using EasyBuild) and on systems with
+#   "nc-config" in PATH
+# If NetCDF can't be found specify "-DNETCDF_DIR=/path/to/netcdf/installation" to the directory
+#   containing include/netcdf.h and lib/libnetcdf.*
+set(NETCDF_DIR "" CACHE PATH "Directory containing the NetCDF installation")
+if (NETCDF_DIR STREQUAL "")
+    # if NETCDF_DIR isn't set, first look for EBROOTNETCDF environment variable, then look for
+    #   nc-config program
+    if ("$ENV{EBROOTNETCDF}" STREQUAL "")
+        find_program(NC_CONFIG nc-config)
+        if (NOT NC_CONFIG)
+            message(FATAL_ERROR "Could not find NetCDF library: try setting -DNETCDF_DIR or adding nc-config to your PATH")
+        endif()
+        execute_process(COMMAND "${NC_CONFIG} --prefix" OUTPUT_VARIABLE NETCDF_DIR)
+        message(STATUS "NetCDF directory from nc-config: ${NETCDF_DIR}")
+    else()
+        set(NETCDF_DIR "$ENV{EBROOTNETCDF}")
+        message(STATUS "NetCDF directory from easybuild: ${NETCDF_DIR}")
+    endif()
+else()
+    # NETCDF_DIR already set
+    message(STATUS "Using NetCDF directory: ${NETCDF_DIR}")
+endif()
+
+# look for NetCDF library
+find_library(NETCDF_LIBRARIES NAMES netcdf PATHS ${NETCDF_DIR}/lib)
+if (NOT NETCDF_LIBRARIES)
+    message(FATAL_ERROR "Could not find NetCDF library: try setting the path to NetCDF with: -DNETCDF_DIR=/path/to/netcdf")
+endif()
+
+# look for NetCDF include dir
+find_path(NETCDF_INCLUDE_DIR NAMES netcdf.h PATHS ${NETCDF_DIR}/include)
+if (NOT NETCDF_INCLUDE_DIR)
+    message(FATAL_ERROR "Could not find NetCDF include dir: try setting the path to NetCDF with: -DNETCDF_DIR=/path/to/netcdf")
+endif()
+
+# list source files
 if(USE_CATALYST)
   find_package(ParaView 5.5 REQUIRED COMPONENTS vtkPVPythonCatalyst)
   include("${PARAVIEW_USE_FILE}")
@@ -13,13 +68,28 @@ else()
   set(bggpu_SRCS Bas_Cart_CPU.cpp BasCart_gpu.cu read_input.cpp writenetcdf.cpp)
 endif()
 
+# need to set these files as CUDA to get it to build with CUDA 8 and GCC 5.4 (Mahuika)
+set_source_files_properties(read_input.cpp PROPERTIES LANGUAGE CUDA)
+set_source_files_properties(writenetcdf.cpp PROPERTIES LANGUAGE CUDA)
+
+# add the executable
 add_executable(BasCGPU ${bggpu_SRCS})
-set_property(TARGET BasCGPU PROPERTY CXX_STANDARD 11)
 
-find_library(nclib libnetcdf.so PATHS $EBROOTNETCDF/lib)
+# linking with netCDF
+target_link_libraries(BasCGPU ${NETCDF_LIBRARIES})
+target_include_directories(BasCGPU PRIVATE ${NETCDF_INCLUDE_DIR})
 
-target_link_libraries(BasCGPU ${nclib})
-
+# linking with catalyst
 if(USE_CATALYST)
   target_link_libraries(BasCGPU vtkPVPythonCatalyst ${VTK_LIBRARIES})
+endif()
+
+# Note: these lines copied from https://devblogs.nvidia.com/building-cuda-applications-cmake/
+#       not sure if they are actually needed as don't have a Mac with Nvidia GPU to test
+if(APPLE)
+  # We need to add the path to the driver (libcuda.dylib) as an rpath,
+  # so that the static cuda runtime can find it at runtime.
+  set_property(TARGET BasCGPU
+               PROPERTY
+               BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
 endif()
