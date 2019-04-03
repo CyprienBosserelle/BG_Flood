@@ -18,7 +18,7 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
 
-# double precision on gpu
+# compile device code in 64-bit mode
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -m64")
 
 # There isn't a really good way to find NetCDF with CMake
