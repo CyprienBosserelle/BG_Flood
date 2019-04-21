@@ -72,16 +72,19 @@ int wetdryadapt(Param XParam)
 		//printf("dxfac=%f, 6%2=%d\t", dxfac,6%2);
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 		//need to prevent coarsenning if the block is on the model edges...
+		  //((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib]
 		if (((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
 			{
+				printf("ib=%d; xnode=--; ynode=--; right_id=%d, top_id=%d, topright_id=%d \n", ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
+
 
 
 				if (newlevel[topblk[ib]] == 0 && newlevel[rightblk[ib]] == 0 && newlevel[rightblk[topblk[ib]]] == 0 && level[ib] > XParam.minlevel)
 				{
 					newlevel[ib] = -1;
-					newlevel[topblk[ib]] = -1;
-					newlevel[rightblk[ib]] = -1;
-					newlevel[rightblk[topblk[ib]]] = -1;
+					//newlevel[topblk[ib]] = -1;
+					//newlevel[rightblk[ib]] = -1;
+					//newlevel[rightblk[topblk[ib]]] = -1;
 
 				}
 				
@@ -126,7 +129,7 @@ int wetdryadapt(Param XParam)
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 
 		
-
+		  //((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib]
 		if (((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])// Beware of round off error
 		{
 			if (newlevel[ib] < 0  && (newlevel[topblk[ib]] >= 0 || newlevel[rightblk[ib]] >= 0 || newlevel[rightblk[topblk[ib]]] >= 0))
@@ -189,7 +192,12 @@ int wetdryadapt(Param XParam)
 		if (newlevel[ib] < 0)
 		{
 			double dxfac = calcres(XParam.dx, level[ib]);
-			if (((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
+			int xnode = int((blockxo_d[ib] - XParam.xo) / dxfac);
+			int ynode = int((blockyo_d[ib] - XParam.yo) / dxfac);
+			//Problem in the if statement below...
+			printf("ib=%d; xnode=%d; ynode=%d; right_id=%d, top_id=%d, topright_id=%d \n", ib, xnode, ynode, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
+			
+			if (((xnode % 2) == 0 && (ynode % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
 			{
 
 				//printf("blockxo_d[ib]=%f\tib=%d\trightblk[ib]=%d\ttopblk[ib]=%d\trightblk[topblk[ib]]=%d\n", blockxo_d[ib], ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
@@ -245,26 +253,31 @@ int wetdryadapt(Param XParam)
 				
 				//Need more?
 				
-				
+				// Make right, top and top-right block available for refine step
 				availblk[XParam.navailblk] = rightblk[ib];
 				availblk[XParam.navailblk+1] = topblk[ib];
 				availblk[XParam.navailblk+2] = rightblk[topblk[ib]];
 				//printf("availblk[XParam.navailblk]=%d; availblk[XParam.navailblk + 1]=%d; availblk[XParam.navailblk + 2]=%d; \n ", availblk[XParam.navailblk], availblk[XParam.navailblk + 1], availblk[XParam.navailblk + 2]);
 
-
+				// increment available block count
 				XParam.navailblk = XParam.navailblk + 3;
 
-
+				// Make right, top and top-right block inactive
 				activeblk[rightblk[ib]] = -1;
 				activeblk[topblk[ib]] = -1;
 				activeblk[rightblk[topblk[ib]]] = -1;
 
-				//check neighbour's
+				//check neighbour's (Full neighbour happens below)
 				rightblk[ib] = rightblk[rightblk[ib]];
 				topblk[ib] = topblk[topblk[ib]];
 
 				blockxo_d[ib] = blockxo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 				blockyo_d[ib] = blockyo_d[ib] + calcres(XParam.dx, level[ib] + 1);
+				printf("ib=%d; blockxo_d[ib]=%f; blockyo_d[ib]=%f; right_id=%d, top_id=%d, topright_id=%d \n", ib, blockxo_d[ib], blockyo_d[ib], rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
+
+
+
+				
 
 
 
@@ -479,7 +492,7 @@ int wetdryadapt(Param XParam)
 
 
 			{
-				//printf("ib=%d; l=%d; xo=%f; yo=%f\n", ib, level[ib], blockxo_d[ib], blockyo_d[ib]);
+				printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
 			}
 		}
 	}
@@ -519,6 +532,14 @@ int wetdryadapt(Param XParam)
 
 		
 
+	}
+
+	//reset blockxo and blockyo
+	
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		blockxo[ibl] = blockxo_d[ibl];
+		blockyo[ibl] = blockyo_d[ibl];
 	}
 	
 
