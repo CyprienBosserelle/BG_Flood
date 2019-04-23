@@ -140,7 +140,7 @@ public:
 
 	//Adaptation
 	int initlevel = 0;
-	int maxlevel = 1;
+	int maxlevel = 0;
 	int minlevel = -1;
 	int nblkmem = 0;
 	int navailblk = 0;

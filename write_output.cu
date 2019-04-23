@@ -472,8 +472,8 @@ Param creatncfileBUQ(Param XParam)
 		xxmin = XParam.xo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
 		yymin = XParam.yo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
 
-		nx = (xxmax - xxmin) / ddx;
-		ny = (yymax - yymin) / ddx;
+		nx = (xxmax - xxmin) / ddx + 1;
+		ny = (yymax - yymin) / ddx + 1;
 
 		static size_t xcount[] = { nx };
 		static size_t ycount[] = { ny };
