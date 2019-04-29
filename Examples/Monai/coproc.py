@@ -12,9 +12,23 @@ from paraview import coprocessing as cp
 #
 # Pipeline parameters
 #
+
+# Turn on additional output of field data in VTK format
 writeVtkOutput = False
-outputFrequency = 30
+
+# Disable either output parameter by setting it to 0
+outputFrequency = 0
+outputTimeInterval = 1.0
+
+# Field to be visualised - this will be requested from the simulation
 fieldName = "hh"
+
+#
+# Internal variables
+#
+
+# Timekeeping for visualisation output
+lastOutputTime = 0.0
 
 # ----------------------- CoProcessor definition -----------------------
 
@@ -29,7 +43,8 @@ def CreateCoProcessor():
       if writeVtkOutput:
         fullWriter = pvs.XMLHierarchicalBoxDataWriter(Input=simData, DataMode="Appended",
                                                       CompressorType="ZLib")
-        coprocessor.RegisterWriter(fullWriter, filename='bg_out_%t.vti', freq=outputFrequency)
+        # Set freq=1 to ensure that output is written whenever the pipeline runs
+        coprocessor.RegisterWriter(fullWriter, filename='bg_out_%t.vti', freq=1)
 
       # Create a new render view to generate images
       renderView = pvs.CreateView('RenderView')
@@ -44,10 +59,10 @@ def CreateCoProcessor():
       renderView.Background = [0.32, 0.34, 0.43]
       renderView.ViewTime = datadescription.GetTime()
 
-      # Register the view with coprocessor
-      # and provide it with information such as the filename to use,
-      # how frequently to write the images, etc.
-      coprocessor.RegisterView(renderView, filename='bg_out_%t.png', freq=outputFrequency,
+      # Register the view with coprocessor and provide it with information such as
+      # the filename to use. Set freq=1 to ensure that images are rendered whenever
+      # the pipeline runs
+      coprocessor.RegisterView(renderView, filename='bg_out_%t.png', freq=1,
                                fittoscreen=1, magnification=1, width=1500, height=768,
                                cinema={})
 
@@ -67,6 +82,26 @@ def CreateCoProcessor():
   class CoProcessor(cp.CoProcessor):
     def CreatePipeline(self, datadescription):
       self.Pipeline = _CreatePipeline(self, datadescription)
+
+    # Override default method here to implement custom criterion and only
+    # ask for fields that are needed by the pipeline
+    def LoadRequestedData(self, datadescription):
+      global lastOutputTime
+      currentTime = datadescription.GetTime()
+      currentTimeStep = datadescription.GetTimeStep()
+
+      # Check if either criterion is independently fulfilled
+      outputThisTime = outputTimeInterval > 0 and currentTime - lastOutputTime > outputTimeInterval
+      outputThisTimeStep = outputFrequency > 0 and currentTimeStep > 0 and \
+                           currentTimeStep % outputFrequency == 0
+
+      if outputThisTime or outputThisTimeStep:
+        # Ask for only the field that is needed
+        datadescription.GetInputDescription(0).AddCellField(fieldName)
+        if outputThisTime:
+          lastOutputTime = currentTime
+      else:
+        datadescription.GetInputDescription(0).AllFieldsOff()
 
   coprocessor = CoProcessor()
   freqs = {'input': [outputFrequency]}

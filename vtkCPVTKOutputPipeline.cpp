@@ -45,8 +45,8 @@ int vtkCPVTKOutputPipeline::RequestDataDescription(vtkCPDataDescription* dataDes
     (this->OutputFrequency > 0 && dataDescription->GetTimeStep() >= 0 &&
      dataDescription->GetTimeStep() % this->OutputFrequency == 0) )
   {
+    // Include all fields by default
     dataDescription->GetInputDescription(0)->AllFieldsOn();
-    dataDescription->GetInputDescription(0)->GenerateMeshOn();
     return 1;
   }
   return 0;

@@ -199,18 +199,33 @@ const int catalystAdaptor::updateFieldSingle(const int patchId, const std::strin
   }
   else
   {
-    // Get number of cells of this grid patch
-    vtkIdType numberOfCells = it->second.VTKGrid->GetNumberOfCells();
+    if (this->dataDescription == nullptr)
+    {
+      vtkGenericWarningMacro("catalystAdaptor::updateFieldSingle DataDescription not initialised.");
+      return 1;
+    }
 
-    vtkSmartPointer<vtkFloatArray> field = vtkSmartPointer<vtkFloatArray>::New();
-    // Store all fields as single component at this point
-    // We could store vector fields as multi-component fields in the future
-    field->SetNumberOfComponents(1);
-    field->SetNumberOfTuples(numberOfCells);
-    field->SetName(name.c_str());
-    // Last parameter "1" prevents VTK from deallocating data array
-    field->SetVoidArray(data, numberOfCells, 1);
-    it->second.VTKGrid->GetCellData()->AddArray(field);
+    // Check if this field has been requested by the pipeline If not, remove array from the
+    // grid if it has been added before, and exit silently
+    if (this->dataDescription->GetInputDescription(0)->IsFieldNeeded(name.c_str()))
+    {
+      // Get number of cells of this grid patch
+      vtkIdType numberOfCells = it->second.VTKGrid->GetNumberOfCells();
+
+      vtkSmartPointer<vtkFloatArray> field = vtkSmartPointer<vtkFloatArray>::New();
+      // Store all fields as single component at this point
+      // We could store vector fields as multi-component fields in the future
+      field->SetNumberOfComponents(1);
+      field->SetNumberOfTuples(numberOfCells);
+      field->SetName(name.c_str());
+      // Last parameter "1" prevents VTK from deallocating data array
+      field->SetVoidArray(data, numberOfCells, 1);
+      it->second.VTKGrid->GetCellData()->AddArray(field);
+    }
+    else if (it->second.VTKGrid->GetCellData()->HasArray(name.c_str()))
+    {
+      it->second.VTKGrid->GetCellData()->RemoveArray(name.c_str());
+    }
     return 0;
   }
 }
@@ -226,13 +241,25 @@ const int catalystAdaptor::updateFieldDouble(const int patchId, const std::strin
   }
   else
   {
-    vtkIdType numberOfCells = it->second.VTKGrid->GetNumberOfCells();
-    vtkSmartPointer<vtkDoubleArray> field = vtkSmartPointer<vtkDoubleArray>::New();
-    field->SetNumberOfComponents(1);
-    field->SetNumberOfTuples(numberOfCells);
-    field->SetName(name.c_str());
-    field->SetVoidArray(data, numberOfCells, 1);
-    it->second.VTKGrid->GetCellData()->AddArray(field);
+    if (this->dataDescription == nullptr)
+    {
+      vtkGenericWarningMacro("catalystAdaptor::updateFieldSingle DataDescription not initialised.");
+      return 1;
+    }
+    if (this->dataDescription->GetInputDescription(0)->IsFieldNeeded(name.c_str()))
+    {
+      vtkIdType numberOfCells = it->second.VTKGrid->GetNumberOfCells();
+      vtkSmartPointer<vtkDoubleArray> field = vtkSmartPointer<vtkDoubleArray>::New();
+      field->SetNumberOfComponents(1);
+      field->SetNumberOfTuples(numberOfCells);
+      field->SetName(name.c_str());
+      field->SetVoidArray(data, numberOfCells, 1);
+      it->second.VTKGrid->GetCellData()->AddArray(field);
+    }
+    else if (it->second.VTKGrid->GetCellData()->HasArray(name.c_str()))
+    {
+      it->second.VTKGrid->GetCellData()->RemoveArray(name.c_str());
+    }
     return 0;
   }
 }
