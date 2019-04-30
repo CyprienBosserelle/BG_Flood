@@ -397,6 +397,11 @@ Param creatncfileBUQ(Param XParam)
 	int time_id, xx_id, yy_id;
 	int tdim[] = { time_dim };
 	static size_t tst[] = { 0 };
+
+	size_t xcount[] = { 0 };
+	size_t ycount[] = { 0 };
+	static size_t xstart[] = { 0 }; // start at first value
+	static size_t ystart[] = { 0 };
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_error(status);
 
@@ -424,10 +429,13 @@ Param creatncfileBUQ(Param XParam)
 		nyy = ny;
 
 		//Define dimensions: Name and length
-		std::string xxname, yyname;
+		std::string xxname, yyname, sign;
 
-		xxname = "xx_" + std::to_string(lev);
-		yyname = "yy_" + std::to_string(lev);
+		lev < 0?sign="N":sign = "P";
+
+
+		xxname = "xx_" + sign + std::to_string(abs(lev));
+		yyname = "yy_" + sign + std::to_string(abs(lev));
 
 		printf("lev=%d; xxname=%s; yynam e=%s;\n", lev, xxname.c_str(), yyname.c_str());
 		printf("ddx=%f; nxx=%d;\n", ddx, nxx);
@@ -458,7 +466,7 @@ Param creatncfileBUQ(Param XParam)
 	//status = nc_put_var1_double(ncid, time_id, tst, &XParam.totaltime);
 	//if (status != NC_NOERR) handle_error(status);
 	
-	std::string xxname, yyname;
+	std::string xxname, yyname, sign;
 
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
@@ -475,13 +483,14 @@ Param creatncfileBUQ(Param XParam)
 		nx = (xxmax - xxmin) / ddx + 1;
 		ny = (yymax - yymin) / ddx + 1;
 
-		static size_t xcount[] = { nx };
-		static size_t ycount[] = { ny };
+		
 
-		static size_t xstart[] = { 0 }; // start at first value
-		static size_t ystart[] = { 0 }; // start at first value
-		static size_t thstart[] = { 0 };
-
+		printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin, nx);
+		printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
+		// start at first value
+		//static size_t thstart[] = { 0 };
+		xcount[0] = nx;
+		ycount[0] = ny;
 		//Recreat the x, y
 		xval = (float *)malloc(nx*sizeof(float));
 		yval = (float *)malloc(ny*sizeof(float));
@@ -498,9 +507,13 @@ Param creatncfileBUQ(Param XParam)
 
 
 
+		//std::string xxname, yyname, sign;
 
-		xxname = "xx_" + std::to_string(lev);
-		yyname = "yy_" + std::to_string(lev);
+		lev < 0 ? sign = "N" : sign = "P";
+
+
+		xxname = "xx_" + sign + std::to_string(abs(lev));
+		yyname = "yy_" + sign + std::to_string(abs(lev));
 
 		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
 
@@ -759,16 +772,21 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	}
 
 
-	std::string xxname, yyname, varname;
+	std::string xxname, yyname, varname,sign;
 
 	//generate a different variable name for each level and add attribute as necessary
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
 
-		xxname = "xx_" + std::to_string(lev);
-		yyname = "yy_" + std::to_string(lev);
+		//std::string xxname, yyname, sign;
 
-		varname = varst + "_" + std::to_string(lev);
+		lev < 0 ? sign = "N" : sign = "P";
+
+
+		xxname = "xx_" + sign + std::to_string(abs(lev));
+		yyname = "yy_" + sign + std::to_string(abs(lev));
+
+		varname = varst + "_" + sign + std::to_string(abs(lev));
 
 
 		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
@@ -835,10 +853,15 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 
 
-		xxname = "xx_" + std::to_string(lev);
-		yyname = "yy_" + std::to_string(lev);
+		//std::string xxname, yyname, sign;
 
-		varname = varst + "_" + std::to_string(lev);
+		lev < 0 ? sign = "N" : sign = "P";
+
+
+		xxname = "xx_" + sign + std::to_string(abs(lev));
+		yyname = "yy_" + sign + std::to_string(abs(lev));
+
+		varname = varst +  "_" + sign + std::to_string(abs(lev));
 
 		status = nc_inq_dimid(ncid, xxname.c_str(), &xid);
 		if (status != NC_NOERR) handle_error(status);
