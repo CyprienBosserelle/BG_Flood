@@ -179,7 +179,7 @@ TEST_CASE( "Updating Fields", "[catalyst_adaptor]" )
 
 // ------------------------------------------------------------------------------------------
 
-TEST_CASE( "RequestDataDescription", "[catalyst_adaptor]" )
+TEST_CASE( "requestDataDescription", "[catalyst_adaptor]" )
 {
   catalystAdaptor& adaptor = catalystAdaptor::getInstance();
 
