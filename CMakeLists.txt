@@ -7,6 +7,13 @@ project(bggpu LANGUAGES CXX CUDA)
 # option to use Catalyst (disable with cmake option "-DUSE_CATALYST=OFF")
 option(USE_CATALYST "Link with Catalyst" ON)
 
+# option for running tests
+option(BUILD_TESTING "Build Testing" OFF)
+if(BUILD_TESTING)
+  include(CTest)
+  add_subdirectory(test)
+endif()
+
 # C++ standard
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)

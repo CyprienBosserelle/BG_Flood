@@ -16,7 +16,7 @@ from paraview import coprocessing as cp
 # Turn on additional output of field data in VTK format
 writeVtkOutput = False
 
-# Disable either output parameter by setting it to 0
+# Disable either output criterion by setting it to 0
 outputFrequency = 0
 outputTimeInterval = 1.0
 
@@ -83,8 +83,8 @@ def CreateCoProcessor():
     def CreatePipeline(self, datadescription):
       self.Pipeline = _CreatePipeline(self, datadescription)
 
-    # Override default method here to implement custom criterion and only
-    # ask for fields that are needed by the pipeline
+    # Override default method here to implement custom criterion to run pipeline and only
+    # ask for fields that are actually needed
     def LoadRequestedData(self, datadescription):
       global lastOutputTime
       currentTime = datadescription.GetTime()
@@ -96,11 +96,12 @@ def CreateCoProcessor():
                            currentTimeStep % outputFrequency == 0
 
       if outputThisTime or outputThisTimeStep:
-        # Ask for only the field that is needed
+        # Ask simulation for field required by pipeline
         datadescription.GetInputDescription(0).AddCellField(fieldName)
         if outputThisTime:
           lastOutputTime = currentTime
       else:
+        # No output; make sure that no fields are requested from simulation
         datadescription.GetInputDescription(0).AllFieldsOff()
 
   coprocessor = CoProcessor()
@@ -153,4 +154,4 @@ def DoCoProcessing(datadescription):
     coprocessor.WriteImages(datadescription, rescale_lookuptable=False)
 
     # Live Visualization, if enabled.
-    coprocessor.DoLiveVisualization(datadescription, "localhost", 22224)
+    coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)

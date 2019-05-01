@@ -205,7 +205,7 @@ const int catalystAdaptor::updateFieldSingle(const int patchId, const std::strin
       return 1;
     }
 
-    // Check if this field has been requested by the pipeline If not, remove array from the
+    // Check if this field has been requested by the pipeline. If not, remove array from the
     // grid if it has been added before, and exit silently
     if (this->dataDescription->GetInputDescription(0)->IsFieldNeeded(name.c_str()))
     {
