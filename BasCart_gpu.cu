@@ -298,7 +298,7 @@ void mainloopGPUDB(Param XParam)
 			pointoutputstep(XParam, gridDim, blockDim, nTSsteps, zsAllout);
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Save output step
 			DivmeanvarGPUD(XParam, nstep);
@@ -746,7 +746,7 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 			DivmeanvarGPUD(XParam, nstep*1.0f);
@@ -878,7 +878,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 			pointoutputstep(XParam, gridDim, blockDim, nTSsteps, zsAllout);
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Save output step
 			DivmeanvarGPUD(XParam, nstep);
@@ -1299,7 +1299,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 			pointoutputstep(XParam, gridDim, blockDim, nTSsteps, zsAllout);
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Save output step
 			DivmeanvarGPUD(XParam, nstep);
@@ -1421,7 +1421,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 			DivmeanvarGPU(XParam, nstep*1.0f);
@@ -1849,7 +1849,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 			DivmeanvarGPU(XParam, nstep*1.0f);
@@ -2069,7 +2069,7 @@ void mainloopGPUold(Param XParam)
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 			{
@@ -2390,7 +2390,7 @@ void mainloopCPU(Param XParam)
 
 		}
 		// CHeck for grid output
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 
@@ -4127,22 +4127,22 @@ int main(int argc, char **argv)
 	{
 		if (XParam.spherical == 1)
 		{
-			mainloopGPUDSPH(XParam);
+			//mainloopGPUDSPH(XParam);
 		}
 		else if (XParam.doubleprecision == 1)
 		{
-			mainloopGPUDB(XParam);
+			//mainloopGPUDB(XParam);
 		}
 		else
 		{
 			if (!XParam.windU.inputfile.empty())
 			{
 				//
-				mainloopGPUATM(XParam);
+				//mainloopGPUATM(XParam);
 			}
 			else
 			{
-				mainloopGPU(XParam);
+				//mainloopGPU(XParam);
 			}
 		}
 		//checkGradGPU(XParam);
@@ -4150,7 +4150,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		mainloopCPU(XParam);
+		//mainloopCPU(XParam);
 	}
 
 	

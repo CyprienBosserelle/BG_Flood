@@ -1039,7 +1039,7 @@ Param checkparamsanity(Param XParam)
 
 	
 
-	if (XParam.outvars.empty() && XParam.outputtimestep > 0)
+	if (XParam.outvars.empty() && XParam.outputtimestep > 0.0)
 	{
 		//a nc file was specified but no output variable were specified
 		std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh" }; 
