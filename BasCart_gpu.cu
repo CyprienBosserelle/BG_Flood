@@ -196,7 +196,7 @@ cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaC
 // Main loop that actually runs the model.
 void mainloopGPUDB(Param XParam)
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 	int nTSsteps = 0;
 	int rainstep = 1;
@@ -343,7 +343,7 @@ void mainloopGPUDB(Param XParam)
 }
 void mainloopGPUDATM(Param XParam) // float, metric coordinate
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 	int nTSsteps = 0;
 
@@ -797,7 +797,7 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 
 void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate system 
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 
 	int rainstep = 1;
@@ -924,7 +924,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 
 void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinate system 
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 
 	int rainstep = 1;
@@ -1345,7 +1345,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 
 void mainloopGPU(Param XParam) // float, metric coordinate
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 	int nTSsteps = 0;
 
@@ -1473,7 +1473,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 
 void mainloopGPUATM(Param XParam) // float, metric coordinate
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 	int nTSsteps = 0;
 
@@ -1901,7 +1901,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 void mainloopGPUold(Param XParam) 
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 	int nTSsteps = 0;
 
@@ -2166,7 +2166,7 @@ void mainloopGPUold(Param XParam)
 
 void mainloopCPU(Param XParam)
 {
-	double nextoutputtime = XParam.outputtimestep;
+	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
 
 	int nTSstep = 0;
