@@ -1,25 +1,10 @@
-cmake_minimum_required(VERSION 3.9.1 FATAL_ERROR)
-
-# C++ standard
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED YES)
+# include Catch CMake integration module
+include("${CMAKE_CURRENT_SOURCE_DIR}/Catch2/cmake/Catch.cmake")
 
 if(USE_CATALYST)
-  find_package(ParaView 5.5 REQUIRED COMPONENTS vtkPVPythonCatalyst)
-  include("${PARAVIEW_USE_FILE}")
-  set(Test_SRCS catch_main.cpp catalyst_adaptor_UnitTest.cpp vtkCPVTKOutputPipeline_UnitTest.cpp
-      ../catalyst_adaptor.cpp ../vtkCPVTKOutputPipeline.cpp)
-  add_definitions("-DUSE_CATALYST")
-  add_executable (catalystTests ${Test_SRCS})
+  set(Test_SRCS catch_main.cpp catalyst_adaptor_UnitTest.cpp vtkCPVTKOutputPipeline_UnitTest.cpp)
+  add_executable(catalystTests ${Test_SRCS})
   target_include_directories(catalystTests PRIVATE ${PROJECT_SOURCE_DIR})
-  target_link_libraries(catalystTests vtkPVPythonCatalyst ${VTK_LIBRARIES})
-endif()
-
-option(BUILD_TESTING "Build Testing" OFF)
-if(BUILD_TESTING)
-  include(CTest)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/Catch2/cmake/Catch.cmake")
-  if(USE_CATALYST)
-    catch_discover_tests(catalystTests)
-  endif()
+  target_link_libraries(catalystTests BasCGPU_catalyst)
+  catch_discover_tests(catalystTests)
 endif()

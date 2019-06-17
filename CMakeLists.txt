@@ -7,12 +7,9 @@ project(bggpu LANGUAGES CXX CUDA)
 # option to use Catalyst (disable with cmake option "-DUSE_CATALYST=OFF")
 option(USE_CATALYST "Link with Catalyst" ON)
 
-# option for running tests
-option(BUILD_TESTING "Build Testing" OFF)
-if(BUILD_TESTING)
-  include(CTest)
-  add_subdirectory(test)
-endif()
+# option for running tests - include(CTest) adds the option -DBUILD_TESTING
+# that is set to ON by default (to disable tests use -DBUILD_TESTING=OFF)
+include(CTest)
 
 # C++ standard
 set(CMAKE_CXX_STANDARD 11)
@@ -65,14 +62,17 @@ if (NOT NETCDF_INCLUDE_DIR)
     message(FATAL_ERROR "Could not find NetCDF include dir: try setting the path to NetCDF with: -DNETCDF_DIR=/path/to/netcdf")
 endif()
 
-# list source files
+# BasCGPU source files
+set(bggpu_SRCS Bas_Cart_CPU.cpp BasCart_gpu.cu read_input.cpp writenetcdf.cpp)
+
+# catalyst source files
 if(USE_CATALYST)
   find_package(ParaView 5.5 REQUIRED COMPONENTS vtkPVPythonCatalyst)
   include("${PARAVIEW_USE_FILE}")
-  set(bggpu_SRCS Bas_Cart_CPU.cpp BasCart_gpu.cu read_input.cpp writenetcdf.cpp vtkCPVTKOutputPipeline.cpp catalyst_adaptor.cpp)
-  add_definitions("-DUSE_CATALYST")
-else()
-  set(bggpu_SRCS Bas_Cart_CPU.cpp BasCart_gpu.cu read_input.cpp writenetcdf.cpp)
+  set(catalyst_SRCS vtkCPVTKOutputPipeline.cpp catalyst_adaptor.cpp)
+  add_library(BasCGPU_catalyst ${catalyst_SRCS})
+  target_compile_definitions(BasCGPU_catalyst PUBLIC "USE_CATALYST")
+  target_link_libraries(BasCGPU_catalyst PUBLIC vtkPVPythonCatalyst ${VTK_LIBRARIES})
 endif()
 
 # need to set these files as CUDA to get it to build with CUDA 8 and GCC 5.4 (Mahuika)
@@ -88,7 +88,7 @@ target_include_directories(BasCGPU PRIVATE ${NETCDF_INCLUDE_DIR})
 
 # linking with catalyst
 if(USE_CATALYST)
-  target_link_libraries(BasCGPU vtkPVPythonCatalyst ${VTK_LIBRARIES})
+  target_link_libraries(BasCGPU BasCGPU_catalyst)
 endif()
 
 # Note: these lines copied from https://devblogs.nvidia.com/building-cuda-applications-cmake/
@@ -99,4 +99,8 @@ if(APPLE)
   set_property(TARGET BasCGPU
                PROPERTY
                BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
+endif()
+
+if (BUILD_TESTING)
+  add_subdirectory(test)
 endif()
