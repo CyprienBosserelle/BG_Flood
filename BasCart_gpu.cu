@@ -1612,7 +1612,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		
 		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> > ((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vv_g, dvdx_g, dvdy_g);
 		
-		if (atmpuni == 0)
+		if (atmpuniform == 0)
 		{
 			gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> > ((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, Patm_g, dPdx_g, dPdy_g);
 		}
@@ -1631,7 +1631,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 		//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
 		
-		if (atmpuni == 1)
+		if (atmpuniform == 1)
 		{
 			updateKurgX << <gridDim, blockDim, 0, streams[0] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, leftblk_g, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
 			//CUDA_CHECK(cudaDeviceSynchronize());
@@ -1761,7 +1761,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		if (atmpuni == 1)
+		if (atmpuniform == 1)
 		{
 
 			updateKurgX << <gridDim, blockDim, 0, streams[0] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, leftblk_g, hho_g, zso_g, uuo_g, vvo_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
