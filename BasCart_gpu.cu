@@ -1534,48 +1534,53 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 	ResetmaxvarGPU(XParam);
 
 
+	//Prep model
+	//dim3 blockDim(16, 16, 1);
+	//dim3 gridDim(XParam.nblk, 1, 1);
+
+
+	const int num_streams = 4;
+
+	cudaStream_t streams[num_streams];
+	
+
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
+		
 		LeftFlowBnd(XParam);
 		RightFlowBnd(XParam);
 		TopFlowBnd(XParam);
 		BotFlowBnd(XParam);
-
 		
-
-
-		// Core engine
-
-		
-			
-		
-
-		//XParam.dt = FlowGPUATM(XParam, nextoutputtime);
-
-		const int num_streams = 3;
-
-		cudaStream_t streams[num_streams];
 		for (int i = 0; i < num_streams; i++)
 		{
 			CUDA_CHECK(cudaStreamCreate(&streams[i]));
 		}
 
+		
+		// Core engine
 
+		//dim3 blockDim(16, 16, 1);
+		//dim3 gridDim(XParam.nblk, 1, 1);
+			
+		
 
+		//XParam.dt = FlowGPUATM(XParam, nextoutputtime);
+
+		
 		//dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 		//dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
-		dim3 blockDim(16, 16, 1);
-		dim3 gridDim(XParam.nblk, 1, 1);
+		
 
 		dtmax = (float)(1.0 / epsilon);
 		//float dtmaxtmp = dtmax;
 
 
-
+		
 		// Check the atm Pressure forcing before starting
 
-		if (!XParam.atmP.inputfile.empty() && atmpuniform == 1) //this is a gven 
+		if (!XParam.atmP.inputfile.empty() && atmpuniform == 0) //this is a gven 
 		{
 
 			//
@@ -1595,13 +1600,13 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 
 
-		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hh_g, dhdx_g, dhdy_g);
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hh_g, dhdx_g, dhdy_g);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
 
 
-		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zs_g, dzsdx_g, dzsdy_g);
-		//CUDA_CHECK(cudaDeviceSynchronize());
+		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[2] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, zs_g, dzsdx_g, dzsdy_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 
 
@@ -1614,7 +1619,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		
 		if (atmpuniform == 0)
 		{
-			gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> > ((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, Patm_g, dPdx_g, dPdy_g);
+			gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[2] >> > ((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, Patm_g, dPdx_g, dPdy_g);
 		}
 
 		// Check the wind forcing at the same time here
@@ -1622,7 +1627,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		if (!XParam.windU.inputfile.empty())
 		{
 			
-			Windthisstep(XParam, gridDimWND, blockDimWND, streams[2], windstep, uwinduni, vwinduni);
+			Windthisstep(XParam, gridDimWND, blockDimWND, streams[0], windstep, uwinduni, vwinduni);
 		}
 
 
@@ -1650,9 +1655,9 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 		}
 		CUDA_CHECK(cudaDeviceSynchronize());
+		
 
-
-
+		/*
 		//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
 		// This was successfully tested with a range of grid size
 		//reducemax3 << <gridDimLine, blockDimLine, 64*sizeof(float) >> >(dtmax_g, arrmax_g, nx*ny)
@@ -1695,25 +1700,28 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		mindtmaxB = dummy[0];
 
 		//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
-		/*
-		for (int i = 0; i < 32; i++)
-		{
-		mindtmaxB = min(dummy[i], mindtmaxB);
-		printf("dt=%f\n", dummy[i]);
+		
+		//for (int i = 0; i < 32; i++)
+		//{
+		//mindtmaxB = min(dummy[i], mindtmaxB);
+		//printf("dt=%f\n", dummy[i]);
 
-		}
-		*/
+		//}
+		
 
 
 		//float diffdt = mindtmaxB - mindtmax;
 		XParam.dt = mindtmaxB;
+		*/
+		XParam.dt = Calcmaxdt(XParam, dtmax_g, arrmax_g);
+
 		if (ceil((nextoutputtime - XParam.totaltime) / XParam.dt)> 0.0)
 		{
 			XParam.dt = (nextoutputtime - XParam.totaltime) / ceil((nextoutputtime - XParam.totaltime) / XParam.dt);
 		}
 		//printf("dt=%f\n", XParam.dt);
 
-
+		
 		if (winduniform == 1)
 		{
 			// simpler input if wind is uniform
@@ -1806,16 +1814,27 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		cleanupGPU << <gridDim, blockDim, 0 >> >(hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
+		
+
 		//Bottom friction
 		bottomfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, (float)XParam.dt, (float)XParam.eps, cf_g, hh_g, uu_g, vv_g);
 		CUDA_CHECK(cudaDeviceSynchronize());
+		
 
-		CUDA_CHECK(cudaStreamDestroy(streams[0]));
-		CUDA_CHECK(cudaStreamDestroy(streams[1]));
-
+		//Destroy streams
+		for (int i = 0; i < num_streams; i++)
+		{
+			CUDA_CHECK(cudaStreamDestroy(streams[i]));
+		}
+		//CUDA_CHECK(cudaStreamDestroy(streams[0]));
+		//CUDA_CHECK(cudaStreamDestroy(streams[1]));
+		
 		// Impose no slip condition by default
 		//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		
+
 
 		// River
 		if (XParam.Rivers.size() > 0)
@@ -1834,7 +1853,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		meanmaxvarGPU(XParam);
 
 
-
+		
 
 		//Check for TSoutput
 		if (XParam.TSnodesout.size() > 0)
@@ -1894,7 +1913,8 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 			// Reset nstep
 			nstep = 0;
 		} // End of output part
-
+		
+		
 	} //Main while loop
 }
 

@@ -3102,6 +3102,8 @@ template <class T> __global__ void initdtmax( T epsi,T *dtmax)
 	
 }
 
+
+
 __global__ void minmaxKernel(int ntot, float *max, float *min, float *a) {
 	__shared__ double maxtile[32];
 	__shared__ double mintile[32];
