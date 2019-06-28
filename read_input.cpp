@@ -510,6 +510,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> nodes = split(parametervalue, ',');
+		//Need sanity check here
 		TSnode node;
 		node.x = std::stod(nodes[0]);
 		node.y = std::stod(nodes[1]);
@@ -1325,7 +1326,7 @@ inputmap readBathyhead(inputmap BathyParam)
 
 
 
-		printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo);
+		printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%lf\talpha=%f\txo=%lf\tyo=%lf\txmax=%lf\tymax=%lf\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo, BathyParam.xmax, BathyParam.ymax);
 		write_text_to_log_file("Bathymetry grid info: nx=" + std::to_string(BathyParam.nx) + " ny=" + std::to_string(BathyParam.ny) + " dx=" + std::to_string(BathyParam.dx) + " grdalpha=" + std::to_string(BathyParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(BathyParam.xo) + " yo=" + std::to_string(BathyParam.yo));
 
 
