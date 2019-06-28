@@ -41,7 +41,7 @@ catalystAdaptor& catalystAdaptor::getInstance()
 
 //------------------------------------------------------
 
-const int catalystAdaptor::initialiseWithPython(const std::string& scriptName)
+int catalystAdaptor::initialiseWithPython(const std::string& scriptName)
 {
   if (this->Processor != nullptr)
   {
@@ -74,7 +74,7 @@ const int catalystAdaptor::initialiseWithPython(const std::string& scriptName)
 
 //------------------------------------------------------
 
-const int catalystAdaptor::initialiseVTKOutput(const int frequency, const double time, const std::string& fileName)
+int catalystAdaptor::initialiseVTKOutput(const int frequency, const double time, const std::string& fileName)
 {
   if (this->Processor != nullptr)
   {
@@ -106,10 +106,10 @@ const int catalystAdaptor::initialiseVTKOutput(const int frequency, const double
 
 //------------------------------------------------------
 
-const int catalystAdaptor::addPatch(const int patchId, const int level,
-                                    const int nx, const int ny,
-                                    const double dx, const double dy,
-                                    const double x0, const double y0)
+int catalystAdaptor::addPatch(const int patchId, const int level,
+                              const int nx, const int ny,
+                              const double dx, const double dy,
+                              const double x0, const double y0)
 {
   // Check if a patch with this ID exists already
   std::unordered_map<int,gridPatch>::const_iterator it = this->patches.find(patchId);
@@ -134,7 +134,7 @@ const int catalystAdaptor::addPatch(const int patchId, const int level,
 
 //------------------------------------------------------
 
-const int catalystAdaptor::removePatch(const int patchId)
+int catalystAdaptor::removePatch(const int patchId)
 {
   // Check if a patch with this ID exists
   std::unordered_map<int,gridPatch>::const_iterator it = this->patches.find(patchId);
@@ -189,7 +189,7 @@ void catalystAdaptor::setAMRPatches(vtkSmartPointer<vtkNonOverlappingAMR> AMRGri
 
 //------------------------------------------------------
 
-const int catalystAdaptor::updateFieldSingle(const int patchId, const std::string& name, float* data)
+int catalystAdaptor::updateFieldSingle(const int patchId, const std::string& name, float* data)
 {
   // Check if a patch with this ID exists
   std::unordered_map<int,gridPatch>::const_iterator it = this->patches.find(patchId);
@@ -233,7 +233,7 @@ const int catalystAdaptor::updateFieldSingle(const int patchId, const std::strin
 
 //------------------------------------------------------
 
-const int catalystAdaptor::updateFieldDouble(const int patchId, const std::string& name, double* data)
+int catalystAdaptor::updateFieldDouble(const int patchId, const std::string& name, double* data)
 {
   std::unordered_map<int,gridPatch>::const_iterator it = this->patches.find(patchId);
   if (it == this->patches.end())
@@ -267,7 +267,7 @@ const int catalystAdaptor::updateFieldDouble(const int patchId, const std::strin
 
 //------------------------------------------------------
 
-const bool catalystAdaptor::requestDataDescription(const double time, const unsigned int timeStep)
+bool catalystAdaptor::requestDataDescription(const double time, const unsigned int timeStep)
 {
   if (this->dataDescription == nullptr)
   {
@@ -288,7 +288,7 @@ const bool catalystAdaptor::requestDataDescription(const double time, const unsi
 
 //------------------------------------------------------
 
-const int catalystAdaptor::runCoprocessor()
+int catalystAdaptor::runCoprocessor()
 {
   if (this->Processor == nullptr)
   {

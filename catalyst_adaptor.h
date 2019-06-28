@@ -32,34 +32,34 @@ class catalystAdaptor
   // Catalyst can run in two modes - full visualisation using Python script,
   // or just output in VTK file format. Note that only one can be used
   // in a given simulation run.
-  const int initialiseWithPython(const std::string& scriptName);
-  const int initialiseVTKOutput(const int frequency, const double time, const std::string& fileName);
+  int initialiseWithPython(const std::string& scriptName);
+  int initialiseVTKOutput(const int frequency, const double time, const std::string& fileName);
 
   // Add a new vtkUniformGrid patch with given parameters
   // Patch IDs must be handled by the simulation program
   // to make sure that they are consistent with grid
   // patches used by the solver
-  const int addPatch(const int patchId, const int level,
+  int addPatch(const int patchId, const int level,
                      const int nx, const int ny,
                      const double dx, const double dy,
                      const double x0, const double y0);
 
   // Remove patch with given ID
-  const int removePatch(const int patchId);
+  int removePatch(const int patchId);
 
   // Update simulation data - must be called in each time step and before
   // running the coprocessor
   // IMPORTANT: These methods use "zero copy", Catalyst will access the
   // original data array for visualisation. "data" must therefore still
   // be in scope and in consistent state!
-  const int updateFieldSingle(const int patchId, const std::string& name, float* data);
-  const int updateFieldDouble(const int patchId, const std::string& name, double* data);
+  int updateFieldSingle(const int patchId, const std::string& name, float* data);
+  int updateFieldDouble(const int patchId, const std::string& name, double* data);
 
   // Check if coprocessor should be run at this time/time step
-  const bool requestDataDescription(const double time, const unsigned int timeStep);
+  bool requestDataDescription(const double time, const unsigned int timeStep);
 
   // Run the visualisation pipeline
-  const int runCoprocessor();
+  int runCoprocessor();
 
   // Prevent copying and moving
   catalystAdaptor(const catalystAdaptor&) = delete;
