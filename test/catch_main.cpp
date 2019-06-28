@@ -8,7 +8,7 @@ int main( int argc, char * argv[] )
   // Construct Catalyst Adaptor singleton here - the adaptor can only
   // be initialised once
   catalystAdaptor& adaptor = catalystAdaptor::getInstance();
-  if (adaptor.initialiseVTKOutput(1, "test"))
+  if (adaptor.initialiseVTKOutput(1, 1.0, "test"))
   {
     std::cerr <<  "main::initialiseVTKOutput failed\n";
     return 1;

@@ -27,6 +27,9 @@ class vtkCPVTKOutputPipeline: public vtkCPPipeline
   vtkSetMacro(OutputFrequency, int);
   vtkGetMacro(OutputFrequency, int);
 
+  vtkSetMacro(OutputTimeInterval, double);
+  vtkGetMacro(OutputTimeInterval, double);
+
   vtkSetMacro(FileName, std::string);
   vtkGetMacro(FileName, std::string);
 
@@ -41,6 +44,8 @@ class vtkCPVTKOutputPipeline: public vtkCPPipeline
  private:
 
   int OutputFrequency;
+  double OutputTimeInterval;
+  double LastOutputTime;
   std::string FileName;
 };
 

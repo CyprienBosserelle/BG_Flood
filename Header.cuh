@@ -188,7 +188,8 @@ public:
         // ParaView Catalyst parameters
         int use_catalyst = 0;
         int catalyst_python_pipeline = 0;
-        int vtk_output_frequency = 10;
+        int vtk_output_frequency = 0;
+        double vtk_output_time_interval = 1.0;
         std::string vtk_outputfile_root = "bg_out";
         std::string python_pipeline = "coproc.py";
 #endif

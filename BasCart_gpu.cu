@@ -2405,7 +2405,7 @@ void mainloopCPU(Param XParam)
 		}
 
 #ifdef USE_CATALYST
-                // Is there a global time step counter?
+                // Could use existing global time step counter here
                 catalystTimeStep += 1;
                 if (XParam.use_catalyst)
                 {
@@ -4123,7 +4123,7 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                        if (adaptor.initialiseVTKOutput(XParam.vtk_output_frequency, XParam.vtk_outputfile_root))
+                        if (adaptor.initialiseVTKOutput(XParam.vtk_output_frequency, XParam.vtk_output_time_interval, XParam.vtk_outputfile_root))
                         {
                                 fprintf(stderr, "catalystAdaptor::initialiseVTKOutput failed");
                         }

@@ -14,6 +14,8 @@ vtkStandardNewMacro(vtkCPVTKOutputPipeline);
 vtkCPVTKOutputPipeline::vtkCPVTKOutputPipeline()
 {
   this->OutputFrequency = 0;
+  this->OutputTimeInterval = 0.0;
+  this->LastOutputTime = 0.0;
   this->FileName.clear();
 }
 
@@ -40,14 +42,29 @@ int vtkCPVTKOutputPipeline::RequestDataDescription(vtkCPDataDescription* dataDes
     return 0;
   }
 
-  // Check if we need to produce output (either forced or via regular timestep request)
-  if(dataDescription->GetForceOutput() == true ||
-    (this->OutputFrequency > 0 && dataDescription->GetTimeStep() >= 0 &&
-     dataDescription->GetTimeStep() % this->OutputFrequency == 0) )
+  double currentTime = dataDescription->GetTime();
+  vtkIdType currentTimeStep = dataDescription->GetTimeStep();
+
+  // Check if simulation time and time step criteria are independently fulfilled
+  bool outputThisTime = (this->OutputTimeInterval > 0) && 
+                        ((currentTime - this->LastOutputTime) >= this->OutputTimeInterval);
+  bool outputThisTimeStep = (this->OutputFrequency > 0) && (currentTimeStep > 0) &&
+                            (currentTimeStep % this->OutputFrequency == 0);
+
+  if(dataDescription->GetForceOutput() || outputThisTime || outputThisTimeStep)
   {
-    // Include all fields by default
+    // Include all fields by default - the pipeline is handed same set of fields as netCDF output
     dataDescription->GetInputDescription(0)->AllFieldsOn();
+    if(outputThisTime)
+    {
+      this->LastOutputTime = currentTime;
+    }
     return 1;
+  }
+  else
+  {
+    // No output; make sure that no fields are requested from simulation
+    dataDescription->GetInputDescription(0)->AllFieldsOff();
   }
   return 0;
 }
@@ -105,5 +122,6 @@ void vtkCPVTKOutputPipeline::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "OutputFrequency: " << this->OutputFrequency << "\n";
+  os << indent << "OutputTimeInterval: " << this->OutputTimeInterval << "\n";
   os << indent << "FileName: " << this->FileName << "\n";
 }

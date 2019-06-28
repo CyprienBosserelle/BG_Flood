@@ -92,7 +92,7 @@ if(USE_CATALYST)
 endif()
 
 # Note: these lines copied from https://devblogs.nvidia.com/building-cuda-applications-cmake/
-#       not sure if they are actually needed as don't have a Mac with Nvidia GPU to test
+#       not sure if they are actually needed as I don't have a Mac with Nvidia GPU to test
 if(APPLE)
   # We need to add the path to the driver (libcuda.dylib) as an rpath,
   # so that the static cuda runtime can find it at runtime.

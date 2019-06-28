@@ -10,7 +10,7 @@ TEST_CASE( "Initialisation", "[catalyst_adaptor]" )
 
   SECTION( "CoProcessor With VTK Output Fails To Initialise Twice" )
   {
-    REQUIRE ( adaptor.initialiseVTKOutput(1, "test") == 1 );
+    REQUIRE ( adaptor.initialiseVTKOutput(1, 1.0, "test") == 1 );
   }
 
   SECTION( "Cannot Re-initialise CoProcessor With Python Pipeline" )
@@ -183,11 +183,11 @@ TEST_CASE( "requestDataDescription", "[catalyst_adaptor]" )
 {
   catalystAdaptor& adaptor = catalystAdaptor::getInstance();
 
-  SECTION( "Coprocessor Should Run At Positive Timesteps" )
+  SECTION( "Coprocessor Should Run At Positive Times And Timesteps" )
   {
-    // Simulation time is currently ignored by VTK output pipeline
-    REQUIRE ( adaptor.requestDataDescription(0.0, 1) == true );
-    REQUIRE ( adaptor.requestDataDescription(0.0, 2) == true );
-    REQUIRE ( adaptor.requestDataDescription(0.0, 7) == true );
+    REQUIRE ( adaptor.requestDataDescription(1.0, 1) == true );
+    REQUIRE ( adaptor.requestDataDescription(2.0, 2) == true );
+    REQUIRE ( adaptor.requestDataDescription(3.0, 3) == true );
+    REQUIRE ( adaptor.requestDataDescription(7.0, 7) == true );
   }
 }

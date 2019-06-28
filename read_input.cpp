@@ -784,6 +784,12 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.vtk_output_frequency = std::stoi(parametervalue);
 	}
+	parameterstr = "vtk_output_time_interval";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.vtk_output_time_interval = std::stod(parametervalue);
+	}
 	parameterstr = "vtk_outputfile_root";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())

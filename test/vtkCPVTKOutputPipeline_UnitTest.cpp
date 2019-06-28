@@ -17,6 +17,13 @@ TEST_CASE( "Basic Class Tests", "[vtkCPVTKOutputPipeline]" )
     REQUIRE( pipeline->GetOutputFrequency() == frequency );
   }
 
+  SECTION( "SetOutputTimeInterval/GetOutputTimeInterval Methods Work" )
+  {
+    const double time = 11.456;
+    pipeline->SetOutputTimeInterval(time);
+    REQUIRE( pipeline->GetOutputTimeInterval() == time );
+  }
+
   SECTION( "SetFileName/GetFileName Methods Work" )
   {
     const std::string fileName = "my_testname";
@@ -68,27 +75,51 @@ TEST_CASE( "RequestDataDescription", "[vtkCPVTKOutputPipeline]" )
     REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
   }
 
+  SECTION( "Negative Reply With Zero Output Time Interval" )
+  {
+    dataDescription->AddInput("input");
+    pipeline->SetOutputTimeInterval(0.0);
+    dataDescription->SetTimeData(1.0, 1);
+    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
+  }
+
   SECTION( "Negative Reply At Negative Timestep" )
   {
     dataDescription->AddInput("input");
     pipeline->SetOutputFrequency(1);
-    dataDescription->SetTimeData(1.0, -1);
+    dataDescription->SetTimeData(0.0, -1);
     REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
   }
 
-  SECTION( "Positive Reply At Zero Timestep" )
+  SECTION( "Negative Reply At Negative Time" )
+  {
+    dataDescription->AddInput("input");
+    pipeline->SetOutputTimeInterval(1.0);
+    dataDescription->SetTimeData(-1.0, 0);
+    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
+  }
+
+  SECTION( "Negative Reply At Zero Time And Timestep" )
   {
     dataDescription->AddInput("input");
     pipeline->SetOutputFrequency(1);
     dataDescription->SetTimeData(0.0, 0);
-    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 1 );
+    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
   }
 
   SECTION( "Positive Reply At Requested Timestep" )
   {
     dataDescription->AddInput("input");
     pipeline->SetOutputFrequency(5);
-    dataDescription->SetTimeData(5.0, 5);
+    dataDescription->SetTimeData(0.0, 5);
+    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 1 );
+  }
+
+  SECTION( "Positive Reply At Requested Time" )
+  {
+    dataDescription->AddInput("input");
+    pipeline->SetOutputTimeInterval(3.14159);
+    dataDescription->SetTimeData(3.14159, 0);
     REQUIRE( pipeline->RequestDataDescription(dataDescription) == 1 );
   }
 
@@ -96,7 +127,15 @@ TEST_CASE( "RequestDataDescription", "[vtkCPVTKOutputPipeline]" )
   {
     dataDescription->AddInput("input");
     pipeline->SetOutputFrequency(5);
-    dataDescription->SetTimeData(4.0, 4);
+    dataDescription->SetTimeData(0.0, 4);
+    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
+  }
+
+  SECTION( "Negative Reply At Non-requested Time" )
+  {
+    dataDescription->AddInput("input");
+    pipeline->SetOutputTimeInterval(5.0);
+    dataDescription->SetTimeData(4.0, 0);
     REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
   }
 

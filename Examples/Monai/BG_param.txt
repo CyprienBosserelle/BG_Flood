@@ -33,7 +33,8 @@ bot = 0;
 # ParaView Catalyst
 use_catalyst = 1;
 catalyst_python_pipeline = 0;
-vtk_output_frequency = 25;
+vtk_output_frequency = 0;
+vtk_output_time_interval = 1;
 vtk_outputfile_root = myoutput;
 python_pipeline = coproc.py;
 

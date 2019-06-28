@@ -59,6 +59,11 @@ def CreateCoProcessor():
       renderView.Background = [0.32, 0.34, 0.43]
       renderView.ViewTime = datadescription.GetTime()
 
+      # Show simulation time with 1 digit after decimal point
+      annotateTime = pvs.AnnotateTime()
+      annotateTime.Format = 'time: %.1f'
+      timeDisplay = pvs.Show(annotateTime, renderView)
+
       # Register the view with coprocessor and provide it with information such as
       # the filename to use. Set freq=1 to ensure that images are rendered whenever
       # the pipeline runs
@@ -91,7 +96,7 @@ def CreateCoProcessor():
       currentTimeStep = datadescription.GetTimeStep()
 
       # Check if either criterion is independently fulfilled
-      outputThisTime = outputTimeInterval > 0 and currentTime - lastOutputTime > outputTimeInterval
+      outputThisTime = outputTimeInterval > 0 and (currentTime - lastOutputTime) >= outputTimeInterval
       outputThisTimeStep = outputFrequency > 0 and currentTimeStep > 0 and \
                            currentTimeStep % outputFrequency == 0
 

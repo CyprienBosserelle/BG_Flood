@@ -74,7 +74,7 @@ const int catalystAdaptor::initialiseWithPython(const std::string& scriptName)
 
 //------------------------------------------------------
 
-const int catalystAdaptor::initialiseVTKOutput(const int frequency, const std::string& fileName)
+const int catalystAdaptor::initialiseVTKOutput(const int frequency, const double time, const std::string& fileName)
 {
   if (this->Processor != nullptr)
   {
@@ -94,6 +94,7 @@ const int catalystAdaptor::initialiseVTKOutput(const int frequency, const std::s
   // Initialise VTK output pipeline
   vtkSmartPointer<vtkCPVTKOutputPipeline> pipeline = vtkSmartPointer<vtkCPVTKOutputPipeline>::New();
   pipeline->SetOutputFrequency(frequency);
+  pipeline->SetOutputTimeInterval(time);
   if (!fileName.empty()) pipeline->SetFileName(fileName);
   this->Processor->AddPipeline(pipeline);
 
