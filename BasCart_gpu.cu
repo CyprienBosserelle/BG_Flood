@@ -3306,11 +3306,11 @@ int main(int argc, char **argv)
 		write_text_to_log_file("Hotstart");
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
-			hotstartsucess = readhotstartfileD(XParam, leftblk, rightblk,topblk, botblk, blockxo_d, blockyo_d, dummy_d, zs_d, zb_d, hh_d, uu_d, vv_d);
+			hotstartsucess = readhotstartfileD(XParam, leftblk, rightblk,topblk, botblk, blockxo_d, blockyo_d,  zs_d, zb_d, hh_d, uu_d, vv_d);
 		}
 		else
 		{
-			hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk,  botblk, blockxo_d, blockyo_d, dummy, zs, zb, hh, uu, vv);
+			hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk,  botblk, blockxo_d, blockyo_d,  zs, zb, hh, uu, vv);
 		}
 		
 		if (hotstartsucess == 0)

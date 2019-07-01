@@ -1086,69 +1086,111 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 
 }
 
-int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
+int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 {
-	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
-	int ncid, varid, ndims;
-	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
-	int nx, ny, nt;
-	float scalefac = 1.0;
-	float offset = 0.0;
-	size_t  *ddim;
-
-
-
-
+	// This function reads the dimentions for each variables
+	int status, varid;
+	int ncid, ndims;
+	int dimids[NC_MAX_VAR_DIMS];
 	//Open NC file
-	printf("Open file\n");
-	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+	//printf("Open file\n");
+
+	status = nc_open(filename.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	//inquire variable by name
+	//printf("Reading information about %s...", Varname.c_str());
+	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varndims(ncid, varid, &ndims);
 	if (status != NC_NOERR) handle_error(status);
 
 
-	//first check if hotstart has zb 
-	zberror = nc_inq_varid(ncid, "zb", &varid);
-	if (zberror == NC_NOERR)
+	status = nc_inq_vardimid(ncid, varid, dimids);
+	if (status != NC_NOERR) handle_error(status);
+
+	ddimU = (size_t *)malloc(ndims*sizeof(size_t));
+
+	//Read dimensions nx_u ny_u 
+	for (int iddim = 0; iddim < ndims; iddim++)
 	{
-
-		status = nc_inq_varndims(ncid, varid, &ndims);
-		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
-
-		status = nc_inq_vardimid(ncid, varid, dimids);
+		status = nc_inq_dimlen(ncid, dimids[iddim], &ddimU[iddim]);
 		if (status != NC_NOERR) handle_error(status);
 
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { max(XParam.hotstep,nt - 1), 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
+		//printf("dim:%d=%d\n", iddim, ddimU[iddim]);
+	}
 
 
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
+	status = nc_close(ncid);
 
+	return ndims;
+}
+
+
+int readvardata(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, float * vardata)
+{
+	// function to standardise the way to read netCDF data off a file
+	// The role of this function is to offload and simplify the rest of the code
+
+
+	int nx, ny, nt, status, ncid, varid, sferr, oferr;
+	size_t * start, * count;
+	float scalefac, offset;
+
+	start = (size_t *)malloc(ndims*sizeof(size_t));
+	count = (size_t *)malloc(ndims*sizeof(size_t));
+
+
+	// 
+	status = nc_open(filename.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	if (status != NC_NOERR) handle_error(status);
+
+	if (ndims == 1)
+	{
+		nx = (int)ddim[0];
+		start[0] = 0;
+		count[0] =  nx ;
+
+
+
+	}
+	else if (ndims == 2)
+	{
+		ny = (int)ddim[0];
+		nx = (int)ddim[1];
+		start[0] = 0;
+		start[1] = 0;
+		
+		count[0] = ny;
+		count[1] = nx;
+	
+		
+	}
+	else //(ndim>2)
+	{
+		nt = (int)ddim[0];
+		ny = (int)ddim[1];
+		nx = (int)ddim[2];
+		start[0] = min(hotstep, nt - 1);
+		start[1] = 0;
+		start[2] = 0;
+
+		count[0] = 1;
+		count[1] = ny;
+		count[2] = nx;
+		
+
+
+	}
+	status = nc_get_vara_float(ncid, varid, start, count, vardata);
+	if (status != NC_NOERR) handle_error(status);
+	
+	if (ndims > 1)
+	{
 		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
 		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
 
@@ -1158,12 +1200,180 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
+					vardata[i + j*nx] = vardata[i + j*nx] * scalefac + offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
+	}
+
+
+
+	//clean up
+	free(start);
+	free(count);
+
+	status = nc_close(ncid);
+
+	return status;
+
+}
+
+
+int readvardataD(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, double * vardata)
+{
+	// function to standardise the way to read netCDF data off a file
+	// The role of this function is to offload and simplify the rest of the code
+
+
+	int nx, ny, nt, status, ncid, varid, sferr, oferr;
+	size_t * start, *count;
+	double scalefac, offset;
+
+	start = (size_t *)malloc(ndims*sizeof(size_t));
+	count = (size_t *)malloc(ndims*sizeof(size_t));
+
+
+	// 
+	status = nc_open(filename.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	if (status != NC_NOERR) handle_error(status);
+
+	if (ndims == 1)
+	{
+		nx = (int)ddim[0];
+		start[0] = 0;
+		count[0] = nx;
+
+
+
+	}
+	else if (ndims == 2)
+	{
+		ny = (int)ddim[0];
+		nx = (int)ddim[1];
+		start[0] = 0;
+		start[1] = 0;
+
+		count[0] = ny;
+		count[1] = nx;
+
+
+	}
+	else //(ndim>2)
+	{
+		nt = (int)ddim[0];
+		ny = (int)ddim[1];
+		nx = (int)ddim[2];
+		start[0] = min(hotstep, nt - 1);
+		start[1] = 0;
+		start[2] = 0;
+
+		count[0] = 1;
+		count[1] = ny;
+		count[2] = nx;
+
+
+
+	}
+	status = nc_get_vara_double(ncid, varid, start, count, vardata);
+	if (status != NC_NOERR) handle_error(status);
+
+	if (ndims > 1)
+	{
+		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
+		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
+
+		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+		{
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					vardata[i + j*nx] = vardata[i + j*nx] * scalefac + offset;
+					//unpacked_value = packed_value * scale_factor + add_offset
+				}
+			}
+		}
+	}
+
+
+
+	//clean up
+	free(start);
+	free(count);
+
+	status = nc_close(ncid);
+
+	return status;
+
+}
+
+
+int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
+{
+	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
+	int ncid, varid, ndims;
+	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
+	int nx, ny, nt;
+	float * xcoord, *ycoord, * varinfile; // Not necessarily identical to any prevoious ones
+	float scalefac = 1.0;
+	float offset = 0.0;
+	size_t  *ddim;
+
+	// Open the file for read access
+	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
+
+
+	//Open NC file
+	printf("Open file\n");
+	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+	zberror = nc_inq_varid(ncid, "zb", &varid);
+	zserror = nc_inq_varid(ncid, "zs", &varid);
+	hherror = nc_inq_varid(ncid, "hh", &varid);
+	uuerror = nc_inq_varid(ncid, "uu", &varid);
+	vverror = nc_inq_varid(ncid, "vv", &varid);
+	status = nc_close(ncid);
+
+	// First we should read x and y coordinates
+	// Just as with other variables we expect the file follow the output naming convention of "xx" and "yy" both as a dimension and a variable
+	ndims = readvarinfo(XParam.hotstartfile.c_str(), "xx", ddim);
+	nx = ddim[0];
+	xcoord = (float *)malloc(ddim[0]*sizeof(float)); /// Warning here we assume xx is 1D but may not be in the future
+
+	status = readvardata(XParam.hotstartfile.c_str(), "xx", ndims, 0, ddim, xcoord);
+	if (status != NC_NOERR) handle_error(status);
+	free(ddim);
+
+	//Now read y coordinates
+	ndims = readvarinfo(XParam.hotstartfile.c_str(), "yy", ddim);
+	ny = ddim[0];
+	ycoord = (float *)malloc(ddim[0] * sizeof(float)); /// Warning here we assume xx is 1D but may not be in the future
+
+	status = readvardata(XParam.hotstartfile.c_str(), "yy", ndims, 0, ddim, ycoord);
+	if (status != NC_NOERR) handle_error(status);
+	free(ddim);
+
+
+	// Allocate var in file to temporarily store the variable stored
+	varinfile = (float *)malloc(nx*ny * sizeof(float));
+
+	//first check if hotstart has zb 
+	
+	if (zberror == NC_NOERR)
+	{
+		//zb is set
+
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zb", ddim);
+		
+		status = readvardata(XParam.hotstartfile.c_str(), "zb", ndims, 0, ddim, varinfile);
+		if (status != NC_NOERR) handle_error(status);
+			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zb);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 		
@@ -1173,66 +1383,21 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
+		
 	}
 	// second check if zs or hh are in teh file 
-	zserror = nc_inq_varid(ncid, "zs", &varid);
+	
+
+	//zs Section
 	if (zserror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zs", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardata(XParam.hotstartfile.c_str(), "zs", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
-
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zs);
-
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zs);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
 		//because we set the edges around empty blocks we need the set the edges for zs too 
@@ -1269,63 +1434,17 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 			handle_error(zserror);
 		}
 	}
-	hherror = nc_inq_varid(ncid, "hh", &varid);
+
+	//hh section
 	if (hherror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "hh", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardata(XParam.hotstartfile.c_str(), "hh", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
-
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, hh);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, hh);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 		
@@ -1380,63 +1499,18 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		}
 	}
 
-	uuerror = nc_inq_varid(ncid, "uu", &varid);
+	//uu Section
+	
 	if (uuerror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "uu", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardata(XParam.hotstartfile.c_str(), "uu", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, uu);
 
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, uu);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
 		free(ddim);
@@ -1465,63 +1539,17 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		}
 	}
 
-	vverror = nc_inq_varid(ncid, "vv", &varid);
+	//vv section
+	
 	if (vverror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "vv", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardata(XParam.hotstartfile.c_str(), "vv", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
-
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			//nt = (int) ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_float(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_float(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, vv);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, vv);
 
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
@@ -1558,154 +1586,97 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 }
 
-int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv)
+int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv)
 {
 	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
 	int ncid, varid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
 	int nx, ny, nt;
-	double scalefac = 1.0;
-	double offset = 0.0;
+	double * xcoord, *ycoord, *varinfile; // Not necessarily identical to any prevoious ones
+	
 	size_t  *ddim;
 
-
+	// Open the file for read access
+	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
 
 
 	//Open NC file
 	printf("Open file\n");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
+	zberror = nc_inq_varid(ncid, "zb", &varid);
+	zserror = nc_inq_varid(ncid, "zs", &varid);
+	hherror = nc_inq_varid(ncid, "hh", &varid);
+	uuerror = nc_inq_varid(ncid, "uu", &varid);
+	vverror = nc_inq_varid(ncid, "vv", &varid);
+	status = nc_close(ncid);
 
+	// First we should read x and y coordinates
+	// Just as with other variables we expect the file follow the output naming convention of "xx" and "yy" both as a dimension and a variable
+	ndims = readvarinfo(XParam.hotstartfile.c_str(), "xx", ddim);
+	nx = ddim[0];
+	xcoord = (double *)malloc(ddim[0] * sizeof(double)); /// Warning here we assume xx is 1D but may not be in the future
+
+	status = readvardataD(XParam.hotstartfile.c_str(), "xx", ndims, 0, ddim, xcoord);
+	if (status != NC_NOERR) handle_error(status);
+	free(ddim);
+
+	//Now read y coordinates
+	ndims = readvarinfo(XParam.hotstartfile.c_str(), "yy", ddim);
+	ny = ddim[0];
+	ycoord = (double *)malloc(ddim[0] * sizeof(double)); /// Warning here we assume xx is 1D but may not be in the future
+
+	status = readvardataD(XParam.hotstartfile.c_str(), "yy", ndims, 0, ddim, ycoord);
+	if (status != NC_NOERR) handle_error(status);
+	free(ddim);
+
+
+	// Allocate var in file to temporarily store the variable stored
+	varinfile = (double *)malloc(nx*ny * sizeof(double));
 
 	//first check if hotstart has zb 
-	zberror = nc_inq_varid(ncid, "zb", &varid);
+
 	if (zberror == NC_NOERR)
 	{
+		//zb is set
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zb", ddim);
+
+		status = readvardataD(XParam.hotstartfile.c_str(), "zb", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
-
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { max(XParam.hotstep,nt - 1), 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-
-			
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zb);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
+
+		//because we set the edges around empty blocks we need the set the edges for zs too 
+		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
+
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
+
 	}
 	// second check if zs or hh are in teh file 
-	zserror = nc_inq_varid(ncid, "zs", &varid);
+
+
+	//zs Section
 	if (zserror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zs", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardataD(XParam.hotstartfile.c_str(), "zs", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
-
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zs);
-
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zs);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
+
 		//check sanity
 		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
@@ -1736,70 +1707,23 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 			handle_error(zserror);
 		}
 	}
-	hherror = nc_inq_varid(ncid, "hh", &varid);
+
+	//hh section
 	if (hherror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "hh", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardataD(XParam.hotstartfile.c_str(), "hh", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
-
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, hh);
-
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, hh);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
+
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, hh);
-
 		//if zs was not specified
 		if (zserror == -49)
 		{
@@ -1848,63 +1772,18 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		}
 	}
 
-	uuerror = nc_inq_varid(ncid, "uu", &varid);
+	//uu Section
+
 	if (uuerror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "uu", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardataD(XParam.hotstartfile.c_str(), "uu", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, uu);
 
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
-
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			nt = (int)ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, uu);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
 		free(ddim);
@@ -1922,7 +1801,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 					for (int i = 0; i < 16; i++)
 					{
 						int n = i + j * 16 + bl * 256;
-						uu[n] = 0.0;
+						uu[n] = 0.0f;
 					}
 				}
 			}
@@ -1933,62 +1812,19 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		}
 	}
 
-	vverror = nc_inq_varid(ncid, "vv", &varid);
+	//vv section
+
 	if (vverror == NC_NOERR)
 	{
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), "vv", ddim);
 
-		status = nc_inq_varndims(ncid, varid, &ndims);
+		status = readvardataD(XParam.hotstartfile.c_str(), "vv", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
-		//printf("hhVar:%d dims\n", ndimshh);
+		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		status = nc_inq_vardimid(ncid, varid, dimids);
-		if (status != NC_NOERR) handle_error(status);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, vv);
 
-		ddim = (size_t *)malloc(ndims * sizeof(size_t));
 
-		//Read dimensions nx_u ny_u 
-		for (int iddim = 0; iddim < ndims; iddim++)
-		{
-			status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
-			if (status != NC_NOERR) handle_error(status);
-
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		}
-		if (ndims > 2)
-		{
-			//nt = (int) ddim[0];
-			ny = (int)ddim[1];
-			nx = (int)ddim[2];
-			size_t start[] = { XParam.hotstep, 0, 0 };
-			size_t count[] = { 1, ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-		else
-		{
-			ny = (int)ddim[0];
-			nx = (int)ddim[1];
-			size_t start[] = { 0, 0 };
-			size_t count[] = { ny, nx };
-			status = nc_get_vara_double(ncid, varid, start, count, dummy);
-			if (status != NC_NOERR) handle_error(status);
-		}
-
-		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
-		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
-
-		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
-		{
-			for (int j = 0; j < ny; j++)
-			{
-				for (int i = 0; i < nx; i++)
-				{
-					dummy[i + j*nx] = dummy[i + j*nx] * scalefac + offset;
-					//unpacked_value = packed_value * scale_factor + add_offset
-				}
-			}
-		}
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, vv);
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
 		free(ddim);
 
@@ -2005,7 +1841,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 					for (int i = 0; i < 16; i++)
 					{
 						int n = i + j * 16 + bl * 256;
-						vv[n] = 0.0;
+						vv[n] = 0.0f;
 					}
 				}
 			}
