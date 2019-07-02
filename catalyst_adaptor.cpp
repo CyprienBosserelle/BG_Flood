@@ -82,9 +82,15 @@ int catalystAdaptor::initialiseVTKOutput(const int frequency, const double time,
     return 1;
   }
 
-  if (frequency < 1)
+  if (frequency < 0)
   {
-    vtkGenericWarningMacro("catalystAdaptor::initialiseVTKOutput VTK output frequency must >0." << endl);
+    vtkGenericWarningMacro("catalystAdaptor::initialiseVTKOutput VTK output frequency must 0 or >0." << endl);
+    return 1;
+  }
+
+  if (time < 0.0)
+  {
+    vtkGenericWarningMacro("catalystAdaptor::initialiseVTKOutput VTK output time interval must 0.0 or >0.0." << endl);
     return 1;
   }
 

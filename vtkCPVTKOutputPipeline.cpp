@@ -16,6 +16,7 @@ vtkCPVTKOutputPipeline::vtkCPVTKOutputPipeline()
   this->OutputFrequency = 0;
   this->OutputTimeInterval = 0.0;
   this->LastOutputTime = 0.0;
+  this->TimeTrigger = false;
   this->FileName.clear();
 }
 
@@ -51,14 +52,13 @@ int vtkCPVTKOutputPipeline::RequestDataDescription(vtkCPDataDescription* dataDes
   bool outputThisTimeStep = (this->OutputFrequency > 0) && (currentTimeStep > 0) &&
                             (currentTimeStep % this->OutputFrequency == 0);
 
+  // Keep time trigger to reset output timer correctly
+  this->TimeTrigger = outputThisTime;
+
   if(dataDescription->GetForceOutput() || outputThisTime || outputThisTimeStep)
   {
     // Include all fields by default - the pipeline is handed same set of fields as netCDF output
     dataDescription->GetInputDescription(0)->AllFieldsOn();
-    if(outputThisTime)
-    {
-      this->LastOutputTime = currentTime;
-    }
     return 1;
   }
   else
@@ -112,6 +112,15 @@ int vtkCPVTKOutputPipeline::CoProcess(vtkCPDataDescription* dataDescription)
   std::string name = this->FileName + o.str() + ".vti";
   writer->SetFileName(name.c_str());
   writer->Update();
+
+  // Reset output time if time criterion was triggered - this needs to be AFTER the CoProcess
+  // method has been called, as RequestDataDescription method can be called more than once
+  // in one timestep
+  if(this->TimeTrigger)
+  {
+    this->LastOutputTime = dataDescription->GetTime();
+    this->TimeTrigger = false;
+  }
 
   return 1;
 }

@@ -46,6 +46,7 @@ class vtkCPVTKOutputPipeline: public vtkCPPipeline
   int OutputFrequency;
   double OutputTimeInterval;
   double LastOutputTime;
+  bool TimeTrigger;
   std::string FileName;
 };
 

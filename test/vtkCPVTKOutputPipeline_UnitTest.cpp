@@ -42,6 +42,10 @@ TEST_CASE( "RequestDataDescription", "[vtkCPVTKOutputPipeline]" )
   vtkCPVTKOutputPipeline * pipeline = vtkCPVTKOutputPipeline::New();
   vtkCPDataDescription* dataDescription = vtkCPDataDescription::New();
 
+  // Set both output criteria to no output
+  pipeline->SetOutputFrequency(0);
+  pipeline->SetOutputTimeInterval(0.0);
+
   SECTION( "Negative Reply Without DataDescription Object" )
   {
     vtkCPDataDescription* noDataDescription = nullptr;
@@ -123,6 +127,15 @@ TEST_CASE( "RequestDataDescription", "[vtkCPVTKOutputPipeline]" )
     REQUIRE( pipeline->RequestDataDescription(dataDescription) == 1 );
   }
 
+  SECTION( "Positive Reply At Requested Time And Timestep" )
+  {
+    dataDescription->AddInput("input");
+    pipeline->SetOutputFrequency(3);
+    pipeline->SetOutputTimeInterval(3.0);
+    dataDescription->SetTimeData(3.0, 3);
+    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 1 );
+  }
+
   SECTION( "Negative Reply At Non-requested Timestep" )
   {
     dataDescription->AddInput("input");
@@ -136,6 +149,15 @@ TEST_CASE( "RequestDataDescription", "[vtkCPVTKOutputPipeline]" )
     dataDescription->AddInput("input");
     pipeline->SetOutputTimeInterval(5.0);
     dataDescription->SetTimeData(4.0, 0);
+    REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
+  }
+
+  SECTION( "Negative Reply At Non-requested Time And Timestep" )
+  {
+    dataDescription->AddInput("input");
+    pipeline->SetOutputFrequency(5);
+    pipeline->SetOutputTimeInterval(5.0);
+    dataDescription->SetTimeData(4.0, 4);
     REQUIRE( pipeline->RequestDataDescription(dataDescription) == 0 );
   }
 
