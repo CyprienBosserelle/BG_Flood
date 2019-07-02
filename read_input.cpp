@@ -811,13 +811,7 @@ Param readparamstr(std::string line, Param param)
 		param.hotstartfile = parametervalue;
 		
 	}
-	parameterstr = "deformfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.deformfile = parametervalue;
-
-	}
+	
 	parameterstr = "hotstep";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -1238,6 +1232,49 @@ inputmap readcfmaphead(inputmap Roughmap)
 
 
 	return Roughmap;
+}
+
+void readmapdata(inputmap Roughmap, float * &cfmapinput)
+{
+	// Check extension 
+	std::string fileext;
+
+	std::vector<std::string> extvec = split(Roughmap.inputfile, '.');
+
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+
+	//Now choose the right function to read the data
+
+	if (fileext.compare("md") == 0)
+	{
+		readbathyMD(Roughmap.inputfile, cfmapinput);
+	}
+	if (fileext.compare("nc") == 0)
+	{
+		readnczb(Roughmap.nx, Roughmap.ny, Roughmap.inputfile, cfmapinput);
+	}
+	if (fileext.compare("bot") == 0 || fileext.compare("dep") == 0)
+	{
+		readXBbathy(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, cfmapinput);
+	}
+	if (fileext.compare("asc") == 0)
+	{
+		//
+		readbathyASCzb(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, cfmapinput);
+	}
+
+	//return 1;
 }
 
 forcingmap readforcingmaphead(forcingmap Fmap)

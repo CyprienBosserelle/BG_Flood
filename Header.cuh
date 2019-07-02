@@ -190,7 +190,7 @@ public:
 	double zsinit = -999.0; //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
 
 	std::string hotstartfile;
-	std::string deformfile;
+	//std::string deformfile;
 	int hotstep = 0; //step to read if hotstart file has multiple steps
 	//other
 	clock_t startcputime, endcputime;
@@ -224,6 +224,7 @@ public:
 
 	// deformation forcing for tsunami generation
 	std::vector<deformmap> deform;
+	double deformmaxtime = 0.0; // time after which no deformation occurs (internal parameter to cut some of the loops)
 
 };
 
@@ -485,6 +486,7 @@ double interp2wnd(int wndnx, int wndny, double wnddx, double wndxo, double wndyo
 // I/O
 inputmap readBathyhead(inputmap Bathy);
 inputmap readcfmaphead(inputmap Roughmap);
+void readmapdata(inputmap Roughmap, float * &cfmapinput);
 forcingmap readforcingmaphead(forcingmap Fmap);
 std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 extern "C" void readbathyMD(std::string filename, float *&zb);

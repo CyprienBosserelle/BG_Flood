@@ -838,6 +838,9 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 		TopFlowBnd(XParam);
 		BotFlowBnd(XParam);
 
+		
+
+
 		// Core
 		XParam.dt = FlowGPUSpherical(XParam, nextoutputtime);
 
@@ -845,6 +848,41 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 		XParam.totaltime = XParam.totaltime + XParam.dt;
 		nstep++;
 
+		// Add deformation?
+		if (XParam.deform.size() > 0 && (XParam.totaltime - XParam.dt ) <= XParam.deformmaxtime)
+		{
+			//Check each deform input
+			for (int nd = 0; nd < XParam.deform.size(); nd++)
+			{
+				
+				if ((XParam.totaltime - XParam.deform[nd].startime) <= XParam.dt)
+				{
+					readmapdata(XParam.deform[nd].grid, dummy);
+					
+					if (XParam.deform[nd].duration > 0.0)
+					{
+						//do zs=zs+dummy;
+					}
+						
+					else
+					{
+						//do zs=zs+dummy/duration *(XParam.totaltime - XParam.deform[nd].startime);
+					}
+
+				}
+				if ((XParam.totaltime - XParam.deform[nd].startime) > XParam.dt && XParam.totaltime <= (XParam.deform[nd].startime + XParam.deform[nd].duration))
+				{
+					// read the data and store to dummy
+					readmapdata(XParam.deform[nd].grid, dummy);
+
+					// DO zs=zs+dummy/duration*dt
+
+				}
+
+			}
+
+
+		}
 
 		// add rain ?
 		if (!XParam.Rainongrid.inputfile.empty())
@@ -3509,43 +3547,8 @@ int main(int argc, char **argv)
 			Allocate1CPU(XParam.roughnessmap.nx, XParam.roughnessmap.ny, cfmapinput);
 
 			// read the roughness map data
-			// Check bathy extension 
-			std::string fileext;
+			readmapdata(XParam.roughnessmap, cfmapinput);
 
-			std::vector<std::string> extvec = split(XParam.roughnessmap.inputfile, '.');
-
-			std::vector<std::string> nameelements;
-			//by default we expect tab delimitation
-			nameelements = split(extvec.back(), '?');
-			if (nameelements.size() > 1)
-			{
-				//variable name for bathy is not given so it is assumed to be zb
-				fileext = nameelements[0];
-			}
-			else
-			{
-				fileext = extvec.back();
-			}
-
-			//Now choose the right function to read the data
-
-			if (fileext.compare("md") == 0)
-			{
-				readbathyMD(XParam.roughnessmap.inputfile, cfmapinput);
-			}
-			if (fileext.compare("nc") == 0)
-			{
-				readnczb(XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.inputfile, cfmapinput);
-			}
-			if (fileext.compare("bot") == 0 || bathyext.compare("dep") == 0)
-			{
-				readXBbathy(XParam.roughnessmap.inputfile, XParam.roughnessmap.nx, XParam.roughnessmap.ny, cfmapinput);
-			}
-			if (fileext.compare("asc") == 0)
-			{
-				//
-				readbathyASCzb(XParam.roughnessmap.inputfile, XParam.roughnessmap.nx, XParam.roughnessmap.ny, cfmapinput);
-			}
 			// Interpolate data to the roughness array
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
@@ -3585,7 +3588,7 @@ int main(int argc, char **argv)
 	}
 
 
-	if (!XParam.deform.empty())
+	if (XParam.deform.size()>0)
 	{
 		// Deformation files was specified!
 
@@ -3595,7 +3598,7 @@ int main(int argc, char **argv)
 			XParam.deform[nd].grid = readcfmaphead(XParam.deform[nd].grid);
 			// deform data is read and allocatted and applied only when needed so it doesn't use any unecessary memory
 			// On the other hand applying deformation over long duration will be slow (it will read teh file at every step for teh duration of teh deformation)
-
+			XParam.deformmaxtime = max(XParam.deformmaxtime, XParam.deform[nd].startime + XParam.deform[nd].duration);
 		}
 
 		
