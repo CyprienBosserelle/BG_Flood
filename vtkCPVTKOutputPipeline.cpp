@@ -109,7 +109,8 @@ int vtkCPVTKOutputPipeline::CoProcess(vtkCPDataDescription* dataDescription)
   // Filename
   std::ostringstream o;
   o << dataDescription->GetTimeStep();
-  std::string name = this->FileName + o.str() + ".vti";
+  // Use .vth suffix for hierarchical box data files, this is closest to AMR grids
+  std::string name = this->FileName + o.str() + ".vth";
   writer->SetFileName(name.c_str());
   writer->Update();
 

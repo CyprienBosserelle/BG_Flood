@@ -44,7 +44,7 @@ def CreateCoProcessor():
         fullWriter = pvs.XMLHierarchicalBoxDataWriter(Input=simData, DataMode="Appended",
                                                       CompressorType="ZLib")
         # Set freq=1 to ensure that output is written whenever the pipeline runs
-        coprocessor.RegisterWriter(fullWriter, filename='bg_out_%t.vti', freq=1)
+        coprocessor.RegisterWriter(fullWriter, filename='bg_out_%t.vth', freq=1)
 
       # Create a new render view to generate images
       renderView = pvs.CreateView('RenderView')
