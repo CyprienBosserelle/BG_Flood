@@ -3584,6 +3584,24 @@ int main(int argc, char **argv)
 		}
 	}
 
+
+	if (!XParam.deform.empty())
+	{
+		// Deformation files was specified!
+
+		for (int nd = 0; nd < XParam.deform.size(); nd++)
+		{
+			// read the roughness map header
+			XParam.deform[nd].grid = readcfmaphead(XParam.deform[nd].grid);
+			// deform data is read and allocatted and applied only when needed so it doesn't use any unecessary memory
+			// On the other hand applying deformation over long duration will be slow (it will read teh file at every step for teh duration of teh deformation)
+
+		}
+
+		
+	}
+
+
 	///////////////////////////////////////////////////
 	// GPU data init
 	///////////////////////////////////////////////////

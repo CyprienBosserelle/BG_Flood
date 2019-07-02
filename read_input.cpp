@@ -522,7 +522,32 @@ Param readparamstr(std::string line, Param param)
 		
 	}
 
+	//Tsunami deformation input files
+	parameterstr = "deform";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
 		
+		deformmap thisdeform;
+		std::vector<std::string> items = split(parametervalue, ',');
+		//Need sanity check here
+		thisdeform.grid.inputfile = items[0];
+		if (items.size() > 1)
+		{
+			thisdeform.startime = std::stod(items[1]);
+
+		}
+		if (items.size() > 2)
+		{
+			thisdeform.duration = std::stod(items[2]);
+
+		}
+
+		param.deform.push_back(thisdeform);
+
+	}
+
+
 	//outvars
 	parameterstr = "outvars";
 	parametervalue = findparameter(parameterstr, line);
@@ -1149,7 +1174,7 @@ std::string trim(const std::string& str, const std::string& whitespace)
 
 inputmap readcfmaphead(inputmap Roughmap)
 {
-	// Read critical parameter for the roughness map
+	// Read critical parameter for the roughness map or deformation file grid input
 	write_text_to_log_file("Rougness map was specified. Checking file... " );
 	std::string fileext;
 	double dummy;
@@ -1217,8 +1242,8 @@ inputmap readcfmaphead(inputmap Roughmap)
 
 forcingmap readforcingmaphead(forcingmap Fmap)
 {
-	// Read critical parameter for the roughness map
-	write_text_to_log_file("Rougness map was specified. Checking file... ");
+	// Read critical parameter for the forcing map
+	write_text_to_log_file("Forcing map was specified. Checking file... ");
 	std::string fileext;
 	double dummy;
 	std::vector<std::string> extvec = split(Fmap.inputfile, '.');

@@ -1314,7 +1314,7 @@ int readvardataD(std::string filename, std::string Varname, int ndims, int hotst
 
 int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv)
 {
-	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr;
+	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr, xerror, yerror;
 	int ncid, varid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
 	int nx, ny, nt;
@@ -1336,24 +1336,72 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	hherror = nc_inq_varid(ncid, "hh", &varid);
 	uuerror = nc_inq_varid(ncid, "uu", &varid);
 	vverror = nc_inq_varid(ncid, "vv", &varid);
+	
+
+
+	//by default we assume that the x axis is called "xx" but that is not sure "x" shoudl be accepted and so does "lon" for spherical grid
+	// The folowing section figure out which one is in the file and if none exits with the netcdf error
+	// default name is "xx"
+	std::string xvname = "xx";
+	
+	xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
+	if (xerror == -49) // Variable not found
+	{
+		xvname = "x";
+		xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
+		if (xerror == -49) // Variable not found
+		{
+			xvname = "lon";
+			xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
+			if (xerror != NC_NOERR) handle_error(status);
+		}
+		else if (xerror != NC_NOERR) handle_error(status);
+
+
+	}
+	else if (xerror != NC_NOERR) handle_error(status);
+
+	std::string yvname = "yy";
+
+	yerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
+	if (yerror == -49) // Variable not found
+	{
+		yvname = "y";
+		yerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
+		if (yerror == -49) // Variable not found
+		{
+			yvname = "lat";
+			xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
+			if (yerror != NC_NOERR) handle_error(status);
+		}
+		else if (yerror != NC_NOERR) handle_error(status);
+
+
+	}
+	else if (yerror != NC_NOERR) handle_error(status);
+
+
+
+
 	status = nc_close(ncid);
+
 
 	// First we should read x and y coordinates
 	// Just as with other variables we expect the file follow the output naming convention of "xx" and "yy" both as a dimension and a variable
-	ndims = readvarinfo(XParam.hotstartfile.c_str(), "xx", ddim);
+	ndims = readvarinfo(XParam.hotstartfile.c_str(), xvname.c_str(), ddim);
 	nx = ddim[0];
 	xcoord = (float *)malloc(ddim[0]*sizeof(float)); /// Warning here we assume xx is 1D but may not be in the future
 
-	status = readvardata(XParam.hotstartfile.c_str(), "xx", ndims, 0, ddim, xcoord);
+	status = readvardata(XParam.hotstartfile.c_str(), xvname.c_str(), ndims, 0, ddim, xcoord);
 	if (status != NC_NOERR) handle_error(status);
 	free(ddim);
 
 	//Now read y coordinates
-	ndims = readvarinfo(XParam.hotstartfile.c_str(), "yy", ddim);
+	ndims = readvarinfo(XParam.hotstartfile.c_str(), yvname.c_str(), ddim);
 	ny = ddim[0];
 	ycoord = (float *)malloc(ddim[0] * sizeof(float)); /// Warning here we assume xx is 1D but may not be in the future
 
-	status = readvardata(XParam.hotstartfile.c_str(), "yy", ndims, 0, ddim, ycoord);
+	status = readvardata(XParam.hotstartfile.c_str(), yvname.c_str(), ndims, 0, ddim, ycoord);
 	if (status != NC_NOERR) handle_error(status);
 	free(ddim);
 

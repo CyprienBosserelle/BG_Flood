@@ -34,6 +34,11 @@ public:
 	double time, q;
 };
 
+class Mapparam {
+public:
+
+};
+
 class River {
 public:
 	std::vector<int> i, j, block; // one river can spring across multiple cells
@@ -88,6 +93,17 @@ public:
 	double dt;
 	std::string inputfile;
 	std::vector<Windin> data; // only used if uniform forcing
+
+};
+
+class deformmap{
+	//Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave
+	// Here you can spread the deformation across a certain amount of time and apply it at any point in the model
+public:
+	inputmap grid;
+	double startime = 0.0;
+	double duration = 0.0;
+	
 
 };
 
@@ -205,6 +221,10 @@ public:
 	forcingmap windV;
 	forcingmap atmP;
 	forcingmap Rainongrid;
+
+	// deformation forcing for tsunami generation
+	std::vector<deformmap> deform;
+
 };
 
 
