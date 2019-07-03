@@ -26,6 +26,9 @@
 #include "Header.cuh"
 
 
+#ifdef USE_CATALYST
+#include "catalyst_adaptor.h"
+#endif
 
 //double phi = (1.0f + sqrt(5.0f)) / 2;
 //double aphi = 1 / (phi + 1);
@@ -2198,6 +2201,23 @@ void mainloopCPU(Param XParam)
 		zsAllout.push_back(std::vector<Pointout>());
 	}
 
+#ifdef USE_CATALYST
+        int catalystTimeStep = 0;
+        if (XParam.use_catalyst)
+        {
+                // Retrieve adaptor object and add vtkUniformGrid patch for each 16x16 block
+                catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+                for (int blockId = 0; blockId < XParam.nblk; blockId++)
+                {
+                        // Hardcoding 16x16 patch size - may need to be replaced with parameter
+                        if (adaptor.addPatch(blockId, 0, 16, 16, XParam.dx, XParam.dx, blockxo[blockId], blockyo[blockId]))
+                        {
+                                fprintf(stderr, "catalystAdaptor::addPatch failed");
+                        }
+                }
+        }
+#endif
+
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
@@ -2383,6 +2403,45 @@ void mainloopCPU(Param XParam)
 			nTSstep++;
 
 		}
+
+#ifdef USE_CATALYST
+                // Could use existing global time step counter here
+                catalystTimeStep += 1;
+                if (XParam.use_catalyst)
+                {
+                        // Check if Catalyst should run at this simulation time or time step
+                        catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+                        if (adaptor.requestDataDescription(XParam.totaltime, catalystTimeStep))
+                        {
+                                // Use same output mechanism as netCDF output for updating VTK data fields
+                                for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+                                {
+                                        if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
+                                        {
+                                                for (int blockId = 0; blockId < XParam.nblk; blockId++)
+                                                {
+                                                        int adaptorStatus = 0;
+                                                        if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+                                                        {
+                                                                // Find memory address for this block - hardcoding 16x16 block size here
+                                                                double * dataptr = OutputVarMapCPUD[XParam.outvars[ivar]] + blockId*16*16;
+                                                                adaptorStatus = adaptor.updateFieldDouble(blockId, XParam.outvars[ivar], dataptr);
+                                                        }
+                                                        else
+                                                        {
+                                                                float * dataptr = OutputVarMapCPU[XParam.outvars[ivar]] + blockId*16*16;
+                                                                adaptorStatus = adaptor.updateFieldSingle(blockId, XParam.outvars[ivar], dataptr);
+                                                        }
+                                                        if (adaptorStatus) fprintf(stderr, "catalystAdaptor::updateField failed");
+                                                }
+                                        }
+                                }
+                                // Run Catalyst pipeline
+                                if (adaptor.runCoprocessor()) fprintf(stderr, "catalystAdaptor::runCoprocessor failed");
+                        }
+                }
+#endif
+
 		// CHeck for grid output
 		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
 		{
@@ -4049,6 +4108,28 @@ int main(int argc, char **argv)
 
 	
 	SaveParamtolog(XParam);
+
+#ifdef USE_CATALYST
+        if (XParam.use_catalyst)
+        {
+                // Retrieve adaptor and initialise visualisation/VTK output pipeline
+                catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+                if (XParam.catalyst_python_pipeline)
+                {
+                        if (adaptor.initialiseWithPython(XParam.python_pipeline))
+                        {
+                                fprintf(stderr, "catalystAdaptor::initialiseWithPython failed");
+                        }
+                }
+                else
+                {
+                        if (adaptor.initialiseVTKOutput(XParam.vtk_output_frequency, XParam.vtk_output_time_interval, XParam.vtk_outputfile_root))
+                        {
+                                fprintf(stderr, "catalystAdaptor::initialiseVTKOutput failed");
+                        }
+                }
+        }
+#endif
 
 	/////////////////////////////////////
 	////      STARTING MODEL     ////////

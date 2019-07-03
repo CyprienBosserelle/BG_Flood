@@ -765,6 +765,45 @@ Param readparamstr(std::string line, Param param)
 		param.posdown = std::stoi(parametervalue);
 	}
 
+#ifdef USE_CATALYST
+	parameterstr = "use_catalyst";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.use_catalyst = std::stoi(parametervalue);
+	}
+	parameterstr = "catalyst_python_pipeline";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.catalyst_python_pipeline = std::stoi(parametervalue);
+	}
+	parameterstr = "vtk_output_frequency";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.vtk_output_frequency = std::stoi(parametervalue);
+	}
+	parameterstr = "vtk_output_time_interval";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.vtk_output_time_interval = std::stod(parametervalue);
+	}
+	parameterstr = "vtk_outputfile_root";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.vtk_outputfile_root = parametervalue;
+	}
+	parameterstr = "python_pipeline";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.python_pipeline = parametervalue;
+	}
+#endif
+
 	parameterstr = "initzs";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
