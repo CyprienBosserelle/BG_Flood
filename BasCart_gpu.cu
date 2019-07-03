@@ -851,33 +851,62 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 		// Add deformation?
 		if (XParam.deform.size() > 0 && (XParam.totaltime - XParam.dt ) <= XParam.deformmaxtime)
 		{
+			float * def;
+			double *def_d;
 			//Check each deform input
 			for (int nd = 0; nd < XParam.deform.size(); nd++)
 			{
-				
+				Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def_d);
+				Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def);
 				if ((XParam.totaltime - XParam.deform[nd].startime) <= XParam.dt)
 				{
-					readmapdata(XParam.deform[nd].grid, dummy);
+					readmapdata(XParam.deform[nd].grid, def);
+
+					for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
+					{
+						def_d[k] = def[k];
+					}
+
+
+					interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
+					CUDA_CHECK(cudaMemcpy(dh_gd, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
 					
 					if (XParam.deform[nd].duration > 0.0)
 					{
-						//do zs=zs+dummy;
+
+						//do zs=zs+dummy/duration *(XParam.totaltime - XParam.deform[nd].startime);
+						Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *(XParam.totaltime - XParam.deform[nd].startime), dh_gd, zs_gd, zb_gd);
+						CUDA_CHECK(cudaDeviceSynchronize());
 					}
 						
 					else
 					{
-						//do zs=zs+dummy/duration *(XParam.totaltime - XParam.deform[nd].startime);
+						//do zs=zs+dummy;
+						Deform << <gridDim, blockDim, 0 >> > (1.0, dh_gd, zs_gd, zb_gd);
+						CUDA_CHECK(cudaDeviceSynchronize());
 					}
 
 				}
-				if ((XParam.totaltime - XParam.deform[nd].startime) > XParam.dt && XParam.totaltime <= (XParam.deform[nd].startime + XParam.deform[nd].duration))
+				else if ((XParam.totaltime - XParam.deform[nd].startime) > XParam.dt && XParam.totaltime <= (XParam.deform[nd].startime + XParam.deform[nd].duration))
 				{
 					// read the data and store to dummy
-					readmapdata(XParam.deform[nd].grid, dummy);
+					readmapdata(XParam.deform[nd].grid, def);
+					for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
+					{
+						def_d[k] = def[k];
+					}
+
+
+					interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
+					CUDA_CHECK(cudaMemcpy(dh_gd, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
 
 					// DO zs=zs+dummy/duration*dt
+					Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *XParam.dt, dh_gd, zs_gd, zb_gd);
+					CUDA_CHECK(cudaDeviceSynchronize());
+
 
 				}
+				free(def_d);
 
 			}
 

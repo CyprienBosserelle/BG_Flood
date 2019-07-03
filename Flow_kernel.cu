@@ -4445,3 +4445,20 @@ __global__ void HD_interp(int nx, int ny, int backswitch, int nhdstp, T totaltim
 		UU[ix + nx*iy] = Uxo[tx][ty] + (totaltime - hddt*nhdstp)*(Uxn[tx][ty] - Uxo[tx][ty]) / hddt;
 	}
 }
+
+template <class T>
+__global__ void Deform(T scale, T * def, T * zs, T * zb)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	zs[i] = zs[i] + def[i] * scale;
+	zb[i] = zs[i] + def[i] * scale;
+	
+
+
+}
+
