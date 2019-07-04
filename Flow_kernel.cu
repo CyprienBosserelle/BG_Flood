@@ -4456,7 +4456,7 @@ __global__ void Deform(T scale, T * def, T * zs, T * zb)
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
 	zs[i] = zs[i] + def[i] * scale;
-	zb[i] = zs[i] + def[i] * scale;
+	zb[i] = zb[i] + def[i] * scale;
 	
 
 
