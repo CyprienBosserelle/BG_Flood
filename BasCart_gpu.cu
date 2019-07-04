@@ -858,7 +858,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 			{
 				Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def_d);
 				Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def);
-				if ((XParam.totaltime - XParam.deform[nd].startime) <= XParam.dt)
+				if ((XParam.totaltime - XParam.deform[nd].startime) <= XParam.dt && (XParam.totaltime - XParam.deform[nd].startime)>0.0)
 				{
 					readmapdata(XParam.deform[nd].grid, def);
 
