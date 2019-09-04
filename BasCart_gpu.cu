@@ -851,7 +851,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 		// Add deformation?
 		if (XParam.deform.size() > 0 && (XParam.totaltime - XParam.dt ) <= XParam.deformmaxtime)
 		{
-			ApplyDeform(XParam, dh_gd,hh_gd, zs_gd, zb_gd );
+			ApplyDeform(XParam,dummy_d, dh_gd,hh_gd, zs_gd, zb_gd );
 			// float * def;
 			// double *def_d;
 			// //Check each deform input
