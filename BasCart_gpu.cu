@@ -12,7 +12,7 @@
 //the Free Software Foundation.                                                 //
 //                                                                              //
 //This program is distributed in the hope that it will be useful,               //
-//but WITHOUT ANY WARRANTY; without even the implied warranty of                //    
+//but WITHOUT ANY WARRANTY; without even the implied warranty of                //
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 //
 //GNU General Public License for more details.                                  //
 //                                                                              //
@@ -246,7 +246,7 @@ void mainloopGPUDB(Param XParam)
 			//(Param XParam, dim3 gridDimRain, dim3 blockDimRain, int & rainstep, double rainuni)
 			//this function moves in the forcing file for both inuform and variable input
 			rainuni = Rainthisstep(XParam, gridDimRain, blockDimRain, rainstep);
-			
+
 		}
 
 
@@ -451,7 +451,7 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 
 		// Check the atm Pressure forcing before starting
 
-		if (!XParam.atmP.inputfile.empty() && atmpuniform == 1) //this is a gven 
+		if (!XParam.atmP.inputfile.empty() && atmpuniform == 1) //this is a gven
 		{
 
 			//
@@ -795,7 +795,7 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 	} //Main while loop
 }
 
-void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate system 
+void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate system
 {
 	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
@@ -838,7 +838,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 		TopFlowBnd(XParam);
 		BotFlowBnd(XParam);
 
-		
+
 
 
 		// Core
@@ -851,64 +851,65 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 		// Add deformation?
 		if (XParam.deform.size() > 0 && (XParam.totaltime - XParam.dt ) <= XParam.deformmaxtime)
 		{
-			float * def;
-			double *def_d;
-			//Check each deform input
-			for (int nd = 0; nd < XParam.deform.size(); nd++)
-			{
-				Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def_d);
-				Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def);
-				if ((XParam.totaltime - XParam.deform[nd].startime) <= XParam.dt && (XParam.totaltime - XParam.deform[nd].startime)>0.0)
-				{
-					readmapdata(XParam.deform[nd].grid, def);
-
-					for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
-					{
-						def_d[k] = def[k];
-					}
-
-
-					interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
-					CUDA_CHECK(cudaMemcpy(dh_gd, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
-					
-					if (XParam.deform[nd].duration > 0.0)
-					{
-
-						//do zs=zs+dummy/duration *(XParam.totaltime - XParam.deform[nd].startime);
-						Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *(XParam.totaltime - XParam.deform[nd].startime), dh_gd, zs_gd, zb_gd);
-						CUDA_CHECK(cudaDeviceSynchronize());
-					}
-						
-					else
-					{
-						//do zs=zs+dummy;
-						Deform << <gridDim, blockDim, 0 >> > (1.0, dh_gd, zs_gd, zb_gd);
-						CUDA_CHECK(cudaDeviceSynchronize());
-					}
-
-				}
-				else if ((XParam.totaltime - XParam.deform[nd].startime) > XParam.dt && XParam.totaltime <= (XParam.deform[nd].startime + XParam.deform[nd].duration))
-				{
-					// read the data and store to dummy
-					readmapdata(XParam.deform[nd].grid, def);
-					for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
-					{
-						def_d[k] = def[k];
-					}
-
-
-					interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
-					CUDA_CHECK(cudaMemcpy(dh_gd, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
-
-					// DO zs=zs+dummy/duration*dt
-					Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *XParam.dt, dh_gd, zs_gd, zb_gd);
-					CUDA_CHECK(cudaDeviceSynchronize());
-
-
-				}
-				free(def_d);
-
-			}
+			ApplyDeform(XParam, dh_gd,hh_gd, zs_gd, zb_gd );
+			// float * def;
+			// double *def_d;
+			// //Check each deform input
+			// for (int nd = 0; nd < XParam.deform.size(); nd++)
+			// {
+			// 	Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def_d);
+			// 	Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def);
+			// 	if ((XParam.totaltime - XParam.deform[nd].startime) <= XParam.dt && (XParam.totaltime - XParam.deform[nd].startime)>0.0)
+			// 	{
+			// 		readmapdata(XParam.deform[nd].grid, def);
+			//
+			// 		for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
+			// 		{
+			// 			def_d[k] = def[k];
+			// 		}
+			//
+			//
+			// 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
+			// 		CUDA_CHECK(cudaMemcpy(dh_gd, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
+			//
+			// 		if (XParam.deform[nd].duration > 0.0)
+			// 		{
+			//
+			// 			//do zs=zs+dummy/duration *(XParam.totaltime - XParam.deform[nd].startime);
+			// 			Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *(XParam.totaltime - XParam.deform[nd].startime), dh_gd, zs_gd, zb_gd);
+			// 			CUDA_CHECK(cudaDeviceSynchronize());
+			// 		}
+			//
+			// 		else
+			// 		{
+			// 			//do zs=zs+dummy;
+			// 			Deform << <gridDim, blockDim, 0 >> > (1.0, dh_gd, zs_gd, zb_gd);
+			// 			CUDA_CHECK(cudaDeviceSynchronize());
+			// 		}
+			//
+			// 	}
+			// 	else if ((XParam.totaltime - XParam.deform[nd].startime) > XParam.dt && XParam.totaltime <= (XParam.deform[nd].startime + XParam.deform[nd].duration))
+			// 	{
+			// 		// read the data and store to dummy
+			// 		readmapdata(XParam.deform[nd].grid, def);
+			// 		for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
+			// 		{
+			// 			def_d[k] = def[k];
+			// 		}
+			//
+			//
+			// 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
+			// 		CUDA_CHECK(cudaMemcpy(dh_gd, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
+			//
+			// 		// DO zs=zs+dummy/duration*dt
+			// 		Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *XParam.dt, dh_gd, zs_gd, zb_gd);
+			// 		CUDA_CHECK(cudaDeviceSynchronize());
+			//
+			//
+			// 	}
+			// 	free(def_d);
+			//
+			// }
 
 
 		}
@@ -989,7 +990,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 	}
 }
 
-void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinate system 
+void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinate system
 {
 	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
@@ -1078,7 +1079,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 		dim3 gridDim(XParam.nblk, 1, 1);
 
 
-		if (!XParam.atmP.inputfile.empty() && atmpuniform == 1) //this is a gven 
+		if (!XParam.atmP.inputfile.empty() && atmpuniform == 1) //this is a gven
 		{
 
 			//
@@ -1117,7 +1118,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 
 
 		gradientGPUXYBUQ << <gridDim, blockDim, 0, streams[1] >> >(XParam.theta, XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vv_gd, dvdx_gd, dvdy_gd);
-		
+
 
 
 		if (atmpuni == 0)
@@ -1139,12 +1140,12 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 		//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
 		if (atmpuni == 1)
 		{
-			//Spherical coordinates 
+			//Spherical coordinates
 			updateKurgXSPH << <gridDim, blockDim, 0, streams[0] >> > (XParam.delta, XParam.g, XParam.eps, XParam.CFL, leftblk_g, blockyo_gd, XParam.Radius, hh_gd, zs_gd, uu_gd, vv_gd, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd, Fhu_gd, Fqux_gd, Fqvx_gd, Su_gd, dtmax_gd);
 
 			updateKurgYSPH << <gridDim, blockDim, 0, streams[1] >> > (XParam.delta, XParam.g, XParam.eps, XParam.CFL, botblk_g, blockyo_gd, XParam.Radius, hh_gd, zs_gd, uu_gd, vv_gd, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd, Fhv_gd, Fqvy_gd, Fquy_gd, Sv_gd, dtmax_gd);
 
-			
+
 
 		}
 		else
@@ -1153,7 +1154,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 
 			updateKurgYSPHATM << <gridDim, blockDim, 0, streams[1] >> > (XParam.delta, XParam.g, XParam.eps, XParam.CFL, XParam.Pa2m, botblk_g, blockyo_gd, XParam.Radius, hh_gd, zs_gd, uu_gd, vv_gd, Patm_gd, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd, dPdy_gd, Fhv_gd, Fqvy_gd, Fquy_gd, Sv_gd, dtmax_gd);
 
-			
+
 		}
 		CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -1229,7 +1230,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 		{
 			//if spherical corrdinate use this kernel with the right corrections
 			updateEVSPHATMUNI << <gridDim, blockDim, 0 >> > (XParam.delta, XParam.g, XParam.yo, XParam.ymax, XParam.Radius, uwinduni, vwinduni, XParam.Cd, rightblk_g, topblk_g, blockyo_gd, hh_gd, uu_gd, vv_gd, Fhu_gd, Fhv_gd, Su_gd, Sv_gd, Fqux_gd, Fquy_gd, Fqvx_gd, Fqvy_gd, dh_gd, dhu_gd, dhv_gd);
-		
+
 		}
 		else
 		{
@@ -1278,7 +1279,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 
 	if (atmpuni == 1)
 	{
-		//Spherical coordinates 
+		//Spherical coordinates
 		updateKurgXSPH << <gridDim, blockDim, 0, streams[0] >> > (XParam.delta, XParam.g, XParam.eps, XParam.CFL, leftblk_g, blockyo_gd, XParam.Radius, hho_gd, zso_gd, uuo_gd, vvo_gd, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd, Fhu_gd, Fqux_gd, Fqvx_gd, Su_gd, dtmax_gd);
 
 		updateKurgYSPH << <gridDim, blockDim, 0, streams[1] >> > (XParam.delta, XParam.g, XParam.eps, XParam.CFL, botblk_g, blockyo_gd, XParam.Radius, hho_gd, zso_gd, uuo_gd, vvo_gd, dzsdy_gd, dhdy_gd, dudy_gd, dvdy_gd, Fhv_gd, Fqvy_gd, Fquy_gd, Sv_gd, dtmax_gd);
@@ -1443,7 +1444,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 	// Reset GPU mean and max arrays
 	ResetmeanvarGPU(XParam);
 	ResetmaxvarGPU(XParam);
-	
+
 
 	while (XParam.totaltime < XParam.endtime)
 	{
@@ -1457,20 +1458,20 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 
 		// Core engine
 		XParam.dt = FlowGPU(XParam, nextoutputtime);
-		
+
 		// River
 		if (XParam.Rivers.size() > 0)
 		{
 			RiverSource(XParam);
 		}
-		
+
 		//Time keeping
 		XParam.totaltime = XParam.totaltime + XParam.dt;
 		nstep++;
 
 		// Do Sum & Max variables Here
 		meanmaxvarGPU(XParam);
-		
+
 
 
 
@@ -1512,7 +1513,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 					}
 				}
 			}
-			
+
 			nextoutputtime = min(nextoutputtime + XParam.outputtimestep, XParam.endtime);
 
 			printf("Writing output, totaltime:%f s, Mean dt=%f\n", XParam.totaltime, XParam.outputtimestep / nstep);
@@ -1524,7 +1525,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 			{
 				ResetmaxvarGPU(XParam);
 			}
-			
+
 
 
 
@@ -1609,45 +1610,45 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 	const int num_streams = 4;
 
 	cudaStream_t streams[num_streams];
-	
+
 
 	while (XParam.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-		
+
 		LeftFlowBnd(XParam);
 		RightFlowBnd(XParam);
 		TopFlowBnd(XParam);
 		BotFlowBnd(XParam);
-		
+
 		for (int i = 0; i < num_streams; i++)
 		{
 			CUDA_CHECK(cudaStreamCreate(&streams[i]));
 		}
 
-		
+
 		// Core engine
 
 		//dim3 blockDim(16, 16, 1);
 		//dim3 gridDim(XParam.nblk, 1, 1);
-			
-		
+
+
 
 		//XParam.dt = FlowGPUATM(XParam, nextoutputtime);
 
-		
+
 		//dim3 blockDim(16, 16, 1);// The grid has a better ocupancy when the size is a factor of 16 on both x and y
 		//dim3 gridDim(ceil((nx*1.0f) / blockDim.x), ceil((ny*1.0f) / blockDim.y), 1);
-		
+
 
 		dtmax = (float)(1.0 / epsilon);
 		//float dtmaxtmp = dtmax;
 
 
-		
+
 		// Check the atm Pressure forcing before starting
 
-		if (!XParam.atmP.inputfile.empty() && atmpuniform == 0) //this is a gven 
+		if (!XParam.atmP.inputfile.empty() && atmpuniform == 0) //this is a gven
 		{
 
 			//
@@ -1658,7 +1659,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 
 		}
-		
+
 
 
 		resetdtmax << <gridDim, blockDim, 0, streams[0] >> > (dtmax_g);
@@ -1681,19 +1682,19 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
 
-		
+
 		gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[1] >> > ((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, vv_g, dvdx_g, dvdy_g);
-		
+
 		if (atmpuniform == 0)
 		{
 			gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[2] >> > ((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, Patm_g, dPdx_g, dPdy_g);
 		}
 
 		// Check the wind forcing at the same time here
-		
+
 		if (!XParam.windU.inputfile.empty())
 		{
-			
+
 			Windthisstep(XParam, gridDimWND, blockDimWND, streams[0], windstep, uwinduni, vwinduni);
 		}
 
@@ -1702,7 +1703,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
-		
+
 		if (atmpuniform == 1)
 		{
 			updateKurgX << <gridDim, blockDim, 0, streams[0] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, leftblk_g, hh_g, zs_g, uu_g, vv_g, dzsdx_g, dhdx_g, dudx_g, dvdx_g, Fhu_g, Fqux_g, Fqvx_g, Su_g, dtmax_g);
@@ -1722,7 +1723,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 		}
 		CUDA_CHECK(cudaDeviceSynchronize());
-		
+
 
 		/*
 		//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
@@ -1767,14 +1768,14 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		mindtmaxB = dummy[0];
 
 		//32 seem safe here bu I wonder why it is not 1 for the largers arrays...
-		
+
 		//for (int i = 0; i < 32; i++)
 		//{
 		//mindtmaxB = min(dummy[i], mindtmaxB);
 		//printf("dt=%f\n", dummy[i]);
 
 		//}
-		
+
 
 
 		//float diffdt = mindtmaxB - mindtmax;
@@ -1788,7 +1789,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		}
 		//printf("dt=%f\n", XParam.dt);
 
-		
+
 		if (winduniform == 1)
 		{
 			// simpler input if wind is uniform
@@ -1853,9 +1854,9 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 			updateKurgYATM << <gridDim, blockDim, 0, streams[1] >> > ((float)XParam.delta, (float)XParam.g, (float)XParam.eps, (float)XParam.CFL, (float)XParam.Pa2m, botblk_g, hho_g, zso_g, uuo_g, vvo_g, Patm_g, dzsdy_g, dhdy_g, dudy_g, dvdy_g, dPdy_g, Fhv_g, Fqvy_g, Fquy_g, Sv_g, dtmax_g);
 		}
-			
+
 		CUDA_CHECK(cudaDeviceSynchronize());
-		
+
 		// no reduction of dtmax during the corrector step
 
 		if (winduniform == 1)
@@ -1881,12 +1882,12 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		cleanupGPU << <gridDim, blockDim, 0 >> >(hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		
+
 
 		//Bottom friction
 		bottomfriction << <gridDim, blockDim, 0 >> > (XParam.frictionmodel, (float)XParam.dt, (float)XParam.eps, cf_g, hh_g, uu_g, vv_g);
 		CUDA_CHECK(cudaDeviceSynchronize());
-		
+
 
 		//Destroy streams
 		for (int i = 0; i < num_streams; i++)
@@ -1895,12 +1896,12 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		}
 		//CUDA_CHECK(cudaStreamDestroy(streams[0]));
 		//CUDA_CHECK(cudaStreamDestroy(streams[1]));
-		
+
 		// Impose no slip condition by default
 		//noslipbndall << <gridDim, blockDim, 0 >> > (nx, ny, XParam.dt, XParam.eps, zb_g, zs_g, hh_g, uu_g, vv_g);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
-		
+
 
 
 		// River
@@ -1908,7 +1909,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		{
 			RiverSource(XParam);
 		}
-		
+
 
 
 
@@ -1920,7 +1921,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 		meanmaxvarGPU(XParam);
 
 
-		
+
 
 		//Check for TSoutput
 		if (XParam.TSnodesout.size() > 0)
@@ -1980,13 +1981,13 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 			// Reset nstep
 			nstep = 0;
 		} // End of output part
-		
-		
+
+
 	} //Main while loop
 }
 
 
-void mainloopGPUold(Param XParam) 
+void mainloopGPUold(Param XParam)
 {
 	double nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	int nstep = 0;
@@ -2050,14 +2051,14 @@ void mainloopGPUold(Param XParam)
 			{
 				XParam.dt = FlowGPU(XParam, nextoutputtime);
 			}
-			
+
 		}
-		
-		
+
+
 		//Time keeping
 		XParam.totaltime = XParam.totaltime + XParam.dt;
 		nstep++;
-		
+
 		// Do Sum & Max variables Here
 		if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 		{
@@ -2067,7 +2068,7 @@ void mainloopGPUold(Param XParam)
 		{
 			meanmaxvarGPU(XParam);
 		}
-		
+
 
 
 		//Check for TSoutput
@@ -2091,11 +2092,11 @@ void mainloopGPUold(Param XParam)
 				{
 					storeTSout << <gridDim, blockDim, 0 >> > ( (int)XParam.TSnodesout.size(), o, nTSsteps, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, zs_g, hh_g, uu_g, vv_g, TSstore_g);
 				}
-				
+
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			nTSsteps++;
-			
+
 			if ((nTSsteps+1)*XParam.TSnodesout.size() * 4 > 2048 || XParam.endtime-XParam.totaltime <= XParam.dt*0.00001f)
 			{
 				//Flush
@@ -2143,10 +2144,10 @@ void mainloopGPUold(Param XParam)
 					nTSsteps = 0;
 				}
 
-				
+
 
 			}
-			
+
 
 		}
 
@@ -2236,7 +2237,7 @@ void mainloopGPUold(Param XParam)
 					ResetmaxvarGPU(XParam);
 				}
 			}
-			
+
 
 
 			//
@@ -2353,10 +2354,10 @@ void mainloopCPU(Param XParam)
 
 				//float Uwndi = interp2wnd(windnx, windny, winddx, windxo, windyo, x, y, Uwnd);
 
-				
+
 			}
 
-			
+
 
 
 		}
@@ -2382,8 +2383,8 @@ void mainloopCPU(Param XParam)
 
 				uwinduni = interptime(XParam.windU.data[Wstepinbnd].uwind, XParam.windU.data[Wstepinbnd - 1].uwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
 				vwinduni = interptime(XParam.windU.data[Wstepinbnd].vwind, XParam.windU.data[Wstepinbnd - 1].vwind, XParam.windU.data[Wstepinbnd].time - XParam.windU.data[Wstepinbnd - 1].time, XParam.totaltime - XParam.windU.data[Wstepinbnd - 1].time);
-				
-			
+
+
 			}
 			else
 			{
@@ -2425,7 +2426,7 @@ void mainloopCPU(Param XParam)
 			}
 			else
 			{
-				
+
 				if (!XParam.windU.inputfile.empty() || !XParam.atmP.inputfile.empty())
 				{
 					XParam.dt = FlowCPUATM(XParam, nextoutputtime, cstwind, cstpress, uwinduni, uwinduni);
@@ -2434,7 +2435,7 @@ void mainloopCPU(Param XParam)
 				{
 					XParam.dt = FlowCPU(XParam, nextoutputtime);
 				}
-				
+
 			}
 		}
 
@@ -2491,9 +2492,9 @@ void mainloopCPU(Param XParam)
 					CalcVort(XParam);
 				}
 			}
-			
+
 			// Check for and calculate Vorticity if required
-			
+
 
 			if (!XParam.outvars.empty())
 			{
@@ -2503,8 +2504,8 @@ void mainloopCPU(Param XParam)
 				{
 					if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
 					{
-						
-						//write output step for each variable 
+
+						//write output step for each variable
 						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 						{
 							writencvarstepD(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
@@ -2513,7 +2514,7 @@ void mainloopCPU(Param XParam)
 						{
 							writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 						}
-						
+
 					}
 				}
 			}
@@ -2532,7 +2533,7 @@ void mainloopCPU(Param XParam)
 			{
 				ResetmeanCPU(XParam);
 			}
-			
+
 
 			//
 			if (!XParam.TSoutfile.empty())
@@ -2555,7 +2556,7 @@ void mainloopCPU(Param XParam)
 			nstep = 0;
 		}
 
-		
+
 
 	}
 }
@@ -2566,15 +2567,15 @@ void mainloopCPU(Param XParam)
 int main(int argc, char **argv)
 {
 
-	
+
 	//Model starts Here//
 	Param XParam;
 	//The main function setups all the init of the model and then calls the mainloop to actually run the model
 
-	// Theire are many (12) mainloops depending whether the model runs on the GPU/CPU and whether the implementation is float/double or spherical coordinate (double only) 
+	// Theire are many (12) mainloops depending whether the model runs on the GPU/CPU and whether the implementation is float/double or spherical coordinate (double only)
 
 
-	//First part reads the inputs to the model 
+	//First part reads the inputs to the model
 	//then allocate memory on GPU and CPU
 	//Then prepare and initialise memory and arrays on CPU and GPU
 	// Prepare output file
@@ -2582,12 +2583,12 @@ int main(int argc, char **argv)
 	// Clean up and close
 
 
-	// Start timer to keep track of time 
+	// Start timer to keep track of time
 	XParam.startcputime = clock();
 
 
 
-	// Reset the log file 
+	// Reset the log file
 	FILE * flog;
 	flog = fopen("BG_log.txt", "w"); //Find better name
 	fclose(flog);
@@ -2621,7 +2622,7 @@ int main(int argc, char **argv)
 		SaveParamtolog(XParam);
 
 		exit(1);
-		
+
 	}
 	else
 	{
@@ -2629,7 +2630,7 @@ int main(int argc, char **argv)
 		std::string line;
 		while (std::getline(fs, line))
 		{
-			
+
 			//Get param or skip empty lines
 			if (!line.empty() && line.substr(0, 1).compare("#") != 0)
 			{
@@ -2640,7 +2641,7 @@ int main(int argc, char **argv)
 		}
 		fs.close();
 
-		
+
 	}
 
 
@@ -2684,7 +2685,7 @@ int main(int argc, char **argv)
 	if (XParam.dx == 0.0)
 	{
 		XParam.dx = XParam.Bathymetry.dx;
-		
+
 	}
 	if (XParam.grdalpha == 0.0) // This default value sucks because 0.0 should be enforcable from the input parameter file
 	{
@@ -2692,7 +2693,7 @@ int main(int argc, char **argv)
 
 	}
 
-	XParam.nx = (XParam.xmax - XParam.xo) / XParam.dx+1; 
+	XParam.nx = (XParam.xmax - XParam.xo) / XParam.dx+1;
 	XParam.ny = (XParam.ymax - XParam.yo) / XParam.dx+1; //+1?
 
 	if (XParam.spherical < 1)
@@ -2740,7 +2741,7 @@ int main(int argc, char **argv)
 	write_text_to_log_file("Read Bathy data");
 
 
-	// Check bathy extension 
+	// Check bathy extension
 	std::string bathyext;
 
 	std::vector<std::string> extvec = split(XParam.Bathymetry.inputfile, '.');
@@ -2778,7 +2779,7 @@ int main(int argc, char **argv)
 		readbathyASCzb(XParam.Bathymetry.inputfile, XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy);
 	}
 
-	
+
 
 
 	//printf("%f\n", zb[0]);
@@ -2806,7 +2807,7 @@ int main(int argc, char **argv)
 	////////////////////////////////////////////////
 	// Rearrange the memory in uniform blocks
 	////////////////////////////////////////////////
-	
+
 	//max nb of blocks is ceil(nx/16)*ceil(ny/16)
 	int nblk = 0;
 	int nmask = 0;
@@ -2825,7 +2826,7 @@ int main(int argc, char **argv)
 
 					if (x >= XParam.Bathymetry.xo && x <= XParam.Bathymetry.xmax && y >= XParam.Bathymetry.yo && y <= XParam.Bathymetry.ymax)
 					{
-						// cells that falls off this domain are assigned 
+						// cells that falls off this domain are assigned
 						double x1, x2, y1, y2;
 						double q11, q12, q21, q22, q;
 						int cfi, cfip, cfj, cfjp;
@@ -2869,7 +2870,7 @@ int main(int argc, char **argv)
 	}
 
 	XParam.nblk = nblk;
-	
+
 	int blksize = XParam.blksize; //useful below
 	printf("Number of blocks: %i\n",nblk);
 
@@ -2877,7 +2878,7 @@ int main(int argc, char **argv)
 	///// Allocate and arrange blocks
 	////////////////////////////////////////////////
 	// caluculate the Block xo yo and what are its neighbour
-	
+
 
 	Allocate1CPU(nblk, 1, blockxo);
 	Allocate1CPU(nblk, 1, blockyo);
@@ -2904,7 +2905,7 @@ int main(int argc, char **argv)
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
 					if (x >= XParam.Bathymetry.xo && x <= XParam.Bathymetry.xmax && y >= XParam.Bathymetry.yo && y <= XParam.Bathymetry.ymax)
 					{
-						// cells that falls off this domain are assigned 
+						// cells that falls off this domain are assigned
 						double x1, x2, y1, y2;
 						double q11, q12, q21, q22, q;
 						int cfi, cfip, cfj, cfjp;
@@ -2957,7 +2958,7 @@ int main(int argc, char **argv)
 	for (int bl = 0; bl < nblk; bl++)
 	{
 		double espdist = 0.00000001;///WARMING
-		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range 
+		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 16.0 * XParam.dx;
 		rightyo = blockyo_d[bl];
@@ -2966,7 +2967,7 @@ int main(int argc, char **argv)
 		botxo = blockxo_d[bl];
 		botyo = blockyo_d[bl] - 16.0 * XParam.dx;
 
-		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour 
+		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour
 		leftblk[bl] = bl;
 		rightblk[bl] = bl;
 		topblk[bl] = bl;
@@ -2985,14 +2986,14 @@ int main(int argc, char **argv)
 			if (abs(blockxo_d[blb] - topxo) < espdist && abs(blockyo_d[blb] - topyo) < espdist)
 			{
 				topblk[bl] = blb;
-				
+
 			}
 			if (abs(blockxo_d[blb] - botxo) < espdist && abs(blockyo_d[blb] - botyo) < espdist)
 			{
 				botblk[bl] = blb;
 			}
 		}
-		
+
 		//printf("leftxo=%f\t leftyo=%f\t rightxo=%f\t rightyo=%f\t botxo=%f\t botyo=%f\t topxo=%f\t topyo=%f\n", leftxo, leftyo, rightxo, rightyo, botxo, botyo, topxo, topyo);
 		//printf("blk=%d\t blockxo=%f\t blockyo=%f\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, blockxo_d[bl], blockyo_d[bl], leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
 
@@ -3063,8 +3064,8 @@ int main(int argc, char **argv)
 	for (int bl = 0; bl < nblk; bl++)
 	{
 		double espdist = 0.00000001;///WARMING
-		
-		leftxo = blockxo_d[bl]; // in adaptive this shoulbe be a range 
+
+		leftxo = blockxo_d[bl]; // in adaptive this shoulbe be a range
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
 		rightyo = blockyo_d[bl];
@@ -3121,7 +3122,7 @@ int main(int argc, char **argv)
 	{
 		double espdist = 0.00000001;///WARMING
 
-		leftxo = blockxo_d[bl] ; // in adaptive this shoulbe be a range 
+		leftxo = blockxo_d[bl] ; // in adaptive this shoulbe be a range
 		leftyo = blockyo_d[bl];
 		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
 		rightyo = blockyo_d[bl];
@@ -3133,7 +3134,7 @@ int main(int argc, char **argv)
 		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
 		{
 			//
-			
+
 			bndrightblk[blbr] = bl;
 			blbr++;
 
@@ -3142,7 +3143,7 @@ int main(int argc, char **argv)
 		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
 		{
 			//
-			
+
 			bndtopblk[blbt] = bl;
 			blbt++;
 
@@ -3150,7 +3151,7 @@ int main(int argc, char **argv)
 		if ((XParam.yo - botyo) > (-1.0*XParam.dx))
 		{
 			//
-			
+
 			bndbotblk[blbb] = bl;
 			blbb++;
 
@@ -3158,7 +3159,7 @@ int main(int argc, char **argv)
 		if ((XParam.xo - leftxo) > (-1.0*XParam.dx))
 		{
 			//
-			
+
 			bndleftblk[blbl] = bl;
 			blbl++;
 			//printf("bl_left=%d\n", bl);
@@ -3166,7 +3167,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	
+
 
 
 	////////////////////////////////////////////////
@@ -3176,7 +3177,7 @@ int main(int argc, char **argv)
 	printf("Allocate CPU memory...");
 	write_text_to_log_file("Allocate CPU memory...");
 	int check;
-	
+
 	check = AllocMemCPU(XParam);
 
 
@@ -3204,7 +3205,7 @@ int main(int argc, char **argv)
 		cudaGetDeviceProperties(&prop, XParam.GPUDEVICE);
 		printf("There are %d GPU devices on this machine\n", nDevices);
 		write_text_to_log_file("There are " + std::to_string(nDevices) + "GPU devices on this machine");
-		
+
 		if (XParam.GPUDEVICE >= 0)
 		{
 			printf("Using Device : %s\n", prop.name);
@@ -3229,13 +3230,13 @@ int main(int argc, char **argv)
 		int check;
 		check = AllocMemGPU(XParam);
 		check = AllocMemGPUBND(XParam);
-		
+
 		printf("Done\n");
 		write_text_to_log_file("Done");
 
 	}
 
-	
+
 	////////////////////////////////////////
 	//////// Copy initial cartesian bathy array to BUQ array
 	////////////////////////////////////////
@@ -3263,7 +3264,7 @@ int main(int argc, char **argv)
 	}
 
 
-	
+
 
 	printf("Done\n");
 	write_text_to_log_file("Done");
@@ -3281,12 +3282,12 @@ int main(int argc, char **argv)
 	{
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 	}
-	
+
 
 	/////////////////////////////////////////////////////
 	// Prep River discharge
 	/////////////////////////////////////////////////////
-	
+
 	if (XParam.Rivers.size() > 0)
 	{
 		double xx, yy;
@@ -3309,7 +3310,7 @@ int main(int argc, char **argv)
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
 						if (xx >= XParam.Rivers[Rin].xstart && xx <= XParam.Rivers[Rin].xend && yy >= XParam.Rivers[Rin].ystart && yy <= XParam.Rivers[Rin].yend)
 						{
-							
+
 							// This cell belongs to the river discharge area
 							idis.push_back(i);
 							jdis.push_back(j);
@@ -3318,7 +3319,7 @@ int main(int argc, char **argv)
 						}
 					}
 				}
-				
+
 			}
 
 			XParam.Rivers[Rin].i = idis;
@@ -3326,12 +3327,12 @@ int main(int argc, char **argv)
 			XParam.Rivers[Rin].block = blockdis;
 			XParam.Rivers[Rin].disarea = idis.size()*XParam.dx*XParam.dx; // That is not valid for spherical grids
 
-			// Now read the discharge input and store to  
+			// Now read the discharge input and store to
 			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
 		}
 		//Now identify sort unique blocks where rivers are being inserted
 		std::vector<int> activeRiverBlk;
-		
+
 		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
 		{
 
@@ -3364,12 +3365,12 @@ int main(int argc, char **argv)
 	printf("Initial condition: ");
 	write_text_to_log_file("Initial condition:");
 
-	//move this to a subroutine 
+	//move this to a subroutine
 	int hotstartsucess = 0;
 	if (!XParam.hotstartfile.empty())
 	{
 		// hotstart
-		printf("Hotstart "); 
+		printf("Hotstart ");
 		write_text_to_log_file("Hotstart");
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
@@ -3379,7 +3380,7 @@ int main(int argc, char **argv)
 		{
 			hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk,  botblk, blockxo_d, blockyo_d,  zs, zb, hh, uu, vv);
 		}
-		
+
 		if (hotstartsucess == 0)
 		{
 			printf("Failed...  ");
@@ -3391,13 +3392,13 @@ int main(int argc, char **argv)
 		printf("Cold start  ");
 		write_text_to_log_file("Cold start");
 		//Cold start
-		// 2 options: 
+		// 2 options:
 		//		(1) if zsinit is set, then apply zsinit everywhere
 		//		(2) zsinit is not set so interpolate from boundaries. (if no boundaries were specified set zsinit to zeros and apply case (1))
 
 		Param defaultParam;
 		//!leftWLbnd.empty()
-		
+
 		//case 2b (i.e. zsinint and no boundaries were specified)
 		if ((abs(XParam.zsinit - defaultParam.zsinit) <= epsilon) && (!XParam.leftbnd.on && !XParam.rightbnd.on && !XParam.topbnd.on && !XParam.botbnd.on)) //zsinit is default
 		{
@@ -3438,7 +3439,7 @@ int main(int argc, char **argv)
 
 			}
 		}// end else
-		
+
 	}
 	printf("done \n");
 	write_text_to_log_file("Done");
@@ -3463,24 +3464,24 @@ int main(int argc, char **argv)
 	{
 		// Set default cf
 		InitArraySV(XParam.nblk, XParam.blksize, XParam.cf, cf_d);
-		
+
 		if (XParam.outhhmax == 1)
 		{
-			CopyArray(XParam.nblk, XParam.blksize, hh_d, hhmax_d);			
+			CopyArray(XParam.nblk, XParam.blksize, hh_d, hhmax_d);
 		}
 
 		if (XParam.outhhmean == 1)
 		{
-			InitArraySV(XParam.nblk, XParam.blksize, 0.0, hhmean_d);			
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, hhmean_d);
 		}
 		if (XParam.outzsmax == 1)
 		{
-			CopyArray(XParam.nblk, XParam.blksize, zs_d, zsmax_d);			
+			CopyArray(XParam.nblk, XParam.blksize, zs_d, zsmax_d);
 		}
 
 		if (XParam.outzsmean == 1)
 		{
-			InitArraySV(XParam.nblk, XParam.blksize, 0.0, zsmean_d);			
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, zsmean_d);
 		}
 
 		if (XParam.outuumax == 1)
@@ -3490,20 +3491,20 @@ int main(int argc, char **argv)
 
 		if (XParam.outuumean == 1)
 		{
-			InitArraySV(XParam.nblk, XParam.blksize, 0.0, uumean_d);			
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, uumean_d);
 		}
 		if (XParam.outvvmax == 1)
 		{
-			CopyArray(XParam.nblk, XParam.blksize, vv_d, vvmax_d);			
+			CopyArray(XParam.nblk, XParam.blksize, vv_d, vvmax_d);
 		}
 
 		if (XParam.outvvmean == 1)
 		{
-			InitArraySV(XParam.nblk, XParam.blksize, 0.0, vvmean_d);			
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, vvmean_d);
 		}
 		if (XParam.outvort == 1)
 		{
-			InitArraySV(XParam.nblk, XParam.blksize, 0.0, vort_d);			
+			InitArraySV(XParam.nblk, XParam.blksize, 0.0, vort_d);
 		}
 	}
 	else //Using Float *
@@ -3553,9 +3554,9 @@ int main(int argc, char **argv)
 		{
 			InitArraySV(XParam.nblk, XParam.blksize, 0.0f, vort);
 		}
-		
+
 	}
-	
+
 	///////////////////////////////////////////////////
 	// Friction maps
 	///////////////////////////////////////////////////
@@ -3610,7 +3611,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			//Error message 
+			//Error message
 			printf("Error while reading roughness map. Using constant roughness instead ");
 			write_text_to_log_file("Error while reading roughness map. Using constant roughness instead ");
 		}
@@ -3630,7 +3631,7 @@ int main(int argc, char **argv)
 			XParam.deformmaxtime = max(XParam.deformmaxtime, XParam.deform[nd].startime + XParam.deform[nd].duration);
 		}
 
-		
+
 	}
 
 
@@ -3656,7 +3657,7 @@ int main(int argc, char **argv)
 			CUDA_CHECK(cudaMemcpy(cf_gd, cf_d, nblk*blksize * sizeof(double), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockxo_gd, blockxo_d, nblk * sizeof(double), cudaMemcpyHostToDevice));
 			CUDA_CHECK(cudaMemcpy(blockyo_gd, blockyo_d, nblk * sizeof(double), cudaMemcpyHostToDevice));
-			
+
 			initdtmax << <gridDim, blockDim, 0 >> >(epsilon, dtmax_gd);
 		}
 		else
@@ -3671,7 +3672,7 @@ int main(int argc, char **argv)
 			CUDA_CHECK(cudaMemcpy(blockyo_g, blockyo, nblk * sizeof(float), cudaMemcpyHostToDevice));
 			initdtmax << <gridDim, blockDim, 0 >> >( (float)epsilon, dtmax_g);
 		}
-		
+
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		CUDA_CHECK(cudaMemcpy(leftblk_g, leftblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
@@ -3679,12 +3680,12 @@ int main(int argc, char **argv)
 		CUDA_CHECK(cudaMemcpy(topblk_g, topblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(botblk_g, botblk, nblk * sizeof(int), cudaMemcpyHostToDevice));
 
-		
+
 		CUDA_CHECK(cudaMemcpy(bndleftblk_g, bndleftblk, XParam.leftbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(bndrightblk_g, bndrightblk, XParam.rightbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(bndtopblk_g, bndtopblk, XParam.topbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
 		CUDA_CHECK(cudaMemcpy(bndbotblk_g, bndbotblk, XParam.botbnd.nblk * sizeof(int), cudaMemcpyHostToDevice));
-		
+
 
 
 		printf("...Done\n");
@@ -3696,7 +3697,7 @@ int main(int argc, char **argv)
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Prep wind  / atm / rain forcing
 	/////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	if (!XParam.windU.inputfile.empty())
 	{
 		//windfile is present
@@ -3784,7 +3785,7 @@ int main(int argc, char **argv)
 			}
 		}
 
-		
+
 
 
 	}
@@ -3811,8 +3812,8 @@ int main(int argc, char **argv)
 
 
 		XParam.atmP.uniform = (ffext.compare("nc") == 0) ? 0 : 1;
-		
-		
+
+
 
 
 		if (XParam.atmP.uniform == 1)
@@ -3841,7 +3842,7 @@ int main(int argc, char **argv)
 				Allocate1CPU(XParam.nblk, XParam.blksize, Patm_d);
 				Allocate1CPU(XParam.nblk, XParam.blksize, dPdx_d);
 				Allocate1CPU(XParam.nblk, XParam.blksize, dPdy_d);
-				
+
 
 
 			}
@@ -3860,7 +3861,7 @@ int main(int argc, char **argv)
 
 			readATMstep(XParam.atmP, readfirststep, Patmbef);
 			readATMstep(XParam.atmP, readfirststep+1, Patmaft);
-			
+
 			InterpstepCPU(XParam.atmP.nx, XParam.atmP.ny, readfirststep, XParam.totaltime, XParam.atmP.dt, PatmX, Patmbef, Patmaft);
 
 			if (XParam.GPUDEVICE >= 0)
@@ -3919,13 +3920,13 @@ int main(int argc, char **argv)
 			// grid and time varying wind input
 			// read parameters fro the size of wind input
 			XParam.Rainongrid = readforcingmaphead(XParam.Rainongrid);
-			
+
 			Allocate1CPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rain);
 			Allocate1CPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef);
 			Allocate1CPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainaft);
-			
+
 			XParam.Rainongrid.dt = abs(XParam.Rainongrid.to - XParam.Rainongrid.tmax) / (XParam.Rainongrid.nt - 1);
-			
+
 
 			int readfirststep = min(max((int)floor((XParam.totaltime - XParam.Rainongrid.to) / XParam.Rainongrid.dt), 0), XParam.Rainongrid.nt - 2);
 
@@ -3943,13 +3944,13 @@ int main(int argc, char **argv)
 				Allocate1GPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rain_g);
 				Allocate1GPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g);
 				Allocate1GPU(XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainaft_g);
-				
+
 
 
 				CUDA_CHECK(cudaMemcpy(Rain_g, Rain, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
 				CUDA_CHECK(cudaMemcpy(Rainaft_g, Rainaft, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
 				CUDA_CHECK(cudaMemcpy(Rainbef_g, Rainbef, XParam.Rainongrid.nx*XParam.Rainongrid.ny * sizeof(float), cudaMemcpyHostToDevice));
-				
+
 
 				//
 				CUDA_CHECK(cudaMallocArray(&Rain_gp, &channelDescRain, XParam.Rainongrid.nx, XParam.Rainongrid.ny));
@@ -3965,7 +3966,7 @@ int main(int argc, char **argv)
 
 				CUDA_CHECK(cudaBindTextureToArray(texRAIN, Rain_gp, channelDescRain));
 
-				
+
 
 
 
@@ -4110,14 +4111,14 @@ int main(int argc, char **argv)
 		{
 			defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
 		}
-		
+
 	}
 	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
 	printf("done \n");
 	write_text_to_log_file("Done ");
 
-	
+
 	SaveParamtolog(XParam);
 
 	/////////////////////////////////////
@@ -4152,15 +4153,15 @@ int main(int argc, char **argv)
 			}
 		}
 		//checkGradGPU(XParam);
-			
+
 	}
 	else
 	{
 		mainloopCPU(XParam);
 	}
 
-	
-	
+
+
 
 
 
@@ -4496,7 +4497,7 @@ int main(int argc, char **argv)
 	}
 
 
-	
+
 
 
 
@@ -4507,4 +4508,3 @@ int main(int argc, char **argv)
 
 	exit(0);
 }
-
