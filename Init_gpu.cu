@@ -2392,22 +2392,16 @@ template <class T> void ApplyDeform(Param XParam, T *&dummy, T *&dh,T *&hh, T *&
 		else if ((XParam.totaltime - XParam.deform[nd].startime) > XParam.dt && XParam.totaltime <= (XParam.deform[nd].startime + XParam.deform[nd].duration))
 		{
 			// read the data and store to dummy
-			readmapdata(XParam.deform[nd].grid, def);
+			readmapdata(XParam.deform[nd].grid, def_f);
 			for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
 			{
-				def_d[k] = def[k];
+				def[k] = def_f[k];
 			}
 
-			if(XParam.spherical==1 || XParam.doubleprecision == 1)
-			{
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
-				CUDA_CHECK(cudaMemcpy(dh_gd, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
-		  }
-			else
-			{
+
 				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
-				CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(float), cudaMemcpyHostToDevice));
-			}
+				CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(T), cudaMemcpyHostToDevice));
+
 			// DO zs=zs+dummy/duration*dt
 			Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *XParam.dt, dh, zs, zb);
 			CUDA_CHECK(cudaDeviceSynchronize());
