@@ -2347,7 +2347,7 @@ template <class T> double Calcmaxdt(Param XParam, T *dtmax, T *arrmax )
 }
 
 
-template <class T> void ApplyDeform(Param XParam, T *&dh,T *&hh, T *&zs, T *&zb )
+template <class T> void ApplyDeform(Param XParam, T *&dummy, T *&dh,T *&hh, T *&zs, T *&zb )
 {
 	float * def;
 	double *def_d;
@@ -2370,16 +2370,17 @@ template <class T> void ApplyDeform(Param XParam, T *&dh,T *&hh, T *&zs, T *&zb 
 				}
 
 
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy_d);
-				CUDA_CHECK(cudaMemcpy(dh, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
+				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy);
+				//CUDA_CHECK(cudaMemcpy(dh, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
 			}
 			else
 			{
 												//(int, int, double, float *, float *, int, int, double, double, double, double, double, float *, float *)
 				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
-				CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(float), cudaMemcpyHostToDevice));
+				//CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(float), cudaMemcpyHostToDevice));
 
 			}
+			CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(T), cudaMemcpyHostToDevice));
 			if (XParam.deform[nd].duration > 0.0)
 			{
 
@@ -2422,6 +2423,7 @@ template <class T> void ApplyDeform(Param XParam, T *&dh,T *&hh, T *&zs, T *&zb 
 
 		}
 		free(def_d);
+		free(def);
 
 	}
 }
