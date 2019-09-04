@@ -2377,14 +2377,14 @@ template <class T> void ApplyDeform(Param XParam,dim3 blockDim,dim3 gridDim, T *
 			{
 
 				//do zs=zs+dummy/duration *(XParam.totaltime - XParam.deform[nd].startime);
-				Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *(XParam.totaltime - XParam.deform[nd].startime), dh, zs, zb);
+				Deform << <gridDim, blockDim, 0 >> > (T(1.0 / XParam.deform[nd].duration *(XParam.totaltime - XParam.deform[nd].startime)), dh, zs, zb);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 
 			else
 			{
 				//do zs=zs+dummy;
-				Deform << <gridDim, blockDim, 0 >> > (1.0, dh, zs, zb);
+				Deform << <gridDim, blockDim, 0 >> > (T(1.0), dh, zs, zb);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 
@@ -2403,7 +2403,7 @@ template <class T> void ApplyDeform(Param XParam,dim3 blockDim,dim3 gridDim, T *
 				CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(T), cudaMemcpyHostToDevice));
 
 			// DO zs=zs+dummy/duration*dt
-			Deform << <gridDim, blockDim, 0 >> > (1.0 / XParam.deform[nd].duration *XParam.dt, dh, zs, zb);
+			Deform << <gridDim, blockDim, 0 >> > (T(1.0 / XParam.deform[nd].duration *XParam.dt), dh, zs, zb);
 			CUDA_CHECK(cudaDeviceSynchronize());
 
 

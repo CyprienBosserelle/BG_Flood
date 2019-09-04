@@ -1471,7 +1471,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 
 		if (XParam.deform.size() > 0 && (XParam.totaltime - XParam.dt ) <= XParam.deformmaxtime)
 		{
-			ApplyDeform(XParam,blockDim,gridDim,dummy, dh_g,hh_g, zs_g, zb_g );
+			ApplyDeform(XParam,blockDim,gridDim, dummy, dh_g, hh_g, zs_g, zb_g );
 		}
 
 		// Do Sum & Max variables Here
