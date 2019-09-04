@@ -2349,37 +2349,29 @@ template <class T> double Calcmaxdt(Param XParam, T *dtmax, T *arrmax )
 
 template <class T> void ApplyDeform(Param XParam, T *&dummy, T *&dh,T *&hh, T *&zs, T *&zb )
 {
-	float * def;
-	double *def_d;
+	float * def_f;
+	T *def;
 	//Check each deform input
 	for (int nd = 0; nd < XParam.deform.size(); nd++)
 	{
-		Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def_d);
 		Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def);
+		Allocate1CPU(XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, def_f);
 		if ((XParam.totaltime - XParam.deform[nd].startime) <= XParam.dt && (XParam.totaltime - XParam.deform[nd].startime)>0.0)
 		{
-			readmapdata(XParam.deform[nd].grid, def);
+			readmapdata(XParam.deform[nd].grid, def_f);
 
 			//Should skip this part for float ops
-			if(XParam.spherical==1 || XParam.doubleprecision == 1)
+
+
+			for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
 			{
-
-				for (int k = 0; k<(XParam.deform[nd].grid.nx*XParam.deform[nd].grid.ny); k++)
-				{
-					def_d[k] = def[k];
-				}
-
-
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def_d, dummy);
-				//CUDA_CHECK(cudaMemcpy(dh, dummy_d, XParam.nblk*XParam.blksize * sizeof(double), cudaMemcpyHostToDevice));
+				def[k] = def_f[k];
 			}
-			else
-			{
-												//(int, int, double, float *, float *, int, int, double, double, double, double, double, float *, float *)
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
-				//CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(float), cudaMemcpyHostToDevice));
 
-			}
+
+
+			interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
+
 			CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(T), cudaMemcpyHostToDevice));
 			if (XParam.deform[nd].duration > 0.0)
 			{
