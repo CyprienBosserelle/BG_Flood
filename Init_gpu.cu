@@ -2347,7 +2347,7 @@ template <class T> double Calcmaxdt(Param XParam, T *dtmax, T *arrmax )
 }
 
 
-template <class T> void ApplyDeform(Param XParam, T *&dummy, T *&dh,T *&hh, T *&zs, T *&zb )
+template <class T> void ApplyDeform(Param XParam,dim3 blockDim,dim3 gridDim, T *&dummy, T *&dh,T *&hh, T *&zs, T *&zb )
 {
 	float * def_f;
 	T *def;
