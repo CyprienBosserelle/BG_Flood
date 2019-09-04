@@ -2408,7 +2408,7 @@ template <class T> void ApplyDeform(Param XParam, T *&dummy, T *&dh,T *&hh, T *&
 
 
 		}
-		free(def_d);
+		free(def_f);
 		free(def);
 
 	}
