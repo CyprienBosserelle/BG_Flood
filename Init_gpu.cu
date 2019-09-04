@@ -2375,7 +2375,8 @@ template <class T> void ApplyDeform(Param XParam, T *&dh,T *&hh, T *&zs, T *&zb 
 			}
 			else
 			{
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
+												(int, int, double, float *, float *, int, int, double, double, double, double, double, float *, float *)
+				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
 				CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(float), cudaMemcpyHostToDevice));
 
 			}
@@ -2411,7 +2412,7 @@ template <class T> void ApplyDeform(Param XParam, T *&dh,T *&hh, T *&zs, T *&zb 
 		  }
 			else
 			{
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
+				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.deform[nd].grid.nx, XParam.deform[nd].grid.ny, XParam.deform[nd].grid.xo, XParam.deform[nd].grid.xmax, XParam.deform[nd].grid.yo, XParam.deform[nd].grid.ymax, XParam.deform[nd].grid.dx, def, dummy);
 				CUDA_CHECK(cudaMemcpy(dh, dummy, XParam.nblk*XParam.blksize * sizeof(float), cudaMemcpyHostToDevice));
 			}
 			// DO zs=zs+dummy/duration*dt
