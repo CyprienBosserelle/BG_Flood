@@ -100,6 +100,23 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
+std::vector<SLTS> readNestfile(std::string ncfile)
+{
+	// Prep boundary input vector from anorthe model output file
+	std::vector<SLTS> slbnd;
+
+	//Define NC file variables
+	int nx, ny, nt;
+	double dx, xo, yo, to, xmax, ymax, tmax;
+
+	// Read NC info
+	readgridncsize(ncfile, nx, ny, nt, dx, xo, yo, to, xmax, ymax, tmax);
+
+	///To Be continued
+	
+	
+
+}
 
 std::vector<Flowin> readFlowfile(std::string Flowfilename)
 {
