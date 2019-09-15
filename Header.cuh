@@ -481,7 +481,8 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po);
 void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
 float interp2wnd(int wndnx, int wndny, float wnddx, float wndxo, float wndyo, float x, float y, float * U);
 double interp2wnd(int wndnx, int wndny, double wnddx, double wndxo, double wndyo, double x, double y, float * U);
-
+int readnctime(std::string filename, double * &time);
+int readncslev1(std::string filename, std::string Varname, size_t indx, size_t indy, size_t indt, double * &zsa);
 
 // I/O
 inputmap readBathyhead(inputmap Bathy);
@@ -491,7 +492,9 @@ forcingmap readforcingmaphead(forcingmap Fmap);
 std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
+std::vector<SLTS> readbndfile(std::string filename, Param XParam);
 std::vector<SLTS> readWLfile(std::string WLfilename);
+std::vector<SLTS> readNestfile(std::string ncfile, double bndxo, double bndxmax, double bndyo, double bndymax);
 std::vector<Flowin> readFlowfile(std::string Flowfilename);
 std::vector<Windin> readINfileUNI(std::string filename);
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);

@@ -20,6 +20,39 @@
 
 #include "Header.cuh"
 
+std::vector<SLTS> readbndfile(std::string filename,Param XParam)
+{
+	std::string fileext;
+	std::vector<std::string> extvec = split(filename, '.');
+
+	std::vector<std::string> nameelements;
+
+	std::vector<SLTS> Bndinfo;
+
+	//
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+
+	if (fileext.compare("nc") == 0)
+	{
+		//Bndinfo = readNestfile(filename);
+		Bndinfo = readNestfile(filename, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
+	}
+	else
+	{
+		Bndinfo = readWLfile(filename);
+	}
+	return Bndinfo;
+}
+
 std::vector<SLTS> readWLfile(std::string WLfilename)
 {
 	std::vector<SLTS> slbnd;
@@ -100,22 +133,56 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
-std::vector<SLTS> readNestfile(std::string ncfile)
+std::vector<SLTS> readNestfile(std::string ncfile, double bndxo, double bndxmax, double bndyo, double bndymax)
 {
 	// Prep boundary input vector from anorthe model output file
 	std::vector<SLTS> slbnd;
+	SLTS slbndline;
 
+	std::vector<double> WLS;
 	//Define NC file variables
-	int nx, ny, nt;
+	int nx, ny, nt, nbndpts, indx,indy;
 	double dx, xo, yo, to, xmax, ymax, tmax;
+	double * ttt, *zsa;
+	
 
 	// Read NC info
 	readgridncsize(ncfile, nx, ny, nt, dx, xo, yo, to, xmax, ymax, tmax);
+	
+	// Read time vector
+	ttt=(double *)malloc(nt*sizeof(double));
+	zsa = (double *)malloc(1*sizeof(double));
+	readnctime(ncfile, ttt);
 
+
+
+
+	nbndpts = (int)((bndymax - bndyo) / dx)+1;
+	printf("%d\n", nbndpts);
+	for (int it = 0; it < nt; it++)
+	{
+		slbndline.time = ttt[it];
+		for (int ibnd = 0; ibnd < nbndpts; ibnd++)
+		{
+			//
+			// Read// interpolate data for each bnds
+			indx = max(min((int)((bndxo - xo) / dx), nx - 1), 0);
+			indy = max(min((int)((bndyo+(dx*ibnd) - yo) / dx), ny - 1), 0);
+
+			readncslev1(ncfile, "zs", indx, indy,it, zsa);
+			printf("%f\n", zsa);
+
+			WLS.push_back(zsa[0]);
+		}
+		slbndline.wlevs = WLS;
+		slbnd.push_back(slbndline);
+		//std::cout << line << std::endl;
+		WLS.clear();
+	}
 	///To Be continued
 	
-	
-
+	free(ttt);
+	return slbnd;
 }
 
 std::vector<Flowin> readFlowfile(std::string Flowfilename)

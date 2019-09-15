@@ -3034,7 +3034,9 @@ int main(int argc, char **argv)
 
 	if (!XParam.leftbnd.inputfile.empty())
 	{
-		XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);
+		//XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);
+		XParam.leftbnd.data = readbndfile(XParam.leftbnd.inputfile,XParam);
+
 		XParam.leftbnd.on = 1; // redundant?
 	}
 	if (!XParam.rightbnd.inputfile.empty())

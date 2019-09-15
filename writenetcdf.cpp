@@ -1128,6 +1128,60 @@ int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 }
 
 
+int readnctime(std::string filename, double * &time)
+{
+	int status, ncid, varid;
+	std::string Varname = "time";
+
+	status = nc_open(filename.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_get_var_double(ncid, varid, time);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_close(ncid);
+
+	return status;
+}
+
+int readncslev1(std::string filename, std::string Varname, size_t indx, size_t indy, size_t indt, double * &zsa)
+{
+	int status, ncid, varid,ndims;
+	size_t *start, *count;
+	//std::string Varname = "time";
+	ndims = 3;
+
+	start = (size_t *)malloc(ndims*sizeof(size_t));
+	//count = (size_t *)malloc(ndims*sizeof(size_t));
+
+	start[0] = indt;
+	start[1] = indy;
+	start[2] = indx;
+
+	
+
+	status = nc_open(filename.c_str(), 0, &ncid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_get_var1_double(ncid, varid, start, zsa);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_close(ncid);
+
+	free(start);
+	//free(count);
+
+
+	return status;
+}
+
+
 int readvardata(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, float * vardata)
 {
 	// function to standardise the way to read netCDF data off a file
