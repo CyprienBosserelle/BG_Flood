@@ -216,7 +216,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 
 
 	nbndpts = (int)((bndxmax - bndxo) / dx)+1;
-	printf("%d\n", nbndpts);
+	//printf("%d\n", nbndpts);
 	for (int it = 0; it < nt; it++)
 	{
 		slbndline.time = ttt[it];
@@ -228,7 +228,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 			indy = max(min((int)((bndy+(dx*ibnd) - yo) / dx), ny - 1), 0);
 
 			readncslev1(ncfile, "zs", indx, indy,it, zsa);
-			printf("%f\n", zsa[0]);
+			//printf("%f\n", zsa[0]);
 
 			WLS.push_back(zsa[0]);
 		}
