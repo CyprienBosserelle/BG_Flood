@@ -224,8 +224,8 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 		{
 			//
 			// Read// interpolate data for each bnds
-			indx = max(min((int)((bndxo - xo) / dx), nx - 1), 0);
-			indy = max(min((int)((bndy+(dx*ibnd) - yo) / dx), ny - 1), 0);
+			indx = max(min((int)((bndxo+(dx*ibnd) - xo) / dx), nx - 1), 0);
+			indy = max(min((int)((bndy - yo) / dx), ny - 1), 0);
 
 			readncslev1(ncfile, "zs", indx, indy,it, zsa);
 			//printf("%f\n", zsa[0]);
@@ -240,6 +240,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 	///To Be continued
 	
 	free(ttt);
+	free(zsa);
 	return slbnd;
 }
 
