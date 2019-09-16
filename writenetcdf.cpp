@@ -1149,7 +1149,8 @@ int readnctime(std::string filename, double * &time)
 
 int readncslev1(std::string filename, std::string Varname, size_t indx, size_t indy, size_t indt, double * &zsa)
 {
-	int status, ncid, varid,ndims;
+	int status, ncid, varid,ndims,sferr,oferr;
+	double scalefac, offset;
 	size_t *start, *count;
 	//std::string Varname = "time";
 	ndims = 3;
@@ -1161,8 +1162,6 @@ int readncslev1(std::string filename, std::string Varname, size_t indx, size_t i
 	start[1] = indy;
 	start[2] = indx;
 
-	
-
 	status = nc_open(filename.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
@@ -1171,6 +1170,14 @@ int readncslev1(std::string filename, std::string Varname, size_t indx, size_t i
 
 	status = nc_get_var1_double(ncid, varid, start, zsa);
 	if (status != NC_NOERR) handle_error(status);
+
+	sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
+	oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
+
+	if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+	{
+		zsa[0] = zsa[0] * scalefac + offset;
+	}
 
 	status = nc_close(ncid);
 

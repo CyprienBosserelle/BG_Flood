@@ -20,8 +20,11 @@
 
 #include "Header.cuh"
 
-std::vector<SLTS> readbndfile(std::string filename,Param XParam)
+std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 {
+	// read bnd or nest file
+	// side is for deciding whether we are talking about a left(side=0) bot (side =1) right (side=2) or top (side=3)
+	// Warning just made this up and need to have some sort of convention in the model
 	std::string fileext;
 	std::vector<std::string> extvec = split(filename, '.');
 
@@ -30,6 +33,43 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam)
 	std::vector<SLTS> Bndinfo;
 
 	//
+	double xxo, xxmax, yy;
+	int hor;
+	switch (side)
+	{
+		case 0://Left bnd
+		{
+			xxo = XParam.yo;
+			xxmax = XParam.ymax;
+			yy = XParam.xo;
+			hor = 0;
+		}
+		case 1://Bot bnd
+		{
+			xxo = XParam.xo;
+			xxmax = XParam.xmax;
+			yy = XParam.yo;
+			hor = 1;
+		}
+		case 2://Right bnd
+		{
+			xxo = XParam.yo;
+			xxmax = XParam.ymax;
+			yy = XParam.xmax;
+			hor = 0;
+		}
+		case 3://Top bnd
+		{
+			xxo = XParam.xo;
+			xxmax = XParam.xmax;
+			yy = XParam.ymax;
+			hor = 1;
+		}
+	}
+
+
+
+
 	nameelements = split(extvec.back(), '?');
 	if (nameelements.size() > 1)
 	{
@@ -44,7 +84,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam)
 	if (fileext.compare("nc") == 0)
 	{
 		//Bndinfo = readNestfile(filename);
-		Bndinfo = readNestfile(filename, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
+		Bndinfo = readNestfile(filename,hor, xxo, xxmax, yy);
 	}
 	else
 	{
@@ -133,22 +173,40 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
-std::vector<SLTS> readNestfile(std::string ncfile, double bndxo, double bndxmax, double bndyo, double bndymax)
+std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, double bndxmax, double bndy)
 {
 	// Prep boundary input vector from anorthe model output file
+	//this function works for botom top bnd as written but flips x and y for left and right bnds
+	// hor controls wheter the boundary is a top/botom bnd hor=1 or left/right hor=0 
 	std::vector<SLTS> slbnd;
 	SLTS slbndline;
 
 	std::vector<double> WLS;
 	//Define NC file variables
-	int nx, ny, nt, nbndpts, indx,indy;
-	double dx, xo, yo, to, xmax, ymax, tmax;
+	int nnx, nny, nt, nbndpts, indx,indy,nx,ny;
+	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
 	double * ttt, *zsa;
 	
 
 	// Read NC info
-	readgridncsize(ncfile, nx, ny, nt, dx, xo, yo, to, xmax, ymax, tmax);
+	readgridncsize(ncfile, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax);
 	
+	if (hor == 0)
+	{
+		nx = nny;
+		ny = nnx;
+		xo = yyo;
+		yo = xxo;
+
+	}
+	else
+	{
+		nx = nnx;
+		ny = nny;
+		xo = xxo;
+		yo = yyo;
+	}
+
 	// Read time vector
 	ttt=(double *)malloc(nt*sizeof(double));
 	zsa = (double *)malloc(1*sizeof(double));
@@ -157,7 +215,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, double bndxo, double bndxmax,
 
 
 
-	nbndpts = (int)((bndymax - bndyo) / dx)+1;
+	nbndpts = (int)((bndxmax - bndxo) / dx)+1;
 	printf("%d\n", nbndpts);
 	for (int it = 0; it < nt; it++)
 	{
@@ -167,10 +225,10 @@ std::vector<SLTS> readNestfile(std::string ncfile, double bndxo, double bndxmax,
 			//
 			// Read// interpolate data for each bnds
 			indx = max(min((int)((bndxo - xo) / dx), nx - 1), 0);
-			indy = max(min((int)((bndyo+(dx*ibnd) - yo) / dx), ny - 1), 0);
+			indy = max(min((int)((bndy+(dx*ibnd) - yo) / dx), ny - 1), 0);
 
 			readncslev1(ncfile, "zs", indx, indy,it, zsa);
-			printf("%f\n", zsa);
+			printf("%f\n", zsa[0]);
 
 			WLS.push_back(zsa[0]);
 		}

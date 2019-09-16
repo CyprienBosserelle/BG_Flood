@@ -3035,23 +3035,23 @@ int main(int argc, char **argv)
 	if (!XParam.leftbnd.inputfile.empty())
 	{
 		//XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);
-		XParam.leftbnd.data = readbndfile(XParam.leftbnd.inputfile,XParam);
+		XParam.leftbnd.data = readbndfile(XParam.leftbnd.inputfile,XParam,0);
 
 		XParam.leftbnd.on = 1; // redundant?
 	}
 	if (!XParam.rightbnd.inputfile.empty())
 	{
-		XParam.rightbnd.data = readWLfile(XParam.rightbnd.inputfile);
+		XParam.rightbnd.data = readbndfile(XParam.rightbnd.inputfile, XParam, 2);
 		XParam.rightbnd.on = 1;
 	}
 	if (!XParam.topbnd.inputfile.empty())
 	{
-		XParam.topbnd.data = readWLfile(XParam.topbnd.inputfile);
+		XParam.topbnd.data = readbndfile(XParam.topbnd.inputfile, XParam, 3);
 		XParam.topbnd.on = 1;
 	}
 	if (!XParam.botbnd.inputfile.empty())
 	{
-		XParam.botbnd.data = readWLfile(XParam.botbnd.inputfile);
+		XParam.botbnd.data = readbndfile(XParam.botbnd.inputfile, XParam, 1);
 		XParam.botbnd.on = 1;
 	}
 
