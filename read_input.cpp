@@ -33,6 +33,8 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	std::vector<SLTS> Bndinfo;
 
 	//
+	//printf("%d\n", side);
+
 	double xxo, xxmax, yy;
 	int hor;
 	switch (side)
@@ -43,6 +45,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 			xxmax = XParam.ymax;
 			yy = XParam.xo;
 			hor = 0;
+			break;
 		}
 		case 1://Bot bnd
 		{
@@ -50,6 +53,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 			xxmax = XParam.xmax;
 			yy = XParam.yo;
 			hor = 1;
+			break;
 		}
 		case 2://Right bnd
 		{
@@ -57,6 +61,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 			xxmax = XParam.ymax;
 			yy = XParam.xmax;
 			hor = 0;
+			break;
 		}
 		case 3://Top bnd
 		{
@@ -64,11 +69,12 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 			xxmax = XParam.xmax;
 			yy = XParam.ymax;
 			hor = 1;
+			break;
 		}
 	}
 
 
-
+	//printf("%f\t%f\t%f\n", xxo, xxmax, yy);
 
 	nameelements = split(extvec.back(), '?');
 	if (nameelements.size() > 1)
@@ -213,9 +219,14 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 	readnctime(ncfile, ttt);
 
 
-
+	
 
 	nbndpts = (int)((bndxmax - bndxo) / dx)+1;
+
+	//printf("%f\t%f\t%f\t%f\n", bndxmax, bndxo, xo, yo);
+	//printf("%f\t%f\t%f\t%f\n", bndxmax, bndxo, xxo, yyo);
+	//printf("%f\t%d\t%d\t%f\n", bndy, nx, ny, dx);
+
 	//printf("%d\n", nbndpts);
 	for (int it = 0; it < nt; it++)
 	{
@@ -227,8 +238,8 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 			indx = max(min((int)((bndxo+(dx*ibnd) - xo) / dx), nx - 1), 0);
 			indy = max(min((int)((bndy - yo) / dx), ny - 1), 0);
 
-			readncslev1(ncfile, "zs", indx, indy,it, zsa);
-			//printf("%f\n", zsa[0]);
+			readncslev1(ncfile, "zs", indx, indy, it, zsa);
+			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
 			WLS.push_back(zsa[0]);
 		}
