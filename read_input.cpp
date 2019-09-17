@@ -189,7 +189,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 
 	std::vector<double> WLS;
 	//Define NC file variables
-	int nnx, nny, nt, nbndpts, indx,indy,nx,ny;
+	int nnx, nny, nt, nbndpts, indxx, indyy, indx, indy,nx, ny;
 	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
 	double * ttt, *zsa;
 	
@@ -235,11 +235,22 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 		{
 			//
 			// Read// interpolate data for each bnds
-			indx = max(min((int)((bndxo+(dx*ibnd) - xo) / dx), nx - 1), 0);
-			indy = max(min((int)((bndy - yo) / dx), ny - 1), 0);
+			indxx = max(min((int)((bndxo+(dx*ibnd) - xo) / dx), nx - 1), 0);
+			indyy = max(min((int)((bndy - yo) / dx), ny - 1), 0);
+
+			if (hor == 0)
+			{
+				indy = indxx;
+				indx = indyy;
+			}
+			else
+			{
+				indx = indxx;
+				indy = indyy;
+			}
 
 			readncslev1(ncfile, "zs", indx, indy, it, zsa);
-			printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
 			WLS.push_back(zsa[0]);
 		}
