@@ -239,7 +239,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 			indy = max(min((int)((bndy - yo) / dx), ny - 1), 0);
 
 			readncslev1(ncfile, "zs", indx, indy, it, zsa);
-			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+			printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
 			WLS.push_back(zsa[0]);
 		}
