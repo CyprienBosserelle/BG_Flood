@@ -1149,8 +1149,8 @@ int readnctime(std::string filename, double * &time)
 
 int readncslev1(std::string filename, std::string Varname, size_t indx, size_t indy, size_t indt, double * &zsa)
 {
-	int status, ncid, varid,ndims,sferr,oferr;
-	double scalefac, offset;
+	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr;
+	double scalefac, offset, missing, fillval;
 	size_t *start, *count;
 	//std::string Varname = "time";
 	ndims = 3;
@@ -1173,6 +1173,30 @@ int readncslev1(std::string filename, std::string Varname, size_t indx, size_t i
 
 	sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
 	oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
+
+	// Check if variable is a missing value
+
+	misserr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
+	
+	fillerr = nc_get_att_double(ncid, varid, "missingvalue", &fillval);
+
+	if (misserr == NC_NOERR)
+	{
+		if (zsa[0] == missing)
+		{
+			zsa[0] = 0.0;
+		}
+	}
+	if (fillerr == NC_NOERR)
+	{
+		if (zsa[0] == fillval)
+		{
+			zsa[0] = 0.0;
+		}
+	}
+
+
+	
 
 	if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 	{
