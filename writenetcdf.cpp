@@ -1490,7 +1490,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	if (status != NC_NOERR) handle_error(status);
 	free(ddim);
 
-	printf("xcoord[0]=%f, ycoord[0]=%f\n", xcoord[0], ycoord[0]);
+	//printf("xcoord[0]=%f, ycoord[0]=%f\n", xcoord[0], ycoord[0]);
 	// Allocate var in file to temporarily store the variable stored
 	varinfile = (float *)malloc(nx*ny * sizeof(float));
 
