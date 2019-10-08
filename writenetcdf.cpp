@@ -7,7 +7,7 @@
 //the Free Software Foundation.                                                 //
 //                                                                              //
 //This program is distributed in the hope that it will be useful,               //
-//but WITHOUT ANY WARRANTY; without even the implied warranty of                //    
+//but WITHOUT ANY WARRANTY; without even the implied warranty of                //
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 //
 //GNU General Public License for more details.                                  //
 //                                                                              //
@@ -20,8 +20,8 @@
 
 
 void handle_error(int status) {
-	
-	
+
+
 	if (status != NC_NOERR) {
 		fprintf(stderr, "Netcdf %s\n", nc_strerror(status));
 		std::ostringstream stringStream;
@@ -51,16 +51,16 @@ Param creatncfileUD(Param XParam)
 
 	static size_t tst[] = { 0 };
 	static size_t xstart[] = { 0 }; // start at first value
-	static size_t ystart[] = { 0 }; // start at first value 
+	static size_t ystart[] = { 0 }; // start at first value
 	static size_t thstart[] = { 0 }; // start at first value
 	nxx = nx;
 	nyy = ny;
-	
+
 
 	//Recreat the x, y and theta array
 	xval = (float *)malloc(nx*sizeof(float));
 	yval = (float *)malloc(ny*sizeof(float));
-	
+
 
 	for (int i = 0; i<nx; i++)
 	{
@@ -70,13 +70,13 @@ Param creatncfileUD(Param XParam)
 	{
 		yval[i] = (float) (XParam.yo + i*XParam.dx);
 	}
-	
+
 
 	//create the netcdf datasetXParam.outfile.c_str()
 	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
 	if (status != NC_NOERR)
 	{
-		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
+		if (status == NC_EEXIST) // File already axist so automatically rename the output file
 		{
 			printf("Warning! Outut file name already exist  ");
 			write_text_to_log_file("Warning! Outut file name already exist   ");
@@ -100,7 +100,7 @@ Param creatncfileUD(Param XParam)
 			}
 			printf("New file name: %s  ", XParam.outfile.c_str());
 			write_text_to_log_file("New file name: " + XParam.outfile);
-			
+
 		}
 		else
 		{
@@ -123,8 +123,8 @@ Param creatncfileUD(Param XParam)
 	int tdim[] = { time_dim };
 	int xdim[] = { xx_dim };
 	int ydim[] = { yy_dim };
-	
-	
+
+
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_error(status);
 	status = nc_def_var(ncid, "xx", NC_FLOAT, 1, xdim, &xx_id);
@@ -151,7 +151,7 @@ Param creatncfileUD(Param XParam)
 	free(yval);
 
 	return XParam;
-	
+
 }
 
 extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var)
@@ -184,7 +184,7 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 	if (status != NC_NOERR) handle_error(status);
 	status = nc_inq_dimid(ncid, "yy", &yid);
 	if (status != NC_NOERR) handle_error(status);
-	
+
 
 	var_dimid2D[0] = yid;
 	var_dimid2D[1] = xid;
@@ -196,16 +196,16 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 	float fillval = 9.9692e+36f;
 	short Sfillval = 32767;
 //short fillval = 32767
-	static size_t start2D[] = { 0, 0 }; // start at first value 
+	static size_t start2D[] = { 0, 0 }; // start at first value
 	//static size_t count2D[] = { ny, nx };
 	static size_t count2D[] = { 16, 16 };
 
-	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
+	static size_t start3D[] = { 0, 0, 0 }; // start at first value
 	//static size_t count3D[] = { 1, ny, nx };
 	static size_t count3D[] = { 1, 16, 16 };
 
 	varblk = (float *)malloc(XParam.blksize * sizeof(float));
-	
+
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
@@ -229,7 +229,7 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 	{
 		if (smallnc > 0)
 		{
-			
+
 			status = nc_def_var(ncid, varst.c_str(), NC_SHORT, vdim, var_dimid2D, &var_id);
 			if (status != NC_NOERR) handle_error(status);
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
@@ -286,7 +286,7 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 			}
 		}
 
-		
+
 	}
 	if (vdim == 3)
 	{
@@ -348,7 +348,7 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 			}
 		}
 	}
-	
+
 	if (smallnc > 0)
 	{
 		free(var_s);
@@ -403,11 +403,11 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 	float fillval = 9.9692e+36f;
 	short Sfillval = 32767;
 	//short fillval = 32767
-	static size_t start2D[] = { 0, 0 }; // start at first value 
+	static size_t start2D[] = { 0, 0 }; // start at first value
 										//static size_t count2D[] = { ny, nx };
 	static size_t count2D[] = { 16, 16 };
 
-	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
+	static size_t start3D[] = { 0, 0, 0 }; // start at first value
 										   //static size_t count3D[] = { 1, ny, nx };
 	static size_t count3D[] = { 1, 16, 16 };
 
@@ -621,7 +621,7 @@ extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, 
 	start = (size_t *)malloc(ndims*sizeof(size_t));
 	count = (size_t *)malloc(ndims*sizeof(size_t));
 
-	//Read dimensions nx_u ny_u 
+	//Read dimensions nx_u ny_u
 	for (int iddim = 0; iddim < ndims; iddim++)
 	{
 		status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
@@ -695,7 +695,7 @@ extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, 
 			if (status != NC_NOERR) handle_error(status);
 		}
 	}
-	
+
 	//close and save
 	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_error(status);
@@ -735,7 +735,7 @@ extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo,
 	start = (size_t *)malloc(ndims * sizeof(size_t));
 	count = (size_t *)malloc(ndims * sizeof(size_t));
 
-	//Read dimensions nx_u ny_u 
+	//Read dimensions nx_u ny_u
 	for (int iddim = 0; iddim < ndims; iddim++)
 	{
 		status = nc_inq_dimlen(ncid, dimids[iddim], &ddim[iddim]);
@@ -823,7 +823,7 @@ extern "C" void readnczb(int nx, int ny, const std::string ncfile, float * &zb)
 {
 	int status;
 	int ncid, hh_id;
-	
+
 	std::string varstr,ncfilestr;
 	std::vector<std::string> nameelements;
 	//by default we expect tab delimitation
@@ -854,7 +854,7 @@ extern "C" void readnczb(int nx, int ny, const std::string ncfile, float * &zb)
 }
 void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax)
 {
-	//read the dimentions of grid, levels and time 
+	//read the dimentions of grid, levels and time
 	int status;
 	int ncid, ndimshh, ndims;
 	double *xcoord, *ycoord, *tcoord;
@@ -891,7 +891,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 	status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
-	
+
 	//printf(" %s...\n", hhvar);
 	status = nc_inq_varid(ncid, varstr.c_str(), &varid);
 	if (status != NC_NOERR)	handle_error(status);
@@ -907,7 +907,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 
 	ddimhh = (size_t *)malloc(ndimshh*sizeof(size_t));
 
-	//Read dimensions nx_u ny_u 
+	//Read dimensions nx_u ny_u
 	for (int iddim = 0; iddim < ndimshh; iddim++)
 	{
 		status = nc_inq_dimlen(ncid, dimids[iddim], &ddimhh[iddim]);
@@ -1041,7 +1041,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 		status = nc_inq_dimname(ncid, tcovar, coordname);
 		if (status != NC_NOERR) handle_error(status);
 
-		//inquire variable id 
+		//inquire variable id
 		status = nc_inq_varid(ncid, coordname, &varid);
 		if (status != NC_NOERR) handle_error(status);
 
@@ -1058,7 +1058,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 
 		to = ttempvar[0];
 		tmax= ttempvar[nt-1];
-		
+
 		free(ttempvar);
 	}
 	else
@@ -1112,7 +1112,7 @@ int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 
 	ddimU = (size_t *)malloc(ndims*sizeof(size_t));
 
-	//Read dimensions nx_u ny_u 
+	//Read dimensions nx_u ny_u
 	for (int iddim = 0; iddim < ndims; iddim++)
 	{
 		status = nc_inq_dimlen(ncid, dimids[iddim], &ddimU[iddim]);
@@ -1177,7 +1177,7 @@ int readncslev1(std::string filename, std::string Varname, size_t indx, size_t i
 	// Check if variable is a missing value
 
 	misserr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
-	
+
 	fillerr = nc_get_att_double(ncid, varid, "missingvalue", &fillval);
 
 	if (misserr == NC_NOERR)
@@ -1196,7 +1196,7 @@ int readncslev1(std::string filename, std::string Varname, size_t indx, size_t i
 	}
 
 
-	
+
 
 	if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 	{
@@ -1227,7 +1227,7 @@ int readvardata(std::string filename, std::string Varname, int ndims, int hotste
 	count = (size_t *)malloc(ndims*sizeof(size_t));
 
 
-	// 
+	//
 	status = nc_open(filename.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
@@ -1249,11 +1249,11 @@ int readvardata(std::string filename, std::string Varname, int ndims, int hotste
 		nx = (int)ddim[1];
 		start[0] = 0;
 		start[1] = 0;
-		
+
 		count[0] = ny;
 		count[1] = nx;
-	
-		
+
+
 	}
 	else //(ndim>2)
 	{
@@ -1267,13 +1267,13 @@ int readvardata(std::string filename, std::string Varname, int ndims, int hotste
 		count[0] = 1;
 		count[1] = ny;
 		count[2] = nx;
-		
+
 
 
 	}
 	status = nc_get_vara_float(ncid, varid, start, count, vardata);
 	if (status != NC_NOERR) handle_error(status);
-	
+
 	if (ndims > 1)
 	{
 		sferr = nc_get_att_float(ncid, varid, "scale_factor", &scalefac);
@@ -1319,7 +1319,7 @@ int readvardataD(std::string filename, std::string Varname, int ndims, int hotst
 	count = (size_t *)malloc(ndims*sizeof(size_t));
 
 
-	// 
+	//
 	status = nc_open(filename.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
@@ -1421,14 +1421,14 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	hherror = nc_inq_varid(ncid, "hh", &varid);
 	uuerror = nc_inq_varid(ncid, "uu", &varid);
 	vverror = nc_inq_varid(ncid, "vv", &varid);
-	
+
 
 
 	//by default we assume that the x axis is called "xx" but that is not sure "x" shoudl be accepted and so does "lon" for spherical grid
 	// The folowing section figure out which one is in the file and if none exits with the netcdf error
 	// default name is "xx"
 	std::string xvname = "xx";
-	
+
 	xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
 	if (xerror == -49) // Variable not found
 	{
@@ -1476,7 +1476,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	ndims = readvarinfo(XParam.hotstartfile.c_str(), xvname.c_str(), ddim);
 	nx = ddim[0];
 	xcoord = (float *)malloc(ddim[0]*sizeof(float)); /// Warning here we assume xx is 1D but may not be in the future
-	
+
 	status = readvardata(XParam.hotstartfile.c_str(), xvname.c_str(), ndims, 0, ddim, xcoord);
 	if (status != NC_NOERR) handle_error(status);
 	free(ddim);
@@ -1494,32 +1494,32 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	// Allocate var in file to temporarily store the variable stored
 	varinfile = (float *)malloc(nx*ny * sizeof(float));
 
-	//first check if hotstart has zb 
-	
+	//first check if hotstart has zb
+
 	if (zberror == NC_NOERR)
 	{
 		//zb is set
 
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zb", ddim);
-		
+
 		status = readvardata(XParam.hotstartfile.c_str(), "zb", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
 			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		
+
 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zb);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
-		
-		//because we set the edges around empty blocks we need the set the edges for zs too 
+
+		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 
 		//status = nc_get_var_float(ncid, varid, zb);
 		free(ddim);
-		
+
 	}
-	// second check if zs or hh are in teh file 
-	
+	// second check if zs or hh are in teh file
+
 
 	//zs Section
 	if (zserror == NC_NOERR)
@@ -1529,13 +1529,14 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		status = readvardata(XParam.hotstartfile.c_str(), "zs", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		printf("zs hotstartfile[1407,435]=%f\n", varinfile[1407+435*nx]);
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zs);
-		
-		printf("zs interpolated[ 8 + 8 * 16 + 9000 * blksize]=%f\n", zs[8 + 8 * 16 + 9000 * 256]);
+		//printf("zs hotstartfile[1407,435]=%f\n", varinfile[1407+435*nx]);
+		//printf("xcoord[0]=%f \t xcoord[nx]=%f \t dx=%f \t nx=%d\n",xcoord[0],xcoord[nx],(xcoord[nx] - xcoord[0]) / (nx - 1),nx);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, zs);
+
+		//printf("zs interpolated[ 8 + 8 * 16 + 9000 * blksize]=%f\n", zs[0]);
 		//printf("zs hotstartfile[1407,435]=%f\n", zs[1407 + 435 * nx]);
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
-		//because we set the edges around empty blocks we need the set the edges for zs too 
+		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
 
@@ -1582,8 +1583,8 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, hh);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
-		
-		//because we set the edges around empty blocks we need the set the edges for zs too 
+
+		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, hh);
 		//if zs was not specified
@@ -1635,7 +1636,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	}
 
 	//uu Section
-	
+
 	if (uuerror == NC_NOERR)
 	{
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "uu", ddim);
@@ -1675,7 +1676,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	}
 
 	//vv section
-	
+
 	if (vverror == NC_NOERR)
 	{
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "vv", ddim);
@@ -1728,7 +1729,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
 	int nx, ny, nt;
 	double * xcoord, *ycoord, *varinfile; // Not necessarily identical to any prevoious ones
-	
+
 	size_t  *ddim;
 
 	// Open the file for read access
@@ -1769,7 +1770,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 	// Allocate var in file to temporarily store the variable stored
 	varinfile = (double *)malloc(nx*ny * sizeof(double));
 
-	//first check if hotstart has zb 
+	//first check if hotstart has zb
 
 	if (zberror == NC_NOERR)
 	{
@@ -1785,7 +1786,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 
-		//because we set the edges around empty blocks we need the set the edges for zs too 
+		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 
@@ -1793,7 +1794,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		free(ddim);
 
 	}
-	// second check if zs or hh are in teh file 
+	// second check if zs or hh are in teh file
 
 
 	//zs Section
@@ -1808,7 +1809,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zs);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
-		//because we set the edges around empty blocks we need the set the edges for zs too 
+		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
 
@@ -1856,7 +1857,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 
-		//because we set the edges around empty blocks we need the set the edges for zs too 
+		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, hh);
 		//if zs was not specified
@@ -2003,7 +2004,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
 	int uu_id, vv_id;
 	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
-	// right now the model will catch anexception 
+	// right now the model will catch anexception
 	printf("Reading Wind data step: %d ...", steptoread);
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
@@ -2082,7 +2083,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_error(status);
 	printf("Done!\n");
-	
+
 }
 
 void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
@@ -2093,7 +2094,7 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
 	int uu_id, vv_id;
 	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
-	// right now the model will catch anexception 
+	// right now the model will catch anexception
 	printf("Reading atm pressure data. step: %d ...", steptoread);
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
