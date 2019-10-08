@@ -1506,7 +1506,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		if (status != NC_NOERR) handle_error(status);
 			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zb);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, zb);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 
@@ -1580,7 +1580,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, hh);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, hh);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 
@@ -1645,7 +1645,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, uu);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, uu);
 
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
@@ -1671,7 +1671,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		}
 		else
 		{
-			handle_error(zserror);
+			handle_error(uuerror);
 		}
 	}
 
@@ -1685,7 +1685,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, vv);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, vv);
 
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
@@ -1782,7 +1782,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zb);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, zb);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
 
@@ -1806,7 +1806,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zs);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, zs);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
 		//because we set the edges around empty blocks we need the set the edges for zs too
@@ -1853,7 +1853,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, hh);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, hh);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
 
@@ -1918,7 +1918,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, uu);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, uu);
 
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
@@ -1958,7 +1958,7 @@ int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, 
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, vv);
+		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, vv);
 
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
