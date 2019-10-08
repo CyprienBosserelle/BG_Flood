@@ -1476,7 +1476,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	ndims = readvarinfo(XParam.hotstartfile.c_str(), xvname.c_str(), ddim);
 	nx = ddim[0];
 	xcoord = (float *)malloc(ddim[0]*sizeof(float)); /// Warning here we assume xx is 1D but may not be in the future
-
+	
 	status = readvardata(XParam.hotstartfile.c_str(), xvname.c_str(), ndims, 0, ddim, xcoord);
 	if (status != NC_NOERR) handle_error(status);
 	free(ddim);
@@ -1490,7 +1490,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	if (status != NC_NOERR) handle_error(status);
 	free(ddim);
 
-
+	printf("xcoord[0]=%f, ycoord[0]=%f\n", xcoord[0], ycoord[0]);
 	// Allocate var in file to temporarily store the variable stored
 	varinfile = (float *)malloc(nx*ny * sizeof(float));
 
@@ -1529,7 +1529,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		status = readvardata(XParam.hotstartfile.c_str(), "zs", ndims, 0, ddim, varinfile);
 		if (status != NC_NOERR) handle_error(status);
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-
+		printf("zs hotstartfile[1407,435]=%f\n", varinfile[1407+435*nx]);
 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zs);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
