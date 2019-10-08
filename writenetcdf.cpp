@@ -1531,7 +1531,9 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
 		printf("zs hotstartfile[1407,435]=%f\n", varinfile[1407+435*nx]);
 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, nx, ny, xcoord[0], xcoord[nx], ycoord[0], ycoord[ny], (xcoord[nx] - xcoord[0]) / (nx - 1), varinfile, zs);
-
+		
+		printf("zs interpolated[ 8 + 8 * 16 + 9000 * blksize]=%f\n", zs[8 + 8 * 16 + 9000 * 256]);
+		//printf("zs hotstartfile[1407,435]=%f\n", zs[1407 + 435 * nx]);
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
 		//because we set the edges around empty blocks we need the set the edges for zs too 
 		// otherwise we create some gitantic waves at the edges of empty blocks
