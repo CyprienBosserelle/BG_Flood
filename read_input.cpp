@@ -249,7 +249,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 				indy = indyy;
 			}
 
-			readncslev1(ncfile, "zs", indx, indy, it, zsa);
+			readncslev1(ncfile, indx, indy, it, zsa);
 			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
 			WLS.push_back(zsa[0]);

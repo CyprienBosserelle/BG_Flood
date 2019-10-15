@@ -1147,7 +1147,7 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
-int readncslev1(std::string filename, std::string Varname, size_t indx, size_t indy, size_t indt, double * &zsa)
+int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, double * &zsa)
 {
 	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr;
 	double scalefac, offset, missing, fillval;
@@ -1162,10 +1162,30 @@ int readncslev1(std::string filename, std::string Varname, size_t indx, size_t i
 	start[1] = indy;
 	start[2] = indx;
 
+	std::string ncfilestr;
+	std::string varstr;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+
+	nameelements = split(filename, '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		ncfilestr = nameelements[0];
+		varstr = nameelements[1];
+	}
+	else
+	{
+		ncfilestr = filename;
+		varstr = "zs";
+	}
+
 	status = nc_open(filename.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
-	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	status = nc_inq_varid(ncid, varstr.c_str(), &varid);
 	if (status != NC_NOERR) handle_error(status);
 
 	status = nc_get_var1_double(ncid, varid, start, zsa);
