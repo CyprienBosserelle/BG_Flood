@@ -1182,7 +1182,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 		varstr = "zs";
 	}
 
-	status = nc_open(filename.c_str(), 0, &ncid);
+	status = nc_open(ncfilestr.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
 	status = nc_inq_varid(ncid, varstr.c_str(), &varid);
