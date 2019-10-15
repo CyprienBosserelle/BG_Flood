@@ -1131,9 +1131,31 @@ int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 int readnctime(std::string filename, double * &time)
 {
 	int status, ncid, varid;
+
+	std::string ncfilestr;
+	std::string varstr;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+
+	nameelements = split(filename, '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		ncfilestr = nameelements[0];
+		//varstr = nameelements[1];
+	}
+	else
+	{
+		ncfilestr = filename;
+		//varstr = "time";
+	}
+
+	// Warning this could be more robust by taking the unlimited dimention if time does not exist!
 	std::string Varname = "time";
 
-	status = nc_open(filename.c_str(), 0, &ncid);
+	status = nc_open(ncfilestr.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
 	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
