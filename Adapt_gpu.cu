@@ -18,17 +18,23 @@ template <class T> double calcres(T dx, int level)
 
 int wetdryadapt(Param XParam)
 {
+
+
+	// First use a simple refining criteria: wet or dry
 	int success = 0;
 	//int i;
 	int tl, tr, lt, lb, bl, br, rb, rt;//boundary neighbour (max of 8)
 	//Coarsen dry blocks and refine wet ones
 	//CPU version
 
+
+	// To start 
 	bool iswet = false;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
-		newlevel[ib] = 0; // no resolution change by default
+		refine[ib] = false; // only refine if all are wet
+		coarsen[ib] = true; // always try to coarsen
 		iswet = false;
 		for (int iy = 0; iy < 16; iy++)
 		{
@@ -41,26 +47,28 @@ int wetdryadapt(Param XParam)
 				}
 			}
 		}
-		if (iswet)
-		{
-			
-				newlevel[ib] = 1;
-			
-		}
 		
-
-
+			
+		refine[ib] = iswet;
+		coarsen[ib] = !iswet;
 	}
 	
+
+	
+	// Can't actually refine if the level is the max level (i.e. finest)
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
-		if (newlevel[ib] == 1 && level[ib] == XParam.maxlevel)
+		if (refine[ib] == true && level[ib] == XParam.maxlevel)
 		{
-			newlevel[ib] = 0;
+			refine[ib] = false;
 		}
 	}
 
+	// Can't actually coarsen if top, right and topright block are not all refine
+
+	
 	
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -69,82 +77,88 @@ int wetdryadapt(Param XParam)
 		//printf("ib=%d\n", ib);
 		// if all the neighbour are not wet then coarsen if possible
 		double dxfac = calcres(XParam.dx, level[ib]);
-		//printf("dxfac=%f, 6%2=%d\t", dxfac,6%2);
+		//printf("blockxo_d[ib]=%f, dxfac=%f, ((blx-xo)/dx)%2=%d\n", blockxo_d[ib], dxfac, (int((blockxo_d[ib] - XParam.xo) / dxfac / XParam.blkwidth) % 2));
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 		//need to prevent coarsenning if the block is on the model edges...
 		  //((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib]
-		if (((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
+		if (coarsen[ib] == true)
+		{
+			//if this block is a lower left corner block of teh potentialy coarser block
+			if (((int((blockxo_d[ib] - XParam.xo) / dxfac / XParam.blkwidth) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac / XParam.blkwidth) % 2) == 0 && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib]))
 			{
-				printf("ib=%d; xnode=--; ynode=--; right_id=%d, top_id=%d, topright_id=%d \n", ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
-
-
-
-				if (newlevel[topblk[ib]] == 0 && newlevel[rightblk[ib]] == 0 && newlevel[rightblk[topblk[ib]]] == 0 && level[ib] > XParam.minlevel)
+				//if all the neighbour blocks ar at the same level
+				if (level[ib] == level[rightblk[ib]] && level[ib] == level[topblk[ib]] && level[ib] == level[rightblk[topblk[ib]]])
 				{
-					newlevel[ib] = -1;
-					//newlevel[topblk[ib]] = -1;
-					//newlevel[rightblk[ib]] = -1;
-					//newlevel[rightblk[topblk[ib]]] = -1;
-
+					//if right, top and topright block teh same level and can coarsen
+					if (coarsen[rightblk[ib]] == true && coarsen[topblk[ib]] == true && coarsen[rightblk[topblk[ib]]] == true)
+					{
+						//Yes 
+						//coarsen[ib] = true;
+					}
+					else
+					{
+						coarsen[ib] = false;
+					}
 				}
-				
+				else
+				{
+					coarsen[ib] = false;
+				}
+
 			}
+			else
+			{
+				coarsen[ib] = false;
+			}
+		}
 		
 	}
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		printf("level =%d, %d, %d, %d\n", ib, level[ib], refine[ib], coarsen[ib]);
+	}
+
+	
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
 		//check whether neighbour need refinement
 
-		if ((level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]) > 1)
+
+		if (refine[ib] == false)
 		{
-			//printf("level diff=%d\n", level[topblk[ib]] + newlevel[topblk[ib]] - newlevel[ib] - level[ib]);
-			newlevel[ib] = min(newlevel[ib] + 1, 1);
 
-		}
-		if ((level[botblk[ib]] + newlevel[botblk[ib]] - newlevel[ib] - level[ib]) > 1)
-		{
-			newlevel[ib] = min(newlevel[ib] + 1, 1);
-
-		}
-		if ((level[leftblk[ib]] + newlevel[leftblk[ib]] - newlevel[ib] - level[ib]) > 1)
-		{
-			newlevel[ib] = min(newlevel[ib] + 1, 1);// is this necessary?
-		}
-		if ((level[rightblk[ib]] + newlevel[rightblk[ib]] - newlevel[ib] - level[ib]) > 1)
-		{
-			newlevel[ib] = min(newlevel[ib] + 1, 1); // is this necessary?
-		}
-
-
-
-	}
-
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
-		// if all the neighbour are not wet then coarsen if possible
-		double dxfac = calcres(XParam.dx, level[ib]);
-
-		//only check for coarsening if the block analysed is a lower left corner block of the lower level
-
-		
-		  //((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib]
-		if (((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])// Beware of round off error
-		{
-			if (newlevel[ib] < 0  && (newlevel[topblk[ib]] >= 0 || newlevel[rightblk[ib]] >= 0 || newlevel[rightblk[topblk[ib]]] >= 0))
+			if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
 			{
-				newlevel[ib] = 0;
-				newlevel[topblk[ib]] = 0;
-				newlevel[rightblk[ib]] = 0;
-				newlevel[rightblk[topblk[ib]]] = 0;
-
+				refine[ib] = true;
+				coarsen[ib] = false;
+			}
+			if (refine[botblk[ib]] == true && (level[botblk[ib]] - level[ib]) > 0)
+			{
+				refine[ib] = true;
+				coarsen[ib] = false;
+			}
+			if (refine[leftblk[ib]] == true && (level[leftblk[ib]] - level[ib]) > 0)
+			{
+				refine[ib] = true;
+				coarsen[ib] = false;
+			}
+			if (refine[rightblk[ib]] == true && (level[rightblk[ib]] - level[ib]) > 0)
+			{
+				refine[ib] = true;
+				coarsen[ib] = false;
 			}
 		}
+
 	}
-	
-	
-	
+
+
+
+
+
+		
 	//Calc cumsum that will determine where the new cell will be located in the memory
 
 	int csum = 0;
@@ -156,12 +170,12 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		//
-		if (newlevel[ib]>0)
+		if (refine[ib]==true)
 		{
 			nrefineblk++;
-			csum = csum + 3;
+			csum = csum+3;
 		}
-		if (newlevel[ib] < 0)
+		if (coarsen[ib] == true)
 		{
 			ncoarsenlk++;
 		}
@@ -169,9 +183,9 @@ int wetdryadapt(Param XParam)
 		csumblk[ib] = csum;
 
 	}
-	nnewblk = 3*nrefineblk - ncoarsenlk*3/4;
+	nnewblk = 3*nrefineblk - ncoarsenlk*3;
 
-	printf("%d blocks to be refined, %d blocks to be coarsen; %d blocks to be freed (%d are already available) %d new blocks will be created\n", nrefineblk, ncoarsenlk, ncoarsenlk * 3 / 4, XParam.navailblk, nnewblk);
+	printf("%d blocks to be refined, %d blocks to be coarsen; %d blocks to be freed (%d are already available) %d new blocks will be created\n", nrefineblk, ncoarsenlk, ncoarsenlk * 3 , XParam.navailblk, nnewblk);
 	//printf("csunblk[end]=%d; navailblk=%d\n", csumblk[XParam.nblk - 1], XParam.navailblk);
 	if (nnewblk>XParam.navailblk)
 	{

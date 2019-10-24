@@ -160,6 +160,8 @@ float *Rain_g, *Rainbef_g, *Rainaft_g;
 // Adaptivity
 int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, *activeblk_g, *availblk_g, *csumblk, *csumblk_g;
 
+bool* coarsen, * refine;;
+
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
 std::map<std::string, float *> OutputVarMapCPU;
@@ -2813,6 +2815,8 @@ int main(int argc, char **argv)
 	Allocate1CPU(XParam.nblkmem, 1, activeblk);
 	Allocate1CPU(XParam.nblkmem, 1, availblk);
 	Allocate1CPU(XParam.nblkmem, 1, csumblk);
+	Allocate1CPU(XParam.nblkmem, 1, coarsen);
+	Allocate1CPU(XParam.nblkmem, 1, refine);
 
 
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
@@ -2948,6 +2952,8 @@ int main(int argc, char **argv)
 		blockyo[bl] = blockyo_d[bl];
 		level[bl] = XParam.initlevel;
 		newlevel[bl] = 0;
+		coarsen[bl] = false;
+		refine[bl] = false;
 		
 	}
 
