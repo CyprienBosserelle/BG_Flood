@@ -66,9 +66,14 @@ int wetdryadapt(Param XParam)
 		}
 	}
 
-	// Can't actually coarsen if top, right and topright block are not all refine
 
-	
+
+
+
+
+
+	// Can't actually coarsen if top, right and topright block are not all corsen
+		
 	
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -154,6 +159,7 @@ int wetdryadapt(Param XParam)
 
 	}
 
+	
 
 
 
@@ -203,15 +209,15 @@ int wetdryadapt(Param XParam)
 	{
 		int ib = activeblk[ibl];
 		int i, ii, ir , it , itr;
-		if (newlevel[ib] < 0)
+		if (coarsen[ib] == true)
 		{
 			double dxfac = calcres(XParam.dx, level[ib]);
-			int xnode = int((blockxo_d[ib] - XParam.xo) / dxfac);
-			int ynode = int((blockyo_d[ib] - XParam.yo) / dxfac);
+			int xnode = int((blockxo_d[ib] - XParam.xo) / dxfac / XParam.blkwidth);
+			int ynode = int((blockyo_d[ib] - XParam.yo) / dxfac / XParam.blkwidth);
 			//Problem in the if statement below...
 			printf("ib=%d; xnode=%d; ynode=%d; right_id=%d, top_id=%d, topright_id=%d \n", ib, xnode, ynode, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
 			
-			if (((xnode % 2) == 0 && (ynode % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
+			//if (((xnode % 2) == 0 && (ynode % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
 			{
 
 				//printf("blockxo_d[ib]=%f\tib=%d\trightblk[ib]=%d\ttopblk[ib]=%d\trightblk[topblk[ib]]=%d\n", blockxo_d[ib], ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
@@ -318,7 +324,7 @@ int wetdryadapt(Param XParam)
 
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
-			if (newlevel[ib] > 0)
+			if (refine[ib] == true)
 			{
 
 				double delx = calcres(XParam.dx, level[ib] + 1);
@@ -408,6 +414,9 @@ int wetdryadapt(Param XParam)
 		}
 
 	}
+
+
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		//
@@ -419,7 +428,7 @@ int wetdryadapt(Param XParam)
 		//printf("ib=%d\n", ib);
 		if (ib >=0) // ib can be -1 for newly inactive blocks
 		{
-			if (newlevel[ib] > 0)
+			if (refine[ib] == true)
 			{
 				////
 				oldtop = topblk[topblk[ib]];
@@ -500,9 +509,17 @@ int wetdryadapt(Param XParam)
 		
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
+
 			oldlevel = level[ib];
 			//printf("oldlevel=%d, newlevel=%d, level=%d\n", oldlevel, newlevel[ib], oldlevel + min(newlevel[ib], 1));
-			level[ib] = oldlevel + min(newlevel[ib],1); // WARNING how ould this be >1????
+			if (coarsen[ib] == true)
+			{
+				level[ib] = oldlevel - 1;
+			}
+			if (refine[ib] == true)
+			{
+				level[ib] = oldlevel + 1;
+			}
 
 
 			{
@@ -516,8 +533,8 @@ int wetdryadapt(Param XParam)
 	{
 		//reuse newlevel as temporary storage for activeblk
 		newlevel[ibl] = activeblk[ibl];
-
-		//printf("ibl=%d; activeblk[ibl]=%d; newlevel[ibl]=%d;\n", ibl, activeblk[ibl], newlevel[ibl]);
+	
+	//printf("ibl=%d; activeblk[ibl]=%d; newlevel[ibl]=%d;\n", ibl, activeblk[ibl], newlevel[ibl]);
 	}
 
 	int ib = 0;
