@@ -41,21 +41,23 @@ int wetdryadapt(Param XParam)
 			for (int ix = 0; ix < 16; ix++)
 			{
 				int i = ix + iy * 16 + ib * XParam.blksize;
-				if (hh[i]>XParam.eps)
+				if (hh[i] > XParam.eps)
 				{
 					iswet = true;
 				}
 			}
 		}
-		
-			
+
+
 		refine[ib] = iswet;
 		coarsen[ib] = !iswet;
 	}
-	
 
-	
+
+
 	// Can't actually refine if the level is the max level (i.e. finest)
+
+	// this may be over-ruled later on
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -68,6 +70,78 @@ int wetdryadapt(Param XParam)
 
 
 
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		//check whether neighbour need refinement
+
+
+		if (refine[ib] == false)
+		{
+			//topleft blk
+			if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
+			{
+				refine[ib] = true;
+				coarsen[ib] = false;
+			}
+			//top right if lev=lev+1
+			if ((level[topblk[ib]] - level[ib]) > 0)
+			{
+				if (refine[rightblk[topblk[ib]]] == true && (level[rightblk[topblk[ib]]] - level[ib]) > 0)
+				{
+					refine[ib] = true;
+					coarsen[ib] = false;
+				}
+			}
+			//bot left
+
+			if (refine[botblk[ib]] == true && (level[botblk[ib]] - level[ib]) > 0)
+			{
+				refine[ib] = true;
+				coarsen[ib] = false;
+			}
+			//bot right
+			if ((level[botblk[ib]] - level[ib]) > 0)
+			{
+				if (refine[rightblk[botblk[ib]]] == true && (level[rightblk[botblk[ib]]] - level[ib]) > 0)
+				{
+					refine[ib] = true;
+					coarsen[ib] = false;
+				}
+			}
+			//Left bottom
+			if (refine[leftblk[ib]] == true && (level[leftblk[ib]] - level[ib]) > 0)
+			{
+				refine[ib] = true;
+				coarsen[ib] = false;
+			}
+			if ((level[leftblk[ib]] - level[ib]) > 0)
+			{
+				//left top
+				if (refine[topblk[leftblk[ib]]] == true && (level[topblk[leftblk[ib]]] - level[ib]) > 0)
+				{
+					refine[ib] = true;
+					coarsen[ib] = false;
+				}
+			}
+			if (refine[rightblk[ib]] == true && (level[rightblk[ib]] - level[ib]) > 0)
+			{
+				refine[ib] = true;
+				coarsen[ib] = false;
+			}
+			if (level[rightblk[ib]] - level[ib] > 0)
+			{
+				//
+				if (refine[topblk[rightblk[ib]]] == true && (level[topblk[rightblk[ib]]] - level[ib]) > 0)
+				{
+					refine[ib] = true;
+					coarsen[ib] = false;
+				}
+
+			}
+
+		}
+	}
 
 
 
@@ -118,46 +192,14 @@ int wetdryadapt(Param XParam)
 		}
 		
 	}
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	/*for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
 		printf("level =%d, %d, %d, %d\n", ib, level[ib], refine[ib], coarsen[ib]);
-	}
+	}*/
 
 	
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
-		//check whether neighbour need refinement
-
-
-		if (refine[ib] == false)
-		{
-
-			if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
-			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-			if (refine[botblk[ib]] == true && (level[botblk[ib]] - level[ib]) > 0)
-			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-			if (refine[leftblk[ib]] == true && (level[leftblk[ib]] - level[ib]) > 0)
-			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-			if (refine[rightblk[ib]] == true && (level[rightblk[ib]] - level[ib]) > 0)
-			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-		}
-
-	}
 
 	
 

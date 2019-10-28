@@ -145,7 +145,7 @@ public:
 	int minlevel = -1;
 	int nblkmem = 0;
 	int navailblk = 0;
-	double membuffer = 1.05; //needs toallocate more memory than initially needed so adaptation can happen without memory reallocation
+	double membuffer = 1.05; //needs to allocate more memory than initially needed so adaptation can happen without memory reallocation
 
 	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
 	//files
