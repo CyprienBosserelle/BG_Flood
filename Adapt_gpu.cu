@@ -231,6 +231,7 @@ int wetdryadapt(Param XParam)
 		csumblk[ib] = csum;
 
 	}
+
 	nnewblk = 3*nrefineblk - ncoarsenlk*3;
 
 	printf("%d blocks to be refined, %d blocks to be coarsen; %d blocks to be freed (%d are already available) %d new blocks will be created\n", nrefineblk, ncoarsenlk, ncoarsenlk * 3 , XParam.navailblk, nnewblk);
@@ -238,6 +239,61 @@ int wetdryadapt(Param XParam)
 	if (nnewblk>XParam.navailblk)
 	{
 		//reallocate memory to make more room
+		int nblkmem;
+		nblkmem = (int)ceil((XParam.nblk + nnewblk)* XParam.membuffer);
+		XParam.nblkmem = nblkmem;
+
+		// HH UU VV ZS ZB
+		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, hh, dummy);
+		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, zs, dummy);
+		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, zb, dummy);
+		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, uu, dummy);
+		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, vv, dummy);
+
+		//also reallocate Blk info
+		ReallocArray(XParam.nblk, 1, nblkmem, blockxo, dummy);
+		ReallocArray(XParam.nblk, 1, nblkmem, blockyo, dummy);
+
+		ReallocArray(XParam.nblk, 1, nblkmem, blockxo_d, dummy_d);
+		ReallocArray(XParam.nblk, 1, nblkmem, blockyo_d, dummy_d);
+
+		ReallocArray(XParam.nblk, 1, nblkmem, leftblk, newlevel);
+		ReallocArray(XParam.nblk, 1, nblkmem, rightblk, newlevel);
+		ReallocArray(XParam.nblk, 1, nblkmem, topblk, newlevel);
+		ReallocArray(XParam.nblk, 1, nblkmem, botblk, newlevel);
+
+		ReallocArray(XParam.nblk, 1, nblkmem, level, newlevel);
+		ReallocArray(XParam.nblk, 1, nblkmem, activeblk, newlevel);
+		ReallocArray(XParam.nblk, 1, nblkmem, availblk, newlevel);
+		ReallocArray(XParam.nblk, 1, nblkmem, csumblk, newlevel);
+		
+
+		//wipe out new level and rebuild it empty
+		free(newlevel);
+		Allocate1CPU(nblkmem, 1, newlevel);
+
+		//no preallocate dummy for the 2 boolean arrays
+		bool* temp;
+		Allocate1CPU(nblkmem, 1, temp);
+		ReallocArray(XParam.nblk, 1, nblkmem, coarsen, temp);
+		ReallocArray(XParam.nblk, 1, nblkmem, refine, temp);
+		free(temp);
+		
+		
+
+
+		// Reconstruct avail blk
+		XParam.navailblk = 0;
+		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
+		{
+
+			availblk[ibl] = XParam.nblk + ibl;
+			XParam.navailblk++;
+
+		}
+		
+		printf("Reallocation complete: %d new blocks are available\n", XParam.navailblk);
+
 	}
 
 

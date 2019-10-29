@@ -93,6 +93,19 @@ template <class T> void CopyArray(int nblk, int blksize, T* source, T * & dest)
 	}
 }
 
+template <class T> void ReallocArray(int nblk, int blksize, int nblkmem, T* & source, T* & interm)
+{
+	//
+	
+	CopyArray(nblk, blksize, source, interm);
+	free(source);
+	
+	Allocate1CPU(nblkmem, blksize, source);
+	CopyArray(nblk, blksize, interm, source);
+	//return nblkmem
+}
+
+
 template <class T>  void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, T *&zb)
 {
 	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
