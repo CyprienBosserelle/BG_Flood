@@ -93,15 +93,17 @@ template <class T> void CopyArray(int nblk, int blksize, T* source, T * & dest)
 	}
 }
 
-template <class T> void ReallocArray(int nblk, int blksize, int nblkmem, T* & source, T* & interm)
+template <class T> void ReallocArray(int nblk, int blksize, T* & zb)
 {
 	//
 	
-	CopyArray(nblk, blksize, source, interm);
-	free(source);
-	
-	Allocate1CPU(nblkmem, blksize, source);
-	CopyArray(nblk, blksize, interm, source);
+	zb = (T*)realloc(zb,nblk * blksize * sizeof(T));
+	if (zb == NULL)
+	{
+		fprintf(stderr, "Memory reallocation failure\n");
+
+		exit(EXIT_FAILURE);
+	}
 	//return nblkmem
 }
 

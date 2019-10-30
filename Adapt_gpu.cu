@@ -244,40 +244,36 @@ int wetdryadapt(Param XParam)
 		XParam.nblkmem = nblkmem;
 
 		// HH UU VV ZS ZB
-		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, hh, dummy);
-		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, zs, dummy);
-		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, zb, dummy);
-		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, uu, dummy);
-		ReallocArray(XParam.nblk, XParam.blksize, nblkmem, vv, dummy);
+		ReallocArray(nblkmem, XParam.blksize, hh);
+		ReallocArray(nblkmem, XParam.blksize, zs);
+		ReallocArray(nblkmem, XParam.blksize, zb);
+		ReallocArray(nblkmem, XParam.blksize, uu);
+		ReallocArray(nblkmem, XParam.blksize, vv);
+
+
 
 		//also reallocate Blk info
-		ReallocArray(XParam.nblk, 1, nblkmem, blockxo, dummy);
-		ReallocArray(XParam.nblk, 1, nblkmem, blockyo, dummy);
+		ReallocArray(nblkmem, 1, blockxo);
+		ReallocArray(nblkmem, 1, blockyo);
 
-		ReallocArray(XParam.nblk, 1, nblkmem, blockxo_d, dummy_d);
-		ReallocArray(XParam.nblk, 1, nblkmem, blockyo_d, dummy_d);
+		ReallocArray(nblkmem, 1, blockxo_d);
+		ReallocArray(nblkmem, 1, blockyo_d);
 
-		ReallocArray(XParam.nblk, 1, nblkmem, leftblk, newlevel);
-		ReallocArray(XParam.nblk, 1, nblkmem, rightblk, newlevel);
-		ReallocArray(XParam.nblk, 1, nblkmem, topblk, newlevel);
-		ReallocArray(XParam.nblk, 1, nblkmem, botblk, newlevel);
+		ReallocArray(nblkmem, 1, leftblk);
+		ReallocArray(nblkmem, 1, rightblk);
+		ReallocArray(nblkmem, 1, topblk);
+		ReallocArray(nblkmem, 1, botblk);
 
-		ReallocArray(XParam.nblk, 1, nblkmem, level, newlevel);
-		ReallocArray(XParam.nblk, 1, nblkmem, activeblk, newlevel);
-		ReallocArray(XParam.nblk, 1, nblkmem, availblk, newlevel);
-		ReallocArray(XParam.nblk, 1, nblkmem, csumblk, newlevel);
+		ReallocArray(nblkmem, 1, level);
+		ReallocArray(nblkmem, 1, newlevel);
+		ReallocArray(nblkmem, 1, activeblk);
+		ReallocArray(nblkmem, 1, availblk);
+		ReallocArray(nblkmem, 1, csumblk);
 		
-
-		//wipe out new level and rebuild it empty
-		free(newlevel);
-		Allocate1CPU(nblkmem, 1, newlevel);
-
-		//no preallocate dummy for the 2 boolean arrays
-		bool* temp;
-		Allocate1CPU(nblkmem, 1, temp);
-		ReallocArray(XParam.nblk, 1, nblkmem, coarsen, temp);
-		ReallocArray(XParam.nblk, 1, nblkmem, refine, temp);
-		free(temp);
+		ReallocArray(nblkmem, 1, coarsen);
+		ReallocArray(nblkmem, 1, refine);
+		
+		
 		
 		
 
