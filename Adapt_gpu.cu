@@ -36,11 +36,11 @@ int wetdryadapt(Param XParam)
 		refine[ib] = false; // only refine if all are wet
 		coarsen[ib] = true; // always try to coarsen
 		iswet = false;
-		for (int iy = 0; iy < 16; iy++)
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
-			for (int ix = 0; ix < 16; ix++)
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
-				int i = ix + iy * 16 + ib * XParam.blksize;
+				int i = ix + iy * XParam.blkwidth + ib * XParam.blksize;
 				if (hh[i] > XParam.eps)
 				{
 					iswet = true;
@@ -387,6 +387,9 @@ int wetdryadapt(Param XParam)
 
 				blockxo_d[ib] = blockxo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 				blockyo_d[ib] = blockyo_d[ib] + calcres(XParam.dx, level[ib] + 1);
+
+
+				newlevel[ib] = level[ib] - 1;
 				printf("ib=%d; blockxo_d[ib]=%f; blockyo_d[ib]=%f; right_id=%d, top_id=%d, topright_id=%d \n", ib, blockxo_d[ib], blockyo_d[ib], rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
 
 
@@ -468,21 +471,24 @@ int wetdryadapt(Param XParam)
 
 				// sort out block info
 
-				
+				newlevel[ib] = level[ib] + 1;
+				newlevel[availblk[csumblk[ibl]]] = level[ib] + 1;
+				newlevel[availblk[csumblk[ibl] + 1]] = level[ib] + 1;
+				newlevel[availblk[csumblk[ibl] + 2]] = level[ib] + 1;
 
 
 				blockxo_d[ib] = xoblk;
 				blockyo_d[ib] = yoblk;
 
 				//bottom right blk
-				blockxo_d[availblk[csumblk[ibl]]] = xoblk + 16 * delx;
+				blockxo_d[availblk[csumblk[ibl]]] = xoblk + (XParam.blkwidth) * delx;
 				blockyo_d[availblk[csumblk[ibl]]] = yoblk;
 				//top left blk
 				blockxo_d[availblk[csumblk[ibl] + 1]] = xoblk;
-				blockyo_d[availblk[csumblk[ibl] + 1]] = yoblk + 16 * delx;
+				blockyo_d[availblk[csumblk[ibl] + 1]] = yoblk + (XParam.blkwidth) * delx;
 				//top right blk
-				blockxo_d[availblk[csumblk[ibl] + 2]] = xoblk + 16 * delx;
-				blockyo_d[availblk[csumblk[ibl] + 2]] = yoblk + 16 * delx;
+				blockxo_d[availblk[csumblk[ibl] + 2]] = xoblk + (XParam.blkwidth) * delx;
+				blockyo_d[availblk[csumblk[ibl] + 2]] = yoblk + (XParam.blkwidth ) * delx;
 
 
 				//sort out blocks neighbour
@@ -532,7 +538,7 @@ int wetdryadapt(Param XParam)
 
 				//printf("ib=%d; oldtop=%d; oldright=%d; oldleft=%d; oldbot=%d\n ", ib,oldtop,oldright,oldleft,oldbot);
 				//printf("availblk[csumblk[ibl]]=%d, availblk[csumblk[ibl]+1] = %d, availblk[csumblk[ibl]+2]=%d\n", availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
-				if (level[oldtop] + newlevel[oldtop] < level[ib] + newlevel[ib])
+				if (newlevel[oldtop] <  newlevel[ib])
 				{
 					topblk[availblk[csumblk[ibl] + 2]] = oldtop;
 				}
@@ -542,7 +548,7 @@ int wetdryadapt(Param XParam)
 				}
 
 				/////
-				if (level[oldright] + newlevel[oldright] < level[ib] + newlevel[ib])
+				if ( newlevel[oldright] <  newlevel[ib])
 				{
 					rightblk[availblk[csumblk[ibl] + 2]] = oldright;
 				}
@@ -552,7 +558,7 @@ int wetdryadapt(Param XParam)
 				}
 
 				/////
-				if (level[oldleft] + newlevel[oldleft] < level[ib] + newlevel[ib])
+				if (newlevel[oldleft] < newlevel[ib])
 				{
 					leftblk[availblk[csumblk[ibl] + 1]] = oldleft;
 				}
@@ -562,7 +568,7 @@ int wetdryadapt(Param XParam)
 				}
 
 				/////
-				if (level[oldbot] + newlevel[oldbot] < level[ib] + newlevel[ib])
+				if ( newlevel[oldbot] <  newlevel[ib])
 				{
 					botblk[availblk[csumblk[ibl]]] = oldbot;
 				}
@@ -576,9 +582,7 @@ int wetdryadapt(Param XParam)
 				level[availblk[csumblk[ibl]+1]] = level[ib];
 				level[availblk[csumblk[ibl]+2]] = level[ib];
 
-				newlevel[availblk[csumblk[ibl]]] = newlevel[ib];
-				newlevel[availblk[csumblk[ibl] + 1]] = newlevel[ib];
-				newlevel[availblk[csumblk[ibl] + 2]] = newlevel[ib];
+				
 
 				activeblk[nblk] = availblk[csumblk[ibl]];
 				activeblk[nblk + 1] = availblk[csumblk[ibl] + 1];
@@ -604,21 +608,11 @@ int wetdryadapt(Param XParam)
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 
-			oldlevel = level[ib];
-			//printf("oldlevel=%d, newlevel=%d, level=%d\n", oldlevel, newlevel[ib], oldlevel + min(newlevel[ib], 1));
-			if (coarsen[ib] == true)
-			{
-				level[ib] = oldlevel - 1;
-			}
-			if (refine[ib] == true)
-			{
-				level[ib] = oldlevel + 1;
-			}
-
-
-			{
-				printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
-			}
+			
+			level[ib] = newlevel[ib];
+			
+			printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
+			
 		}
 	}
 
