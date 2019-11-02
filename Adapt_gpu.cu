@@ -69,6 +69,20 @@ int wetdryadapt(Param XParam)
 	}
 
 
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		if (refine[ib] == true )
+		{
+			coarsen[rightblk[ib]] = false;
+			coarsen[leftblk[ib]] = false;
+			coarsen[topblk[ib]] = false;
+			coarsen[botblk[ib]] = false;
+		}
+	}
+
+
+
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
