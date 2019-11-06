@@ -695,7 +695,7 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 
-	float epsc = 0.07f;
+	//float epsc = 0.07f;
 
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
@@ -782,8 +782,10 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hm,4.0f))));
-			qp = hp*up*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hp,4.0f))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hm,4.0f))));
+			//qp = hp*up*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hp,4.0f))));
 
 			a = max(ap, -am);
 
@@ -967,7 +969,7 @@ __global__ void updateKurgXATM(T delta, T g, T eps, T CFL, T Pa2m, int *leftblk,
 			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
 			T epsi = (T)1e-30;
 
-			T epsc = T(0.07);
+			//T epsc = T(0.07);
 
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
@@ -979,8 +981,10 @@ __global__ void updateKurgXATM(T delta, T g, T eps, T CFL, T Pa2m, int *leftblk,
 			//am = min(am, 0.0f);
 			ad = T(1.0) / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(T(2.)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hm, (T)4.0))));
-			qp = hp*up*(sqrt(T(2.)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hp, (T)4.0))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrt(T(2.)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hm, (T)4.0))));
+			//qp = hp*up*(sqrt(T(2.)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hp, (T)4.0))));
 
 			a = max(ap, -am);
 
@@ -1128,7 +1132,7 @@ __global__ void updateKurgXD( double delta, double g, double eps, double CFL, in
 			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
 
-			double epsc = 0.07;
+			//double epsc = 0.07;
 			// along X
 			dx = delta*0.5;
 			zi = zs[i] - hi;
@@ -1174,8 +1178,10 @@ __global__ void updateKurgXD( double delta, double g, double eps, double CFL, in
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
-			qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			a = max(ap, -am);
 
@@ -1336,7 +1342,7 @@ __global__ void updateKurgXSPH( double delta, double g, double eps, double CFL,i
 		{
 			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
-			double epsc = 0.07;
+			//double epsc = 0.07;
 			// along X
 			dx = delta*0.5;
 			zi = zs[i] - hi;
@@ -1383,8 +1389,10 @@ __global__ void updateKurgXSPH( double delta, double g, double eps, double CFL,i
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
-			qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			a = max(ap, -am);
 
@@ -1544,7 +1552,7 @@ __global__ void updateKurgXSPHATM(double delta, double g, double eps, double CFL
 		{
 			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
-			double epsc = 0.07;
+			//double epsc = 0.07;
 			// along X
 			dx = delta*0.5;
 			zi = zs[i] - hi + Pa2m * Patm[i];
@@ -1591,8 +1599,10 @@ __global__ void updateKurgXSPHATM(double delta, double g, double eps, double CFL
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
-			qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			a = max(ap, -am);
 
@@ -1756,7 +1766,7 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
 			float cp, cmo, ap, am, qm, qp, a, dlt,ad,hm2,hp2,ga,apm;
 			float epsi = 1e-30f;
-			float epsc = 0.07f;
+			//float epsc = 0.07f;
 
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
@@ -1768,8 +1778,10 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrtf(2.0f) / sqrtf(1.0f + max(1.0f, powf(epsc / hm, 4.0f))));
-			qp = hp*up*(sqrtf(2.0f) / sqrtf(1.0f + max(1.0f, powf(epsc / hp, 4.0f))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrtf(2.0f) / sqrtf(1.0f + max(1.0f, powf(epsc / hm, 4.0f))));
+			//qp = hp*up*(sqrtf(2.0f) / sqrtf(1.0f + max(1.0f, powf(epsc / hp, 4.0f))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -1903,7 +1915,7 @@ __global__ void updateKurgYATM(T delta, T g, T eps, T CFL, T Pa2m, int *botblk, 
 			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
 			T epsi = (T)1e-30;
 
-			T epsc = (T)0.07;
+			//T epsc = (T)0.07;
 
 			cp = sqrt(g*hp);/// how to enforce sqrtf when T is float ?
 			cmo = sqrt(g*hm);
@@ -1915,8 +1927,10 @@ __global__ void updateKurgYATM(T delta, T g, T eps, T CFL, T Pa2m, int *botblk, 
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(T(2.0)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hm, (T)4.0))));
-			qp = hp*up*(sqrt(T(2.0)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hp, (T)4.0))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrt(T(2.0)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hm, (T)4.0))));
+			//qp = hp*up*(sqrt(T(2.0)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hp, (T)4.0))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -2048,7 +2062,7 @@ __global__ void updateKurgYD( double delta, double g, double eps, double CFL, in
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
 			double cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
 			double epsi = 1e-30;
-			double epsc = 0.07;
+			//double epsc = 0.07;
 
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
@@ -2060,8 +2074,10 @@ __global__ void updateKurgYD( double delta, double g, double eps, double CFL, in
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
-			qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -2208,7 +2224,7 @@ __global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,i
 			double ap, am, ad;
 			double epsi = 1e-30;
 
-			double epsc = 0.07;
+			//double epsc = 0.07;
 
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
@@ -2221,8 +2237,10 @@ __global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,i
 			ad = 1.0 / (ap - am);
 
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
-			qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
+			qm = hm*um;
+			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -2370,7 +2388,7 @@ __global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL
 			double ap, am, ad;
 			double epsi = 1e-30;
 
-			double epsc = 0.07;
+			//double epsc = 0.07;
 
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
@@ -2383,8 +2401,10 @@ __global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL
 			ad = 1.0 / (ap - am);
 
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));;
-			qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));;
+			qm = hm*um;
+			qp = hp*up; 
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));;
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));;
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
