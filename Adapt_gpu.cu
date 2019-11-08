@@ -16,10 +16,9 @@ template <class T> double calcres(T dx, int level)
 	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
 }
 
-int wetdryadapt(Param XParam)
+
+int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 {
-
-
 	// First use a simple refining criteria: wet or dry
 	int success = 0;
 	//int i;
@@ -52,6 +51,19 @@ int wetdryadapt(Param XParam)
 		refine[ib] = iswet;
 		coarsen[ib] = !iswet;
 	}
+	return success;
+}
+
+
+
+
+
+
+int adapt(Param XParam)
+{
+
+
+	
 
 
 
@@ -323,10 +335,7 @@ int wetdryadapt(Param XParam)
 			int xnode = int((blockxo_d[ib] - XParam.xo) / dxfac / XParam.blkwidth);
 			int ynode = int((blockyo_d[ib] - XParam.yo) / dxfac / XParam.blkwidth);
 			//Problem in the if statement below...
-			printf("ib=%d; xnode=%d; ynode=%d; right_id=%d, top_id=%d, topright_id=%d \n", ib, xnode, ynode, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
 			
-			//if (((xnode % 2) == 0 && (ynode % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib])
-			{
 
 				//printf("blockxo_d[ib]=%f\tib=%d\trightblk[ib]=%d\ttopblk[ib]=%d\trightblk[topblk[ib]]=%d\n", blockxo_d[ib], ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
 				for (int iy = 0; iy < 16; iy++)
@@ -364,6 +373,7 @@ int wetdryadapt(Param XParam)
 						}
 
 
+						// These are the only guys that need to be coarsen, other are recalculated on teh fly or interpolated from forcing
 
 						hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it], hho[itr]);
 						zs[i] = 0.25*(zso[ii] + zso[ir] + zso[it], zso[itr]);
@@ -404,7 +414,7 @@ int wetdryadapt(Param XParam)
 
 
 				newlevel[ib] = level[ib] - 1;
-				printf("ib=%d; blockxo_d[ib]=%f; blockyo_d[ib]=%f; right_id=%d, top_id=%d, topright_id=%d \n", ib, blockxo_d[ib], blockyo_d[ib], rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
+				//printf("ib=%d; blockxo_d[ib]=%f; blockyo_d[ib]=%f; right_id=%d, top_id=%d, topright_id=%d \n", ib, blockxo_d[ib], blockyo_d[ib], rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
 
 
 
@@ -413,7 +423,7 @@ int wetdryadapt(Param XParam)
 
 
 
-			}
+			
 		}
 
 	}
@@ -474,7 +484,7 @@ int wetdryadapt(Param XParam)
 
 						//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
 						//flat interpolation // need to replace with simplify bilinear
-						//zs needs to be interpolated from texture
+						//zb needs to be interpolated from texture
 						hh[o] = hho[i];
 						hh[oo] = hho[ii];
 						hh[ooo] = hho[iii];
@@ -639,6 +649,8 @@ int wetdryadapt(Param XParam)
 	//printf("ibl=%d; activeblk[ibl]=%d; newlevel[ibl]=%d;\n", ibl, activeblk[ibl], newlevel[ibl]);
 	}
 
+
+	// cleanup and Reorder active block list
 	int ib = 0;
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
@@ -652,20 +664,7 @@ int wetdryadapt(Param XParam)
 
 	nblk = ib;
 
-	for (int ibl = 0; ibl < nblk; ibl++)
-	{
-		//reset
-		newlevel[ibl] = 0;
-		ib = activeblk[ibl];
 
-		//if (level[ib]>1)
-		{
-			//printf("ib=%d; l=%d; xo=%f; yo=%f\n", ib, level[ib], blockxo_d[ib], blockyo_d[ib]);
-		}
-
-		
-
-	}
 
 	//reset blockxo and blockyo
 	
@@ -673,6 +672,7 @@ int wetdryadapt(Param XParam)
 	{
 		blockxo[ibl] = blockxo_d[ibl];
 		blockyo[ibl] = blockyo_d[ibl];
+		newlevel[ibl] = 0;
 	}
 	
 

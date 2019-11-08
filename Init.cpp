@@ -237,6 +237,10 @@ template <class T> void interp2BUQ(int nblk, double blksize, double blkdx, doubl
 	}
 }
 
+
+
+
+
 template <class T> void interp2cf(Param XParam, float * cfin, T* blockxo, T* blockyo, T * &cf)
 {
 	// This function interpolates the values in cfmapin to cf using a bilinear interpolation

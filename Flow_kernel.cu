@@ -73,6 +73,39 @@ __device__ T sq(T a)
 	return a*a;
 }
 
+
+template<class T>
+__device__ T leftNeighBG( int iy, int leftblk, int topleftblk, int ib, int lev, int leftlev, int levtL,int bdimx, T* var)
+{
+	T leftval;
+	int ixx, iyy, ibx;
+	
+	if (leftlev == lev)
+	{
+		iyy = iy;
+		if (leftblk == ib)
+		{
+			ixx = 0;
+			ibx = ib;
+		}
+		else
+		{
+			ixx = 15;
+			ibx = leftblk;
+		}
+
+		leftval = var[ixx + iy * bdimx + ibx * (bdimx * bdimx)];
+	}
+	if (leftlev == (lev + 1))
+	{
+		//sss
+	}
+		
+
+
+	return leftval;
+}
+
 __device__ int findleftG(int ix,int iy,int leftblk, int ibl, int bdimx)
 {
 	int ileft;

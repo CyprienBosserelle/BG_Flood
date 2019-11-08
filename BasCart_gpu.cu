@@ -199,6 +199,7 @@ cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaC
 #include "Init_gpu.cu"
 #include "Adapt_gpu.cu"
 #include "write_output.cu"
+#include "Mainloop_Adapt.cu"
 
 
 // Main loop that actually runs the model.
@@ -3969,7 +3970,10 @@ int main(int argc, char **argv)
 	//////////////////////////////////////////////////////////////////////////////////
 	// Initial adaptation
 	//////////////////////////////////////////////////////////////////////////////////
-	XParam.nblk=wetdryadapt(XParam);
+
+	wetdrycriteria(XParam, refine, coarsen);
+
+	XParam.nblk=adapt(XParam);
 
 
 
