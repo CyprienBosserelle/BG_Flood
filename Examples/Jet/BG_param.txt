@@ -1,0 +1,31 @@
+
+
+#################################
+# Bathymetry file
+
+bathy = Slit_Bathy.asc;
+
+
+# Model controls
+gpudevice = 0;
+doubleprecision = 0;
+
+theta=1.3;
+
+
+# Timekeeping parameters
+outputtimestep = 10.0;
+outvars = zs,hh,uu,vv,zb,vort;
+endtime = 600.0;
+# Write out put as floats
+smallnc=0
+
+# Files
+outfile = Demo_jet.nc;
+
+# Boundaries
+# 0:Wall (no slip); 1:neumann (zeros gredient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D
+left = 3;
+leftbndfile = Leftbnd.txt
+right = 3; # shock absorbing
+rightbndfile = Rightbnd.txt

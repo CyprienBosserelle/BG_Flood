@@ -34,6 +34,11 @@ public:
 	double time, q;
 };
 
+class Mapparam {
+public:
+
+};
+
 class River {
 public:
 	std::vector<int> i, j, block; // one river can spring across multiple cells
@@ -88,6 +93,17 @@ public:
 	double dt;
 	std::string inputfile;
 	std::vector<Windin> data; // only used if uniform forcing
+
+};
+
+class deformmap{
+	//Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave
+	// Here you can spread the deformation across a certain amount of time and apply it at any point in the model
+public:
+	inputmap grid;
+	double startime = 0.0;
+	double duration = 0.0;
+	
 
 };
 
@@ -174,7 +190,7 @@ public:
 	double zsinit = -999.0; //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
 
 	std::string hotstartfile;
-	std::string deformfile;
+	//std::string deformfile;
 	int hotstep = 0; //step to read if hotstart file has multiple steps
 	//other
 	clock_t startcputime, endcputime;
@@ -205,6 +221,11 @@ public:
 	forcingmap windV;
 	forcingmap atmP;
 	forcingmap Rainongrid;
+
+	// deformation forcing for tsunami generation
+	std::vector<deformmap> deform;
+	double deformmaxtime = 0.0; // time after which no deformation occurs (internal parameter to cut some of the loops)
+
 };
 
 
@@ -453,23 +474,27 @@ extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, 
 extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d);//templating should have been fine here!
 void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
-int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * dummy, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
-int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * dummy, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
+int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
+int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo);
 void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po);
 void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
 float interp2wnd(int wndnx, int wndny, float wnddx, float wndxo, float wndyo, float x, float y, float * U);
 double interp2wnd(int wndnx, int wndny, double wnddx, double wndxo, double wndyo, double x, double y, float * U);
-
+int readnctime(std::string filename, double * &time);
+int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, double * &zsa);
 
 // I/O
 inputmap readBathyhead(inputmap Bathy);
 inputmap readcfmaphead(inputmap Roughmap);
+void readmapdata(inputmap Roughmap, float * &cfmapinput);
 forcingmap readforcingmaphead(forcingmap Fmap);
 std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
+std::vector<SLTS> readbndfile(std::string filename, Param XParam, int side);
 std::vector<SLTS> readWLfile(std::string WLfilename);
+std::vector<SLTS> readNestfile(std::string ncfile, int hor, double bndxo, double bndxmax, double bndy);
 std::vector<Flowin> readFlowfile(std::string Flowfilename);
 std::vector<Windin> readINfileUNI(std::string filename);
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);

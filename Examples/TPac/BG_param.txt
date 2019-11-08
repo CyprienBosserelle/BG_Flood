@@ -1,0 +1,61 @@
+
+
+###################################
+### Summary of model parameters ###
+###################################
+# Bathymetry file
+bathy = Tpac_big.asc;
+posdown = 0;
+
+grdalpha = 0.000000;
+spherical = 1;
+
+#xmin=-190.0
+#xmax=-118.32
+ymin=-78.0
+ymax=14.32
+
+dx=0.08;
+
+
+gpudevice = 0;
+
+mask = 30.0;
+
+# Flow parameters
+eps = 0.000100;
+cf = 0.000100;
+theta = 1.300000;
+Cd = 0.002000;
+
+
+# Timekeeping parameters
+CFL = 0.500000;
+totaltime = 0.000000; # Start time
+endtime = 54000.000000;
+outputtimestep = 600.000000;
+outvars = hh,zs,zsmax;
+
+
+# Files
+outfile = Output_simple_fault.nc;
+smallnc = 0; #if smallnc==1 all Output are scaled and saved as a short int
+
+TSnode = -86.374,-17.984
+TSOfile = SW_Lima.txt
+
+hotstartfile=Maule_zs_init_simpleflt.nc;
+
+# Boundaries
+# 0:wall; 1: Neumann (Default)
+right = 1;
+left = 1;
+top = 1;
+bot = 1;
+
+
+# Others
+g = 9.810000;
+rho = 1025.000000;
+
+
