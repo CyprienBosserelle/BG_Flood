@@ -434,6 +434,186 @@ __host__ __device__ T LeftAda(int ix, int iy, int ibl, int leftibl, int leftofbo
 
 
 
+template<class T>
+__host__ __device__ T TopAda(int ix, int iy, int ibl, int topibl, int topofrightibl, int topofleftibl, int leftoftopibl, int rightoftopibl, int* level, T* var)
+{
+	T varval;
+	int i;
+	int n1, n2, jj, bb;
+	int lev = level[ibl];
+	int toplev = level[topibl];
+
+
+
+	if (iy < 15)
+	{
+		i =  ix + (iy + 1) * 16 + ibl * (256);// replace with blockdim.x  ...etc
+		varval = var[i];
+	}
+	else
+	{
+		if (topibl == ibl) // No neighbour
+		{
+			i = ix + 15 * 16 + ibl * (256);
+			varval = var[i];
+
+		}
+		else if (lev == toplev) // neighbour blk is same resolution
+		{
+			i = ix + (0) * 16 + topibl * (256);
+			varval = var[i];
+		}
+		else if (toplev > lev)
+		{
+			int ii, ir, it, itr;
+
+
+			if (ix < 8)
+			{
+				jj = ix * 2;
+				bb = topibl;
+
+			}
+			if (iy >= 8)
+			{
+				jj = (ix - 8) * 2;
+				bb = rightoftopibl;
+
+			}
+			ii = jj + 0 * 16 + bb * 256;
+			it = jj + 1 * 16 + bb * 256;
+			ir = (jj + 1) + 0 * 16 + bb * 256;
+			itr = (jj + 1) + 1 * 16 + bb * 256;
+
+			varval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+		}
+		else if (toplev < lev)
+		{
+			T vari, varn1, varn2;
+
+			i = ix + iy * 16 + ibl * (256);
+
+			vari = var[i];
+
+			if (ix == 0)
+			{
+
+				if (leftoftopibl == topibl)
+				{
+
+					varn1 = var[0 + 0 * 16 + topibl * 256];
+					varval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (topofleftibl == topibl) //// That is not good enough
+				{
+					jj = 8;
+					varn1 = var[15 + jj * 16 + leftibl * 256];
+					varn2 = var[15 + (jj - 1) * 16 + leftibl * 256];
+					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+
+
+				}
+				else if (level[botofleftibl] == level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + leftibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+				}
+				else if (level[botofleftibl] > level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + leftibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofleftibl] < level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + leftibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
+				}
+			}
+			else if (iy == 15)
+			{
+				if (topofleftibl == leftibl) /// the top right block does not exist
+				{
+
+					varn1 = var[15 + iy * 16 + leftibl * 256];
+					varval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (leftoftopibl == leftibl) /// we are at the bottom
+				{
+
+					varn1 = var[15 + 8 * 16 + leftibl * 256];
+					varn2 = var[15 + 7 * 16 + leftibl * 256];
+					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
+
+
+				}
+				else if (level[topofleftibl] == level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + topofleftibl * 256];
+					varn2 = var[15 + (15) * 16 + leftibl * 256];
+					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
+				}
+				else if (level[topofleftibl] > level[leftibl])
+				{
+
+					varn1 = var[15 + 15 * 16 + leftibl * 256];
+					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
+					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofleftibl] < level[leftibl])
+				{
+
+					varn1 = var[15 + 15 * 16 + leftibl * 256];
+					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
+					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
+				}
+
+			}
+			else
+			{
+				T w0, w1, w2;
+				jj = ceil(iy * 0.5);
+				w0 = 1.0 / 3.0;
+
+				if (jj * 2 > iy)
+				{
+					w1 = 1.0 / 6.0;
+					w2 = 0.5;
+
+
+				}
+				else
+				{
+					w1 = 0.5;
+					w2 = 1.0 / 6.0;
+				}
+
+				if (leftofbotibl == leftibl)
+				{
+					jj = jj + 8;
+				}
+
+
+				varn1 = var[15 + (jj) * 16 + leftibl * 256];
+				varn2 = var[15 + (jj - 1) * 16 + leftibl * 256];
+				varval = vari * w0 + varn1 * w1 + varn2 * w2;
+			}
+
+
+
+		}
+	}
+
+	return varval;
+}
+
+
 __device__ int findleftG(int ix,int iy,int leftblk, int ibl, int bdimx)
 {
 	int ileft;
