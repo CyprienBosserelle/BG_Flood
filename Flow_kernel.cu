@@ -75,36 +75,364 @@ __device__ T sq(T a)
 
 
 template<class T>
-__device__ T leftNeighBG( int iy, int leftblk, int topleftblk, int ib, int lev, int leftlev, int levtL,int bdimx, T* var)
+__host__ __device__ T RightAda(int ix, int iy, int ibl, int rightibl, int rightofbotibl, int rightoftopibl, int botofrightibl, int topofrightibl, int * level, T* var)
 {
-	T leftval;
-	int ixx, iyy, ibx;
+	T rightvarval;
+	int i;
+	int n1, n2, jj, bb;
+	int lev = level[ibl];
+	int rightlev = level[rightibl];
+
+
+
+	if (ix < 15)
+	{
+		i=  (ix + 1) + iy * 16 + ibl * (256);// replace with blockdim.x  ...etc
+		rightvarval = var[i];
+	}
+	else
+	{
+		if (rightibl == ibl) // No neighbour
+		{
+			i = (15) + iy * 16 + ibl * (256);
+			rightvarval = var[i];
+
+		}
+		else if (lev == rightlev)
+		{
+			i = (0) + iy * 16 + rightibl * (256);
+			rightvarval = var[i];
+		}
+		else if (rightlev > lev)
+		{
+			int ii, ir, it, itr;
+			
+
+			if (iy < 8)
+			{
+				jj = iy * 2;
+				bb = rightibl;
+
+			}
+			if (iy >= 8)
+			{
+				jj = (iy - 8) * 2;
+				bb = topofrightibl;
+				
+			}
+			ii = 0 + jj * 16 + bb * 256;
+			ir = 1 + jj * 16 + bb * 256;
+			it = 0 + (jj + 1) * 16 + bb * 256;
+			itr = 1 + (jj + 1) * 16 + bb * 256;
+
+			rightvarval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+		}
+		else if (rightlev < lev)
+		{
+			T vari, varn1, varn2;
+			
+			i = (15) + iy * 16 + ibl * (256);
+			
+			vari = var[i];
+			
+			if (iy==0)
+			{
+				
+				if (botofrightibl == rightibl) /// the bot right block does not exist
+				{
+					
+					varn1 = var[0 + 0 * 16 + rightibl * 256];
+					rightvarval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (rightofbotibl == rightibl) /// we are at the top
+				{
+					jj = 8;
+					varn1 = var[0 + jj * 16 + rightibl * 256];
+					varn2 = var[0 + (jj - 1) * 16 + rightibl * 256];
+					rightvarval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+
+
+				}
+				else if (level[botofrightibl] == level[rightibl])
+				{
+					
+					varn1 = var[0 + 0 * 16 + rightibl * 256];
+					varn2 = var[0 + (15) * 16 + botofrightibl * 256];
+					rightvarval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+				}
+				else if (level[botofrightibl] > level[rightibl])
+				{
+
+					varn1 = var[0 + 0 * 16 + rightibl * 256];
+					varn2 = var[0 + (15) * 16 + botofrightibl * 256];
+					rightvarval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofrightibl] < level[rightibl])
+				{
+
+					varn1 = var[0 + 0 * 16 + rightibl * 256];
+					varn2 = var[0 + (15) * 16 + botofrightibl * 256];
+					rightvarval = vari *0.4 + 0.5 * varn1 + varn2 *0.1;
+				}
+			}
+			else if (iy == 15)
+			{
+				if (topofrightibl == rightibl) /// the top right block does not exist
+				{
+
+					varn1 = var[0 + iy * 16 + rightibl * 256];
+					rightvarval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (rightoftopibl == rightibl) /// we are at the bottom
+				{
+					
+					varn1 = var[0 + 8 * 16 + rightibl * 256];
+					varn2 = var[0 + 7 * 16 + rightibl * 256];
+					rightvarval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
+
+
+				}
+				else if (level[topofrightibl] == level[rightibl])
+				{
+
+					varn1 = var[0 + 0 * 16 + topofrightibl * 256];
+					varn2 = var[0 + (15) * 16 + rightibl * 256];
+					rightvarval = vari / 3.0 +  varn1 / 6.0 + varn2 / 2.0;
+				}
+				else if (level[topofrightibl] > level[rightibl])
+				{
+
+					varn1 = var[0 + 15 * 16 + rightibl * 256];
+					varn2 = var[0 + (0) * 16 + topofrightibl * 256];
+					rightvarval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofrightibl] < level[rightibl])
+				{
+
+					varn1 = var[0 + 15 * 16 + rightibl * 256];
+					varn2 = var[0 + (0) * 16 + topofrightibl * 256];
+					rightvarval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
+				}
+
+			}
+			else
+			{
+				T w0, w1, w2;
+				jj = ceil(iy * 0.5);
+				w0 = 1.0 / 3.0;
+				
+				if (jj * 2 > iy)
+				{
+					w1 = 1.0 / 6.0;
+					w2 = 0.5;
+
+
+				}
+				else
+				{
+					w1 = 0.5;
+					w2 = 1.0 / 6.0;
+				}
+
+				if (rightofbotibl == rightibl)
+				{
+					jj = jj + 8;
+				}
+
+				
+				varn1 = var[0 + (jj) * 16 + rightibl * 256];
+				varn2 = var[0 + (jj-1) * 16 + rightibl * 256];
+				rightvarval = vari * w0 + varn1 * w1 + varn2 * w2;
+			}
+
+			
+				
+		}
+	}
 	
-	if (leftlev == lev)
-	{
-		iyy = iy;
-		if (leftblk == ib)
-		{
-			ixx = 0;
-			ibx = ib;
-		}
-		else
-		{
-			ixx = 15;
-			ibx = leftblk;
-		}
-
-		leftval = var[ixx + iy * bdimx + ibx * (bdimx * bdimx)];
-	}
-	if (leftlev == (lev + 1))
-	{
-		//sss
-	}
-		
-
-
-	return leftval;
+	return rightvarval;
 }
+
+template<class T>
+__host__ __device__ T LeftAda(int ix, int iy, int ibl, int leftibl, int leftofbotibl, int leftoftopibl, int botofleftibl, int topofleftibl, int* level, T* var)
+{
+	T varval;
+	int i;
+	int n1, n2, jj, bb;
+	int lev = level[ibl];
+	int leftlev = level[leftibl];
+
+
+
+	if (ix > 0)
+	{
+		i = (ix - 1) + iy * 16 + ibl * (256);// replace with blockdim.x  ...etc
+		varval = var[i];
+	}
+	else
+	{
+		if (leftibl == ibl) // No neighbour
+		{
+			i = (0) + iy * 16 + ibl * (256);
+			varval = var[i];
+
+		}
+		else if (lev == leftlev) // neighbour blk is same resolution
+		{
+			i = (15) + iy * 16 + leftibl * (256);
+			varval = var[i];
+		}
+		else if (leftlev > lev)
+		{
+			int ii, ir, it, itr;
+
+
+			if (iy < 8)
+			{
+				jj = iy * 2;
+				bb = leftibl;
+
+			}
+			if (iy >= 8)
+			{
+				jj = (iy - 8) * 2;
+				bb = topofleftibl;
+
+			}
+			ii = 15 + jj * 16 + bb * 256;
+			ir = 14 + jj * 16 + bb * 256;
+			it = 15 + (jj + 1) * 16 + bb * 256;
+			itr = 14 + (jj + 1) * 16 + bb * 256;
+
+			varval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+		}
+		else if (leftlev < lev)
+		{
+			T vari, varn1, varn2;
+
+			i = (0) + iy * 16 + ibl * (256);
+
+			vari = var[i];
+
+			if (iy == 0)
+			{
+
+				if (botofleftibl == leftibl) /// the bot left block does not exist
+				{
+
+					varn1 = var[15 + 0 * 16 + leftibl * 256];
+					varval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (leftofbotibl == leftibl) /// we are at the top
+				{
+					jj = 8;
+					varn1 = var[15 + jj * 16 + leftibl * 256];
+					varn2 = var[15 + (jj - 1) * 16 + leftibl * 256];
+					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+
+
+				}
+				else if (level[botofleftibl] == level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + leftibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+				}
+				else if (level[botofleftibl] > level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + leftibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofleftibl] < level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + leftibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
+				}
+			}
+			else if (iy == 15)
+			{
+				if (topofleftibl == leftibl) /// the top right block does not exist
+				{
+
+					varn1 = var[15 + iy * 16 + leftibl * 256];
+					varval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (leftoftopibl == leftibl) /// we are at the bottom
+				{
+
+					varn1 = var[15 + 8 * 16 + leftibl * 256];
+					varn2 = var[15 + 7 * 16 + leftibl * 256];
+					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
+
+
+				}
+				else if (level[topofleftibl] == level[leftibl])
+				{
+
+					varn1 = var[15 + 0 * 16 + topofleftibl * 256];
+					varn2 = var[15 + (15) * 16 + leftibl * 256];
+					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
+				}
+				else if (level[topofleftibl] > level[leftibl])
+				{
+
+					varn1 = var[15 + 15 * 16 + leftibl * 256];
+					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
+					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofleftibl] < level[leftibl])
+				{
+
+					varn1 = var[15 + 15 * 16 + leftibl * 256];
+					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
+					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
+				}
+
+			}
+			else
+			{
+				T w0, w1, w2;
+				jj = ceil(iy * 0.5);
+				w0 = 1.0 / 3.0;
+
+				if (jj * 2 > iy)
+				{
+					w1 = 1.0 / 6.0;
+					w2 = 0.5;
+
+
+				}
+				else
+				{
+					w1 = 0.5;
+					w2 = 1.0 / 6.0;
+				}
+
+				if (leftofbotibl == leftibl)
+				{
+					jj = jj + 8;
+				}
+
+
+				varn1 = var[15 + (jj) * 16 + leftibl * 256];
+				varn2 = var[15 + (jj - 1) * 16 + leftibl * 256];
+				varval = vari * w0 + varn1 * w1 + varn2 * w2;
+			}
+
+
+
+		}
+	}
+
+	return varval;
+}
+
+
 
 __device__ int findleftG(int ix,int iy,int leftblk, int ibl, int bdimx)
 {
@@ -507,6 +835,91 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 	*/
 
 }
+
+
+template <class T> __global__ void gradientGPUXYBUQADASM(T theta, T dx, int * Activeblk, int * lev, int* leftblk, int* rightblk, int* topblk, int* botblk, T* a, T* dadx, T* dady)
+{
+	//int *leftblk,int *rightblk,int* topblk, int * botblk,
+
+	//int ix = threadIdx.x+1;
+	//int iy = threadIdx.y+1;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = Activeblk[blockIdx.x];
+
+	// shared array index to make the code bit more readable
+	int sx = ix + 1;
+	int sy = iy + 1;
+
+	T delta = calcres(dx, lev[ibl]);
+
+	int i = ix + iy * blockDim.x + ibl * (blockDim.x * blockDim.y);
+
+
+
+
+	int ileft, iright, itop, ibot;
+
+
+	
+
+	__shared__ T a_s[18][18];
+
+
+
+
+	a_s[sx][sy] = a[i];
+	//__syncthreads;
+	//syncthread is needed here ?
+
+
+	// read the halo around the tile
+	if (threadIdx.x == blockDim.x - 1)
+	{
+		//iright = findrightGSM(ix, iy, rightblk[ibl], ibl, blockDim.x);
+		a_s[sx + 1][sy] = RightAda(ix,iy,ibl,rightblk[ibl],rightblk[botblk[ibl]], rightblk[topblk[ibl]], botblk[rightblk[ibl]], topblk[rightblk[ibl]], lev, a);
+	}
+
+
+	if (threadIdx.x == 0)
+	{
+		ileft = findleftGSM(ix, iy, leftblk[ibl], ibl, blockDim.x);
+		a_s[sx - 1][sy] = a[ileft];
+	}
+
+
+	if (threadIdx.y == blockDim.y - 1)
+	{
+		itop = findtopGSM(ix, iy, topblk[ibl], ibl, blockDim.x);
+		a_s[sx][sy + 1] = a[itop];
+	}
+
+	if (threadIdx.y == 0)
+	{
+		ibot = findbotGSM(ix, iy, botblk[ibl], ibl, blockDim.x);
+		a_s[sx][sy - 1] = a[ibot];
+	}
+
+	__syncthreads;
+	/*
+	a_i = a[i];
+	a_r = a[iright];
+	a_l = a[ileft];
+	a_t = a[itop];
+	a_b = a[ibot];
+	*/
+
+	dadx[i] = minmod2GPU(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
+	dady[i] = minmod2GPU(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
+	/*
+	dadx[i] = minmod2GPU(theta, a_l, a_i, a_r) / delta;
+	dady[i] = minmod2GPU(theta, a_b, a_i, a_t) / delta;
+	*/
+
+}
+
+
+
 
 template <class T>
 __global__ void interp2ATMP(float xoatm,float yoatm,float dxatm,T delta, T Pref,T*blockxo, T *blockyo,  T * P)
