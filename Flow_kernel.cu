@@ -474,7 +474,7 @@ __host__ __device__ T TopAda(int ix, int iy, int ibl, int topibl, int topofright
 				bb = topibl;
 
 			}
-			if (iy >= 8)
+			if (ix >= 8)
 			{
 				jj = (ix - 8) * 2;
 				bb = rightoftopibl;
@@ -498,79 +498,79 @@ __host__ __device__ T TopAda(int ix, int iy, int ibl, int topibl, int topofright
 			if (ix == 0)
 			{
 
-				if (leftoftopibl == topibl)
+				if (leftoftopibl == topibl) // no neighbour
 				{
 
 					varn1 = var[0 + 0 * 16 + topibl * 256];
 					varval = (vari + 2 * varn1) / 3.0;
 				}
-				else if (topofleftibl == topibl) //// That is not good enough
+				else if (topofleftibl == topibl) 
 				{
 					jj = 8;
-					varn1 = var[15 + jj * 16 + leftibl * 256];
-					varn2 = var[15 + (jj - 1) * 16 + leftibl * 256];
+					varn1 = var[jj + 0 * 16 + topibl * 256];
+					varn2 = var[(jj - 1) + 0 * 16 + topibl * 256];
 					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
 
 
 				}
-				else if (level[botofleftibl] == level[leftibl])
+				else if (level[topofleftibl] == level[topibl])
 				{
 
-					varn1 = var[15 + 0 * 16 + leftibl * 256];
-					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varn1 = var[0 + 0 * 16 + topibl * 256];
+					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
 					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
 				}
-				else if (level[botofleftibl] > level[leftibl])
+				else if (level[topofleftibl] > level[topibl])
 				{
 
-					varn1 = var[15 + 0 * 16 + leftibl * 256];
-					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varn1 = var[0 + 0 * 16 + topibl * 256];
+					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
 					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
 				}
-				else if (level[botofleftibl] < level[leftibl])
+				else if (level[topofleftibl] < level[topibl])
 				{
 
-					varn1 = var[15 + 0 * 16 + leftibl * 256];
-					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varn1 = var[0 + 0 * 16 + topibl * 256];
+					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
 					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
 				}
 			}
-			else if (iy == 15)
+			else if (ix == 15)
 			{
-				if (topofleftibl == leftibl) /// the top right block does not exist
+				if (rightoftopibl == topibl) /// the top right block does not exist
 				{
 
-					varn1 = var[15 + iy * 16 + leftibl * 256];
+					varn1 = var[15 + 0 * 16 + topibl * 256];
 					varval = (vari + 2 * varn1) / 3.0;
 				}
-				else if (leftoftopibl == leftibl) /// we are at the bottom
+				else if (topofrightibl == topibl) 
 				{
 
-					varn1 = var[15 + 8 * 16 + leftibl * 256];
-					varn2 = var[15 + 7 * 16 + leftibl * 256];
+					varn1 = var[8 + 0 * 16 + topibl * 256];
+					varn2 = var[7 + 0 * 16 + topibl * 256];
 					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
 
 
 				}
-				else if (level[topofleftibl] == level[leftibl])
+				else if (level[topofrightibl] == level[topibl])
 				{
 
-					varn1 = var[15 + 0 * 16 + topofleftibl * 256];
-					varn2 = var[15 + (15) * 16 + leftibl * 256];
+					varn1 = var[0 + 0 * 16 + topofrightibl * 256];
+					varn2 = var[15 + (0) * 16 + topibl * 256];
 					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
 				}
-				else if (level[topofleftibl] > level[leftibl])
+				else if (level[topofrightibl] > level[topibl])
 				{
 
-					varn1 = var[15 + 15 * 16 + leftibl * 256];
-					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
+					varn1 = var[15 + 0 * 16 + topibl * 256];
+					varn2 = var[0 + (0) * 16 + topofrightibl * 256];
 					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
 				}
-				else if (level[botofleftibl] < level[leftibl])
+				else if (level[topofrightibl] < level[topibl])
 				{
 
-					varn1 = var[15 + 15 * 16 + leftibl * 256];
-					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
+					varn1 = var[0 + 0 * 16 + topibl * 256];
+					varn2 = var[15 + (0) * 16 + topofrightibl * 256];
 					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
 				}
 
@@ -578,10 +578,10 @@ __host__ __device__ T TopAda(int ix, int iy, int ibl, int topibl, int topofright
 			else
 			{
 				T w0, w1, w2;
-				jj = ceil(iy * 0.5);
+				jj = ceil(ix * 0.5);
 				w0 = 1.0 / 3.0;
 
-				if (jj * 2 > iy)
+				if (jj * 2 > ix)
 				{
 					w1 = 1.0 / 6.0;
 					w2 = 0.5;
@@ -594,14 +594,193 @@ __host__ __device__ T TopAda(int ix, int iy, int ibl, int topibl, int topofright
 					w2 = 1.0 / 6.0;
 				}
 
-				if (leftofbotibl == leftibl)
+				if (topofleftibl == topibl)
 				{
 					jj = jj + 8;
 				}
 
 
-				varn1 = var[15 + (jj) * 16 + leftibl * 256];
-				varn2 = var[15 + (jj - 1) * 16 + leftibl * 256];
+				varn1 = var[jj + (0) * 16 + topib * 256];
+				varn2 = var[(jj - 1) + 0 * 16 + topib * 256];
+				varval = vari * w0 + varn1 * w1 + varn2 * w2;
+			}
+
+
+
+		}
+	}
+
+	return varval;
+}
+
+template<class T>
+__host__ __device__ T BotAda(int ix, int iy, int ibl, int botibl, int botofrightibl, int botofleftibl, int leftofbotibl, int rightofbotibl, int* level, T* var)
+{
+	T varval;
+	int i;
+	int n1, n2, jj, bb;
+	int lev = level[ibl];
+	int botplev = level[botibl];
+
+
+
+	if (iy > 0)
+	{
+		i = ix + (iy - 1) * 16 + ibl * (256);// replace with blockdim.x  ...etc
+		varval = var[i];
+	}
+	else
+	{
+		if (botibl == ibl) // No neighbour
+		{
+			i = ix + 0 * 16 + ibl * (256);
+			varval = var[i];
+
+		}
+		else if (lev == botlev) // neighbour blk is same resolution
+		{
+			i = ix + (15) * 16 + botibl * (256);
+			varval = var[i];
+		}
+		else if (botlev > lev)
+		{
+			int ii, ir, it, itr;
+
+
+			if (ix < 8)
+			{
+				jj = ix * 2;
+				bb = topibl;
+
+			}
+			if (ix >= 8)
+			{
+				jj = (ix - 8) * 2;
+				bb = rightofbotibl;
+
+			}
+			ii = jj + 15 * 16 + bb * 256;
+			it = jj + 14 * 16 + bb * 256;
+			ir = (jj + 1) + 15 * 16 + bb * 256;
+			itr = (jj + 1) + 14 * 16 + bb * 256;
+
+			varval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+		}
+		else if (botlev < lev)
+		{
+			T vari, varn1, varn2;
+
+			i = ix + iy * 16 + ibl * (256);
+
+			vari = var[i];
+
+			if (ix == 0)
+			{
+
+				if (leftofbotibl == botibl) // no neighbour
+				{
+
+					varn1 = var[0 + 0 * 16 + topibl * 256];
+					varval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (botofleftibl == botibl)
+				{
+					jj = 8;
+					varn1 = var[jj + 15 * 16 + botibl * 256];
+					varn2 = var[(jj - 1) + 15 * 16 + botibl * 256];
+					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+
+
+				}
+				else if (level[botofleftibl] == level[botibl])
+				{
+
+					varn1 = var[0 + 15 * 16 + botibl * 256];
+					varn2 = var[15 + (15) * 16 + botiblofleftibl * 256];
+					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
+				}
+				else if (level[botofleftibl] > level[botibl])
+				{
+
+					varn1 = var[0 + 15 * 16 + botibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofleftibl] < level[botibl])
+				{
+
+					varn1 = var[0 + 15 * 16 + botibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
+					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
+				}
+			}
+			else if (ix == 15)
+			{
+				if (rightofbotibl == botibl) /// the top right block does not exist
+				{
+
+					varn1 = var[15 + 15 * 16 + botibl * 256];
+					varval = (vari + 2 * varn1) / 3.0;
+				}
+				else if (botofrightibl == botibl)
+				{
+
+					varn1 = var[8 + 15 * 16 + botibl * 256];
+					varn2 = var[7 + 15 * 16 + botibl * 256];
+					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
+
+
+				}
+				else if (level[botofrightibl] == level[botibl])
+				{
+
+					varn1 = var[0 + 15 * 16 + botofrightibl * 256];
+					varn2 = var[15 + (15) * 16 + botibl * 256];
+					varval = vari / 3.0 + varn1 / 6.0 + varn2 / 2.0;
+				}
+				else if (level[botofrightibl] > level[botibl])
+				{
+
+					varn1 = var[15 + 15 * 16 + botibl * 256];
+					varn2 = var[0 + (15) * 16 + botofrightibl * 256];
+					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
+				}
+				else if (level[botofrightibl] < level[botibl])
+				{
+
+					varn1 = var[0 + 15 * 16 + botibl * 256];
+					varn2 = var[15 + (15) * 16 + botofrightibl * 256];
+					varval = vari * 0.4 + 0.5 * varn1 + varn2 * 0.1;
+				}
+
+			}
+			else
+			{
+				T w0, w1, w2;
+				jj = ceil(ix * 0.5);
+				w0 = 1.0 / 3.0;
+
+				if (jj * 2 > ix)
+				{
+					w1 = 1.0 / 6.0;
+					w2 = 0.5;
+
+
+				}
+				else
+				{
+					w1 = 0.5;
+					w2 = 1.0 / 6.0;
+				}
+
+				if (botofleftibl == botibl)
+				{
+					jj = jj + 8;
+				}
+
+
+				varn1 = var[jj + (15) * 16 + botibl * 256];
+				varn2 = var[(jj - 1) + 15 * 16 + botibl * 256];
 				varval = vari * w0 + varn1 * w1 + varn2 * w2;
 			}
 
