@@ -1169,10 +1169,15 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
-int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, double * &zsa)
+int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, double eps, double * &zsa)
 {
-	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr;
+	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr, varerr;
 	double scalefac, offset, missing, fillval;
+
+	double hha,zza;
+
+	bool checkhh = false;
+
 	size_t *start, *count;
 	//std::string Varname = "time";
 	ndims = 3;
@@ -1202,6 +1207,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 	{
 		ncfilestr = filename;
 		varstr = "zs";
+		checkhh = true;
 	}
 
 	status = nc_open(ncfilestr.c_str(), 0, &ncid);
@@ -1212,6 +1218,8 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 
 	status = nc_get_var1_double(ncid, varid, start, zsa);
 	if (status != NC_NOERR) handle_error(status);
+
+	
 
 	sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
 	oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
@@ -1244,6 +1252,62 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 	{
 		zsa[0] = zsa[0] * scalefac + offset;
 	}
+
+	if (checkhh)
+	{
+		zza = zsa[0];
+		iderr = nc_inq_varid(ncid, "hh", &varid);
+		if (iderr == NC_NOERR)
+		{
+			status = nc_get_var1_double(ncid, varid, start, zsa);
+			sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
+			oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
+
+			// Check if variable is a missing value
+
+			misserr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
+
+			fillerr = nc_get_att_double(ncid, varid, "missingvalue", &fillval);
+
+			if (misserr == NC_NOERR)
+			{
+				if (zsa[0] == missing)
+				{
+					zsa[0] = 0.0;
+				}
+			}
+			if (fillerr == NC_NOERR)
+			{
+				if (zsa[0] == fillval)
+				{
+					zsa[0] = 0.0;
+				}
+			}
+
+
+
+
+			if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+			{
+				zsa[0] = zsa[0] * scalefac + offset;
+			}
+
+			hha = zsa[0];
+			if (hha > eps)
+			{
+				zsa[0] = zza;
+			}
+			else
+			{
+				zsa[0] = 0.0;
+			}
+			
+		}
+
+
+	}
+
+
 
 	status = nc_close(ncid);
 

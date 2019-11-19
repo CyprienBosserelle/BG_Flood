@@ -90,7 +90,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	if (fileext.compare("nc") == 0)
 	{
 		//Bndinfo = readNestfile(filename);
-		Bndinfo = readNestfile(filename,hor, xxo, xxmax, yy);
+		Bndinfo = readNestfile(filename,hor, XParam.eps, xxo, xxmax, yy);
 	}
 	else
 	{
@@ -179,7 +179,7 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
-std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, double bndxmax, double bndy)
+std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double bndxo, double bndxmax, double bndy)
 {
 	// Prep boundary input vector from anorthe model output file
 	//this function works for botom top bnd as written but flips x and y for left and right bnds
@@ -249,7 +249,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 				indy = indyy;
 			}
 
-			readncslev1(ncfile, indx, indy, it, zsa);
+			readncslev1(ncfile, indx, indy, it,eps, zsa);
 			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
 			WLS.push_back(zsa[0]);
