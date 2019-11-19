@@ -90,7 +90,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	if (fileext.compare("nc") == 0)
 	{
 		//Bndinfo = readNestfile(filename);
-		Bndinfo = readNestfile(filename,hor, XParam.eps, xxo, xxmax, yy);
+		Bndinfo = readNestfile(filename, hor, XParam.eps, xxo, xxmax, yy);
 	}
 	else
 	{
