@@ -1461,6 +1461,9 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	//CUDA_CHECK(cudaStreamSynchronize(streams[0]));
 
 
+	
+
+
 
 	updateKurgXD << <gridDim, blockDim, 0, streams[0] >> > (XParam.delta, XParam.g, XParam.eps, XParam.CFL, leftblk_g, hh_gd, zs_gd, uu_gd, vv_gd, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd, Fhu_gd, Fqux_gd, Fqvx_gd, Su_gd, dtmax_gd);
 
@@ -1548,6 +1551,9 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	Advkernel << <gridDim, blockDim, 0 >> >(XParam.dt*0.5, XParam.eps, hh_gd, zb_gd, uu_gd, vv_gd, dh_gd, dhu_gd, dhv_gd, zso_gd, hho_gd, uuo_gd, vvo_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	uvcorr << <gridDim, blockDim, 0, streams[0] >> > (XParam.delta, hho_gd, uuo_gd, vvo_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
 	//corrector setp
 	//update again
 	// calculate gradients
@@ -1580,6 +1586,7 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	// Test whether it is better to have one here or later (are the instuctions overlap if occupancy and meme acess is available?)
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
+	
 
 
 	updateKurgXD << <gridDim, blockDim, 0, streams[0] >> > (XParam.delta, XParam.g, XParam.eps, XParam.CFL, leftblk_g, hho_gd, zso_gd, uuo_gd, vvo_gd, dzsdx_gd, dhdx_gd, dudx_gd, dvdx_gd, Fhu_gd, Fqux_gd, Fqvx_gd, Su_gd, dtmax_gd);
@@ -1600,6 +1607,9 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 
 	//
 	Advkernel << <gridDim, blockDim, 0 >> >(XParam.dt, XParam.eps, hh_gd, zb_gd, uu_gd, vv_gd, dh_gd, dhu_gd, dhv_gd, zso_gd, hho_gd, uuo_gd, vvo_gd);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	uvcorr << <gridDim, blockDim, 0 >> > (XParam.delta, hho_gd, uuo_gd, vvo_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);

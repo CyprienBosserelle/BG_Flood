@@ -2468,6 +2468,41 @@ __global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL
 	}
 }
 
+template<class T>
+__global__ void uvcorr(T delta, T* hh, T*uu, T*vv)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	// Corect u for spurious velocities t very shallow depth
+	//u=sqrt(2)*h*hu/(sqrt(h^4+max(h^4,epsdepth)))
+	T epsdelta = delta*delta*delta*delta;
+
+	T uui,hhi,vvi, hhiQ;
+
+	uui = uu[i];
+	vvi = vv[i];
+	hhi = hh[i];
+
+	hhiQ = hhi*hhi*hhi*hhi;
+
+
+
+	uu[i] = sqrt(T(2.0))*hhi*(hhi*uui) / (sqrt(hhiQ + max(epsdelta, hhiQ)));
+	vv[i] = sqrt(T(2.0))*hhi*(hhi*vvi) / (sqrt(hhiQ + max(epsdelta, hhiQ)));
+
+
+
+
+
+
+}
+
 __global__ void updateEV( float delta, float g, float fc, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
 {
 	int ix = threadIdx.x;
