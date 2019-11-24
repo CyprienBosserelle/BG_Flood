@@ -1551,8 +1551,8 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	Advkernel << <gridDim, blockDim, 0 >> >(XParam.dt*0.5, XParam.eps, hh_gd, zb_gd, uu_gd, vv_gd, dh_gd, dhu_gd, dhv_gd, zso_gd, hho_gd, uuo_gd, vvo_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	uvcorr << <gridDim, blockDim, 0, streams[0] >> > (XParam.delta, hho_gd, uuo_gd, vvo_gd);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//uvcorr << <gridDim, blockDim, 0, streams[0] >> > (XParam.delta, hho_gd, uuo_gd, vvo_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//corrector setp
 	//update again
@@ -1609,8 +1609,8 @@ double FlowGPUDouble(Param XParam, double nextoutputtime)
 	Advkernel << <gridDim, blockDim, 0 >> >(XParam.dt, XParam.eps, hh_gd, zb_gd, uu_gd, vv_gd, dh_gd, dhu_gd, dhv_gd, zso_gd, hho_gd, uuo_gd, vvo_gd);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	uvcorr << <gridDim, blockDim, 0 >> > (XParam.delta, hho_gd, uuo_gd, vvo_gd);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//uvcorr << <gridDim, blockDim, 0 >> > (XParam.delta, hho_gd, uuo_gd, vvo_gd);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	cleanupGPU << <gridDim, blockDim, 0 >> >(hho_gd, zso_gd, uuo_gd, vvo_gd, hh_gd, zs_gd, uu_gd, vv_gd);
