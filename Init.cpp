@@ -503,8 +503,8 @@ void warmstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 				distleft = max((xi - XParam.xo) / XParam.dx, 0.1);//max((double)i, 0.1);
 				distright = max((XParam.xmax - xi) / XParam.dx, 0.1);//max((double)(nx - 1) - i, 0.1);
 
-				jj = (yi - XParam.yo) / XParam.dx;
-				ii = (xi - XParam.xo) / XParam.dx;
+				jj = (yi - XParam.yo) / (XParam.ymax - XParam.yo);
+				ii = (xi - XParam.xo) / (XParam.ymax - XParam.yo);
 
 				if (XParam.leftbnd.on)
 				{
@@ -534,7 +534,7 @@ void warmstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 					}
 					else
 					{
-						int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int iprev = min(max((int)ceil(jj * (zsbndvec.size() - 1)), 0), (int)zsbndvec.size() - 2);
 						int inext = iprev + 1;
 						// here interp time is used to interpolate to the right node rather than in time...
 						zsleft = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
@@ -569,7 +569,7 @@ void warmstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 					}
 					else
 					{
-						int iprev = min(max((int)ceil(jj / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int iprev = min(max((int)ceil(jj * (zsbndvec.size() - 1)), 0), (int)zsbndvec.size() - 2);
 						int inext = iprev + 1;
 						// here interp time is used to interpolate to the right node rather than in time...
 						zsright = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(jj - iprev));
@@ -606,7 +606,7 @@ void warmstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 					}
 					else
 					{
-						int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int iprev = min(max((int)ceil(ii * (zsbndvec.size() - 1)), 0), (int)zsbndvec.size() - 2);
 						int inext = iprev + 1;
 						// here interp time is used to interpolate to the right node rather than in time...
 						zsbot = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
@@ -642,7 +642,7 @@ void warmstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 					}
 					else
 					{
-						int iprev = min(max((int)ceil(ii / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+						int iprev = min(max((int)ceil(ii * (zsbndvec.size() - 1)), 0), (int)zsbndvec.size() - 2);
 						int inext = iprev + 1;
 						// here interp time is used to interpolate to the right node rather than in time...
 						zstop = interptime(zsbndvec[inext], zsbndvec[iprev], (double)(inext - iprev), (double)(ii - iprev));
