@@ -193,6 +193,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
 	double * ttt, *zsa;
 	
+	int iswet;
 
 	// Read NC info
 	readgridncsize(ncfile, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax);
@@ -249,8 +250,14 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 				indy = indyy;
 			}
 
-			readncslev1(ncfile, indx, indy, it,eps, zsa);
+			iswet=readncslev1(ncfile, indx, indy, it,eps, zsa);
 			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+
+			if (iswet == 0)
+			{
+				zsa[0] = WLS.back();
+			}
+
 
 			WLS.push_back(zsa[0]);
 		}

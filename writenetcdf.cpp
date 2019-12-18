@@ -1178,6 +1178,8 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 
 	bool checkhh = false;
 
+	int wet = 1;
+
 	size_t *start, *count;
 	//std::string Varname = "time";
 	ndims = 3;
@@ -1235,6 +1237,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 		if (zsa[0] == missing)
 		{
 			zsa[0] = 0.0;
+			wet = 0;
 		}
 	}
 	if (fillerr == NC_NOERR)
@@ -1242,6 +1245,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 		if (zsa[0] == fillval)
 		{
 			zsa[0] = 0.0;
+			wet = 0;
 		}
 	}
 
@@ -1274,6 +1278,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 				if (zsa[0] == missing)
 				{
 					zsa[0] = 0.0;
+					wet = 0;
 				}
 			}
 			if (fillerr == NC_NOERR)
@@ -1281,6 +1286,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 				if (zsa[0] == fillval)
 				{
 					zsa[0] = 0.0;
+					wet = 0;
 				}
 			}
 
@@ -1300,6 +1306,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 			else
 			{
 				zsa[0] = 0.0;
+				wet = 0;
 			}
 			
 		}
@@ -1315,7 +1322,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 	//free(count);
 
 
-	return status;
+	return wet;
 }
 
 
