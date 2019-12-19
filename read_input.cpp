@@ -186,13 +186,13 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 	// hor controls wheter the boundary is a top/botom bnd hor=1 or left/right hor=0 
 	std::vector<SLTS> slbnd;
 	SLTS slbndline;
-
-	std::vector<double> WLS;
+	
+	std::vector<double> WLS,Unest,Vnest;
 	//Define NC file variables
 	int nnx, nny, nt, nbndpts, indxx, indyy, indx, indy,nx, ny;
 	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
 	double * ttt, *zsa;
-	
+	bool checkhh = false;
 	int iswet;
 
 	// Read NC info
@@ -229,6 +229,28 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 	//printf("%f\t%d\t%d\t%f\n", bndy, nx, ny, dx);
 
 	//printf("%d\n", nbndpts);
+	std::string ncfilestr;
+	std::string varstr;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+	nameelements = split(ncfile, '?');
+	if (nameelements.size() > 1)
+	{
+
+		ncfilestr = nameelements[0];
+		varstr = nameelements[1];
+	}
+	else
+	{
+
+		ncfilestr = ncfile;
+		varstr = "zs";
+		checkhh = true;
+	}
+
+
 	for (int it = 0; it < nt; it++)
 	{
 		slbndline.time = ttt[it];
@@ -250,7 +272,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 				indy = indyy;
 			}
 
-			iswet=readncslev1(ncfile, indx, indy, it,eps, zsa);
+			iswet=readncslev1(ncfile, varstr, indx, indy, it, checkhh,eps, zsa);
 			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
 			if (iswet == 0)
@@ -258,13 +280,52 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 				zsa[0] = WLS.back();
 			}
 
-
 			WLS.push_back(zsa[0]);
+
+			// If true nesting then uu and vv are expected to be present in the netcdf file 
+
+			if (checkhh)
+			{
+				varstr = "uu";
+				iswet = readncslev1(ncfilestr, varstr, indx, indy, it, checkhh, eps, zsa);
+				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+
+				if (iswet == 0)
+				{
+					zsa[0] = Unest.back();
+				}
+
+				Unest.push_back(zsa[0]);
+
+				varstr = "vv";
+				iswet = readncslev1(ncfile, varstr, indx, indy, it, checkhh, eps, zsa);
+				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+
+				if (iswet == 0)
+				{
+					zsa[0] = Vnest.back();
+				}
+
+				Vnest.push_back(zsa[0]);
+			}
+
+
+
+
 		}
 		slbndline.wlevs = WLS;
+		WLS.clear();
+		if (checkhh)
+		{
+			slbndline.uuvel = Unest;
+			slbndline.vvvel = Vnest;
+			Unest.clear();
+			Vnest.clear();
+		}
+
 		slbnd.push_back(slbndline);
 		//std::cout << line << std::endl;
-		WLS.clear();
+		
 	}
 	///To Be continued
 	

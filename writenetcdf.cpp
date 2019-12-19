@@ -1169,14 +1169,14 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
-int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, double eps, double * &zsa)
+int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, double * &zsa)
 {
 	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr, varerr;
 	double scalefac, offset, missing, fillval;
 
 	double hha,zza;
 
-	bool checkhh = false;
+	//bool checkhh = false;
 
 	int wet = 1;
 
@@ -1191,28 +1191,29 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 	start[1] = indy;
 	start[2] = indx;
 
-	std::string ncfilestr;
-	std::string varstr;
+	//std::string ncfilestr;
+	//std::string varstr;
 
 
 	//char ncfile[]="ocean_ausnwsrstwq2.nc";
-	std::vector<std::string> nameelements;
+	//std::vector<std::string> nameelements;
 
-	nameelements = split(filename, '?');
+	/*nameelements = split(filename, '?');
 	if (nameelements.size() > 1)
 	{
-		//variable name for bathy is not given so it is assumed to be zb
+		
 		ncfilestr = nameelements[0];
 		varstr = nameelements[1];
 	}
 	else
 	{
+		
 		ncfilestr = filename;
 		varstr = "zs";
 		checkhh = true;
-	}
+	}*/
 
-	status = nc_open(ncfilestr.c_str(), 0, &ncid);
+	status = nc_open(filename.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
 	status = nc_inq_varid(ncid, varstr.c_str(), &varid);
@@ -1324,6 +1325,8 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 
 	return wet;
 }
+
+
 
 
 int readvardata(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, float * vardata)

@@ -171,16 +171,36 @@ cudaArray* rightWLS_gp;
 cudaArray* topWLS_gp;
 cudaArray* botWLS_gp;
 
+cudaArray* leftUvel_gp;
+cudaArray* rightUvel_gp;
+cudaArray* topUvel_gp;
+cudaArray* botUvel_gp;
+
+cudaArray* leftVvel_gp;
+cudaArray* rightVvel_gp;
+cudaArray* topVvel_gp;
+cudaArray* botVvel_gp;
+
 // store wind data in cuda array before sending to texture memory
 cudaArray* Uwind_gp;
 cudaArray* Vwind_gp;
 cudaArray* Patm_gp;
 cudaArray* Rain_gp;
 
-cudaChannelFormatDesc channelDescleftbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-cudaChannelFormatDesc channelDescrightbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-cudaChannelFormatDesc channelDescbotbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-cudaChannelFormatDesc channelDesctopbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescleftbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescrightbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescbotbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDesctopbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+
+cudaChannelFormatDesc channelDescleftbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescrightbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescbotbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDesctopbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+
+cudaChannelFormatDesc channelDescleftbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescrightbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescbotbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDesctopbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
 cudaChannelFormatDesc channelDescUwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescVwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
