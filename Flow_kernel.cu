@@ -3794,15 +3794,15 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 		//zs[i] = zsbnd;
 		//uu[i] = -2.0f*(sqrtf(g*max(hh[iright], 0.0f)) - sqrtf(g*max(zsbnd - zb[iright], 0.0f))) + uu[iright];
 		//vv[i] = 0.0f;
-		if (iy == 0)
-		{
-			printf("zsbnd=%f\t uubnd=%f\t", zsbnd,umean);
-		}
+		//if (iy == 0)
+		//{
+		//	printf("zsbnd=%f\t uubnd=%f\t", zsbnd,umean);
+		//}
 		//printf("zsbnd=%f\n", zsbnd);
 		un[i] = sign*sqrt(g / hh[i])*(zsinside - zsbnd) + umean;
-		zs[i] = zsinside;
+		zs[i] = zsbnd;
 		ut[i] = ut[inside];
-		hh[i] = hh[inside];
+		//hh[i] = hh[inside];
 	}
 }
 

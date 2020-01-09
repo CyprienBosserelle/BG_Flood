@@ -205,12 +205,13 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 	static size_t count3D[] = { 1, 16, 16 };
 
 	varblk = (float *)malloc(XParam.blksize * sizeof(float));
+	var_s = (short*)malloc(XParam.nblk * XParam.blksize * sizeof(short));
+	varblk_s = (short*)malloc(XParam.blksize * sizeof(short));
 
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(XParam.nblk*XParam.blksize *sizeof(short));
-		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		
 		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
 			for (int j = 0; j < 16; j++)
@@ -349,11 +350,10 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 		}
 	}
 
-	if (smallnc > 0)
-	{
-		free(var_s);
-		free(varblk_s);
-	}
+	
+	free(var_s);
+	free(varblk_s);
+	
 	free(varblk);
 	//close and save new file
 	status = nc_close(ncid);
@@ -412,12 +412,13 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 	static size_t count3D[] = { 1, 16, 16 };
 
 	varblk = (float *)malloc(XParam.blksize * sizeof(float));
+	var_s = (short*)malloc(XParam.nblk * XParam.blksize * sizeof(short));
+	varblk_s = (short*)malloc(XParam.blksize * sizeof(short));
 
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(XParam.nblk*XParam.blksize * sizeof(short));
-		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		
 		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
 			for (int j = 0; j < 16; j++)
@@ -545,7 +546,7 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 					for (int i = 0; i < 16; i++)
 					{
 						int n = i + j * 16 + bl * XParam.blksize;
-						varblk[i + j * 16] = var[n];
+						varblk[i + j * 16] = float(var[n]);
 					}
 				}
 				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
@@ -556,11 +557,10 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 		}
 	}
 
-	if (smallnc > 0)
-	{
-		free(var_s);
-		free(varblk_s);
-	}
+	
+	free(var_s);
+	free(varblk_s);
+	
 	free(varblk);
 	//close and save new file
 	status = nc_close(ncid);
