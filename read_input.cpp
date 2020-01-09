@@ -273,7 +273,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 			}
 
 			iswet=readncslev1(ncfile, varstr, indx, indy, it, checkhh,eps, zsa);
-			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+			printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
 			if (iswet == 0)
 			{

@@ -3800,9 +3800,9 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 		//}
 		//printf("zsbnd=%f\n", zsbnd);
 		un[i] = sign*sqrt(g / hh[i])*(zsinside - zsbnd) + umean;
-		zs[i] = zsbnd;
+		zs[i] = zsinside;
 		ut[i] = ut[inside];
-		//hh[i] = hh[inside];
+		hh[i] = hh[inside];
 	}
 }
 
