@@ -230,7 +230,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 
 	//printf("%d\n", nbndpts);
 	std::string ncfilestr;
-	std::string varstr;
+	std::string varstr,varstruu,varstrvv;
 
 
 	//char ncfile[]="ocean_ausnwsrstwq2.nc";
@@ -273,6 +273,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 			}
 
 			iswet=readncslev1(ncfile, varstr, indx, indy, it, checkhh,eps, zsa);
+			//varstr
 			printf("%d\t%d\t%d\tzs=%f\t%d\n", it,indx, indy, zsa[0],iswet);
 
 			if (iswet == 0)
@@ -286,8 +287,8 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 
 			if (checkhh)
 			{
-				varstr = "uu";
-				iswet = readncslev1(ncfilestr, varstr, indx, indy, it, checkhh, eps, zsa);
+				varstruu = "uu";
+				iswet = readncslev1(ncfilestr, varstruu, indx, indy, it, checkhh, eps, zsa);
 				printf("%d\t%d\t%d\tuu=%f\t%d\n", it, indx, indy, zsa[0], iswet);
 				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
@@ -298,8 +299,8 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 
 				Unest.push_back(zsa[0]);
 
-				varstr = "vv";
-				iswet = readncslev1(ncfile, varstr, indx, indy, it, checkhh, eps, zsa);
+				varstrvv = "vv";
+				iswet = readncslev1(ncfile, varstrvv, indx, indy, it, checkhh, eps, zsa);
 				printf("%d\t%d\t%d\tvv=%f\t%d\n", it, indx, indy, zsa[0], iswet);
 				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
 
