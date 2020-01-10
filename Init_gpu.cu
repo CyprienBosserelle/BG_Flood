@@ -211,12 +211,40 @@ int AllocMemGPU(Param XParam)
 }
 
 
-//int allocTexMem(bndparam bnd, cudaArray * WLS, cudaArray * Uvel, cudaArray * Vvel, cudaChannelFormatDesc CFDbndzs, cudaChannelFormatDesc CFDbnduu, cudaChannelFormatDesc CFDbndvv, texture<float, 2, cudaReadModeElementType> TexZs, texture<float, 2, cudaReadModeElementType> TexU, texture<float, 2, cudaReadModeElementType> TexV)
-//{
-//	int nbndtimes = (int)bnd.data.size();
-//	int nbndvec = (int)bnd.data[0].wlevs.size();
+int allocTexMem(bndparam bnd, cudaArray * &WLS, cudaArray * &Uvel, cudaArray * &Vvel, cudaChannelFormatDesc &CFDbndzs, cudaChannelFormatDesc &CFDbnduu, cudaChannelFormatDesc &CFDbndvv, texture<float, 2, cudaReadModeElementType> &TexZs, texture<float, 2, cudaReadModeElementType> &TexU, texture<float, 2, cudaReadModeElementType> &TexV)
+{
+	int nbndtimes = (int)bnd.data.size();
+	int nbndvec = (int)bnd.data[0].wlevs.size();
+	CUDA_CHECK(cudaMallocArray(&WLS, &CFDbndzs, nbndtimes, nbndvec));
 
-//}
+	float * lWLS;
+	lWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
+
+	for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+	{
+		for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+		{
+			//
+			lWLS[ibndt + ibndv*nbndtimes] = bnd.data[ibndt].wlevs[ibndv];
+		}
+	}
+
+	CUDA_CHECK(cudaMemcpyToArray(WLS, 0, 0, lWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+	TexZs.addressMode[0] = cudaAddressModeClamp;
+	TexZs.addressMode[1] = cudaAddressModeClamp;
+	TexZs.filterMode = cudaFilterModeLinear;
+	TexZs.normalized = false;
+
+
+	CUDA_CHECK(cudaBindTextureToArray(TexZs, WLS, CFDbndzs));
+
+
+	free(lWLS);
+
+	return 1;
+
+}
 
 int AllocMemGPUBND(Param XParam)
 {
@@ -231,6 +259,7 @@ int AllocMemGPUBND(Param XParam)
 
 	if (XParam.leftbnd.on)
 	{
+		allocTexMem(XParam.leftbnd, leftWLS_gp, leftUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
 
 
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
