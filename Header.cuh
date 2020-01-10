@@ -190,6 +190,10 @@ public:
 	//hot start
 	double zsinit = -999.0; //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
 
+	//Add a water level offset to initial conditions and bnds
+	double zsoffset = 0.0;
+
+
 	std::string hotstartfile;
 	//std::string deformfile;
 	int hotstep = 0; //step to read if hotstart file has multiple steps

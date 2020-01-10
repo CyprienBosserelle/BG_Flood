@@ -2595,6 +2595,8 @@ int main(int argc, char **argv)
 
 	//Model starts Here//
 	Param XParam;
+	Param defaultParam; // This is used later 
+
 	//The main function setups all the init of the model and then calls the mainloop to actually run the model
 
 	// Theire are many (12) mainloops depending whether the model runs on the GPU/CPU and whether the implementation is float/double or spherical coordinate (double only)
@@ -3423,7 +3425,7 @@ int main(int argc, char **argv)
 		//		(1) if zsinit is set, then apply zsinit everywhere
 		//		(2) zsinit is not set so interpolate from boundaries. (if no boundaries were specified set zsinit to zeros and apply case (1))
 
-		Param defaultParam;
+		//Param defaultParam;
 		//!leftWLbnd.empty()
 
 		//case 2b (i.e. zsinint and no boundaries were specified)
@@ -3468,6 +3470,23 @@ int main(int argc, char **argv)
 		}// end else
 
 	}
+
+	//add offset if present
+	if (abs(XParam.zsoffset - defaultParam.zsoffset) > epsilon) // apply specified zsoffset
+	{
+		//
+		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+		{
+			AddZSoffset(XParam, zs, hh);
+		}
+		else
+		{
+			AddZSoffset(XParam, zs_d, hh_d);
+		}
+
+	}
+
+
 	printf("done \n");
 	write_text_to_log_file("Done");
 

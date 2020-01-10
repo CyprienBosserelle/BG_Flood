@@ -666,3 +666,29 @@ void warmstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 		}
 	}
 }
+
+template <class T>
+int AddZSoffset(Param XParam, T*& zs, T*& hh)
+{
+	int success = 1;
+	for (int bl = 0; bl < XParam.nblk; bl++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				int n = i + j * 16 + bl * XParam.blksize;
+
+				
+				
+				zs[n] = max(zs[n]+T(XParam.zsoffset), zb[n]);
+				
+				hh[n] = max(zs[n] - zb[n], XParam.eps);//0.0?
+
+			}
+
+		}
+	}
+	
+	return success;
+}
