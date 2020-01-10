@@ -259,9 +259,9 @@ int AllocMemGPUBND(Param XParam)
 
 	if (XParam.leftbnd.on)
 	{
-		allocTexMem(XParam.leftbnd, leftWLS_gp, leftUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
+		//allocTexMem(XParam.leftbnd, leftWLS_gp, leftUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
 
-		/*
+		
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
 		int nbndtimes = (int)XParam.leftbnd.data.size();
@@ -351,7 +351,7 @@ int AllocMemGPUBND(Param XParam)
 
 
 		free(leftWLS);
-		*/
+		
 
 	}
 	if (XParam.rightbnd.on)
