@@ -3712,7 +3712,7 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 
 	T xx, yy;
 	int bnd, bnd_c;
-	T  sign, umean;
+	T  sign;
 	float itx;
 
 	sign = T(isright) + T(istop);
@@ -3723,8 +3723,8 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 	//int xplus;
 	//float hhi;
 	float zsbnd;
-	float uubnd=0.0;
-	float vvbnd=0.0;
+	float unbnd=0.0;
+	float utbnd=0.0;
 
 	T zsinside;
 
@@ -3742,8 +3742,10 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 		itx = (yy - yo) / (ymax - yo)*nbnd;
 
 		zsbnd = tex2D(texLZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
-		uubnd = tex2D(texLUBND, itime + 0.5f, itx + 0.5f);
-		vvbnd = tex2D(texLVBND, itime + 0.5f, itx + 0.5f);
+		unbnd = tex2D(texLUBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texLVBND, itime + 0.5f, itx + 0.5f);
+
+		
 	}
 	else if (isright > 0) // right bnd
 	{
@@ -3753,6 +3755,10 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
 		itx = (yy - yo) / (ymax - yo)*nbnd;
 		zsbnd = tex2D(texRZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		unbnd = tex2D(texRUBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texRVBND, itime + 0.5f, itx + 0.5f);
+		
+
 	}
 	else if (istop < 0) // bottom bnd  (isright must be ==0!)
 	{
@@ -3762,6 +3768,9 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 		itx = (xx - xo) / (xmax - xo)*nbnd;
 		zsbnd = tex2D(texBZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		unbnd = tex2D(texBVBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texBUBND, itime + 0.5f, itx + 0.5f);
+
 	}
 	else // top bnd istop ==1 && isright ==0
 	{
@@ -3771,6 +3780,8 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 		itx = (xx - xo) / (xmax - xo)*nbnd;
 		zsbnd = tex2D(texTZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		unbnd = tex2D(texTVBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texTUBND, itime + 0.5f, itx + 0.5f);
 	}
 
 	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
@@ -3783,7 +3794,7 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 
 
 
-	umean = T(uubnd);
+	
 
 
 	if (bnd == bnd_c && zsbnd>zb[i])
@@ -3799,9 +3810,9 @@ template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T
 		//	printf("zsbnd=%f\t uubnd=%f\t", zsbnd,umean);
 		//}
 		//printf("zsbnd=%f\n", zsbnd);
-		un[i] = sign*sqrt(g / hh[i])*(zsinside - zsbnd) + umean;
+		un[i] = sign*sqrt(g / hh[i])*(zsinside - zsbnd) + T(unbnd);
 		zs[i] = zsinside;
-		ut[i] = ut[inside];
+		ut[i] = T(utbnd);//ut[inside];
 		hh[i] = hh[inside];
 	}
 }

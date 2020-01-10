@@ -415,99 +415,18 @@ int AllocMemGPUBND(Param XParam)
 	}
 	if (XParam.rightbnd.on)
 	{
-		//allocTexMem(XParam.rightbnd, rightWLS_gp, rightUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
-
-		//leftWLbnd = readWLfile(XParam.leftbndfile);
-		//Flatten bnd to copy to cuda array
-		int nbndtimes = (int)XParam.rightbnd.data.size();
-		int nbndvec = (int)XParam.rightbnd.data[0].wlevs.size();
-		CUDA_CHECK(cudaMallocArray(&rightWLS_gp, &channelDescrightbndzs, nbndtimes, nbndvec));
-
-		float * rightWLS;
-		rightWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
-
-		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
-		{
-			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
-			{
-				//
-				rightWLS[ibndt + ibndv*nbndtimes] = XParam.rightbnd.data[ibndt].wlevs[ibndv];
-			}
-		}
-		CUDA_CHECK(cudaMemcpyToArray(rightWLS_gp, 0, 0, rightWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
-
-		texRZsBND.addressMode[0] = cudaAddressModeClamp;
-		texRZsBND.addressMode[1] = cudaAddressModeClamp;
-		texRZsBND.filterMode = cudaFilterModeLinear;
-		texRZsBND.normalized = false;
-
-
-		CUDA_CHECK(cudaBindTextureToArray(texRZsBND, rightWLS_gp, channelDescrightbndzs));
-		free(rightWLS);
+		allocTexMem(XParam.rightbnd, rightWLS_gp, rightUvel_gp, rightVvel_gp, channelDescrightbndzs, channelDescrightbnduu, channelDescrightbndvv, texRZsBND, texRUBND, texRVBND);
 
 	}
 	if (XParam.topbnd.on)
 	{
-
-		//leftWLbnd = readWLfile(XParam.leftbndfile);
-		//Flatten bnd to copy to cuda array
-		int nbndtimes = (int)XParam.topbnd.data.size();
-		int nbndvec = (int)XParam.topbnd.data[0].wlevs.size();
-		CUDA_CHECK(cudaMallocArray(&topWLS_gp, &channelDesctopbndzs, nbndtimes, nbndvec));
-
-		float * topWLS;
-		topWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
-
-		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
-		{
-			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
-			{
-				//
-				topWLS[ibndt + ibndv*nbndtimes] = XParam.topbnd.data[ibndt].wlevs[ibndv];
-			}
-		}
-		CUDA_CHECK(cudaMemcpyToArray(topWLS_gp, 0, 0, topWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
-
-		texTZsBND.addressMode[0] = cudaAddressModeClamp;
-		texTZsBND.addressMode[1] = cudaAddressModeClamp;
-		texTZsBND.filterMode = cudaFilterModeLinear;
-		texTZsBND.normalized = false;
-
-
-		CUDA_CHECK(cudaBindTextureToArray(texTZsBND, topWLS_gp, channelDesctopbndzs));
-		free(topWLS);
+		allocTexMem(XParam.topbnd, topWLS_gp, topUvel_gp, topVvel_gp, channelDesctopbndzs, channelDesctopbnduu, channelDesctopbndvv, texTZsBND, texTUBND, texTVBND);
 
 	}
 	if (XParam.botbnd.on)
 	{
+		allocTexMem(XParam.botbnd, botWLS_gp, botUvel_gp, botVvel_gp, channelDescbotbndzs, channelDescbotbnduu, channelDescbotbndvv, texBZsBND, texBUBND, texBVBND);
 
-		//leftWLbnd = readWLfile(XParam.leftbndfile);
-		//Flatten bnd to copy to cuda array
-		int nbndtimes = (int)XParam.botbnd.data.size();
-		int nbndvec = (int)XParam.botbnd.data[0].wlevs.size();
-		CUDA_CHECK(cudaMallocArray(&botWLS_gp, &channelDescbotbndzs, nbndtimes, nbndvec));
-
-		float * botWLS;
-		botWLS = (float *)malloc(nbndtimes * nbndvec * sizeof(float));
-
-		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
-		{
-			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
-			{
-				//
-				botWLS[ibndt + ibndv*nbndtimes] = XParam.botbnd.data[ibndt].wlevs[ibndv];
-			}
-		}
-		CUDA_CHECK(cudaMemcpyToArray(botWLS_gp, 0, 0, botWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
-
-		texBZsBND.addressMode[0] = cudaAddressModeClamp;
-		texBZsBND.addressMode[1] = cudaAddressModeClamp;
-		texBZsBND.filterMode = cudaFilterModeLinear;
-		texBZsBND.normalized = false;
-
-
-		CUDA_CHECK(cudaBindTextureToArray(texBZsBND, botWLS_gp, channelDescbotbndzs));
-		free(botWLS);
 
 	}
 	return 1;
@@ -687,6 +606,15 @@ void RightFlowBnd(Param XParam)
 			{
 				ABS1D << <gridDimRBND, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndrightblk_g, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
+			if (XParam.rightbnd.type == 4 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
+			{
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1DNEST << <gridDimRBND, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndrightblk_g, leftblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+			}
+			else if (XParam.rightbnd.type == 4)
+			{
+				ABS1DNEST << <gridDimRBND, blockDim, 0 >> > (1, 0, (int)XParam.rightbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndrightblk_g, leftblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+			}
 
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
@@ -789,6 +717,15 @@ void TopFlowBnd(Param XParam)
 			{
 				ABS1D << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndtopblk_g, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
 			}
+			if (XParam.topbnd.type == 4 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
+			{
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1DNEST << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndtopblk_g, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+			}
+			else if (XParam.topbnd.type == 4)
+			{
+				ABS1DNEST << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndtopblk_g, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+			}
 
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
@@ -890,6 +827,15 @@ void BotFlowBnd(Param XParam)
 			else if (XParam.botbnd.type == 3)
 			{
 				ABS1D << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndbotblk_g, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
+			}
+			if (XParam.botbnd.type == 4 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
+			{
+				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1DNEST << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndbotblk_g, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+			}
+			else if (XParam.botbnd.type == 4)
+			{
+				ABS1DNEST << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndbotblk_g, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
 			}
 
 			CUDA_CHECK(cudaDeviceSynchronize());
