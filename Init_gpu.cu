@@ -720,11 +720,11 @@ void TopFlowBnd(Param XParam)
 			if (XParam.topbnd.type == 4 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
-				ABS1DNEST << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndtopblk_g, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1DNEST << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndtopblk_g, botblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, vv_gd, uu_gd);
 			}
 			else if (XParam.topbnd.type == 4)
 			{
-				ABS1DNEST << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndtopblk_g, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				ABS1DNEST << <gridDimTBND, blockDim, 0 >> > (0, 1, (int)XParam.topbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndtopblk_g, botblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
 			}
 
 			CUDA_CHECK(cudaDeviceSynchronize());
@@ -831,11 +831,11 @@ void BotFlowBnd(Param XParam)
 			if (XParam.botbnd.type == 4 && (XParam.doubleprecision == 1 || XParam.spherical == 1))
 			{
 				//leftdirichletD << <gridDim, blockDim, 0 >> > ((int)XParam.leftbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.ymax, itime, rightblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
-				ABS1DNEST << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndbotblk_g, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, uu_gd, vv_gd);
+				ABS1DNEST << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), XParam.g, XParam.dx, XParam.xo, XParam.yo, XParam.xmax, XParam.ymax, itime, bndbotblk_g, topblk_g, blockxo_gd, blockyo_gd, zs_gd, zb_gd, hh_gd, vv_gd, uu_gd);
 			}
 			else if (XParam.botbnd.type == 4)
 			{
-				ABS1DNEST << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndbotblk_g, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, uu_g, vv_g);
+				ABS1DNEST << <gridDimBBND, blockDim, 0 >> > (0, -1, (int)XParam.botbnd.data[0].wlevs.size(), (float)XParam.g, (float)XParam.dx, (float)XParam.xo, (float)XParam.yo, (float)XParam.xmax, (float)XParam.ymax, (float)itime, bndbotblk_g, topblk_g, blockxo_g, blockyo_g, zs_g, zb_g, hh_g, vv_g, uu_g);
 			}
 
 			CUDA_CHECK(cudaDeviceSynchronize());
