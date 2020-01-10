@@ -261,7 +261,7 @@ int AllocMemGPUBND(Param XParam)
 	{
 		allocTexMem(XParam.leftbnd, leftWLS_gp, leftUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
 
-
+		/*
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
 		int nbndtimes = (int)XParam.leftbnd.data.size();
@@ -345,16 +345,18 @@ int AllocMemGPUBND(Param XParam)
 			CUDA_CHECK(cudaBindTextureToArray(texLVBND, leftVvel_gp, channelDescleftbndvv));
 
 		}
-
+		
 		///BEWARE
 		/// The cases above is not dealing with weird situation where nbndvecvv != nbndvec != nbndvecuu 
 
 
 		free(leftWLS);
+		*/
 
 	}
 	if (XParam.rightbnd.on)
 	{
+		//allocTexMem(XParam.rightbnd, rightWLS_gp, rightUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
 
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
