@@ -240,6 +240,65 @@ int allocTexMem(bndparam bnd, cudaArray * &WLS, cudaArray * &Uvel, cudaArray * &
 	CUDA_CHECK(cudaBindTextureToArray(TexZs, WLS, CFDbndzs));
 
 
+	// In case of Nesting U and V are also prescribed
+
+		// If uu information is available in the boundary we can assume it is a nesting type of bnd
+	int nbndvecuu = (int)bnd.data[0].uuvel.size();
+
+	if (nbndvecuu == nbndvec)
+	{
+		CUDA_CHECK(cudaMallocArray(&Uvel, &CFDbnduu, nbndtimes, nbndvec));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				lWLS[ibndt + ibndv * nbndtimes] =bnd.data[ibndt].uuvel[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(Uvel, 0, 0, lWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		TexU.addressMode[0] = cudaAddressModeClamp;
+		TexU.addressMode[1] = cudaAddressModeClamp;
+		TexU.filterMode = cudaFilterModeLinear;
+		TexU.normalized = false;
+
+		CUDA_CHECK(cudaBindTextureToArray(TexU, Uvel, CFDbnduu));
+
+	}
+
+
+	//V velocity side
+	int nbndvecvv = (int)bnd.data[0].vvvel.size();
+
+	if (nbndvecvv == nbndvec)
+	{
+
+		CUDA_CHECK(cudaMallocArray(&Vvel, &CFDbndvv, nbndtimes, nbndvec));
+
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				lWLS[ibndt + ibndv * nbndtimes] = bnd.data[ibndt].vvvel[ibndv];
+			}
+		}
+		CUDA_CHECK(cudaMemcpyToArray(Vvel, 0, 0, lWLS, nbndtimes * nbndvec * sizeof(float), cudaMemcpyHostToDevice));
+
+		TexV.addressMode[0] = cudaAddressModeClamp;
+		TexV.addressMode[1] = cudaAddressModeClamp;
+		TexV.filterMode = cudaFilterModeLinear;
+		TexV.normalized = false;
+
+		CUDA_CHECK(cudaBindTextureToArray(TexV, Vvel, CFDbndvv));
+
+	}
+
+	///BEWARE
+	/// The cases above is not dealing with weird situation where nbndvecvv != nbndvec != nbndvecuu 
+
 	free(lWLS);
 
 	return 1;
@@ -259,9 +318,9 @@ int AllocMemGPUBND(Param XParam)
 
 	if (XParam.leftbnd.on)
 	{
-		//allocTexMem(XParam.leftbnd, leftWLS_gp, leftUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
+		allocTexMem(XParam.leftbnd, leftWLS_gp, leftUvel_gp, leftVvel_gp, channelDescleftbndzs, channelDescleftbnduu, channelDescleftbndvv, texLZsBND, texLUBND, texLVBND);
 
-		
+		/*
 		//leftWLbnd = readWLfile(XParam.leftbndfile);
 		//Flatten bnd to copy to cuda array
 		int nbndtimes = (int)XParam.leftbnd.data.size();
@@ -351,7 +410,7 @@ int AllocMemGPUBND(Param XParam)
 
 
 		free(leftWLS);
-		
+		*/
 
 	}
 	if (XParam.rightbnd.on)
