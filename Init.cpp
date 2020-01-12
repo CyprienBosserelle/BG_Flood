@@ -455,7 +455,7 @@ int coldstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 				uu[n] = T(0.0);
 				vv[n] = T(0.0);
 				//zb[n] = 0.0f;
-				zs[n] = max(XParam.zsinit, zb[n]);
+				zs[n] = max(XParam.zsinit+XParam.zsoffset, zb[n]);
 				//if (i >= 64 && i < 82)
 				//{
 				//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);

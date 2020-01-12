@@ -96,6 +96,17 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	{
 		Bndinfo = readWLfile(filename);
 	}
+
+	// Add zsoffset
+	for (int i = 0; i < Bndinfo.size(); i++)
+	{
+		for (int n = 0; n < Bndinfo[i].wlevs.size(); n++)
+		{
+			Bndinfo[i].wlevs[n] = Bndinfo[i].wlevs[n] + XParam.zsoffset;
+		}
+	}
+
+
 	return Bndinfo;
 }
 

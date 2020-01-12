@@ -3409,7 +3409,20 @@ int main(int argc, char **argv)
 		{
 			hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk,  botblk, blockxo_d, blockyo_d,  zs, zb, hh, uu, vv);
 		}
+		//add offset if present
+		if (abs(XParam.zsoffset - defaultParam.zsoffset) > epsilon) // apply specified zsoffset
+		{
+			//
+			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+			{
+				AddZSoffset(XParam, zs, hh);
+			}
+			else
+			{
+				AddZSoffset(XParam, zs_d, hh_d);
+			}
 
+		}
 		if (hotstartsucess == 0)
 		{
 			printf("Failed...  ");
@@ -3471,20 +3484,7 @@ int main(int argc, char **argv)
 
 	}
 
-	//add offset if present
-	if (abs(XParam.zsoffset - defaultParam.zsoffset) > epsilon) // apply specified zsoffset
-	{
-		//
-		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
-		{
-			AddZSoffset(XParam, zs, hh);
-		}
-		else
-		{
-			AddZSoffset(XParam, zs_d, hh_d);
-		}
-
-	}
+	
 
 
 	printf("done \n");
