@@ -1051,6 +1051,14 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.zsinit = std::stod(parametervalue);
 	}
+
+	parameterstr = "zsoffset";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.zsoffset = std::stod(parametervalue);
+	}
+
 	parameterstr = "hotstartfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
