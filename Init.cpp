@@ -679,12 +679,13 @@ int AddZSoffset(Param XParam, T*&zb,  T*& zs, T*& hh)
 			{
 				int n = i + j * 16 + bl * XParam.blksize;
 
-				
-				
-				zs[n] = max(zs[n]+T(XParam.zsoffset), zb[n]);
-				
-				hh[n] = zs[n] - zb[n];//0.0?
+				if (hh[n] > XParam.eps)
+				{
 
+					zs[n] = max(zs[n] + T(XParam.zsoffset), zb[n]);
+
+					hh[n] = zs[n] - zb[n];//0.0?
+				}
 			}
 
 		}
