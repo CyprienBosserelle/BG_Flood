@@ -1529,7 +1529,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 
 	//Open NC file
-	printf("Open file\n");
+	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 	zberror = nc_inq_varid(ncid, "zb", &varid);
@@ -1611,10 +1611,10 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	varinfile = (float *)malloc(nx*ny * sizeof(float));
 
 	//first check if hotstart has zb
-
+	printf("Found variables: ");
 	if (zberror == NC_NOERR)
 	{
-		printf("Found zb variable!\n");
+		printf("zb... ");
 		//zb is set
 
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zb", ddim);
@@ -1641,7 +1641,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	//zs Section
 	if (zserror == NC_NOERR)
 	{
-		printf("Found zs variable!\n");
+		printf(" zs... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zs", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "zs", ndims, 0, ddim, varinfile);
@@ -1681,7 +1681,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		{
 			//Variable not found
 			//It's ok if hh is specified
-			printf("zs not found in hotstart file. Looking for hh\n");
+			printf("zs not found in hotstart file. Looking for hh... ");
 		}
 		else
 		{
@@ -1692,7 +1692,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	//hh section
 	if (hherror == NC_NOERR)
 	{
-		printf("Found hh variable!\n");
+		printf("hh... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "hh", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "hh", ndims, 0, ddim, varinfile);
@@ -1758,7 +1758,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 	if (uuerror == NC_NOERR)
 	{
-		printf("Found uu variable!\n");
+		printf("uu... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "uu", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "uu", ndims, 0, ddim, varinfile);
@@ -1799,7 +1799,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 	if (vverror == NC_NOERR)
 	{
-		printf("Found vv variable!\n");
+		printf("vv... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "vv", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "vv", ndims, 0, ddim, varinfile);
@@ -1838,6 +1838,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	//status = nc_get_var_float(ncid, hh_id, zb);
 	status = nc_close(ncid);
 
+	
 
 	return 1;
 

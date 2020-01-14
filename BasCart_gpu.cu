@@ -3412,14 +3412,15 @@ int main(int argc, char **argv)
 		//add offset if present
 		if (abs(XParam.zsoffset - defaultParam.zsoffset) > epsilon) // apply specified zsoffset
 		{
+			printf("add offset to zs and hh... ");
 			//
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				AddZSoffset(XParam, zs, hh);
+				AddZSoffset(XParam, zs_d, hh_d);
 			}
 			else
 			{
-				AddZSoffset(XParam, zs_d, hh_d);
+				AddZSoffset(XParam, zs, hh);
 			}
 
 		}
@@ -3428,6 +3429,7 @@ int main(int argc, char **argv)
 			printf("Failed...  ");
 			write_text_to_log_file("Hotstart failed switching to cold start");
 		}
+		printf("Done.\n");
 	}
 	if (XParam.hotstartfile.empty() || hotstartsucess == 0)
 	{
