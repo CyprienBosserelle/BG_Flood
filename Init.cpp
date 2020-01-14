@@ -668,7 +668,7 @@ void warmstart(Param XParam, T*zb, T *&uu, T*&vv, T*&zs, T*&hh)
 }
 
 template <class T>
-int AddZSoffset(Param XParam, T*& zs, T*& hh)
+int AddZSoffset(Param XParam, T*&zb,  T*& zs, T*& hh)
 {
 	int success = 1;
 	for (int bl = 0; bl < XParam.nblk; bl++)
@@ -683,7 +683,7 @@ int AddZSoffset(Param XParam, T*& zs, T*& hh)
 				
 				zs[n] = max(zs[n]+T(XParam.zsoffset), zb[n]);
 				
-				hh[n] = max(zs[n] - zb[n], XParam.eps);//0.0?
+				hh[n] = zs[n] - zb[n];//0.0?
 
 			}
 
