@@ -294,7 +294,9 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 					zsa[0] = WLS.back();
 				}
 				else
+				{
 					zsa[0] = 0.0;
+				}
 			}
 
 			WLS.push_back(zsa[0]);
@@ -312,7 +314,15 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 
 				if (iswet == 0)
 				{
-					zsa[0] = Unest.back();
+
+					if (Unest.size() >= 1)
+					{
+						zsa[0] = Unest.back();
+					}
+					else
+					{
+						zsa[0] = 0.0;
+					}
 				}
 
 				Unest.push_back(zsa[0]);
@@ -324,7 +334,14 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 
 				if (iswet == 0)
 				{
-					zsa[0] = Vnest.back();
+					if (Vnest.size() >= 1)
+					{
+						zsa[0] = Vnest.back();
+					}
+					else
+					{
+						zsa[0] = 0.0;
+					}
 				}
 
 				Vnest.push_back(zsa[0]);
