@@ -289,7 +289,12 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 
 			if (iswet == 0)
 			{
-				zsa[0] = WLS.back();
+				if (WLS.size() >= 1)
+				{
+					zsa[0] = WLS.back();
+				}
+				else
+					zsa[0] = 0.0;
 			}
 
 			WLS.push_back(zsa[0]);
