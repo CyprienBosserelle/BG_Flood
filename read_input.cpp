@@ -294,6 +294,8 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 
 			WLS.push_back(zsa[0]);
 
+			printf("zs=%f\\n", zsa[0]);
+
 			// If true nesting then uu and vv are expected to be present in the netcdf file 
 
 			if (checkhh)
