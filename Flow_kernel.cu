@@ -600,8 +600,8 @@ __host__ __device__ T TopAda(int ix, int iy, int ibl, int topibl, int topofright
 				}
 
 
-				varn1 = var[jj + (0) * 16 + topib * 256];
-				varn2 = var[(jj - 1) + 0 * 16 + topib * 256];
+				varn1 = var[jj + (0) * 16 + topibl * 256];
+				varn2 = var[(jj - 1) + 0 * 16 + topibl * 256];
 				varval = vari * w0 + varn1 * w1 + varn2 * w2;
 			}
 
@@ -680,7 +680,7 @@ __host__ __device__ T BotAda(int ix, int iy, int ibl, int botibl, int botofright
 				if (leftofbotibl == botibl) // no neighbour
 				{
 
-					varn1 = var[0 + 0 * 16 + topibl * 256];
+					varn1 = var[0 + 0 * 16 + botibl * 256];
 					varval = (vari + 2 * varn1) / 3.0;
 				}
 				else if (botofleftibl == botibl)
@@ -696,7 +696,7 @@ __host__ __device__ T BotAda(int ix, int iy, int ibl, int botibl, int botofright
 				{
 
 					varn1 = var[0 + 15 * 16 + botibl * 256];
-					varn2 = var[15 + (15) * 16 + botiblofleftibl * 256];
+					varn2 = var[15 + (15) * 16 + botofleftibl * 256];
 					varval = vari / 3.0 + 0.5 * varn1 + varn2 / 6.0;
 				}
 				else if (level[botofleftibl] > level[botibl])
