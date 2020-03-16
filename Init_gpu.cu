@@ -867,12 +867,12 @@ void BotFlowBnd(Param XParam)
 
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				noslipbnd << <gridDimBBND, blockDim, 0 >> >(0, 1, bndbotblk_g, topblk_g, zs_gd, hh_gd, vv_gd);
+				noslipbnd << <gridDimBBND, blockDim, 0 >> >(0, -1, bndbotblk_g, topblk_g, zs_gd, hh_gd, vv_gd);
 				//noslipbndBot << <gridDim, blockDim, 0 >> > (XParam.yo, XParam.eps, topblk_g, blockyo_gd, zb_gd, zs_gd, hh_gd, uu_gd, vv_gd);
 			}
 			else
 			{
-				noslipbnd << <gridDimBBND, blockDim, 0 >> >(0, 1, bndbotblk_g, topblk_g, zs_g, hh_g, vv_g);
+				noslipbnd << <gridDimBBND, blockDim, 0 >> >(0, -1, bndbotblk_g, topblk_g, zs_g, hh_g, vv_g);
 				//noslipbndBot << <gridDim, blockDim, 0 >> > ((float)XParam.yo, (float)XParam.eps, topblk_g, blockyo_g, zb_g, zs_g, hh_g, uu_g, vv_g);
 			}
 
