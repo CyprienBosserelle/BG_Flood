@@ -2865,7 +2865,7 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 		double vvi = vv[i];
 
 
-		float cmdinv, ga;
+		double cmdinv, ga;
 
 		cmdinv = 1.0 / (cm*delta);
 		ga = 0.5*g;
@@ -2886,9 +2886,9 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
-		float dmdt = (fmvp - fmv) / (cm*delta);
-		float fG = vvi * dmdl - uui * dmdt;
+		double dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		double dmdt = (fmvp - fmv) / (cm*delta);
+		double fG = vvi * dmdl - uui * dmdt;
 
 		//With Coriolis
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + fc*sin(phi)*vvi;
@@ -2971,7 +2971,7 @@ __global__ void updateEVSPHATMUNI(double delta, double g, double yo, double ymax
 		double vvi = vv[i];
 
 
-		float cmdinv, ga;
+		double cmdinv, ga;
 
 		cmdinv = 1.0 / (cm*delta);
 		ga = 0.5*g;
@@ -2992,9 +2992,9 @@ __global__ void updateEVSPHATMUNI(double delta, double g, double yo, double ymax
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
-		float dmdt = (fmvp - fmv) / (cm*delta);
-		float fG = vvi * dmdl - uui * dmdt;
+		double dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		double dmdt = (fmvp - fmv) / (cm*delta);
+		double fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*sin(phi)*vvi; // why not fc*sin(phi)*hi*vvi ??
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*sin(phi)*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
@@ -3073,7 +3073,7 @@ __global__ void updateEVSPHATM(double delta, double g, double yo, double ymax, d
 		double vvi = vv[i];
 
 
-		float cmdinv, ga;
+		double cmdinv, ga;
 
 		cmdinv = 1.0 / (cm*delta);
 		ga = 0.5*g;
@@ -3094,9 +3094,9 @@ __global__ void updateEVSPHATM(double delta, double g, double yo, double ymax, d
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
-		float dmdt = (fmvp - fmv) / (cm*delta);
-		float fG = vvi * dmdl - uui * dmdt;
+		double dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		double dmdt = (fmvp - fmv) / (cm*delta);
+		double fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*sin(phi)*vvi; // why not fc*sin(phi)*hi*vvi ??
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*sin(phi)*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
