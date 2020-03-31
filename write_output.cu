@@ -74,7 +74,7 @@ Param creatncfileUD(Param XParam)
 					// This is in case there are "." in the file name that do not relate to the file extension"
 					newname = newname + "." + extvec[nstin];
 				}
-				newname = newname + "(" + std::to_string(fileinc) + ")" + "." + bathyext;
+				newname = newname + "_" + std::to_string(fileinc) + "." + bathyext;
 				XParam.outfile = newname;
 				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
 				fileinc++;
@@ -348,7 +348,7 @@ Param creatncfileBUQ(Param XParam)
 	int nx, ny;
 	//double dx = XParam.dx;
 	size_t nxx, nyy;
-	int ncid, xx_dim, yy_dim, time_dim;
+	int ncid, xx_dim, yy_dim, time_dim, blockid_dim;
 	float * xval, *yval;
 	// create the netcdf datasetXParam.outfile.c_str()
 	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
@@ -371,7 +371,7 @@ Param creatncfileBUQ(Param XParam)
 					// This is in case there are "." in the file name that do not relate to the file extension"
 					newname = newname + "." + extvec[nstin];
 				}
-				newname = newname + "(" + std::to_string(fileinc) + ")" + "." + bathyext;
+				newname = newname + "_" + std::to_string(fileinc) + "." + bathyext;
 				XParam.outfile = newname;
 				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
 				fileinc++;
@@ -389,13 +389,14 @@ Param creatncfileBUQ(Param XParam)
 
 	// status could be a new error after renaming the file
 	if (status != NC_NOERR) handle_error(status);
-
+	
 	// Define time variable 
 	status = nc_def_dim(ncid, "time", NC_UNLIMITED, &time_dim);
 	if (status != NC_NOERR) handle_error(status);
 
 	int time_id, xx_id, yy_id;
 	int tdim[] = { time_dim };
+	
 	static size_t tst[] = { 0 };
 
 	size_t xcount[] = { 0 };
@@ -404,6 +405,32 @@ Param creatncfileBUQ(Param XParam)
 	static size_t ystart[] = { 0 };
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_error(status);
+
+	// Define dimensions and variables to store block id,, status, level xo, yo
+	status = nc_def_dim(ncid, "blockid", NC_UNLIMITED, &blockid_dim);
+	if (status != NC_NOERR) handle_error(status);
+
+	int biddim[] = { blockid_dim };
+	int blkid_id, blkxo_id, blkyo_id, blklevel_id, blkwidth_id, blkstatus_id;
+
+	status = nc_def_var(ncid, "blockid", NC_INT, 1, biddim, &blkid_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_def_var(ncid, "blockxo", NC_FLOAT, 1, biddim, &blkxo_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_def_var(ncid, "blockyo", NC_FLOAT, 1, biddim, &blkyo_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_def_var(ncid, "blockwidth", NC_FLOAT, 1, biddim, &blkwidth_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_def_var(ncid, "blocklevel", NC_INT, 1, biddim, &blklevel_id);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_def_var(ncid, "blockstatus", NC_INT, 1, biddim, &blklevel_id);
+	if (status != NC_NOERR) handle_error(status);
+
 
 	// For each level Define xx yy 
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
@@ -572,7 +599,7 @@ Param creatncfileBUQO(Param XParam)
 					// This is in case there are "." in the file name that do not relate to the file extension"
 					newname = newname + "." + extvec[nstin];
 				}
-				newname = newname + "(" + std::to_string(fileinc) + ")" + "." + bathyext;
+				newname = newname + "_" + std::to_string(fileinc) + "." + bathyext;
 				XParam.outfile = newname;
 				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
 				fileinc++;
