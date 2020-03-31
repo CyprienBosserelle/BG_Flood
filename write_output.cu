@@ -407,7 +407,8 @@ Param creatncfileBUQ(Param XParam)
 	if (status != NC_NOERR) handle_error(status);
 
 	// Define dimensions and variables to store block id,, status, level xo, yo
-	status = nc_def_dim(ncid, "blockid", NC_UNLIMITED, &blockid_dim);
+
+	status = nc_def_dim(ncid, "blockid", XParam.nblk, &blockid_dim);
 	if (status != NC_NOERR) handle_error(status);
 
 	int biddim[] = { blockid_dim };
