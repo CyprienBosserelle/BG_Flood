@@ -380,6 +380,7 @@ int adapt(Param XParam)
 						zs[i] = 0.25*(zso[ii] + zso[ir] + zso[it], zso[itr]);
 						uu[i] = 0.25*(uuo[ii] + uuo[ir] + uuo[it], uuo[itr]);
 						vv[i] = 0.25*(vvo[ii] + vvo[ir] + vvo[it], vvo[itr]);
+						//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
 						//zs, zb, uu,vv
 
 						
@@ -471,13 +472,13 @@ int adapt(Param XParam)
 						//
 
 						o = ix + iy * 16 + ib * XParam.blksize;
-						i = round(ix*0.5) + round(iy*0.5) * 16 + ib * XParam.blksize;
+						i = floor(ix*0.5) + floor(iy*0.5) * 16 + ib * XParam.blksize;
 						oo = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
-						ii = (round(ix*0.5) + 8) + round(iy*0.5) * 16 + ib * XParam.blksize;
+						ii = (floor(ix*0.5) + 8) + floor(iy*0.5) * 16 + ib * XParam.blksize;
 						ooo = ix + iy * 16 + availblk[csumblk[ibl] + 1] * XParam.blksize;
-						iii = round(ix*0.5) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
+						iii = floor(ix*0.5) + (floor(iy*0.5) + 8) * 16 + ib * XParam.blksize;
 						oooo = ix + iy * 16 + availblk[csumblk[ibl] + 2] * XParam.blksize;
-						iiii = (round(ix*0.5) + 8) + (round(iy*0.5) + 8) * 16 + ib * XParam.blksize;
+						iiii = (floor(ix*0.5) + 8) + (floor(iy*0.5) + 8) * 16 + ib * XParam.blksize;
 
 						//printf("ib=%d; i=%d; o=%d; ii=%d; oo=%d; iii=%d; ooo=%d; iiii=%d; oooo=%d;\n", ib, i, o, ii, oo, iii, ooo, iiii, oooo);
 						//printf("csumblk[ibl]=%d\tavailblk[csumblk[ibl]]=%d\tavailblk[csumblk[ibl]+1]=%d\tavailblk[csumblk[ibl]+2]=%d\n", csumblk[ibl], availblk[csumblk[ibl]], availblk[csumblk[ibl]+1], availblk[csumblk[ibl]+2]);
@@ -486,6 +487,9 @@ int adapt(Param XParam)
 						//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
 						//flat interpolation // need to replace with simplify bilinear
 						//zb needs to be interpolated from texture
+
+
+						//printf("hho[%d]=%f; hho[%d]=%f; hho[%d]=%f; hho[%d]=%f\n",i,hho[i],ii,hho[ii],iii,hho[iii],iiii,hho[iiii]);
 						hh[o] = hho[i];
 						hh[oo] = hho[ii];
 						hh[ooo] = hho[iii];

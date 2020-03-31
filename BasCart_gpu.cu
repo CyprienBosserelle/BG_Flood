@@ -3351,6 +3351,12 @@ int main(int argc, char **argv)
 	// relocate this to the Allocate CPU part?
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
+
+		CopyArray(XParam.nblk, XParam.blksize, hh_d, hho_d);
+		CopyArray(XParam.nblk, XParam.blksize, uu_d, uuo_d);
+		CopyArray(XParam.nblk, XParam.blksize, vv_d, vvo_d);
+		CopyArray(XParam.nblk, XParam.blksize, zs_d, zso_d);
+
 		// Set default cf
 		InitArraySV(XParam.nblk, XParam.blksize, XParam.cf, cf_d);
 		
@@ -3398,6 +3404,11 @@ int main(int argc, char **argv)
 	}
 	else //Using Float *
 	{
+
+		CopyArray(XParam.nblk, XParam.blksize, hh, hho);
+		CopyArray(XParam.nblk, XParam.blksize, uu, uuo);
+		CopyArray(XParam.nblk, XParam.blksize, vv, vvo);
+		CopyArray(XParam.nblk, XParam.blksize, zs, zso);
 
 		// Set default cf
 		InitArraySV(XParam.nblk, XParam.blksize,(float) XParam.cf, cf);
