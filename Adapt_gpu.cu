@@ -464,7 +464,7 @@ int adapt(Param XParam)
 				//printf("ib=%d; availblk[csumblk[ibl]]=%d; availblk[csumblk[ibl] + 1]=%d; availblk[csumblk[ibl] + 2]=%d; \n ", ib, availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
 
 
-				//
+				// Flat interolation
 				for (int iy = 0; iy < 16; iy++)
 				{
 					for (int ix = 0; ix < 16; ix++)
@@ -497,6 +497,73 @@ int adapt(Param XParam)
 
 					}
 				}
+
+				// Bilinear interpolation
+				for (int iy = 0; iy < 16; iy++)
+				{
+					for (int ix = 0; ix < 16; ix++)
+					{
+						int kx[] = {0,8,0,8};
+						int ky[] = {0,0,8,8};
+						int kb[] = { ib,availblk[csumblk[ibl]],availblk[csumblk[ibl] + 1],availblk[csumblk[ibl] + 2] };
+						double mx, my;
+
+						for (int kk = 0; kk < 4; kk++)
+						{
+
+
+
+							o = ix + iy * 16 + ib * XParam.blksize;
+
+							i = floor(ix * 0.5) + floor(iy * 0.5) * 16 + ib * XParam.blksize;
+							mx = floor(ix * 0.5)+kx[kk];
+							my = floor(iy * 0.5)+kx[kk];
+							//double q11, q12, q21, q22, x1, x2, y1, y2, x, y;
+							double x, y, hhleft, hhright, hhtop, hhbot;
+							x = mx * 0.5 - 0.25;
+							y = my * 0.5 - 0.25;
+
+							hhleft = LeftAda(mx, my, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, hho);
+
+							hhright = RightAda(mx, my, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, hho);
+
+							hhtop = TopAda(mx, my, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, hho);
+
+							hhbot = BotAda(mx, my, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, hho);
+
+							if (x > 0.0 && y > 0.0)
+							{
+								hh[o] = 0.0;
+							}
+							else if (x < 0.0 && y < 0.0)
+							{
+								hh[o] = BarycentricInterpolation(hho[o], 0.0, 0.0, hhleft, -0.5, 0.0, hhbot, 0.0, -0.5, x, y);
+							}
+							else if (x > 15.0 && y > 15.0)
+							{
+								hh[o] = BarycentricInterpolation(hho[o], 0.0, 0.0, hhright, 0.5, 0.0, hhtop, 0.0, 0.5, x, y);
+							}
+
+
+
+
+
+
+							printf("hhleft=%f\t hhright=%f\t hhtop=%f\t hhbot=%f\t\n", hhleft, hhright, hhtop, hh[o]);
+
+							//q11= floor(ix * 0.5) + floor(iy * 0.5) * 16 + ib * XParam.blksize;
+
+
+
+							//do the operafor each 4 refined blocks 
+
+							//hh[o]=BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
+						}
+
+					}
+				}
+
+
 
 				// sort out block info
 
@@ -685,4 +752,6 @@ int adapt(Param XParam)
 }
 
 
-//int refineblk()
+
+
+

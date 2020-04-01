@@ -1734,4 +1734,16 @@ double BilinearInterpolation(double q11, double q12, double q21, double q22, dou
 		q22 * xx1 * yy1
 		);
 }
+double BarycentricInterpolation(double q1, double x1,double y1,double q2, double x2, double y2, double q3, double x3, double y3,double x, double y)
+{
+	double w1, w2, w3,D;
+
+	D = (y2 - y3) * (x1 + x3) + (x3-x2) * (y1-y3);
+
+	w1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / D;
+	w2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / D;
+	w3 = 1 - w1 - w2;
+
+	return q1 * w1 + q2 * w2 + q3 * w3;
+}
 

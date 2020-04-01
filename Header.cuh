@@ -508,7 +508,7 @@ void SaveParamtolog(Param XParam);
 //
 double interptime(double next, double prev, double timenext, double time);
 double BilinearInterpolation(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y);
-
+double BarycentricInterpolation(double q1, double x1, double y1, double q2, double x2, double y2, double q3, double x3, double y3, double x, double y);
 
 // End of global definition
 #endif

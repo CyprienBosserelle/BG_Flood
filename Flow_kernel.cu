@@ -620,9 +620,9 @@ __host__ __device__ T BotAda(int ix, int iy, int ibl, int botibl, int botofright
 	int i;
 	int n1, n2, jj, bb;
 	int lev = level[ibl];
-	int botplev = level[botibl];
+	int botlev = level[botibl];
 
-
+	// replace with blockdim.x  ...etc for some values... This will need a CUA_ARCH if statement
 
 	if (iy > 0)
 	{
@@ -650,7 +650,7 @@ __host__ __device__ T BotAda(int ix, int iy, int ibl, int botibl, int botofright
 			if (ix < 8)
 			{
 				jj = ix * 2;
-				bb = topibl;
+				bb = botibl;
 
 			}
 			if (ix >= 8)
