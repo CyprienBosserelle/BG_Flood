@@ -121,6 +121,8 @@ double *arrmin_d;
 float * dummy;
 double * dummy_d;
 
+float* bathydata;
+
 float * cf;
 float * cf_g;
 double * cf_d;
@@ -2658,6 +2660,7 @@ int main(int argc, char **argv)
 	////////////////////////////////////////////////
 	// read the bathy file (and store to dummy for now)
 	////////////////////////////////////////////////
+	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, bathydata);
 	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy);
 	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy_d);
 
@@ -2725,6 +2728,14 @@ int main(int argc, char **argv)
 				//printf("%f\n", zb[i + (j)*nx]);
 
 			}
+		}
+	}
+
+	for (int j = 0; j < XParam.Bathymetry.ny; j++)
+	{
+		for (int i = 0; i < XParam.Bathymetry.nx; i++)
+		{
+			bathydata[i + j * XParam.Bathymetry.nx] = dummy[i + j * XParam.Bathymetry.nx];
 		}
 	}
 	printf("...done\n");

@@ -307,7 +307,7 @@ extern double * vort_d, *vort_gd;// Vorticity output
 extern float dtmax;
 extern float * dtmax_g;
 extern float * TSstore, *TSstore_g;
-extern float * dummy;
+extern float * dummy, *bathydata;
 
 extern double dtmax_d;
 extern double * dtmax_gd;

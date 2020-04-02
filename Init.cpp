@@ -237,7 +237,63 @@ template <class T> void interp2BUQ(int nblk, double blksize, double blkdx, doubl
 	}
 }
 
+template <class T> void interp2BUQAda(int nblk, double blksize, double bdx, int * activeblk, int * level, double* blockxo, double* blockyo, int nx, int ny, double xo, double xmax, double yo, double ymax, double dx, T* zb, T*& zb_buq)
+{
+	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
 
+	double x, y;
+	int n;
+
+	for (int ibl = 0; ibl < nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = activeblk[ibl];
+		double blkdx = calcres(bdx, level[ib]);
+		for (int j = 0; j < 16; j++)
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				n = i + j * 16 + ib * blksize;
+				x = blockxo[ib] + i * blkdx;
+				y = blockyo[ib] + j * blkdx;
+
+				//if (x >= xo && x <= xmax && y >= yo && y <= ymax)
+				{
+					//this is safer!
+					x = max(min(x, xmax), xo);
+					y = max(min(y, ymax), yo);
+					// cells that falls off this domain are assigned 
+					double x1, x2, y1, y2;
+					double q11, q12, q21, q22;
+					int cfi, cfip, cfj, cfjp;
+
+
+
+					cfi = min(max((int)floor((x - xo) / dx), 0), nx - 2);
+					cfip = cfi + 1;
+
+					x1 = xo + dx * cfi;
+					x2 = xo + dx * cfip;
+
+					cfj = min(max((int)floor((y - yo) / dx), 0), ny - 2);
+					cfjp = cfj + 1;
+
+					y1 = yo + dx * cfj;
+					y2 = yo + dx * cfjp;
+
+					q11 = zb[cfi + cfj * nx];
+					q12 = zb[cfi + cfjp * nx];
+					q21 = zb[cfip + cfj * nx];
+					q22 = zb[cfip + cfjp * nx];
+
+					zb_buq[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
+					//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
+				}
+
+			}
+		}
+	}
+}
 
 
 
