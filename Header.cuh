@@ -141,8 +141,8 @@ public:
 
 	//Adaptation
 	int initlevel = 0;
-	int maxlevel = 1;
-	int minlevel = -1;
+	int maxlevel = 2;
+	int minlevel = -2;
 	int nblkmem = 0;
 	int navailblk = 0;
 	double membuffer = 1.05; //needs to allocate more memory than initially needed so adaptation can happen without memory reallocation

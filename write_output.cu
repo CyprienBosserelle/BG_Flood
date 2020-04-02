@@ -450,8 +450,8 @@ Param creatncfileBUQ(Param XParam)
 		nx = (xxmax - xxmin) / ddx + 1;
 		ny = (yymax - yymin) / ddx + 1;
 
-		printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
-		printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
+		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
+		//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
 
 		nxx = nx;
 		nyy = ny;
@@ -465,8 +465,8 @@ Param creatncfileBUQ(Param XParam)
 		xxname = "xx_" + sign + std::to_string(abs(lev));
 		yyname = "yy_" + sign + std::to_string(abs(lev));
 
-		printf("lev=%d; xxname=%s; yynam e=%s;\n", lev, xxname.c_str(), yyname.c_str());
-		printf("ddx=%f; nxx=%d;\n", ddx, nxx);
+		//printf("lev=%d; xxname=%s; yynam e=%s;\n", lev, xxname.c_str(), yyname.c_str());
+		//printf("ddx=%f; nxx=%d;\n", ddx, nxx);
 		status = nc_def_dim(ncid, xxname.c_str(), nxx, &xx_dim);
 		if (status != NC_NOERR) handle_error(status);
 		status = nc_def_dim(ncid, yyname.c_str(), nyy, &yy_dim);
@@ -513,8 +513,8 @@ Param creatncfileBUQ(Param XParam)
 
 		
 
-		printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin, nx);
-		printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
+		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin, nx);
+		//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
 		// start at first value
 		//static size_t thstart[] = { 0 };
 		xcount[0] = nx;
@@ -543,7 +543,7 @@ Param creatncfileBUQ(Param XParam)
 		xxname = "xx_" + sign + std::to_string(abs(lev));
 		yyname = "yy_" + sign + std::to_string(abs(lev));
 
-		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+		//printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
 
 		status = nc_inq_varid(ncid, xxname.c_str(), &xx_id);
 		if (status != NC_NOERR) handle_error(status);
@@ -648,8 +648,8 @@ Param creatncfileBUQO(Param XParam)
 		xxname = "xx_" + std::to_string(lev);
 		yyname = "yy_" + std::to_string(lev);
 
-		printf("lev=%d; xxname=%s; yynam e=%s;\n",lev, xxname.c_str(), yyname.c_str());
-		printf("ddx=%f; nxx=%d;\n", ddx, nxx);
+		//printf("lev=%d; xxname=%s; yynam e=%s;\n",lev, xxname.c_str(), yyname.c_str());
+		//printf("ddx=%f; nxx=%d;\n", ddx, nxx);
 		//status = nc_def_dim(ncid, xxname.c_str(), nxx, &xx_dim);
 		//if (status != NC_NOERR) handle_error(status);
 		//status = nc_def_dim(ncid, yyname.c_str(), nyy, &yy_dim);
@@ -817,7 +817,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		varname = varst + "_" + sign + std::to_string(abs(lev));
 
 
-		printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+		//printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
 		status = nc_inq_dimid(ncid, xxname.c_str(), &xid);
 		if (status != NC_NOERR) handle_error(status);
 		status = nc_inq_dimid(ncid, yyname.c_str(), &yid);
@@ -942,7 +942,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n",bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 			start3D[1] = (size_t)round((blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 			start3D[2] = (size_t)round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
-			printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
+			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 
 

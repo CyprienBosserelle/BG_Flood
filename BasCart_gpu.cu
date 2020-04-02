@@ -3993,9 +3993,18 @@ int main(int argc, char **argv)
 	// Initial adaptation
 	//////////////////////////////////////////////////////////////////////////////////
 
-	wetdrycriteria(XParam, refine, coarsen);
+	int oldnblk = 0;
 
-	XParam.nblk=adapt(XParam);
+	//while (oldnblk != XParam.nblk)
+	for (int i=0; i<2;i++)
+	{
+		oldnblk = XParam.nblk;
+		wetdrycriteria(XParam, refine, coarsen);
+
+		XParam = adapt(XParam);
+
+	}
+	
 
 
 

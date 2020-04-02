@@ -60,7 +60,7 @@ int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 
 
 
-int adapt(Param XParam)
+Param adapt(Param XParam)
 {
 
 
@@ -225,7 +225,15 @@ int adapt(Param XParam)
 		printf("level =%d, %d, %d, %d\n", ib, level[ib], refine[ib], coarsen[ib]);
 	}*/
 
-	
+	// Reconstruct avail blk
+	XParam.navailblk = 0;
+	for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
+	{
+
+		availblk[ibl] = XParam.nblk + ibl;
+		XParam.navailblk++;
+
+	}
 
 
 	
@@ -234,7 +242,7 @@ int adapt(Param XParam)
 
 
 		
-	//Calc cumsum that will determine where the new cell will be located in the memory
+	//Calc cumsum that will determine where the new blocks will be located in the memory
 
 	int csum = 0;
 	int nrefineblk = 0;
@@ -261,7 +269,7 @@ int adapt(Param XParam)
 
 	nnewblk = 3*nrefineblk - ncoarsenlk*3;
 
-	printf("%d blocks to be refined, %d blocks to be coarsen; %d blocks to be freed (%d are already available) %d new blocks will be created\n", nrefineblk, ncoarsenlk, ncoarsenlk * 3 , XParam.navailblk, nnewblk);
+	printf("%d blocks to be refined, %d blocks to be coarsen (with neighbour); %d blocks untouched; %d blocks to be freed (%d are already available) %d new blocks will be created\n", nrefineblk, ncoarsenlk, XParam.nblk- nrefineblk-4* ncoarsenlk,  ncoarsenlk * 3 , XParam.navailblk, nnewblk);
 	//printf("csunblk[end]=%d; navailblk=%d\n", csumblk[XParam.nblk - 1], XParam.navailblk);
 	if (nnewblk>XParam.navailblk)
 	{
@@ -279,6 +287,35 @@ int adapt(Param XParam)
 		ReallocArray(nblkmem, XParam.blksize, vv);
 
 		// Also need to reallocate all the others!
+		ReallocArray(XParam.nblkmem, XParam.blksize, hho);
+		ReallocArray(XParam.nblkmem, XParam.blksize, zso);
+		ReallocArray(XParam.nblkmem, XParam.blksize, uuo);
+		ReallocArray(XParam.nblkmem, XParam.blksize, vvo);
+
+		ReallocArray(XParam.nblkmem, XParam.blksize, dzsdx);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dhdx);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dudx);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dvdx);
+
+		ReallocArray(XParam.nblkmem, XParam.blksize, dzsdy);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dhdy);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dudy);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dvdy);
+
+		ReallocArray(XParam.nblkmem, XParam.blksize, Su);
+		ReallocArray(XParam.nblkmem, XParam.blksize, Sv);
+		ReallocArray(XParam.nblkmem, XParam.blksize, Fhu);
+		ReallocArray(XParam.nblkmem, XParam.blksize, Fhv);
+
+		ReallocArray(XParam.nblkmem, XParam.blksize, Fqux);
+		ReallocArray(XParam.nblkmem, XParam.blksize, Fquy);
+		ReallocArray(XParam.nblkmem, XParam.blksize, Fqvx);
+		ReallocArray(XParam.nblkmem, XParam.blksize, Fqvy);
+
+		ReallocArray(XParam.nblkmem, XParam.blksize, dh);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dhu);
+		ReallocArray(XParam.nblkmem, XParam.blksize, dhv);
+		ReallocArray(XParam.nblkmem, XParam.blksize, cf);
 
 		//also reallocate Blk info
 		ReallocArray(nblkmem, 1, blockxo);
@@ -310,6 +347,7 @@ int adapt(Param XParam)
 		XParam.navailblk = 0;
 		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
 		{
+			activeblk[XParam.nblk + ibl] = -1;
 
 			availblk[ibl] = XParam.nblk + ibl;
 			XParam.navailblk++;
@@ -320,8 +358,19 @@ int adapt(Param XParam)
 
 	}
 
+	// Initialise newlevel (Do this every time because new level is reused later)
 
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//
+		
+		int ib = activeblk[ibl];
 
+	
+		newlevel[ib] = level[ib];
+
+		
+	}
 
 
 	//coarsen
@@ -622,6 +671,7 @@ int adapt(Param XParam)
 								cx = 16;
 							}
 
+							//printf("First blk %f\n",BilinearInterpolation(h11, h12, h21, h22, fx, cx, fy, cy, rx, ry));
 							
 							hh[o] = BilinearInterpolation(h11, h12, h21, h22, fx, cx, fy, cy, rx, ry);
 							zs[o] = BilinearInterpolation(zs11, zs12, zs21, zs22, fx, cx, fy, cy, rx, ry);
@@ -677,7 +727,7 @@ int adapt(Param XParam)
 				leftblk[availblk[csumblk[ibl]]] = ib;
 				leftblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl] + 1];
 
-				
+				XParam.navailblk= XParam.navailblk-3;
 			}
 		}
 
@@ -779,7 +829,7 @@ int adapt(Param XParam)
 			
 			level[ib] = newlevel[ib];
 			
-			printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
+			//printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
 			
 		}
 	}
@@ -801,10 +851,12 @@ int adapt(Param XParam)
 		if (newlevel[ibl] != -1)//i.e. old activeblk
 		{
 			activeblk[ib] = newlevel[ibl];
-			printf("ib=%d; l=%d; xo=%f; yo=%f\n", activeblk[ib], level[activeblk[ib]], blockxo_d[activeblk[ib]], blockyo_d[activeblk[ib]]);
+			//printf("ib=%d; l=%d; xo=%f; yo=%f\n", activeblk[ib], level[activeblk[ib]], blockxo_d[activeblk[ib]], blockyo_d[activeblk[ib]]);
 			ib++;
 		}
 	}
+
+	printf("ib=%d; nblk=%d; XParam.nblk=%d\n", ib, nblk, XParam.nblk);
 
 	nblk = ib;
 
@@ -819,46 +871,18 @@ int adapt(Param XParam)
 		newlevel[ibl] = 0;
 	}
 
-	ReallocArray(XParam.nblkmem, XParam.blksize, hho);
-	ReallocArray(XParam.nblkmem, XParam.blksize, zso);
-	ReallocArray(XParam.nblkmem, XParam.blksize, uuo);
-	ReallocArray(XParam.nblkmem, XParam.blksize, vvo);
-
-	ReallocArray(XParam.nblkmem, XParam.blksize, dzsdx);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dhdx);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dudx);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dvdx);
-
-	ReallocArray(XParam.nblkmem, XParam.blksize, dzsdy);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dhdy);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dudy);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dvdy);
-
-	ReallocArray(XParam.nblkmem, XParam.blksize, Su);
-	ReallocArray(XParam.nblkmem, XParam.blksize, Sv);
-	ReallocArray(XParam.nblkmem, XParam.blksize, Fhu);
-	ReallocArray(XParam.nblkmem, XParam.blksize, Fhv);
-
-	ReallocArray(XParam.nblkmem, XParam.blksize, Fqux);
-	ReallocArray(XParam.nblkmem, XParam.blksize, Fquy);
-	ReallocArray(XParam.nblkmem, XParam.blksize, Fqvx);
-	ReallocArray(XParam.nblkmem, XParam.blksize, Fqvy);
 	
-	ReallocArray(XParam.nblkmem, XParam.blksize, dh);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dhu);
-	ReallocArray(XParam.nblkmem, XParam.blksize, dhv);
-	ReallocArray(XParam.nblkmem, XParam.blksize, cf);
 
 	
 
 	//interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, bathydata, zb);
-	interp2BUQAda(XParam.nblk, XParam.blksize, XParam.dx, activeblk, level, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, bathydata, zb);
+	interp2BUQAda(nblk, XParam.blksize, XParam.dx, activeblk, level, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, bathydata, zb);
 
 	// Because zb cannot be conserved through the refinement or coarsening
 	// We have o decide whtether to conserve elevation (zs) or Volume (hh)
 	// 
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
 		for (int iy = 0; iy < 16; iy++)
@@ -871,7 +895,19 @@ int adapt(Param XParam)
 		}
 	}
 
-	return nblk;
+	// Copy basic info to hho zso uuo vvo for further iterations
+	CopyArray(nblk, XParam.blksize, hh, hho);
+	CopyArray(nblk, XParam.blksize, zs, zso);
+	CopyArray(nblk, XParam.blksize, uu, uuo);
+	CopyArray(nblk, XParam.blksize, vv, vvo);
+
+
+
+	// Update nblk (nblk is the new number of block XParam.nblk is the previous number of blk)
+	XParam.nblk = nblk;
+
+
+	return XParam;
 }
 
 
