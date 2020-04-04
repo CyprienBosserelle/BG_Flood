@@ -398,7 +398,8 @@ Param creatncfileBUQ(Param XParam)
 	int tdim[] = { time_dim };
 	
 	static size_t tst[] = { 0 };
-
+	size_t blkstart[] = { 0 };
+	size_t blkcount[] = { XParam.nblk };
 	size_t xcount[] = { 0 };
 	size_t ycount[] = { 0 };
 	static size_t xstart[] = { 0 }; // start at first value
@@ -429,7 +430,7 @@ Param creatncfileBUQ(Param XParam)
 	status = nc_def_var(ncid, "blocklevel", NC_INT, 1, biddim, &blklevel_id);
 	if (status != NC_NOERR) handle_error(status);
 
-	status = nc_def_var(ncid, "blockstatus", NC_INT, 1, biddim, &blklevel_id);
+	status = nc_def_var(ncid, "blockstatus", NC_INT, 1, biddim, &blkstatus_id);
 	if (status != NC_NOERR) handle_error(status);
 
 
@@ -490,9 +491,34 @@ Param creatncfileBUQ(Param XParam)
 	//status = nc_close(ncid);
 	//if (status != NC_NOERR) handle_error(status);
 
+	float* blkwidth;
+	int* blkid;
 
-	//status = nc_put_var1_double(ncid, time_id, tst, &XParam.totaltime);
-	//if (status != NC_NOERR) handle_error(status);
+
+	Allocate1CPU(1, XParam.nblk, blkwidth);
+	Allocate1CPU(1, XParam.nblk, blkid);
+
+
+	for (int ib = 0; ib < XParam.nblk; ib++)
+	{
+		blkwidth[ib] = (float)calcres(XParam.dx, level[ib]);
+		blkid[ib] = ib;
+	}
+
+	status = nc_put_vara_int(ncid, blkid_id, blkstart, blkcount, blkid);
+	status = nc_put_vara_int(ncid, blkstatus_id, blkstart, blkcount, activeblk);
+	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blockxo);
+	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blockyo);
+	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, level);
+	status = nc_put_vara_float(ncid, blkwidth_id, blkstart, blkcount, blkwidth);
+
+
+
+
+
+	free(blkwidth);
+
+	if (status != NC_NOERR) handle_error(status);
 	
 	std::string xxname, yyname, sign;
 

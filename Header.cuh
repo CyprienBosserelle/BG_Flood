@@ -140,7 +140,7 @@ public:
 	double Radius = 6371220.; //Earth radius [m]
 
 	//Adaptation
-	int initlevel = 0;
+	int initlevel = 1;
 	int maxlevel = 2;
 	int minlevel = -2;
 	int nblkmem = 0;
