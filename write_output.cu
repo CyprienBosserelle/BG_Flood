@@ -501,21 +501,41 @@ Param creatncfileBUQ(Param XParam)
 
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
-		blkwidth[ib] = (float)calcres(XParam.dx, level[ib]);
-		blkid[ib] = ib;
+		int ibl = activeblk[ib];
+		blkwidth[ib] = (float)calcres(XParam.dx, level[ibl]);
+		blkid[ib] = ibl;
 	}
 
 	status = nc_put_vara_int(ncid, blkid_id, blkstart, blkcount, blkid);
-	status = nc_put_vara_int(ncid, blkstatus_id, blkstart, blkcount, activeblk);
-	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blockxo);
-	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blockyo);
-	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, level);
+	//status = nc_put_vara_int(ncid, blkstatus_id, blkstart, blkcount, activeblk);
 	status = nc_put_vara_float(ncid, blkwidth_id, blkstart, blkcount, blkwidth);
 
 
+	// Reusing blkwidth for other array
+	// This is needed because the blockxo array may be shuffled to memory block beyond nblk
+	for (int ib = 0; ib < XParam.nblk; ib++)
+	{
+		int ibl = activeblk[ib];
+		blkwidth[ib] = blockxo[ibl];
+		blkid[ib] = level[ibl];
+		
+	}
+
+	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blkwidth);
+	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, blkid);
+	for (int ib = 0; ib < XParam.nblk; ib++)
+	{
+		int ibl = activeblk[ib];
+		blkwidth[ib] = blockyo[ibl];
+	}
+
+	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blkwidth);
+	
+	
 
 
 
+	free(blkid);
 	free(blkwidth);
 
 	if (status != NC_NOERR) handle_error(status);

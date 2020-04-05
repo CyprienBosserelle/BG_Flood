@@ -94,6 +94,20 @@ Param adapt(Param XParam)
 		}
 	}
 
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		if (coarsen[ib] == true)
+		{
+			int levi = level[ib];
+
+			if (levi < level[leftblk[ib]] || levi < level[rightblk[ib]] || levi < level[topblk[ib]] || levi < level[botblk[ib]])
+			{
+				coarsen[ib] = false;
+			}
+		}
+	}
+
 
 
 
@@ -869,6 +883,8 @@ Param adapt(Param XParam)
 		blockxo[ibl] = blockxo_d[ibl];
 		blockyo[ibl] = blockyo_d[ibl];
 		newlevel[ibl] = 0;
+		refine[ibl] = false;
+		coarsen[ibl] = false;
 	}
 
 	
