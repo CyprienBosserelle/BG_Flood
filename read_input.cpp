@@ -380,6 +380,37 @@ Param readparamstr(std::string line, Param param)
 		param.doubleprecision = std::stoi(parametervalue);
 	}
 	///////////////////////////////////////////////////////
+	// Adaptation
+	//
+	parameterstr = "maxlevel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.maxlevel = std::stoi(parametervalue);
+	}
+
+	parameterstr = "minlevel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.minlevel = std::stoi(parametervalue);
+	}
+
+	parameterstr = "initlevel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.initlevel = std::stoi(parametervalue);
+	}
+
+	parameterstr = "membuffer";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.membuffer = std::stod(parametervalue);
+	}
+
+	///////////////////////////////////////////////////////
 	// Flow parameters
 	//
 	parameterstr = "eps";
