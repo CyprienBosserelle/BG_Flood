@@ -51,6 +51,8 @@ int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 
 		refine[ib] = iswet;
 		coarsen[ib] = !iswet;
+
+		printf("ib=%d; refibe[ib]=%s\n", ib, iswet ? "true" : "false");
 	}
 	return success;
 }
@@ -258,7 +260,7 @@ Param adapt(Param XParam)
 		
 	//Calc cumsum that will determine where the new blocks will be located in the memory
 
-	int csum = 0;
+	int csum = -3;
 	int nrefineblk = 0;
 	int ncoarsenlk = 0;
 	int nnewblk = 0;
@@ -366,6 +368,8 @@ Param adapt(Param XParam)
 			availblk[ibl] = XParam.nblk + ibl;
 			XParam.navailblk++;
 
+			printf("ibl=%d; availblk[ibl]=%d;\n",ibl, availblk[ibl]);
+
 		}
 		
 		printf("Reallocation complete: %d new blocks are available\n", XParam.navailblk);
@@ -374,11 +378,11 @@ Param adapt(Param XParam)
 
 	// Initialise newlevel (Do this every time because new level is reused later)
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ib = 0; ib < XParam.nblkmem; ib++)
 	{
 		//
 		
-		int ib = activeblk[ibl];
+		//int ib = activeblk[ibl];
 
 	
 		newlevel[ib] = level[ib];
@@ -439,11 +443,10 @@ Param adapt(Param XParam)
 
 
 						// These are the only guys that need to be coarsen, other are recalculated on teh fly or interpolated from forcing
-
-						hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it], hho[itr]);
-						zs[i] = 0.25*(zso[ii] + zso[ir] + zso[it], zso[itr]);
-						uu[i] = 0.25*(uuo[ii] + uuo[ir] + uuo[it], uuo[itr]);
-						vv[i] = 0.25*(vvo[ii] + vvo[ir] + vvo[it], vvo[itr]);
+						hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it] + hho[itr]);
+						zs[i] = 0.25*(zso[ii] + zso[ir] + zso[it] + zso[itr]);
+						uu[i] = 0.25*(uuo[ii] + uuo[ir] + uuo[it] + uuo[itr]);
+						vv[i] = 0.25*(vvo[ii] + vvo[ir] + vvo[it] + vvo[itr]);
 						//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
 						//zs, zb, uu,vv
 
@@ -525,7 +528,7 @@ Param adapt(Param XParam)
 				oldright = rightblk[ib];
 				oldleft = leftblk[ib];
 
-				//printf("ib=%d; availblk[csumblk[ibl]]=%d; availblk[csumblk[ibl] + 1]=%d; availblk[csumblk[ibl] + 2]=%d; \n ", ib, availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
+				//printf("ib=%d; nblk=%d; availblk[csumblk[ibl]]=%d; availblk[csumblk[ibl] + 1]=%d; availblk[csumblk[ibl] + 2]=%d; \n ", ib, nblk, availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
 
 
 				// Flat interolation
@@ -563,57 +566,70 @@ Param adapt(Param XParam)
 					}
 				}
 				**/
+				printf("ibl=%d; ib=%d; csumblk[ib]=%d; availblk[csumblk[ib]]=%d; availblk[csumblk[ib]+1]=%d; availblk[csumblk[ib]+2]=%d;\n", ibl, ib, csumblk[ib], availblk[csumblk[ib]], availblk[csumblk[ib] + 1], availblk[csumblk[ib] + 2]);
+
 				
 				// Bilinear interpolation
 				for (int iy = 0; iy < 16; iy++)
 				{
 					for (int ix = 0; ix < 16; ix++)
 					{
-						int kx[] = {0,8,0,8};
-						int ky[] = {0,0,8,8};
-						int kb[] = { ib,availblk[csumblk[ibl]],availblk[csumblk[ibl] + 1],availblk[csumblk[ibl] + 2] };
-						double mx, my;
+						int kx[] = { 0, 8, 0, 8};
+						int ky[] = { 0, 0, 8, 8};
+						int kb[] = { ib, availblk[csumblk[ib]], availblk[csumblk[ib] + 1], availblk[csumblk[ib] + 2]};
+						
+						//double mx, my;
 
 						for (int kk = 0; kk < 4; kk++)
 						{
 
-							int cx, fx, cy, fy, rx, ry;
+							int cx, fx, cy, fy;
 							double h11, h12, h21, h22;
 							double zs11, zs12, zs21, zs22;
 							double u11, u12, u21, u22;
 							double v11, v12, v21, v22;
+							double lx, ly, rx, ry;
+
+							lx = ix * 0.5 - 0.25;
+							ly = iy * 0.5 - 0.25;
 
 
-							fx = (int) floor(ix * 0.5) + kx[kk];
-							cx = max((int)ceil(ix * 0.5) + kx[kk],15);
-							fy = (int) floor(iy * 0.5) + ky[kk];
-							cy = max((int)ceil(iy * 0.5) + ky[kk],15);
+							fx = max((int) floor(lx) + kx[kk],0);
+							cx = min((int) ceil(lx) + kx[kk],15);
+							fy = max((int) floor(ly) + ky[kk],0);
+							cy = min((int) ceil(ly) + ky[kk],15);
 
-							rx= (ix * 0.5) + kx[kk];
-							ry= (iy * 0.5) + ky[kk];
+							rx= (lx) + (double)kx[kk];
+							ry= (ly) + (double)ky[kk];
+
+
+						
 
 
 							o = ix + iy * 16 + kb[kk] * XParam.blksize;
 
 							h11 = hho[fx + fy * 16 + ib * XParam.blksize];
-							h12 = hho[cx + fy * 16 + ib * XParam.blksize];
-							h21 = hho[fx + cy * 16 + ib * XParam.blksize];
+							h21 = hho[cx + fy * 16 + ib * XParam.blksize];
+							h12 = hho[fx + cy * 16 + ib * XParam.blksize];
 							h22 = hho[cx + cy * 16 + ib * XParam.blksize];
 
 							zs11 = zso[fx + fy * 16 + ib * XParam.blksize];
-							zs12 = zso[cx + fy * 16 + ib * XParam.blksize];
-							zs21 = zso[fx + cy * 16 + ib * XParam.blksize];
+							zs21 = zso[cx + fy * 16 + ib * XParam.blksize];
+							zs12 = zso[fx + cy * 16 + ib * XParam.blksize];
 							zs22 = zso[cx + cy * 16 + ib * XParam.blksize];
 
 							u11 = uuo[fx + fy * 16 + ib * XParam.blksize];
-							u12 = uuo[cx + fy * 16 + ib * XParam.blksize];
-							u21 = uuo[fx + cy * 16 + ib * XParam.blksize];
+							u21 = uuo[cx + fy * 16 + ib * XParam.blksize];
+							u12 = uuo[fx + cy * 16 + ib * XParam.blksize];
 							u22 = uuo[cx + cy * 16 + ib * XParam.blksize];
 
 							v11 = vvo[fx + fy * 16 + ib * XParam.blksize];
-							v12 = vvo[cx + fy * 16 + ib * XParam.blksize];
-							v21 = vvo[fx + cy * 16 + ib * XParam.blksize];
+							v21 = vvo[cx + fy * 16 + ib * XParam.blksize];
+							v12 = vvo[fx + cy * 16 + ib * XParam.blksize];
 							v22 = vvo[cx + cy * 16 + ib * XParam.blksize];
+
+							
+
 
 							if (cy == 0)
 							{
@@ -629,69 +645,89 @@ Param adapt(Param XParam)
 								v11 = BotAda(fx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, vvo);
 								v12 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, vvo);
 							
-								fy = -1;
+								
 							}
 
 							if (fy >= 15)
 							{
-								h21 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, hho);
+								h12 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, hho);
 								h22 = TopAda(cx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, hho);
 								
-								zs21 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, zso);
+								zs12 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, zso);
 								zs22 = TopAda(cx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, zso);
 
-								u21 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, uuo);
+								u12 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, uuo);
 								u22 = TopAda(cx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, uuo);
 
-								v21 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, vvo);
+								v12 = TopAda(fx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, vvo);
 								v22 = TopAda(cx, fy, ib, topblk[ib], topblk[rightblk[ib]], topblk[leftblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], level, vvo);
 
 								
-								cy = 16;
+								
 							}
 
 							if (cx == 0)
 							{
-								h21 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, hho);
+								h12 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, hho);
 								h11 = LeftAda(cx, fy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, hho);
 								
-								zs21 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, zso);
+								zs12 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, zso);
 								zs11 = LeftAda(cx, fy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, zso);
 
-								u21 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, uuo);
+								u12 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, uuo);
 								u11 = LeftAda(cx, fy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, uuo);
 
-								v21 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, vvo);
+								v12 = LeftAda(cx, cy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, vvo);
 								v11 = LeftAda(cx, fy, ib, leftblk[ib], leftblk[botblk[ib]], leftblk[topblk[ib]], botblk[leftblk[ib]], topblk[leftblk[ib]], level, vvo);
 							
-								fx = -1;
+								
 							}
 
 							if (fx >= 15)
 							{
 								h22 = RightAda(fx, cy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, hho);
-								h12 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, hho);
+								h21 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, hho);
 								
 								zs22 = RightAda(fx, cy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, zso);
-								zs12 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, zso);
+								zs21 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, zso);
 
 								u22 = RightAda(fx, cy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, uuo);
-								u12 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, uuo);
+								u21 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, uuo);
 
 								v22 = RightAda(fx, cy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, vvo);
-								v12 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, vvo);
+								v21 = RightAda(fx, fy, ib, rightblk[ib], rightblk[botblk[ib]], rightblk[topblk[ib]], botblk[rightblk[ib]], topblk[rightblk[ib]], level, vvo);
 
 								
+								
+							}
+
+
+
+							if (cy == 0)
+							{
+								fy = -1;
+							}
+							if (fy >= 15)
+							{
+								cy = 16;
+							}
+							if (cx == 0)
+							{
+								fx = -1;
+							}
+							if (fx >= 15)
+							{
 								cx = 16;
 							}
 
+							//printf("fx = %d; cx=%d; fy=%d; cy=%d; rx=%f; ry=%f\n", fx, cx, fy, cy,rx,ry);
+
 							//printf("First blk %f\n",BilinearInterpolation(h11, h12, h21, h22, fx, cx, fy, cy, rx, ry));
 							
-							hh[o] = BilinearInterpolation(h11, h12, h21, h22, fx, cx, fy, cy, rx, ry);
-							zs[o] = BilinearInterpolation(zs11, zs12, zs21, zs22, fx, cx, fy, cy, rx, ry);
-							uu[o] = BilinearInterpolation(u11, u12, u21, u22, fx, cx, fy, cy, rx, ry);
-							vv[o] = BilinearInterpolation(v11, v12, v21, v22, fx, cx, fy, cy, rx, ry);
-
+							hh[o] = BilinearInterpolation(h11, h12, h21, h22, (double)fx, (double)cx, (double)fy, (double)cy, rx, ry);
+							zs[o] = BilinearInterpolation(zs11, zs12, zs21, zs22, (double)fx, (double)cx, (double)fy, (double)cy, rx, ry);
+							uu[o] = BilinearInterpolation(u11, u12, u21, u22, (double)fx, (double)cx, (double)fy, (double)cy, rx, ry);
+							vv[o] = BilinearInterpolation(v11, v12, v21, v22, (double)fx, (double)cx, (double)fy, (double)cy, rx, ry);
 
 
 						}
@@ -704,42 +740,42 @@ Param adapt(Param XParam)
 				// sort out block info
 
 				newlevel[ib] = level[ib] + 1;
-				newlevel[availblk[csumblk[ibl]]] = level[ib] + 1;
-				newlevel[availblk[csumblk[ibl] + 1]] = level[ib] + 1;
-				newlevel[availblk[csumblk[ibl] + 2]] = level[ib] + 1;
+				newlevel[availblk[csumblk[ib]]] = level[ib] + 1;
+				newlevel[availblk[csumblk[ib] + 1]] = level[ib] + 1;
+				newlevel[availblk[csumblk[ib] + 2]] = level[ib] + 1;
 
 
 				blockxo_d[ib] = xoblk;
 				blockyo_d[ib] = yoblk;
 
 				//bottom right blk
-				blockxo_d[availblk[csumblk[ibl]]] = xoblk + (XParam.blkwidth) * delx;
-				blockyo_d[availblk[csumblk[ibl]]] = yoblk;
+				blockxo_d[availblk[csumblk[ib]]] = xoblk + (XParam.blkwidth) * delx;
+				blockyo_d[availblk[csumblk[ib]]] = yoblk;
 				//top left blk
-				blockxo_d[availblk[csumblk[ibl] + 1]] = xoblk;
-				blockyo_d[availblk[csumblk[ibl] + 1]] = yoblk + (XParam.blkwidth) * delx;
+				blockxo_d[availblk[csumblk[ib] + 1]] = xoblk;
+				blockyo_d[availblk[csumblk[ib] + 1]] = yoblk + (XParam.blkwidth) * delx;
 				//top right blk
-				blockxo_d[availblk[csumblk[ibl] + 2]] = xoblk + (XParam.blkwidth) * delx;
-				blockyo_d[availblk[csumblk[ibl] + 2]] = yoblk + (XParam.blkwidth ) * delx;
+				blockxo_d[availblk[csumblk[ib] + 2]] = xoblk + (XParam.blkwidth) * delx;
+				blockyo_d[availblk[csumblk[ib] + 2]] = yoblk + (XParam.blkwidth ) * delx;
 
 
 				//sort out blocks neighbour
 
-				topblk[ib] = availblk[csumblk[ibl] + 1];
-				topblk[availblk[csumblk[ibl] + 1]] = oldtop;
-				topblk[availblk[csumblk[ibl]]] = availblk[csumblk[ibl] + 2];
+				topblk[ib] = availblk[csumblk[ib] + 1];
+				topblk[availblk[csumblk[ib] + 1]] = oldtop;
+				topblk[availblk[csumblk[ib]]] = availblk[csumblk[ib] + 2];
 
 				//printf("topblk[ib]=%d; oldtop=%d; topblk[availblk[csumblk[ibl] + 1]]=%d; topblk[availblk[csumblk[ibl]]]=%d; \n ", availblk[csumblk[ibl] + 1], oldtop, topblk[availblk[csumblk[ibl] + 1]], topblk[availblk[csumblk[ibl]]]);
 
-				rightblk[ib] = availblk[csumblk[ibl]];
-				rightblk[availblk[csumblk[ibl] + 1]] = availblk[csumblk[ibl] + 2];
-				rightblk[availblk[csumblk[ibl]]] = oldright;
+				rightblk[ib] = availblk[csumblk[ib]];
+				rightblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 2];
+				rightblk[availblk[csumblk[ib]]] = oldright;
 
-				botblk[availblk[csumblk[ibl] + 1]] = ib;
-				botblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl]];
+				botblk[availblk[csumblk[ib] + 1]] = ib;
+				botblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib]];
 
-				leftblk[availblk[csumblk[ibl]]] = ib;
-				leftblk[availblk[csumblk[ibl] + 2]] = availblk[csumblk[ibl] + 1];
+				leftblk[availblk[csumblk[ib]]] = ib;
+				leftblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 1];
 
 				XParam.navailblk= XParam.navailblk-3;
 			}
@@ -772,53 +808,53 @@ Param adapt(Param XParam)
 				//printf("availblk[csumblk[ibl]]=%d, availblk[csumblk[ibl]+1] = %d, availblk[csumblk[ibl]+2]=%d\n", availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
 				if (newlevel[oldtop] <  newlevel[ib])
 				{
-					topblk[availblk[csumblk[ibl] + 2]] = oldtop;
+					topblk[availblk[csumblk[ib] + 2]] = oldtop;
 				}
 				else
 				{
-					topblk[availblk[csumblk[ibl] + 2]] = rightblk[oldtop];
+					topblk[availblk[csumblk[ib] + 2]] = rightblk[oldtop];
 				}
 
 				/////
 				if ( newlevel[oldright] <  newlevel[ib])
 				{
-					rightblk[availblk[csumblk[ibl] + 2]] = oldright;
+					rightblk[availblk[csumblk[ib] + 2]] = oldright;
 				}
 				else
 				{
-					rightblk[availblk[csumblk[ibl] + 2]] = topblk[oldright];
+					rightblk[availblk[csumblk[ib] + 2]] = topblk[oldright];
 				}
 
 				/////
 				if (newlevel[oldleft] < newlevel[ib])
 				{
-					leftblk[availblk[csumblk[ibl] + 1]] = oldleft;
+					leftblk[availblk[csumblk[ib] + 1]] = oldleft;
 				}
 				else
 				{
-					leftblk[availblk[csumblk[ibl] + 1]] = topblk[oldleft];
+					leftblk[availblk[csumblk[ib] + 1]] = topblk[oldleft];
 				}
 
 				/////
 				if ( newlevel[oldbot] <  newlevel[ib])
 				{
-					botblk[availblk[csumblk[ibl]]] = oldbot;
+					botblk[availblk[csumblk[ib]]] = oldbot;
 				}
 				else
 				{
-					botblk[availblk[csumblk[ibl]]] = rightblk[oldbot];
+					botblk[availblk[csumblk[ib]]] = rightblk[oldbot];
 				}
 
 				//printf("level=%d\n", level[ib]);
-				level[availblk[csumblk[ibl]]] = level[ib];
-				level[availblk[csumblk[ibl]+1]] = level[ib];
-				level[availblk[csumblk[ibl]+2]] = level[ib];
+				//newlevel[availblk[csumblk[ibl]]] = level[ib];
+				//newlevel[availblk[csumblk[ibl]+1]] = level[ib];
+				//newlevel[availblk[csumblk[ibl]+2]] = level[ib];
 
 				
 
-				activeblk[nblk] = availblk[csumblk[ibl]];
-				activeblk[nblk + 1] = availblk[csumblk[ibl] + 1];
-				activeblk[nblk + 2] = availblk[csumblk[ibl] + 2];
+				activeblk[nblk] = availblk[csumblk[ib]];
+				activeblk[nblk + 1] = availblk[csumblk[ib] + 1];
+				activeblk[nblk + 2] = availblk[csumblk[ib] + 2];
 
 				//printf("ib=%d; ib_right=%d; ib_top=%d; ib_TR=%d\n", ib, activeblk[nblk], activeblk[nblk + 1], activeblk[nblk + 2]);
 
@@ -829,7 +865,7 @@ Param adapt(Param XParam)
 	}
 
 	//update level
-	for (int ibl = 0; ibl < nblk; ibl++)
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		//
 		int oldlevel;
@@ -853,6 +889,7 @@ Param adapt(Param XParam)
 	{
 		//reuse newlevel as temporary storage for activeblk
 		newlevel[ibl] = activeblk[ibl];
+		activeblk[ibl] = -1;
 	
 	//printf("ibl=%d; activeblk[ibl]=%d; newlevel[ibl]=%d;\n", ibl, activeblk[ibl], newlevel[ibl]);
 	}
@@ -862,6 +899,7 @@ Param adapt(Param XParam)
 	int ib = 0;
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
+		
 		if (newlevel[ibl] != -1)//i.e. old activeblk
 		{
 			activeblk[ib] = newlevel[ibl];
@@ -870,7 +908,7 @@ Param adapt(Param XParam)
 		}
 	}
 
-	printf("ib=%d; nblk=%d; XParam.nblk=%d\n", ib, nblk, XParam.nblk);
+	//printf("ib=%d; nblk=%d; XParam.nblk=%d\n", ib, nblk, XParam.nblk);
 
 	nblk = ib;
 
@@ -906,7 +944,9 @@ Param adapt(Param XParam)
 			for (int ix = 0; ix < 16; ix++)
 			{
 				int i = ix + iy * 16 + ib * XParam.blksize;
-				hh[i] = max((float) XParam.eps, zs[i] - zb[i]);
+				 
+				hh[i] = max((float)XParam.eps, zs[i] - zb[i]);
+
 			}
 		}
 	}

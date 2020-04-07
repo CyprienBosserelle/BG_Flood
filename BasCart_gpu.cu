@@ -3994,17 +3994,18 @@ int main(int argc, char **argv)
 	//////////////////////////////////////////////////////////////////////////////////
 
 	int oldnblk = 0;
-
-	while (oldnblk != XParam.nblk)
-	//for (int i=0; i<2;i++)
+	if (XParam.maxlevel != XParam.minlevel)
 	{
-		oldnblk = XParam.nblk;
-		wetdrycriteria(XParam, refine, coarsen);
+		while (oldnblk != XParam.nblk)
+			//for (int i=0; i<1;i++)
+		{
+			oldnblk = XParam.nblk;
+			wetdrycriteria(XParam, refine, coarsen);
 
-		XParam = adapt(XParam);
+			XParam = adapt(XParam);
 
+		}
 	}
-	
 
 
 
