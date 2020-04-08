@@ -52,7 +52,7 @@ int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 		refine[ib] = iswet;
 		coarsen[ib] = !iswet;
 
-		printf("ib=%d; refibe[ib]=%s\n", ib, iswet ? "true" : "false");
+		//printf("ib=%d; refibe[ib]=%s\n", ib, iswet ? "true" : "false");
 	}
 	return success;
 }
@@ -477,6 +477,7 @@ Param adapt(Param XParam)
 				//check neighbour's (Full neighbour happens below)
 				rightblk[ib] = rightblk[rightblk[ib]];
 				topblk[ib] = topblk[topblk[ib]];
+				// Bot and left blk should remain unchanged at this stage (they will change if the neighbour themselves change)
 
 				blockxo_d[ib] = blockxo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 				blockyo_d[ib] = blockyo_d[ib] + calcres(XParam.dx, level[ib] + 1);
@@ -566,7 +567,7 @@ Param adapt(Param XParam)
 					}
 				}
 				**/
-				printf("ibl=%d; ib=%d; csumblk[ib]=%d; availblk[csumblk[ib]]=%d; availblk[csumblk[ib]+1]=%d; availblk[csumblk[ib]+2]=%d;\n", ibl, ib, csumblk[ib], availblk[csumblk[ib]], availblk[csumblk[ib] + 1], availblk[csumblk[ib] + 2]);
+				//printf("ibl=%d; ib=%d; csumblk[ib]=%d; availblk[csumblk[ib]]=%d; availblk[csumblk[ib]+1]=%d; availblk[csumblk[ib]+2]=%d;\n", ibl, ib, csumblk[ib], availblk[csumblk[ib]], availblk[csumblk[ib] + 1], availblk[csumblk[ib] + 2]);
 
 				
 				// Bilinear interpolation
@@ -783,7 +784,7 @@ Param adapt(Param XParam)
 
 	}
 
-
+	// deal with the neighbour
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -796,6 +797,7 @@ Param adapt(Param XParam)
 		//printf("ib=%d\n", ib);
 		if (ib >=0) // ib can be -1 for newly inactive blocks
 		{
+
 			if (refine[ib] == true)
 			{
 				////
@@ -804,21 +806,30 @@ Param adapt(Param XParam)
 				oldleft = leftblk[ib];
 				oldbot = botblk[ib];
 
+
+
+
+
+
 				//printf("ib=%d; oldtop=%d; oldright=%d; oldleft=%d; oldbot=%d\n ", ib,oldtop,oldright,oldleft,oldbot);
 				//printf("availblk[csumblk[ibl]]=%d, availblk[csumblk[ibl]+1] = %d, availblk[csumblk[ibl]+2]=%d\n", availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
 				if (newlevel[oldtop] <  newlevel[ib])
 				{
 					topblk[availblk[csumblk[ib] + 2]] = oldtop;
+					//botblk[oldtop] = availblk[csumblk[ib] + 2];
 				}
 				else
 				{
 					topblk[availblk[csumblk[ib] + 2]] = rightblk[oldtop];
+					
 				}
+
 
 				/////
 				if ( newlevel[oldright] <  newlevel[ib])
 				{
 					rightblk[availblk[csumblk[ib] + 2]] = oldright;
+					
 				}
 				else
 				{
@@ -849,6 +860,12 @@ Param adapt(Param XParam)
 				//newlevel[availblk[csumblk[ibl]]] = level[ib];
 				//newlevel[availblk[csumblk[ibl]+1]] = level[ib];
 				//newlevel[availblk[csumblk[ibl]+2]] = level[ib];
+
+
+				//Below is only not valid if the block above/right adapts and is sequentially before the present block.
+
+				botblk[oldtop] = availblk[csumblk[ib] + 1];
+				leftblk[oldright] = availblk[csumblk[ib]];
 
 				
 
