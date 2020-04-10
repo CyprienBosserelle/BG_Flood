@@ -3996,8 +3996,8 @@ int main(int argc, char **argv)
 	int oldnblk = 0;
 	if (XParam.maxlevel != XParam.minlevel)
 	{
-		while (oldnblk != XParam.nblk)
-			//for (int i=0; i<1;i++)
+		//while (oldnblk != XParam.nblk)
+		for (int i=0; i<2;i++)
 		{
 			oldnblk = XParam.nblk;
 			wetdrycriteria(XParam, refine, coarsen);
@@ -4007,6 +4007,27 @@ int main(int argc, char **argv)
 		}
 	}
 
+	// Debugging...
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		for (int iy = 0; iy < 16; iy++)
+		{
+			for (int ix = 0; ix < 16; ix++)
+			{
+				int i = ix + iy * 16 + ib * XParam.blksize;
+
+				hh[i] = ib;
+				zs[i] = leftblk[ib];
+				zb[i] = botblk[ib];
+				uu[i] = rightblk[ib];
+				vv[i] = topblk[ib];
+
+
+			}
+		}
+	}
 
 
 
