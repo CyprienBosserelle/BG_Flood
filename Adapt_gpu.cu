@@ -812,8 +812,10 @@ Param adapt(Param XParam)
 
 					if (newlevel[oldleft] < newlevel[ib])
 					{
-						if (leftblk[oldbot] == leftblk[ib])
+						//printf("ib=%d\t; oldleft=%d; leftblk[ib]=%d; leftblk[botblk[ib]]=%d\n",ib,oldleft, leftblk[ib], leftblk[botblk[ib]]);
+						if ((blockyo_d[oldleft]-blockyo_d[ib])<0.0)//(leftblk[botblk[ib]] == leftblk[ib])
 						{
+							//printf("ib=%d\t; oldleft=%d; blockyo_d[ib]=%f; blockyo_d[oldleft]=%f;\n", ib, oldleft, blockyo_d[ib], blockyo_d[oldleft]);
 							leftblk[ib]= availblk[csumblk[oldleft] + 2];
 							leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[oldleft] + 2];
 						}
@@ -826,8 +828,17 @@ Param adapt(Param XParam)
 
 					if (newlevel[oldleft] == newlevel[ib])
 					{
-						leftblk[ib] = availblk[csumblk[oldleft]];
-						leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[oldleft] + 2];
+						if (oldleft == ib)
+						{
+							leftblk[ib] = ib;
+							leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
+						}
+						else
+						{
+							leftblk[ib] = availblk[csumblk[oldleft]];
+							leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[oldleft] + 2];
+						}
+						
 					}
 
 					if (newlevel[oldleft] > newlevel[ib])
@@ -843,15 +854,205 @@ Param adapt(Param XParam)
 					if (newlevel[oldleft] < newlevel[ib])
 					{
 						leftblk[availblk[csumblk[ib] + 1]] = oldleft;
-
-
+						//leftblk[ib] = oldleft; //alrready the case
+						//also broadcast teh new neighbour to the "static" neighbour block
+						//rightblk[oldleft] = ib;//Already the case
 					}
 					else
 					{
 						leftblk[availblk[csumblk[ib] + 1]] = topblk[oldleft];
+						//leftblk[ib] = oldleft; //alrready the case
+						rightblk[topblk[oldleft]] = availblk[csumblk[ib] + 2];
 					}
 
 				}
+				// Deal with Bottom neighbour
+				// 
+				if (refine[oldbot])// is true
+				{
+
+					if (newlevel[oldbot] < newlevel[ib])
+					{
+						if ((blockxo_d[oldbot] - blockxo_d[ib]) < 0.0)//(botblk[oldleft] == botblk[ib])
+						{
+							botblk[ib] = availblk[csumblk[oldbot] + 2];
+							botblk[availblk[csumblk[ib]]] = availblk[csumblk[oldbot] + 2];
+						}
+						else
+						{
+							botblk[ib] = availblk[csumblk[oldbot]+1];
+							botblk[availblk[csumblk[ib]]] = availblk[csumblk[oldbot]+1];
+						}
+					}
+
+					if (newlevel[oldbot] == newlevel[ib])
+					{
+						if (oldbot == ib)
+						{
+							botblk[ib] = ib;
+							botblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
+						}
+						else
+						{
+							botblk[ib] = availblk[csumblk[oldbot] + 1];
+							botblk[availblk[csumblk[ib]]] = availblk[csumblk[oldbot] + 2];
+						}
+					}
+
+					if (newlevel[oldbot] > newlevel[ib])
+					{
+						botblk[ib] = availblk[csumblk[oldbot]+1];
+						// 					   
+						botblk[availblk[csumblk[ib]]] = availblk[csumblk[rightblk[rightblk[oldbot]]]+1];
+					}
+				}
+				else
+				{
+					// i.e. not refined (can't be coarsen either)
+					if (newlevel[oldbot] < newlevel[ib])
+					{
+						botblk[availblk[csumblk[ib] ]] = oldbot;
+						//botblk[ib]=oldbot //already the case
+
+					}
+					else
+					{
+						botblk[availblk[csumblk[ib] ]] = rightblk[oldbot];
+						//botblk[ib]=oldbot //already the case
+						topblk[rightblk[oldbot]] = availblk[csumblk[ib]];
+					}
+
+				}
+
+
+
+				// Deal with right neighbour
+				// 
+				if (refine[oldright])// is true
+				{
+
+					if (newlevel[oldright] < newlevel[ib])
+					{
+						if (((blockyo_d[oldright] - blockyo_d[ib]) < 0.0))
+						{
+							//rightblk[ib] = availblk[csumblk[oldbot] + 2];
+							rightblk[availblk[csumblk[ib]]] = availblk[csumblk[oldright] + 1];
+							rightblk[availblk[csumblk[ib]+2]] = availblk[csumblk[oldright] + 1];
+						}
+						else
+						{
+							rightblk[availblk[csumblk[ib]]] = oldright;
+							rightblk[availblk[csumblk[ib] + 2]] = oldright;
+						}
+					}
+
+					if (newlevel[oldright] == newlevel[ib])
+					{
+						if (oldright == ib)
+						{
+							rightblk[ib] = ib;
+							rightblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+						}
+						else
+						{
+							rightblk[availblk[csumblk[ib]]] = oldright;
+							rightblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[oldright] + 1];
+						}
+					}
+
+					if (newlevel[oldright] > newlevel[ib])
+					{
+						rightblk[availblk[csumblk[ib]]] = oldright;
+						// 					   
+						rightblk[availblk[csumblk[ib] + 2]] = topblk[topblk[oldright]];
+					}
+				}
+				else
+				{
+					// i.e. not refined (can't be coarsen either)
+					if (newlevel[oldright] < newlevel[ib])
+					{
+						rightblk[availblk[csumblk[ib]]] = oldright;
+						rightblk[availblk[csumblk[ib]]+2] = oldright;
+						
+						leftblk[oldright] = availblk[csumblk[ib]];
+
+					}
+					else
+					{
+						botblk[availblk[csumblk[ib]]] = oldright;
+						botblk[availblk[csumblk[ib]+2]] = topblk[oldright];
+
+						leftblk[oldright] = availblk[csumblk[ib]];
+						leftblk[topblk[oldright]] = availblk[csumblk[ib] + 2];
+					}
+
+				}
+
+				// Deal with top neighbour
+				// 
+				if (refine[oldtop])// is true
+				{
+
+					if (newlevel[oldtop] < newlevel[ib])
+					{
+						if ((blockxo_d[oldtop] - blockxo_d[ib]) < 0.0)
+						{
+							//rightblk[ib] = availblk[csumblk[oldbot] + 2];
+							topblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[oldtop]];
+							topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[oldtop]];
+						}
+						else
+						{
+							topblk[availblk[csumblk[ib] + 1]] = oldtop;
+							topblk[availblk[csumblk[ib] + 2]] = oldtop;
+						}
+					}
+
+					if (newlevel[oldtop] == newlevel[ib])
+					{
+						if (oldtop == ib)
+						{
+							topblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
+							topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+						}
+						else
+						{
+							topblk[availblk[csumblk[ib] + 1]] = oldtop;
+							topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[oldtop]];
+						}
+						
+					}
+
+					if (newlevel[oldtop] > newlevel[ib])
+					{
+						topblk[availblk[csumblk[ib] + 1]] = oldtop;
+						// 					   
+						topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[rightblk[rightblk[oldtop]]]];
+					}
+				}
+				else
+				{
+					// i.e. not refined (can't be coarsen either)
+					if (newlevel[oldtop] < newlevel[ib])
+					{
+						topblk[availblk[csumblk[ib] + 1]] = oldtop;
+						topblk[availblk[csumblk[ib] + 2]] = oldtop;
+
+						botblk[oldtop] = availblk[csumblk[ib] + 1];
+					}
+					else
+					{
+						topblk[availblk[csumblk[ib] + 1]] = oldtop;
+						topblk[availblk[csumblk[ib] + 2]] = rightblk[oldtop];
+
+						botblk[oldtop] = availblk[csumblk[ib] + 1];
+						botblk[rightblk[oldtop]] = availblk[csumblk[ib] + 2];
+
+					}
+
+				}
+
 			}
 		}
 	}
@@ -862,10 +1063,9 @@ Param adapt(Param XParam)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		//
-		int oldtop, oldleft, oldright, oldbot;
+		
 		int ib = activeblk[ibl];
-		int o, oo, ooo, oooo;
-		int i, ii, iii, iiii;
+		
 
 		//printf("ib=%d\n", ib);
 		if (ib >=0) // ib can be -1 for newly inactive blocks
@@ -874,70 +1074,6 @@ Param adapt(Param XParam)
 			if (refine[ib] == true)
 			{
 				////
-				oldtop = topblk[topblk[ib]];
-				oldright = rightblk[rightblk[ib]];
-				oldleft = leftblk[ib];
-				oldbot = botblk[ib];
-
-
-				
-
-
-
-				//printf("ib=%d; oldtop=%d; oldright=%d; oldleft=%d; oldbot=%d\n ", ib,oldtop,oldright,oldleft,oldbot);
-				//printf("availblk[csumblk[ibl]]=%d, availblk[csumblk[ibl]+1] = %d, availblk[csumblk[ibl]+2]=%d\n", availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
-				if (newlevel[oldtop] <  newlevel[ib])
-				{
-					topblk[availblk[csumblk[ib] + 2]] = oldtop;
-					//botblk[oldtop] = availblk[csumblk[ib] + 2];
-				}
-				else
-				{
-					topblk[availblk[csumblk[ib] + 2]] = rightblk[oldtop];
-					
-				}
-
-
-				/////
-				if ( newlevel[oldright] <  newlevel[ib])
-				{
-					rightblk[availblk[csumblk[ib] + 2]] = oldright;
-					
-				}
-				else
-				{
-					rightblk[availblk[csumblk[ib] + 2]] = topblk[oldright];
-				}
-
-				/////
-				if (newlevel[oldleft] < newlevel[ib])
-				{
-					leftblk[availblk[csumblk[ib] + 1]] = oldleft;
-
-
-				}
-				else
-				{
-					leftblk[availblk[csumblk[ib] + 1]] = topblk[oldleft];
-				}
-
-				/////
-				if ( newlevel[oldbot] <  newlevel[ib])
-				{
-					botblk[availblk[csumblk[ib]]] = oldbot;
-				}
-				else
-				{
-					botblk[availblk[csumblk[ib]]] = rightblk[oldbot];
-				}
-
-				//printf("level=%d\n", level[ib]);
-				//newlevel[availblk[csumblk[ibl]]] = level[ib];
-				//newlevel[availblk[csumblk[ibl]+1]] = level[ib];
-				//newlevel[availblk[csumblk[ibl]+2]] = level[ib];
-
-					
-
 				
 				//After that we are done so activate the new blocks
 				activeblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
