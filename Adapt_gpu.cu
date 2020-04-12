@@ -80,9 +80,23 @@ Param adapt(Param XParam)
 		if (refine[ib] == true && level[ib] == XParam.maxlevel)
 		{
 			refine[ib] = false;
+			printf("ib=%d; level[ib]=%d\n", ib, level[ib]);
 		}
 	}
 
+
+	int nref = 0;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		if (refine[ib] == true )
+		{
+			printf("ib=%d; level[ib]=%d\n", ib, level[ib]);
+			nref++;
+		}
+	}
+
+	printf("nref=%d\n",nref);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -118,9 +132,10 @@ Param adapt(Param XParam)
 		int ib = activeblk[ibl];
 		//check whether neighbour need refinement
 
-
+		
 		if (refine[ib] == false)
 		{
+			printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
 			//topleft blk
 			if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
 			{
@@ -634,18 +649,19 @@ Param adapt(Param XParam)
 
 							if (cy == 0)
 							{
+								// This wont work if 
 								h11 = BotAda(fx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, hho);
-								h12 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, hho);
-								
+								h21 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, hho);
+
 								zs11 = BotAda(fx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, zso);
-								zs12 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, zso);
+								zs21 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, zso);
 
 								u11 = BotAda(fx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, uuo);
-								u12 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, uuo);
+								u21 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, uuo);
 
 								v11 = BotAda(fx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, vvo);
-								v12 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, vvo);
-							
+								v21 = BotAda(cx, cy, ib, botblk[ib], botblk[rightblk[ib]], botblk[leftblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], level, vvo);
+								
 								
 							}
 
@@ -1028,7 +1044,7 @@ Param adapt(Param XParam)
 					{
 						topblk[availblk[csumblk[ib] + 1]] = oldtop;
 						// 					   
-						topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[rightblk[rightblk[oldtop]]]];
+						topblk[availblk[csumblk[ib] + 2]] = rightblk[rightblk[oldtop]];
 					}
 				}
 				else

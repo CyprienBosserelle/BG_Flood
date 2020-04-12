@@ -4008,7 +4008,7 @@ int main(int argc, char **argv)
 	}
 
 	// Debugging...
-
+	/*
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
@@ -4028,7 +4028,7 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-
+	*/
 
 
 	///////////////////////////////////////////////////////////////////////////////////
