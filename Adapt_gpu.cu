@@ -135,7 +135,7 @@ Param adapt(Param XParam)
 		
 		if (refine[ib] == false)
 		{
-			printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
+			//printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
 			//topleft blk
 			if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
 			{
@@ -1214,8 +1214,16 @@ Param adapt(Param XParam)
 			for (int ix = 0; ix < 16; ix++)
 			{
 				int i = ix + iy * 16 + ib * XParam.blksize;
-				 
-				hh[i] = max((float)XParam.eps, zs[i] - zb[i]);
+				if (hh[i] > XParam.eps)
+				{
+					hh[i] = max((float)XParam.eps, zs[i] - zb[i]);
+				}
+				else
+				{
+					// when refining dry area zs should be zb!
+					zs[i] = zb[i];
+				}
+				//hh[i] = max((float)XParam.eps, zs[i] - zb[i]);
 				
 
 			}
