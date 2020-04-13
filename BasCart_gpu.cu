@@ -3996,8 +3996,8 @@ int main(int argc, char **argv)
 	int oldnblk = 0;
 	if (XParam.maxlevel != XParam.minlevel)
 	{
-		//while (oldnblk != XParam.nblk)
-		for (int i=0; i<2;i++)
+		while (oldnblk != XParam.nblk)
+		//for (int i=0; i<2;i++)
 		{
 			oldnblk = XParam.nblk;
 			wetdrycriteria(XParam, refine, coarsen);

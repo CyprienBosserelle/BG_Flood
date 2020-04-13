@@ -125,7 +125,7 @@ __host__ __device__ T RightAda(int ix, int iy, int ibl, int rightibl, int righto
 			it = 0 + (jj + 1) * 16 + bb * 256;
 			itr = 1 + (jj + 1) * 16 + bb * 256;
 
-			rightvarval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+			rightvarval = T(0.25) * (var[ii] + var[ir] + var[it]+ var[itr]);
 		}
 		else if (rightlev < lev)
 		{
@@ -304,7 +304,7 @@ __host__ __device__ T LeftAda(int ix, int iy, int ibl, int leftibl, int leftofbo
 			it = 15 + (jj + 1) * 16 + bb * 256;
 			itr = 14 + (jj + 1) * 16 + bb * 256;
 
-			varval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+			varval = T(0.25) * (var[ii] + var[ir] + var[it] + var[itr]);
 		}
 		else if (leftlev < lev)
 		{
@@ -485,7 +485,7 @@ __host__ __device__ T TopAda(int ix, int iy, int ibl, int topibl, int topofright
 			ir = (jj + 1) + 0 * 16 + bb * 256;
 			itr = (jj + 1) + 1 * 16 + bb * 256;
 
-			varval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+			varval = T(0.25) * (var[ii] + var[ir] + var[it] + var[itr]);
 		}
 		else if (toplev < lev)
 		{
@@ -664,7 +664,7 @@ __host__ __device__ T BotAda(int ix, int iy, int ibl, int botibl, int botofright
 			ir = (jj + 1) + 15 * 16 + bb * 256;
 			itr = (jj + 1) + 14 * 16 + bb * 256;
 
-			varval = T(0.25) * (var[ii] + var[ir] + var[it], var[itr]);
+			varval = T(0.25) * (var[ii] + var[ir] + var[it] + var[itr]);
 		}
 		else if (botlev < lev)
 		{
