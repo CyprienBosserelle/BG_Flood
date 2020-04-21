@@ -109,7 +109,7 @@ Param adapt(Param XParam)
 		if (coarsen[ib] == true)
 		{
 			int levi = level[ib];
-
+			//printf("ib=%d; leftblk[ib]=%d; rightblk[ib]=%d, topblk[ib]=%d, botblk[ib]=%d\n", ib, leftblk[ib], rightblk[ib], topblk[ib], botblk[ib]);
 			if (levi < level[leftblk[ib]] || levi < level[rightblk[ib]] || levi < level[topblk[ib]] || levi < level[botblk[ib]])
 			{
 				coarsen[ib] = false;
@@ -431,7 +431,7 @@ Param adapt(Param XParam)
 			int oldbot = botblk[ib];
 			int oldrightofbot = rightblk[oldbot];
 
-				printf("ibl=%d; ib=%d; rightblk[ib]=%d\ttopblk[ib]=%d\trightblk[topblk[ib]]=%d\n", ibl, ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
+				//printf("ibl=%d; ib=%d; rightblk[ib]=%d\ttopblk[ib]=%d\trightblk[topblk[ib]]=%d\n", ibl, ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
 				for (int iy = 0; iy < 16; iy++)
 				{
 					for (int ix = 0; ix < 16; ix++)
@@ -874,11 +874,12 @@ Param adapt(Param XParam)
 							// There is still an issue in the corners when other block are finer resolution
 							if (fy == 15 && fx == 15)
 							{
+								/*
 								zs[o] = BarycentricInterpolation(zs11, fx, fy, zs21, cx, fx, zs12, fx, cy, rx, ry);
 								hh[o] = BarycentricInterpolation(h11, fx, fy, h21, cx, fx, h12, fx, cy, rx, ry);
 								uu[o] = BarycentricInterpolation(u11, fx, fy, u21, cx, fx, u12, fx, cy, rx, ry);
 								vv[o] = BarycentricInterpolation(v11, fx, fy, v21, cx, fx, v12, fx, cy, rx, ry);
-								/*
+								*/
 								if (level[topblk[ib]] > level[ib])
 								{
 									zs[o] = BotAda(15, 0, topblk[ib], ib, botblk[rightblk[topblk[ib]]], botblk[leftblk[topblk[ib]]], leftblk[botblk[topblk[ib]]], rightblk[botblk[topblk[ib]]], level, zso);
@@ -898,16 +899,17 @@ Param adapt(Param XParam)
 								{
 									//do nothing?
 								}
-								*/
+								
 							}
 							if (cy == 0 && cx == 0)
 							{
+								/*
 								zs[o] = BarycentricInterpolation(zs22, cx, cy, zs21, cx, fx, zs12, fx, cy, rx, ry);
 								hh[o] = BarycentricInterpolation(h22, cx, cy, h21, cx, fx, h12, fx, cy, rx, ry);
 								uu[o] = BarycentricInterpolation(u22, cx, cy, u21, cx, fx, u12, fx, cy, rx, ry);
 								vv[o] = BarycentricInterpolation(v22, cx, cy, v21, cx, fx, v12, fx, cy, rx, ry);
-
-								/*
+								*/
+								
 								if (level[leftblk[ib]] > level[ib])
 								{
 									zs[o] = RightAda(15, 0, leftblk[ib], ib, rightblk[botblk[leftblk[ib]]], rightblk[topblk[leftblk[ib]]], botblk[rightblk[leftblk[ib]]], topblk[rightblk[leftblk[ib]]], level, zso);
@@ -926,7 +928,7 @@ Param adapt(Param XParam)
 								{
 									//do nothing?
 								}
-								*/
+								
 							}
 
 
@@ -1180,7 +1182,7 @@ Param adapt(Param XParam)
 					{
 						if (oldright == ib)
 						{
-							rightblk[ib] = ib;
+							rightblk[availblk[csumblk[ib]]] = ib;
 							rightblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
 						}
 						else
@@ -1210,8 +1212,8 @@ Param adapt(Param XParam)
 					}
 					else
 					{
-						botblk[availblk[csumblk[ib]]] = oldright;
-						botblk[availblk[csumblk[ib]+2]] = topblk[oldright];
+						rightblk[availblk[csumblk[ib]]] = oldright;
+						rightblk[availblk[csumblk[ib]+2]] = topblk[oldright];
 
 						leftblk[oldright] = availblk[csumblk[ib]];
 						leftblk[topblk[oldright]] = availblk[csumblk[ib] + 2];
@@ -1362,7 +1364,7 @@ Param adapt(Param XParam)
 		}
 	}
 
-	printf("ib=%d; nblk=%d; XParam.nblk=%d\n", ib, nblk, XParam.nblk);
+	//printf("ib=%d; nblk=%d; XParam.nblk=%d\n", ib, nblk, XParam.nblk);
 
 	nblk = ib;
 
