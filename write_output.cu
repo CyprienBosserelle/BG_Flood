@@ -439,14 +439,14 @@ Param creatncfileBUQ(Param XParam)
 	{
 
 		double ddx = calcres(XParam.dx, lev);
-
+		double initdx= calcres(XParam.dx, XParam.initlevel);
 		double xxmax, xxmin, yymax, yymin;
 
-		xxmax = XParam.xmax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
 
-		xxmin = XParam.xo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
 
 		nx = (xxmax - xxmin) / ddx + 1;
 		ny = (yymax - yymin) / ddx + 1;
@@ -466,7 +466,7 @@ Param creatncfileBUQ(Param XParam)
 		xxname = "xx_" + sign + std::to_string(abs(lev));
 		yyname = "yy_" + sign + std::to_string(abs(lev));
 
-		//printf("lev=%d; xxname=%s; yynam e=%s;\n", lev, xxname.c_str(), yyname.c_str());
+		//printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
 		//printf("ddx=%f; nxx=%d;\n", ddx, nxx);
 		status = nc_def_dim(ncid, xxname.c_str(), nxx, &xx_dim);
 		if (status != NC_NOERR) handle_error(status);
@@ -919,11 +919,13 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 		double xxmax, xxmin, yymax, yymin;
 
-		xxmax = XParam.xmax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		xxmin = XParam.xo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
+
+		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
 
 
 
@@ -992,7 +994,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 
 
-			if (smallnc > 0)
+ 			if (smallnc > 0)
 			{
 				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);
 				if (status != NC_NOERR) handle_error(status);

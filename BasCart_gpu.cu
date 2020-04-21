@@ -2985,7 +2985,7 @@ int main(int argc, char **argv)
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*levdx;
 
 
-	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
+	printf("Model domain info: nx=%d\tny=%d\tlevdx(dx)=%f(%f)\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, levdx, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
 
 
 
