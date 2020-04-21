@@ -160,7 +160,7 @@ float *Rain, *Rainbef, *Rainaft;
 float *Rain_g, *Rainbef_g, *Rainaft_g;
 
 // Adaptivity
-int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, *activeblk_g, *availblk_g, *csumblk, *csumblk_g;
+int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, * invactive, *activeblk_g, *availblk_g, *csumblk, *csumblk_g,* invactive_g ;
 
 bool* coarsen, * refine;;
 
@@ -2829,11 +2829,12 @@ int main(int argc, char **argv)
 	Allocate1CPU(XParam.nblkmem, 1, csumblk);
 	Allocate1CPU(XParam.nblkmem, 1, coarsen);
 	Allocate1CPU(XParam.nblkmem, 1, refine);
-
+	Allocate1CPU(XParam.nblkmem, 1, invactive);
 
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		activeblk[ibl] = -1;
+		invactive[ibl] = -1;
 	}
 
 
@@ -3997,7 +3998,7 @@ int main(int argc, char **argv)
 	if (XParam.maxlevel != XParam.minlevel)
 	{
 		while (oldnblk != XParam.nblk)
-		//for (int i=0; i<2;i++)
+		//for (int i=0; i<1;i++)
 		{
 			oldnblk = XParam.nblk;
 			wetdrycriteria(XParam, refine, coarsen);

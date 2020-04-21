@@ -355,7 +355,7 @@ extern int * Riverblk, *Riverblk_g;
 
 
 // Adaptivity
-extern int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, *activeblk_g, *availblk_g, *csumblk, *csumblk_g;
+extern int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, *invactive, *activeblk_g, *availblk_g, *csumblk, *csumblk_g, * invactive_g ;
 
 extern bool * coarsen, * refine;
 //Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch

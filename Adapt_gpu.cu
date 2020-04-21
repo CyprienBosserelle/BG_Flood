@@ -280,14 +280,14 @@ Param adapt(Param XParam)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
-		csumblk[ib] = ibl; //inverse of active block is needed when coarsening
+		invactive[ib] = ibl;
 
 		// When refining we need csum
 		if (refine[ib]==true)
 		{
 			nrefineblk++;
 			csum = csum+3;
-			csumblk[ib] = csum;
+			
 		}
 		if (coarsen[ib] == true)
 		{
@@ -295,7 +295,7 @@ Param adapt(Param XParam)
 			
 
 		}
-
+		csumblk[ib] = csum;
 		
 
 	}
@@ -365,6 +365,7 @@ Param adapt(Param XParam)
 		ReallocArray(nblkmem, 1, level);
 		ReallocArray(nblkmem, 1, newlevel);
 		ReallocArray(nblkmem, 1, activeblk);
+		ReallocArray(nblkmem, 1, invactive);
 		ReallocArray(nblkmem, 1, availblk);
 		ReallocArray(nblkmem, 1, csumblk);
 		
@@ -501,9 +502,9 @@ Param adapt(Param XParam)
 				XParam.navailblk = XParam.navailblk + 3;
 
 				// Make right, top and top-right block inactive
-				activeblk[csumblk[rightblk[ib]]] = -1;
-				activeblk[csumblk[topblk[ib]]] = -1;
-				activeblk[csumblk[rightblk[topblk[ib]]]] = -1;
+				activeblk[invactive[rightblk[ib]]] = -1;
+				activeblk[invactive[topblk[ib]]] = -1;
+				activeblk[invactive[rightblk[topblk[ib]]]] = -1;
 
 				//check neighbour's (Full neighbour happens below)
 				if (rightblk[ib] == oldright)
@@ -524,19 +525,14 @@ Param adapt(Param XParam)
 				}
 				// Bot and left blk should remain unchanged at this stage(they will change if the neighbour themselves change)
 
-				
-
-
-
-				
-
+				// xo=oldxo+olddx/2 ->  xo=oldxo+olddx/2 
 				blockxo_d[ib] = blockxo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 				blockyo_d[ib] = blockyo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 
 
 				
 				//printf("ibl=%d; ib=%d; blockxo_d[ib]=%f; blockyo_d[ib]=%f; right_id=%d, top_id=%d, topright_id=%d \n", ib, blockxo_d[ib], blockyo_d[ib], rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
-				printf("ibl=%d; ib=%d; rightblk[ib]=%d\toldright[ib]=%d\trightblk[topblk[ib]]=%d\n", ibl, ib, rightblk[ib], oldright);
+				//printf("ibl=%d; ib=%d; rightblk[ib]=%d\toldright[ib]=%d\trightblk[topblk[ib]]=%d\n", ibl, ib, rightblk[ib], oldright);
 
 
 				
@@ -1386,7 +1382,7 @@ Param adapt(Param XParam)
 	
 
 	
-
+	//Not necessary if no coarsening/refinement occur
 	//interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, bathydata, zb);
 	interp2BUQAda(nblk, XParam.blksize, XParam.dx, activeblk, level, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, bathydata, zb);
 
