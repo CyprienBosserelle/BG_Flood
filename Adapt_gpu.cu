@@ -166,6 +166,7 @@ Param adapt(Param XParam)
 				refine[ib] = true;
 				coarsen[ib] = false;
 			}
+			printf("ib=%d; leftblk[ib]=%d\n",ib, leftblk[ib]);
 			if ((level[leftblk[ib]] - level[ib]) > 0)
 			{
 				//left top

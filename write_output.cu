@@ -390,6 +390,34 @@ Param creatncfileBUQ(Param XParam)
 	// status could be a new error after renaming the file
 	if (status != NC_NOERR) handle_error(status);
 	
+	double initdx = calcres(XParam.dx, XParam.initlevel);
+	double xmin, xmax, ymin, ymax;
+
+	xmin = XParam.xo - initdx / 2.0;
+	xmax = XParam.xmax + initdx / 2.0;
+	ymin = XParam.yo - initdx / 2.0;
+	ymax = XParam.ymax + initdx / 2.0;
+
+	// Define global attributes
+	status = nc_put_att_int(ncid, NC_GLOBAL, "maxlevel", NC_INT, 1, &XParam.maxlevel);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_put_att_int(ncid, NC_GLOBAL, "minlevel", NC_INT, 1, &XParam.minlevel);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_put_att_double(ncid, NC_GLOBAL, "xmin", NC_DOUBLE, 1, &xmin);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_put_att_double(ncid, NC_GLOBAL, "xmax", NC_DOUBLE, 1, &xmax);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_put_att_double(ncid, NC_GLOBAL, "ymin", NC_DOUBLE, 1, &ymin);
+	if (status != NC_NOERR) handle_error(status);
+
+	status = nc_put_att_double(ncid, NC_GLOBAL, "ymax", NC_DOUBLE, 1, &ymax);
+	if (status != NC_NOERR) handle_error(status);
+
+
 	// Define time variable 
 	status = nc_def_dim(ncid, "time", NC_UNLIMITED, &time_dim);
 	if (status != NC_NOERR) handle_error(status);
@@ -545,17 +573,18 @@ Param creatncfileBUQ(Param XParam)
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
 		double ddx = calcres(XParam.dx, lev);
-
+		double initdx = calcres(XParam.dx, XParam.initlevel);
 		double xxmax, xxmin, yymax, yymin;
 
-		xxmax = XParam.xmax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax + XParam.dx / 2.0 - calcres(XParam.dx, lev + 1);
+		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
 
-		xxmin = XParam.xo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo - XParam.dx / 2.0 + calcres(XParam.dx, lev + 1);
+		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
 
 		nx = (xxmax - xxmin) / ddx + 1;
 		ny = (yymax - yymin) / ddx + 1;
+
 
 		
 
