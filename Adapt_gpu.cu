@@ -118,85 +118,103 @@ Param adapt(Param XParam)
 	}
 
 
+	// This below could be cascading so need to iterate sevral time
 
+	int iter = 1;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	while (iter > 0)
 	{
-		int ib = activeblk[ibl];
-		//check whether neighbour need refinement
+		iter = 0;
 
-		
-		if (refine[ib] == false)
+
+
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
 		{
-			//printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
-			//topleft blk
-			if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
-			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-			//top right if lev=lev+1
-			if ((level[topblk[ib]] - level[ib]) > 0)
-			{
-				if (refine[rightblk[topblk[ib]]] == true && (level[rightblk[topblk[ib]]] - level[ib]) > 0)
-				{
-					refine[ib] = true;
-					coarsen[ib] = false;
-				}
-			}
-			//bot left
+			int ib = activeblk[ibl];
+			//check whether neighbour need refinement
 
-			if (refine[botblk[ib]] == true && (level[botblk[ib]] - level[ib]) > 0)
+
+			if (refine[ib] == false)
 			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-			//bot right
-			if ((level[botblk[ib]] - level[ib]) > 0)
-			{
-				if (refine[rightblk[botblk[ib]]] == true && (level[rightblk[botblk[ib]]] - level[ib]) > 0)
+				//printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
+				//topleft blk
+				if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
 				{
 					refine[ib] = true;
 					coarsen[ib] = false;
+					iter = 1;
 				}
-			}
-			//Left bottom
-			if (refine[leftblk[ib]] == true && (level[leftblk[ib]] - level[ib]) > 0)
-			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-			printf("ib=%d; leftblk[ib]=%d\n",ib, leftblk[ib]);
-			if ((level[leftblk[ib]] - level[ib]) > 0)
-			{
-				//left top
-				if (refine[topblk[leftblk[ib]]] == true && (level[topblk[leftblk[ib]]] - level[ib]) > 0)
+				//top right if lev=lev+1
+				if ((level[topblk[ib]] - level[ib]) > 0)
 				{
-					refine[ib] = true;
-					coarsen[ib] = false;
+					if (refine[rightblk[topblk[ib]]] == true && (level[rightblk[topblk[ib]]] - level[ib]) > 0)
+					{
+						refine[ib] = true;
+						coarsen[ib] = false;
+						iter = 1;
+					}
 				}
-			}
-			if (refine[rightblk[ib]] == true && (level[rightblk[ib]] - level[ib]) > 0)
-			{
-				refine[ib] = true;
-				coarsen[ib] = false;
-			}
-			if (level[rightblk[ib]] - level[ib] > 0)
-			{
-				//
-				if (refine[topblk[rightblk[ib]]] == true && (level[topblk[rightblk[ib]]] - level[ib]) > 0)
+				//bot left
+
+				if (refine[botblk[ib]] == true && (level[botblk[ib]] - level[ib]) > 0)
 				{
 					refine[ib] = true;
 					coarsen[ib] = false;
+					iter = 1;
+				}
+				//bot right
+				if ((level[botblk[ib]] - level[ib]) > 0)
+				{
+					if (refine[rightblk[botblk[ib]]] == true && (level[rightblk[botblk[ib]]] - level[ib]) > 0)
+					{
+						refine[ib] = true;
+						coarsen[ib] = false;
+						iter = 1;
+					}
+				}
+				//Left bottom
+				if (refine[leftblk[ib]] == true && (level[leftblk[ib]] - level[ib]) > 0)
+				{
+					refine[ib] = true;
+					coarsen[ib] = false;
+					iter = 1;
+				}
+				//printf("ib=%d; leftblk[ib]=%d\n", ib, leftblk[ib]);
+				if ((level[leftblk[ib]] - level[ib]) > 0)
+				{
+					//left top
+					if (refine[topblk[leftblk[ib]]] == true && (level[topblk[leftblk[ib]]] - level[ib]) > 0)
+					{
+						refine[ib] = true;
+						coarsen[ib] = false;
+						iter = 1;
+					}
+				}
+				if (refine[rightblk[ib]] == true && (level[rightblk[ib]] - level[ib]) > 0)
+				{
+					refine[ib] = true;
+					coarsen[ib] = false;
+					iter = 1;
+				}
+				if ((level[rightblk[ib]] - level[ib]) > 0)
+				{
+					//
+					if (refine[topblk[rightblk[ib]]] == true && (level[topblk[rightblk[ib]]] - level[ib]) > 0)
+					{
+						refine[ib] = true;
+						coarsen[ib] = false;
+						iter = 1;
+					}
+
 				}
 
 			}
-
 		}
 	}
 
 
-
+	
+	
 
 	// Can't actually coarsen if top, right and topright block are not all corsen
 		
@@ -1435,6 +1453,76 @@ Param adapt(Param XParam)
 }
 
 
+bool checkBUQsanity(Param XParam)
+{
+	bool check = true;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
 
+		//check 1st order neighbours level
+		if (abs(level[leftblk[ib]] - (level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; leftblk[ib]=%d; level[leftblk[ib]]=%d\n",ib,level[ib],leftblk[ib],level[leftblk[ib]]);
+			check = false;
+		}
+		if (abs(level[rightblk[ib]] - (level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[ib]=%d; level[rightblk[ib]]=%d\n", ib, level[ib], rightblk[ib], level[rightblk[ib]]);
+			check = false;
+		}
+		if (abs(level[botblk[ib]] - (level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; botblk[ib]=%d; level[botblk[ib]]=%d\n", ib, level[ib], botblk[ib], level[botblk[ib]]);
+			check = false;
+		}
+		if (abs(level[topblk[ib]] - (level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[ib]=%d; level[topblk[ib]]=%d\n", ib, level[ib], topblk[ib], level[topblk[ib]]);
+			
+			check = false;
+		}
+
+		if ((level[leftblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[topblk[leftblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[leftblk[ib]]=%d; level[topblk[leftblk[ib]]]=%d\n", ib, level[ib], topblk[leftblk[ib]], level[topblk[leftblk[ib]]]);
+				check = false;
+			}
+		}
+
+		if ((level[rightblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[topblk[rightblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[rightblk[ib]]=%d; level[topblk[rightblk[ib]]]=%d\n", ib, level[ib], topblk[rightblk[ib]], level[topblk[rightblk[ib]]]);
+				check = false;
+			}
+		}
+		if ((level[topblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[rightblk[topblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[topblk[ib]]=%d; level[rightblk[topblk[ib]]]=%d\n", ib, level[ib], rightblk[topblk[ib]], level[rightblk[topblk[ib]]]);
+				check = false;
+			}
+		}
+
+		if ((level[botblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[rightblk[botblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[botblk[ib]]=%d; level[rightblk[botblk[ib]]]=%d\n", ib, level[ib], rightblk[botblk[ib]], level[rightblk[botblk[ib]]]);
+				check = false;
+			}
+		}
+
+
+	}
+
+	return check;
+
+}
 
 

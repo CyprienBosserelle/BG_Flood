@@ -4004,6 +4004,12 @@ int main(int argc, char **argv)
 			wetdrycriteria(XParam, refine, coarsen);
 
 			XParam = adapt(XParam);
+			if (!checkBUQsanity(XParam))
+			{
+				printf("Bad BUQ mesh layout\n");
+				exit(2);
+			}
+
 
 		}
 	}
