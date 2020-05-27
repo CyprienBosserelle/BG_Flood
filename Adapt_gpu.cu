@@ -214,12 +214,7 @@ Param adapt(Param XParam)
 
 
 	
-	if (XParam.nblkmem > 1473)
-	{
-		int ib = 1473;
-		printf("ib=%d; leftblk[ib]=%d; level[ib]=%d; level[leftblk[ib]]=%d; refine[leftblk[ib]]=%d; refine[ib]=%d; coarsen[ib]=%d; \n", ib, leftblk[ib], level[ib], level[leftblk[ib]], refine[leftblk[ib]], refine[ib], coarsen[ib]);
-	}
-
+	
 	// Can't actually coarsen if top, right and topright block are not all corsen
 		
 	
@@ -663,10 +658,7 @@ Param adapt(Param XParam)
 	}
 
 
-	if (XParam.nblk > 933)
-	{
-		printf("Prerefine ib=%d; leftblk[ib]=%d; refine[leftblk[ib]]=%d\n", 933, leftblk[933], refine[leftblk[933]]);
-	}
+	
 
 	//refine
 	int nblk = XParam.nblk;
@@ -970,10 +962,7 @@ Param adapt(Param XParam)
 		}
 	}
 
-	if (XParam.nblk > 933)
-	{
-		printf("Prerefine interface ib=%d; leftblk[ib]=%d; \n", 933, leftblk[933]);
-	}
+	
 	// Break this into separate loops so not to interfere with interpolation scheme
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1071,20 +1060,7 @@ Param adapt(Param XParam)
 
 	}
 
-	if (XParam.nblk > 933)
-	{
-
-		printf("Prerefine critical neighbour nblk=%d ib=%d; level[ib]=%d; refine[ib]=%d; availblk[933]=%d leftblk[933]=%d  rightblk[933]=%d  topblk[933]=%d  botblk[933]=%d\n",XParam.nblk, 933, level[933], refine[933], availblk[csumblk[933]], leftblk[933], rightblk[933], topblk[933], botblk[933]);
-		printf("Prerefine critical neighbour nblk=%d ib=%d; level[ib]=%d; refine[ib]=%d; availblk[932]=%d leftblk[932]=%d  rightblk[932]=%d  topblk[932]=%d  botblk[932]=%d\n", XParam.nblk, 932, level[932], refine[932], availblk[csumblk[932]], leftblk[932], rightblk[932], topblk[932], botblk[932]);
-		printf("Prerefine critical neighbour nblk=%d ib=%d; level[ib]=%d; refine[ib]=%d; availblk[931]=%d leftblk[931]=%d  rightblk[931]=%d  topblk[931]=%d  botblk[931]=%d\n", XParam.nblk, 931, level[931], refine[931], availblk[csumblk[931]], leftblk[931], rightblk[931], topblk[931], botblk[931]);
-
-	}
-	if (XParam.nblk > 6998)
-	{
-		printf("Prerefine critical neighbour nblk=%d ib=%d; refine[ib]=%d; availblk[6999]=%d leftblk[6999]=%d  rightblk[6999]=%d  topblk[6999]=%d  botblk[6999]=%d  oldright=%d\n", XParam.nblk, 6999, refine[6999], availblk[csumblk[6999]], leftblk[6999], rightblk[6999], topblk[6999], botblk[6999], rightblk[rightblk[6999]]);
-		//printf("Prerefine critical neighbour nblk=%d ib=%d; refine[ib]=%d; availblk[933]=%d leftblk[933]=%d  rightblk[933]=%d  topblk[933]=%d  botblk[933]=%d\n", XParam.nblk, 933, refine[933], availblk[csumblk[933]], leftblk[933], rightblk[933], topblk[933], botblk[933]);
-
-	}
+	
 
 	// set the critical neighbour
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1305,11 +1281,7 @@ Param adapt(Param XParam)
 				}
 				else
 				{
-					if (oldright == 933)
-					{
-						printf("Inside oldright oldright=%d;  leftblk[oldright]=%d; activeblk=%d \n", oldright, leftblk[oldright],activeblk[ibl]);
-						printf("newlevel[ib]=%d; newlevel[oldright]=%d; \n",newlevel[ib],newlevel[oldright]);
-					}
+					
 					// i.e. not refined (can't be coarsen either)
 					if (newlevel[oldright] < newlevel[ib])
 					{
@@ -1432,10 +1404,7 @@ Param adapt(Param XParam)
 		}
 	}
 
-	if (XParam.nblk > 933)
-	{
-		printf("Postrefine ib=%d; leftblk[ib]=%d; \n", 933, leftblk[933]);
-	}
+	
 	
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
