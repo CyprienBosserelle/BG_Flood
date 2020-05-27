@@ -214,7 +214,11 @@ Param adapt(Param XParam)
 
 
 	
-	
+	if (XParam.nblkmem > 1473)
+	{
+		int ib = 1473;
+		printf("ib=%d; leftblk[ib]=%d; level[ib]=%d; level[leftblk[ib]]=%d; refine[leftblk[ib]]=%d; refine[ib]=%d; coarsen[ib]=%d; \n", ib, leftblk[ib], level[ib], level[leftblk[ib]], refine[leftblk[ib]], refine[ib], coarsen[ib]);
+	}
 
 	// Can't actually coarsen if top, right and topright block are not all corsen
 		
@@ -659,6 +663,11 @@ Param adapt(Param XParam)
 	}
 
 
+	if (XParam.nblk > 933)
+	{
+		printf("Prerefine ib=%d; leftblk[ib]=%d; refine[leftblk[ib]]=%d\n", 933, leftblk[933], refine[leftblk[933]]);
+	}
+
 	//refine
 	int nblk = XParam.nblk;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -677,6 +686,8 @@ Param adapt(Param XParam)
 		{
 			if (refine[ib] == true)
 			{
+
+				
 
 				double delx = calcres(XParam.dx, level[ib] + 1);
 				double xoblk = blockxo_d[ib] - 0.5 * delx;
@@ -959,7 +970,10 @@ Param adapt(Param XParam)
 		}
 	}
 
-
+	if (XParam.nblk > 933)
+	{
+		printf("Prerefine interface ib=%d; leftblk[ib]=%d; \n", 933, leftblk[933]);
+	}
 	// Break this into separate loops so not to interfere with interpolation scheme
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -996,6 +1010,7 @@ Param adapt(Param XParam)
 				newlevel[availblk[csumblk[ib] + 1]] = level[ib] + 1;
 				newlevel[availblk[csumblk[ib] + 2]] = level[ib] + 1;
 
+				
 
 				blockxo_d[ib] = xoblk;
 				blockyo_d[ib] = yoblk;
@@ -1017,21 +1032,57 @@ Param adapt(Param XParam)
 				topblk[availblk[csumblk[ib] + 1]] = oldtop;
 				topblk[availblk[csumblk[ib]]] = availblk[csumblk[ib] + 2];
 
+				if (oldtop == ib)
+				{
+					topblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
+					topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+				}
+
 				//printf("topblk[ib]=%d; oldtop=%d; topblk[availblk[csumblk[ibl] + 1]]=%d; topblk[availblk[csumblk[ibl]]]=%d; \n ", availblk[csumblk[ibl] + 1], oldtop, topblk[availblk[csumblk[ibl] + 1]], topblk[availblk[csumblk[ibl]]]);
 
 				rightblk[ib] = availblk[csumblk[ib]];
 				rightblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 2];
 				rightblk[availblk[csumblk[ib]]] = oldright;
+				if (oldright == ib)
+				{
+					rightblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
+					rightblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+				}
+
 
 				botblk[availblk[csumblk[ib] + 1]] = ib;
 				botblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib]];
+				if (oldbot == ib)
+				{
+					botblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
+					
+				}
 
 				leftblk[availblk[csumblk[ib]]] = ib;
 				leftblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 1];
+				if (oldleft == ib)
+				{
+					leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
+				}
 
 				XParam.navailblk= XParam.navailblk-3;
 			}
 		}
+
+	}
+
+	if (XParam.nblk > 933)
+	{
+
+		printf("Prerefine critical neighbour nblk=%d ib=%d; level[ib]=%d; refine[ib]=%d; availblk[933]=%d leftblk[933]=%d  rightblk[933]=%d  topblk[933]=%d  botblk[933]=%d\n",XParam.nblk, 933, level[933], refine[933], availblk[csumblk[933]], leftblk[933], rightblk[933], topblk[933], botblk[933]);
+		printf("Prerefine critical neighbour nblk=%d ib=%d; level[ib]=%d; refine[ib]=%d; availblk[932]=%d leftblk[932]=%d  rightblk[932]=%d  topblk[932]=%d  botblk[932]=%d\n", XParam.nblk, 932, level[932], refine[932], availblk[csumblk[932]], leftblk[932], rightblk[932], topblk[932], botblk[932]);
+		printf("Prerefine critical neighbour nblk=%d ib=%d; level[ib]=%d; refine[ib]=%d; availblk[931]=%d leftblk[931]=%d  rightblk[931]=%d  topblk[931]=%d  botblk[931]=%d\n", XParam.nblk, 931, level[931], refine[931], availblk[csumblk[931]], leftblk[931], rightblk[931], topblk[931], botblk[931]);
+
+	}
+	if (XParam.nblk > 6998)
+	{
+		printf("Prerefine critical neighbour nblk=%d ib=%d; refine[ib]=%d; availblk[6999]=%d leftblk[6999]=%d  rightblk[6999]=%d  topblk[6999]=%d  botblk[6999]=%d  oldright=%d\n", XParam.nblk, 6999, refine[6999], availblk[csumblk[6999]], leftblk[6999], rightblk[6999], topblk[6999], botblk[6999], rightblk[rightblk[6999]]);
+		//printf("Prerefine critical neighbour nblk=%d ib=%d; refine[ib]=%d; availblk[933]=%d leftblk[933]=%d  rightblk[933]=%d  topblk[933]=%d  botblk[933]=%d\n", XParam.nblk, 933, refine[933], availblk[csumblk[933]], leftblk[933], rightblk[933], topblk[933], botblk[933]);
 
 	}
 
@@ -1058,7 +1109,7 @@ Param adapt(Param XParam)
 
 				// Deal with left neighbour first 
 				// This is F* tedious!
-				if (refine[oldleft])// is true
+				if (refine[oldleft])// is true or the top left guy!!!
 				{
 
 					if (newlevel[oldleft] < newlevel[ib])
@@ -1094,9 +1145,10 @@ Param adapt(Param XParam)
 
 					if (newlevel[oldleft] > newlevel[ib])
 					{
+
 						leftblk[ib] = availblk[csumblk[oldleft]];
 						//==right of top of top of old left blk  					   
-						leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[topblk[topblk[oldleft]]]];
+						//leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[topblk[topblk[oldleft]]]];
 					}
 				}
 				else
@@ -1111,12 +1163,28 @@ Param adapt(Param XParam)
 					}
 					else
 					{
-						leftblk[availblk[csumblk[ib] + 1]] = topblk[oldleft];
 						//leftblk[ib] = oldleft; //alrready the case
-						rightblk[topblk[oldleft]] = availblk[csumblk[ib] + 2];
+						if (topblk[oldleft] != oldleft && refine[topblk[oldleft]]==false)
+						{
+							leftblk[availblk[csumblk[ib] + 1]] = topblk[oldleft];
+							
+							rightblk[topblk[oldleft]] = availblk[csumblk[ib] + 2];
+						}
+						else
+						{
+							leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
+						}
+						
 					}
 
 				}
+				if (newlevel[oldleft] > newlevel[ib] && refine[topblk[oldleft]])
+				{
+					leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[topblk[oldleft]]];
+					//rightblk[availblk[csumblk[topblk[oldleft]]]] = availblk[csumblk[ib] + 1];
+					//rightblk[availblk[csumblk[topblk[oldleft]] + 2]] = availblk[csumblk[ib] + 1];
+				}
+				
 				// Deal with Bottom neighbour
 				// 
 				if (refine[oldbot])// is true
@@ -1154,7 +1222,7 @@ Param adapt(Param XParam)
 					{
 						botblk[ib] = availblk[csumblk[oldbot]+1];
 						// 					   
-						botblk[availblk[csumblk[ib]]] = availblk[csumblk[rightblk[rightblk[oldbot]]]+1];
+						//botblk[availblk[csumblk[ib]]] = availblk[csumblk[rightblk[rightblk[oldbot]]]+1];
 					}
 				}
 				else
@@ -1168,12 +1236,29 @@ Param adapt(Param XParam)
 					}
 					else
 					{
-						botblk[availblk[csumblk[ib] ]] = rightblk[oldbot];
 						//botblk[ib]=oldbot //already the case
-						topblk[rightblk[oldbot]] = availblk[csumblk[ib]];
+
+						if (rightblk[oldbot] != oldbot && refine[rightblk[oldbot]] == false)
+						{
+							botblk[availblk[csumblk[ib]]] = rightblk[oldbot];
+							
+							topblk[rightblk[oldbot]] = availblk[csumblk[ib]];
+						}
+						else
+						{
+							botblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
+						}
 					}
 
 				}
+				if (level[oldbot] > level[ib] && refine[rightblk[oldbot]])
+				{
+					botblk[availblk[csumblk[ib]]] = availblk[csumblk[rightblk[oldbot]] + 1];
+
+					//topblk[availblk[csumblk[rightblk[oldbot]] + 1]] = availblk[csumblk[ib]];
+					//topblk[availblk[csumblk[rightblk[oldbot]] + 2]] = availblk[csumblk[ib]];
+				}
+				
 
 
 
@@ -1215,16 +1300,21 @@ Param adapt(Param XParam)
 					{
 						rightblk[availblk[csumblk[ib]]] = oldright;
 						// 					   
-						rightblk[availblk[csumblk[ib] + 2]] = topblk[topblk[oldright]];
+						//rightblk[availblk[csumblk[ib] + 2]] = topblk[topblk[oldright]];
 					}
 				}
 				else
 				{
+					if (oldright == 933)
+					{
+						printf("Inside oldright oldright=%d;  leftblk[oldright]=%d; activeblk=%d \n", oldright, leftblk[oldright],activeblk[ibl]);
+						printf("newlevel[ib]=%d; newlevel[oldright]=%d; \n",newlevel[ib],newlevel[oldright]);
+					}
 					// i.e. not refined (can't be coarsen either)
 					if (newlevel[oldright] < newlevel[ib])
 					{
 						rightblk[availblk[csumblk[ib]]] = oldright;
-						rightblk[availblk[csumblk[ib]]+2] = oldright;
+						rightblk[availblk[csumblk[ib] + 2]] = oldright;
 						
 						leftblk[oldright] = availblk[csumblk[ib]];
 
@@ -1232,13 +1322,30 @@ Param adapt(Param XParam)
 					else
 					{
 						rightblk[availblk[csumblk[ib]]] = oldright;
-						rightblk[availblk[csumblk[ib]+2]] = topblk[oldright];
-
 						leftblk[oldright] = availblk[csumblk[ib]];
-						leftblk[topblk[oldright]] = availblk[csumblk[ib] + 2];
+
+						if (topblk[oldright] != oldright && refine[topblk[oldright]] == false)
+						{
+							rightblk[availblk[csumblk[ib] + 2]] = topblk[oldright];
+							leftblk[topblk[oldright]] = availblk[csumblk[ib] + 2];
+						}
+						else //oldright is a boundary block
+						{
+							rightblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+						}
+						
+
+						
 					}
 
 				}
+				if (level[oldright] > level[ib] && refine[topblk[oldright]])
+				{
+					rightblk[availblk[csumblk[ib] + 2]] = topblk[oldright];
+					//leftblk[topblk[oldright]] = availblk[csumblk[ib] + 2];
+					//leftblk[availblk[csumblk[topblk[oldright]] + 1]] = availblk[csumblk[ib] + 2];
+				}
+				
 
 				// Deal with top neighbour
 				// 
@@ -1279,7 +1386,7 @@ Param adapt(Param XParam)
 					{
 						topblk[availblk[csumblk[ib] + 1]] = oldtop;
 						// 					   
-						topblk[availblk[csumblk[ib] + 2]] = rightblk[rightblk[oldtop]];
+						//topblk[availblk[csumblk[ib] + 2]] = rightblk[rightblk[oldtop]];
 					}
 				}
 				else
@@ -1295,20 +1402,40 @@ Param adapt(Param XParam)
 					else
 					{
 						topblk[availblk[csumblk[ib] + 1]] = oldtop;
-						topblk[availblk[csumblk[ib] + 2]] = rightblk[oldtop];
-
 						botblk[oldtop] = availblk[csumblk[ib] + 1];
-						botblk[rightblk[oldtop]] = availblk[csumblk[ib] + 2];
+
+						if (rightblk[oldtop] != oldtop && refine[rightblk[oldtop]] == false)
+						{
+														
+							topblk[availblk[csumblk[ib] + 2]] = rightblk[oldtop];
+											
+							botblk[rightblk[oldtop]] = availblk[csumblk[ib] + 2];
+						}
+						else
+						{
+							topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+						}
 
 					}
 
 				}
+				if (level[oldtop] > level[ib] && refine[rightblk[oldtop]])
+				{
+					topblk[availblk[csumblk[ib] + 2]] = rightblk[oldtop];
+					//botblk[rightblk[oldtop]] = availblk[csumblk[ib] + 2];
+
+					//botblk[availblk[csumblk[rightblk[oldtop]]]] = availblk[csumblk[ib] + 2];
+				}
+				
 
 			}
 		}
 	}
 
-	
+	if (XParam.nblk > 933)
+	{
+		printf("Postrefine ib=%d; leftblk[ib]=%d; \n", 933, leftblk[933]);
+	}
 	
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1350,7 +1477,7 @@ Param adapt(Param XParam)
 		
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
-
+			
 			
 			level[ib] = newlevel[ib];
 			
