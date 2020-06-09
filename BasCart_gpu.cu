@@ -4008,6 +4008,7 @@ int main(int argc, char **argv)
 			{
 				printf("Bad BUQ mesh layout\n");
 				exit(2);
+				//break;
 			}
 
 
