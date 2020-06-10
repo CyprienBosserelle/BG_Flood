@@ -362,7 +362,7 @@ Param adapt(Param XParam)
 		
 
 	}
-
+	
 	nnewblk = 3*nrefineblk - ncoarsenlk*3;
 
 	printf("%d blocks to be refined, %d blocks to be coarsen (with neighbour); %d blocks untouched; %d blocks to be freed (%d are already available) %d new blocks will be created\n", nrefineblk, ncoarsenlk, XParam.nblk- nrefineblk-4* ncoarsenlk,  ncoarsenlk * 3 , XParam.navailblk, nnewblk);
@@ -456,6 +456,10 @@ Param adapt(Param XParam)
 		printf("Reallocation complete: %d new blocks are available\n", XParam.navailblk);
 
 	}
+
+
+	printf("csumblk[0]=%d availblk[csumblk[0]]=%d\n", csumblk[0], availblk[csumblk[0]]);
+
 
 	// Initialise newlevel (Do this every time because new level is reused later)
 
@@ -1066,39 +1070,47 @@ Param adapt(Param XParam)
 				topblk[availblk[csumblk[ib] + 1]] = oldtop;
 				topblk[availblk[csumblk[ib]]] = availblk[csumblk[ib] + 2];
 
+				//this is done below
+				/*
 				if (oldtop == ib)
 				{
 					topblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
 					topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
 				}
-
+				*/
 				//printf("topblk[ib]=%d; oldtop=%d; topblk[availblk[csumblk[ibl] + 1]]=%d; topblk[availblk[csumblk[ibl]]]=%d; \n ", availblk[csumblk[ibl] + 1], oldtop, topblk[availblk[csumblk[ibl] + 1]], topblk[availblk[csumblk[ibl]]]);
 
 				rightblk[ib] = availblk[csumblk[ib]];
 				rightblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 2];
 				rightblk[availblk[csumblk[ib]]] = oldright;
+				//this is done below
+				/*
 				if (oldright == ib)
 				{
 					rightblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
 					rightblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
 				}
-
+				*/
 
 				botblk[availblk[csumblk[ib] + 1]] = ib;
 				botblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib]];
+				//this is done below
+				/*
 				if (oldbot == ib)
 				{
 					botblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
 					
 				}
-
+				*/
 				leftblk[availblk[csumblk[ib]]] = ib;
 				leftblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 1];
+				//this is done below
+				/*
 				if (oldleft == ib)
 				{
 					leftblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
 				}
-
+				*/
 				XParam.navailblk= XParam.navailblk-3;
 			}
 		}
@@ -1458,6 +1470,7 @@ Param adapt(Param XParam)
 					}
 					else // i.e. newlevel[oldtop] == newlevel[ib]
 					{
+
 						if (oldtop != ib)
 						{
 							topblk[availblk[csumblk[ib] + 1]] = oldtop;
@@ -1567,11 +1580,11 @@ Param adapt(Param XParam)
 
 	nblk = ib;
 
-
+	/*
 	for (int ibl = 0; ibl < nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
-		if (ib == 90)
+		if (ib == 1570)
 		{
 			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n",ib,level[ib],leftblk[ib],rightblk[ib],topblk[ib],botblk[ib], refine[ib]);
 			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", leftblk[ib], level[leftblk[ib]], leftblk[leftblk[ib]], rightblk[leftblk[ib]], topblk[leftblk[ib]], botblk[leftblk[ib]], refine[leftblk[ib]]);
@@ -1580,7 +1593,7 @@ Param adapt(Param XParam)
 			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", botblk[ib], level[botblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], topblk[botblk[ib]], botblk[botblk[ib]], refine[botblk[ib]]);
 
 		}
-		if (ib == 29)
+		if (ib == 17207)
 		{
 			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", ib, level[ib], leftblk[ib], rightblk[ib], topblk[ib], botblk[ib], refine[ib]);
 			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", leftblk[ib], level[leftblk[ib]], leftblk[leftblk[ib]], rightblk[leftblk[ib]], topblk[leftblk[ib]], botblk[leftblk[ib]], refine[leftblk[ib]]);
@@ -1589,18 +1602,10 @@ Param adapt(Param XParam)
 			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", botblk[ib], level[botblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], topblk[botblk[ib]], botblk[botblk[ib]], refine[botblk[ib]]);
 
 		}
-		if (ib == 20)
-		{
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", ib, level[ib], leftblk[ib], rightblk[ib], topblk[ib], botblk[ib], refine[ib]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", leftblk[ib], level[leftblk[ib]], leftblk[leftblk[ib]], rightblk[leftblk[ib]], topblk[leftblk[ib]], botblk[leftblk[ib]], refine[leftblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", rightblk[ib], level[rightblk[ib]], leftblk[rightblk[ib]], rightblk[rightblk[ib]], topblk[rightblk[ib]], botblk[rightblk[ib]], refine[rightblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", topblk[ib], level[topblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], topblk[topblk[ib]], botblk[topblk[ib]], refine[topblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", botblk[ib], level[botblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], topblk[botblk[ib]], botblk[botblk[ib]], refine[botblk[ib]]);
-
-		}
+		
 
 	}
-	
+	*/
 
 	//reset blockxo and blockyo
 	
