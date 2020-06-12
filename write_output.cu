@@ -976,11 +976,11 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
+		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
+		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
 
-		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
+		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
+		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
 
 
 
@@ -1057,7 +1057,12 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 			else
 			{
 				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
-				if (status != NC_NOERR) handle_error(status);
+
+				if (status != NC_NOERR)
+				{
+					printf("\n ib=%d start=[%d,%d,%d]; level=%d blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2],lev, blockxo[bl],xxmin, blockyo[bl],yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+					handle_error(status);
+				}
 			}
 
 		}
