@@ -1,0 +1,24 @@
+#!/bin/bash
+
+
+
+#modify the xyz input: remove header and make zb positive up
+#awk '{if(NR>1){print($1,$2,$3*-1)}}' ../Data/MonaiValley_Bathymetry.txt > BathyXYZ4Basilisk.txt
+
+#set up the grid
+#xyz2kdt -v Monai_Bath < BathyXYZ4Basilisk.txt
+
+########
+## BASELINE MODEL
+
+rm Tut.exe
+rm output.nc
+#Compile Monai.c
+#qcc Monai_Cart.c -O2 -lm -lkdt -L$BASILISK/kdt/ -o Monai.exe
+
+#-fopenmp -O2 -lm -l:libnetcdf.so.7 -lkdt -L$BASILISK/kdt/ -L/usr/lib64/
+qcc Tutorial_Cart.c -O2 -lm -lnetcdf -lkdt -L$BASILISK/kdt/ -L/usr/lib64/ -o Tut.exe
+
+
+#Run Monai
+./Tut.exe

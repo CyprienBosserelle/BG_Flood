@@ -205,12 +205,13 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 	static size_t count3D[] = { 1, 16, 16 };
 
 	varblk = (float *)malloc(XParam.blksize * sizeof(float));
+	var_s = (short*)malloc(XParam.nblk * XParam.blksize * sizeof(short));
+	varblk_s = (short*)malloc(XParam.blksize * sizeof(short));
 
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(XParam.nblk*XParam.blksize *sizeof(short));
-		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		
 		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
 			for (int j = 0; j < 16; j++)
@@ -349,11 +350,10 @@ extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::s
 		}
 	}
 
-	if (smallnc > 0)
-	{
-		free(var_s);
-		free(varblk_s);
-	}
+	
+	free(var_s);
+	free(varblk_s);
+	
 	free(varblk);
 	//close and save new file
 	status = nc_close(ncid);
@@ -412,12 +412,13 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 	static size_t count3D[] = { 1, 16, 16 };
 
 	varblk = (float *)malloc(XParam.blksize * sizeof(float));
+	var_s = (short*)malloc(XParam.nblk * XParam.blksize * sizeof(short));
+	varblk_s = (short*)malloc(XParam.blksize * sizeof(short));
 
 	if (smallnc > 0)
 	{
 		//If saving as short than we first need to scale and shift the data
-		var_s = (short *)malloc(XParam.nblk*XParam.blksize * sizeof(short));
-		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		
 		for (int bl = 0; bl < XParam.nblk; bl++)
 		{
 			for (int j = 0; j < 16; j++)
@@ -545,7 +546,7 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 					for (int i = 0; i < 16; i++)
 					{
 						int n = i + j * 16 + bl * XParam.blksize;
-						varblk[i + j * 16] = var[n];
+						varblk[i + j * 16] = float(var[n]);
 					}
 				}
 				start3D[1] = (size_t)round((blockyo[bl] - XParam.yo) / XParam.dx);
@@ -556,11 +557,10 @@ extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::
 		}
 	}
 
-	if (smallnc > 0)
-	{
-		free(var_s);
-		free(varblk_s);
-	}
+	
+	free(var_s);
+	free(varblk_s);
+	
 	free(varblk);
 	//close and save new file
 	status = nc_close(ncid);
@@ -1169,10 +1169,17 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
-int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, double * &zsa)
+int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, double * &zsa)
 {
-	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr;
+	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr, varerr;
 	double scalefac, offset, missing, fillval;
+
+	double hha,zza;
+
+	//bool checkhh = false;
+
+	int wet = 1;
+
 	size_t *start, *count;
 	//std::string Varname = "time";
 	ndims = 3;
@@ -1184,27 +1191,29 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 	start[1] = indy;
 	start[2] = indx;
 
-	std::string ncfilestr;
-	std::string varstr;
+	//std::string ncfilestr;
+	//std::string varstr;
 
 
 	//char ncfile[]="ocean_ausnwsrstwq2.nc";
-	std::vector<std::string> nameelements;
+	//std::vector<std::string> nameelements;
 
-	nameelements = split(filename, '?');
+	/*nameelements = split(filename, '?');
 	if (nameelements.size() > 1)
 	{
-		//variable name for bathy is not given so it is assumed to be zb
+		
 		ncfilestr = nameelements[0];
 		varstr = nameelements[1];
 	}
 	else
 	{
+		
 		ncfilestr = filename;
 		varstr = "zs";
-	}
+		checkhh = true;
+	}*/
 
-	status = nc_open(ncfilestr.c_str(), 0, &ncid);
+	status = nc_open(filename.c_str(), 0, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 
 	status = nc_inq_varid(ncid, varstr.c_str(), &varid);
@@ -1212,6 +1221,8 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 
 	status = nc_get_var1_double(ncid, varid, start, zsa);
 	if (status != NC_NOERR) handle_error(status);
+
+	
 
 	sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
 	oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
@@ -1227,6 +1238,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 		if (zsa[0] == missing)
 		{
 			zsa[0] = 0.0;
+			wet = 0;
 		}
 	}
 	if (fillerr == NC_NOERR)
@@ -1234,6 +1246,7 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 		if (zsa[0] == fillval)
 		{
 			zsa[0] = 0.0;
+			wet = 0;
 		}
 	}
 
@@ -1245,14 +1258,75 @@ int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, dou
 		zsa[0] = zsa[0] * scalefac + offset;
 	}
 
+	if (checkhh)
+	{
+		zza = zsa[0];
+		iderr = nc_inq_varid(ncid, "hh", &varid);
+		if (iderr == NC_NOERR)
+		{
+			status = nc_get_var1_double(ncid, varid, start, zsa);
+			sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
+			oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
+
+			// Check if variable is a missing value
+
+			misserr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
+
+			fillerr = nc_get_att_double(ncid, varid, "missingvalue", &fillval);
+
+			if (misserr == NC_NOERR)
+			{
+				if (zsa[0] == missing)
+				{
+					zsa[0] = 0.0;
+					wet = 0;
+				}
+			}
+			if (fillerr == NC_NOERR)
+			{
+				if (zsa[0] == fillval)
+				{
+					zsa[0] = 0.0;
+					wet = 0;
+				}
+			}
+
+
+
+
+			if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
+			{
+				zsa[0] = zsa[0] * scalefac + offset;
+			}
+
+			hha = zsa[0];
+			if (hha > eps)
+			{
+				zsa[0] = zza;
+			}
+			else
+			{
+				zsa[0] = 0.0;
+				wet = 0;
+			}
+			
+		}
+
+
+	}
+
+
+
 	status = nc_close(ncid);
 
 	free(start);
 	//free(count);
 
 
-	return status;
+	return wet;
 }
+
+
 
 
 int readvardata(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, float * vardata)
@@ -1455,7 +1529,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 
 	//Open NC file
-	printf("Open file\n");
+	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
 	if (status != NC_NOERR) handle_error(status);
 	zberror = nc_inq_varid(ncid, "zb", &varid);
@@ -1537,9 +1611,10 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	varinfile = (float *)malloc(nx*ny * sizeof(float));
 
 	//first check if hotstart has zb
-
+	printf("Found variables: ");
 	if (zberror == NC_NOERR)
 	{
+		printf("zb... ");
 		//zb is set
 
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zb", ddim);
@@ -1566,6 +1641,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	//zs Section
 	if (zserror == NC_NOERR)
 	{
+		printf(" zs... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zs", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "zs", ndims, 0, ddim, varinfile);
@@ -1605,7 +1681,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 		{
 			//Variable not found
 			//It's ok if hh is specified
-			printf("zs not found in hotstart file. Looking for hh\n");
+			printf("zs not found in hotstart file. Looking for hh... ");
 		}
 		else
 		{
@@ -1616,6 +1692,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	//hh section
 	if (hherror == NC_NOERR)
 	{
+		printf("hh... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "hh", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "hh", ndims, 0, ddim, varinfile);
@@ -1681,6 +1758,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 	if (uuerror == NC_NOERR)
 	{
+		printf("uu... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "uu", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "uu", ndims, 0, ddim, varinfile);
@@ -1721,6 +1799,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 	if (vverror == NC_NOERR)
 	{
+		printf("vv... ");
 		ndims = readvarinfo(XParam.hotstartfile.c_str(), "vv", ddim);
 
 		status = readvardata(XParam.hotstartfile.c_str(), "vv", ndims, 0, ddim, varinfile);
@@ -1759,6 +1838,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	//status = nc_get_var_float(ncid, hh_id, zb);
 	status = nc_close(ncid);
 
+	
 
 	return 1;
 

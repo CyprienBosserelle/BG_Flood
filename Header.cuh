@@ -66,7 +66,8 @@ class SLTS {
 public:
 	double time;
 	std::vector<double> wlevs;
-
+	std::vector<double> uuvel;
+	std::vector<double> vvvel;
 
 };
 
@@ -188,6 +189,10 @@ public:
 
 	//hot start
 	double zsinit = -999.0; //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
+
+	//Add a water level offset to initial conditions and bnds
+	double zsoffset = 0.0;
+
 
 	std::string hotstartfile;
 	//std::string deformfile;
@@ -379,10 +384,20 @@ extern cudaArray* Patm_gp;
 extern cudaArray* Rain_gp;
 
 // Below create channels between cuda arrays (see above) and textures
-extern cudaChannelFormatDesc channelDescleftbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-extern cudaChannelFormatDesc channelDescrightbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-extern cudaChannelFormatDesc channelDescbotbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-extern cudaChannelFormatDesc channelDesctopbnd;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+extern cudaChannelFormatDesc channelDescleftbndzs;// = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+extern cudaChannelFormatDesc channelDescrightbndzs;
+extern cudaChannelFormatDesc channelDescbotbndzs;
+extern cudaChannelFormatDesc channelDesctopbndzs;
+
+extern cudaChannelFormatDesc channelDescleftbnduu;
+extern cudaChannelFormatDesc channelDescrightbnduu;
+extern cudaChannelFormatDesc channelDescbotbnduu;
+extern cudaChannelFormatDesc channelDesctopbnduu;
+
+extern cudaChannelFormatDesc channelDescleftbndvv;
+extern cudaChannelFormatDesc channelDescrightbndvv;
+extern cudaChannelFormatDesc channelDescbotbndvv;
+extern cudaChannelFormatDesc channelDesctopbndvv;
 
 extern cudaChannelFormatDesc channelDescUwind; 
 extern cudaChannelFormatDesc channelDescVwind; 
@@ -482,8 +497,7 @@ void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, floa
 float interp2wnd(int wndnx, int wndny, float wnddx, float wndxo, float wndyo, float x, float y, float * U);
 double interp2wnd(int wndnx, int wndny, double wnddx, double wndxo, double wndyo, double x, double y, float * U);
 int readnctime(std::string filename, double * &time);
-int readncslev1(std::string filename, size_t indx, size_t indy, size_t indt, double * &zsa);
-
+int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, double * &zsa);
 // I/O
 inputmap readBathyhead(inputmap Bathy);
 inputmap readcfmaphead(inputmap Roughmap);
@@ -494,7 +508,7 @@ extern "C" void readbathyMD(std::string filename, float *&zb);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 std::vector<SLTS> readbndfile(std::string filename, Param XParam, int side);
 std::vector<SLTS> readWLfile(std::string WLfilename);
-std::vector<SLTS> readNestfile(std::string ncfile, int hor, double bndxo, double bndxmax, double bndy);
+std::vector<SLTS> readNestfile(std::string ncfile, int hor,double eps, double bndxo, double bndxmax, double bndy);
 std::vector<Flowin> readFlowfile(std::string Flowfilename);
 std::vector<Windin> readINfileUNI(std::string filename);
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);

@@ -90,12 +90,23 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	if (fileext.compare("nc") == 0)
 	{
 		//Bndinfo = readNestfile(filename);
-		Bndinfo = readNestfile(filename,hor, xxo, xxmax, yy);
+		Bndinfo = readNestfile(filename, hor, XParam.eps, xxo, xxmax, yy);
 	}
 	else
 	{
 		Bndinfo = readWLfile(filename);
 	}
+
+	// Add zsoffset
+	for (int i = 0; i < Bndinfo.size(); i++)
+	{
+		for (int n = 0; n < Bndinfo[i].wlevs.size(); n++)
+		{
+			Bndinfo[i].wlevs[n] = Bndinfo[i].wlevs[n] + XParam.zsoffset;
+		}
+	}
+
+
 	return Bndinfo;
 }
 
@@ -179,20 +190,21 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
-std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, double bndxmax, double bndy)
+std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double bndxo, double bndxmax, double bndy)
 {
 	// Prep boundary input vector from anorthe model output file
 	//this function works for botom top bnd as written but flips x and y for left and right bnds
 	// hor controls wheter the boundary is a top/botom bnd hor=1 or left/right hor=0 
 	std::vector<SLTS> slbnd;
 	SLTS slbndline;
-
-	std::vector<double> WLS;
+	
+	std::vector<double> WLS,Unest,Vnest;
 	//Define NC file variables
 	int nnx, nny, nt, nbndpts, indxx, indyy, indx, indy,nx, ny;
 	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
 	double * ttt, *zsa;
-	
+	bool checkhh = false;
+	int iswet;
 
 	// Read NC info
 	readgridncsize(ncfile, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax);
@@ -228,6 +240,28 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 	//printf("%f\t%d\t%d\t%f\n", bndy, nx, ny, dx);
 
 	//printf("%d\n", nbndpts);
+	std::string ncfilestr;
+	std::string varstr,varstruu,varstrvv;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+	nameelements = split(ncfile, '?');
+	if (nameelements.size() > 1)
+	{
+
+		ncfilestr = nameelements[0];
+		varstr = nameelements[1];
+	}
+	else
+	{
+
+		ncfilestr = ncfile;
+		varstr = "zs";
+		checkhh = true;
+	}
+
+
 	for (int it = 0; it < nt; it++)
 	{
 		slbndline.time = ttt[it];
@@ -249,15 +283,87 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor , double bndxo, doubl
 				indy = indyy;
 			}
 
-			readncslev1(ncfile, indx, indy, it, zsa);
-			//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+			iswet=readncslev1(ncfile, varstr, indx, indy, it, checkhh,eps, zsa);
+			//varstr
+			//printf("%d\t%d\t%d\tzs=%f\t%d\n", it,indx, indy, zsa[0],iswet);
+
+			if (iswet == 0)
+			{
+				if (WLS.size() >= 1)
+				{
+					zsa[0] = WLS.back();
+				}
+				else
+				{
+					zsa[0] = 0.0;
+				}
+			}
 
 			WLS.push_back(zsa[0]);
+
+			//printf("zs=%f\\n", zsa[0]);
+
+			// If true nesting then uu and vv are expected to be present in the netcdf file 
+
+			if (checkhh)
+			{
+				varstruu = "uu";
+				iswet = readncslev1(ncfilestr, varstruu, indx, indy, it, checkhh, eps, zsa);
+				//printf("%d\t%d\t%d\tuu=%f\t%d\n", it, indx, indy, zsa[0], iswet);
+				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+
+				if (iswet == 0)
+				{
+
+					if (Unest.size() >= 1)
+					{
+						zsa[0] = Unest.back();
+					}
+					else
+					{
+						zsa[0] = 0.0;
+					}
+				}
+
+				Unest.push_back(zsa[0]);
+
+				varstrvv = "vv";
+				iswet = readncslev1(ncfile, varstrvv, indx, indy, it, checkhh, eps, zsa);
+				//printf("%d\t%d\t%d\tvv=%f\t%d\n", it, indx, indy, zsa[0], iswet);
+				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+
+				if (iswet == 0)
+				{
+					if (Vnest.size() >= 1)
+					{
+						zsa[0] = Vnest.back();
+					}
+					else
+					{
+						zsa[0] = 0.0;
+					}
+				}
+
+				Vnest.push_back(zsa[0]);
+			}
+
+
+
+
 		}
 		slbndline.wlevs = WLS;
+		WLS.clear();
+		if (checkhh)
+		{
+			slbndline.uuvel = Unest;
+			slbndline.vvvel = Vnest;
+			Unest.clear();
+			Vnest.clear();
+		}
+
 		slbnd.push_back(slbndline);
 		//std::cout << line << std::endl;
-		WLS.clear();
+		
 	}
 	///To Be continued
 	
@@ -969,6 +1075,14 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.zsinit = std::stod(parametervalue);
 	}
+
+	parameterstr = "zsoffset";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.zsoffset = std::stod(parametervalue);
+	}
+
 	parameterstr = "hotstartfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
