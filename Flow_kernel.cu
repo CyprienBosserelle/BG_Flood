@@ -697,6 +697,8 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 
 	//float epsc = 0.07f;
 
+	// This is based on kurganov and Petrova 2007
+
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
 
@@ -775,14 +777,15 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
 
-			ap = max(max(up + cp, um + cmo),0.0f);
+			ap = max(max(up + cp, um + cmo),0.0f);// eq. 2.22
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo),0.0f);
+			am = min(min(up - cp, um - cmo),0.0f);//eq. 2.23
 			//am = min(am, 0.0f);
+
 			ad = 1.0f / (ap - am);
 			//Correct for spurious currents in really shallow depth
-			qm = hm*um;
+			qm = hm*um; 
 			qp = hp*up;
 			//qm = hm*um*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hm,4.0f))));
 			//qp = hp*up*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hp,4.0f))));
@@ -797,8 +800,8 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 
 			if (a > epsi)
 			{
-				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
-				fu = (ap*(qm*um + ga*hm2 ) - am*(qp*up + ga*hp2 ) + apm*(qp - qm)) *ad;
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad; // H  in eq. 2.24 or eq 3.7 for F(h)
+				fu = (ap*(qm*um + ga*hm2 ) - am*(qp*up + ga*hp2 ) + apm*(qp - qm)) *ad; // Eq 3.7 second term (X direction)
 				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
 				float dt = CFL*dlt / a;
 				if (dt < dtmax[i])
@@ -841,7 +844,7 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 			
 			if (fh > 0.0f)
 			{
-				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
+				fv = (vv[ileft] + dx*dvdx[ileft])*fh;// Eq 3.7 third term? (X direction)
 			}
 			else 
 			{
