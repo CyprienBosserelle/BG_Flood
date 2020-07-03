@@ -171,16 +171,36 @@ cudaArray* rightWLS_gp;
 cudaArray* topWLS_gp;
 cudaArray* botWLS_gp;
 
+cudaArray* leftUvel_gp;
+cudaArray* rightUvel_gp;
+cudaArray* topUvel_gp;
+cudaArray* botUvel_gp;
+
+cudaArray* leftVvel_gp;
+cudaArray* rightVvel_gp;
+cudaArray* topVvel_gp;
+cudaArray* botVvel_gp;
+
 // store wind data in cuda array before sending to texture memory
 cudaArray* Uwind_gp;
 cudaArray* Vwind_gp;
 cudaArray* Patm_gp;
 cudaArray* Rain_gp;
 
-cudaChannelFormatDesc channelDescleftbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-cudaChannelFormatDesc channelDescrightbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-cudaChannelFormatDesc channelDescbotbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-cudaChannelFormatDesc channelDesctopbnd = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescleftbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescrightbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescbotbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDesctopbndzs = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+
+cudaChannelFormatDesc channelDescleftbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescrightbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescbotbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDesctopbnduu = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+
+cudaChannelFormatDesc channelDescleftbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescrightbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDescbotbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+cudaChannelFormatDesc channelDesctopbndvv = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
 cudaChannelFormatDesc channelDescUwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescVwind = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
@@ -2575,6 +2595,8 @@ int main(int argc, char **argv)
 
 	//Model starts Here//
 	Param XParam;
+	Param defaultParam; // This is used later 
+
 	//The main function setups all the init of the model and then calls the mainloop to actually run the model
 
 	// Theire are many (12) mainloops depending whether the model runs on the GPU/CPU and whether the implementation is float/double or spherical coordinate (double only)
@@ -3387,12 +3409,27 @@ int main(int argc, char **argv)
 		{
 			hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk,  botblk, blockxo_d, blockyo_d,  zs, zb, hh, uu, vv);
 		}
+		//add offset if present
+		if (abs(XParam.zsoffset - defaultParam.zsoffset) > epsilon) // apply specified zsoffset
+		{
+			printf("add offset to zs and hh... ");
+			//
+			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+			{
+				AddZSoffset(XParam, zb_d, zs_d, hh_d);
+			}
+			else
+			{
+				AddZSoffset(XParam, zb, zs, hh);
+			}
 
+		}
 		if (hotstartsucess == 0)
 		{
 			printf("Failed...  ");
 			write_text_to_log_file("Hotstart failed switching to cold start");
 		}
+		
 	}
 	if (XParam.hotstartfile.empty() || hotstartsucess == 0)
 	{
@@ -3403,7 +3440,7 @@ int main(int argc, char **argv)
 		//		(1) if zsinit is set, then apply zsinit everywhere
 		//		(2) zsinit is not set so interpolate from boundaries. (if no boundaries were specified set zsinit to zeros and apply case (1))
 
-		Param defaultParam;
+		//Param defaultParam;
 		//!leftWLbnd.empty()
 
 		//case 2b (i.e. zsinint and no boundaries were specified)
@@ -3448,6 +3485,10 @@ int main(int argc, char **argv)
 		}// end else
 
 	}
+
+	
+
+
 	printf("done \n");
 	write_text_to_log_file("Done");
 
