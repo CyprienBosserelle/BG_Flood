@@ -1063,7 +1063,7 @@ Param adapt(Param XParam)
 				blockxo_d[availblk[csumblk[ib] + 2]] = xoblk + (XParam.blkwidth) * delx;
 				blockyo_d[availblk[csumblk[ib] + 2]] = yoblk + (XParam.blkwidth ) * delx;
 
-
+				
 				//sort out blocks neighbour
 
 				topblk[ib] = availblk[csumblk[ib] + 1];
@@ -1548,7 +1548,10 @@ Param adapt(Param XParam)
 			level[ib] = newlevel[ib];
 			
 			//printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
-			
+			if (ib == 1177)
+			{
+				printf("\nib=%d; blockxo=%f; blockyo=%f\n\n",ib, blockxo_d[ib], blockyo_d[ib]);
+			}
 		}
 	}
 
