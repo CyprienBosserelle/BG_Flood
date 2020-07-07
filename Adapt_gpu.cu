@@ -11,13 +11,23 @@ bool isPow2(int x)
 
 }
 
+/*! \fn template <class T> __host__ __device__ double calcres(T dx, int level)
+* 
+* Template function to calculate the grid cell size based on level and initial/seed dx
+* 
+*/
 template <class T> 
 __host__ __device__ double calcres(T dx, int level)
 {
 	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
 }
 
-
+/*! \fn int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
+* Simple wet/.dry refining criteria.
+* if the block is wet -> refine is true
+* if the block is dry -> coarsen is true
+* beware the refinement sanity check is meant to be done after running this function 
+*/
 int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 {
 	// First use a simple refining criteria: wet or dry
@@ -58,18 +68,14 @@ int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 }
 
 
-
-
-
-
-Param adapt(Param XParam)
+/*! \fn bool refinesanitycheck(Param XParam, bool*& refine, bool*& coarsen)
+* check and correct the sanity of first order refining/corasening criteria.
+* 
+* 
+* 
+*/
+bool refinesanitycheck(Param XParam, bool*& refine, bool*& coarsen)
 {
-
-
-	
-
-
-
 	// Can't actually refine if the level is the max level (i.e. finest)
 
 	// this may be over-ruled later on
@@ -94,7 +100,7 @@ Param adapt(Param XParam)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
-		if (refine[ib] == true )
+		if (refine[ib] == true)
 		{
 			coarsen[rightblk[ib]] = false;
 			coarsen[leftblk[ib]] = false;
@@ -180,77 +186,77 @@ Param adapt(Param XParam)
 			/*
 			if (refine[ib] == false)
 			{
-				//printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
-				//topleft blk
-				if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
-				{
-					refine[ib] = true;
-					coarsen[ib] = false;
-					iter = 1;
-				}
-				//top right if lev=lev+1
-				if ((level[topblk[ib]] - level[ib]) > 0)
-				{
-					if (refine[rightblk[topblk[ib]]] == true && (level[rightblk[topblk[ib]]] - level[ib]) > 0)
-					{
-						refine[ib] = true;
-						coarsen[ib] = false;
-						iter = 1;
-					}
-				}
-				//bot left
+			//printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
+			//topleft blk
+			if (refine[topblk[ib]] == true && (level[topblk[ib]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
+			//top right if lev=lev+1
+			if ((level[topblk[ib]] - level[ib]) > 0)
+			{
+			if (refine[rightblk[topblk[ib]]] == true && (level[rightblk[topblk[ib]]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
+			}
+			//bot left
 
-				if (refine[botblk[ib]] == true && (level[botblk[ib]] - level[ib]) > 0)
-				{
-					refine[ib] = true;
-					coarsen[ib] = false;
-					iter = 1;
-				}
-				//bot right
-				if ((level[botblk[ib]] - level[ib]) > 0)
-				{
-					if (refine[rightblk[botblk[ib]]] == true && (level[rightblk[botblk[ib]]] - level[ib]) > 0)
-					{
-						refine[ib] = true;
-						coarsen[ib] = false;
-						iter = 1;
-					}
-				}
-				//Left bottom
-				if (refine[leftblk[ib]] == true && (level[leftblk[ib]] - level[ib]) > 0)
-				{
-					refine[ib] = true;
-					coarsen[ib] = false;
-					iter = 1;
-				}
-				//printf("ib=%d; leftblk[ib]=%d\n", ib, leftblk[ib]);
-				if ((level[leftblk[ib]] - level[ib]) > 0)
-				{
-					//left top
-					if (refine[topblk[leftblk[ib]]] == true && (level[topblk[leftblk[ib]]] - level[ib]) > 0)
-					{
-						refine[ib] = true;
-						coarsen[ib] = false;
-						iter = 1;
-					}
-				}
-				if (refine[rightblk[ib]] == true && (level[rightblk[ib]] - level[ib]) > 0)
-				{
-					refine[ib] = true;
-					coarsen[ib] = false;
-					iter = 1;
-				}
-				if ((level[rightblk[ib]] - level[ib]) > 0)
-				{
-					//
-					if (refine[topblk[rightblk[ib]]] == true && (level[topblk[rightblk[ib]]] - level[ib]) > 0)
-					{
-						refine[ib] = true;
-						coarsen[ib] = false;
-						iter = 1;
-					}
+			if (refine[botblk[ib]] == true && (level[botblk[ib]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
+			//bot right
+			if ((level[botblk[ib]] - level[ib]) > 0)
+			{
+			if (refine[rightblk[botblk[ib]]] == true && (level[rightblk[botblk[ib]]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
+			}
+			//Left bottom
+			if (refine[leftblk[ib]] == true && (level[leftblk[ib]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
+			//printf("ib=%d; leftblk[ib]=%d\n", ib, leftblk[ib]);
+			if ((level[leftblk[ib]] - level[ib]) > 0)
+			{
+			//left top
+			if (refine[topblk[leftblk[ib]]] == true && (level[topblk[leftblk[ib]]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
+			}
+			if (refine[rightblk[ib]] == true && (level[rightblk[ib]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
+			if ((level[rightblk[ib]] - level[ib]) > 0)
+			{
+			//
+			if (refine[topblk[rightblk[ib]]] == true && (level[topblk[rightblk[ib]]] - level[ib]) > 0)
+			{
+			refine[ib] = true;
+			coarsen[ib] = false;
+			iter = 1;
+			}
 
-				}
+			}
 
 			}
 			*/
@@ -258,11 +264,11 @@ Param adapt(Param XParam)
 	}
 
 
-	
-	
+
+
 	// Can't actually coarsen if top, right and topright block are not all corsen
-		
-	
+
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
@@ -273,7 +279,7 @@ Param adapt(Param XParam)
 		//printf("blockxo_d[ib]=%f, dxfac=%f, ((blx-xo)/dx)%2=%d\n", blockxo_d[ib], dxfac, (int((blockxo_d[ib] - XParam.xo) / dxfac / XParam.blkwidth) % 2));
 		//only check for coarsening if the block analysed is a lower left corner block of the lower level
 		//need to prevent coarsenning if the block is on the model edges...
-		  //((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib]
+		//((int((blockxo_d[ib] - XParam.xo) / dxfac) % 2) == 0 && (int((blockyo_d[ib] - XParam.yo) / dxfac) % 2) == 0) && rightblk[ib] != ib && topblk[ib] != ib && rightblk[topblk[ib]] != topblk[ib]
 		if (coarsen[ib] == true)
 		{
 			//if this block is a lower left corner block of teh potentialy coarser block
@@ -306,24 +312,30 @@ Param adapt(Param XParam)
 				coarsen[ib] = false;
 			}
 		}
-		
+
 	}
-	/*for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
-		printf("level =%d, %d, %d, %d\n", ib, level[ib], refine[ib], coarsen[ib]);
-	}*/
+	return true;
+}
 
-	// Reconstruct avail blk
+
+/*! \fn Param adapt(Param XParam)
+* perform refining/corasening
+*
+*
+*
+*/
+Param adapt(Param XParam)
+{
+	// This function works in several interconnected step
+	// At this stage it works but is very hard to follow or debug
+	// while the function is not particularly well written it is a complex proble to breakup in small peices
 	
-
 	
-
-
-
-
-		
-	//Calc cumsum that will determine where the new blocks will be located in the memory
+	//===================================================================
+	//	Calculate invactive blk and cumsumblk
+	// invactiveblk is used to deasctivate the 3 stale block from a coarsened group and to identify which block in memory is available 
+	// cumsum will determine where the new blocks will be located in the memory
+	// availblk[csumblk[refine_block]]
 
 	int csum = -3;
 	int nrefineblk = 0;
@@ -359,6 +371,8 @@ Param adapt(Param XParam)
 
 	}
 
+	//=========================================
+	//	Reconstruct availblk
 	XParam.navailblk = 0;
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
@@ -370,10 +384,20 @@ Param adapt(Param XParam)
 
 	}
 	
-	nnewblk = 3*nrefineblk - ncoarsenlk*3;
+	// How many new block are needed
+	// This below would be ideal but I don't see how that could work.
+	// One issue is to make the newly coarsen blocks directly available in the section above but that would make the code even more confusingalthough we haven't taken them into account in the 
+	//nnewblk = 3*nrefineblk - ncoarsenlk*3;
+	// Below is conservative and keeps the peice of code above a bit more simple
+	nnewblk = 3 * nrefineblk;
 
 	printf("There are %d active blocks (%d blocks allocated in memory), %d blocks to be refined, %d blocks to be coarsen (with neighbour); %d blocks untouched; %d blocks to be freed (%d are already available) %d new blocks will be created\n",XParam.nblk,XParam.nblkmem, nrefineblk, ncoarsenlk, XParam.nblk- nrefineblk-4* ncoarsenlk,  ncoarsenlk * 3 , XParam.navailblk, nnewblk);
 	//printf("csunblk[end]=%d; navailblk=%d\n", csumblk[XParam.nblk - 1], XParam.navailblk);
+
+	//===============================================
+	//	Reallocate memory if necessary
+
+	
 	if (nnewblk>XParam.navailblk)
 	{
 		//reallocate memory to make more room
@@ -448,7 +472,7 @@ Param adapt(Param XParam)
 		
 
 
-		// Reconstruct avail blk
+		// Reconstruct blk info
 		XParam.navailblk = 0;
 		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
 		{
@@ -480,10 +504,11 @@ Param adapt(Param XParam)
 	}
 
 
-	printf("csumblk[0]=%d availblk[csumblk[0]]=%d\n", csumblk[0], availblk[csumblk[0]]);
+	//printf("csumblk[0]=%d availblk[csumblk[0]]=%d\n", csumblk[0], availblk[csumblk[0]]);
 
-
-	// Initialise newlevel (Do this every time because new level is reused later)
+	//===========================================================
+	//	Start coarsening and refinement
+	// First Initialise newlevel (Do this every time because new level is reused later)
 
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
@@ -497,8 +522,17 @@ Param adapt(Param XParam)
 		
 	}
 
+	//=========================================================
+	//	COARSEN
+	//=========================================================
+	// This is a 2 step process
+	// 1. First deal with the conserved variables (hh,uu,vv,zs,zb)
+	// 2. Deactivate the block
+	// 3. Fix neighbours
 
-	//coarsen
+	//____________________________________________________
+	//
+	// Step 1 & 2: Average conserved variables and deactivate the blocks
 
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -564,12 +598,7 @@ Param adapt(Param XParam)
 						//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
 						//zs, zb, uu,vv
 
-						
-
-						
-
-
-					}
+						}
 				}
 				
 				//Need more?
@@ -621,22 +650,14 @@ Param adapt(Param XParam)
 				blockyo_d[ib] = blockyo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 
 
-				
-				//printf("ibl=%d; ib=%d; blockxo_d[ib]=%f; blockyo_d[ib]=%f; right_id=%d, top_id=%d, topright_id=%d \n", ib, blockxo_d[ib], blockyo_d[ib], rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
-				//printf("ibl=%d; ib=%d; rightblk[ib]=%d\toldright[ib]=%d\trightblk[topblk[ib]]=%d\n", ibl, ib, rightblk[ib], oldright);
-
-
-				
-
-
-
-
 			
 		}
 
 	}
 
-	// deal with neighbour
+	//____________________________________________________
+	//
+	// Step 3: deal with neighbour
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = activeblk[ibl];
@@ -688,52 +709,23 @@ Param adapt(Param XParam)
 			}
 
 			
-			/*
-			int oldright = rightblk[ib];
-			//int oldtopofright = topblk[oldright];
-			int oldtop = topblk[topblk[ib]];
-			//int oldrightoftop = rightblk[oldtop];
-			int oldleft = leftblk[ib];
-			//int oldtopofleft = topblk[oldleft];
-			int oldbot = botblk[ib];
-			//int oldrightofbot = rightblk[oldbot];
-
-
-			// broadcast new neighbourhood to the neighbours
-			if (newlevel[oldright]==level[oldright] && oldright != ib)
-			{
-				leftblk[oldright] = ib;
-			}
-			if (topblk[ib] != ib)
-			{
-				botblk[oldtop] = ib;
-			}
-			// if the neighbour had the same level needs additional info
-			// Warning below is not safe for parallele calculations
-			if (level[ib] == level[oldleft] && leftblk[ib] != ib)
-			{
-				rightblk[oldtopofleft] = ib;
-			}
-			if (level[ib] == level[oldright] && rightblk[ib] != ib)
-			{
-				leftblk[oldtopofright] = ib;
-			}
-			if (level[ib] == level[oldtop] && topblk[ib] != ib)
-			{
-				botblk[oldrightoftop] = ib;
-			}
-			if (level[ib] == level[oldbot] && botblk[ib] != ib)
-			{
-				topblk[oldrightofbot] = ib;
-			}
-			*/
 		}
 	}
 
 
-	
+	//==========================================================================
+	//	REFINE
+	//==========================================================================
+	// This is also a multi step process:
+	//	1. Interpolate conserved variables (although zb is done here it is overwritten later down the code)
+	//	2. Set direct neighbours blockxo/yo and levels
+	//	3. Set wider neighbourhood
+	//	4. Activate new blocks 
 
-	//refine
+	//____________________________________________________
+	//
+	// Step 1. Interpolate conserved variables
+
 	int nblk = XParam.nblk;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -1035,8 +1027,10 @@ Param adapt(Param XParam)
 		}
 	}
 
-	
-	// Break this into separate loops so not to interfere with interpolation scheme
+	//____________________________________________________
+	//	
+	// Step 2. Set direct neighbours blockxo/yo and levels
+	//
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -1142,7 +1136,10 @@ Param adapt(Param XParam)
 	}
 
 	
-
+	//____________________________________________________
+	//	
+	//	Step 3. Set wider neighbourhood
+	//
 	// set the critical neighbour
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -1525,6 +1522,11 @@ Param adapt(Param XParam)
 		}
 	}
 
+
+	//____________________________________________________
+	//	
+	//	Step 4. Activate new blocks 
+	//
 	
 	nblk = XParam.nblk;
 
@@ -1560,7 +1562,13 @@ Param adapt(Param XParam)
 		}
 	}
 
-	//update level
+	//===========================================================
+	// UPDATE all remaining variables and clean up
+
+	//____________________________________________________
+	//
+	//	Update level
+	//
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		//
@@ -1583,7 +1591,11 @@ Param adapt(Param XParam)
 		}
 	}
 
-	// Reorder activeblk
+	//____________________________________________________
+	//
+	//	Reorder activeblk
+	//
+	// 
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		//reuse newlevel as temporary storage for activeblk
@@ -1638,7 +1650,11 @@ Param adapt(Param XParam)
 	}
 	*/
 
-	//reset blockxo and blockyo
+	//____________________________________________________
+	//
+	//	Update blockxo and blockyo
+	//
+	// 
 	
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
@@ -1650,14 +1666,26 @@ Param adapt(Param XParam)
 	}
 
 	
-
+	//____________________________________________________
+	//
+	//	Reinterpolate zb. 
+	//
+	//	Isn't it better to do that only for newly refined blk?
+	// 
 	
 	//Not necessary if no coarsening/refinement occur
 	//interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, bathydata, zb);
 	interp2BUQAda(nblk, XParam.blksize, XParam.dx, activeblk, level, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, bathydata, zb);
 
+	//____________________________________________________
+	//
+	//	Update hh and or zb
+	//
+	//	Recalculate hh from zs for fully wet cells and zs from zb for dry cells
+	//
+
 	// Because zb cannot be conserved through the refinement or coarsening
-	// We have o decide whtether to conserve elevation (zs) or Volume (hh)
+	// We have to decide whtether to conserve elevation (zs) or Volume (hh)
 	// 
 
 	for (int ibl = 0; ibl < nblk; ibl++)
@@ -1686,13 +1714,20 @@ Param adapt(Param XParam)
 		}
 	}
 
-	// Copy basic info to hho zso uuo vvo for further iterations
+	//____________________________________________________
+	//
+	//	Update hho zso, uuo and vvo
+	//
+	// Copy basic info to hho zso uuo vvo for next iterations of coarsening/refinement
 	CopyArray(nblk, XParam.blksize, hh, hho);
 	CopyArray(nblk, XParam.blksize, zs, zso);
 	CopyArray(nblk, XParam.blksize, uu, uuo);
 	CopyArray(nblk, XParam.blksize, vv, vvo);
 
-
+	//____________________________________________________
+	//
+	//	Update and return XParam
+	//
 
 	// Update nblk (nblk is the new number of block XParam.nblk is the previous number of blk)
 	XParam.nblk = nblk;
@@ -1702,6 +1737,12 @@ Param adapt(Param XParam)
 }
 
 
+/*! \fn bool checkBUQsanity(Param XParam)
+* Check the sanity of the BUQ mesh
+* This function mostly checks the level of neighbouring blocks 
+*
+*	Needs improvements
+*/
 bool checkBUQsanity(Param XParam)
 {
 	bool check = true;
