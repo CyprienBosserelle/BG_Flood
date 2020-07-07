@@ -315,15 +315,7 @@ Param adapt(Param XParam)
 	}*/
 
 	// Reconstruct avail blk
-	XParam.navailblk = 0;
-	for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
-	{
-
-		availblk[ibl] = XParam.nblk + ibl;
-		XParam.navailblk++;
-
-	}
-
+	
 
 	
 
@@ -338,6 +330,10 @@ Param adapt(Param XParam)
 	int ncoarsenlk = 0;
 	int nnewblk = 0;
 
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		invactive[ibl] = -1;
+	}
 
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -362,15 +358,27 @@ Param adapt(Param XParam)
 		
 
 	}
+
+	XParam.navailblk = 0;
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		if (invactive[ibl] == -1)
+		{
+			availblk[XParam.navailblk] = ibl;
+			XParam.navailblk++;
+		}
+
+	}
 	
 	nnewblk = 3*nrefineblk - ncoarsenlk*3;
 
-	printf("%d blocks to be refined, %d blocks to be coarsen (with neighbour); %d blocks untouched; %d blocks to be freed (%d are already available) %d new blocks will be created\n", nrefineblk, ncoarsenlk, XParam.nblk- nrefineblk-4* ncoarsenlk,  ncoarsenlk * 3 , XParam.navailblk, nnewblk);
+	printf("There are %d active blocks (%d blocks allocated in memory), %d blocks to be refined, %d blocks to be coarsen (with neighbour); %d blocks untouched; %d blocks to be freed (%d are already available) %d new blocks will be created\n",XParam.nblk,XParam.nblkmem, nrefineblk, ncoarsenlk, XParam.nblk- nrefineblk-4* ncoarsenlk,  ncoarsenlk * 3 , XParam.navailblk, nnewblk);
 	//printf("csunblk[end]=%d; navailblk=%d\n", csumblk[XParam.nblk - 1], XParam.navailblk);
 	if (nnewblk>XParam.navailblk)
 	{
 		//reallocate memory to make more room
-		int nblkmem;
+		int nblkmem,oldblkmem;
+		oldblkmem = XParam.nblkmem;
 		nblkmem = (int)ceil((XParam.nblk + nnewblk)* XParam.membuffer);
 		XParam.nblkmem = nblkmem;
 
@@ -445,12 +453,26 @@ Param adapt(Param XParam)
 		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
 		{
 			activeblk[XParam.nblk + ibl] = -1;
-
-			availblk[ibl] = XParam.nblk + ibl;
-			XParam.navailblk++;
+			
 
 			//printf("ibl=%d; availblk[ibl]=%d;\n",ibl, availblk[ibl]);
 
+		}
+
+		for (int ibl = 0; ibl < (XParam.nblkmem - oldblkmem); ibl++)
+		{
+			invactive[oldblkmem + ibl] = -1;
+
+
+		}
+		for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+		{
+			if (invactive[ibl] == -1)
+			{
+				availblk[XParam.navailblk] = ibl;
+				XParam.navailblk++;
+			}
+			
 		}
 		
 		printf("Reallocation complete: %d new blocks are available\n", XParam.navailblk);
@@ -559,6 +581,8 @@ Param adapt(Param XParam)
 				//printf("availblk[XParam.navailblk]=%d; availblk[XParam.navailblk + 1]=%d; availblk[XParam.navailblk + 2]=%d; \n ", availblk[XParam.navailblk], availblk[XParam.navailblk + 1], availblk[XParam.navailblk + 2]);
 
 				newlevel[ib] = level[ib] - 1;
+
+				//Below not needed since the blocks are to become inactive
 				newlevel[rightblk[ib]] = level[ib] - 1;
 				newlevel[topblk[ib]] = level[ib] - 1;
 				newlevel[rightblk[topblk[ib]]] = level[ib] - 1;
@@ -1502,7 +1526,7 @@ Param adapt(Param XParam)
 	}
 
 	
-	
+	nblk = XParam.nblk;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -1520,9 +1544,13 @@ Param adapt(Param XParam)
 				////
 				
 				//After that we are done so activate the new blocks
-				activeblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
-				activeblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
-				activeblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+				//activeblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
+				//activeblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
+				//activeblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
+
+				activeblk[nblk] = availblk[csumblk[ib]];
+				activeblk[nblk + 1] = availblk[csumblk[ib] + 1];
+				activeblk[nblk + 2] = availblk[csumblk[ib] + 2];
 
 				//printf("ib=%d; availblk[csumblk[ib]]=%d; ib_right=%d; ib_top=%d; ib_TR=%d\n", ib, availblk[csumblk[ib]],  activeblk[availblk[csumblk[ib]]], activeblk[availblk[csumblk[ib] + 1]], activeblk[availblk[csumblk[ib] + 2]]);
 
