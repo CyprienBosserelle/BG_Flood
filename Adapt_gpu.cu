@@ -33,7 +33,7 @@ int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 	// First use a simple refining criteria: wet or dry
 	int success = 0;
 	//int i;
-	int tl, tr, lt, lb, bl, br, rb, rt;//boundary neighbour (max of 8)
+	
 	//Coarsen dry blocks and refine wet ones
 	//CPU version
 
@@ -66,6 +66,44 @@ int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 	}
 	return success;
 }
+
+template<class T>
+int inrangecriteria(Param XParam,T zmin,T zmax, bool*& refine, bool*& coarsen, T* z)
+{
+	// First use a simple refining criteria: zb>zmin && zb<zmax refine otherwise corasen
+	int success = 0;
+	//int i;
+	
+
+	// To start 
+	bool isinrange = false;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		refine[ib] = false; // only refine if zb is in range
+		coarsen[ib] = true; // always try to coarsen otherwise
+		isinrange = false;
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = ix + iy * XParam.blkwidth + ib * XParam.blksize;
+				if (z[i] >= zmin && z[i] <= zmax)
+				{
+					isinrange = true;
+				}
+			}
+		}
+
+
+		refine[ib] = isinrange;
+		coarsen[ib] = !isinrange;
+
+		//printf("ib=%d; refibe[ib]=%s\n", ib, iswet ? "true" : "false");
+	}
+	return success;
+}
+
 
 
 /*! \fn bool refinesanitycheck(Param XParam, bool*& refine, bool*& coarsen)
