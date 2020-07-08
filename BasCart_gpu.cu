@@ -4002,7 +4002,7 @@ int main(int argc, char **argv)
 		{
 			oldnblk = XParam.nblk;
 			//wetdrycriteria(XParam, refine, coarsen);
-			inrangecriteria(XParam, -100.0f, 30.0f, refine, coarsen, zb);
+			inrangecriteria(XParam, -10.0f, 10.0f, refine, coarsen, zb);
 			refinesanitycheck(XParam, refine, coarsen);
 			XParam = adapt(XParam);
 			if (!checkBUQsanity(XParam))

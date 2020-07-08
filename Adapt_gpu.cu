@@ -375,6 +375,19 @@ Param adapt(Param XParam)
 	// cumsum will determine where the new blocks will be located in the memory
 	// availblk[csumblk[refine_block]]
 
+		
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+
+		if (ib == 1 || ib == 3)
+		{
+			//int ib = activeblk[ibl];
+			printf("\n ib=%d; level[ib]=%d; refine[ib]=%d; coarsen[ib]=%d; blockxo=%f; blockyo=%f\n\n", ib, level[ib], refine[ib], coarsen[ib], blockxo_d[ib], blockyo_d[ib]);
+		}
+	}
+	
+
 	int csum = -3;
 	int nrefineblk = 0;
 	int ncoarsenlk = 0;
@@ -383,7 +396,10 @@ Param adapt(Param XParam)
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		invactive[ibl] = -1;
+
+		
 	}
+
 
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -515,7 +531,8 @@ Param adapt(Param XParam)
 		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
 		{
 			activeblk[XParam.nblk + ibl] = -1;
-			
+			coarsen[XParam.nblk + ibl] = false;
+			refine[XParam.nblk + ibl] = false;
 
 			//printf("ibl=%d; availblk[ibl]=%d;\n",ibl, availblk[ibl]);
 
@@ -527,6 +544,7 @@ Param adapt(Param XParam)
 
 
 		}
+
 		for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 		{
 			if (invactive[ibl] == -1)
@@ -540,7 +558,6 @@ Param adapt(Param XParam)
 		printf("Reallocation complete: %d new blocks are available\n", XParam.navailblk);
 
 	}
-
 
 	//printf("csumblk[0]=%d availblk[csumblk[0]]=%d\n", csumblk[0], availblk[csumblk[0]]);
 
@@ -558,6 +575,17 @@ Param adapt(Param XParam)
 		newlevel[ibl] = level[ibl];
 
 		
+	}
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+
+		if (ib ==0 || ib == 1 || ib == 3)
+		{
+			//int ib = activeblk[ibl];
+			printf("\n Before coarsen ib=%d; level[ib]=%d; refine[ib]=%d; coarsen[ib]=%d; blockxo=%f; blockyo=%f; rightblk[ib]=%d; topblk[ib]=%d; rightblk[toopblk[ib]]=%d\n\n", ib, level[ib], refine[ib], coarsen[ib], blockxo_d[ib], blockyo_d[ib],rightblk[ib],topblk[ib],rightblk[topblk[ib]]);
+		}
 	}
 
 	//=========================================================
@@ -751,6 +779,17 @@ Param adapt(Param XParam)
 	}
 
 
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+
+		if (ib == 1 || ib == 3)
+		{
+			//int ib = activeblk[ibl];
+			printf("\n Before refine ib=%d; level[ib]=%d; refine[ib]=%d; coarsen[ib]=%d; blockxo=%f; blockyo=%f\n\n", ib, level[ib], refine[ib], coarsen[ib], blockxo_d[ib], blockyo_d[ib]);
+		}
+	}
+
 	//==========================================================================
 	//	REFINE
 	//==========================================================================
@@ -772,7 +811,6 @@ Param adapt(Param XParam)
 		int ib = activeblk[ibl];
 		int o, oo, ooo, oooo;
 		int i, ii, iii, iiii;
-
 
 		//printf("ib=%d\n", ib);
 
@@ -1622,9 +1660,9 @@ Param adapt(Param XParam)
 			level[ib] = newlevel[ib];
 			
 			//printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
-			if (ib == 1177)
+			if (ib == 1 || ib == 3)
 			{
-				printf("\nib=%d; blockxo=%f; blockyo=%f\n\n",ib, blockxo_d[ib], blockyo_d[ib]);
+				printf("\n Update level loop ib=%d; level[ib]=%d; blockxo=%f; blockyo=%f\n\n",ib,level[ib], blockxo_d[ib], blockyo_d[ib]);
 			}
 		}
 	}

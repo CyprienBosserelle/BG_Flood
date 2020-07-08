@@ -206,7 +206,7 @@ __host__ __device__ T RightAda(int ix, int iy, int ibl, int rightibl, int righto
 					varn2 = var[0 + (0) * 16 + topofrightibl * 256];
 					rightvarval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
 				}
-				else if (level[botofrightibl] < level[rightibl])
+				else if (level[topofrightibl] < level[rightibl])//Bug? level[botofrightibl] < level[rightibl] or level[topofrightibl] < level[rightibl]
 				{
 
 					varn1 = var[0 + 15 * 16 + rightibl * 256];
@@ -385,7 +385,7 @@ __host__ __device__ T LeftAda(int ix, int iy, int ibl, int leftibl, int leftofbo
 					varn2 = var[15 + (0) * 16 + topofleftibl * 256];
 					varval = vari / 4.0 + 0.5 * varn1 + varn2 / 4.0;
 				}
-				else if (level[botofleftibl] < level[leftibl])
+				else if (level[topofleftibl] < level[leftibl]) //bug? level[botofleftibl] < level[leftibl] or level[topofleftibl] < level[leftibl]
 				{
 
 					varn1 = var[15 + 15 * 16 + leftibl * 256];
