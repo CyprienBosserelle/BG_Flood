@@ -67,6 +67,13 @@ int wetdrycriteria(Param XParam, bool*& refine, bool*& coarsen)
 	return success;
 }
 
+
+/*! \fn int inrangecriteria(Param XParam,T zmin,T zmax, bool*& refine, bool*& coarsen, T* z)
+* Simple in-range refining criteria.
+* if any value of z (could be any variable) is zmin <= z <= zmax the block will try to refine
+* otherwise, the block will try to coarsen
+* beware the refinement sanity check is meant to be done after running this function
+*/
 template<class T>
 int inrangecriteria(Param XParam,T zmin,T zmax, bool*& refine, bool*& coarsen, T* z)
 {
@@ -222,6 +229,7 @@ bool refinesanitycheck(Param XParam, bool*& refine, bool*& coarsen)
 
 			}
 			/*
+			// This section below is commented because it does the same thing as above but from a different point of view. 
 			if (refine[ib] == false)
 			{
 			//printf("ib=%d; refine[topblk[ib]]=%d; refine[rightblk[topblk[ib]]]=%d;\n", ib, refine[topblk[ib]], refine[rightblk[topblk[ib]]]);
@@ -376,17 +384,7 @@ Param adapt(Param XParam)
 	// availblk[csumblk[refine_block]]
 
 		
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
-
-		if (ib == 1 || ib == 3)
-		{
-			//int ib = activeblk[ibl];
-			printf("\n ib=%d; level[ib]=%d; refine[ib]=%d; coarsen[ib]=%d; blockxo=%f; blockyo=%f\n\n", ib, level[ib], refine[ib], coarsen[ib], blockxo_d[ib], blockyo_d[ib]);
-		}
-	}
-	
+		
 
 	int csum = -3;
 	int nrefineblk = 0;
@@ -446,8 +444,7 @@ Param adapt(Param XParam)
 	nnewblk = 3 * nrefineblk;
 
 	printf("There are %d active blocks (%d blocks allocated in memory), %d blocks to be refined, %d blocks to be coarsen (with neighbour); %d blocks untouched; %d blocks to be freed (%d are already available) %d new blocks will be created\n",XParam.nblk,XParam.nblkmem, nrefineblk, ncoarsenlk, XParam.nblk- nrefineblk-4* ncoarsenlk,  ncoarsenlk * 3 , XParam.navailblk, nnewblk);
-	//printf("csunblk[end]=%d; navailblk=%d\n", csumblk[XParam.nblk - 1], XParam.navailblk);
-
+	
 	//===============================================
 	//	Reallocate memory if necessary
 
@@ -567,26 +564,12 @@ Param adapt(Param XParam)
 
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
-		//
-		
-		//int ib = activeblk[ibl];
-
-	
+		// Set newlevel
 		newlevel[ibl] = level[ibl];
 
 		
 	}
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
-
-		if (ib ==0 || ib == 1 || ib == 3)
-		{
-			//int ib = activeblk[ibl];
-			printf("\n Before coarsen ib=%d; level[ib]=%d; refine[ib]=%d; coarsen[ib]=%d; blockxo=%f; blockyo=%f; rightblk[ib]=%d; topblk[ib]=%d; rightblk[toopblk[ib]]=%d\n\n", ib, level[ib], refine[ib], coarsen[ib], blockxo_d[ib], blockyo_d[ib],rightblk[ib],topblk[ib],rightblk[topblk[ib]]);
-		}
-	}
 
 	//=========================================================
 	//	COARSEN
@@ -620,7 +603,7 @@ Param adapt(Param XParam)
 			int oldbot = botblk[ib];
 			int oldrightofbot = rightblk[oldbot];
 
-				//printf("ibl=%d; ib=%d; rightblk[ib]=%d\ttopblk[ib]=%d\trightblk[topblk[ib]]=%d\n", ibl, ib, rightblk[ib], topblk[ib], rightblk[topblk[ib]]);
+				
 				for (int iy = 0; iy < 16; iy++)
 				{
 					for (int ix = 0; ix < 16; ix++)
@@ -656,13 +639,15 @@ Param adapt(Param XParam)
 						}
 
 
-						// These are the only guys that need to be coarsen, other are recalculated on teh fly or interpolated from forcing
+						// These are the only guys that need to be coarsen, other are recalculated on the fly or interpolated from forcing
 						hh[i] = 0.25*(hho[ii] + hho[ir] + hho[it] + hho[itr]);
 						zs[i] = 0.25*(zso[ii] + zso[ir] + zso[it] + zso[itr]);
 						uu[i] = 0.25*(uuo[ii] + uuo[ir] + uuo[it] + uuo[itr]);
 						vv[i] = 0.25*(vvo[ii] + vvo[ir] + vvo[it] + vvo[itr]);
+						//zb will be interpolated from input grid later // I wonder is this makes the bilinear interpolation scheme crash at the refining step for zb?
+						// No because zb is also interpolated later from the original mesh data
 						//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
-						//zs, zb, uu,vv
+						
 
 						}
 				}
@@ -673,11 +658,10 @@ Param adapt(Param XParam)
 				availblk[XParam.navailblk] = rightblk[ib];
 				availblk[XParam.navailblk+1] = topblk[ib];
 				availblk[XParam.navailblk+2] = rightblk[topblk[ib]];
-				//printf("availblk[XParam.navailblk]=%d; availblk[XParam.navailblk + 1]=%d; availblk[XParam.navailblk + 2]=%d; \n ", availblk[XParam.navailblk], availblk[XParam.navailblk + 1], availblk[XParam.navailblk + 2]);
-
+				
 				newlevel[ib] = level[ib] - 1;
 
-				//Below not needed since the blocks are to become inactive
+				//Do not comment! Below is needed for the neighbours below (next step down) but then is not afterward
 				newlevel[rightblk[ib]] = level[ib] - 1;
 				newlevel[topblk[ib]] = level[ib] - 1;
 				newlevel[rightblk[topblk[ib]]] = level[ib] - 1;
@@ -693,7 +677,7 @@ Param adapt(Param XParam)
 				activeblk[invactive[rightblk[topblk[ib]]]] = -1;
 
 				//check neighbour's (Full neighbour happens below)
-				if (rightblk[ib] == oldright)
+				if (rightblk[ib] == oldright) // Sure that can never be true. if that was the case the coarsening would not have been allowed!
 				{
 					rightblk[ib] = ib;
 				}
@@ -701,7 +685,7 @@ Param adapt(Param XParam)
 				{
 					rightblk[ib] = oldright;
 				}
-				if (topblk[ib] == oldtop)
+				if (topblk[ib] == oldtop)//Ditto here
 				{
 					topblk[ib] = ib;
 				}
@@ -711,7 +695,6 @@ Param adapt(Param XParam)
 				}
 				// Bot and left blk should remain unchanged at this stage(they will change if the neighbour themselves change)
 
-				// xo=oldxo+olddx/2 ->  xo=oldxo+olddx/2 
 				blockxo_d[ib] = blockxo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 				blockyo_d[ib] = blockyo_d[ib] + calcres(XParam.dx, level[ib] + 1);
 
@@ -779,16 +762,7 @@ Param adapt(Param XParam)
 	}
 
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
-
-		if (ib == 1 || ib == 3)
-		{
-			//int ib = activeblk[ibl];
-			printf("\n Before refine ib=%d; level[ib]=%d; refine[ib]=%d; coarsen[ib]=%d; blockxo=%f; blockyo=%f\n\n", ib, level[ib], refine[ib], coarsen[ib], blockxo_d[ib], blockyo_d[ib]);
-		}
-	}
+	
 
 	//==========================================================================
 	//	REFINE
@@ -812,9 +786,7 @@ Param adapt(Param XParam)
 		int o, oo, ooo, oooo;
 		int i, ii, iii, iiii;
 
-		//printf("ib=%d\n", ib);
-
-
+		
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 			if (refine[ib] == true)
@@ -832,46 +804,6 @@ Param adapt(Param XParam)
 				oldbot = botblk[ib];
 				oldright = rightblk[ib];
 				oldleft = leftblk[ib];
-
-				//printf("ib=%d; nblk=%d; availblk[csumblk[ibl]]=%d; availblk[csumblk[ibl] + 1]=%d; availblk[csumblk[ibl] + 2]=%d; \n ", ib, nblk, availblk[csumblk[ibl]], availblk[csumblk[ibl] + 1], availblk[csumblk[ibl] + 2]);
-
-
-				// Flat interolation
-				/**
-				for (int iy = 0; iy < 16; iy++)
-				{
-					for (int ix = 0; ix < 16; ix++)
-					{
-						//
-
-						o = ix + iy * 16 + ib * XParam.blksize;
-						i = floor(ix*0.5) + floor(iy*0.5) * 16 + ib * XParam.blksize;
-						oo = ix + iy * 16 + availblk[csumblk[ibl]] * XParam.blksize;
-						ii = (floor(ix*0.5) + 8) + floor(iy*0.5) * 16 + ib * XParam.blksize;
-						ooo = ix + iy * 16 + availblk[csumblk[ibl] + 1] * XParam.blksize;
-						iii = floor(ix*0.5) + (floor(iy*0.5) + 8) * 16 + ib * XParam.blksize;
-						oooo = ix + iy * 16 + availblk[csumblk[ibl] + 2] * XParam.blksize;
-						iiii = (floor(ix*0.5) + 8) + (floor(iy*0.5) + 8) * 16 + ib * XParam.blksize;
-
-						//printf("ib=%d; i=%d; o=%d; ii=%d; oo=%d; iii=%d; ooo=%d; iiii=%d; oooo=%d;\n", ib, i, o, ii, oo, iii, ooo, iiii, oooo);
-						//printf("csumblk[ibl]=%d\tavailblk[csumblk[ibl]]=%d\tavailblk[csumblk[ibl]+1]=%d\tavailblk[csumblk[ibl]+2]=%d\n", csumblk[ibl], availblk[csumblk[ibl]], availblk[csumblk[ibl]+1], availblk[csumblk[ibl]+2]);
-
-
-						//hh[o] = hh[or] = hh[ot] = hh[tr] = hho[o];
-						//flat interpolation // need to replace with simplify bilinear
-						//zb needs to be interpolated from texture
-
-
-						//printf("hho[%d]=%f; hho[%d]=%f; hho[%d]=%f; hho[%d]=%f\n",i,hho[i],ii,hho[ii],iii,hho[iii],iiii,hho[iiii]);
-						hh[o] = hho[i];
-						hh[oo] = hho[ii];
-						hh[ooo] = hho[iii];
-						hh[oooo] = hho[iiii];
-
-					}
-				}
-				**/
-				//printf("ibl=%d; ib=%d; csumblk[ib]=%d; availblk[csumblk[ib]]=%d; availblk[csumblk[ib]+1]=%d; availblk[csumblk[ib]+2]=%d;\n", ibl, ib, csumblk[ib], availblk[csumblk[ib]], availblk[csumblk[ib] + 1], availblk[csumblk[ib] + 2]);
 
 
 				// Bilinear interpolation
@@ -1037,12 +969,7 @@ Param adapt(Param XParam)
 							// There is still an issue in the corners when other block are finer resolution
 							if (fy == 15 && fx == 15)
 							{
-								/*
-								zs[o] = BarycentricInterpolation(zs11, fx, fy, zs21, cx, fx, zs12, fx, cy, rx, ry);
-								hh[o] = BarycentricInterpolation(h11, fx, fy, h21, cx, fx, h12, fx, cy, rx, ry);
-								uu[o] = BarycentricInterpolation(u11, fx, fy, u21, cx, fx, u12, fx, cy, rx, ry);
-								vv[o] = BarycentricInterpolation(v11, fx, fy, v21, cx, fx, v12, fx, cy, rx, ry);
-								*/
+								
 								if (level[topblk[ib]] > level[ib])
 								{
 									zs[o] = BotAda(15, 0, topblk[ib], ib, botblk[rightblk[topblk[ib]]], botblk[leftblk[topblk[ib]]], leftblk[botblk[topblk[ib]]], rightblk[botblk[topblk[ib]]], level, zso);
@@ -1066,12 +993,7 @@ Param adapt(Param XParam)
 							}
 							if (cy == 0 && cx == 0)
 							{
-								/*
-								zs[o] = BarycentricInterpolation(zs22, cx, cy, zs21, cx, fx, zs12, fx, cy, rx, ry);
-								hh[o] = BarycentricInterpolation(h22, cx, cy, h21, cx, fx, h12, fx, cy, rx, ry);
-								uu[o] = BarycentricInterpolation(u22, cx, cy, u21, cx, fx, u12, fx, cy, rx, ry);
-								vv[o] = BarycentricInterpolation(v22, cx, cy, v21, cx, fx, v12, fx, cy, rx, ry);
-								*/
+								
 								
 								if (level[leftblk[ib]] > level[ib])
 								{
@@ -1172,8 +1094,7 @@ Param adapt(Param XParam)
 					topblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
 				}
 				*/
-				//printf("topblk[ib]=%d; oldtop=%d; topblk[availblk[csumblk[ibl] + 1]]=%d; topblk[availblk[csumblk[ibl]]]=%d; \n ", availblk[csumblk[ibl] + 1], oldtop, topblk[availblk[csumblk[ibl] + 1]], topblk[availblk[csumblk[ibl]]]);
-
+				
 				rightblk[ib] = availblk[csumblk[ib]];
 				rightblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 2];
 				rightblk[availblk[csumblk[ib]]] = oldright;
@@ -1612,26 +1533,18 @@ Param adapt(Param XParam)
 		
 		int ib = activeblk[ibl];
 		
-
-		//printf("ib=%d\n", ib);
 		if (ib >=0) // ib can be -1 for newly inactive blocks
 		{
 
 			if (refine[ib] == true)
 			{
-				////
-				
+								
 				//After that we are done so activate the new blocks
-				//activeblk[availblk[csumblk[ib]]] = availblk[csumblk[ib]];
-				//activeblk[availblk[csumblk[ib] + 1]] = availblk[csumblk[ib] + 1];
-				//activeblk[availblk[csumblk[ib] + 2]] = availblk[csumblk[ib] + 2];
-
 				activeblk[nblk] = availblk[csumblk[ib]];
 				activeblk[nblk + 1] = availblk[csumblk[ib] + 1];
 				activeblk[nblk + 2] = availblk[csumblk[ib] + 2];
 
-				//printf("ib=%d; availblk[csumblk[ib]]=%d; ib_right=%d; ib_top=%d; ib_TR=%d\n", ib, availblk[csumblk[ib]],  activeblk[availblk[csumblk[ib]]], activeblk[availblk[csumblk[ib] + 1]], activeblk[availblk[csumblk[ib] + 2]]);
-
+				
 
 				nblk = nblk + 3;
 			}
@@ -1651,19 +1564,14 @@ Param adapt(Param XParam)
 		int oldlevel;
 		int ib = activeblk[ibl];
 
-		//printf("ib=%d; l=%d; xo=%f; yo=%f\n", ib, level[ib], blockxo_d[ib], blockyo_d[ib]);
-		
+				
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 			
 			
 			level[ib] = newlevel[ib];
 			
-			//printf("ib=%d; oldlevel=%d; newlevel[ib]=%d; l=%d;  block_xo=%f; block_yo=%f\n", ib, oldlevel, newlevel[ib], level[ib], blockxo_d[ib], blockyo_d[ib]);
-			if (ib == 1 || ib == 3)
-			{
-				printf("\n Update level loop ib=%d; level[ib]=%d; blockxo=%f; blockyo=%f\n\n",ib,level[ib], blockxo_d[ib], blockyo_d[ib]);
-			}
+			
 		}
 	}
 
@@ -1678,7 +1586,7 @@ Param adapt(Param XParam)
 		newlevel[ibl] = activeblk[ibl];
 		activeblk[ibl] = -1;
 	
-	//printf("ibl=%d; activeblk[ibl]=%d; newlevel[ibl]=%d;\n", ibl, activeblk[ibl], newlevel[ibl]);
+	
 	}
 
 
@@ -1690,41 +1598,16 @@ Param adapt(Param XParam)
 		if (newlevel[ibl] != -1)//i.e. old activeblk
 		{
 			activeblk[ib] = newlevel[ibl];
-			//printf("ib=%d; l=%d; xo=%f; yo=%f\n", activeblk[ib], level[activeblk[ib]], blockxo_d[activeblk[ib]], blockyo_d[activeblk[ib]]);
+			
 			ib++;
 		}
 	}
 
-	//printf("ib=%d; nblk=%d; XParam.nblk=%d\n", ib, nblk, XParam.nblk);
+	
 
 	nblk = ib;
 
-	/*
-	for (int ibl = 0; ibl < nblk; ibl++)
-	{
-		int ib = activeblk[ibl];
-		if (ib == 1570)
-		{
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n",ib,level[ib],leftblk[ib],rightblk[ib],topblk[ib],botblk[ib], refine[ib]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", leftblk[ib], level[leftblk[ib]], leftblk[leftblk[ib]], rightblk[leftblk[ib]], topblk[leftblk[ib]], botblk[leftblk[ib]], refine[leftblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", rightblk[ib], level[rightblk[ib]], leftblk[rightblk[ib]], rightblk[rightblk[ib]], topblk[rightblk[ib]], botblk[rightblk[ib]], refine[rightblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", topblk[ib], level[topblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], topblk[topblk[ib]], botblk[topblk[ib]], refine[topblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", botblk[ib], level[botblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], topblk[botblk[ib]], botblk[botblk[ib]], refine[botblk[ib]]);
-
-		}
-		if (ib == 17207)
-		{
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", ib, level[ib], leftblk[ib], rightblk[ib], topblk[ib], botblk[ib], refine[ib]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", leftblk[ib], level[leftblk[ib]], leftblk[leftblk[ib]], rightblk[leftblk[ib]], topblk[leftblk[ib]], botblk[leftblk[ib]], refine[leftblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", rightblk[ib], level[rightblk[ib]], leftblk[rightblk[ib]], rightblk[rightblk[ib]], topblk[rightblk[ib]], botblk[rightblk[ib]], refine[rightblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", topblk[ib], level[topblk[ib]], leftblk[topblk[ib]], rightblk[topblk[ib]], topblk[topblk[ib]], botblk[topblk[ib]], refine[topblk[ib]]);
-			printf("ib=%d level[ib]=%d leftblk[ib]=%d rightblk[ib]=%d topblk[ib]=%d botblk[ib]=%d refine[ib]=%d\n", botblk[ib], level[botblk[ib]], leftblk[botblk[ib]], rightblk[botblk[ib]], topblk[botblk[ib]], botblk[botblk[ib]], refine[botblk[ib]]);
-
-		}
-		
-
-	}
-	*/
+	
 
 	//____________________________________________________
 	//
@@ -1783,8 +1666,7 @@ Param adapt(Param XParam)
 					zs[i] = zb[i];
 				}
 				
-				//hh[i] = max((float)XParam.eps, zs[i] - zb[i]);
-				//hh[i] = zs[i] - zb[i];
+				
 
 			}
 		}

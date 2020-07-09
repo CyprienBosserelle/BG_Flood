@@ -284,6 +284,8 @@ template <class T> void gradient(int nblk, int blksize, T theta, T delta, int * 
 
 }
 
+
+
 template <class T> void kurganov(T g, T CFL, T hm, T hp, T um, T up, T Delta, T  *fh, T  *fq, T *dtmax)
 {
 	

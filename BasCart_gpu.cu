@@ -199,8 +199,10 @@ cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaC
 #include "Flow_kernel.cu"
 #include "Init.cpp" // excluded from direct buil to move the template out of the main source
 #include "Init_gpu.cu"
+#include "Adapt_Flow_kernel.cu"
 #include "Adapt_gpu.cu"
 #include "write_output.cu"
+
 #include "Mainloop_Adapt.cu"
 
 
@@ -4012,10 +4014,11 @@ int main(int argc, char **argv)
 				//break;
 			}
 
-
+			
 		}
+		
 	}
-
+	gradientADA(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dx, activeblk, level, leftblk, rightblk, topblk, botblk, zb, uu, vv);
 	// Debugging...
 	/*
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
