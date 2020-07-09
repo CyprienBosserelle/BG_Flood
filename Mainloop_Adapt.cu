@@ -14,9 +14,4 @@
 	gradientGPUXYBUQADASM << <gridDim, blockDim, 0 >> >((float)XParam.theta, (float)XParam.delta,activeblk_g,level_g, leftblk_g, rightblk_g, topblk_g, botblk_g, zb_g, dzsdx_g, dzsdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-
-
-
-
-
 }
