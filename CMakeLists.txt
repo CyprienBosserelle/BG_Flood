@@ -96,10 +96,7 @@ target_include_directories(
     PRIVATE
     ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
 )
-target_link_libraries(
-    BasCGPU
-    ${CUDART_LIBRARY}
-)
+
 
 # linking with catalyst
 if(USE_CATALYST)
