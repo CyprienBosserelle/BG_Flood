@@ -17,6 +17,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CUDA_STANDARD 11)
 set(CMAKE_CUDA_STANDARD_REQUIRED YES)
 
+find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
+
+
 # default to a release (optimised) build
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
@@ -79,12 +82,24 @@ endif()
 set_source_files_properties(read_input.cpp PROPERTIES LANGUAGE CUDA)
 set_source_files_properties(writenetcdf.cpp PROPERTIES LANGUAGE CUDA)
 
+
 # add the executable
 add_executable(BasCGPU ${bggpu_SRCS})
 
 # linking with netCDF
 target_link_libraries(BasCGPU ${NETCDF_LIBRARIES})
 target_include_directories(BasCGPU PRIVATE ${NETCDF_INCLUDE_DIR})
+
+# linking cuda libraries
+target_include_directories(
+    BasCGPU
+    PRIVATE
+    ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
+)
+target_link_libraries(
+    BasCGPU
+    ${CUDART_LIBRARY}
+)
 
 # linking with catalyst
 if(USE_CATALYST)
