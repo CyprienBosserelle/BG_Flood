@@ -331,7 +331,8 @@ void mainloopGPUDB(Param XParam)
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -779,7 +780,8 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -911,7 +913,8 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1332,7 +1335,8 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1454,7 +1458,8 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1882,7 +1887,8 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -2135,7 +2141,8 @@ void mainloopGPUold(Param XParam)
 
 							}
 							//Create definition for each variable and store it
-							writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 						}
 					}
 				}
@@ -2433,11 +2440,13 @@ void mainloopCPU(Param XParam)
 						//write output step for each variable 
 						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 						{
-							writencvarstep(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							//writencvarstep(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 						}
 						else
 						{
-							writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 						}
 						
 					}
@@ -4193,42 +4202,44 @@ int main(int argc, char **argv)
 	////      STARTING MODEL     ////////
 	/////////////////////////////////////
 
-
-
-	printf("\n###################################\n   Starting Model.\n###################################\n \n");
-	write_text_to_log_file("Starting Model. ");
-
-	if (XParam.GPUDEVICE >= 0)
+	if (XParam.maxlevel == XParam.minlevel)
 	{
-		if (XParam.spherical == 1)
+		XParam.delta = levdx;
+
+		printf("\n###################################\n   Starting Model.\n###################################\n \n");
+		write_text_to_log_file("Starting Model. ");
+
+		if (XParam.GPUDEVICE >= 0)
 		{
-			//mainloopGPUDSPH(XParam);
-		}
-		else if (XParam.doubleprecision == 1)
-		{
-			//mainloopGPUDB(XParam);
-		}
-		else
-		{
-			if (!XParam.windU.inputfile.empty())
+			if (XParam.spherical == 1)
 			{
-				//
-				//mainloopGPUATM(XParam);
+				mainloopGPUDSPH(XParam);
+			}
+			else if (XParam.doubleprecision == 1)
+			{
+				mainloopGPUDB(XParam);
 			}
 			else
 			{
-				//mainloopGPU(XParam);
+				if (!XParam.windU.inputfile.empty())
+				{
+					//
+					mainloopGPUATM(XParam);
+				}
+				else
+				{
+					mainloopGPU(XParam);
+				}
 			}
-		}
-		//checkGradGPU(XParam);
-			
-	}
-	else
-	{
-		//mainloopCPU(XParam);
-	}
+			//checkGradGPU(XParam);
 
-	
+		}
+		else
+		{
+			mainloopCPU(XParam);
+		}
+
+	}
 	
 
 
