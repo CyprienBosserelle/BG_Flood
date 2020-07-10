@@ -20,6 +20,96 @@
 
 #include "Header.cuh"
 
+std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
+{
+	// read bnd or nest file
+	// side is for deciding whether we are talking about a left(side=0) bot (side =1) right (side=2) or top (side=3)
+	// Warning just made this up and need to have some sort of convention in the model
+	std::string fileext;
+	std::vector<std::string> extvec = split(filename, '.');
+
+	std::vector<std::string> nameelements;
+
+	std::vector<SLTS> Bndinfo;
+
+	//
+	//printf("%d\n", side);
+
+	double xxo, xxmax, yy;
+	int hor;
+	switch (side)
+	{
+		case 0://Left bnd
+		{
+			xxo = XParam.yo;
+			xxmax = XParam.ymax;
+			yy = XParam.xo;
+			hor = 0;
+			break;
+		}
+		case 1://Bot bnd
+		{
+			xxo = XParam.xo;
+			xxmax = XParam.xmax;
+			yy = XParam.yo;
+			hor = 1;
+			break;
+		}
+		case 2://Right bnd
+		{
+			xxo = XParam.yo;
+			xxmax = XParam.ymax;
+			yy = XParam.xmax;
+			hor = 0;
+			break;
+		}
+		case 3://Top bnd
+		{
+			xxo = XParam.xo;
+			xxmax = XParam.xmax;
+			yy = XParam.ymax;
+			hor = 1;
+			break;
+		}
+	}
+
+
+	//printf("%f\t%f\t%f\n", xxo, xxmax, yy);
+
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+
+	if (fileext.compare("nc") == 0)
+	{
+		//Bndinfo = readNestfile(filename);
+		Bndinfo = readNestfile(filename, hor, XParam.eps, xxo, xxmax, yy);
+	}
+	else
+	{
+		Bndinfo = readWLfile(filename);
+	}
+
+	// Add zsoffset
+	for (int i = 0; i < Bndinfo.size(); i++)
+	{
+		for (int n = 0; n < Bndinfo[i].wlevs.size(); n++)
+		{
+			Bndinfo[i].wlevs[n] = Bndinfo[i].wlevs[n] + XParam.zsoffset;
+		}
+	}
+
+
+	return Bndinfo;
+}
+
 std::vector<SLTS> readWLfile(std::string WLfilename)
 {
 	std::vector<SLTS> slbnd;
@@ -100,6 +190,187 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
+std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double bndxo, double bndxmax, double bndy)
+{
+	// Prep boundary input vector from anorthe model output file
+	//this function works for botom top bnd as written but flips x and y for left and right bnds
+	// hor controls wheter the boundary is a top/botom bnd hor=1 or left/right hor=0 
+	std::vector<SLTS> slbnd;
+	SLTS slbndline;
+	
+	std::vector<double> WLS,Unest,Vnest;
+	//Define NC file variables
+	int nnx, nny, nt, nbndpts, indxx, indyy, indx, indy,nx, ny;
+	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
+	double * ttt, *zsa;
+	bool checkhh = false;
+	int iswet;
+
+	// Read NC info
+	readgridncsize(ncfile, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax);
+	
+	if (hor == 0)
+	{
+		nx = nny;
+		ny = nnx;
+		xo = yyo;
+		yo = xxo;
+
+	}
+	else
+	{
+		nx = nnx;
+		ny = nny;
+		xo = xxo;
+		yo = yyo;
+	}
+
+	// Read time vector
+	ttt=(double *)malloc(nt*sizeof(double));
+	zsa = (double *)malloc(1*sizeof(double));
+	readnctime(ncfile, ttt);
+
+
+	
+
+	nbndpts = (int)((bndxmax - bndxo) / dx)+1;
+
+	//printf("%f\t%f\t%f\t%f\n", bndxmax, bndxo, xo, yo);
+	//printf("%f\t%f\t%f\t%f\n", bndxmax, bndxo, xxo, yyo);
+	//printf("%f\t%d\t%d\t%f\n", bndy, nx, ny, dx);
+
+	//printf("%d\n", nbndpts);
+	std::string ncfilestr;
+	std::string varstr,varstruu,varstrvv;
+
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	std::vector<std::string> nameelements;
+	nameelements = split(ncfile, '?');
+	if (nameelements.size() > 1)
+	{
+
+		ncfilestr = nameelements[0];
+		varstr = nameelements[1];
+	}
+	else
+	{
+
+		ncfilestr = ncfile;
+		varstr = "zs";
+		checkhh = true;
+	}
+
+
+	for (int it = 0; it < nt; it++)
+	{
+		slbndline.time = ttt[it];
+		for (int ibnd = 0; ibnd < nbndpts; ibnd++)
+		{
+			//
+			// Read// interpolate data for each bnds
+			indxx = max(min((int)((bndxo+(dx*ibnd) - xo) / dx), nx - 1), 0);
+			indyy = max(min((int)((bndy - yo) / dx), ny - 1), 0);
+
+			if (hor == 0)
+			{
+				indy = indxx;
+				indx = indyy;
+			}
+			else
+			{
+				indx = indxx;
+				indy = indyy;
+			}
+
+			iswet=readncslev1(ncfile, varstr, indx, indy, it, checkhh,eps, zsa);
+			//varstr
+			//printf("%d\t%d\t%d\tzs=%f\t%d\n", it,indx, indy, zsa[0],iswet);
+
+			if (iswet == 0)
+			{
+				if (WLS.size() >= 1)
+				{
+					zsa[0] = WLS.back();
+				}
+				else
+				{
+					zsa[0] = 0.0;
+				}
+			}
+
+			WLS.push_back(zsa[0]);
+
+			//printf("zs=%f\\n", zsa[0]);
+
+			// If true nesting then uu and vv are expected to be present in the netcdf file 
+
+			if (checkhh)
+			{
+				varstruu = "uu";
+				iswet = readncslev1(ncfilestr, varstruu, indx, indy, it, checkhh, eps, zsa);
+				//printf("%d\t%d\t%d\tuu=%f\t%d\n", it, indx, indy, zsa[0], iswet);
+				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+
+				if (iswet == 0)
+				{
+
+					if (Unest.size() >= 1)
+					{
+						zsa[0] = Unest.back();
+					}
+					else
+					{
+						zsa[0] = 0.0;
+					}
+				}
+
+				Unest.push_back(zsa[0]);
+
+				varstrvv = "vv";
+				iswet = readncslev1(ncfile, varstrvv, indx, indy, it, checkhh, eps, zsa);
+				//printf("%d\t%d\t%d\tvv=%f\t%d\n", it, indx, indy, zsa[0], iswet);
+				//printf("%d\t%d\t%f\n", indx, indy, zsa[0]);
+
+				if (iswet == 0)
+				{
+					if (Vnest.size() >= 1)
+					{
+						zsa[0] = Vnest.back();
+					}
+					else
+					{
+						zsa[0] = 0.0;
+					}
+				}
+
+				Vnest.push_back(zsa[0]);
+			}
+
+
+
+
+		}
+		slbndline.wlevs = WLS;
+		WLS.clear();
+		if (checkhh)
+		{
+			slbndline.uuvel = Unest;
+			slbndline.vvvel = Vnest;
+			Unest.clear();
+			Vnest.clear();
+		}
+
+		slbnd.push_back(slbndline);
+		//std::cout << line << std::endl;
+		
+	}
+	///To Be continued
+	
+	free(ttt);
+	free(zsa);
+	return slbnd;
+}
 
 std::vector<Flowin> readFlowfile(std::string Flowfilename)
 {
@@ -541,6 +812,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> nodes = split(parametervalue, ',');
+		//Need sanity check here
 		TSnode node;
 		node.x = std::stod(nodes[0]);
 		node.y = std::stod(nodes[1]);
@@ -552,7 +824,32 @@ Param readparamstr(std::string line, Param param)
 		
 	}
 
+	//Tsunami deformation input files
+	parameterstr = "deform";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
 		
+		deformmap thisdeform;
+		std::vector<std::string> items = split(parametervalue, ',');
+		//Need sanity check here
+		thisdeform.grid.inputfile = items[0];
+		if (items.size() > 1)
+		{
+			thisdeform.startime = std::stod(items[1]);
+
+		}
+		if (items.size() > 2)
+		{
+			thisdeform.duration = std::stod(items[2]);
+
+		}
+
+		param.deform.push_back(thisdeform);
+
+	}
+
+
 	//outvars
 	parameterstr = "outvars";
 	parametervalue = findparameter(parameterstr, line);
@@ -809,6 +1106,14 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.zsinit = std::stod(parametervalue);
 	}
+
+	parameterstr = "zsoffset";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.zsoffset = std::stod(parametervalue);
+	}
+
 	parameterstr = "hotstartfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -816,13 +1121,7 @@ Param readparamstr(std::string line, Param param)
 		param.hotstartfile = parametervalue;
 		
 	}
-	parameterstr = "deformfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.deformfile = parametervalue;
-
-	}
+	
 	parameterstr = "hotstep";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -1179,7 +1478,7 @@ std::string trim(const std::string& str, const std::string& whitespace)
 
 inputmap readcfmaphead(inputmap Roughmap)
 {
-	// Read critical parameter for the roughness map
+	// Read critical parameter for the roughness map or deformation file grid input
 	write_text_to_log_file("Rougness map was specified. Checking file... " );
 	std::string fileext;
 	double dummy;
@@ -1245,10 +1544,53 @@ inputmap readcfmaphead(inputmap Roughmap)
 	return Roughmap;
 }
 
+void readmapdata(inputmap Roughmap, float * &cfmapinput)
+{
+	// Check extension 
+	std::string fileext;
+
+	std::vector<std::string> extvec = split(Roughmap.inputfile, '.');
+
+	std::vector<std::string> nameelements;
+	//by default we expect tab delimitation
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		fileext = nameelements[0];
+	}
+	else
+	{
+		fileext = extvec.back();
+	}
+
+	//Now choose the right function to read the data
+
+	if (fileext.compare("md") == 0)
+	{
+		readbathyMD(Roughmap.inputfile, cfmapinput);
+	}
+	if (fileext.compare("nc") == 0)
+	{
+		readnczb(Roughmap.nx, Roughmap.ny, Roughmap.inputfile, cfmapinput);
+	}
+	if (fileext.compare("bot") == 0 || fileext.compare("dep") == 0)
+	{
+		readXBbathy(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, cfmapinput);
+	}
+	if (fileext.compare("asc") == 0)
+	{
+		//
+		readbathyASCzb(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, cfmapinput);
+	}
+
+	//return 1;
+}
+
 forcingmap readforcingmaphead(forcingmap Fmap)
 {
-	// Read critical parameter for the roughness map
-	write_text_to_log_file("Rougness map was specified. Checking file... ");
+	// Read critical parameter for the forcing map
+	write_text_to_log_file("Forcing map was specified. Checking file... ");
 	std::string fileext;
 	double dummy;
 	std::vector<std::string> extvec = split(Fmap.inputfile, '.');
@@ -1356,7 +1698,7 @@ inputmap readBathyhead(inputmap BathyParam)
 
 
 
-		printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\tyo=%f\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo);
+		printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%lf\talpha=%f\txo=%lf\tyo=%lf\txmax=%lf\tymax=%lf\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo, BathyParam.xmax, BathyParam.ymax);
 		write_text_to_log_file("Bathymetry grid info: nx=" + std::to_string(BathyParam.nx) + " ny=" + std::to_string(BathyParam.ny) + " dx=" + std::to_string(BathyParam.dx) + " grdalpha=" + std::to_string(BathyParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(BathyParam.xo) + " yo=" + std::to_string(BathyParam.yo));
 
 

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+
+rootname="Testbed-Gaussian"
+
+
+##############################
+## 50 m
+
+
+#Make 50m run param file
+
+rm bathy.nc zsinit.nc Testbed-Gaussian.nc error.nc
+
+julia setup.jl
+
+
+printf "bathy = bathy.nc?z;\n" > BG_param.txt
+
+printf "# Model controls\n" >> BG_param.txt
+printf "gpudevice = 0;\n spherical = 0;\n theta=1.3;\n" >> BG_param.txt
+printf "doubleprecision=1\n" >> BG_param.txt
+printf "zsinit=0.0\n" >> BG_param.txt
+printf "hotstartfile=zsinit.nc\n" >> BG_param.txt
+
+printf "# Flow parameters\n eps = 0.00010000;\n cf=0.0000;\n frictionmodel = 0\n" >> BG_param.txt
+
+printf "# Timekeeping parameters\n" >> BG_param.txt
+printf "CFL = 0.500000;\n" >> BG_param.txt
+printf "outputtimestep = 1.0;\n" >> BG_param.txt
+printf "outvars = zb, hh, uu, vv, hhmax, zs, zsmax;\n" >> BG_param.txt
+printf "endtime = 32.0;\n" >> BG_param.txt
+
+printf "left=0;\n" >> BG_param.txt
+printf "right=0;\n" >> BG_param.txt
+printf "top=0;\n" >> BG_param.txt
+printf "bot=0;\n" >> BG_param.txt
+
+printf "smallnc=0;\n" >> BG_param.txt
+
+
+printf "outfile = %s.nc;\n" ${rootname}  >> BG_param.txt
+
+./BG-Flood
+
+julia Compare.jl
+
+#

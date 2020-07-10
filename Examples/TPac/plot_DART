@@ -1,0 +1,43 @@
+#!/bin/bash
+
+## Plot
+
+gmt gmtset FONT_LABEL 12p FONT_ANNOT_PRIMARY 10p FONT_TITLE 12p
+
+
+
+###########################################################################
+### User param
+
+
+region=-R0/54000/-1/1 
+proj=-JX15c/5c
+
+
+# for perspective view
+persp=-p180/90
+
+
+tickX=3600
+annotX=3600
+tickY=0.5
+annotY=0.5
+
+
+datafile=SW_Lima.txt
+
+psfile=SW_lima_dart.ps
+
+gmt psbasemap $proj $region -Bxa${annotX}f${tickX}+l"time [s]" -Bya${annotY}f${tickY}+l"zs [m]" -BWSen -K >$psfile
+
+gmt psxy $proj $region ${datafile} -W1p,black -O -K >>$psfile
+gmt psxy -T -J -R -O >>$psfile
+
+gmt psconvert $psfile -A -Tg -P
+
+
+rm $psfile
+
+
+
+

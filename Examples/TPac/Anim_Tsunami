@@ -1,0 +1,143 @@
+#!/bin/bash
+
+## Plot
+
+gmtset FONT_LABEL 12p FONT_ANNOT_PRIMARY 10p FONT_TITLE 12p
+
+
+
+###########################################################################
+### User param
+
+
+XBfile=Output_simple_fault.nc
+
+
+region=-Rg
+#-R100/-42/160/-8r -JS130/-30/4i
+proj=-JG-130/-20/20c
+
+
+
+outfolder=Frames
+
+# for perspective view
+persp=-p180/90
+
+
+tickX=5
+annotX=10
+tickY=5
+annotY=10
+
+
+#Choose one below
+makecpt -Cabyss -T-5/5/0.1 -D -I >flood.cpt
+
+
+#####################################################
+
+#makecpt -Cterra -T-6000/6000/100 --COLOR_NAN=255/255/255 >topo.cpt
+
+
+mkdir $outfolder
+
+
+makecpt -Cterra -T-100/100/1 >topo.cpt
+
+
+
+
+#321 1 860
+for step in `seq 0 1 90`
+do
+
+frame=`printf "%04d" $step`
+
+#partnum=`echo "($step-320)*4"|bc`
+
+#partfile=`printf "%03d" $partnum`
+
+#echo $partfile
+
+psfile=out-${frame}.ps
+
+#psfile=vv-${step}.ps
+
+#makecpt -Cpolar -T-1/1/0.1 -D > h.cpt
+
+
+grdmath ${XBfile}?hh[${step}] 0.001 GT 0.0 NAN = wet.nc
+
+
+#grdmath ${XBfile}?vv[${step}] wet.nc MUL = toplot.nc
+grdmath Output.nc?zb[0] 1.0 MUL = topo.nc
+
+
+#psfile=zs-${step}.ps
+
+#makecpt -Cpanoply -T-5/9/0.1 -D > h.cpt
+
+grdmath ${XBfile}?zs[${step}] wet.nc MUL = toplot.nc
+# -Bxa2000f1000 -Bya2000f1000 -BWSen
+
+
+psbasemap $proj $region -Bxa${annotX}f${tickX}+l"Degrees West" -Bya${annotY}f${tickY}+l"Degrees North" -BWSen -K >$psfile
+
+
+grdimage $proj $region $persp topo.nc -Ctopo.cpt  -K -O >>$psfile
+
+grdimage $proj $region $persp  toplot.nc -Cflood.cpt -I++n0.6 -t30 -Q -O -K >>$psfile
+#psxy $proj $region $persp Part_${partfile}.xyz -Sc0.02c -Gblack -O -K >>$psfile
+
+#psscale  $proj $region -DjBR+w6c/0.3c+e+o2c/2c -Cflood.cpt -Ba2f1+l"flood depth [m]" -O -K >>$psfile
+psscale  $proj $region -DjBR+w6c/0.3c+e+o-9.5c/2c -Ctopo.cpt -Ba1000f500+l"Topography [m MSL]" -O -K >>$psfile
+#pscoast $proj $region -Df -W0.1p,black -O -K >>$psfile
+#psxy -T -J -R -O >>$psfile
+
+#psconvert $psfile -A -Tg -P
+
+
+regtimebar=-R0/24/0/1
+projbar=-JX12c/0.3c
+psbasemap $regtimebar $projbar -X3c -Y0.5c -Bxa5f1+l"model time [h]" -BwseN+gwhite -O -K >>$psfile
+echo -e "$step\t0.5\n" | psxy $regtimebar -i0+s0.16666667,1 $projbar -SB0.7c -Gred -O -K >>$psfile
+
+
+psxy -T -J -R -O >>$psfile
+
+psconvert $psfile -A -Tg -P -D"./Frames"
+
+rm $psfile
+
+
+
+
+done
+
+psfile=Maule_max_zs.ps
+makecpt -Chaxby -T0/5/0.1 -D >maxzs.cpt
+
+grdmath ${XBfile}?hh[90] 0.001 GT 0.0 NAN = wet.nc
+grdmath ${XBfile}?zsmax[90] wet.nc MUL = toplot.nc
+
+psbasemap $proj $region -Bxa${annotX}f${tickX}+l"Degrees West" -Bya${annotY}f${tickY}+l"Degrees North" -BWSen -K >$psfile
+
+
+grdimage $proj $region $persp topo.nc -Ctopo.cpt  -K -O >>$psfile
+
+grdimage $proj $region $persp  toplot.nc -Cmaxzs.cpt -t10 -Q -O -K >>$psfile
+
+psscale  $proj $region -DjBR+w6c/0.3c+e+o-9.5c/2c -Cmaxzs.cpt -Ba1f0.5+l"Maximum Water Level [m MSL]" -O -K >>$psfile
+
+psxy -T -J -R -O >>$psfile
+
+psconvert $psfile -A -Tg -P
+
+
+
+cd $outfolder
+
+convert -resize 800 -delay 5 *.png -loop 0 Animation.gif
+
+cd ..

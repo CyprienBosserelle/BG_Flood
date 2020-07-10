@@ -1,0 +1,66 @@
+#!/bin/bash
+
+datafile=$1
+
+echo $datafile
+
+# For each step extract vv and hh between 0.5 to 1.5 at y=0.0
+# integrate flux. save in a time sevries and plot the results-E0.5/0.0/1.5/1.5
+#`seq 1 151`
+
+awk '{if(NR>1 && $1<=30){print($1,$2*0.01)}}' ./data/MonaiValley_WaveGages.txt > gauge1-data.txt
+awk '{if(NR>1 && $1<=30){print($1,$3*0.01)}}' ./data/MonaiValley_WaveGages.txt > gauge2-data.txt
+awk '{if(NR>1 && $1<=30){print($1,$4*0.01)}}' ./data/MonaiValley_WaveGages.txt > gauge3-data.txt
+
+gmt sample1d gauge1-$datafile.txt -Ngauge1-data.txt -T0  > g1_resamp.tmp
+gmt sample1d gauge2-$datafile.txt -Ngauge2-data.txt -T0  > g2_resamp.tmp
+gmt sample1d gauge3-$datafile.txt -Ngauge3-data.txt -T0  > g3_resamp.tmp
+
+#RMS
+RMS1=`gmt gmtmath g1_resamp.tmp gauge1-data.txt SUB RMS -S -o1 =`
+RMS2=`gmt gmtmath g2_resamp.tmp gauge2-data.txt SUB RMS -S -o1 =`
+RMS3=`gmt gmtmath g3_resamp.tmp gauge3-data.txt SUB RMS -S -o1 =`
+
+#echo 0.22 | printf "RMS=%f\n"
+#| awk 'BEGIN{RMS=0.0;n=0;}{if(NR>1){RMS=RMS+($4-$2)*($4-$2);n=n+1}}END{print(sqrt(RMS/n))}'
+
+#BSS
+gmt gmtmath g1_resamp.tmp gauge1-data.txt SUB VAR = var_diff.tmp
+gmt gmtmath gauge1-data.txt MEAN = mean_meas.txt
+BSS1=`gmt gmtmath mean_meas.txt -1 MUL gauge1-data.txt ADD VAR INV var_diff.tmp MUL -1 MUL 1 ADD -S -o1 =`
+
+
+#Willmot corr/ IOA
+gmt gmtmath g1_resamp.tmp gauge1-data.txt SUB 2 POW SUM UPPER = Will_numer.tmp
+gmt gmtmath g1_resamp.tmp mean_meas.txt SUB ABS = bmeandiff.tmp
+WC1=`gmt gmtmath gauge1-data.txt mean_meas.txt SUB ABS bmeandiff.tmp ADD 2 POW SUM UPPER INV Will_numer.tmp MUL -1 MUL 1 ADD -S -o1 =`
+
+#BSS
+#BSS
+gmt gmtmath g2_resamp.tmp gauge2-data.txt SUB VAR = var_diff.tmp
+gmt gmtmath gauge2-data.txt MEAN = mean_meas.txt
+BSS2=`gmt gmtmath mean_meas.txt -1 MUL gauge2-data.txt ADD VAR INV var_diff.tmp MUL -1 MUL 1 ADD -S -o1 =`
+
+
+#Willmot corr/ IOA
+gmt gmtmath g2_resamp.tmp gauge2-data.txt SUB 2 POW SUM UPPER = Will_numer.tmp
+gmt gmtmath g2_resamp.tmp mean_meas.txt SUB ABS = bmeandiff.tmp
+WC2=`gmt gmtmath gauge2-data.txt mean_meas.txt SUB ABS bmeandiff.tmp ADD 2 POW SUM UPPER INV Will_numer.tmp MUL -1 MUL 1 ADD -S -o1 =`
+
+#BSS
+gmt gmtmath g3_resamp.tmp gauge3-data.txt SUB VAR = var_diff.tmp
+gmt gmtmath gauge3-data.txt MEAN = mean_meas.txt
+BSS3=`gmt gmtmath mean_meas.txt -1 MUL gauge3-data.txt ADD VAR INV var_diff.tmp MUL -1 MUL 1 ADD -S -o1 =`
+
+
+#Willmot corr/ IOA
+gmt gmtmath g3_resamp.tmp gauge3-data.txt SUB 2 POW SUM UPPER = Will_numer.tmp
+gmt gmtmath g3_resamp.tmp mean_meas.txt SUB ABS = bmeandiff.tmp
+WC3=`gmt gmtmath gauge3-data.txt mean_meas.txt SUB ABS bmeandiff.tmp ADD 2 POW SUM UPPER INV Will_numer.tmp MUL -1 MUL 1 ADD -S -o1 =`
+
+
+printf "Monai\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" $RMS1 $RMS2 $RMS3 $BSS1 $BSS2 $BSS3 $WC1 $WC2 $WC3 > allResults.txt
+
+awk '{printf("Monai\t%f\t%f\t%f\n",($2+$3+$4)/3,($5+$6+$7)/3,($8+$9+$10)/3)}' allResults.txt > Results.txt
+
+rm  *.tmp

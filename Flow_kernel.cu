@@ -22,10 +22,20 @@
 
 
 // textures have to be declared here...
-texture<float, 2, cudaReadModeElementType> texLBND;
-texture<float, 2, cudaReadModeElementType> texRBND;
-texture<float, 2, cudaReadModeElementType> texTBND;
-texture<float, 2, cudaReadModeElementType> texBBND;
+texture<float, 2, cudaReadModeElementType> texLZsBND;
+texture<float, 2, cudaReadModeElementType> texRZsBND;
+texture<float, 2, cudaReadModeElementType> texTZsBND;
+texture<float, 2, cudaReadModeElementType> texBZsBND;
+
+texture<float, 2, cudaReadModeElementType> texLUBND;
+texture<float, 2, cudaReadModeElementType> texRUBND;
+texture<float, 2, cudaReadModeElementType> texTUBND;
+texture<float, 2, cudaReadModeElementType> texBUBND;
+
+texture<float, 2, cudaReadModeElementType> texLVBND;
+texture<float, 2, cudaReadModeElementType> texRVBND;
+texture<float, 2, cudaReadModeElementType> texTVBND;
+texture<float, 2, cudaReadModeElementType> texBVBND;
 
 texture<float, 2, cudaReadModeElementType> texUWND;
 texture<float, 2, cudaReadModeElementType> texVWND;
@@ -704,7 +714,9 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 
+	//float epsc = 0.07f;
 
+	// This is based on kurganov and Petrova 2007
 
 
 	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
@@ -784,14 +796,18 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
 
-			ap = max(max(up + cp, um + cmo),0.0f);
+			ap = max(max(up + cp, um + cmo),0.0f);// eq. 2.22
 			//ap = max(ap, 0.0f);
 
-			am = min(min(up - cp, um - cmo),0.0f);
+			am = min(min(up - cp, um - cmo),0.0f);//eq. 2.23
 			//am = min(am, 0.0f);
+
 			ad = 1.0f / (ap - am);
-			qm = hm*um;
+			//Correct for spurious currents in really shallow depth
+			qm = hm*um; 
 			qp = hp*up;
+			//qm = hm*um*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hm,4.0f))));
+			//qp = hp*up*(sqrtf(2) / sqrtf(1.0f + max(1.0f, powf(epsc / hp,4.0f))));
 
 			a = max(ap, -am);
 
@@ -803,8 +819,8 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 
 			if (a > epsi)
 			{
-				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad;
-				fu = (ap*(qm*um + ga*hm2 ) - am*(qp*up + ga*hp2 ) + apm*(qp - qm)) *ad;
+				fh = (ap*qm - am*qp + apm*(hp - hm)) *ad; // H  in eq. 2.24 or eq 3.7 for F(h)
+				fu = (ap*(qm*um + ga*hm2 ) - am*(qp*up + ga*hp2 ) + apm*(qp - qm)) *ad; // Eq 3.7 second term (X direction)
 				//fu = (ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm)) / (ap - am);
 				float dt = CFL*dlt / a;
 				if (dt < dtmax[i])
@@ -813,6 +829,7 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 				}
 				//	*dtmax = dt;
 
+				
 
 			}
 			else
@@ -842,9 +859,11 @@ __global__ void updateKurgX( float delta, float g, float eps,float CFL, int *lef
 			else
 			*fh = *fq = 0.;*/
 
+
+			
 			if (fh > 0.0f)
 			{
-				fv = (vv[ileft] + dx*dvdx[ileft])*fh;
+				fv = (vv[ileft] + dx*dvdx[ileft])*fh;// Eq 3.7 third term? (X direction)
 			}
 			else 
 			{
@@ -972,6 +991,8 @@ __global__ void updateKurgXATM(T delta, T g, T eps, T CFL, T Pa2m, int *leftblk,
 			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
 			T epsi = (T)1e-30;
 
+			//T epsc = T(0.07);
+
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
 
@@ -981,8 +1002,11 @@ __global__ void updateKurgXATM(T delta, T g, T eps, T CFL, T Pa2m, int *leftblk,
 			am = min(min(up - cp, um - cmo), (T)0.0);
 			//am = min(am, 0.0f);
 			ad = T(1.0) / (ap - am);
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrt(T(2.)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hm, (T)4.0))));
+			//qp = hp*up*(sqrt(T(2.)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hp, (T)4.0))));
 
 			a = max(ap, -am);
 
@@ -1004,6 +1028,7 @@ __global__ void updateKurgXATM(T delta, T g, T eps, T CFL, T Pa2m, int *leftblk,
 				}
 				//	*dtmax = dt;
 
+				
 
 			}
 			else
@@ -1128,6 +1153,8 @@ __global__ void updateKurgXD( double delta, double g, double eps, double CFL, in
 		{
 			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
+
+			//double epsc = 0.07;
 			// along X
 			dx = delta*0.5;
 			zi = zs[i] - hi;
@@ -1172,8 +1199,11 @@ __global__ void updateKurgXD( double delta, double g, double eps, double CFL, in
 			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			a = max(ap, -am);
 
@@ -1195,6 +1225,7 @@ __global__ void updateKurgXD( double delta, double g, double eps, double CFL, in
 				}
 				//	*dtmax = dt;
 
+				
 
 			}
 			else
@@ -1333,6 +1364,7 @@ __global__ void updateKurgXSPH( double delta, double g, double eps, double CFL,i
 		{
 			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
+			//double epsc = 0.07;
 			// along X
 			dx = delta*0.5;
 			zi = zs[i] - hi;
@@ -1378,8 +1410,11 @@ __global__ void updateKurgXSPH( double delta, double g, double eps, double CFL,i
 			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			a = max(ap, -am);
 
@@ -1401,7 +1436,7 @@ __global__ void updateKurgXSPH( double delta, double g, double eps, double CFL,i
 				}
 				//	*dtmax = dt;
 
-
+				
 			}
 			else
 			{
@@ -1539,6 +1574,7 @@ __global__ void updateKurgXSPHATM(double delta, double g, double eps, double CFL
 		{
 			double dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr;
 
+			//double epsc = 0.07;
 			// along X
 			dx = delta*0.5;
 			zi = zs[i] - hi + Pa2m * Patm[i];
@@ -1584,8 +1620,11 @@ __global__ void updateKurgXSPHATM(double delta, double g, double eps, double CFL
 			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			a = max(ap, -am);
 
@@ -1606,7 +1645,7 @@ __global__ void updateKurgXSPHATM(double delta, double g, double eps, double CFL
 					dtmax[i] = dt;
 				}
 				//	*dtmax = dt;
-
+				
 
 			}
 			else
@@ -1749,6 +1788,7 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
 			float cp, cmo, ap, am, qm, qp, a, dlt,ad,hm2,hp2,ga,apm;
 			float epsi = 1e-30f;
+			//float epsc = 0.07f;
 
 			cp = sqrtf(g*hp);
 			cmo = sqrtf(g*hm);
@@ -1759,8 +1799,11 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 			am = min(min(up - cp, um - cmo),0.0f);
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrtf(2.0f) / sqrtf(1.0f + max(1.0f, powf(epsc / hm, 4.0f))));
+			//qp = hp*up*(sqrtf(2.0f) / sqrtf(1.0f + max(1.0f, powf(epsc / hp, 4.0f))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -1779,7 +1822,8 @@ __global__ void updateKurgY(float delta, float g, float eps, float CFL, int *bot
 					dtmax[i] = dt;
 				}
 				//	*dtmax = dt;
-
+				
+				
 
 			}
 			else
@@ -1893,6 +1937,8 @@ __global__ void updateKurgYATM(T delta, T g, T eps, T CFL, T Pa2m, int *botblk, 
 			T cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
 			T epsi = (T)1e-30;
 
+			//T epsc = (T)0.07;
+
 			cp = sqrt(g*hp);/// how to enforce sqrtf when T is float ?
 			cmo = sqrt(g*hm);
 
@@ -1902,8 +1948,11 @@ __global__ void updateKurgYATM(T delta, T g, T eps, T CFL, T Pa2m, int *botblk, 
 			am = min(min(up - cp, um - cmo), (T) 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0f / (ap - am);
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrt(T(2.0)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hm, (T)4.0))));
+			//qp = hp*up*(sqrt(T(2.0)) / sqrt(T(1.0) + max(T(1.0), (T)pow((T)epsc / hp, (T)4.0))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -1922,7 +1971,8 @@ __global__ void updateKurgYATM(T delta, T g, T eps, T CFL, T Pa2m, int *botblk, 
 					dtmax[i] = dt;
 				}
 				//	*dtmax = dt;
-
+				
+				
 
 			}
 			else
@@ -2034,6 +2084,7 @@ __global__ void updateKurgYD( double delta, double g, double eps, double CFL, in
 			//We can now call one of the approximate Riemann solvers to get the fluxes.
 			double cp, cmo, ap, am, qm, qp, a, dlt, ad, hm2, hp2, ga, apm;
 			double epsi = 1e-30;
+			//double epsc = 0.07;
 
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
@@ -2044,8 +2095,11 @@ __global__ void updateKurgYD( double delta, double g, double eps, double CFL, in
 			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -2064,7 +2118,7 @@ __global__ void updateKurgYD( double delta, double g, double eps, double CFL, in
 					dtmax[i] = dt;
 				}
 				//	*dtmax = dt;
-
+				
 
 			}
 			else
@@ -2192,6 +2246,8 @@ __global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,i
 			double ap, am, ad;
 			double epsi = 1e-30;
 
+			//double epsc = 0.07;
+
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
 
@@ -2201,8 +2257,12 @@ __global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,i
 			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
+
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
 			qp = hp*up;
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -2222,7 +2282,7 @@ __global__ void updateKurgYSPH( double delta, double g, double eps, double CFL,i
 				}
 				//	*dtmax = dt;
 
-
+				
 			}
 			else
 			{
@@ -2350,6 +2410,8 @@ __global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL
 			double ap, am, ad;
 			double epsi = 1e-30;
 
+			//double epsc = 0.07;
+
 			cp = sqrt(g*hp);
 			cmo = sqrt(g*hm);
 
@@ -2359,8 +2421,12 @@ __global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL
 			am = min(min(up - cp, um - cmo), 0.0);
 			//am = min(am, 0.0f);
 			ad = 1.0 / (ap - am);
+
+			//Correct for spurious currents in really shallow depth
 			qm = hm*um;
-			qp = hp*up;
+			qp = hp*up; 
+			//qm = hm*um*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hm, 4.0))));;
+			//qp = hp*up*(sqrt(2.0) / sqrt(1.0 + max(1.0, pow(epsc / hp, 4.0))));;
 
 			hm2 = sq(hm);
 			hp2 = sq(hp);
@@ -2380,7 +2446,7 @@ __global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL
 				}
 				//	*dtmax = dt;
 
-
+				
 			}
 			else
 			{
@@ -2422,6 +2488,41 @@ __global__ void updateKurgYSPHATM(double delta, double g, double eps, double CFL
 			Fquy[i] = 0.0;
 		}
 	}
+}
+
+template<class T>
+__global__ void uvcorr(T delta, T* hh, T*uu, T*vv)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+
+
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	// Corect u for spurious velocities t very shallow depth
+	//u=sqrt(2)*h*hu/(sqrt(h^4+max(h^4,epsdepth)))
+	T epsdelta = delta*delta*delta*delta;
+
+	T uui,hhi,vvi, hhiQ;
+
+	uui = uu[i];
+	vvi = vv[i];
+	hhi = hh[i];
+
+	hhiQ = hhi*hhi*hhi*hhi;
+
+
+
+	uu[i] = sqrt(T(2.0))*hhi*(hhi*uui) / (sqrt(hhiQ + max(epsdelta, hhiQ)));
+	vv[i] = sqrt(T(2.0))*hhi*(hhi*vvi) / (sqrt(hhiQ + max(epsdelta, hhiQ)));
+
+
+
+
+
+
 }
 
 __global__ void updateEV( float delta, float g, float fc, int *rightblk, int*topblk, float * hh, float *uu, float * vv, float * Fhu, float *Fhv, float * Su, float *Sv, float *Fqux, float *Fquy, float *Fqvx, float *Fqvy, float *dh, float *dhu, float *dhv)
@@ -2776,7 +2877,7 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 		double vvi = vv[i];
 
 
-		float cmdinv, ga;
+		double cmdinv, ga;
 
 		cmdinv = 1.0 / (cm*delta);
 		ga = 0.5*g;
@@ -2797,11 +2898,17 @@ __global__ void updateEVSPH(double delta, double g, double yo, double ymax, doub
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
-		float dmdt = (fmvp - fmv) / (cm*delta);
-		float fG = vvi * dmdl - uui * dmdt;
-		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv +fc*sin(phi)*vvi;
-		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv -fc*sin(phi)*uui;
+		double dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		double dmdt = (fmvp - fmv) / (cm*delta);
+		double fG = vvi * dmdl - uui * dmdt;
+
+		//With Coriolis
+		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + fc*sin(phi)*vvi;
+		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv - fc*sin(phi)*uui;
+
+		//without Coriolis
+		//dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv;
+		//dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
 		dhu[i] += hi * (ga*hi *dmdl + fG*vvi);
 		dhv[i] += hi * (ga*hi *dmdt - fG*uui);
@@ -2876,7 +2983,7 @@ __global__ void updateEVSPHATMUNI(double delta, double g, double yo, double ymax
 		double vvi = vv[i];
 
 
-		float cmdinv, ga;
+		double cmdinv, ga;
 
 		cmdinv = 1.0 / (cm*delta);
 		ga = 0.5*g;
@@ -2897,9 +3004,9 @@ __global__ void updateEVSPHATMUNI(double delta, double g, double yo, double ymax
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
-		float dmdt = (fmvp - fmv) / (cm*delta);
-		float fG = vvi * dmdl - uui * dmdt;
+		double dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		double dmdt = (fmvp - fmv) / (cm*delta);
+		double fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*sin(phi)*vvi; // why not fc*sin(phi)*hi*vvi ??
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*sin(phi)*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
@@ -2978,7 +3085,7 @@ __global__ void updateEVSPHATM(double delta, double g, double yo, double ymax, d
 		double vvi = vv[i];
 
 
-		float cmdinv, ga;
+		double cmdinv, ga;
 
 		cmdinv = 1.0 / (cm*delta);
 		ga = 0.5*g;
@@ -2999,9 +3106,9 @@ __global__ void updateEVSPHATM(double delta, double g, double yo, double ymax, d
 
 		//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 		//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-		float dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
-		float dmdt = (fmvp - fmv) / (cm*delta);
-		float fG = vvi * dmdl - uui * dmdt;
+		double dmdl = (fmup - fmu) / (cm*delta);// absurd even for spherical because fmu==1 always! What's up with that?
+		double dmdt = (fmvp - fmv) / (cm*delta);
+		double fG = vvi * dmdl - uui * dmdt;
 		dhu[i] = (Fqux[i] + Fquy[i] - Su[iright] - Fquy[itop]) *cmdinv + 0.00121951*Cd*Uw*abs(Uw) + fc*sin(phi)*vvi; // why not fc*sin(phi)*hi*vvi ??
 		dhv[i] = (Fqvy[i] + Fqvx[i] - Sv[itop] - Fqvx[iright]) *cmdinv + 0.00121951*Cd*Vw*abs(Vw) - fc*sin(phi)*uui;
 		//dhu.x[] = (Fq.x.x[] + Fq.x.y[] - S.x[1, 0] - Fq.x.y[0, 1]) / (cm[] * Δ);
@@ -3110,6 +3217,8 @@ template <class T> __global__ void initdtmax( T epsi,T *dtmax)
 		dtmax[i] = T(1.0) / epsi;
 	
 }
+
+
 
 __global__ void minmaxKernel(int ntot, float *max, float *min, float *a) {
 	__shared__ double maxtile[32];
@@ -3335,7 +3444,7 @@ __global__ void leftdirichlet(int nybnd,float g,float dx,float xo,float ymax, fl
 	//float hhi;
 	float zsbnd;
 	float itx = (blockyo[ibl]+iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texLBND, itime+0.5f, itx+0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
+	zsbnd = tex2D(texLZsBND, itime+0.5f, itx+0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
 	if (abs(blockxo[ibl] - xo) <= 1.0e-16 && ix == 0 && zsbnd>zb[i])
 	{
 		//xplus = min(ix + 1, nx - 1);
@@ -3414,7 +3523,7 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 		bnd = ix;
 		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
 		itx = (yy - yo) / (ymax - yo)*nbnd;
-		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		zsbnd = tex2D(texLZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 		
 		//if (ix == 0 && iy == 0)
 		//{
@@ -3429,7 +3538,7 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 		bnd = ix;
 		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
 		itx = (yy - yo) / (ymax - yo)*nbnd;
-		zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		zsbnd = tex2D(texRZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else if (istop < 0)//isright must be ==0!
 	{
@@ -3438,7 +3547,7 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 		bnd = iy;
 		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 		itx = (xx - xo) / (xmax - xo)*nbnd;
-		zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		zsbnd = tex2D(texBZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else // istop ==1 && isright ==0
 	{
@@ -3447,7 +3556,7 @@ template <class T> __global__ void dirichlet(int isright, int istop, int nbnd, T
 		bnd = iy;
 		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 		itx = (xx - xo) / (xmax - xo)*nbnd;
-		zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		zsbnd = tex2D(texTZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 
 	if (bnd == bnd_c && zsbnd>zb[i])
@@ -3539,7 +3648,7 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 
 		itx = (yy - yo) / (ymax - yo)*nbnd;
 
-		zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
+		zsbnd = tex2D(texLZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
 	}
 	else if (isright > 0)
 	{
@@ -3548,7 +3657,7 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 		bnd = ix;
 		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
 		itx = (yy - yo) / (ymax - yo)*nbnd;
-		zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		zsbnd = tex2D(texRZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else if (istop < 0)//isright must be ==0!
 	{
@@ -3557,7 +3666,7 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 		bnd = iy;
 		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 		itx = (xx - xo) / (xmax - xo)*nbnd;
-		zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		zsbnd = tex2D(texBZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 	else // istop ==1 && isright ==0
 	{
@@ -3566,7 +3675,7 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 		bnd = iy;
 		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
 		itx = (xx - xo) / (xmax - xo)*nbnd;
-		zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		zsbnd = tex2D(texTZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
 	}
 
 	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
@@ -3598,6 +3707,130 @@ template <class T> __global__ void ABS1D(int isright, int istop,int nbnd, T g, T
 		un[i] = sign*sqrt(g / hh[i])*(zsinside - zsbnd)+umean;
 		zs[i] = zsinside;
 		ut[i] = ut[inside];
+		hh[i] = hh[inside];
+	}
+}
+
+template <class T> __global__ void ABS1DNEST(int isright, int istop, int nbnd, T g, T dx, T xo, T yo, T xmax, T ymax, T itime, int * bndblck, int * neighbourblk, T *blockxo, T *blockyo, T *zs, T *zb, T *hh, T *un, T *ut)
+{
+
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ib = blockIdx.x;
+
+	int ibl = bndblck[ib];
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+	int inside;
+
+	// left bnd: isrigit = -1; istop=0;
+	// right bnd: isright = 1; istop=0;
+	// bottom bnd: isright = 0; istop=-1;
+	// top bnd: isright = 0; istop=1;
+
+	T xx, yy;
+	int bnd, bnd_c;
+	T  sign;
+	float itx;
+
+	sign = T(isright) + T(istop);
+
+
+
+
+	//int xplus;
+	//float hhi;
+	float zsbnd;
+	float unbnd=0.0;
+	float utbnd=0.0;
+
+	T zsinside;
+
+	xx = blockxo[ibl] + ix*dx;
+	yy = blockyo[ibl] + iy*dx;
+
+
+	if (isright < 0) // left bnd
+	{
+		inside = findrightG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+
+		zsbnd = tex2D(texLZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??) 
+		unbnd = tex2D(texLUBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texLVBND, itime + 0.5f, itx + 0.5f);
+
+		
+	}
+	else if (isright > 0) // right bnd
+	{
+		inside = findleftG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = ix;
+		//itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nbnd - 1.0f));//Bleark!
+		itx = (yy - yo) / (ymax - yo)*nbnd;
+		zsbnd = tex2D(texRZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		unbnd = tex2D(texRUBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texRVBND, itime + 0.5f, itx + 0.5f);
+		
+
+	}
+	else if (istop < 0) // bottom bnd  (isright must be ==0!)
+	{
+		inside = findtopG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 0;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
+		zsbnd = tex2D(texBZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		unbnd = tex2D(texBVBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texBUBND, itime + 0.5f, itx + 0.5f);
+
+	}
+	else // top bnd istop ==1 && isright ==0
+	{
+		inside = findbotG(ix, iy, neighbourblk[ibl], ibl, blockDim.x);
+		bnd_c = 15;
+		bnd = iy;
+		//itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nbnd - 1.0f));
+		itx = (xx - xo) / (xmax - xo)*nbnd;
+		zsbnd = tex2D(texTZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(is this totally sure??)
+		unbnd = tex2D(texTVBND, itime + 0.5f, itx + 0.5f);
+		utbnd = tex2D(texTUBND, itime + 0.5f, itx + 0.5f);
+	}
+
+	//ileft = findleftG(ix, iy, leftblk[ibl], ibl, blockDim.x);
+	//iright = findrightG(ix, iy, rightblk[ibl], ibl, blockDim.x);
+	//itop = findtopG(ix, iy, topblk[ibl], ibl, blockDim.x);
+	//ibot = findbotG(ix, iy, botblk[ibl], ibl, blockDim.x);
+
+
+
+
+
+
+	
+
+
+	if (bnd == bnd_c && zsbnd>zb[i])
+	{
+		zsinside = zs[inside];
+		//xplus = min(ix + 1, nx - 1);
+		//hh[i] = zsbnd - zb[i];
+		//zs[i] = zsbnd;
+		//uu[i] = -2.0f*(sqrtf(g*max(hh[iright], 0.0f)) - sqrtf(g*max(zsbnd - zb[iright], 0.0f))) + uu[iright];
+		//vv[i] = 0.0f;
+		//if (iy == 0)
+		//{
+		//	printf("zsbnd=%f\t uubnd=%f\t", zsbnd,umean);
+		//}
+		//printf("zsbnd=%f\n", zsbnd);
+		un[i] = sign*sqrt(g / hh[i])*(zsinside - zsbnd) + T(unbnd);
+		zs[i] = zsinside;
+		ut[i] = T(utbnd);//ut[inside];
 		hh[i] = hh[inside];
 	}
 }
@@ -3681,7 +3914,7 @@ __global__ void leftdirichletD(int nybnd, double g, double dx, double xo, double
 	//float hhi;
 	float zsbnd; //remains a float because this is how it is stored on the texture memory // I don't think it is a big deal
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texLBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
+	zsbnd = tex2D(texLZsBND, itime + 0.5f, itx + 0.5f); // textures use pixel registration so index of 0 is actually located at 0.5...(?) 
 	if (abs(blockxo[ibl] - xo) <= 1.0e-16 && ix == 0 && zsbnd>zb[i])
 	{
 		//xplus = min(ix + 1, nx - 1);
@@ -3716,7 +3949,7 @@ __global__ void rightdirichlet( int nybnd, float g, float dx, float xmax, float 
 	//float hhi;
 	float zsbnd;
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texRBND, itime+0.5f, itx+0.5f);
+	zsbnd = tex2D(texRZsBND, itime+0.5f, itx+0.5f);
 
 	if (abs(blockxo[ibl] + 15 * dx - xmax) <= 1.0e-16 && ix == 15 && zsbnd>zb[i])
 	{
@@ -3748,7 +3981,7 @@ __global__ void rightdirichletD( int nybnd, double g,double dx,double xmax,doubl
 	//float hhi;
 	float zsbnd;
 	float itx = (blockyo[ibl] + iy*dx / ymax) / (1.0f / (1.0f*nybnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texRBND, itime + 0.5f, itx + 0.5f);
+	zsbnd = tex2D(texRZsBND, itime + 0.5f, itx + 0.5f);
 	if (abs(blockxo[ibl] + 15 * dx - xmax) <= 1.0e-16 && ix == 15 && zsbnd>zb[i])
 	{
 		//xminus = max(ix - 1, 0);
@@ -3777,7 +4010,7 @@ __global__ void topdirichlet( int nxbnd, float g,float dx, float xmax, float yma
 	//float hhi;
 	float zsbnd;
 	float itx = (blockxo[ibl]+ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
+	zsbnd = tex2D(texTZsBND, itime + 0.5f, itx + 0.5f);
 	if (abs(blockyo[ibl]+15*dx-ymax)<=1.0e-16 && iy == 15 && zsbnd>zb[i])
 	{
 		//yminus = max(iy - 1, 0);
@@ -3806,7 +4039,7 @@ __global__ void topdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	//float hhi;
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texTBND, itime + 0.5f, itx + 0.5f);
+	zsbnd = tex2D(texTZsBND, itime + 0.5f, itx + 0.5f);
 	if (abs(blockyo[ibl] + 15 * dx - ymax) <= 1.0e-16 && iy == 15 && zsbnd>zb[i])
 	{
 		//yminus = max(iy - 1, 0);
@@ -3834,7 +4067,7 @@ __global__ void botdirichlet( int nxbnd, float g, float dx,float xmax, float yo,
 	//float hhi;
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
+	zsbnd = tex2D(texBZsBND, itime + 0.5f, itx + 0.5f);
 	if (abs(blockyo[ibl] - yo) <= 1.0e-16 && iy == 0 && zsbnd>zb[i])
 	{
 		//yplus = min(iy + 1, ny-1);
@@ -3863,7 +4096,7 @@ __global__ void botdirichletD( int nxbnd, double g,double dx,double xmax,double 
 	//float hhi;
 	float zsbnd;
 	float itx = (blockxo[ibl] + ix*dx / xmax) / (1.0f / (1.0f*nxbnd - 1.0f));//Bleark!
-	zsbnd = tex2D(texBBND, itime + 0.5f, itx + 0.5f);
+	zsbnd = tex2D(texBZsBND, itime + 0.5f, itx + 0.5f);
 	if (abs(blockyo[ibl] - yo) <= 1.0e-16 && iy == 0 && zsbnd>zb[i])
 	{
 		//yplus = min(iy + 1, ny - 1);
@@ -3910,7 +4143,7 @@ template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, 
 			//uu[i] = uui / frc;
 			//vv[i] = vvi / frc;
 			T cfi = cf[i];
-			if (smart == 1)
+			if (smart == 1)//Smart friction formulation
 			{
 				T zo = cfi;
 				T Hbar = hhi / zo;
@@ -3924,7 +4157,12 @@ template <class T> __global__ void bottomfriction(int smart, T dt,T eps, T* cf, 
 				}
 				cfi = cfi*cfi; // 
 			}
+			if (smart == -1)// Manning friction formulation
+			{
+				T n = cfi;
+				cfi = T(9.81)*n*n / cbrt(hhi);
 
+			}
 
 			T tb = cfi*normu/hhi*dt;
 			uu[i] = uui / (T(1.0)+tb);
@@ -4447,3 +4685,20 @@ __global__ void HD_interp(int nx, int ny, int backswitch, int nhdstp, T totaltim
 		UU[ix + nx*iy] = Uxo[tx][ty] + (totaltime - hddt*nhdstp)*(Uxn[tx][ty] - Uxo[tx][ty]) / hddt;
 	}
 }
+
+template <class T>
+__global__ void Deform(T scale, T * def, T * zs, T * zb)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int i = ix + iy * blockDim.x + ibl*(blockDim.x*blockDim.y);
+
+	zs[i] = zs[i] + def[i] * scale;
+	zb[i] = zb[i] + def[i] * scale;
+	
+
+
+}
+
