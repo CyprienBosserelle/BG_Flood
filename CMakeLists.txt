@@ -1,4 +1,4 @@
-# CMake build for BasCGPU
+# CMake build for BG-Flood
 # Based on: https://devblogs.nvidia.com/building-cuda-applications-cmake/
 
 cmake_minimum_required(VERSION 3.9.1 FATAL_ERROR)
@@ -65,7 +65,7 @@ if (NOT NETCDF_INCLUDE_DIR)
     message(FATAL_ERROR "Could not find NetCDF include dir: try setting the path to NetCDF with: -DNETCDF_DIR=/path/to/netcdf")
 endif()
 
-# BasCGPU source files
+# BG-Flood source files
 set(bggpu_SRCS Bas_Cart_CPU.cpp BasCart_gpu.cu read_input.cpp writenetcdf.cpp)
 
 # catalyst source files
@@ -73,9 +73,9 @@ if(USE_CATALYST)
   find_package(ParaView 5.5 REQUIRED COMPONENTS vtkPVPythonCatalyst)
   include("${PARAVIEW_USE_FILE}")
   set(catalyst_SRCS vtkCPVTKOutputPipeline.cpp catalyst_adaptor.cpp)
-  add_library(BasCGPU_catalyst ${catalyst_SRCS})
-  target_compile_definitions(BasCGPU_catalyst PUBLIC "USE_CATALYST")
-  target_link_libraries(BasCGPU_catalyst PUBLIC vtkPVPythonCatalyst ${VTK_LIBRARIES})
+  add_library(BG-Flood_catalyst ${catalyst_SRCS})
+  target_compile_definitions(BG-Flood_catalyst PUBLIC "USE_CATALYST")
+  target_link_libraries(BG-Flood_catalyst PUBLIC vtkPVPythonCatalyst ${VTK_LIBRARIES})
 endif()
 
 # need to set these files as CUDA to get it to build with CUDA 8 and GCC 5.4 (Mahuika)
@@ -84,15 +84,15 @@ set_source_files_properties(writenetcdf.cpp PROPERTIES LANGUAGE CUDA)
 
 
 # add the executable
-add_executable(BasCGPU ${bggpu_SRCS})
+add_executable(BG-Flood ${bggpu_SRCS})
 
 # linking with netCDF
-target_link_libraries(BasCGPU ${NETCDF_LIBRARIES})
-target_include_directories(BasCGPU PRIVATE ${NETCDF_INCLUDE_DIR})
+target_link_libraries(BG-Flood ${NETCDF_LIBRARIES})
+target_include_directories(BG-Flood PRIVATE ${NETCDF_INCLUDE_DIR})
 
 # linking cuda libraries
 target_include_directories(
-    BasCGPU
+    BG-Flood
     PRIVATE
     ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
 )
@@ -100,7 +100,7 @@ target_include_directories(
 
 # linking with catalyst
 if(USE_CATALYST)
-  target_link_libraries(BasCGPU BasCGPU_catalyst)
+  target_link_libraries(BG-Flood BG-Flood_catalyst)
 endif()
 
 # Note: these lines copied from https://devblogs.nvidia.com/building-cuda-applications-cmake/
@@ -108,7 +108,7 @@ endif()
 if(APPLE)
   # We need to add the path to the driver (libcuda.dylib) as an rpath,
   # so that the static cuda runtime can find it at runtime.
-  set_property(TARGET BasCGPU
+  set_property(TARGET BG-Flood
                PROPERTY
                BUILD_RPATH ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
 endif()
