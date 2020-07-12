@@ -214,6 +214,16 @@ public:
 	float scalefactor = 0.01f;
 	float addoffset = 0.0f;
 
+#ifdef USE_CATALYST
+        // ParaView Catalyst parameters
+        int use_catalyst = 0;
+        int catalyst_python_pipeline = 0;
+        int vtk_output_frequency = 0;
+        double vtk_output_time_interval = 1.0;
+        std::string vtk_outputfile_root = "bg_out";
+        std::string python_pipeline = "coproc.py";
+#endif
+
 	// This is controlled by the sanity checker not directly by the user
 	int resetmax = 0;
 	int outhhmax = 0;
