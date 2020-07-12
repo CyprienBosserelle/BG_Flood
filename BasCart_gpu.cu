@@ -26,6 +26,9 @@
 #include "Header.cuh"
 
 
+#ifdef USE_CATALYST
+#include "catalyst_adaptor.h"
+#endif
 
 //double phi = (1.0f + sqrt(5.0f)) / 2;
 //double aphi = 1 / (phi + 1);
@@ -121,6 +124,8 @@ double *arrmin_d;
 float * dummy;
 double * dummy_d;
 
+float* bathydata;
+
 float * cf;
 float * cf_g;
 double * cf_d;
@@ -157,6 +162,10 @@ double * Patm_gd, *dPdx_gd, *dPdy_gd;
 float *Rain, *Rainbef, *Rainaft;
 float *Rain_g, *Rainbef_g, *Rainaft_g;
 
+// Adaptivity
+int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, * invactive, *activeblk_g, *availblk_g, *csumblk, *csumblk_g,* invactive_g ;
+
+bool* coarsen, * refine;;
 
 //std::string outfile = "output.nc";
 //std::vector<std::string> outvars;
@@ -207,10 +216,17 @@ cudaChannelFormatDesc channelDescVwind = cudaCreateChannelDesc(32, 0, 0, 0, cuda
 cudaChannelFormatDesc channelDescPatm = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 cudaChannelFormatDesc channelDescRain = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
+
+// Below file are included rather than compiled separately because this allow to use Template for function
+// Otherwise I would need to keep a double and a single precision copy of almost most function wich would be impossible to manage
 #include "Flow_kernel.cu"
 #include "Init.cpp" // excluded from direct buil to move the template out of the main source
 #include "Init_gpu.cu"
+#include "Adapt_Flow_kernel.cu"
+#include "Adapt_gpu.cu"
+#include "write_output.cu"
 
+#include "Mainloop_Adapt.cu"
 
 
 // Main loop that actually runs the model.
@@ -312,7 +328,7 @@ void mainloopGPUDB(Param XParam)
 			pointoutputstep(XParam, gridDim, blockDim, nTSsteps, zsAllout);
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Save output step
 			DivmeanvarGPUD(XParam, nstep);
@@ -338,7 +354,8 @@ void mainloopGPUDB(Param XParam)
 
 						}
 						//Create definition for each variable and store it
-						writencvarstepD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -760,7 +777,7 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 			DivmeanvarGPUD(XParam, nstep*1.0f);
@@ -786,7 +803,8 @@ void mainloopGPUDATM(Param XParam) // float, metric coordinate
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -960,7 +978,7 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 			pointoutputstep(XParam, gridDim, blockDim, nTSsteps, zsAllout);
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Save output step
 			DivmeanvarGPUD(XParam, nstep);
@@ -986,7 +1004,8 @@ void mainloopGPUDSPH(Param XParam)// double precision and spherical coordinate s
 
 						}
 						//Create definition for each variable and store it
-						writencvarstepD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1381,7 +1400,7 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 			pointoutputstep(XParam, gridDim, blockDim, nTSsteps, zsAllout);
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Save output step
 			DivmeanvarGPUD(XParam, nstep);
@@ -1407,7 +1426,8 @@ void mainloopGPUDSPHATM(Param XParam)// double precision and spherical coordinat
 
 						}
 						//Create definition for each variable and store it
-						writencvarstepD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1508,7 +1528,7 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 			DivmeanvarGPU(XParam, nstep*1.0f);
@@ -1534,7 +1554,8 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -1955,7 +1976,7 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 			DivmeanvarGPU(XParam, nstep*1.0f);
@@ -1981,7 +2002,8 @@ void mainloopGPUATM(Param XParam) // float, metric coordinate
 
 						}
 						//Create definition for each variable and store it
-						writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+						writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 					}
 				}
 			}
@@ -2176,7 +2198,7 @@ void mainloopGPUold(Param XParam)
 
 		}
 
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			if (XParam.spherical == 1 || XParam.doubleprecision == 1)
 			{
@@ -2203,7 +2225,7 @@ void mainloopGPUold(Param XParam)
 
 							}
 							//Create definition for each variable and store it
-							writencvarstepD(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							writencvarstep(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 						}
 					}
 				}
@@ -2235,7 +2257,8 @@ void mainloopGPUold(Param XParam)
 
 							}
 							//Create definition for each variable and store it
-							writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 						}
 					}
 				}
@@ -2310,6 +2333,23 @@ void mainloopCPU(Param XParam)
 		// Add empty row for each output point
 		zsAllout.push_back(std::vector<Pointout>());
 	}
+
+#ifdef USE_CATALYST
+        int catalystTimeStep = 0;
+        if (XParam.use_catalyst)
+        {
+                // Retrieve adaptor object and add vtkUniformGrid patch for each 16x16 block
+                catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+                for (int blockId = 0; blockId < XParam.nblk; blockId++)
+                {
+                        // Hardcoding 16x16 patch size - may need to be replaced with parameter
+                        if (adaptor.addPatch(blockId, 0, 16, 16, XParam.dx, XParam.dx, blockxo[blockId], blockyo[blockId]))
+                        {
+                                fprintf(stderr, "catalystAdaptor::addPatch failed");
+                        }
+                }
+        }
+#endif
 
 	while (XParam.totaltime < XParam.endtime)
 	{
@@ -2496,8 +2536,47 @@ void mainloopCPU(Param XParam)
 			nTSstep++;
 
 		}
+
+#ifdef USE_CATALYST
+                // Could use existing global time step counter here
+                catalystTimeStep += 1;
+                if (XParam.use_catalyst)
+                {
+                        // Check if Catalyst should run at this simulation time or time step
+                        catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+                        if (adaptor.requestDataDescription(XParam.totaltime, catalystTimeStep))
+                        {
+                                // Use same output mechanism as netCDF output for updating VTK data fields
+                                for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+                                {
+                                        if (OutputVarMaplen[XParam.outvars[ivar]] > 0)
+                                        {
+                                                for (int blockId = 0; blockId < XParam.nblk; blockId++)
+                                                {
+                                                        int adaptorStatus = 0;
+                                                        if (XParam.doubleprecision == 1 || XParam.spherical == 1)
+                                                        {
+                                                                // Find memory address for this block - hardcoding 16x16 block size here
+                                                                double * dataptr = OutputVarMapCPUD[XParam.outvars[ivar]] + blockId*16*16;
+                                                                adaptorStatus = adaptor.updateFieldDouble(blockId, XParam.outvars[ivar], dataptr);
+                                                        }
+                                                        else
+                                                        {
+                                                                float * dataptr = OutputVarMapCPU[XParam.outvars[ivar]] + blockId*16*16;
+                                                                adaptorStatus = adaptor.updateFieldSingle(blockId, XParam.outvars[ivar], dataptr);
+                                                        }
+                                                        if (adaptorStatus) fprintf(stderr, "catalystAdaptor::updateField failed");
+                                                }
+                                        }
+                                }
+                                // Run Catalyst pipeline
+                                if (adaptor.runCoprocessor()) fprintf(stderr, "catalystAdaptor::runCoprocessor failed");
+                        }
+                }
+#endif
+
 		// CHeck for grid output
-		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0)
+		if (nextoutputtime - XParam.totaltime <= XParam.dt*0.00001f  && XParam.outputtimestep > 0.0)
 		{
 			// Avg var sum here
 
@@ -2533,11 +2612,13 @@ void mainloopCPU(Param XParam)
 						//write output step for each variable
 						if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 						{
-							writencvarstepD(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							//writencvarstep(XParam,blockxo_d,blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
+							writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPUD[XParam.outvars[ivar]]);
 						}
 						else
 						{
-							writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							//writencvarstep(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
+							writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], OutputVarMapCPU[XParam.outvars[ivar]]);
 						}
 
 					}
@@ -2720,8 +2801,13 @@ int main(int argc, char **argv)
 
 	}
 
-	XParam.nx = (XParam.xmax - XParam.xo) / XParam.dx+1;
-	XParam.ny = (XParam.ymax - XParam.yo) / XParam.dx+1; //+1?
+
+	double levdx = calcres(XParam.dx ,XParam.initlevel);// true grid resolution as in dx/2^(initlevel)
+	printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, calcres(1.0, XParam.initlevel));
+
+	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
+	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?
+
 
 	if (XParam.spherical < 1)
 	{
@@ -2761,6 +2847,7 @@ int main(int argc, char **argv)
 	////////////////////////////////////////////////
 	// read the bathy file (and store to dummy for now)
 	////////////////////////////////////////////////
+	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, bathydata);
 	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy);
 	Allocate1CPU(XParam.Bathymetry.nx, XParam.Bathymetry.ny, dummy_d);
 
@@ -2830,6 +2917,14 @@ int main(int argc, char **argv)
 			}
 		}
 	}
+
+	for (int j = 0; j < XParam.Bathymetry.ny; j++)
+	{
+		for (int i = 0; i < XParam.Bathymetry.nx; i++)
+		{
+			bathydata[i + j * XParam.Bathymetry.nx] = dummy[i + j * XParam.Bathymetry.nx];
+		}
+	}
 	printf("...done\n");
 	////////////////////////////////////////////////
 	// Rearrange the memory in uniform blocks
@@ -2848,8 +2943,8 @@ int main(int argc, char **argv)
 			{
 				for (int j = 0; j < 16; j++)
 				{
-					double x = XParam.xo + (i + 16 * nblkx)*XParam.dx;
-					double y = XParam.yo + (j + 16 * nblky)*XParam.dx;
+					double x = XParam.xo + (i + 16 * nblkx)*levdx;
+					double y = XParam.yo + (j + 16 * nblky)*levdx;
 
 					if (x >= XParam.Bathymetry.xo && x <= XParam.Bathymetry.xmax && y >= XParam.Bathymetry.yo && y <= XParam.Bathymetry.ymax)
 					{
@@ -2898,6 +2993,9 @@ int main(int argc, char **argv)
 
 	XParam.nblk = nblk;
 
+	XParam.nblkmem = (int)ceil(nblk*XParam.membuffer); //5% buffer on the memory for adaptation 
+
+
 	int blksize = XParam.blksize; //useful below
 	printf("Number of blocks: %i\n",nblk);
 
@@ -2907,11 +3005,27 @@ int main(int argc, char **argv)
 	// caluculate the Block xo yo and what are its neighbour
 
 
-	Allocate1CPU(nblk, 1, blockxo);
-	Allocate1CPU(nblk, 1, blockyo);
-	Allocate1CPU(nblk, 1, blockxo_d);
-	Allocate1CPU(nblk, 1, blockyo_d);
-	Allocate4CPU(nblk, 1, leftblk, rightblk, topblk, botblk);
+	Allocate1CPU(XParam.nblkmem, 1, blockxo);
+	Allocate1CPU(XParam.nblkmem, 1, blockyo);
+	Allocate1CPU(XParam.nblkmem, 1, blockxo_d);
+	Allocate1CPU(XParam.nblkmem, 1, blockyo_d);
+	Allocate4CPU(XParam.nblkmem, 1, leftblk, rightblk, topblk, botblk);
+
+	Allocate1CPU(XParam.nblkmem, 1, level);
+	Allocate1CPU(XParam.nblkmem, 1, newlevel);
+	Allocate1CPU(XParam.nblkmem, 1, activeblk);
+	Allocate1CPU(XParam.nblkmem, 1, availblk);
+	Allocate1CPU(XParam.nblkmem, 1, csumblk);
+	Allocate1CPU(XParam.nblkmem, 1, coarsen);
+	Allocate1CPU(XParam.nblkmem, 1, refine);
+	Allocate1CPU(XParam.nblkmem, 1, invactive);
+
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		activeblk[ibl] = -1;
+		invactive[ibl] = -1;
+	}
+
 
 	nmask = 0;
 	mloc = 0;
@@ -2925,8 +3039,8 @@ int main(int argc, char **argv)
 			{
 				for (int j = 0; j < 16; j++)
 				{
-					double x = XParam.xo + (i + 16 * nblkx)*XParam.dx;
-					double y = XParam.yo + (j + 16 * nblky)*XParam.dx;
+					double x = XParam.xo + (i + 16 * nblkx)*levdx;
+					double y = XParam.yo + (j + 16 * nblky)*levdx;
 
 					//x = max(min(x, XParam.Bathymetry.xmax), XParam.Bathymetry.xo);
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
@@ -2973,35 +3087,43 @@ int main(int argc, char **argv)
 			if (nmask < 256)
 			{
 				//
-				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * XParam.dx;
-				blockyo_d[blkid] = XParam.yo + nblky * 16.0 * XParam.dx;
+				blockxo_d[blkid] = XParam.xo + nblkx * 16.0 * levdx;
+				blockyo_d[blkid] = XParam.yo + nblky * 16.0 * levdx;
+				activeblk[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;
 			}
 		}
 	}
 
+	
+
 	double leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
+		int bl = activeblk[ibl];
 		double espdist = 0.00000001;///WARMING
-		leftxo = blockxo_d[bl] - 16.0 * XParam.dx; // in adaptive this shoulbe be a range
+
+		leftxo = blockxo_d[bl] - 16.0 * levdx; // in adaptive this shoulbe be a range 
+
 		leftyo = blockyo_d[bl];
-		rightxo = blockxo_d[bl] + 16.0 * XParam.dx;
+		rightxo = blockxo_d[bl] + 16.0 * levdx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
-		topyo = blockyo_d[bl] + 16.0 * XParam.dx;
+		topyo = blockyo_d[bl] + 16.0 * levdx;
 		botxo = blockxo_d[bl];
-		botyo = blockyo_d[bl] - 16.0 * XParam.dx;
+		botyo = blockyo_d[bl] - 16.0 * levdx;
 
 		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour
 		leftblk[bl] = bl;
 		rightblk[bl] = bl;
 		topblk[bl] = bl;
 		botblk[bl] = bl;
-		for (int blb = 0; blb < nblk; blb++)
+		for (int iblb = 0; iblb < nblk; iblb++)
 		{
 			//
+			int blb = activeblk[iblb];
+
 			if (abs(blockxo_d[blb] - leftxo) < espdist  && abs(blockyo_d[blb] - leftyo) < espdist)
 			{
 				leftblk[bl] = blb;
@@ -3027,20 +3149,34 @@ int main(int argc, char **argv)
 
 	}
 
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
+		int bl = activeblk[ibl];
 		blockxo[bl] = blockxo_d[bl];
 		blockyo[bl] = blockyo_d[bl];
+		level[bl] = XParam.initlevel;
+		newlevel[bl] = 0;
+		coarsen[bl] = false;
+		refine[bl] = false;
+		
+	}
+
+	for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
+	{
+		
+		availblk[ibl] = XParam.nblk + ibl;
+		XParam.navailblk++;
+
 	}
 
 
 	// Also recalculate xmax and ymax here
 	//xo + (ceil(nx / 16.0)*16.0 - 1)*dx
-	XParam.xmax = XParam.xo + (ceil(XParam.nx / 16.0) * 16.0 - 1)*XParam.dx;
-	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*XParam.dx;
+	XParam.xmax = XParam.xo + (ceil(XParam.nx / 16.0) * 16.0 - 1)*levdx;
+	XParam.ymax = XParam.yo + (ceil(XParam.ny / 16.0) * 16.0 - 1)*levdx;
 
 
-	printf("Model domain info: nx=%d\tny=%d\tdx=%f\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
+	printf("Model domain info: nx=%d\tny=%d\tlevdx(dx)=%f(%f)\talpha=%f\txo=%f\txmax=%f\tyo=%f\tymax=%f\n", XParam.nx, XParam.ny, levdx, XParam.dx, XParam.grdalpha * 180.0 / pi, XParam.xo, XParam.xmax, XParam.yo, XParam.ymax);
 
 
 
@@ -3090,20 +3226,22 @@ int main(int argc, char **argv)
 
 	// Find how many blocks are on each bnds
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
 		double espdist = 0.00000001;///WARMING
 
-		leftxo = blockxo_d[bl]; // in adaptive this shoulbe be a range
+		int bl = activeblk[ibl];
+		leftxo = blockxo_d[bl]; // in adaptive this shoulbe be a range 
+
 		leftyo = blockyo_d[bl];
-		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
+		rightxo = blockxo_d[bl] + 15.0 * levdx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
-		topyo = blockyo_d[bl] + 15.0 * XParam.dx;
+		topyo = blockyo_d[bl] + 15.0 * levdx;
 		botxo = blockxo_d[bl];
 		botyo = blockyo_d[bl];
 
-		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
+		if ((rightxo - XParam.xmax) > (-1.0*levdx))
 		{
 			//
 			blbr++;
@@ -3111,21 +3249,21 @@ int main(int argc, char **argv)
 
 		}
 
-		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
+		if ((topyo - XParam.ymax) > (-1.0*levdx))
 		{
 			//
 			blbt++;
 			//bndtopblk[blbt] = bl;
 
 		}
-		if ((XParam.yo-botyo ) > (-1.0*XParam.dx))
+		if ((XParam.yo - botyo) > (-1.0*levdx))
 		{
 			//
 			blbb++;
 			//bndbotblk[blbb] = bl;
 
 		}
-		if ((XParam.xo-leftxo ) > (-1.0*XParam.dx))
+		if ((XParam.xo - leftxo) > (-1.0*levdx))
 		{
 			//
 			blbl++;
@@ -3147,20 +3285,21 @@ int main(int argc, char **argv)
 	Allocate1CPU(blbb, 1, bndbotblk);
 
 	blbr = blbb = blbl = blbt = 0;
-	for (int bl = 0; bl < nblk; bl++)
+	for (int ibl = 0; ibl < nblk; ibl++)
 	{
 		double espdist = 0.00000001;///WARMING
+		int bl = activeblk[ibl];
 
 		leftxo = blockxo_d[bl] ; // in adaptive this shoulbe be a range
 		leftyo = blockyo_d[bl];
-		rightxo = blockxo_d[bl] + 15.0 * XParam.dx;
+		rightxo = blockxo_d[bl] + 15.0 * levdx;
 		rightyo = blockyo_d[bl];
 		topxo = blockxo_d[bl];
-		topyo = blockyo_d[bl] + 15.0 * XParam.dx;
+		topyo = blockyo_d[bl] + 15.0 * levdx;
 		botxo = blockxo_d[bl];
 		botyo = blockyo_d[bl];
 
-		if ((rightxo - XParam.xmax) > (-1.0*XParam.dx))
+		if ((rightxo - XParam.xmax) > (-1.0*levdx))
 		{
 			//
 
@@ -3169,7 +3308,7 @@ int main(int argc, char **argv)
 
 		}
 
-		if ((topyo - XParam.ymax) > (-1.0*XParam.dx))
+		if ((topyo - XParam.ymax) > (-1.0*levdx))
 		{
 			//
 
@@ -3177,7 +3316,7 @@ int main(int argc, char **argv)
 			blbt++;
 
 		}
-		if ((XParam.yo - botyo) > (-1.0*XParam.dx))
+		if ((XParam.yo - botyo) > (-1.0*levdx))
 		{
 			//
 
@@ -3185,7 +3324,7 @@ int main(int argc, char **argv)
 			blbb++;
 
 		}
-		if ((XParam.xo - leftxo) > (-1.0*XParam.dx))
+		if ((XParam.xo - leftxo) > (-1.0*levdx))
 		{
 			//
 
@@ -3278,16 +3417,16 @@ int main(int argc, char **argv)
 		{
 			for (int i = 0; i < XParam.Bathymetry.nx; i++)
 			{
-				dummy_d[i + j*XParam.Bathymetry.nx] = dummy[i + j*XParam.Bathymetry.nx] * 1.0;
+				dummy_d[i + j*XParam.Bathymetry.nx] = dummy[i + j*XParam.Bathymetry.nx] * 1.0; //*1.0 elevates to double safely
 			}
 		}
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy_d, zb_d);
+		interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy_d, zb_d);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy_d, zb_d);
 	}
 	else
 	{
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
+		interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.Bathymetry.nx, XParam.Bathymetry.ny, XParam.Bathymetry.xo, XParam.Bathymetry.xmax, XParam.Bathymetry.yo, XParam.Bathymetry.ymax, XParam.Bathymetry.dx, dummy, zb);
 
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo_d, blockyo_d, dummy, zb);
 	}
@@ -3313,80 +3452,7 @@ int main(int argc, char **argv)
 	}
 
 
-	/////////////////////////////////////////////////////
-	// Prep River discharge
-	/////////////////////////////////////////////////////
 
-	if (XParam.Rivers.size() > 0)
-	{
-		double xx, yy;
-		printf("Preparing rivers... ");
-		write_text_to_log_file("Preparing rivers");
-		//For each rivers
-		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
-		{
-			// find the cells where the river discharge will be applied
-			std::vector<int> idis, jdis, blockdis;
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						xx = blockxo_d[bl] + i*XParam.dx;
-						yy = blockyo_d[bl] + j*XParam.dx;
-						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
-						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-						if (xx >= XParam.Rivers[Rin].xstart && xx <= XParam.Rivers[Rin].xend && yy >= XParam.Rivers[Rin].ystart && yy <= XParam.Rivers[Rin].yend)
-						{
-
-							// This cell belongs to the river discharge area
-							idis.push_back(i);
-							jdis.push_back(j);
-							blockdis.push_back(bl);
-
-						}
-					}
-				}
-
-			}
-
-			XParam.Rivers[Rin].i = idis;
-			XParam.Rivers[Rin].j = jdis;
-			XParam.Rivers[Rin].block = blockdis;
-			XParam.Rivers[Rin].disarea = idis.size()*XParam.dx*XParam.dx; // That is not valid for spherical grids
-
-			// Now read the discharge input and store to
-			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
-		}
-		//Now identify sort unique blocks where rivers are being inserted
-		std::vector<int> activeRiverBlk;
-
-		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
-		{
-
-			activeRiverBlk.insert(std::end(activeRiverBlk),std::begin(XParam.Rivers[Rin].block),std::end(XParam.Rivers[Rin].block));
-		}
-		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
-		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
-		Allocate1CPU(activeRiverBlk.size(), 1, Riverblk);
-
-		XParam.nriverblock = activeRiverBlk.size();
-
-		for (int b = 0; b < activeRiverBlk.size(); b++)
-		{
-			Riverblk[b] = activeRiverBlk[b];
-		}
-
-
-		if (XParam.GPUDEVICE >= 0)
-		{
-			Allocate1GPU(activeRiverBlk.size(), 1, Riverblk_g);
-			CUDA_CHECK(cudaMemcpy(Riverblk_g, Riverblk, activeRiverBlk.size() * sizeof(int), cudaMemcpyHostToDevice));
-
-		}
-		printf("Done\n");
-	}
 
 	/////////////////////////////////////////////////////
 	// Initial Condition
@@ -3499,17 +3565,24 @@ int main(int argc, char **argv)
 	free(dummy);
 	free(dummy_d);
 
-	Allocate1CPU(XParam.nblk, XParam.blksize, dummy);
-	Allocate1CPU(XParam.nblk, XParam.blksize, dummy_d);
+	Allocate1CPU(XParam.nblkmem, XParam.blksize, dummy);
+	Allocate1CPU(XParam.nblkmem, XParam.blksize, dummy_d);
 
 
 
 
 
 
-	// Below is not succint but way faster than one loop that checks the if statemenst each time
+	// Below is not succint but way faster than one loop that checks the if statemenst each time 
+	// relocate this to the Allocate CPU part?
 	if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 	{
+
+		CopyArray(XParam.nblk, XParam.blksize, hh_d, hho_d);
+		CopyArray(XParam.nblk, XParam.blksize, uu_d, uuo_d);
+		CopyArray(XParam.nblk, XParam.blksize, vv_d, vvo_d);
+		CopyArray(XParam.nblk, XParam.blksize, zs_d, zso_d);
+
 		// Set default cf
 		InitArraySV(XParam.nblk, XParam.blksize, XParam.cf, cf_d);
 
@@ -3557,6 +3630,11 @@ int main(int argc, char **argv)
 	}
 	else //Using Float *
 	{
+
+		CopyArray(XParam.nblk, XParam.blksize, hh, hho);
+		CopyArray(XParam.nblk, XParam.blksize, uu, uuo);
+		CopyArray(XParam.nblk, XParam.blksize, vv, vvo);
+		CopyArray(XParam.nblk, XParam.blksize, zs, zso);
 
 		// Set default cf
 		InitArraySV(XParam.nblk, XParam.blksize,(float) XParam.cf, cf);
@@ -3641,7 +3719,7 @@ int main(int argc, char **argv)
 					}
 				}
 
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput_d, cf_d);
+				interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput_d, cf_d);
 
 				//interp2cf(XParam, cfmapinput, blockxo_d, blockyo_d, cf_d);
 				free(cfmapinput_d);
@@ -3649,7 +3727,7 @@ int main(int argc, char **argv)
 			else
 			{
 				//
-				interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput, cf);
+				interp2BUQ(XParam.nblk, XParam.blksize, levdx, blockxo_d, blockyo_d, XParam.roughnessmap.nx, XParam.roughnessmap.ny, XParam.roughnessmap.xo, XParam.roughnessmap.xmax, XParam.roughnessmap.yo, XParam.roughnessmap.ymax, XParam.roughnessmap.dx, cfmapinput, cf);
 
 				//interp2cf(XParam, cfmapinput, blockxo, blockyo, cf);
 			}
@@ -3664,6 +3742,7 @@ int main(int argc, char **argv)
 			write_text_to_log_file("Error while reading roughness map. Using constant roughness instead ");
 		}
 	}
+
 
 
 	if (XParam.deform.size()>0)
@@ -3681,6 +3760,7 @@ int main(int argc, char **argv)
 
 
 	}
+
 
 
 	///////////////////////////////////////////////////
@@ -3745,6 +3825,88 @@ int main(int argc, char **argv)
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Prep wind  / atm / rain forcing
 	/////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+	/////////////////////////////////////////////////////
+	// Prep River discharge
+	/////////////////////////////////////////////////////
+
+	if (XParam.Rivers.size() > 0)
+	{
+		double xx, yy;
+		printf("Preparing rivers... ");
+		write_text_to_log_file("Preparing rivers");
+		//For each rivers
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
+		{
+			// find the cells where the river discharge will be applied
+			std::vector<int> idis, jdis, blockdis;
+			for (int bl = 0; bl < XParam.nblk; bl++)
+			{
+				for (int j = 0; j < 16; j++)
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						xx = blockxo_d[bl] + i*levdx;
+						yy = blockyo_d[bl] + j*levdx;
+						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+						if (xx >= XParam.Rivers[Rin].xstart && xx <= XParam.Rivers[Rin].xend && yy >= XParam.Rivers[Rin].ystart && yy <= XParam.Rivers[Rin].yend)
+						{
+
+							// This cell belongs to the river discharge area
+							idis.push_back(i);
+							jdis.push_back(j);
+							blockdis.push_back(bl);
+
+						}
+					}
+				}
+
+			}
+
+			XParam.Rivers[Rin].i = idis;
+			XParam.Rivers[Rin].j = jdis;
+			XParam.Rivers[Rin].block = blockdis;
+			XParam.Rivers[Rin].disarea = idis.size()*levdx*levdx; // That is not valid for spherical grids
+
+			// Now read the discharge input and store to  
+			XParam.Rivers[Rin].flowinput = readFlowfile(XParam.Rivers[Rin].Riverflowfile);
+		}
+		//Now identify sort unique blocks where rivers are being inserted
+		std::vector<int> activeRiverBlk;
+
+		for (int Rin = 0; Rin < XParam.Rivers.size(); Rin++)
+		{
+
+			activeRiverBlk.insert(std::end(activeRiverBlk), std::begin(XParam.Rivers[Rin].block), std::end(XParam.Rivers[Rin].block));
+		}
+		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
+		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
+		Allocate1CPU(activeRiverBlk.size(), 1, Riverblk);
+
+		XParam.nriverblock = activeRiverBlk.size();
+
+		for (int b = 0; b < activeRiverBlk.size(); b++)
+		{
+			Riverblk[b] = activeRiverBlk[b];
+		}
+
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			Allocate1GPU(activeRiverBlk.size(), 1, Riverblk_g);
+			CUDA_CHECK(cudaMemcpy(Riverblk_g, Riverblk, activeRiverBlk.size() * sizeof(int), cudaMemcpyHostToDevice));
+
+		}
+		printf("Done\n");
+	}
+
+	/////////////////////////////////////////////////////
+	// Prep Wind input
+	/////////////////////////////////////////////////////
+	
 
 	if (!XParam.windU.inputfile.empty())
 	{
@@ -3887,18 +4049,19 @@ int main(int argc, char **argv)
 
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 			{
-				Allocate1CPU(XParam.nblk, XParam.blksize, Patm_d);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdx_d);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdy_d);
 
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, Patm_d);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdx_d);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdy_d);
+				
 
 
 			}
 			else
 			{
-				Allocate1CPU(XParam.nblk, XParam.blksize, Patm);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdx);
-				Allocate1CPU(XParam.nblk, XParam.blksize, dPdy);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, Patm);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdx);
+				Allocate1CPU(XParam.nblkmem, XParam.blksize, dPdy);
 			}
 
 			// read the first 2 stepd of the data
@@ -3920,16 +4083,16 @@ int main(int argc, char **argv)
 				Allocate1GPU(XParam.atmP.nx, XParam.atmP.ny, Patmaft_g);
 				if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 				{
-					Allocate1GPU(XParam.nblk, XParam.blksize, Patm_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdx_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdy_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, Patm_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdx_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdy_gd);
 				}
 				else
 				{
 
-					Allocate1GPU(XParam.nblk, XParam.blksize, Patm_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdx_gd);
-					Allocate1GPU(XParam.nblk, XParam.blksize, dPdy_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, Patm_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdx_gd);
+					Allocate1GPU(XParam.nblkmem, XParam.blksize, dPdy_gd);
 
 				}
 				CUDA_CHECK(cudaMallocArray(&Patm_gp, &channelDescPatm, XParam.atmP.nx, XParam.atmP.ny));
@@ -4027,6 +4190,57 @@ int main(int argc, char **argv)
 
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////
+	// Initial adaptation
+	//////////////////////////////////////////////////////////////////////////////////
+
+	int oldnblk = 0;
+	if (XParam.maxlevel != XParam.minlevel)
+	{
+		while (oldnblk != XParam.nblk)
+		//for (int i=0; i<1;i++)
+		{
+			oldnblk = XParam.nblk;
+			//wetdrycriteria(XParam, refine, coarsen);
+			inrangecriteria(XParam, -10.0f, 10.0f, refine, coarsen, zb);
+			refinesanitycheck(XParam, refine, coarsen);
+			XParam = adapt(XParam);
+			if (!checkBUQsanity(XParam))
+			{
+				printf("Bad BUQ mesh layout\n");
+				exit(2);
+				//break;
+			}
+
+			
+		}
+		
+	}
+	gradientADA(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dx, activeblk, level, leftblk, rightblk, topblk, botblk, zb, uu, vv);
+	// Debugging...
+	/*
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = activeblk[ibl];
+		for (int iy = 0; iy < 16; iy++)
+		{
+			for (int ix = 0; ix < 16; ix++)
+			{
+				int i = ix + iy * 16 + ib * XParam.blksize;
+
+				hh[i] = ib;
+				zs[i] = leftblk[ib];
+				zb[i] = botblk[ib];
+				uu[i] = rightblk[ib];
+				vv[i] = topblk[ib];
+
+
+			}
+		}
+	}
+	
+	*/
+
 	///////////////////////////////////////////////////////////////////////////////////
 	// Prepare various model outputs
 	///////////////////////////////////////////////////////////////////////////////////
@@ -4043,11 +4257,11 @@ int main(int argc, char **argv)
 			for (int blk = 0; blk < XParam.nblk; blk++)
 			{
 				//
-				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*XParam.dx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*XParam.dx))
+				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + 16.0*levdx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + 16.0*levdx))
 				{
 					XParam.TSnodesout[o].block = blk;
-					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / XParam.dx), 0), 15);
-					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / XParam.dx), 0), 15);
+					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / levdx), 0), 15);
+					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / levdx), 0), 15);
 					break;
 				}
 			}
@@ -4146,18 +4360,22 @@ int main(int argc, char **argv)
 	printf("Create netCDF output file ");
 	write_text_to_log_file("Create netCDF output file ");
 	//create nc file with no variables
-	XParam=creatncfileUD(XParam);
+	//XParam=creatncfileUD(XParam);
+	XParam = creatncfileBUQ(XParam);
+	//creatncfileBUQ(XParam);
 	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 	{
 		//Create definition for each variable and store it
 		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
 		{
 			//defncvarD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-			defncvarD(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
+			//defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
+			defncvarBUQ(XParam, activeblk,level,blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
 		}
 		else
 		{
-			defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
+			//defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
+			defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
 		}
 
 	}
@@ -4169,46 +4387,72 @@ int main(int argc, char **argv)
 
 	SaveParamtolog(XParam);
 
+#ifdef USE_CATALYST
+        if (XParam.use_catalyst)
+        {
+                // Retrieve adaptor and initialise visualisation/VTK output pipeline
+                catalystAdaptor& adaptor = catalystAdaptor::getInstance();
+                if (XParam.catalyst_python_pipeline)
+                {
+                        if (adaptor.initialiseWithPython(XParam.python_pipeline))
+                        {
+                                fprintf(stderr, "catalystAdaptor::initialiseWithPython failed");
+                        }
+                }
+                else
+                {
+                        if (adaptor.initialiseVTKOutput(XParam.vtk_output_frequency, XParam.vtk_output_time_interval, XParam.vtk_outputfile_root))
+                        {
+                                fprintf(stderr, "catalystAdaptor::initialiseVTKOutput failed");
+                        }
+                }
+        }
+#endif
+
 	/////////////////////////////////////
 	////      STARTING MODEL     ////////
 	/////////////////////////////////////
 
-
-
-	printf("\n###################################\n   Starting Model.\n###################################\n \n");
-	write_text_to_log_file("Starting Model. ");
-
-	if (XParam.GPUDEVICE >= 0)
+	if (XParam.maxlevel == XParam.minlevel)
 	{
-		if (XParam.spherical == 1)
+		XParam.delta = levdx;
+
+		printf("\n###################################\n   Starting Model.\n###################################\n \n");
+		write_text_to_log_file("Starting Model. ");
+
+		if (XParam.GPUDEVICE >= 0)
 		{
-			mainloopGPUDSPH(XParam);
-		}
-		else if (XParam.doubleprecision == 1)
-		{
-			mainloopGPUDB(XParam);
-		}
-		else
-		{
-			if (!XParam.windU.inputfile.empty())
+			if (XParam.spherical == 1)
 			{
-				//
-				mainloopGPUATM(XParam);
+				mainloopGPUDSPH(XParam);
+			}
+			else if (XParam.doubleprecision == 1)
+			{
+				mainloopGPUDB(XParam);
 			}
 			else
 			{
-				mainloopGPU(XParam);
+				if (!XParam.windU.inputfile.empty())
+				{
+					//
+					mainloopGPUATM(XParam);
+				}
+				else
+				{
+					mainloopGPU(XParam);
+				}
 			}
+			//checkGradGPU(XParam);
+
 		}
-		//checkGradGPU(XParam);
+		else
+		{
+			mainloopCPU(XParam);
+		}
+
 
 	}
-	else
-	{
-		mainloopCPU(XParam);
-	}
-
-
+	
 
 
 

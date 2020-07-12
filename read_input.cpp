@@ -651,6 +651,37 @@ Param readparamstr(std::string line, Param param)
 		param.doubleprecision = std::stoi(parametervalue);
 	}
 	///////////////////////////////////////////////////////
+	// Adaptation
+	//
+	parameterstr = "maxlevel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.maxlevel = std::stoi(parametervalue);
+	}
+
+	parameterstr = "minlevel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.minlevel = std::stoi(parametervalue);
+	}
+
+	parameterstr = "initlevel";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.initlevel = std::stoi(parametervalue);
+	}
+
+	parameterstr = "membuffer";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.membuffer = std::stod(parametervalue);
+	}
+
+	///////////////////////////////////////////////////////
 	// Flow parameters
 	//
 	parameterstr = "eps";
@@ -1062,6 +1093,45 @@ Param readparamstr(std::string line, Param param)
 		param.posdown = std::stoi(parametervalue);
 	}
 
+#ifdef USE_CATALYST
+	parameterstr = "use_catalyst";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.use_catalyst = std::stoi(parametervalue);
+	}
+	parameterstr = "catalyst_python_pipeline";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.catalyst_python_pipeline = std::stoi(parametervalue);
+	}
+	parameterstr = "vtk_output_frequency";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.vtk_output_frequency = std::stoi(parametervalue);
+	}
+	parameterstr = "vtk_output_time_interval";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.vtk_output_time_interval = std::stod(parametervalue);
+	}
+	parameterstr = "vtk_outputfile_root";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.vtk_outputfile_root = parametervalue;
+	}
+	parameterstr = "python_pipeline";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.python_pipeline = parametervalue;
+	}
+#endif
+
 	parameterstr = "initzs";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -1338,7 +1408,7 @@ Param checkparamsanity(Param XParam)
 
 	
 
-	if (XParam.outvars.empty() && XParam.outputtimestep > 0)
+	if (XParam.outvars.empty() && XParam.outputtimestep > 0.0)
 	{
 		//a nc file was specified but no output variable were specified
 		std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh" }; 
@@ -2075,5 +2145,17 @@ double BilinearInterpolation(double q11, double q12, double q21, double q22, dou
 		q12 * x2x * yy1 +
 		q22 * xx1 * yy1
 		);
+}
+double BarycentricInterpolation(double q1, double x1,double y1,double q2, double x2, double y2, double q3, double x3, double y3,double x, double y)
+{
+	double w1, w2, w3,D;
+
+	D = (y2 - y3) * (x1 + x3) + (x3-x2) * (y1-y3);
+
+	w1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / D;
+	w2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / D;
+	w3 = 1 - w1 - w2;
+
+	return q1 * w1 + q2 * w2 + q3 * w3;
 }
 

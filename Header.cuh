@@ -145,6 +145,7 @@ public:
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
 	int nblk=0; // number of compute blocks
+	int blkwidth = 16;
 	int blksize = 256; //16x16 blocks
 	double xo = 0.0; // grid origin
 	double yo = 0.0; // grid origin
@@ -154,6 +155,14 @@ public:
 	int posdown = 0; // flag for bathy input. model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
 	int spherical = 0; // flag for geographical coordinate. can be activated by using teh keyword geographic
 	double Radius = 6371220.; //Earth radius [m]
+
+	//Adaptation
+	int initlevel = 0;
+	int maxlevel = 0;
+	int minlevel = 0;
+	int nblkmem = 0;
+	int navailblk = 0;
+	double membuffer = 1.05; //needs to allocate more memory than initially needed so adaptation can happen without memory reallocation
 
 	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
 	//files
@@ -204,6 +213,16 @@ public:
 	int smallnc = 1;//default save as short integer if smallnc=0 then save all variables as float
 	float scalefactor = 0.01f;
 	float addoffset = 0.0f;
+
+#ifdef USE_CATALYST
+        // ParaView Catalyst parameters
+        int use_catalyst = 0;
+        int catalyst_python_pipeline = 0;
+        int vtk_output_frequency = 0;
+        double vtk_output_time_interval = 1.0;
+        std::string vtk_outputfile_root = "bg_out";
+        std::string python_pipeline = "coproc.py";
+#endif
 
 	// This is controlled by the sanity checker not directly by the user
 	int resetmax = 0;
@@ -324,7 +343,7 @@ extern double * vort_d, *vort_gd;// Vorticity output
 extern float dtmax;
 extern float * dtmax_g;
 extern float * TSstore, *TSstore_g;
-extern float * dummy;
+extern float * dummy, *bathydata;
 
 extern double dtmax_d;
 extern double * dtmax_gd;
@@ -371,6 +390,10 @@ extern int * bndleftblk_g, *bndrightblk_g, *bndtopblk_g, *bndbotblk_g;
 extern int * Riverblk, *Riverblk_g;
 
 
+// Adaptivity
+extern int * level, *level_g, *newlevel, *newlevel_g, *activeblk, *availblk, *invactive, *activeblk_g, *availblk_g, *csumblk, *csumblk_g, * invactive_g ;
+
+extern bool * coarsen, * refine;
 //Cuda Array to pre-store Water level boundary on the GPU and interpolate through the texture fetch
 extern cudaArray* leftWLS_gp; // Cuda array to pre-store HD vel data before converting to textures
 extern cudaArray* rightWLS_gp;
@@ -480,13 +503,18 @@ extern "C" void create2dnc(int nx, int ny, double dx, double dy, double totaltim
 extern "C" void write2varnc(int nx, int ny, double totaltime, float * var);
 
 // Netcdf functions
-Param creatncfileUD(Param XParam);
+void handle_error(int status);
+//functions moved to new file that is directly included in BasCart_gpu so that templates cna be used to simplify the code
+//Param creatncfileUD(Param XParam);
 
-extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
-extern "C" void defncvarD(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, double * var);
-extern "C" void writenctimestep(std::string outfile, double totaltime);
-extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var);
-extern "C" void writencvarstepD(Param XParam, double * blockxo, double *blockyo, std::string varst, double * var_d);//templating should have been fine here!
+//extern "C" void defncvar(Param XParam, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
+
+//extern "C" void writenctimestep(std::string outfile, double totaltime);
+//extern "C" void writencvarstep(Param XParam, double * blockxo, double *blockyo, std::string varst, float * var);
+
+
+
+
 void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax);
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb);
 int readhotstartfileD(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
@@ -529,7 +557,7 @@ void SaveParamtolog(Param XParam);
 //
 double interptime(double next, double prev, double timenext, double time);
 double BilinearInterpolation(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y);
-
+double BarycentricInterpolation(double q1, double x1, double y1, double q2, double x2, double y2, double q3, double x3, double y3, double x, double y);
 
 // End of global definition
 #endif

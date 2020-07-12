@@ -83,6 +83,9 @@ __device__ T sq(T a)
 	return a*a;
 }
 
+
+
+
 __device__ int findleftG(int ix,int iy,int leftblk, int ibl, int bdimx)
 {
 	int ileft;
@@ -248,7 +251,7 @@ __device__ float minmod2fGPU(float theta,float s0, float s1, float s2)
 	return 0.;
 }
 
-template <class T> __device__ T minmod2GPU(T theta, T s0, T s1, T s2)
+template <class T> __host__ __device__ T minmod2GPU(T theta, T s0, T s1, T s2)
 {
 	//theta should be used as a global var 
 	// can be used to tune the limiting (theta=1
@@ -484,6 +487,12 @@ template <class T> __global__ void gradientGPUXYBUQSM(T theta, T delta, int *lef
 	*/
 
 }
+
+
+
+
+
+
 
 template <class T>
 __global__ void interp2ATMP(float xoatm,float yoatm,float dxatm,T delta, T Pref,T*blockxo, T *blockyo,  T * P)
