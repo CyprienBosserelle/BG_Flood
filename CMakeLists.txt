@@ -4,8 +4,8 @@
 cmake_minimum_required(VERSION 3.9.1 FATAL_ERROR)
 project(bggpu LANGUAGES CXX CUDA)
 
-# option to use Catalyst (disable with cmake option "-DUSE_CATALYST=OFF")
-option(USE_CATALYST "Link with Catalyst" ON)
+# option to use Catalyst (enable with cmake option "-DUSE_CATALYST=ON")
+option(USE_CATALYST "Link with Catalyst" OFF)
 
 # option for running tests - include(CTest) adds the option -DBUILD_TESTING
 # that is set to ON by default (to disable tests use -DBUILD_TESTING=OFF)
