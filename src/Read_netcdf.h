@@ -4,6 +4,9 @@
 
 #include "General.h"
 #include "Input.h"
+#include "ReadInput.h"
+#include "Write_netcdf.h"
+
 
 
 // End of global definition

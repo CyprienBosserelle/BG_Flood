@@ -24,6 +24,18 @@
 #include "Util_CPU.h"
 
 
+template <class T> const T& max(const T& a, const T& b) {
+	return (a < b) ? b : a;     // or: return comp(a,b)?b:a; for version (2)
+}
+
+template <class T> const T& min(const T& a, const T& b) {
+	return !(b < a) ? a : b;     // or: return comp(a,b)?b:a; for version (2)
+}
+
+template <class T> T sq(T a) {
+	return (a * a);
+}
+
 unsigned int nextPow2(unsigned int x)
 {
 	--x;

@@ -61,7 +61,7 @@ Param Readparamfile(Param XParam)
 		
 
 	}
-	return XParam
+	return XParam;
 }
 
 

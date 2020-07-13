@@ -6,6 +6,7 @@
 #include "Input.h"
 #include "Param.h"
 #include "Write_txt.h"
+#include "read_netcdf.h"
 
 
 Param Readparamfile(Param XParam);
