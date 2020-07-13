@@ -4216,7 +4216,7 @@ int main(int argc, char **argv)
 		}
 		
 	}
-	gradientADA(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dx, activeblk, level, leftblk, rightblk, topblk, botblk, zb, uu, vv);
+	//gradientADA(XParam.nblk, XParam.blksize, (float)XParam.theta, (float)XParam.dx, activeblk, level, leftblk, rightblk, topblk, botblk, zb, uu, vv);
 	// Debugging...
 	/*
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
