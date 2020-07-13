@@ -28,7 +28,7 @@ Param Readparamfile(Param XParam)
 	std::ifstream fs("BG_param.txt");
 
 	if (fs.fail()) {
-		std::cerr << "BG_param.txt file could not be opened" << std::endl;
+		//std::cerr << "BG_param.txt file could not be opened" << std::endl;
 		log("ERROR: BG_param.txt file could not be opened...use this log file to create a file named BG_param.txt");
 		SaveParamtolog(XParam);
 
@@ -162,8 +162,8 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	std::ifstream fs(WLfilename);
 
 	if (fs.fail()) {
-		std::cerr << WLfilename << " Water level bnd file could not be opened" << std::endl;
-		write_text_to_log_file("ERROR: Water level bnd file could not be opened ");
+		//std::cerr << WLfilename << " Water level bnd file could not be opened" << std::endl;
+		log("ERROR: Water level bnd file could not be opened : " + WLfilename);
 		exit(1);
 	}
 
@@ -200,9 +200,9 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 			{
 				// Giving up now! Could not read the files
 				//issue a warning and exit
-				std::cerr << WLfilename << "ERROR Water level bnd file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
-				write_text_to_log_file("ERROR:  Water level bnd file (" + WLfilename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
-				write_text_to_log_file(line);
+				//std::cerr << WLfilename << "ERROR Water level bnd file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
+				log("ERROR:  Water level bnd file (" + WLfilename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
+				log(line);
 				exit(1);
 			}
 

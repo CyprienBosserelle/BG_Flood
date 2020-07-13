@@ -25,18 +25,18 @@ public:
 	int doubleprecision = 0;
 
 	//grid parameters
-	double dx= 0.0 / 0.0; // grid resolution in the coordinate system unit. 
+	double dx= nan(""); // grid resolution in the coordinate system unit. 
 	double delta; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
 	int nblk=0; // number of compute blocks
 	int blkwidth = 16;
 	int blksize = 256; //16x16 blocks
-	double xo = 0.0 / 0.0; // grid origin
-	double yo = 0.0 / 0.0; // grid origin
-	double ymax = 0.0 / 0.0;
-	double xmax = 0.0 / 0.0;
-	double grdalpha= 0.0 / 0.0; // grid rotation Y axis from the North input in degrees but later converted to rad
+	double xo = nan(""); // originally defined has nan to check whether the user alter these values when runing the model
+	double yo = nan(""); // grid origin
+	double ymax = nan("");
+	double xmax = nan("");
+	double grdalpha= nan(""); // grid rotation Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // flag for bathy input. model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
 	int spherical = 0; // flag for geographical coordinate. can be activated by using teh keyword geographic
 	double Radius = 6371220.; //Earth radius [m]

@@ -5,7 +5,7 @@
 #include "General.h"
 #include "Input.h"
 #include "Param.h"
-
+#include "Write_txt.h"
 
 
 Param Readparamfile(Param XParam);

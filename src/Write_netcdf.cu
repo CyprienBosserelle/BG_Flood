@@ -9,14 +9,14 @@ void handle_ncerror(int status) {
 		std::ostringstream stringStream;
 		stringStream << nc_strerror(status);
 		std::string copyOfStr = stringStream.str();
-		write_text_to_log_file("Netcdf error:" + copyOfStr);
+		log("Netcdf error:" + copyOfStr);
 		//fprintf(logfile, "Netcdf: %s\n", nc_strerror(status));
 		exit(2);
 	}
 }
 
 
-Param creatncfileBUQ(Param XParam)
+Param creatncfileBUQ(Param XParam,int * activeblk, int * level, float * blockxo, float * blockyo)
 {
 	int status;
 	int nx, ny;
@@ -31,7 +31,7 @@ Param creatncfileBUQ(Param XParam)
 		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
 		{
 			printf("Warning! Outut file name already exist  ");
-			write_text_to_log_file("Warning! Outut file name already exist   ");
+			log("Warning! Outut file name already exist   ");
 			int fileinc = 1;
 			std::vector<std::string> extvec = split(XParam.outfile, '.');
 			std::string bathyext = extvec.back();
@@ -197,8 +197,8 @@ Param creatncfileBUQ(Param XParam)
 	int* blkid;
 
 
-	Allocate1CPU(1, XParam.nblk, blkwidth);
-	Allocate1CPU(1, XParam.nblk, blkid);
+	AllocateCPU(1, XParam.nblk, blkwidth);
+	AllocateCPU(1, XParam.nblk, blkid);
 
 
 	for (int ib = 0; ib < XParam.nblk; ib++)
