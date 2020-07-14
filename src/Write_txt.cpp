@@ -30,24 +30,31 @@ void log(std::string text)
 void create_logfile()
 {
 	// Reset the log file
-	FILE * flog;
-	flog = fopen("BG_log.txt", "w"); //Find better name
-	fclose(flog);
+	std::ofstream log_file(
+		"BG_log.txt", std::ios_base::out | std::ios_base::trunc);
+	
+	log_file.close();
 
 	//Logfile header
-	time_t rawtime;
-	struct tm * timeinfo;
-	char buffer[80];
+	//auto n = std::chrono::system_clock::now();
+	//auto in_time_t = std::chrono::system_clock::to_time_t(n);
+	//std::tm buf;
+	//localtime_s(&buf, &in_time_t);
+	//std::cout << std::put_time(&buf, "%Y-%m-%d %X") << std::endl;
 
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
+	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-	strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
-	std::string strtimenow(buffer);
+	std::string s(30, '\0');
+	std::tm buf;
+	localtime_s(&buf, &now);
+	std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", &buf);
+
+	//strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
+	//std::string strtimenow(buffer);
 	log("#################################");
 	log("BG_Flood v0.5");
 	log("#################################");
-	log("model started at " + strtimenow);
+	log("model started at " + s);
 }
 
 void write_text_to_log_file(std::string text)

@@ -1933,47 +1933,92 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 }
 
 
-
-
-
-extern "C" void readbathyMD(std::string filename, float *&zb)
+void readbathyMD(std::string filename, float*& zb)
 {
-	//read input data:
-	//printf("bathy: %s\n", filename);
-	FILE *fid;
+	// Shit that doesn'y wor... Needs fixing 
 	int nx, ny;
-	double dx, grdalpha;
-	//read md file
-	fid = fopen(filename.c_str(), "r");
-	fscanf(fid, "%u\t%u\t%lf\t%*f\t%lf", &nx, &ny, &dx, &grdalpha);
-	grdalpha = grdalpha*pi / 180; // grid rotation
+	float dx, grdalpha;
+	std::ifstream fs(filename);
 
-	int jread;
-	//int jreadzs;
-	for (int fnod = ny; fnod >= 1; fnod--)
+	if (fs.fail()) {
+		std::cerr << filename << " bathy file (md file) could not be opened" << std::endl;
+		log("ERROR: bathy file could not be opened " + filename);
+		exit(1);
+	}
+
+	std::string line;
+
+	std::vector<std::string> lineelements;
+
+	std::getline(fs, line);
+	if (!line.empty() && line.substr(0, 1).compare("#") != 0)
 	{
-
-		fscanf(fid, "%u", &jread);
-		
-		for (int inod = 0; inod < nx; inod++)
+		//by default we expect tab delimitation
+		lineelements = split(line, '\t');
+		if (lineelements.size() < 5)
 		{
-			fscanf(fid, "%f", &zb[inod + (jread - 1)*nx]);
+			// Is it space delimited?
+			lineelements.clear();
+			lineelements = split(line, ' ');
+		}
 
+		if (lineelements.size() < 5)
+		{
+			//Well it has to be comma delimited then
+			lineelements.clear();
+			lineelements = split(line, ',');
+		}
+		if (lineelements.size() < 5)
+		{
+			// Giving up now! Could not read the files
+			//issue a warning and exit
+			std::cerr << filename << "ERROR Wind bnd file format error. only " << lineelements.size() << " where 5 were expected. Exiting." << std::endl;
+			log("ERROR:  Wind bnd file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where 3 were expected. Exiting.");
+			log(line);
+			exit(1);
+		}
+
+		nx = std::stoi(lineelements[0]);
+		ny = std::stoi(lineelements[1]);
+		dx = std::stod(lineelements[2]);
+		grdalpha = std::stod(lineelements[4]);
+	}
+
+	int j = 0;
+	while (std::getline(fs, line))
+	{
+		//std::cout << line << std::endl;
+
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			lineelements = split(line, '\t');
+			for (int i = 0; i < nx; i++)
+			{
+				zb[i + j * nx] = std::stof(lineelements[0]);
+			}
+			j++;
 		}
 	}
 
-	fclose(fid);
+	fs.close();
+
 }
 
-extern "C" void readXBbathy(std::string filename, int nx,int ny, float *&zb)
+
+
+ void readXBbathy(std::string filename, int nx,int ny, float *&zb)
 {
 	//read input data:
 	//printf("bathy: %s\n", filename);
-	FILE *fid;
+	
 	
 	//read md file
-	fid = fopen(filename.c_str(), "r");
-	
+	 std::ifstream fs(filename);
+	 std::string line;
+	 std::vector<std::string> lineelements;
+
+	 
 	
 
 	
@@ -1981,16 +2026,17 @@ extern "C" void readXBbathy(std::string filename, int nx,int ny, float *&zb)
 	for (int jnod = 0; jnod < ny; jnod++)
 	{
 
-		
+		std::getline(fs, line);
 
 		for (int inod = 0; inod < nx; inod++)
 		{
-			fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
+			//fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
+			zb[inod + jnod * nx] = std::stof(lineelements[0]);
 
 		}
 	}
-
-	fclose(fid);
+	fs.close();
+	//fclose(fid);
 }
 
 
