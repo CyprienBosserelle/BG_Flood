@@ -4,7 +4,7 @@
 
 #include "General.h"
 
-template <class T> double calcres(T dx, int level);
+template <class T> __host__ __device__ double calcres(T dx, int level);
 
 // End of global definition
 #endif

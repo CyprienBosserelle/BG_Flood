@@ -23,7 +23,7 @@ void log(std::string text)
 {
 
 	std::cout << text << std::endl;
-	write_text_to_log_file(std::string text);
+	write_text_to_log_file(text);
 
 }
 
@@ -45,7 +45,7 @@ void create_logfile()
 	strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
 	std::string strtimenow(buffer);
 	log("#################################");
-	log("Basilisk-like Cartesian GPU v0.0");
+	log("BG_Flood v0.5");
 	log("#################################");
 	log("model started at " + strtimenow);
 }

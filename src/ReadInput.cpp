@@ -21,7 +21,10 @@
 #include "ReadInput.h"
 
 
-
+/*! \fn Param Readparamfile(Param XParam)
+* Open the BG_param.txt file and read the parameters
+* save the parameter in the Param structure and return an XParam.
+*/
 Param Readparamfile(Param XParam)
 {
 	//
@@ -58,13 +61,17 @@ Param Readparamfile(Param XParam)
 
 		
 
-		
+		XParam = checkparamsanity(XParam);
 
 	}
 	return XParam;
 }
 
 
+/*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
+* Read boundary files
+* 
+*/
 std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 {
 	// read bnd or nest file
@@ -314,8 +321,8 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 		{
 			//
 			// Read// interpolate data for each bnds
-			indxx = max(min((int)((bndxo+(dx*ibnd) - xo) / dx), nx - 1), 0);
-			indyy = max(min((int)((bndy - yo) / dx), ny - 1), 0);
+			indxx = utils::max(utils::min((int)((bndxo+(dx*ibnd) - xo) / dx), nx - 1), 0);
+			indyy = utils::max(utils::min((int)((bndy - yo) / dx), ny - 1), 0);
 
 			if (hor == 0)
 			{
@@ -462,9 +469,9 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 			{
 				// Giving up now! Could not read the files
 				//issue a warning and exit
-				std::cerr << Flowfilename << "ERROR flow file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
-				write_text_to_log_file("ERROR:  flow file (" + Flowfilename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
-				write_text_to_log_file(line);
+				//std::cerr << Flowfilename << "ERROR flow file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
+				log("ERROR:  flow file (" + Flowfilename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
+				log(line);
 				exit(1);
 			}
 
@@ -500,8 +507,8 @@ std::vector<Windin> readINfileUNI(std::string filename)
 	std::ifstream fs(filename);
 
 	if (fs.fail()) {
-		std::cerr << filename << "ERROR: Atm presssure / Rainfall file could not be opened" << std::endl;
-		write_text_to_log_file("ERROR: Atm presssure / Rainfall file could not be opened ");
+		//std::cerr << filename << "ERROR: Atm presssure / Rainfall file could not be opened" << std::endl;
+		log("ERROR: Atm presssure / Rainfall file could not be opened : " + filename);
 		exit(1);
 	}
 
@@ -536,9 +543,9 @@ std::vector<Windin> readINfileUNI(std::string filename)
 			{
 				// Giving up now! Could not read the files
 				//issue a warning and exit
-				std::cerr << filename << "ERROR Atm presssure / Rainfall  file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
-				write_text_to_log_file("ERROR:  Atm presssure / Rainfall file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
-				write_text_to_log_file(line);
+				//std::cerr << filename << "ERROR Atm presssure / Rainfall  file format error. only " << lineelements.size() << " where at least 2 were expected. Exiting." << std::endl;
+				log("ERROR:  Atm presssure / Rainfall file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 2 were expected. Exiting.");
+				log(line);
 				exit(1);
 			}
 
@@ -564,8 +571,8 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 	std::ifstream fs(filename);
 
 	if (fs.fail()) {
-		std::cerr << filename << "ERROR: Wind file could not be opened" << std::endl;
-		write_text_to_log_file("ERROR: Wind file could not be opened ");
+		//std::cerr << filename << "ERROR: Wind file could not be opened" << std::endl;
+		log("ERROR: Wind file could not be opened : "+ filename);
 		exit(1);
 	}
 
@@ -602,9 +609,9 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 			{
 				// Giving up now! Could not read the files
 				//issue a warning and exit
-				std::cerr << filename << "ERROR Wind  file format error. only " << lineelements.size() << " where at least 3 were expected. Exiting." << std::endl;
-				write_text_to_log_file("ERROR:  Wind file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 3 were expected. Exiting.");
-				write_text_to_log_file(line);
+				//std::cerr << filename << "ERROR Wind  file format error. only " << lineelements.size() << " where at least 3 were expected. Exiting." << std::endl;
+				log("ERROR:  Wind file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where at least 3 were expected. Exiting.");
+				log(line);
 				exit(1);
 			}
 
@@ -878,7 +885,7 @@ Param readparamstr(std::string line, Param param)
 		deformmap thisdeform;
 		std::vector<std::string> items = split(parametervalue, ',');
 		//Need sanity check here
-		thisdeform.grid.inputfile = items[0];
+		thisdeform.inputfile = items[0];
 		if (items.size() > 1)
 		{
 			thisdeform.startime = std::stod(items[1]);
@@ -1362,7 +1369,10 @@ Param checkparamsanity(Param XParam)
 
 	// Any of xo,yo,xmax,ymax or dx not defined is assigned the value from bathy file
 	//default value is nan in default param file
+
 	XParam.Bathymetry = readBathyhead(XParam.Bathymetry);
+
+
 	if (std::isnan(XParam.xo))
 		XParam.xo = XParam.Bathymetry.xo;
 	if (std::isnan(XParam.xmax))
@@ -1374,7 +1384,7 @@ Param checkparamsanity(Param XParam)
 
 	if (std::isnan(XParam.dx))
 		XParam.dx = XParam.Bathymetry.dx;
-
+	
 	if (std::isnan(XParam.grdalpha))
 		XParam.grdalpha = XParam.Bathymetry.grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
 
@@ -1383,17 +1393,10 @@ Param checkparamsanity(Param XParam)
 	std::string bathyext;
 	std::vector<std::string> extvec = split(XParam.Bathymetry.inputfile, '.');
 	bathyext = extvec.back();
-	if (bathyext.compare("nc") == 0)
-	{
-		if (abs(XParam.grdalpha - DefaultParams.grdalpha) < tiny)
-		{
-			
-			log("For nc of bathy file please specify grdalpha in the XBG_param.txt (if different then default [0])");
-		}
-	}
+	
 	if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
 	{
-		if (XParam.nx <= 0 || XParam.ny <= 0 || XParam.dx < tiny)
+		if (std::isnan(XParam.dx))
 		{
 			//std::cerr << "FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." << bathyext << " file" << std::endl;
 			log("FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." + bathyext + " file");
@@ -1475,19 +1478,19 @@ Param checkparamsanity(Param XParam)
 	if (XParam.TSoutfile.size() != XParam.TSnodesout.size())
 	{
 		// Issue a Warning
-		std::cout << "WARNING: the number of timeseries output files is not equal to the number of nodes specified" << std::endl;
-		std::cout << "for each location where timeseries output file is required, the XBG_param.txt file shoud contain 2 lines see example felow to extract in 2 locations:" << std::endl;
-		std::cout << "TSOfile = Reef_Crest.txt" << std::endl;
-		std::cout << "TSnode = 124,239;" << std::endl;
-		std::cout << "TSOfile = shore.txt" << std::endl;
-		std::cout << "TSnode = 233,256;" << std::endl;
+		//std::cout << "WARNING: the number of timeseries output files is not equal to the number of nodes specified" << std::endl;
+		//std::cout << "for each location where timeseries output file is required, the XBG_param.txt file shoud contain 2 lines see example felow to extract in 2 locations:" << std::endl;
+		//std::cout << "TSOfile = Reef_Crest.txt" << std::endl;
+		//std::cout << "TSnode = 124,239;" << std::endl;
+		//std::cout << "TSOfile = shore.txt" << std::endl;
+		//std::cout << "TSnode = 233,256;" << std::endl;
 
-		write_text_to_log_file("WARNING: the number of timeseries output files is not equal to the number of nodes specified");
-		write_text_to_log_file("for each location where timeseries output file is required, the XBG_param.txt file shoud contain 2 lines see example felow to extract in 2 locations:");
-		write_text_to_log_file("TSOfile = Reef_Crest.txt");
-		write_text_to_log_file("TSnode = 124,239;");
-		write_text_to_log_file("TSOfile = Shore.txt");
-		write_text_to_log_file("TSnode = 233,256;");
+		log("WARNING: the number of timeseries output files is not equal to the number of nodes specified");
+		log("for each location where timeseries output file is required, the XBG_param.txt file shoud contain 2 lines see example felow to extract in 2 locations:");
+		log("TSOfile = Reef_Crest.txt");
+		log("TSnode = 124,239;");
+		log("TSOfile = Shore.txt");
+		log("TSnode = 233,256;");
 		//min not defined for const so use this convoluted statement below
 		size_t minsize;
 		if (XParam.TSoutfile.size() > XParam.TSnodesout.size())
@@ -1519,6 +1522,26 @@ Param checkparamsanity(Param XParam)
 
 	}
 
+
+	if (XParam.spherical < 1)
+	{
+		XParam.delta = XParam.dx;
+		XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+
+	}
+	else
+	{
+		//Spherical grid
+		XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+		//printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
+		log("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
+		if (XParam.grdalpha != 0.0)
+		{
+			//printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
+			log("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+		}
+	}
+
 	return XParam;
 }
 
@@ -1530,23 +1553,23 @@ double setendtime(Param XParam)
 	if (XParam.leftbnd.on)
 	{
 		tempSLTS = XParam.leftbnd.data.back();
-		endtime = min( endtime, tempSLTS.time);
+		endtime = utils::min( endtime, tempSLTS.time);
 		
 	}
 	if (XParam.rightbnd.on)
 	{
 		tempSLTS = XParam.rightbnd.data.back();
-		endtime = min(endtime, tempSLTS.time);
+		endtime = utils::min(endtime, tempSLTS.time);
 	}
 	if (XParam.topbnd.on)
 	{
 		tempSLTS = XParam.topbnd.data.back();
-		endtime = min(endtime, tempSLTS.time);
+		endtime = utils::min(endtime, tempSLTS.time);
 	}
 	if (XParam.botbnd.on)
 	{
 		tempSLTS = XParam.botbnd.data.back();
-		endtime = min(endtime, tempSLTS.time);
+		endtime = utils::min(endtime, tempSLTS.time);
 	}
 
 	return endtime;
@@ -1617,7 +1640,7 @@ std::string trim(const std::string& str, const std::string& whitespace)
 inputmap readcfmaphead(inputmap Roughmap)
 {
 	// Read critical parameter for the roughness map or deformation file grid input
-	write_text_to_log_file("Rougness map was specified. Checking file... " );
+	log("Rougness map was specified. Checking file... "+ Roughmap.inputfile);
 	std::string fileext;
 	double dummy;
 	std::vector<std::string> extvec = split(Roughmap.inputfile, '.');
@@ -1634,11 +1657,11 @@ inputmap readcfmaphead(inputmap Roughmap)
 	{
 		fileext = extvec.back();
 	}
-	write_text_to_log_file("cfmap file extension : " + fileext);
+	log("cfmap file extension : " + fileext);
 
 	if (fileext.compare("md") == 0)
 	{
-		write_text_to_log_file("Reading 'md' file");
+		log("Reading 'md' file");
 		readbathyHeadMD(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, dummy);
 		Roughmap.xo = 0.0;
 		Roughmap.yo = 0.0;
@@ -1649,7 +1672,7 @@ inputmap readcfmaphead(inputmap Roughmap)
 	{
 		int dummy;
 		double dummya, dummyb;
-		write_text_to_log_file("Reading cfmap as netcdf file");
+		log("Reading cfmap as netcdf file");
 		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny,dummy, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummya, Roughmap.xmax, Roughmap.ymax, dummyb);
 		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		//Roughmap.xo = 0.0;
@@ -1667,7 +1690,7 @@ inputmap readcfmaphead(inputmap Roughmap)
 	if (fileext.compare("asc") == 0)
 	{
 		//
-		write_text_to_log_file("Reading cfmap as asc file");
+		log("Reading cfmap as asc file");
 		readbathyASCHead(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummy);
 		
 		Roughmap.xmax = Roughmap.xo + (Roughmap.nx - 1)*Roughmap.dx;
@@ -1728,7 +1751,7 @@ void readmapdata(inputmap Roughmap, float * &cfmapinput)
 forcingmap readforcingmaphead(forcingmap Fmap)
 {
 	// Read critical parameter for the forcing map
-	write_text_to_log_file("Forcing map was specified. Checking file... ");
+	log("Forcing map was specified. Checking file... ");
 	std::string fileext;
 	double dummy;
 	std::vector<std::string> extvec = split(Fmap.inputfile, '.');
@@ -1749,14 +1772,14 @@ forcingmap readforcingmaphead(forcingmap Fmap)
 
 	if (fileext.compare("nc") == 0)
 	{
-		write_text_to_log_file("Reading Forcing file as netcdf file");
+		log("Reading Forcing file as netcdf file");
 		readgridncsize(Fmap.inputfile, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
 		
 
 	}
 	else
 	{
-		write_text_to_log_file("Forcing file needs to be a .nc file you also need to specify the netcdf variable name like this ncfile.nc?myvar");
+		log("Forcing file needs to be a .nc file you also need to specify the netcdf variable name like this ncfile.nc?myvar");
 	}
 	
 
@@ -1772,9 +1795,9 @@ inputmap readBathyhead(inputmap BathyParam)
 
 	if (!BathyParam.inputfile.empty())
 	{
-		printf("bathy: %s\n", BathyParam.inputfile.c_str());
+		//printf("bathy: %s\n", BathyParam.inputfile.c_str());
 
-		write_text_to_log_file("bathy: " + BathyParam.inputfile);
+		log("bathy: " + BathyParam.inputfile);
 
 		std::vector<std::string> extvec = split(BathyParam.inputfile, '.');
 
@@ -1790,12 +1813,13 @@ inputmap readBathyhead(inputmap BathyParam)
 		{
 			bathyext = extvec.back();
 		}
+		BathyParam.extension = bathyext;
 
 
-		write_text_to_log_file("bathy extension: " + bathyext);
+		log("bathy extension: " + bathyext);
 		if (bathyext.compare("md") == 0)
 		{
-			write_text_to_log_file("Reading 'md' file");
+			log("Reading 'md' file");
 			readbathyHeadMD(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha);
 			BathyParam.xo = 0.0;
 			BathyParam.yo = 0.0;
@@ -1807,26 +1831,26 @@ inputmap readBathyhead(inputmap BathyParam)
 		{
 			int dummy;
 			double dummya, dummyb, dummyc;
-			write_text_to_log_file("Reading bathy netcdf file");
+			log("Reading bathy netcdf file");
 			readgridncsize(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, dummy, BathyParam.dx, BathyParam.xo, BathyParam.yo, dummyb, BathyParam.xmax, BathyParam.ymax, dummyc);
-			write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+			log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 
 		}
 		if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
 		{
 			//XBeach style file
-			write_text_to_log_file("Reading " + bathyext + " file");
-			write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
+			log("Reading " + bathyext + " file");
+			log("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
 		}
 		if (bathyext.compare("asc") == 0)
 		{
 			//
-			write_text_to_log_file("Reading bathy asc file");
+			log("Reading bathy asc file");
 			readbathyASCHead(BathyParam.inputfile, BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.xo, BathyParam.yo, BathyParam.grdalpha);
 			BathyParam.xmax = BathyParam.xo + (BathyParam.nx-1)*BathyParam.dx;
 			BathyParam.ymax = BathyParam.yo + (BathyParam.ny-1)*BathyParam.dx;
-			write_text_to_log_file("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+			log("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
 		
@@ -1836,8 +1860,8 @@ inputmap readBathyhead(inputmap BathyParam)
 
 
 
-		printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%lf\talpha=%f\txo=%lf\tyo=%lf\txmax=%lf\tymax=%lf\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo, BathyParam.xmax, BathyParam.ymax);
-		write_text_to_log_file("Bathymetry grid info: nx=" + std::to_string(BathyParam.nx) + " ny=" + std::to_string(BathyParam.ny) + " dx=" + std::to_string(BathyParam.dx) + " grdalpha=" + std::to_string(BathyParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(BathyParam.xo) + " yo=" + std::to_string(BathyParam.yo));
+		//printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%lf\talpha=%f\txo=%lf\tyo=%lf\txmax=%lf\tymax=%lf\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo, BathyParam.xmax, BathyParam.ymax);
+		log("Bathymetry grid info: nx=" + std::to_string(BathyParam.nx) + " ny=" + std::to_string(BathyParam.ny) + " dx=" + std::to_string(BathyParam.dx) + " grdalpha=" + std::to_string(BathyParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(BathyParam.xo) + " xmax=" + std::to_string(BathyParam.xmax) + " yo=" + std::to_string(BathyParam.yo) + " ymax=" + std::to_string(BathyParam.ymax));
 
 
 
@@ -1848,7 +1872,7 @@ inputmap readBathyhead(inputmap BathyParam)
 	else
 	{
 		std::cerr << "Fatal error: No bathymetry file specified. Please specify using 'bathy = Filename.bot'" << std::endl;
-		write_text_to_log_file("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
+		log("Fatal error : No bathymetry file specified. Please specify using 'bathy = Filename.md'");
 		exit(1);
 	}
 	return BathyParam;
@@ -1862,7 +1886,7 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 
 	if (fs.fail()) {
 		std::cerr << filename << " bathy file (md file) could not be opened" << std::endl;
-		write_text_to_log_file("ERROR: bathy file could not be opened ");
+		log("ERROR: bathy file could not be opened "+ filename);
 		exit(1);
 	}
 
@@ -1894,8 +1918,8 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 			// Giving up now! Could not read the files
 			//issue a warning and exit
 			std::cerr << filename << "ERROR Wind bnd file format error. only " << lineelements.size() << " where 5 were expected. Exiting." << std::endl;
-			write_text_to_log_file("ERROR:  Wind bnd file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where 3 were expected. Exiting.");
-			write_text_to_log_file(line);
+			log("ERROR:  Wind bnd file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " where 3 were expected. Exiting.");
+			log(line);
 			exit(1);
 		}
 
@@ -1972,10 +1996,7 @@ extern "C" void readXBbathy(std::string filename, int nx,int ny, float *&zb)
 
 
 
-double interptime(double next, double prev, double timenext, double time)
-{
-	return prev + (time) / (timenext)*(next - prev);
-}
+
 
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha)
 {
@@ -1983,7 +2004,7 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 
 	if (fs.fail()) {
 		std::cerr << filename << " bathy file (md file) could not be opened" << std::endl;
-		write_text_to_log_file("ERROR: bathy file could not be opened ");
+		log("ERROR: bathy file could not be opened " + filename);
 		exit(1);
 	}
 
@@ -2077,6 +2098,8 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 
 }
 
+
+
 void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 {
 	//
@@ -2085,7 +2108,7 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 	std::string line;
 	if (fs.fail()) {
 		std::cerr << filename << " bathy file (md file) could not be opened" << std::endl;
-		write_text_to_log_file("ERROR: bathy file could not be opened ");
+		log("ERROR: bathy file could not be opened " + filename);
 		exit(1);
 	}
 	while (linehead < 6)
@@ -2113,32 +2136,5 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 	fs.close();
 }
 
-double BilinearInterpolation(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y)
-{
-	double x2x1, y2y1, x2x, y2y, yy1, xx1;
-	x2x1 = x2 - x1;
-	y2y1 = y2 - y1;
-	x2x = x2 - x;
-	y2y = y2 - y;
-	yy1 = y - y1;
-	xx1 = x - x1;
-	return 1.0 / (x2x1 * y2y1) * (
-		q11 * x2x * y2y +
-		q21 * xx1 * y2y +
-		q12 * x2x * yy1 +
-		q22 * xx1 * yy1
-		);
-}
-double BarycentricInterpolation(double q1, double x1,double y1,double q2, double x2, double y2, double q3, double x3, double y3,double x, double y)
-{
-	double w1, w2, w3,D;
 
-	D = (y2 - y3) * (x1 + x3) + (x3-x2) * (y1-y3);
-
-	w1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / D;
-	w2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / D;
-	w3 = 1 - w1 - w2;
-
-	return q1 * w1 + q2 * w2 + q3 * w3;
-}
 

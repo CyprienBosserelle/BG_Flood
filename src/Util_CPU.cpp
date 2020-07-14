@@ -24,16 +24,43 @@
 #include "Util_CPU.h"
 
 
-template <class T> const T& max(const T& a, const T& b) {
-	return (a < b) ? b : a;     // or: return comp(a,b)?b:a; for version (2)
-}
+namespace utils {
+	/*! \fn template <class T> T sq(T a)
+	* Generic squaring function
+	*/
+	template <class T> T sq(T a) {
+		return (a*a);
+	}
 
-template <class T> const T& min(const T& a, const T& b) {
-	return !(b < a) ? a : b;     // or: return comp(a,b)?b:a; for version (2)
-}
+	/*! \fn template <class T> const T& max(const T& a, const T& b)
+	* Generic max function
+	*/
+	template <class T> const T& max(const T& a, const T& b) {
+		return (a<b) ? b : a;     // or: return comp(a,b)?b:a; for version (2)
+	}
 
-template <class T> T sq(T a) {
-	return (a * a);
+	/*! \fn template <class T> const T& min(const T& a, const T& b)
+	* Generic min function
+	*/
+	template <class T> const T& min(const T& a, const T& b) {
+		return !(b<a) ? a : b;     // or: return comp(a,b)?b:a; for version (2)
+	}
+
+
+	template const int& min<int>(const int& a, const int& b);
+	template const float& min<float>(const float& a, const float& b);
+	template const double& min<double>(const double& a, const double& b);
+
+	template const int& max<int>(const int& a, const int& b);
+	template const float& max<float>(const float& a, const float& b);
+	template const double& max<double>(const double& a, const double& b);
+
+	template int sq<int>(int a);
+	template float sq<float>(float a);
+	template double sq<double>(double a);
+
+	
+
 }
 
 unsigned int nextPow2(unsigned int x)
@@ -47,6 +74,12 @@ unsigned int nextPow2(unsigned int x)
 	return ++x;
 }
 
+
+double interptime(double next, double prev, double timenext, double time)
+{
+	return prev + (time) / (timenext)*(next - prev);
+}
+
 template <class T> void AllocateCPU(int nx, int ny, T *&zb)
 {
 	zb = (T *)malloc(nx*ny * sizeof(T));
@@ -58,48 +91,20 @@ template <class T> void AllocateCPU(int nx, int ny, T *&zb)
 	}
 }
 
+
 template <class T> void AllocateCPU(int nx, int ny, T *&zs, T *&h, T *&u, T *&v)
 {
 
-	zs = AllocateCPU(nx, ny,zs);
-	h = AllocateCPU(nx, ny, h);
-	u = AllocateCPU(nx, ny, u);
-	v = AllocateCPU(nx, ny, v);
+	AllocateCPU(nx, ny,zs);
+	AllocateCPU(nx, ny, h);
+	AllocateCPU(nx, ny, u);
+	AllocateCPU(nx, ny, v);
 
 }
 
-
-template <class T> void InitArraySV(int nblk, int blksize, T initval, T * & Arr)
-{
-	//inititiallise array with a single value
-	for (int bl = 0; bl < nblk; bl++)
-	{
-		for (int j = 0; j < 16; j++)
-		{
-			for (int i = 0; i < 16; i++)
-			{
-				int n = i + j * 16 + bl * blksize;
-				Arr[n] = initval;
-			}
-		}
-	}
-}
-
-template <class T> void CopyArray(int nblk, int blksize, T* source, T * & dest)
-{
-	//
-	for (int bl = 0; bl < nblk; bl++)
-	{
-		for (int j = 0; j < 16; j++)
-		{
-			for (int i = 0; i < 16; i++)
-			{
-				int n = i + j * 16 + bl * blksize;
-				dest[n] = source[n];
-			}
-		}
-	}
-}
+template void AllocateCPU<double>(int nx, int ny, double *&zs, double *&h, double *&u, double *&v);
+template void AllocateCPU<float>(int nx, int ny, float *&zs, float *&h, float *&u, float *&v);
+template void AllocateCPU<int>(int nx, int ny, int *&zs, int *&h, int *&u, int *&v);
 
 template <class T> void ReallocArray(int nblk, int blksize, T* & zb)
 {
@@ -115,245 +120,45 @@ template <class T> void ReallocArray(int nblk, int blksize, T* & zb)
 	//return nblkmem
 }
 
+template void ReallocArray<int>(int nblk, int blksize, int* & zb);
+template void ReallocArray<float>(int nblk, int blksize, float* & zb);
+template void ReallocArray<double>(int nblk, int blksize, double* & zb);
 
-template <class T>  void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, T *&zb)
+
+
+template <class T> T BilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y)
 {
-	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
-
-	// here the bathy of the outter most cells of the domain are "set" to the same value as the second outter most.
-	// this also applies to the blocks with no neighbour
-	for (int bl = 0; bl < nblk; bl++)
-	{
-
-		if (bl == leftblk[bl])//i.e. if a block refers to as it's onwn neighbour then it doesn't have a neighbour/// This also applies to block that are on the edge of the grid so the above is commentted
-		{
-			int i = 0;
-			for (int j = 0; j < 16; j++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + 1 + j * 16 + bl * 256];
-			}
-		}
-		if (bl == rightblk[bl])
-		{
-			int i = 15;
-			for (int j = 0; j < 16; j++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i - 1 + j * 16 + bl * 256];
-			}
-		}
-		if (bl == topblk[bl])
-		{
-			int j = 15;
-			for (int i = 0; i < 16; i++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + (j - 1) * 16 + bl * 256];
-			}
-		}
-		if (bl == botblk[bl])
-		{
-			int j = 0;
-			for (int i = 0; i < 16; i++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + (j + 1) * 16 + bl * 256];
-			}
-		}
-
-	}
+	T x2x1, y2y1, x2x, y2y, yy1, xx1;
+	x2x1 = x2 - x1;
+	y2y1 = y2 - y1;
+	x2x = x2 - x;
+	y2y = y2 - y;
+	yy1 = y - y1;
+	xx1 = x - x1;
+	return 1.0 / (x2x1 * y2y1) * (
+		q11 * x2x * y2y +
+		q21 * xx1 * y2y +
+		q12 * x2x * yy1 +
+		q22 * xx1 * yy1
+		);
 }
 
-template <class T> void carttoBUQ(int nblk, int nx, int ny, double xo, double yo, double dx, double* blockxo, double* blockyo, T * zb, T *&zb_buq)
+template float BilinearInterpolation<float>(float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2, float x, float y);
+template double BilinearInterpolation<double>(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y);
+
+
+template <class T> T BarycentricInterpolation(T q1, T x1, T y1, T q2, T x2, T y2, T q3, T x3, T y3, T x, T y)
 {
-	//
-	int ix, iy;
-	T x, y;
-	for (int b = 0; b < nblk; b++)
-	{
+	T w1, w2, w3, D;
 
-		for (int i = 0; i < 16; i++)
-		{
-			for (int j = 0; j < 16; j++)
-			{
-				x = blockxo[b] + i*dx;
-				y = blockyo[b] + j*dx;
-				ix = min(max((int)round((x - xo) / dx), 0), nx - 1); // min(max( part is overkill?
-				iy = min(max((int)round((y - yo) / dx), 0), ny - 1);
+	D = (y2 - y3) * (x1 + x3) + (x3 - x2) * (y1 - y3);
 
-				zb_buq[i + j * 16 + b * 256] = zb[ix + iy*nx];
-				//printf("bid=%i\ti=%i\tj=%i\tix=%i\tiy=%i\tzb_buq[n]=%f\n", b,i,j,ix, iy, zb_buq[i + j * 16 + b * 256]);
-			}
-		}
-	}
+	w1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / D;
+	w2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / D;
+	w3 = 1 - w1 - w2;
+
+	return q1 * w1 + q2 * w2 + q3 * w3;
 }
 
-template <class T> void interp2BUQ(int nblk, double blksize, double blkdx, double* blockxo, double* blockyo, int nx, int ny, double xo, double xmax, double yo, double ymax, double dx, T * zb, T *&zb_buq)
-{
-	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
-
-	double x, y;
-	int n;
-
-	for (int bl = 0; bl < nblk; bl++)
-	{
-		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
-		for (int j = 0; j < 16; j++)
-		{
-			for (int i = 0; i < 16; i++)
-			{
-				n = i + j * 16 + bl * blksize;
-				x = blockxo[bl] + i*blkdx;
-				y = blockyo[bl] + j*blkdx;
-
-				//if (x >= xo && x <= xmax && y >= yo && y <= ymax)
-				{
-					//this is safer!
-					x = max(min(x, xmax), xo);
-					y = max(min(y, ymax), yo);
-					// cells that falls off this domain are assigned 
-					double x1, x2, y1, y2;
-					double q11, q12, q21, q22;
-					int cfi, cfip, cfj, cfjp;
-
-
-
-					cfi = min(max((int)floor((x - xo) / dx), 0), nx - 2);
-					cfip = cfi + 1;
-
-					x1 = xo + dx*cfi;
-					x2 = xo + dx*cfip;
-
-					cfj = min(max((int)floor((y - yo) / dx), 0), ny - 2);
-					cfjp = cfj + 1;
-
-					y1 = yo + dx*cfj;
-					y2 = yo + dx*cfjp;
-
-					q11 = zb[cfi + cfj*nx];
-					q12 = zb[cfi + cfjp*nx];
-					q21 = zb[cfip + cfj*nx];
-					q22 = zb[cfip + cfjp*nx];
-
-					zb_buq[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-					//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
-				}
-
-			}
-		}
-	}
-}
-
-template <class T> void interp2BUQAda(int nblk, double blksize, double bdx, int * activeblk, int * level, double* blockxo, double* blockyo, int nx, int ny, double xo, double xmax, double yo, double ymax, double dx, T* zb, T*& zb_buq)
-{
-	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
-
-	double x, y;
-	int n;
-
-	for (int ibl = 0; ibl < nblk; ibl++)
-	{
-		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
-		int ib = activeblk[ibl];
-		double blkdx = calcres(bdx, level[ib]);
-		for (int j = 0; j < 16; j++)
-		{
-			for (int i = 0; i < 16; i++)
-			{
-				n = i + j * 16 + ib * blksize;
-				x = blockxo[ib] + i * blkdx;
-				y = blockyo[ib] + j * blkdx;
-
-				//if (x >= xo && x <= xmax && y >= yo && y <= ymax)
-				{
-					//this is safer!
-					x = max(min(x, xmax), xo);
-					y = max(min(y, ymax), yo);
-					// cells that falls off this domain are assigned 
-					double x1, x2, y1, y2;
-					double q11, q12, q21, q22;
-					int cfi, cfip, cfj, cfjp;
-
-
-
-					cfi = min(max((int)floor((x - xo) / dx), 0), nx - 2);
-					cfip = cfi + 1;
-
-					x1 = xo + dx * cfi;
-					x2 = xo + dx * cfip;
-
-					cfj = min(max((int)floor((y - yo) / dx), 0), ny - 2);
-					cfjp = cfj + 1;
-
-					y1 = yo + dx * cfj;
-					y2 = yo + dx * cfjp;
-
-					q11 = zb[cfi + cfj * nx];
-					q12 = zb[cfi + cfjp * nx];
-					q21 = zb[cfip + cfj * nx];
-					q22 = zb[cfip + cfjp * nx];
-
-					zb_buq[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-					//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
-				}
-
-			}
-		}
-	}
-}
-
-
-
-template <class T> void interp2cf(Param XParam, float * cfin, T* blockxo, T* blockyo, T * &cf)
-{
-	// This function interpolates the values in cfmapin to cf using a bilinear interpolation
-
-	double x, y;
-	int n;
-
-	for (int bl = 0; bl < XParam.nblk; bl++)
-	{
-		for (int j = 0; j < 16; j++)
-		{
-			for (int i = 0; i < 16; i++)
-			{
-				n = i + j * 16 + bl * XParam.blksize;
-
-				x = blockxo[bl] + i*XParam.dx;
-				y = blockyo[bl] + j*XParam.dx;
-
-				if (x >= XParam.roughnessmap.xo && x <= XParam.roughnessmap.xmax && y >= XParam.roughnessmap.yo && y <= XParam.roughnessmap.ymax)
-				{
-					// cells that falls off this domain are assigned 
-					double x1, x2, y1, y2;
-					double q11, q12, q21, q22;
-					int cfi, cfip, cfj, cfjp;
-
-
-
-					cfi = min(max((int)floor((x - XParam.roughnessmap.xo) / XParam.roughnessmap.dx), 0), XParam.roughnessmap.nx - 2);
-					cfip = cfi + 1;
-
-					x1 = XParam.roughnessmap.xo + XParam.roughnessmap.dx*cfi;
-					x2 = XParam.roughnessmap.xo + XParam.roughnessmap.dx*cfip;
-
-					cfj = min(max((int)floor((y - XParam.roughnessmap.yo) / XParam.roughnessmap.dx), 0), XParam.roughnessmap.ny - 2);
-					cfjp = cfj + 1;
-
-					y1 = XParam.roughnessmap.yo + XParam.roughnessmap.dx*cfj;
-					y2 = XParam.roughnessmap.yo + XParam.roughnessmap.dx*cfjp;
-
-					q11 = cfin[cfi + cfj*XParam.roughnessmap.nx];
-					q12 = cfin[cfi + cfjp*XParam.roughnessmap.nx];
-					q21 = cfin[cfip + cfj*XParam.roughnessmap.nx];
-					q22 = cfin[cfip + cfjp*XParam.roughnessmap.nx];
-
-					cf[n] = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-				}
-
-			}
-		}
-	}
-}
-
+template float BarycentricInterpolation(float q1, float x1, float y1, float q2, float x2, float y2, float q3, float x3, float y3, float x, float y);
+template double BarycentricInterpolation(double q1, double x1, double y1, double q2, double x2, double y2, double q3, double x3, double y3, double x, double y);

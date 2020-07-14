@@ -99,7 +99,7 @@ Param creatncfileBUQ(Param XParam,int * activeblk, int * level, float * blockxo,
 	int time_id, xx_id, yy_id;
 	int tdim[] = { time_dim };
 	
-	static size_t tst[] = { 0 };
+	//static size_t tst[] = { 0 };
 	size_t blkstart[] = { 0 };
 	size_t blkcount[] = { XParam.nblk };
 	size_t xcount[] = { 0 };
@@ -341,7 +341,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
 	float fillval = 9.9692e+36f;
-	short Sfillval = 32767;
+	//short Sfillval = 32767;
 	//short fillval = 32767
 	static size_t start2D[] = { 0, 0 }; // start at first value 
 	//static size_t count2D[] = { ny, nx };
@@ -424,18 +424,23 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 			if (status != NC_NOERR) handle_ncerror(status);
 		}
 
-		status = nc_put_att_short(ncid, var_id, "_FillValue", VarTYPE, 1, &Sfillval);
+		status = nc_put_att_float(ncid, var_id, "_FillValue", VarTYPE, 1, &fillval);
 		if (status != NC_NOERR) handle_ncerror(status);
-		status = nc_put_att_short(ncid, var_id, "missingvalue", VarTYPE, 1, &Sfillval);
+		status = nc_put_att_float(ncid, var_id, "missingvalue", VarTYPE, 1, &fillval);
+
 		if (status != NC_NOERR) handle_ncerror(status);
+
+		
 
 		if (smallnc > 0)
 		{
+			
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
 			if (status != NC_NOERR) handle_ncerror(status);
 			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
 			if (status != NC_NOERR) handle_ncerror(status);
 		}
+		
 
 
 
@@ -453,12 +458,12 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		lev = level[bl];
 
 
-		double xxmax, xxmin, yymax, yymin;
-
+		//double xxmax, xxmin, yymax, yymin;
+		double xxmin, yymin;
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
-		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
+		//xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
+		//yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
 
 		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
 		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;

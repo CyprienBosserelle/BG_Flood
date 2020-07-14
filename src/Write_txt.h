@@ -3,7 +3,7 @@
 #define WRITETXT_H
 
 #include "General.h"
-
+#include "Param.h"
 
 void log(std::string text);
 void create_logfile();

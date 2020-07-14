@@ -30,11 +30,10 @@ inputmap readBathyhead(inputmap BathyParam);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 extern "C" void readbathyMD(std::string filename, float *&zb);
 extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);
-double interptime(double next, double prev, double timenext, double time);
+
+
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
-double BilinearInterpolation(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y);
-double BarycentricInterpolation(double q1, double x1, double y1, double q2, double x2, double y2, double q3, double x3, double y3, double x, double y);
 
 // End of global definition
 #endif

@@ -41,6 +41,7 @@ public:
 	double dx = 0.0;
 	double grdalpha=0.0;
 	std::string inputfile;
+	std::string extension;
 };
 
 class SLTS {
@@ -78,11 +79,11 @@ public:
 
 };
 
-class deformmap{
+class deformmap : public inputmap
+{ 
 	//Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave
 	// Here you can spread the deformation across a certain amount of time and apply it at any point in the model
 public:
-	inputmap grid;
 	double startime = 0.0;
 	double duration = 0.0;
 	

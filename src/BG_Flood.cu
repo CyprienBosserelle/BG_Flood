@@ -36,11 +36,10 @@ int main(int argc, char **argv)
 
 	//The main function setups all the init of the model and then calls the mainloop to actually run the model
 
-	//===========================================
-	//  Define the main variables controling the model 
-	Param XParam;
-	
-
+	// There are 3 main class storing information about the model: XParam (class Param), XModel (class Model) and XForcing (class Forcing)
+	// Leading X stands for eXecution and is to avoid confusion between the class variable and the class declaration
+	// When running with the GPU there is also XModel_g
+	// which is the same as XModel but with GPU specific pointers
 
 	//First part reads the inputs to the model
 	//then allocate memory on GPU and CPU
@@ -51,6 +50,9 @@ int main(int argc, char **argv)
 	// Run main loop
 	// Clean up and close
 
+	//===========================================
+	//  Define the main parameter controling the model (XModels class at produced later) 
+	Param XParam;
 
 	// Start timer to keep track of time
 	XParam.startcputime = clock();
@@ -58,22 +60,34 @@ int main(int argc, char **argv)
 	// Create/overight existing 
 	create_logfile();
 
-	//////////////////////////////////////////////////////
-	/////             Read Operational file          /////
-	//////////////////////////////////////////////////////
+	//============================================
+	// Read Operational file
+	// Also check XParam sanity
 
 	XParam = Readparamfile(XParam);
 	
+
+	//============================================
+	// Create external forcing and model pointers
+	// Before this is done we need to check
+	// if the model will be double or float precision
+	
+
+	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
+	Model<decltype(modeltype)> XModel; // For CPU pointers
+	Model<decltype(modeltype)> XModel_g; // For GPU pointers
+
+	Forcing<decltype(modeltype)> XForcing; // for reading and storing forcing data (CPU only)
+
+	//============================================
+	// Read the forcing data (Including bathymetry)
+
+	
+	
 	
 
 	
-
-
-	double levdx = calcres(XParam.dx ,XParam.initlevel);// true grid resolution as in dx/2^(initlevel)
-	printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, calcres(1.0, XParam.initlevel));
-
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?
+	log("Read Bathy data");
 
 
 
