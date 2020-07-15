@@ -167,6 +167,8 @@ struct Model
 
 	//Block information
 	BlockP<T> blocks;
+
+	AdaptP adapt;
 };
 
 

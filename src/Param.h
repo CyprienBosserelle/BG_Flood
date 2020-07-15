@@ -17,6 +17,9 @@ public:
 	int frictionmodel=0; // 
 	double cf=0.0001; // bottom friction for flow model cf 
 	double Cd=0.002; // Wind drag coeff
+	bool windforcing = false;
+	bool atmpforcing = false;
+	bool rainforcing = false;
 	double Pa2m = 0.00009916; // if unit is hPa then user should use 0.009916;
 	double Paref = 101300.0; // if unit is hPa then user should use 1013.0 
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
@@ -109,19 +112,15 @@ public:
         std::string python_pipeline = "coproc.py";
 #endif
 
-	// This is controlled by the sanity checker not directly by the user
-	int resetmax = 0;
-	int outhhmax = 0;
-	int outzsmax = 0;
-	int outuumax = 0;
-	int outvvmax = 0;
+	// Output switch controls
+	bool resetmax = false;
+	bool outmax = false;
+	
 
-	int outhhmean = 0;
-	int outzsmean = 0;
-	int outuumean = 0;
-	int outvvmean = 0;
+	bool outmean = false;
+	
 
-	int outvort = 0;
+	bool outvort = false;
 
 	// info of the mapped cf
 	//inputmap roughnessmap;

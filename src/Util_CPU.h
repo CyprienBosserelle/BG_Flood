@@ -4,6 +4,7 @@
 
 #include "General.h"
 #include "Param.h"
+#include "Arrays.h"
 
 namespace utils {
 	template <class T> T sq(T a);
@@ -20,6 +21,7 @@ double interptime(double next, double prev, double timenext, double time);
 
 template <class T> void AllocateCPU(int nx, int ny, T*& zb);
 template <class T> void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v);
+
 
 template <class T> void ReallocArray(int nblk, int blksize, T*& zb);
 
