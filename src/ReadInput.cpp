@@ -306,17 +306,17 @@ Param readparamstr(std::string line, Param param)
 
 			}
 
-			param.outhhmean = (vvar.compare("hhmean") == 0) ? 1 : param.outhhmean;
-			param.outzsmean = (vvar.compare("zsmean") == 0) ? 1 : param.outzsmean;
-			param.outuumean = (vvar.compare("uumean") == 0) ? 1 : param.outuumean;
-			param.outvvmean = (vvar.compare("vvmean") == 0) ? 1 : param.outvvmean;
+			param.outmean = (vvar.compare("hhmean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("zsmean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("uumean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("vvmean") == 0) ? true : param.outmean;
 
-			param.outhhmax = (vvar.compare("hhmax") == 0) ? 1 : param.outhhmax;
-			param.outzsmax = (vvar.compare("zsmax") == 0) ? 1 : param.outzsmax;
-			param.outuumax = (vvar.compare("uumax") == 0) ? 1 : param.outuumax;
-			param.outvvmax = (vvar.compare("vvmax") == 0) ? 1 : param.outvvmax;
+			param.outmax = (vvar.compare("hhmax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("zsmax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("uumax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("vvmax") == 0) ? true : param.outmax;
 
-			param.outvort = (vvar.compare("vort") == 0) ? 1 : param.outvort;
+			param.outvort = (vvar.compare("vort") == 0) ? true : param.outvort;
 		}
 		
 

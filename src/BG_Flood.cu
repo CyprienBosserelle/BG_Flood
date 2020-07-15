@@ -83,7 +83,13 @@ int main(int argc, char **argv)
 	// Read the forcing data (Including bathymetry)
 	readforcing(XParam, XForcing);
 
-	log(std::to_string(XForcing.Bathy.val[50]));
+	//============================================
+	// Prepare initial mesh layout
+
+
+
+
+	//log(std::to_string(XForcing.Bathy.val[50]));
 
 
 
