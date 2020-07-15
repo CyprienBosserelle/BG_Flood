@@ -275,7 +275,7 @@ template void interp2BUQAda<int>(int nblk, double blksize, double bdx, int * act
 template void interp2BUQAda<float>(int nblk, double blksize, double bdx, int * activeblk, int * level, double* blockxo, double* blockyo, int nx, int ny, double xo, double xmax, double yo, double ymax, double dx, float* zb, float*& zb_buq);
 template void interp2BUQAda<double>(int nblk, double blksize, double bdx, int * activeblk, int * level, double* blockxo, double* blockyo, int nx, int ny, double xo, double xmax, double yo, double ymax, double dx, double* zb, double*& zb_buq);
 
-
+/*
 template <class T> void interp2cf(Param XParam, float * cfin, T* blockxo, T* blockyo, T * &cf)
 {
 	// This function interpolates the values in cfmapin to cf using a bilinear interpolation
@@ -331,7 +331,7 @@ template <class T> void interp2cf(Param XParam, float * cfin, T* blockxo, T* blo
 template void interp2cf<int>(Param XParam, float * cfin, int* blockxo, int* blockyo, int * &cf);
 template void interp2cf<float>(Param XParam, float * cfin, float* blockxo, float* blockyo, float * &cf);
 template void interp2cf<double>(Param XParam, float * cfin, double* blockxo, double* blockyo, double * &cf);
-
+*/
 template <class T> void InterpstepCPU(int nx, int ny, int hdstep, T totaltime, T hddt, T *&Ux, T *Uo, T *Un)
 {
 	//float fac = 1.0;

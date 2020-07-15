@@ -64,31 +64,7 @@ public:
 
 };
 
-class forcingmap {
-public:
-	int nx, ny;
-	int nt;
-	int uniform = 0;
-	double to, tmax;
-	double xo, yo;
-	double xmax, ymax;
-	double dx;
-	double dt;
-	std::string inputfile;
-	std::vector<Windin> data; // only used if uniform forcing
 
-};
-
-class deformmap : public inputmap
-{ 
-	//Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave
-	// Here you can spread the deformation across a certain amount of time and apply it at any point in the model
-public:
-	double startime = 0.0;
-	double duration = 0.0;
-	
-
-};
 
 
 

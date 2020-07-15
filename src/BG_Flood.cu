@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	//===========================================
 	//  Define the main parameter controling the model (XModels class at produced later) 
 	Param XParam;
-
+	Forcing<float> XForcing; // for reading and storing forcing data (CPU only) // by default we read only float precision!
 	// Start timer to keep track of time
 	XParam.startcputime = clock();
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 	// Read Operational file
 	// Also check XParam sanity
 
-	XParam = Readparamfile(XParam);
+	Readparamfile(XParam,XForcing);
 	
 
 	//============================================
@@ -77,17 +77,13 @@ int main(int argc, char **argv)
 	Model<decltype(modeltype)> XModel; // For CPU pointers
 	Model<decltype(modeltype)> XModel_g; // For GPU pointers
 
-	Forcing<decltype(modeltype)> XForcing; // for reading and storing forcing data (CPU only)
+	
 
 	//============================================
 	// Read the forcing data (Including bathymetry)
+	readforcing(XParam, XForcing);
 
-	
-	
-	
-
-	
-	log("Read Bathy data");
+	log(std::to_string(XForcing.Bathy.val[50]));
 
 
 

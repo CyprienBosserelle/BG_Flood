@@ -135,7 +135,7 @@ template <class T> T BilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x
 	y2y = y2 - y;
 	yy1 = y - y1;
 	xx1 = x - x1;
-	return 1.0 / (x2x1 * y2y1) * (
+	return (T)1.0 / (x2x1 * y2y1) * (
 		q11 * x2x * y2y +
 		q21 * xx1 * y2y +
 		q12 * x2x * yy1 +

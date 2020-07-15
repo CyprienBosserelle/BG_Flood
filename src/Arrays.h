@@ -73,38 +73,6 @@ struct AdaptP
 };
 
 
-template <class T>
-struct DynForcingP: public forcingmap
-{
-	T *now;
-	T *before, *after;
-	//Add map here?
-
-};
-
-template <class T>
-struct StaticForcingP : public forcingmap
-{
-	T *val;
-	
-
-};
-
-template <class T>
-struct Forcing
-{
-	DynForcingP<T> UWind;
-	DynForcingP<T> VWind;
-	DynForcingP<T> Rain;
-	DynForcingP<T> Atmp;
-
-	StaticForcingP<T> Bathy; //Should be a vector at some point
-	StaticForcingP<T> cf;
-
-	std::vector<StaticForcingP<T>> deform;
-
-
-};
 
 
 template <class T>

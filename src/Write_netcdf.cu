@@ -101,7 +101,7 @@ Param creatncfileBUQ(Param XParam,int * activeblk, int * level, float * blockxo,
 	
 	//static size_t tst[] = { 0 };
 	size_t blkstart[] = { 0 };
-	size_t blkcount[] = { XParam.nblk };
+	size_t blkcount[] = { (size_t) XParam.nblk };
 	size_t xcount[] = { 0 };
 	size_t ycount[] = { 0 };
 	static size_t xstart[] = { 0 }; // start at first value

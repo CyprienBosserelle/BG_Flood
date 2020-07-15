@@ -124,15 +124,15 @@ public:
 	int outvort = 0;
 
 	// info of the mapped cf
-	inputmap roughnessmap;
+	//inputmap roughnessmap;
 
-	forcingmap windU;
-	forcingmap windV;
-	forcingmap atmP;
-	forcingmap Rainongrid;
+	//forcingmap windU;
+	//forcingmap windV;
+	//forcingmap atmP;
+	//forcingmap Rainongrid;
 
 	// deformation forcing for tsunami generation
-	std::vector<deformmap> deform;
+	//std::vector<deformmap> deform;
 	double deformmaxtime = 0.0; // time after which no deformation occurs (internal parameter to cut some of the loops)
 
 };

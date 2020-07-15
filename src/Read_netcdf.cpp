@@ -21,13 +21,13 @@
 
 
 
-int nc_get_var_T(int ncid, int varid, float * &zb)
+inline int nc_get_var_T(int ncid, int varid, float * &zb)
 {
 	int status;
 	status = nc_get_var_float(ncid, varid, zb);
 	return status;
 }
-int nc_get_var_T(int ncid, int varid, double * &zb)
+inline int nc_get_var_T(int ncid, int varid, double * &zb)
 {
 	int status;
 	status = nc_get_var_double(ncid, varid, zb);
@@ -36,14 +36,14 @@ int nc_get_var_T(int ncid, int varid, double * &zb)
 
 
 
-int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, float * &zb)
+inline int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, float * &zb)
 {
 	int status;
 	status = nc_get_vara_float(ncid, varid, startp, countp, zb);
 	return status;
 
 }
-int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, double * &zb)
+inline int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, double * &zb)
 {
 	int status;
 	status = nc_get_vara_double(ncid, varid, startp, countp, zb);
@@ -51,54 +51,56 @@ int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* count
 
 }
 
-int nc_get_var1_T(int ncid, int varid, const size_t* startp, float * zsa)
+inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, float * zsa)
 {
 	int status;
 	status = nc_get_var1_float(ncid, varid, startp, zsa);
 	return status;
 }
-int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa)
+inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa)
 {
 	int status;
 	status = nc_get_var1_double(ncid, varid, startp, zsa);
 	return status;
 }
 
-template <class T> int readnczb(int nx, int ny, const std::string ncfile, T * &zb)
-{
-	int status;
-	int ncid, hh_id;
 
-	std::string varstr,ncfilestr;
-	std::vector<std::string> nameelements;
-	//by default we expect tab delimitation
-	nameelements = split(ncfile, '?');
-	if (nameelements.size() > 1)
-	{
-		//variable name for bathy is not given so it is assumed to be zb
-		ncfilestr = nameelements[0];
-		varstr = nameelements[1];
-	}
-	else
-	{
-		ncfilestr = ncfile;
-		varstr = "zb";
-	}
+ template <class T>
+ int readnczb(int nx, int ny, const std::string ncfile, T*& zb)
+ {
+	 int status;
+	 int ncid, hh_id;
+
+	 std::string varstr, ncfilestr;
+	 std::vector<std::string> nameelements;
+	 //by default we expect tab delimitation
+	 nameelements = split(ncfile, '?');
+	 if (nameelements.size() > 1)
+	 {
+		 //variable name for bathy is not given so it is assumed to be zb
+		 ncfilestr = nameelements[0];
+		 varstr = nameelements[1];
+	 }
+	 else
+	 {
+		 ncfilestr = ncfile;
+		 varstr = "zb";
+	 }
 
 
-	status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
-	if (status != NC_NOERR)	handle_ncerror(status);
-	status = nc_inq_varid(ncid, varstr.c_str(), &hh_id);
-	if (status != NC_NOERR)	handle_ncerror(status);
-	// This is safer than using nc_get_var because no mnatter how the netcdfvar is stored it will be converted to teh right type here
-	status = nc_get_var_T(ncid, hh_id, zb);
+	 status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
+	 if (status != NC_NOERR)	handle_ncerror(status);
+	 status = nc_inq_varid(ncid, varstr.c_str(), &hh_id);
+	 if (status != NC_NOERR)	handle_ncerror(status);
+	 // This is safer than using nc_get_var because no mnatter how the netcdfvar is stored it will be converted to teh right type here
+	 status = nc_get_var_T(ncid, hh_id, zb);
 
-	if (status != NC_NOERR)	handle_ncerror(status);
-	status = nc_close(ncid);
-	if (status != NC_NOERR)	handle_ncerror(status);
+	 if (status != NC_NOERR)	handle_ncerror(status);
+	 status = nc_close(ncid);
+	 if (status != NC_NOERR)	handle_ncerror(status);
 
-	return status;
-}
+	 return status;
+ }
 
 template int readnczb<float>(int nx, int ny, const std::string ncfile, float * &zb);
 template int readnczb<double>(int nx, int ny, const std::string ncfile, double * &zb);
@@ -139,7 +141,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 		varstr = "zb";
 	}
 	//Open NC file
-	printf("Open file\n");
+	//printf("Open file\n");
 	status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
 
@@ -282,7 +284,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 	double dxx;
 	//check dx
 	dxx = (xcoord[nx - 1] - xcoord[0]) / (nx - 1.0);
-	log("xo=" + std::to_string(xcoord[0])+"; xmax="+ std::to_string(xcoord[nx - 1]) +"; nx="+ std::to_string(nx) +"; dxx=" +std::to_string(dxx));
+	//log("xo=" + std::to_string(xcoord[0])+"; xmax="+ std::to_string(xcoord[nx - 1]) +"; nx="+ std::to_string(nx) +"; dxx=" +std::to_string(dxx));
 	//dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
 
 
