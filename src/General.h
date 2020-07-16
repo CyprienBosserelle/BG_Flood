@@ -5,8 +5,6 @@
 
 #define pi 3.14159265
 
-#define epsilone 1e-30
-
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <stdio.h>
@@ -24,6 +22,7 @@
 #include <iomanip>
 #include <fstream>
 #include <sstream>
+#include <limits> 
 
 
 // End of global definition

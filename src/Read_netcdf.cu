@@ -683,13 +683,13 @@ int readvardata(std::string filename, std::string Varname, int ndims, int hotste
 
 template int readvardata<float>(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, float * vardata);
 template int readvardata<double>(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, double * vardata);
-
+/*
 template <class T>
 int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, T * &zs, T * &zb, T * &hh, T *&uu, T * &vv)
 {
 	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr, xerror, yerror;
 	int ncid, varid, ndims;
-	int dimids[NC_MAX_VAR_DIMS];   /* dimension IDs */
+	int dimids[NC_MAX_VAR_DIMS];    dimension IDs 
 	int nx, ny, nt;
 	T * xcoord, *ycoord, * varinfile; // Not necessarily identical to any prevoious ones
 	double scalefac = 1.0;
@@ -1019,7 +1019,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 template int readhotstartfile<float>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 
 template int readhotstartfile<double>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
-
+*/
 
 //By default we want to read wind info as float because it will reside in a texture. the value is converted to the apropriate type only when it is used. so there is no need to template this function 
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo)

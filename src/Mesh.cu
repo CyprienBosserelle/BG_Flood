@@ -106,18 +106,25 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 	// allocate a few extra blocks for adaptation
 	XParam.nblkmem = (int)ceil(nblk * XParam.membuffer); //5% buffer on the memory for adaptation 
 
-	log("Initial number of blocks: " + std::to_string(nblk) + "; Will be allocating " + std::to_string(nblkmem) + " in memory.");
+	log("Initial number of blocks: " + std::to_string(nblk) + "; Will be allocating " + std::to_string(XParam.nblkmem) + " in memory.");
 
 	//==============================
 	// Allocate CPU memory for the whole model
 	AllocateCPU(XParam.nblkmem, XParam.blksize, XParam, XModel);
 
-	// Initialise activeblk array as all inactive ( = -1 )
-	InitArrayBUQ(XParam.nblkmem, 1, -1, XModel.blocks.active);
-	// Initialise level info
-	InitArrayBUQ(XParam.nblkmem, 1, XParam.initlevel, XModel.blocks.level);
+	//==============================
+	// Initialise blockinfo info
+	InitBlockInfo(XParam, XForcing, XModel.blocks);
 
+	//==============================
+	// Init. adaptation info if needed
+	if (XParam.maxlevel != XParam.minlevel)
+	{
+		InitBlockadapt(XParam, XModel.adapt);
+	}
 
+	// Initialise Bathy data
+	interp2BUQ(XParam, XModel.blocks, XForcing.Bathy, XModel.zb);
 	
 	
 	
@@ -126,10 +133,49 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 template void InitMesh<float>(Param &XParam, Forcing<float> XForcing, Model<float> &XModel);
 template void InitMesh<double>(Param &XParam, Forcing<float> XForcing, Model<double> &XModel);
 
-template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, Model<T> &XModel)
+template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock)
 {
-	nmask = 0;
-	mloc = 0;
+	//========================
+	// Init active and level
+
+	// Initialise activeblk array as all inactive ( = -1 )
+	InitArrayBUQ(XParam.nblkmem, 1, -1, XBlock.active);
+
+	// Initialise level info
+	InitArrayBUQ(XParam.nblkmem, 1, XParam.initlevel, XBlock.level);
+
+	//========================
+	// Init xo, yo and active blk
+	InitBlockxoyo(XParam, XForcing, XBlock);
+	InitBlockneighbours(XParam, XBlock);
+
+
+}
+
+void InitBlockadapt(Param XParam, AdaptP& XAdap)
+{
+	
+		InitArrayBUQ(XParam.nblkmem, 1, XParam.initlevel, XAdap.newlevel);
+		InitArrayBUQ(XParam.nblkmem, 1, false, XAdap.coarsen);
+		InitArrayBUQ(XParam.nblkmem, 1, false, XAdap.refine);
+
+
+		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
+		{
+
+			XAdap.availblk[ibl] = XParam.nblk + ibl;
+			XParam.navailblk++;
+
+		}
+	
+}
+
+
+template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, BlockP<T> &XBlock)
+{
+
+	int nmask = 0;
+	//mloc = 0;
 	int blkid = 0;
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
@@ -184,127 +230,103 @@ template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, Mod
 						if (q >= XParam.mask)
 							nmask++;
 					}
-					else
-					{
-						//computational domnain is outside of the bathy domain
-						nmask++;
-					}
+					
 
 				}
 			}
 			if (nmask < 256)
 			{
 				//
-				XModel.blocks.xo[blkid] = XParam.xo + nblkx * ((T)XParam.blkwidth) * levdx;
-				XModel.blocks.xo[blkid] = XParam.yo + nblky * ((T)XParam.blkwidth) * levdx;
-				XModel.blocks.activeblk[blkid] = blkid;
+				XBlock.xo[blkid] = XParam.xo + nblkx * ((T)XParam.blkwidth) * levdx;
+				XBlock.xo[blkid] = XParam.yo + nblky * ((T)XParam.blkwidth) * levdx;
+				XBlock.active[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;
 			}
 		}
 	}
+
+
+
+
 }
-template void InitBlockInfo<float>(Param XParam, Forcing<float> XForcing, Model<float> &XModel);
-template void InitBlockInfo<double>(Param XParam, Forcing<float> XForcing, Model<double> &XModel);
+template void InitBlockxoyo<float>(Param XParam, Forcing<float> XForcing, BlockP<float> &XBlock);
+template void InitBlockxoyo<double>(Param XParam, Forcing<float> XForcing, BlockP<double> & XBlockP);
 
-
-template <class T> void InitArrayBUQ(int nblk, int blkwidth, T initval, T * & Arr)
+template <class T> void InitBlockneighbours(Param XParam,  BlockP<T>& XBlock)
 {
-	int blksize = sq(blkwidth);
-	//inititiallise array with a single value
-	for (int bl = 0; bl < nblk; bl++)
-	{
-		for (int j = 0; j < blkwidth; j++)
-		{
-			for (int i = 0; i < blkwidth; i++)
-			{
-				int n = i + j * blkwidth + bl * blksize;
-				Arr[n] = initval;
-			}
-		}
-	}
-}
+	// This function will only work if the blocks are uniform
+	// A separate function is used for adaptivity
+	T leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 
-template <class T> void CopyArrayBUQ(int nblk, int blkwidth, T* source, T * & dest)
-{
-	int blksize = sq(blkwidth);
-	//
-	for (int bl = 0; bl < nblk; bl++)
-	{
-		for (int j = 0; j < blkwidth; j++)
-		{
-			for (int i = 0; i < blkwidth; i++)
-			{
-				int n = i + j * blkwidth + bl * blksize;
-				dest[n] = source[n];
-			}
-		}
-	}
-}
-
-
-template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F forcing, T*& z)
-{
-	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
-
-	double x, y;
-	int n;
-
+	T levdx = calcres(XParam.dx, XParam.initlevel);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
-		int ib = XBlock.active[ibl];
-		double blkdx = calcres(XParam.dx, level[ib]);
-		for (int j = 0; j < XParam.blkwidth; j++)
+		 
+		int bl = XBlock.active[ibl];
+		T espdist = std::numeric_limits<T>::epsilon()*(T)10.0; // i.e. distances are calculated within 10x theoretical machine precision
+
+		leftxo = XBlock.xo[bl] - ((T)XParam.blkwidth) * levdx;
+
+		leftyo = XBlock.yo[bl];
+		rightxo = XBlock.xo[bl] + ((T)XParam.blkwidth) * levdx;
+		rightyo = XBlock.yo[bl];
+		topxo = XBlock.xo[bl];
+		topyo = XBlock.yo[bl] + ((T)XParam.blkwidth) * levdx;
+		botxo = XBlock.xo[bl];
+		botyo = XBlock.yo[bl] - ((T)XParam.blkwidth) * levdx;
+
+		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour
+		XBlock.LeftBot[bl] = bl;
+		XBlock.LeftTop[bl] = bl;
+		XBlock.RightBot[bl] = bl;
+		XBlock.RightTop[bl] = bl;
+		XBlock.TopLeft[bl] = bl;
+		XBlock.TopRight[bl] = bl;
+		XBlock.BotLeft[bl] = bl;
+		XBlock.BotRight[bl] = bl;
+
+
+		for (int iblb = 0; iblb < XParam.nblk; iblb++)
 		{
-			for (int i = 0; i < XParam.blkwidth; i++)
+			//
+			int blb = XBlock.active[iblb];
+
+			if (abs(XBlock.xo[blb] - leftxo) < espdist && abs(XBlock.yo[blb] - leftyo) < espdist)
 			{
-				n = i + j * XParam.blkwidth + ib * XParam.blksize;
-				x = XBlock.xo[ib] + i * blkdx;
-				y = XBlock.yo[ib] + j * blkdx;
-
-				//if (x >= xo && x <= xmax && y >= yo && y <= ymax)
-				{
-					//this is safer!
-					x = utils::max(utils::min(x, F.xmax), F.xo);
-					y = utils::max(utils::min(y, F.ymax), F.yo);
-					// cells that falls off this domain are assigned 
-					double x1, x2, y1, y2;
-					double q11, q12, q21, q22;
-					int cfi, cfip, cfj, cfjp;
-
-
-
-					cfi = utils::min(utils::max((int)floor((x - F.xo) / F.dx), 0), F.nx - 2);
-					cfip = cfi + 1;
-
-					x1 = F.xo + F.dx * cfi;
-					x2 = F.xo + F.dx * cfip;
-
-					cfj = utils::min(utils::max((int)floor((y - F.yo) / F.dx), 0), F.ny - 2);
-					cfjp = cfj + 1;
-
-					y1 = F.yo + F.dx * cfj;
-					y2 = F.yo + F.dx * cfjp;
-
-					q11 = zb[cfi + cfj * F.nx];
-					q12 = zb[cfi + cfjp * F.nx];
-					q21 = zb[cfip + cfj * F.nx];
-					q22 = zb[cfip + cfjp * F.nx];
-
-					z[n] = (U)BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-					//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
-				}
+				XBlock.LeftBot[bl] = blb;
+				XBlock.LeftTop[bl] = blb;
+			}
+			if (abs(XBlock.xo[blb] - rightxo) < espdist && abs(XBlock.yo[blb] - rightyo) < espdist)
+			{
+				XBlock.RightBot[bl] = blb;
+				XBlock.RightTop[bl] = blb;
+			}
+			if (abs(XBlock.xo[blb] - topxo) < espdist && abs(XBlock.yo[blb] - topyo) < espdist)
+			{
+				XBlock.TopLeft[bl] = blb;
+				XBlock.TopRight[bl] = blb;
 
 			}
+			if (abs(XBlock.xo[blb] - botxo) < espdist && abs(XBlock.yo[blb] - botyo) < espdist)
+			{
+				XBlock.BotLeft[bl] = blb;
+				XBlock.BotLeft[bl] = blb;
+			}
 		}
-	}
-}
 
-template void interp2BUQ<float, inputmap>(Param XParam, BlockP<float> XBlock, inputmap forcing, float*& z);
-template void interp2BUQ<double, inputmap>(Param XParam, BlockP<double> XBlock, inputmap forcing, double*& z);
-template void interp2BUQ<float, forcingmap>(Param XParam, BlockP<float> XBlock, forcingmap forcing, float*& z);
-template void interp2BUQ<double, forcingmap>(Param XParam, BlockP<double> XBlock, forcingmap forcing, double*& z);
-template void interp2BUQ<float, deformmap>(Param XParam, BlockP<float> XBlock, deformmap forcing, float*& z);
-template void interp2BUQ<double, deformmap>(Param XParam, BlockP<double> XBlock, deformmap forcing, double*& z);
+		//printf("leftxo=%f\t leftyo=%f\t rightxo=%f\t rightyo=%f\t botxo=%f\t botyo=%f\t topxo=%f\t topyo=%f\n", leftxo, leftyo, rightxo, rightyo, botxo, botyo, topxo, topyo);
+		//printf("blk=%d\t blockxo=%f\t blockyo=%f\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, blockxo_d[bl], blockyo_d[bl], leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
+
+
+	}
+
+
+}
+template void InitBlockneighbours<float>(Param XParam, BlockP<float>& XBlock);
+template void InitBlockneighbours<double>(Param XParam, BlockP<double>& XBlock);
+
+
+
+
 

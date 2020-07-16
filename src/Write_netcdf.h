@@ -6,7 +6,7 @@
 #include "Param.h"
 #include "Write_txt.h"
 #include "ReadInput.h"
-#include "Utils_GPU.h"
+#include "MemManagement.h"
 #include "Util_CPU.h"
 
 void handle_ncerror(int status);
