@@ -15,8 +15,8 @@ void handle_ncerror(int status) {
 	}
 }
 
-
-Param creatncfileBUQ(Param XParam,int * activeblk, int * level, float * blockxo, float * blockyo)
+template<class T>
+Param creatncfileBUQ(Param XParam,int * activeblk, int * level, T * blockxo, T * blockyo)
 {
 	int status;
 	int nx, ny;
@@ -320,6 +320,9 @@ Param creatncfileBUQ(Param XParam,int * activeblk, int * level, float * blockxo,
 	//return XParam;
 }
 
+template Param creatncfileBUQ<float>(Param XParam, int* activeblk, int* level, float* blockxo, float* blockyo);
+template Param creatncfileBUQ<double>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo);
+
 
 template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, double * blockxo, double *blockyo, std::string varst, int vdim, T * var)
 {
@@ -458,12 +461,12 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		lev = level[bl];
 
 
-		//double xxmax, xxmin, yymax, yymin;
+		double xxmax, yymax;
 		double xxmin, yymin;
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		//xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
-		//yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
+		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
+		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
 
 		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
 		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
@@ -568,6 +571,9 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	if (status != NC_NOERR) handle_ncerror(status);
 
 }
+
+template void defncvarBUQ<float>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, int vdim, float* var);
+template void defncvarBUQ<double>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, int vdim, double* var);
 
 
 

@@ -207,13 +207,13 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 
 
 
-						cfi = min(max((int)floor((x - XForcing.Bathy.xo) / XForcing.Bathy.dx), 0), XForcing.Bathy.nx - 2);
+						cfi = utils::min(utils::max((int)floor((x - XForcing.Bathy.xo) / XForcing.Bathy.dx), 0), XForcing.Bathy.nx - 2);
 						cfip = cfi + 1;
 
 						x1 = XForcing.Bathy.xo + XForcing.Bathy.dx*cfi;
 						x2 = XForcing.Bathy.xo + XForcing.Bathy.dx*cfip;
 
-						cfj = min(max((int)floor((y - XForcing.Bathy.yo) / XForcing.Bathy.dx), 0), XForcing.Bathy.ny - 2);
+						cfj = utils::min(utils::max((int)floor((y - XForcing.Bathy.yo) / XForcing.Bathy.dx), 0), XForcing.Bathy.ny - 2);
 						cfjp = cfj + 1;
 
 						y1 = XForcing.Bathy.yo + XForcing.Bathy.dx*cfj;
@@ -238,7 +238,7 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 			{
 				//
 				XBlock.xo[blkid] = XParam.xo + nblkx * ((T)XParam.blkwidth) * levdx;
-				XBlock.xo[blkid] = XParam.yo + nblky * ((T)XParam.blkwidth) * levdx;
+				XBlock.yo[blkid] = XParam.yo + nblky * ((T)XParam.blkwidth) * levdx;
 				XBlock.active[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;

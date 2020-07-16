@@ -818,16 +818,10 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	// Any of xo,yo,xmax,ymax or dx not defined is assigned the value from bathy file
 	//default value is nan in default param file
 
-	inputmap Bathymetry;
-	Bathymetry.inputfile = XForcing.Bathy.inputfile;
-	Bathymetry = readBathyhead(Bathymetry);
-	XForcing.Bathy.xo = Bathymetry.xo;
-	XForcing.Bathy.yo = Bathymetry.yo;
-	XForcing.Bathy.xmax = Bathymetry.xmax;
-	XForcing.Bathy.ymax = Bathymetry.ymax;
-	XForcing.Bathy.nx = Bathymetry.nx;
-	XForcing.Bathy.ny = Bathymetry.ny;
-
+	//inputmap Bathymetry;
+	//Bathymetry.inputfile = XForcing.Bathy.inputfile;
+	XForcing.Bathy = readBathyhead(XForcing.Bathy);
+	
 
 
 	if (std::isnan(XParam.xo))
@@ -843,7 +837,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		XParam.dx = XForcing.Bathy.dx;
 	
 	if (std::isnan(XParam.grdalpha))
-		XParam.grdalpha = Bathymetry.grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
+		XParam.grdalpha = XForcing.Bathy.grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
 
 
 	//Check Bathy input type

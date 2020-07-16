@@ -43,6 +43,11 @@ template <class T> void InitArrayBUQ(int nblk, int blkwidth, T initval, T*& Arr)
 	}
 }
 
+template void InitArrayBUQ<float>(int nblk, int blkwidth, float initval, float*& Arr);
+template void InitArrayBUQ<double>(int nblk, int blkwidth, double initval, double*& Arr);
+template void InitArrayBUQ<int>(int nblk, int blkwidth, int initval, int*& Arr);
+template void InitArrayBUQ<bool>(int nblk, int blkwidth, bool initval, bool*& Arr);
+
 template <class T> void CopyArrayBUQ(int nblk, int blkwidth, T* source, T*& dest)
 {
 	int blksize = sq(blkwidth);

@@ -12,6 +12,7 @@
 #include "Util_CPU.h"
 #include "Arrays.h"
 #include "Forcing.h"
+#include "Mesh.h"
 
 // End of global definition
 #endif

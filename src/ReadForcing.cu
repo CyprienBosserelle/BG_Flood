@@ -940,7 +940,7 @@ forcingmap readforcingmaphead(forcingmap Fmap)
 	return Fmap;
 }
 
-inputmap readBathyhead(inputmap BathyParam)
+template<class T> T readBathyhead(T BathyParam)
 {
 	std::string bathyext;
 
@@ -1030,6 +1030,11 @@ inputmap readBathyhead(inputmap BathyParam)
 	}
 	return BathyParam;
 }
+
+template inputmap readBathyhead<inputmap>(inputmap BathyParam);
+template StaticForcingP<float> readBathyhead<StaticForcingP<float>>(StaticForcingP<float> BathyParam);
+
+
 
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
 {

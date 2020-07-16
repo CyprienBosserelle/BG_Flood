@@ -22,7 +22,7 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 inputmap readcfmaphead(inputmap Roughmap);
 void readmapdata(inputmap Roughmap, float * &cfmapinput);
 forcingmap readforcingmaphead(forcingmap Fmap);
-inputmap readBathyhead(inputmap BathyParam);
+template<class T> T readBathyhead(T BathyParam);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
 extern "C" void readbathyMD(std::string filename, float *&zb);
 extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);
