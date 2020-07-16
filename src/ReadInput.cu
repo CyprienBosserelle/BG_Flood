@@ -858,9 +858,18 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	double levdx = calcres(XParam.dx, XParam.initlevel);// true grid resolution as in dx/2^(initlevel)
 	//printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, calcres(1.0, XParam.initlevel));
 
+	// First estimate nx and ny
 	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
 	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?
 
+
+	// Adjust xmax and ymax so that nx and ny are a factor of XParam.blkwidth [16]
+	XParam.xmax = XParam.xo + (ceil(XParam.nx / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth) - 1) * levdx;
+	XParam.ymax = XParam.yo + (ceil(XParam.ny / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth) - 1) * levdx;
+
+	// Update nx and ny 
+	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
+	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?
 
 	if (XParam.spherical < 1)
 	{
@@ -973,8 +982,6 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	}
 
-
-	
 
 	
 }
