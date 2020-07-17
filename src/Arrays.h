@@ -157,7 +157,7 @@ struct Model
 	TexForcingP<T> Tex;
 
 	// 
-	std::map<std::string, T *> OutputVar;
+	std::map<std::string, T *> OutputVarMap;
 
 	//other output
 	T* TSstore;//buffer for TS data so not to dave too often

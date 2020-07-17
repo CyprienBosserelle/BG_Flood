@@ -35,6 +35,8 @@ public:
 	int nblk=0; // number of compute blocks
 	int blkwidth = 16;
 	int blksize = 256; //16x16 blocks
+	int halowidth = 1; // use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
+
 	double xo = nan(""); // originally defined has nan to check whether the user alter these values when runing the model
 	double yo = nan(""); // grid origin
 	double ymax = nan("");

@@ -22,6 +22,7 @@ template <class T> void InitBlockinfo(Param XParam, Forcing<float> XForcing, Blo
 void InitBlockadapt(Param XParam, AdaptP& XAdap);
 template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock);
 template <class T> void InitBlockneighbours(Param XParam, BlockP<T>& XBlock);
+template<class T> void Initmaparray(Model<T>& XModel);
 
 
 // End of global definition;

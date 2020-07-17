@@ -324,7 +324,7 @@ template Param creatncfileBUQ<float>(Param XParam, int* activeblk, int* level, f
 template Param creatncfileBUQ<double>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo);
 
 
-template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, double * blockxo, double *blockyo, std::string varst, int vdim, T * var)
+template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, T * blockxo, T *blockyo, std::string varst, int vdim, T * var)
 {
 	std::string outfile = XParam.outfile;
 	int smallnc = XParam.smallnc;
@@ -494,7 +494,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		{
 			for (int i = 0; i < 16; i++)
 			{
-				int n = i + j * 16 + bl * XParam.blksize;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + bl * XParam.blksize;
 				int r = i + j * 16;
 				if (smallnc > 0)
 				{
@@ -572,12 +572,12 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 }
 
-template void defncvarBUQ<float>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, int vdim, float* var);
+template void defncvarBUQ<float>(Param XParam, int* activeblk, int* level, float* blockxo, float* blockyo, std::string varst, int vdim, float* var);
 template void defncvarBUQ<double>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, int vdim, double* var);
 
 
 
-template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activeblk, int* level, double * blockxo, double *blockyo, std::string varst, T * var)
+template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activeblk, int* level, T * blockxo, T *blockyo, std::string varst, T * var)
 {
 	int status, ncid, recid, var_id, ndims;
 	static size_t nrec;
@@ -646,7 +646,7 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		{
 			for (int i = 0; i < 16; i++)
 			{
-				int n = i + j * 16 + bl * XParam.blksize;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + bl * XParam.blksize;
 				int r = i + j * 16;
 				if (smallnc > 0)
 				{
@@ -714,9 +714,6 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 // Scope for compiler to know what function to compile
 
-template void defncvarBUQ<float>(Param XParam, int * activeblk, int * level, double * blockxo, double *blockyo, std::string varst, int vdim, float * var);
-template void defncvarBUQ<double>(Param XParam, int * activeblk, int * level, double * blockxo, double *blockyo, std::string varst, int vdim, double * var);
 
-
-template void writencvarstepBUQ<float>(Param XParam, int vdim, int * activeblk, int* level, double * blockxo, double *blockyo, std::string varst, float * var);
+template void writencvarstepBUQ<float>(Param XParam, int vdim, int * activeblk, int* level, float * blockxo, float *blockyo, std::string varst, float * var);
 template void writencvarstepBUQ<double>(Param XParam, int vdim, int * activeblk, int* level, double * blockxo, double *blockyo, std::string varst, double * var);

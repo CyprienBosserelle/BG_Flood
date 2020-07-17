@@ -120,6 +120,7 @@ void readstaticforcing(T& Sforcing)
 	Sforcing.ymax = cfmap.ymax;
 	Sforcing.nx = cfmap.nx;
 	Sforcing.ny = cfmap.ny;
+	Sforcing.dx = cfmap.dx;
 
 	if (Sforcing.nx > 0 && Sforcing.ny > 0)
 	{

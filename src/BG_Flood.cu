@@ -87,37 +87,15 @@ int main(int argc, char **argv)
 	// Prepare initial mesh layout
 	InitMesh(XParam, XForcing, XModel);
 
+	//============================================
+	// Prepare initial conditions
+	InitialConditions(XParam, XForcing, XModel);
 
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
-	XParam = creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zb", 3, XModel.zb);
+	TestingOutput(XParam, XModel);
 
-	/*
-	//creatncfileBUQ(XParam);
-	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
-	{
-		//Create definition for each variable and store it
-		if (XParam.doubleprecision == 1 || XParam.spherical == 1)
-		{
-			//defncvarD(XParam.outfile, XParam.smallnc, XParam.scalefactor, XParam.addoffset, nx, ny, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-			//defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-			defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPUD[XParam.outvars[ivar]]);
-		}
-		else
-		{
-			//defncvar(XParam, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
-			defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, XParam.outvars[ivar], 3, OutputVarMapCPU[XParam.outvars[ivar]]);
-		}
-
-	}
-	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
-
-	printf("done \n");
-	write_text_to_log_file("Done ");
-	*/
-
-
+	
 
 	exit(0);
 }

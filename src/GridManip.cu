@@ -26,7 +26,7 @@
 
 
 
-template <class T> void InitArrayBUQ(int nblk, int blkwidth, T initval, T*& Arr)
+template <class T> void InitArrayBUQ(int nblk, int blkwidth,int halo,  T initval, T*& Arr)
 {
 	int blksize = utils::sq(blkwidth);
 	//inititiallise array with a single value
@@ -36,19 +36,19 @@ template <class T> void InitArrayBUQ(int nblk, int blkwidth, T initval, T*& Arr)
 		{
 			for (int i = 0; i < blkwidth; i++)
 			{
-				int n = i + j * blkwidth + bl * blksize;
+				int n = (i+halo) + (j+halo) * blkwidth + bl * blksize;
 				Arr[n] = initval;
 			}
 		}
 	}
 }
 
-template void InitArrayBUQ<float>(int nblk, int blkwidth, float initval, float*& Arr);
-template void InitArrayBUQ<double>(int nblk, int blkwidth, double initval, double*& Arr);
-template void InitArrayBUQ<int>(int nblk, int blkwidth, int initval, int*& Arr);
-template void InitArrayBUQ<bool>(int nblk, int blkwidth, bool initval, bool*& Arr);
+template void InitArrayBUQ<float>(int nblk, int blkwidth, int halo, float initval, float*& Arr);
+template void InitArrayBUQ<double>(int nblk, int blkwidth, int halo, double initval, double*& Arr);
+template void InitArrayBUQ<int>(int nblk, int blkwidth, int halo, int initval, int*& Arr);
+template void InitArrayBUQ<bool>(int nblk, int blkwidth, int halo, bool initval, bool*& Arr);
 
-template <class T> void CopyArrayBUQ(int nblk, int blkwidth, T* source, T*& dest)
+template <class T> void CopyArrayBUQ(int nblk, int blkwidth, int halo, T* source, T*& dest)
 {
 	int blksize = sq(blkwidth);
 	//
@@ -58,7 +58,7 @@ template <class T> void CopyArrayBUQ(int nblk, int blkwidth, T* source, T*& dest
 		{
 			for (int i = 0; i < blkwidth; i++)
 			{
-				int n = i + j * blkwidth + bl * blksize;
+				int n = (i+halo) + (j+halo) * blkwidth + bl * blksize;
 				dest[n] = source[n];
 			}
 		}
@@ -68,58 +68,76 @@ template <class T> void CopyArrayBUQ(int nblk, int blkwidth, T* source, T*& dest
 
 
 
-template <class T>  void setedges(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, T *&zb)
+template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 {
 	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
-
+	int n,k;
 	// here the bathy of the outter most cells of the domain are "set" to the same value as the second outter most.
 	// this also applies to the blocks with no neighbour
-	for (int bl = 0; bl < nblk; bl++)
+	for (int bl = 0; bl < XParam.nblk; bl++)
 	{
+		int ib = XBlock.active[bl];
+		// Now check each corner of each block
+		
 
-		if (bl == leftblk[bl])//i.e. if a block refers to as it's onwn neighbour then it doesn't have a neighbour/// This also applies to block that are on the edge of the grid so the above is commentted
+		// Left
+		setedgessideLR(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], 1, 0, zb);
+
+		// Right
+		setedgessideLR(XParam, ib, XBlock.RightBot[ib], XBlock.RightTop[ib], XParam.blkwidth - 2, XParam.blkwidth - 1, zb);
+
+		// Top
+		setedgessideBT(XParam, ib, XBlock.TopLeft[ib], XBlock.TopRight[ib], XParam.blkwidth - 2, XParam.blkwidth - 1, zb);
+
+		// Bot
+		setedgessideBT(XParam, ib, XBlock.BotLeft[ib], XBlock.BotRight[ib], 1, 0, zb);
+		
+		
+	}
+}
+template void setedges<float>(Param XParam, BlockP<float> XBlock, float*& zb);
+template void setedges<double>(Param XParam, BlockP<double> XBlock, double*& zb);
+
+template <class T>  void setedgessideLR(Param XParam, int ib,int blkA, int blkB, int iread, int iwrite, T*& zb)
+{
+	if (blkA == ib || blkA == ib)
+	{
+		int n, k;
+		int jstart, jend;
+		jstart = (blkA == ib) ? 0 : XParam.blkwidth / 2;
+		jend = (blkB == ib) ? XParam.blkwidth : XParam.blkwidth / 2;
+
+		for (int j = jstart; j < jend; j++)
 		{
-			int i = 0;
-			for (int j = 0; j < 16; j++)
-			{
+			// read value at n and write at k
+			n = (iread + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+			k = (iwrite + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+			zb[k] = zb[n];
 
-				zb[i + j * 16 + bl * 256] = zb[i + 1 + j * 16 + bl * 256];
-			}
 		}
-		if (bl == rightblk[bl])
-		{
-			int i = 15;
-			for (int j = 0; j < 16; j++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i - 1 + j * 16 + bl * 256];
-			}
-		}
-		if (bl == topblk[bl])
-		{
-			int j = 15;
-			for (int i = 0; i < 16; i++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + (j - 1) * 16 + bl * 256];
-			}
-		}
-		if (bl == botblk[bl])
-		{
-			int j = 0;
-			for (int i = 0; i < 16; i++)
-			{
-
-				zb[i + j * 16 + bl * 256] = zb[i + (j + 1) * 16 + bl * 256];
-			}
-		}
-
 	}
 }
 
-template void setedges<int>(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, int *&zb);
-template void setedges<float>(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, float *&zb);
-template void setedges<double>(int nblk, int * leftblk, int *rightblk, int * topblk, int* botblk, double *&zb);
+template <class T>  void setedgessideBT(Param XParam, int ib, int blkA, int blkB, int jread, int jwrite, T*& zb)
+{
+	if (blkA == ib || blkA == ib)
+	{
+		int n, k;
+		int istart, iend;
+		istart = (blkA == ib) ? 0 : XParam.blkwidth / 2;
+		iend = (blkB == ib) ? XParam.blkwidth : XParam.blkwidth / 2;
+
+		for (int i = istart; i < iend; i++)
+		{
+			// read value at n and write at k
+			n = (i + XParam.halowidth) + (jread + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+			k = (i + XParam.halowidth) + (jwrite + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+			zb[k] = zb[n];
+
+		}
+	}
+}
+
 
 template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F forcing, T*& z)
 {
@@ -137,7 +155,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				n = i + j * XParam.blkwidth + ib * XParam.blksize;
+				n = (i+XParam.halowidth) + (j+XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
 				x = XBlock.xo[ib] + i * blkdx;
 				y = XBlock.yo[ib] + j * blkdx;
 

@@ -1,7 +1,6 @@
 
-#ifndef BGFLOOD_H
-#define BGFLOOD_H
-// includes, system
+#ifndef TESTING_H
+#define TESTING_H
 
 #include "General.h"
 #include "Param.h"
@@ -13,10 +12,10 @@
 #include "Arrays.h"
 #include "Forcing.h"
 #include "Mesh.h"
-#include "InitialConditions.h"
+
+template <class T> void TestingOutput(Param XParam, Model<T> XModel);
 
 
-#include "Testing.h"
 
 // End of global definition
 #endif

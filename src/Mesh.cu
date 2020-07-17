@@ -33,9 +33,12 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
-	for (int nblky = 0; nblky < ceil(XForcing.Bathy.ny / XParam.blkwidth); nblky++)
+	int maxnbx = ceil(XForcing.Bathy.nx / (double)XParam.blkwidth);
+	int maxnby = ceil(XForcing.Bathy.ny / (double)XParam.blkwidth);
+
+	for (int nblky = 0; nblky < maxnby; nblky++)
 	{
-		for (int nblkx = 0; nblkx < ceil(XForcing.Bathy.nx / XParam.blkwidth); nblkx++)
+		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
 			nmask = 0;
 			for (int i = 0; i < 16; i++)
@@ -45,7 +48,7 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 					double x = XParam.xo + (i + XParam.blkwidth * nblkx) * levdx;
 					double y = XParam.yo + (j + XParam.blkwidth * nblky) * levdx;
 
-					if (x >= XForcing.Bathy.xo && x <= XForcing.Bathy.xmax && y >= XForcing.Bathy.yo && y <= XForcing.Bathy.ymax)
+					//if (x >= XForcing.Bathy.xo && x <= XForcing.Bathy.xmax && y >= XForcing.Bathy.yo && y <= XForcing.Bathy.ymax)
 					{
 						// cells that falls off this domain are assigned
 						double x1, x2, y1, y2;
@@ -77,11 +80,11 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 						if (q >= XParam.mask)
 							nmask++;
 					}
-					else
-					{
+					//else
+					//{
 						//computational domnain is outside of the bathy domain
-						nmask++;
-					}
+					///	nmask++;
+					//}
 
 				}
 			}
@@ -110,7 +113,7 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 
 	//==============================
 	// Allocate CPU memory for the whole model
-	AllocateCPU(XParam.nblkmem, XParam.blksize, XParam, XModel);
+	AllocateCPU(XParam.nblkmem, XParam.blksize+XParam.halowidth, XParam, XModel);
 
 	//==============================
 	// Initialise blockinfo info
@@ -123,8 +126,10 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 		InitBlockadapt(XParam, XModel.adapt);
 	}
 
-	// Initialise Bathy data
-	interp2BUQ(XParam, XModel.blocks, XForcing.Bathy, XModel.zb);
+	//==============================
+	// Init. map array
+	Initmaparray(XModel);
+
 	
 	
 	
@@ -139,10 +144,10 @@ template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, Blo
 	// Init active and level
 
 	// Initialise activeblk array as all inactive ( = -1 )
-	InitArrayBUQ(XParam.nblkmem, 1, -1, XBlock.active);
+	InitArrayBUQ(XParam.nblkmem, 1, 0, -1, XBlock.active);
 
 	// Initialise level info
-	InitArrayBUQ(XParam.nblkmem, 1, XParam.initlevel, XBlock.level);
+	InitArrayBUQ(XParam.nblkmem, 1, 0, XParam.initlevel, XBlock.level);
 
 	//========================
 	// Init xo, yo and active blk
@@ -155,9 +160,9 @@ template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, Blo
 void InitBlockadapt(Param XParam, AdaptP& XAdap)
 {
 	
-		InitArrayBUQ(XParam.nblkmem, 1, XParam.initlevel, XAdap.newlevel);
-		InitArrayBUQ(XParam.nblkmem, 1, false, XAdap.coarsen);
-		InitArrayBUQ(XParam.nblkmem, 1, false, XAdap.refine);
+		InitArrayBUQ(XParam.nblkmem, 1, 0, XParam.initlevel, XAdap.newlevel);
+		InitArrayBUQ(XParam.nblkmem, 1, 0, false, XAdap.coarsen);
+		InitArrayBUQ(XParam.nblkmem, 1, 0, false, XAdap.refine);
 
 
 		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
@@ -182,9 +187,9 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 	
 
 
-	for (int nblky = 0; nblky < ceil(XParam.ny / ((T)XParam.blkwidth)); nblky++)
+	for (int nblky = 0; nblky < ceil(XParam.ny / ((double)XParam.blkwidth)); nblky++)
 	{
-		for (int nblkx = 0; nblkx < ceil(XParam.nx / ((T)XParam.blkwidth)); nblkx++)
+		for (int nblkx = 0; nblkx < ceil(XParam.nx / ((double)XParam.blkwidth)); nblkx++)
 		{
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
@@ -327,6 +332,39 @@ template void InitBlockneighbours<float>(Param XParam, BlockP<float>& XBlock);
 template void InitBlockneighbours<double>(Param XParam, BlockP<double>& XBlock);
 
 
+template<class T> void Initmaparray(Model<T>& XModel)
+{
+	XModel.OutputVarMap["zb"] = XModel.zb;
+	
+	XModel.OutputVarMap["u"] = XModel.evolv.u;
+	
+	XModel.OutputVarMap["v"] = XModel.evolv.v;
+	
+	XModel.OutputVarMap["zs"] = XModel.evolv.zs;
+	
+	XModel.OutputVarMap["h"] = XModel.evolv.h;
+	
+	XModel.OutputVarMap["hmean"] = XModel.evmean.h;
+	
+	XModel.OutputVarMap["hmax"] = XModel.evmax.h;
+	
+	XModel.OutputVarMap["zsmean"] = XModel.evmean.zs;
+	
+	XModel.OutputVarMap["zsmax"] = XModel.evmax.zs;
+	
+	XModel.OutputVarMap["umean"] = XModel.evmean.u;
+	
+	XModel.OutputVarMap["umax"] = XModel.evmax.u;
+	
+	XModel.OutputVarMap["vmean"] = XModel.evmean.v;
+	
+	XModel.OutputVarMap["vmax"] = XModel.evmax.v;
+	
+	XModel.OutputVarMap["vort"] = XModel.vort;
+	
+}
 
+template void Initmaparray<float>(Model<float>& XModel);
+template void Initmaparray<double>(Model<double>& XModel);
 
 

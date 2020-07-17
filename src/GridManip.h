@@ -9,10 +9,10 @@
 #include "Forcing.h"
 #include "Arrays.h"
 
-template <class T> void CopyArrayBUQ(int nblk, int blkwidth, T* source, T*& dest);
-template <class T> void InitArrayBUQ(int nblk, int blkwidth, T initval, T*& Arr);
+template <class T> void CopyArrayBUQ(int nblk, int blkwidth, int halo, T* source, T*& dest);
 
-template <class T>  void setedges(int nblk, int* leftblk, int* rightblk, int* topblk, int* botblk, T*& zb);
+template <class T> void InitArrayBUQ(int nblk, int blkwidth, int halo, T initval, T*& Arr);
+template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T*& zb);
 
 
 
