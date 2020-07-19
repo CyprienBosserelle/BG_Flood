@@ -683,11 +683,12 @@ int readvardata(std::string filename, std::string Varname, int ndims, int hotste
 
 template int readvardata<float>(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, float * vardata);
 template int readvardata<double>(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, double * vardata);
-/*
+
+
 template <class T>
-int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, T * &zs, T * &zb, T * &hh, T *&uu, T * &vv)
+int readhotstartfile(Param XParam, EvolvingP<T> &XEv)
 {
-	int status, zserror, hherror, uuerror, vverror, zberror, sferr, oferr, xerror, yerror;
+	int status, zserror, herror, uerror, verror, zerror, sferr, oferr, xerror, yerror;
 	int ncid, varid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];    dimension IDs 
 	int nx, ny, nt;
@@ -695,7 +696,7 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	double scalefac = 1.0;
 	double offset = 0.0;
 	size_t  *ddim;
-
+	std::string zbname, zsname, hname, uname, vname,xname,yname;
 	// Open the file for read access
 	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
 
@@ -704,107 +705,43 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
-	zberror = nc_inq_varid(ncid, "zb", &varid);
-	zserror = nc_inq_varid(ncid, "zs", &varid);
-	hherror = nc_inq_varid(ncid, "h", &varid);
-	uuerror = nc_inq_varid(ncid, "u", &varid);
-	vverror = nc_inq_varid(ncid, "v", &varid);
-
-
-
+	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z");
+	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA");
+	hname = checkncvarname(ncid, "h", "hh", "hhh", "hhhh");
+	uname = checkncvarname(ncid, "u", "uu", "uvel", "UVEL");
+	vname = checkncvarname(ncid, "v", "vv", "vvel", "VVEL");
+	
 	//by default we assume that the x axis is called "xx" but that is not sure "x" shoudl be accepted and so does "lon" for spherical grid
 	// The folowing section figure out which one is in the file and if none exits with the netcdf error
 	// default name is "xx"
-	std::string xvname = "xx";
-
-	xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
-	if (xerror == -49) // Variable not found
-	{
-		xvname = "x";
-		xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
-		if (xerror == -49) // Variable not found
-		{
-			xvname = "lon";
-			xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
-			if (xerror != NC_NOERR) handle_ncerror(status);
-		}
-		else if (xerror != NC_NOERR) handle_ncerror(status);
-
-
-	}
-	else if (xerror != NC_NOERR) handle_ncerror(status);
-
-	std::string yvname = "yy";
-
-	yerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
-	if (yerror == -49) // Variable not found
-	{
-		yvname = "y";
-		yerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
-		if (yerror == -49) // Variable not found
-		{
-			yvname = "lat";
-			xerror = nc_inq_varid(ncid, xvname.c_str(), &varid);
-			if (yerror != NC_NOERR) handle_ncerror(status);
-		}
-		else if (yerror != NC_NOERR) handle_ncerror(status);
-
-
-	}
-	else if (yerror != NC_NOERR) handle_ncerror(status);
-
-
-
+	//xname = checkncvarname(ncid, "x", "xx","lon","Lon");
+	//yname = checkncvarname(ncid, "y", "yy", "lat", "Lat");
 
 	status = nc_close(ncid);
 
 
 	// First we should read x and y coordinates
 	// Just as with other variables we expect the file follow the output naming convention of "xx" and "yy" both as a dimension and a variable
-	ndims = readvarinfo(XParam.hotstartfile.c_str(), xvname.c_str(), ddim);
-	nx = ddim[0];
-	xcoord = (T *)malloc(ddim[0]*sizeof(T)); /// Warning here we assume xx is 1D but may not be in the future
+	StaticForcingP<float> zbhotstart, zshotstart, hhotstart, uhotstart, vhotstart;
+	
 
-	status = readvardata(XParam.hotstartfile.c_str(), xvname.c_str(), ndims, 0, ddim, xcoord);
-	if (status != NC_NOERR) handle_ncerror(status);
-	free(ddim);
-
-	//Now read y coordinates
-	ndims = readvarinfo(XParam.hotstartfile.c_str(), yvname.c_str(), ddim);
-	ny = ddim[0];
-	ycoord = (T *)malloc(ddim[0] * sizeof(T)); /// Warning here we assume xx is 1D but may not be in the future
-
-	status = readvardata(XParam.hotstartfile.c_str(), yvname.c_str(), ndims, 0, ddim, ycoord);
-	if (status != NC_NOERR) handle_ncerror(status);
-	free(ddim);
-
-	//printf("xcoord[0]=%f, ycoord[0]=%f\n", xcoord[0], ycoord[0]);
-	// Allocate var in file to temporarily store the variable stored
-	varinfile = (T *)malloc(nx*ny * sizeof(T));
+	//readstaticforcing(Sforcing)
 
 	//first check if hotstart has zb
-	printf("Found variables: ");
-	if (zberror == NC_NOERR)
+	//printf("Found variables: ");
+	if (!zbname.empty())
 	{
-		printf("zb... ");
 		//zb is set
-
-		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zb", ddim);
-
-		status = readvardata(XParam.hotstartfile.c_str(), "zb", ndims, 0, ddim, varinfile);
-		if (status != NC_NOERR) handle_ncerror(status);
-			//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-
+		zbhotstart.inputfile = XParam.hotstartfile + "?" + zbname;
+		
+		readstaticforcing(zbhotstart);
 		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, zb);
-
-		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zb);
-
+				
 		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 
-		//status = nc_get_var_float(ncid, varid, zb);
-		free(ddim);
+		
 
 	}
 	// second check if zs or hh are in teh file
@@ -1016,10 +953,49 @@ int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, i
 
 }
 
-template int readhotstartfile<float>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
+//template int readhotstartfile<float>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 
-template int readhotstartfile<double>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
-*/
+//template int readhotstartfile<double>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
+
+
+std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD)
+{
+	int varid;
+	int errorA, errorB,errorC,errorD;
+	std::string outstring;
+
+	//std::vector<std::string> teststr;
+
+	//teststr.push_back((stringA))
+
+
+	errorA = nc_inq_varid(ncid, stringA.c_str(), &varid);
+	errorB = nc_inq_varid(ncid, stringB.c_str(), &varid);
+	errorC = nc_inq_varid(ncid, stringC.c_str(), &varid);
+	errorD = nc_inq_varid(ncid, stringD.c_str(), &varid);
+
+	if (errorA == NC_NOERR)
+	{
+		outstring = stringA;
+	}
+	else if (errorB == NC_NOERR)
+	{
+		outstring = stringB;
+	}
+	else if (errorC == NC_NOERR)
+	{
+		outstring = stringC;
+	}
+	else if (errorD == NC_NOERR)
+	{
+		outstring = stringD;
+	}
+
+
+	return outstring;
+
+
+}
 
 //By default we want to read wind info as float because it will reside in a texture. the value is converted to the apropriate type only when it is used. so there is no need to template this function 
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo)
