@@ -33,8 +33,8 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
-	int maxnbx = ceil(XForcing.Bathy.nx / (double)XParam.blkwidth);
-	int maxnby = ceil(XForcing.Bathy.ny / (double)XParam.blkwidth);
+	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
+	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
 
 	for (int nblky = 0; nblky < maxnby; nblky++)
 	{

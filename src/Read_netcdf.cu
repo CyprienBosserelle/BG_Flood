@@ -628,14 +628,14 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 template int readvardata<float>(std::string filename, std::string Varname, int step, float * &vardata);
 template int readvardata<double>(std::string filename, std::string Varname, int step, double * &vardata);
 
-/*
+
 template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 {
 	int status, zserror, herror, uerror, verror, zerror, sferr, oferr, xerror, yerror;
 	int ncid, varid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
-	int nx, ny, nt;
+	int nx, ny, nt,ib;
 	T * xcoord, *ycoord, * varinfile; // Not necessarily identical to any prevoious ones
 	double scalefac = 1.0;
 	double offset = 0.0;
@@ -666,7 +666,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 
 	// First we should read x and y coordinates
 	// Just as with other variables we expect the file follow the output naming convention of "xx" and "yy" both as a dimension and a variable
-	StaticForcingP<float> zbhotstart, zshotstart, hhotstart, uhotstart, vhotstart;
+	DynForcingP<float> zbhotstart, zshotstart, hhotstart, uhotstart, vhotstart;
 	
 	// Read hotstart block info if it exist
 	// By default reuse mesh-layout
@@ -679,14 +679,14 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 	if (!zbname.empty())
 	{
 		//zb is set
-		zbhotstart.inputfile = XParam.hotstartfile + "?" + zbname;
+		zbhotstart = readfileinfo(XParam.hotstartfile + "?" + zbname, zbhotstart);
 		
-		readstaticforcing(zbhotstart);
+		readstaticforcing(XParam.hotstep,zbhotstart);
 		interp2BUQ(XParam,XBlock, zbhotstart, zb);
 				
 		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
-		//setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
+		setedges(XParam, XBlock, zb);
 
 		
 
@@ -697,88 +697,72 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 	//zs Section
 	if (!zsname.empty())
 	{
-		printf(" zs... ");
+		log(" zs... ");
 
-		readforcingmaphead(zshotstart);
-
-
-
-		ndims = readvarinfo(XParam.hotstartfile.c_str(), zsname, ddim);
-
-		status = readvardata(XParam.hotstartfile.c_str(), zsname, ndims, XParam.hotstep, ddim, zshotstart.val);
-		if (status != NC_NOERR) handle_ncerror(status);
+		zshotstart = readfileinfo(XParam.hotstartfile + "?" + zsname, zshotstart);
+		//readforcingmaphead(zshotstart);
+		readstaticforcing(XParam.hotstep, zshotstart);
 		
 		interp2BUQ(XParam, XBlock, zshotstart, XEv.zs);
-		//printf("zs interpolated[ 8 + 8 * 16 + 9000 * blksize]=%f\n", zs[0]);
-		//printf("zs hotstartfile[1407,435]=%f\n", zs[1407 + 435 * nx]);
-		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
-		//because we set the edges around empty blocks we need the set the edges for zs too
-		// otherwise we create some gitantic waves at the edges of empty blocks
+
+		setedges(XParam, XBlock, XEv.zs);
+		
 		//setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
 
 		//check sanity
-		for (int bl = 0; bl < XParam.nblk; bl++)
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
 		{
+			ib = XBlock.active[ibl];
 			for (int j = 0; j < 16; j++)
 			{
 				for (int i = 0; i < 16; i++)
 				{
-					int n = i + j * 16 + bl * 256;
-					zs[n] = utils::max(zs[n], zb[n]);
+					int n = (i+XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+					XEv.zs[n] = utils::max(XEv.zs[n], zb[n]);
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
 			}
 		}
 
-		//status = nc_get_var_float(ncid, varid, zb);
-		free(ddim);
+		
 	}
 	else
 	{
-		if (zserror == -49)
-		{
-			//Variable not found
-			//It's ok if hh is specified
-			printf("zs not found in hotstart file. Looking for hh... ");
-		}
-		else
-		{
-			handle_ncerror(zserror);
-		}
+		//Variable not found
+		//It's ok if hh is specified
+		log("zs not found in hotstart file. Looking for hh... ");
+		
 	}
 
 	//hh section
-	if (hherror == NC_NOERR)
+	if (!hname.empty())
 	{
-		printf("hh... ");
-		ndims = readvarinfo(XParam.hotstartfile.c_str(), "hh", ddim);
+		log("h... ");
+		hhotstart = readfileinfo(XParam.hotstartfile + "?" + hname, hhotstart);
+		//readforcingmaphead(zshotstart);
+		readstaticforcing(XParam.hotstep, hhotstart);
 
-		status = readvardata(XParam.hotstartfile.c_str(), "hh", ndims, 0, ddim, varinfile);
-		if (status != NC_NOERR) handle_ncerror(status);
-		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, hh);
-
-		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, hh);
-
-		//because we set the edges around empty blocks we need the set the edges for zs too
-		// otherwise we create some gitantic waves at the edges of empty blocks
-		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, hh);
+		interp2BUQ(XParam, XBlock, hhotstart, XEv.h);
+		
+		setedges(XParam, XBlock, XEv.h);
+		
 		//if zs was not specified
-		if (zserror == -49)
+		if (zsname.empty())
 		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
+				ib = XBlock.active[ibl];
 				for (int j = 0; j < 16; j++)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * 256;
-						zs[n] = zb[n] + hh[n];
+						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+						XEv.zs[n] = zb[n] + XEv.h[n];
+						//unpacked_value = packed_value * scale_factor + add_offset
 					}
-
 				}
 			}
+			
 		}
 		free(ddim);
 
@@ -786,24 +770,28 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 	}
 	else
 	{
-		if (zserror == -49 && hherror == -49)
+		//if both zs and h were not specified
+		if (zsname.empty() && hname.empty())
 		{
 			//Variable not found
 			//It's ok if hh is specified
-			printf("neither zs nor hh were found in hotstart file. this is not a valid hotstart file. using a cold start instead");
+			log("neither zs nor hh were found in hotstart file. this is not a valid hotstart file. using a cold start instead");
 			return 0;
 		}
 		else
 		{
-			//hherror ==-49
-			for (int bl = 0; bl < XParam.nblk; bl++)
+			//zs was specified but not h
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
+				ib = XBlock.active[ibl];
 				for (int j = 0; j < 16; j++)
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						int n = i + j * 16 + bl * 256;
-						hh[n] = utils::max(zs[n] - zb[n],(T) XParam.eps);
+						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+
+						
+						XEv.h[n] = utils::max(XEv.zs[n] - zb[n],(T) XParam.eps);
 					}
 
 				}
@@ -812,86 +800,43 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 		}
 	}
 
-	//uu Section
+	//u Section
 
-	if (uuerror == NC_NOERR)
+	if (!uname.empty())
 	{
-		printf("uu... ");
-		ndims = readvarinfo(XParam.hotstartfile.c_str(), "uu", ddim);
+		log("u... ");
+		uhotstart = readfileinfo(XParam.hotstartfile + "?" + uname, uhotstart);
+		//readforcingmaphead(zshotstart);
+		readstaticforcing(XParam.hotstep, uhotstart);
 
-		status = readvardata(XParam.hotstartfile.c_str(), "uu", ndims, 0, ddim, varinfile);
-		if (status != NC_NOERR) handle_ncerror(status);
-		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		interp2BUQ(XParam, XBlock, uhotstart, XEv.u);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, uu);
-
-
-		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, uu);
-		free(ddim);
-
+		setedges(XParam, XBlock, XEv.u);
 
 	}
 	else
 	{
-		if (uuerror == -49)
-		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * 256;
-						uu[n] = (T)0.0;
-					}
-				}
-			}
-		}
-		else
-		{
-			handle_ncerror(uuerror);
-		}
+		InitArrayBUQ(XParam.nblk, XParam.blkwidth, XParam.halowidth, (T)0.0, XEv.u);
 	}
 
 	//vv section
 
-	if (vverror == NC_NOERR)
+	if (!vname.empty())
 	{
-		printf("vv... ");
-		ndims = readvarinfo(XParam.hotstartfile.c_str(), "vv", ddim);
+		log("v... ");
+		vhotstart = readfileinfo(XParam.hotstartfile + "?" + vname, vhotstart);
+		//readforcingmaphead(zshotstart);
+		readstaticforcing(XParam.hotstep, vhotstart);
 
-		status = readvardata(XParam.hotstartfile.c_str(), "vv", ndims, 0, ddim, varinfile);
-		if (status != NC_NOERR) handle_ncerror(status);
-		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
+		interp2BUQ(XParam, XBlock, vhotstart, XEv.v);
 
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, vv);
-
-
-		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, vv);
-		free(ddim);
+		setedges(XParam, XBlock, XEv.v);
 
 
 	}
 	else
 	{
-		if (vverror == -49)
-		{
-			for (int bl = 0; bl < XParam.nblk; bl++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					for (int i = 0; i < 16; i++)
-					{
-						int n = i + j * 16 + bl * 256;
-						vv[n] = (T)0.0;
-					}
-				}
-			}
-		}
-		else
-		{
-			handle_ncerror(zserror);
-		}
+		InitArrayBUQ(XParam.nblk, XParam.blkwidth, XParam.halowidth, (T)0.0, XEv.v);
 	}
 	//status = nc_get_var_float(ncid, hh_id, zb);
 	status = nc_close(ncid);
@@ -905,7 +850,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 //template int readhotstartfile<float>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 
 //template int readhotstartfile<double>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
-*/
+
 
 std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD)
 {

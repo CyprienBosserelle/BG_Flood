@@ -62,17 +62,17 @@ template <class T> void initevolv(Param XParam, Forcing<float> XForcing, Evolvin
 	{
 		// hotstart
 		log("Hotstart file used : " + XParam.hotstartfile);
-		/*
+		
 		hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk, botblk, blockxo_d, blockyo_d, zs, zb, hh, uu, vv);
 
 		//add offset if present
-		if (abs(XParam.zsoffset - defaultParam.zsoffset) > epsilon) // apply specified zsoffset
+		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
 		{
 			printf("add offset to zs and hh... ");
 			//
 			AddZSoffset(XParam, zb, zs, hh);
 		}
-		*/
+		
 	}
 	if (hotstartsucess == 0)
 	{
