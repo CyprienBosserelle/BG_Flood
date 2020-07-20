@@ -6,9 +6,10 @@
 #include "Param.h"
 #include "Write_txt.h"
 #include "Forcing.h"
-#include "ReadForcing.h"
+#include "Util_CPU.h"
 
 
+template <class T> T readfileinfo(std::string input, T outinfo);
 
 void Readparamfile(Param& XParam, Forcing<float>& XForcing);
 
@@ -24,7 +25,7 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
 std::string trim(const std::string& str, const std::string& whitespace);
 
-template <class T> T readfileinfo(std::string input);
+
 
 // End of global definition
 #endif

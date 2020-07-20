@@ -65,48 +65,8 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 }
 
 
- template <class T>
- int readnczb(int nx, int ny, const std::string ncfile, T*& zb)
- {
-	 int status;
-	 int ncid, hh_id;
 
-	 std::string varstr, ncfilestr;
-	 std::vector<std::string> nameelements;
-	 //by default we expect tab delimitation
-	 nameelements = split(ncfile, '?');
-	 if (nameelements.size() > 1)
-	 {
-		 //variable name for bathy is not given so it is assumed to be zb
-		 ncfilestr = nameelements[0];
-		 varstr = nameelements[1];
-	 }
-	 else
-	 {
-		 ncfilestr = ncfile;
-		 varstr = "zb";
-	 }
-
-
-	 status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
-	 if (status != NC_NOERR)	handle_ncerror(status);
-	 status = nc_inq_varid(ncid, varstr.c_str(), &hh_id);
-	 if (status != NC_NOERR)	handle_ncerror(status);
-	 // This is safer than using nc_get_var because no mnatter how the netcdfvar is stored it will be converted to teh right type here
-	 status = nc_get_var_T(ncid, hh_id, zb);
-
-	 if (status != NC_NOERR)	handle_ncerror(status);
-	 status = nc_close(ncid);
-	 if (status != NC_NOERR)	handle_ncerror(status);
-
-	 return status;
- }
-
-template int readnczb<float>(int nx, int ny, const std::string ncfile, float * &zb);
-template int readnczb<double>(int nx, int ny, const std::string ncfile, double * &zb);
-
-
-void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax)
+void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax)
 {
 	//read the dimentions of grid, levels and time
 	int status;
@@ -121,25 +81,7 @@ void readgridncsize(const std::string ncfile, int &nx, int &ny, int &nt, double 
 	//char varname[NC_MAX_NAME + 1];
 	size_t  *ddimhh;
 
-	std::string ncfilestr;
-	std::string varstr;
-
-
-	//char ncfile[]="ocean_ausnwsrstwq2.nc";
-	std::vector<std::string> nameelements;
-	//by default we expect tab delimitation
-	nameelements = split(ncfile, '?');
-	if (nameelements.size() > 1)
-	{
-		//variable name for bathy is not given so it is assumed to be zb
-		ncfilestr = nameelements[0];
-		varstr = nameelements[1];
-	}
-	else
-	{
-		ncfilestr = ncfile;
-		varstr = "zb";
-	}
+	
 	//Open NC file
 	//printf("Open file\n");
 	status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
@@ -590,15 +532,17 @@ template int readncslev1<double>(std::string filename, std::string varstr, size_
 
 
 template <class T>
-int readvardata(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, T * vardata)
+int readvardata(std::string filename, std::string Varname, int step, T * &vardata)
 {
 	// function to standardise the way to read netCDF data off a file
 	// The role of this function is to offload and simplify the rest of the code
 
 
-	int nx, ny, nt, status, ncid, varid, sferr, oferr;
-	size_t * start, * count;
+	int nx, ny, nt, status, ncid, varid, sferr, oferr,ndims;
+	size_t * start, * count, *ddim;
 	double scalefac, offset;
+
+	ndims = readvarinfo(filename, Varname, ddim);
 
 	start = (size_t *)malloc(ndims*sizeof(size_t));
 	count = (size_t *)malloc(ndims*sizeof(size_t));
@@ -637,7 +581,7 @@ int readvardata(std::string filename, std::string Varname, int ndims, int hotste
 		nt = (int)ddim[0];
 		ny = (int)ddim[1];
 		nx = (int)ddim[2];
-		start[0] = utils::min(hotstep, nt - 1);
+		start[0] = utils::min(step, nt - 1);
 		start[1] = 0;
 		start[2] = 0;
 
@@ -681,10 +625,10 @@ int readvardata(std::string filename, std::string Varname, int ndims, int hotste
 
 }
 
-template int readvardata<float>(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, float * vardata);
-template int readvardata<double>(std::string filename, std::string Varname, int ndims, int hotstep, size_t * ddim, double * vardata);
+template int readvardata<float>(std::string filename, std::string Varname, int step, float * &vardata);
+template int readvardata<double>(std::string filename, std::string Varname, int step, double * &vardata);
 
-
+/*
 template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 {
@@ -961,7 +905,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 //template int readhotstartfile<float>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 
 //template int readhotstartfile<double>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
-
+*/
 
 std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD)
 {

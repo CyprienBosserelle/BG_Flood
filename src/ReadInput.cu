@@ -20,6 +20,46 @@
 
 #include "ReadInput.h"
 
+template <class T> T readfileinfo(std::string input,T outinfo)
+{
+	// Outinfo is based on an inputmap (or it's sub classes)
+	
+	//filename include the file extension
+
+	std::vector<std::string> extvec = split(input, '.');
+
+	//outinfo.inputfile = extvec.front();
+
+	std::vector<std::string> nameelements;
+	//
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		outinfo.extension = nameelements[0];
+		outinfo.varname = nameelements.back();
+
+	}
+	else
+	{
+		outinfo.extension = extvec.back();
+	}
+
+	//Reconstruct filename with extension but without varname
+	outinfo.inputfile = extvec.front() + "." + outinfo.extension;
+
+
+	return outinfo;
+}
+
+template inputmap readfileinfo<inputmap>(std::string input, inputmap outinfo);
+template forcingmap readfileinfo<forcingmap>(std::string input, forcingmap outinfo);
+template StaticForcingP<float> readfileinfo<StaticForcingP<float>>(std::string input, StaticForcingP<float> outinfo);
+template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input, DynForcingP<float> outinfo);
+template deformmap<float> readfileinfo<deformmap<float>>(std::string input, deformmap<float> outinfo);
+
+
+
 
 /*! \fn Param Readparamfile(Param XParam)
 * Open the BG_param.txt file and read the parameters
@@ -57,13 +97,6 @@ void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 		}
 		fs.close();
 
-		//////////////////////////////////////////////////////
-		/////             Sanity check                   /////
-		//////////////////////////////////////////////////////
-
-		
-
-		checkparamsanity(XParam,XForcing);
 
 	}
 	
@@ -609,7 +642,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue);
+		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -617,7 +650,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue);
+		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -625,7 +658,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue);
+		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -634,7 +667,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue);
+		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 	}
 
 	//Tsunami deformation input files
@@ -646,7 +679,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		deformmap<float> thisdeform;
 		std::vector<std::string> items = split(parametervalue, ',');
 		//Need sanity check here
-		thisdeform = readfileinfo(items[0]);
+		thisdeform = readfileinfo(items[0], thisdeform);
 		//thisdeform.inputfile = items[0];
 		if (items.size() > 1)
 		{
@@ -696,7 +729,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	if (!parametervalue.empty())
 	{
 
-		forcing.cf = readfileinfo(parametervalue);
+		forcing.cf = readfileinfo(parametervalue, forcing.cf);
 
 	}
 	parameterstr = "roughnessmap";
@@ -704,7 +737,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	if (!parametervalue.empty())
 	{
 
-		forcing.cf = readfileinfo(parametervalue);
+		forcing.cf = readfileinfo(parametervalue, forcing.cf);
 
 	}
 
@@ -720,14 +753,14 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			// If 2 parameters (files) are given then 1st file is U wind and second is V wind.
 			// This is for variable winds no rotation of the data is performed
 			
-			forcing.UWind = readfileinfo(trim(vars[0], " "));
-			forcing.VWind = readfileinfo(trim(vars[1], " "));
+			forcing.UWind = readfileinfo(trim(vars[0], " "), forcing.UWind);
+			forcing.VWind = readfileinfo(trim(vars[1], " "), forcing.VWind);
 		}
 		else if (vars.size() == 1)
 		{
 			// if 1 parameter(file) is given then a 3 column file is expected showing time windspeed and direction
 			// wind direction is rotated (later) to the grid direction (via grdalfa)
-			forcing.UWind = readfileinfo(parametervalue);
+			forcing.UWind = readfileinfo(parametervalue, forcing.UWind);
 			forcing.UWind.uniform = 1;
 			
 			//apply the same for Vwind? seem unecessary but need to be careful later in the code
@@ -749,7 +782,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	if (!parametervalue.empty())
 	{
 		// needs to be a netcdf file 
-		forcing.Atmp = readfileinfo(parametervalue);
+		forcing.Atmp = readfileinfo(parametervalue, forcing.Atmp);
 	}
 
 	// atmpress forcing
@@ -759,7 +792,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		// netcdf file == Variable spatially
 		// txt file (other than .nc) == spatially cst (txt file with 2 col time and mmm/h )
-		forcing.Rain = readfileinfo(parametervalue);
+		forcing.Rain = readfileinfo(parametervalue, forcing.Rain);
 		
 		//set the expected type of input
 
@@ -802,7 +835,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	//inputmap Bathymetry;
 	//Bathymetry.inputfile = XForcing.Bathy.inputfile;
-	XForcing.Bathy = readstaticforcinghead(XForcing.Bathy);
+	//XForcing.Bathy = readforcinghead(XForcing.Bathy);
 	
 
 
@@ -1017,43 +1050,5 @@ std::string trim(const std::string& str, const std::string& whitespace)
 }
 
 
-template <class T> T readfileinfo(std::string input)
-{
-	// Outinfo is based on an inputmap (or it's sub classes)
-	T outinfo;
 
 
-
-	//filename include the file extension
-
-	std::vector<std::string> extvec = split(input, '.');
-
-	//outinfo.inputfile = extvec.front();
-
-	std::vector<std::string> nameelements;
-	//
-	nameelements = split(extvec.back(), '?');
-	if (nameelements.size() > 1)
-	{
-		//variable name for bathy is not given so it is assumed to be zb
-		outinfo.extension = nameelements[0];
-		outinfo.varname = nameelements.back();
-		
-	}
-	else
-	{
-		outinfo.extension = extvec.back();
-	}
-
-	//Reconstruct filename with extension but without varname
-	outinfo.inputfile = extvec.front()+"."+ outinfo.extension;
-
-	
-	return outinfo;
-}
-
-template inputmap readfileinfo<inputmap>(std::string input);
-template forcingmap readfileinfo<forcingmap>(std::string input);
-template StaticForcingP<float> readfileinfo<StaticForcingP<float>>(std::string input);
-template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input);
-template deformmap<float> readfileinfo<deformmap<float>>(std::string input);

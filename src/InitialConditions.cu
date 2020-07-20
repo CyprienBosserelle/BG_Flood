@@ -62,6 +62,7 @@ template <class T> void initevolv(Param XParam, Forcing<float> XForcing, Evolvin
 	{
 		// hotstart
 		log("Hotstart file used : " + XParam.hotstartfile);
+		/*
 		hotstartsucess = readhotstartfile(XParam, leftblk, rightblk, topblk, botblk, blockxo_d, blockyo_d, zs, zb, hh, uu, vv);
 
 		//add offset if present
@@ -71,7 +72,7 @@ template <class T> void initevolv(Param XParam, Forcing<float> XForcing, Evolvin
 			//
 			AddZSoffset(XParam, zb, zs, hh);
 		}
-
+		*/
 	}
 	if (hotstartsucess == 0)
 	{
@@ -94,12 +95,14 @@ template <class T> void initevolv(Param XParam, Forcing<float> XForcing, Evolvin
 		//!leftWLbnd.empty()
 
 		//case 2b (i.e. zsinint and no boundaries were specified)
+		/*
 		if ((abs(XParam.zsinit - defaultParam.zsinit) <= epsilon) && (!XParam.leftbnd.on && !XParam.rightbnd.on && !XParam.topbnd.on && !XParam.botbnd.on)) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value
 		}
-
+		*/
 		//case(1)
+		/*
 		if (abs(XParam.zsinit - defaultParam.zsinit) > epsilon) // apply specified zsinit
 		{
 			int coldstartsucess = 0;
@@ -117,6 +120,7 @@ template <class T> void initevolv(Param XParam, Forcing<float> XForcing, Evolvin
 			}
 
 		}
+
 		else // lukewarm start i.e. bilinear interpolation of zs at bnds // Argggh!
 		{
 			if (XParam.doubleprecision == 1 || XParam.spherical == 1)
@@ -133,7 +137,7 @@ template <class T> void initevolv(Param XParam, Forcing<float> XForcing, Evolvin
 
 			}
 		}// end else
-
+		*/
 	}
 }
 

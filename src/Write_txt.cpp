@@ -127,12 +127,12 @@ void SaveParamtolog(Param XParam)
 		write_text_to_log_file("addoffset = " + std::to_string(XParam.addoffset) + ";");
 	}
 
-	if (!XParam.TSoutfile.empty())
+	if (!XParam.TSnodesout.empty())
 	{
-		for (int o = 0; o < XParam.TSoutfile.size(); o++)
+		for (int o = 0; o < XParam.TSnodesout.size(); o++)
 		{
-			write_text_to_log_file("TSOfile = " + XParam.TSoutfile[o] + ";");
-			write_text_to_log_file("TSnode = " + std::to_string(XParam.TSnodesout[o].i) + "," + std::to_string(XParam.TSnodesout[o].j) + ";");
+			write_text_to_log_file("TSOfile = " + XParam.TSnodesout[o].outname + "," + std::to_string(XParam.TSnodesout[o].x) + "," + std::to_string(XParam.TSnodesout[o].y)+";");
+			//write_text_to_log_file("TSnode = " + std::to_string(XParam.TSnodesout[o].i) + "," + std::to_string(XParam.TSnodesout[o].j) + ";");
 		}
 	}
 	write_text_to_log_file("\n");

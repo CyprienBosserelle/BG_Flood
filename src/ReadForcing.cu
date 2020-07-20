@@ -25,15 +25,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 {
 	//=================
 	// Read Bathymetry
+	readbathydata(XParam.posdown,XForcing.Bathy);
 	
-	//First allocate the array for storing the data
-	AllocateCPU(XForcing.Bathy.nx, XForcing.Bathy.ny, XForcing.Bathy.val);
-
-	log("Read Bathy data...");
-	
-	readbathydata(XParam.posdown,XForcing.Bathy, XForcing.Bathy.val);
-
-	log("...done");
 
 
 	//=================
@@ -111,30 +104,7 @@ template void readforcing<float>(Param& XParam, Forcing<float>& XForcing);
 template <class T>
 void readstaticforcing(T& Sforcing)
 {
-	inputmap cfmap;
-	cfmap.inputfile = Sforcing.inputfile;
-	cfmap = readstaticforcinghead(cfmap);
-	Sforcing.xo = cfmap.xo;
-	Sforcing.yo = cfmap.yo;
-	Sforcing.xmax = cfmap.xmax;
-	Sforcing.ymax = cfmap.ymax;
-	Sforcing.nx = cfmap.nx;
-	Sforcing.ny = cfmap.ny;
-	Sforcing.dx = cfmap.dx;
-
-	if (Sforcing.nx > 0 && Sforcing.ny > 0)
-	{
-		AllocateCPU(Sforcing.nx, Sforcing.ny, Sforcing.val);
-
-		// read the roughness map header
-		readbathydata(0, Sforcing, Sforcing.val);
-
-	}
-	else
-	{
-		//Error message
-		log("Error while reading forcing map file: "+ Sforcing.inputfile);
-	}
+	readstaticforcing(0, Sforcing);
 }
 
 template void readstaticforcing<deformmap<float>>(deformmap<float>& Sforcing);
@@ -143,24 +113,18 @@ template void readstaticforcing<StaticForcingP<float>>(StaticForcingP<float>& Sf
 template <class T>
 void readstaticforcing(int step,T& Sforcing)
 {
-	inputmap cfmap;
-	cfmap.inputfile = Sforcing.inputfile;
-	cfmap = readstaticforcinghead(cfmap);;
-	Sforcing.xo = cfmap.xo;
-	Sforcing.yo = cfmap.yo;
-	Sforcing.xmax = cfmap.xmax;
-	Sforcing.ymax = cfmap.ymax;
-	Sforcing.nx = cfmap.nx;
-	Sforcing.ny = cfmap.ny;
-	Sforcing.dx = cfmap.dx;
+	Sforcing=readforcinghead(Sforcing);
+	
 
 	if (Sforcing.nx > 0 && Sforcing.ny > 0)
 	{
 		AllocateCPU(Sforcing.nx, Sforcing.ny, Sforcing.val);
 
-		readvarinfo(Sforcing.inputfile, Sforcing.varname, ddimU)
+		//readvarinfo(Sforcing.inputfile, Sforcing.varname, ddimU)
 		// read the roughness map header
-		readbathydata(0, Sforcing, Sforcing.val);
+		//readvardata(0, Sforcing, Sforcing.val);
+		readforcingdata(step,Sforcing);
+		//readvardata(forcing.inputfile, forcing.varname, step, forcing.val);
 
 	}
 	else
@@ -169,42 +133,23 @@ void readstaticforcing(int step,T& Sforcing)
 		log("Error while reading forcing map file: " + Sforcing.inputfile);
 	}
 }
+template void readstaticforcing<deformmap<float>>(int step, deformmap<float>& Sforcing);
+template void readstaticforcing<StaticForcingP<float>>(int step, StaticForcingP<float>& Sforcing);
+template void readstaticforcing<DynForcingP<float>>(int step, DynForcingP<float>& Sforcing);
 
-
-
-void readbathydata(int posdown, inputmap bathymeta,float * &dummy)
+void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 {
-	// Check bathy extension
-	std::string bathyext = bathymeta.extension;
-	//Now choose the right function to read the data
-
-	if (bathyext.compare("md") == 0)
-	{
-		readbathyMD(bathymeta.inputfile, dummy);
-	}
-	if (bathyext.compare("nc") == 0)
-	{
-		readnczb(bathymeta.nx, bathymeta.ny, bathymeta.inputfile, dummy);
-	}
-	if (bathyext.compare("bot") == 0 || bathyext.compare("dep") == 0)
-	{
-		readXBbathy(bathymeta.inputfile, bathymeta.nx, bathymeta.ny, dummy);
-	}
-	if (bathyext.compare("asc") == 0)
-	{
-		//
-		readbathyASCzb(bathymeta.inputfile, bathymeta.nx, bathymeta.ny, dummy);
-	}
+	readstaticforcing(Sforcing);
 
 	if (posdown == 1)
 	{
 		
 		log("Bathy data is positive down...correcting");
-		for (int j = 0; j < bathymeta.ny; j++)
+		for (int j = 0; j < Sforcing.ny; j++)
 		{
-			for (int i = 0; i < bathymeta.nx; i++)
+			for (int i = 0; i < Sforcing.nx; i++)
 			{
-				dummy[i + j * bathymeta.nx] = dummy[i + j * bathymeta.nx] * -1.0f;
+				Sforcing.val[i + j * Sforcing.nx] = Sforcing.val[i + j * Sforcing.nx] * -1.0f;
 				//printf("%f\n", zb[i + (j)*nx]);
 
 			}
@@ -288,7 +233,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	if (fileext.compare("nc") == 0)
 	{
 		//Bndinfo = readNestfile(filename);
-		Bndinfo = readNestfile(filename, hor, XParam.eps, xxo, xxmax, yy);
+		//Bndinfo = readNestfile(filename, hor, XParam.eps, xxo, xxmax, yy);
 	}
 	else
 	{
@@ -388,6 +333,7 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
+/*
 std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double bndxo, double bndxmax, double bndy)
 {
 	// Prep boundary input vector from anorthe model output file
@@ -569,6 +515,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 	free(zsa);
 	return slbnd;
 }
+*/
 
 std::vector<Flowin> readFlowfile(std::string Flowfilename)
 {
@@ -806,118 +753,41 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 
 
 
-inputmap readcfmaphead(inputmap Roughmap)
-{
-	// Read critical parameter for the roughness map or deformation file grid input
-	log("Rougness map was specified. Checking file... "+ Roughmap.inputfile);
-	std::string fileext;
-	double dummy;
-	std::vector<std::string> extvec = split(Roughmap.inputfile, '.');
-
-	std::vector<std::string> nameelements;
-	//by default we expect tab delimitation
-	nameelements = split(extvec.back(), '?');
-	if (nameelements.size() > 1)
-	{
-		//variable name for bathy is not given so it is assumed to be zb
-		fileext = nameelements[0];
-	}
-	else
-	{
-		fileext = extvec.back();
-	}
-	log("cfmap file extension : " + fileext);
-
-	if (fileext.compare("md") == 0)
-	{
-		log("Reading 'md' file");
-		readbathyHeadMD(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, dummy);
-		Roughmap.xo = 0.0;
-		Roughmap.yo = 0.0;
-		Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
-		Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
-	}
-	if (fileext.compare("nc") == 0)
-	{
-		int dummy;
-		double dummya, dummyb;
-		log("Reading cfmap as netcdf file");
-		readgridncsize(Roughmap.inputfile, Roughmap.nx, Roughmap.ny,dummy, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummya, Roughmap.xmax, Roughmap.ymax, dummyb);
-		//write_text_to_log_file("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
-		//Roughmap.xo = 0.0;
-		//Roughmap.yo = 0.0;
-		//Roughmap.xmax = (Roughmap.nx - 1)*Roughmap.dx;
-		//Roughmap.ymax = (Roughmap.ny - 1)*Roughmap.dx;
-
-	}
-	if (fileext.compare("dep") == 0 || fileext.compare("bot") == 0)
-	{
-		//XBeach style file
-		//write_text_to_log_file("Reading " + bathyext + " file");
-		//write_text_to_log_file("For this type of bathy file please specify nx, ny, dx, xo, yo and grdalpha in the XBG_param.txt");
-	}
-	if (fileext.compare("asc") == 0)
-	{
-		//
-		log("Reading cfmap as asc file");
-		readbathyASCHead(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, Roughmap.dx, Roughmap.xo, Roughmap.yo, dummy);
-		
-		Roughmap.xmax = Roughmap.xo + (Roughmap.nx - 1)*Roughmap.dx;
-		Roughmap.ymax = Roughmap.yo + (Roughmap.ny - 1)*Roughmap.dx;
-	}
-
-
-
-
-
-
-	return Roughmap;
-}
-
-void readmapdata(inputmap Roughmap, float * &cfmapinput)
+template <class T>
+void readforcingdata(int step,T forcing)
 {
 	// Check extension 
 	std::string fileext;
 
-	std::vector<std::string> extvec = split(Roughmap.inputfile, '.');
-
-	std::vector<std::string> nameelements;
-	//by default we expect tab delimitation
-	nameelements = split(extvec.back(), '?');
-	if (nameelements.size() > 1)
-	{
-		//variable name for bathy is not given so it is assumed to be zb
-		fileext = nameelements[0];
-	}
-	else
-	{
-		fileext = extvec.back();
-	}
-
+	fileext = forcing.extension;
 	//Now choose the right function to read the data
 
 	if (fileext.compare("md") == 0)
 	{
-		readbathyMD(Roughmap.inputfile, cfmapinput);
+		readbathyMD(forcing.inputfile, forcing.val);
 	}
 	if (fileext.compare("nc") == 0)
 	{
-		readnczb(Roughmap.nx, Roughmap.ny, Roughmap.inputfile, cfmapinput);
+		readvardata(forcing.inputfile, forcing.varname,step, forcing.val);
 	}
 	if (fileext.compare("bot") == 0 || fileext.compare("dep") == 0)
 	{
-		readXBbathy(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, cfmapinput);
+		readXBbathy(forcing.inputfile, forcing.nx, forcing.ny, forcing.val);
 	}
 	if (fileext.compare("asc") == 0)
 	{
 		//
-		readbathyASCzb(Roughmap.inputfile, Roughmap.nx, Roughmap.ny, cfmapinput);
+		readbathyASCzb(forcing.inputfile, forcing.nx, forcing.ny, forcing.val);
 	}
 
 	//return 1;
 }
+template void readforcingdata<StaticForcingP<float>>(int step, StaticForcingP<float> forcing);
+template void readforcingdata<deformmap<float>>(int step, deformmap<float> forcing);
+template void readforcingdata<DynForcingP<float>>(int step, DynForcingP<float> forcing);
 
-template<class T> T readforcingmaphead( T Fmap)
+
+DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 {
 	// Read critical parameter for the forcing map
 	log("Forcing map was specified. Checking file... ");
@@ -928,7 +798,7 @@ template<class T> T readforcingmaphead( T Fmap)
 	if (fileext.compare("nc") == 0)
 	{
 		log("Reading Forcing file as netcdf file");
-		readgridncsize(Fmap.inputfile+"?"+Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
+		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
 		
 
 	}
@@ -942,12 +812,10 @@ template<class T> T readforcingmaphead( T Fmap)
 	return Fmap;
 }
 
-template forcingmap readforcingmaphead<forcingmap>(forcingmap Fmap);
-template DynForcingP<float> readforcingmaphead<DynForcingP<float>>(DynForcingP<float> Fmap);
-template StaticForcingP<float> readforcingmaphead<StaticForcingP<float>>(StaticForcingP<float> Fmap);
 
 
-template<class T> T readstaticforcinghead(T ForcingParam)
+
+template<class T> T readforcinghead(T ForcingParam)
 {
 	//std::string fileext;
 
@@ -977,7 +845,7 @@ template<class T> T readstaticforcinghead(T ForcingParam)
 			int dummy;
 			double dummya, dummyb, dummyc;
 			log("netcdf file");
-			readgridncsize(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc);
+			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc);
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 
@@ -1023,10 +891,10 @@ template<class T> T readstaticforcinghead(T ForcingParam)
 	return ForcingParam;
 }
 
-//template inputmap readBathyhead<inputmap>(inputmap BathyParam);
+template inputmap readforcinghead<inputmap>(inputmap BathyParam);
+template forcingmap readforcinghead<forcingmap>(forcingmap BathyParam);
 //template StaticForcingP<float> readBathyhead<StaticForcingP<float>>(StaticForcingP<float> BathyParam);
-template inputmap readstaticforcinghead<inputmap>(inputmap ForcingParam);
-template StaticForcingP<float> readstaticforcinghead<StaticForcingP<float>>(StaticForcingP<float> ForcingParam);
+template StaticForcingP<float> readforcinghead<StaticForcingP<float>>(StaticForcingP<float> ForcingParam);
 
 
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)

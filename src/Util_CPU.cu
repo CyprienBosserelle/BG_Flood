@@ -118,3 +118,14 @@ template <class T> T BarycentricInterpolation(T q1, T x1, T y1, T q2, T x2, T y2
 
 template float BarycentricInterpolation(float q1, float x1, float y1, float q2, float x2, float y2, float q3, float x3, float y3, float x, float y);
 template double BarycentricInterpolation(double q1, double x1, double y1, double q2, double x2, double y2, double q3, double x3, double y3, double x, double y);
+
+
+template <class T>
+__host__ __device__ double calcres(T dx, int level)
+{
+	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
+}
+
+template __host__ __device__ double calcres<double>(double dx, int level);
+template __host__ __device__ double calcres<float>(float dx, int level);
+

@@ -77,11 +77,13 @@ int main(int argc, char **argv)
 	Model<decltype(modeltype)> XModel; // For CPU pointers
 	Model<decltype(modeltype)> XModel_g; // For GPU pointers
 
-	
-
 	//============================================
 	// Read the forcing data (Including bathymetry)
 	readforcing(XParam, XForcing);
+
+	//=============================================
+	// Verify Compatibility of forcing and model Parameters
+	checkparamsanity(XParam, XForcing);
 
 	//============================================
 	// Prepare initial mesh layout

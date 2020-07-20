@@ -36,6 +36,7 @@ struct DynForcingP: public forcingmap
 {
 	T *now;
 	T *before, *after;
+	T* val; // useful for reading form file
 	//Add map here?
 
 };
