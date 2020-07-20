@@ -686,11 +686,11 @@ template int readvardata<double>(std::string filename, std::string Varname, int 
 
 
 template <class T>
-int readhotstartfile(Param XParam, EvolvingP<T> &XEv)
+int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T*zb)
 {
 	int status, zserror, herror, uerror, verror, zerror, sferr, oferr, xerror, yerror;
 	int ncid, varid, ndims;
-	int dimids[NC_MAX_VAR_DIMS];    dimension IDs 
+	int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
 	int nx, ny, nt;
 	T * xcoord, *ycoord, * varinfile; // Not necessarily identical to any prevoious ones
 	double scalefac = 1.0;
@@ -724,10 +724,13 @@ int readhotstartfile(Param XParam, EvolvingP<T> &XEv)
 	// Just as with other variables we expect the file follow the output naming convention of "xx" and "yy" both as a dimension and a variable
 	StaticForcingP<float> zbhotstart, zshotstart, hhotstart, uhotstart, vhotstart;
 	
+	// Read hotstart block info if it exist
+	// By default reuse mesh-layout
+	// for now we pretend hotstart are just unifomr maesh layout
 
-	//readstaticforcing(Sforcing)
 
-	//first check if hotstart has zb
+
+	//if hotstart has zb variable overright the previous ne
 	//printf("Found variables: ");
 	if (!zbname.empty())
 	{
@@ -735,11 +738,11 @@ int readhotstartfile(Param XParam, EvolvingP<T> &XEv)
 		zbhotstart.inputfile = XParam.hotstartfile + "?" + zbname;
 		
 		readstaticforcing(zbhotstart);
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, zb);
+		interp2BUQ(XParam,XBlock, zbhotstart, zb);
 				
 		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
-		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
+		//setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zb);
 
 		
 
@@ -748,24 +751,26 @@ int readhotstartfile(Param XParam, EvolvingP<T> &XEv)
 
 
 	//zs Section
-	if (zserror == NC_NOERR)
+	if (!zsname.empty())
 	{
 		printf(" zs... ");
-		ndims = readvarinfo(XParam.hotstartfile.c_str(), "zs", ddim);
 
-		status = readvardata(XParam.hotstartfile.c_str(), "zs", ndims, 0, ddim, varinfile);
+		readforcingmaphead(zshotstart);
+
+
+
+		ndims = readvarinfo(XParam.hotstartfile.c_str(), zsname, ddim);
+
+		status = readvardata(XParam.hotstartfile.c_str(), zsname, ndims, XParam.hotstep, ddim, zshotstart.val);
 		if (status != NC_NOERR) handle_ncerror(status);
-		//printf("dim:%d=%d\n", iddim, ddimhh[iddim]);
-		//printf("zs hotstartfile[1407,435]=%f\n", varinfile[1407+435*nx]);
-		//printf("xcoord[0]=%f \t xcoord[nx]=%f \t dx=%f \t nx=%d\n",xcoord[0],xcoord[nx],(xcoord[nx] - xcoord[0]) / (nx - 1),nx);
-		interp2BUQ(XParam.nblk, XParam.blksize, XParam.dx, blockxo, blockyo, nx, ny, xcoord[0], xcoord[nx-1], ycoord[0], ycoord[ny-1], (xcoord[nx-1] - xcoord[0]) / (nx - 1), varinfile, zs);
-
+		
+		interp2BUQ(XParam, XBlock, zshotstart, XEv.zs);
 		//printf("zs interpolated[ 8 + 8 * 16 + 9000 * blksize]=%f\n", zs[0]);
 		//printf("zs hotstartfile[1407,435]=%f\n", zs[1407 + 435 * nx]);
 		//carttoBUQ(XParam.nblk, XParam.nx, XParam.ny, XParam.xo, XParam.yo, XParam.dx, blockxo, blockyo, dummy, zs);
 		//because we set the edges around empty blocks we need the set the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
-		setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
+		//setedges(XParam.nblk, leftblk, rightblk, topblk, botblk, zs);
 
 		//check sanity
 		for (int bl = 0; bl < XParam.nblk; bl++)

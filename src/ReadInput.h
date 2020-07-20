@@ -24,6 +24,7 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
 std::string trim(const std::string& str, const std::string& whitespace);
 
+template <class T> T readfileinfo(std::string input);
 
 // End of global definition
 #endif

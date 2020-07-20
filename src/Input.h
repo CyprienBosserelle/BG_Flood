@@ -4,10 +4,12 @@
 
 #include "General.h"
 
-class TSnode {
+// Timeseries output
+class TSoutnode {
 public:
 	int i, j, block;
 	double x, y;
+	std::string outname;
 };
 
 class Flowin {
@@ -42,6 +44,7 @@ public:
 	double grdalpha=0.0;
 	std::string inputfile;
 	std::string extension;
+	std::string varname;
 };
 
 class SLTS {
@@ -78,7 +81,7 @@ public:
 	int side = 0; // 0: top bnd, 1: rightbnd, 2: bot bnd, 3, Left bnd
 };
 
-
+// used as vector class to store Time series outputs
 class Pointout {
 public:
 	double time, zs, hh, uu,vv;

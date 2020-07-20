@@ -66,8 +66,7 @@ public:
 	double totaltime = 0.0; //
 
 	//Timeseries output
-	std::vector<std::string> TSoutfile; //filename of output time series (Only save time, H U,V and zs)
-	std::vector<TSnode> TSnodesout; // vector containing i and j of each variables
+	std::vector<TSoutnode> TSnodesout; // vector containing i and j of each variables
 									//Output variables
 	std::vector<std::string> outvars; //list of names of teh variables to output
 

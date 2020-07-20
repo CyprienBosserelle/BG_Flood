@@ -254,31 +254,29 @@ Param readparamstr(std::string line, Param param)
 
 	
 	// Below is a bit more complex than usual because more than 1 node can be outputed as a timeseries
-	parameterstr = "TSOfile";
+	parameterstr = "TSOutput";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.TSoutfile.push_back(parametervalue);
+		TSoutnode node;
+		std::vector<std::string> nodeitems = split(parametervalue, ',');
+		if (nodeitems.size() > 3)
+		{
+			node.outname = nodeitems[0];
+			node.x = std::stod(nodeitems[1]);
+			node.y = std::stod(nodeitems[2]);
+
+			param.TSnodesout.push_back(node);
+		}
+		else
+		{
+			std::cerr << "Node input failed there should be 3 arguments (comma separated) when inputing a outout node: TSOutput = filename, xvalue, yvalue; see log file for details" << std::endl;
+
+			log("Node input failed there should be 3 arguments (comma separated) when inputing a outout node: TSOutput = filename, xvalue, yvalue; see log file for details. Input was: "+ parametervalue);
+			
+		}
 		
 	}
-
-	parameterstr = "TSnode";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> nodes = split(parametervalue, ',');
-		//Need sanity check here
-		TSnode node;
-		node.x = std::stod(nodes[0]);
-		node.y = std::stod(nodes[1]);
-
-		//i and j are calculated in the Sanity check
-
-		param.TSnodesout.push_back(node);
-
-		
-	}
-
 	
 
 
@@ -611,7 +609,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy.inputfile = parametervalue;
+		forcing.Bathy = readfileinfo(parametervalue);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -619,7 +617,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy.inputfile = parametervalue;
+		forcing.Bathy = readfileinfo(parametervalue);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -627,7 +625,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy.inputfile = parametervalue;
+		forcing.Bathy = readfileinfo(parametervalue);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -636,7 +634,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy.inputfile = parametervalue;
+		forcing.Bathy = readfileinfo(parametervalue);
 	}
 
 	//Tsunami deformation input files
@@ -648,7 +646,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		deformmap<float> thisdeform;
 		std::vector<std::string> items = split(parametervalue, ',');
 		//Need sanity check here
-		thisdeform.inputfile = items[0];
+		thisdeform = readfileinfo(items[0]);
+		//thisdeform.inputfile = items[0];
 		if (items.size() > 1)
 		{
 			thisdeform.startime = std::stod(items[1]);
@@ -697,7 +696,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	if (!parametervalue.empty())
 	{
 
-		forcing.cf.inputfile = parametervalue;
+		forcing.cf = readfileinfo(parametervalue);
 
 	}
 	parameterstr = "roughnessmap";
@@ -705,7 +704,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	if (!parametervalue.empty())
 	{
 
-		forcing.cf.inputfile = parametervalue;
+		forcing.cf = readfileinfo(parametervalue);
 
 	}
 
@@ -721,14 +720,14 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			// If 2 parameters (files) are given then 1st file is U wind and second is V wind.
 			// This is for variable winds no rotation of the data is performed
 			
-			forcing.UWind.inputfile = trim(vars[0], " ");
-			forcing.UWind.inputfile = trim(vars[1], " ");
+			forcing.UWind = readfileinfo(trim(vars[0], " "));
+			forcing.VWind = readfileinfo(trim(vars[1], " "));
 		}
 		else if (vars.size() == 1)
 		{
 			// if 1 parameter(file) is given then a 3 column file is expected showing time windspeed and direction
 			// wind direction is rotated (later) to the grid direction (via grdalfa)
-			forcing.UWind.inputfile = parametervalue;
+			forcing.UWind = readfileinfo(parametervalue);
 			forcing.UWind.uniform = 1;
 			
 			//apply the same for Vwind? seem unecessary but need to be careful later in the code
@@ -750,7 +749,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	if (!parametervalue.empty())
 	{
 		// needs to be a netcdf file 
-		forcing.Atmp.inputfile = parametervalue;
+		forcing.Atmp = readfileinfo(parametervalue);
 	}
 
 	// atmpress forcing
@@ -760,28 +759,11 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		// netcdf file == Variable spatially
 		// txt file (other than .nc) == spatially cst (txt file with 2 col time and mmm/h )
-		forcing.Rain.inputfile = parametervalue;
+		forcing.Rain = readfileinfo(parametervalue);
 		
-		std::string fileext;
-
-		std::vector<std::string> extvec = split(parametervalue, '.');
-
-		std::vector<std::string> nameelements;
-		//by default we expect tab delimitation
-		nameelements = split(extvec.back(), '?');
-		if (nameelements.size() > 1)
-		{
-			//variable name is not given so it is assumed to be z
-			fileext = nameelements[0];
-		}
-		else
-		{
-			fileext = extvec.back();
-		}
-
 		//set the expected type of input
 
-		if (fileext.compare("nc") == 0)
+		if (forcing.Rain.extension.compare("nc") == 0)
 		{
 			forcing.Rain.uniform = 0;
 		}
@@ -820,7 +802,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	//inputmap Bathymetry;
 	//Bathymetry.inputfile = XForcing.Bathy.inputfile;
-	XForcing.Bathy = readBathyhead(XForcing.Bathy);
+	XForcing.Bathy = readstaticforcinghead(XForcing.Bathy);
 	
 
 
@@ -841,16 +823,12 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 
 	//Check Bathy input type
-	std::string bathyext;
-	std::vector<std::string> extvec = split(XForcing.Bathy.inputfile, '.');
-	bathyext = extvec.back();
-	
-	if (bathyext.compare("dep") == 0 || bathyext.compare("bot") == 0)
+	if (XForcing.Bathy.extension.compare("dep") == 0 || XForcing.Bathy.extension.compare("bot") == 0)
 	{
 		if (std::isnan(XParam.dx))
 		{
 			//std::cerr << "FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." << bathyext << " file" << std::endl;
-			log("FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." + bathyext + " file");
+			log("FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." + XForcing.Bathy.extension + " file");
 			exit(1);
 		}
 	}
@@ -926,46 +904,6 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	{
 		XParam.outputtimestep = XParam.endtime;
 		//otherwise there is really no point running the model
-	}
-
-
-
-
-
-
-
-	//Check that there are as many file specified for Time series output as there are vectors of nodes
-	if (XParam.TSoutfile.size() != XParam.TSnodesout.size())
-	{
-		// Issue a Warning
-		//std::cout << "WARNING: the number of timeseries output files is not equal to the number of nodes specified" << std::endl;
-		//std::cout << "for each location where timeseries output file is required, the XBG_param.txt file shoud contain 2 lines see example felow to extract in 2 locations:" << std::endl;
-		//std::cout << "TSOfile = Reef_Crest.txt" << std::endl;
-		//std::cout << "TSnode = 124,239;" << std::endl;
-		//std::cout << "TSOfile = shore.txt" << std::endl;
-		//std::cout << "TSnode = 233,256;" << std::endl;
-
-		log("WARNING: the number of timeseries output files is not equal to the number of nodes specified");
-		log("for each location where timeseries output file is required, the XBG_param.txt file shoud contain 2 lines see example felow to extract in 2 locations:");
-		log("TSOfile = Reef_Crest.txt");
-		log("TSnode = 124,239;");
-		log("TSOfile = Shore.txt");
-		log("TSnode = 233,256;");
-		//min not defined for const so use this convoluted statement below
-		size_t minsize;
-		if (XParam.TSoutfile.size() > XParam.TSnodesout.size())
-		{
-			minsize = XParam.TSnodesout.size();
-		}
-
-		if (XParam.TSoutfile.size() < XParam.TSnodesout.size())
-		{
-			minsize = XParam.TSoutfile.size();
-		}
-
-				
-		XParam.TSoutfile.resize(minsize);
-		XParam.TSnodesout.resize(minsize);
 	}
 
 	
@@ -1079,4 +1017,43 @@ std::string trim(const std::string& str, const std::string& whitespace)
 }
 
 
+template <class T> T readfileinfo(std::string input)
+{
+	// Outinfo is based on an inputmap (or it's sub classes)
+	T outinfo;
 
+
+
+	//filename include the file extension
+
+	std::vector<std::string> extvec = split(input, '.');
+
+	//outinfo.inputfile = extvec.front();
+
+	std::vector<std::string> nameelements;
+	//
+	nameelements = split(extvec.back(), '?');
+	if (nameelements.size() > 1)
+	{
+		//variable name for bathy is not given so it is assumed to be zb
+		outinfo.extension = nameelements[0];
+		outinfo.varname = nameelements.back();
+		
+	}
+	else
+	{
+		outinfo.extension = extvec.back();
+	}
+
+	//Reconstruct filename with extension but without varname
+	outinfo.inputfile = extvec.front()+"."+ outinfo.extension;
+
+	
+	return outinfo;
+}
+
+template inputmap readfileinfo<inputmap>(std::string input);
+template forcingmap readfileinfo<forcingmap>(std::string input);
+template StaticForcingP<float> readfileinfo<StaticForcingP<float>>(std::string input);
+template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input);
+template deformmap<float> readfileinfo<deformmap<float>>(std::string input);
