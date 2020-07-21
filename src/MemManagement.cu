@@ -14,6 +14,7 @@ template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zb)
 }
 
 
+
 template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zs, T *&h, T *&u, T *&v)
 {
 

@@ -824,6 +824,8 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		XParam.doubleprecision = 1;
 	}
 
+	XParam.blksize = utils::sq(XParam.blkwidth + XParam.halowidth);
+
 	///////////////////////////////////////////
 	//  Read Bathy Information
 	///////////////////////////////////////////

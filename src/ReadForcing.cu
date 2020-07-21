@@ -74,7 +74,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	}
 	
 	//=====================
-	// Deformation files
+	// Deformation (tsunami generation)
 	if (XForcing.deform.size() > 0)
 	{
 		log("Read deform data...");
@@ -93,9 +93,78 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	}
 
 	//======================
-	// Wind file
+	// Rivers
+	if (XForcing.rivers.size() > 0)
+	{
+		// This part of the code only reads the meta data and data 
+		// the full initialisation and detection of river blocks is done in model initialisation
+		log("Preparing rivers (" + std::to_string(XForcing.rivers.size()) + " rivers)");
+		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+		{
+			// Now read the discharge input and store to  
+			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile);
+		}
+	}
 
 
+	//======================
+	// Wind file(s)
+	if (!XForcing.UWind.inputfile.empty())
+	{
+		// This part of the code only reads the meta data and data for initial step
+		// the full initialisation of the cuda array and texture is done in model initialisation
+		if (XForcing.UWind.uniform == 1)
+		{
+			// grid uniform time varying wind input: wlevs[0] is wind speed and wlev[1] is direction
+			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.grdalpha);
+		}
+		else
+		{
+			//
+			readDynforcing(XParam.totaltime, XForcing.UWind);
+			readDynforcing(XParam.totaltime, XForcing.VWind);
+		}
+
+	}
+
+	//======================
+	// ATM file
+	if (!XForcing.Atmp.inputfile.empty())
+	{
+		// This part of the code only reads the meta data and data for initial step
+		// the full initialisation of the cuda array and texture is done in model initialisation
+		XForcing.Atmp.uniform = (XForcing.Atmp.extension.compare("nc") == 0) ? 0 : 1;
+		if (XForcing.Atmp.uniform == 1)
+		{
+			// grid uniform time varying atm pressure input is pretty useless...
+			XForcing.Atmp.unidata = readINfileUNI(XForcing.Atmp.inputfile);;
+		}
+		else
+		{
+			readDynforcing(XParam.totaltime, XForcing.Atmp);
+		}
+	}
+
+	//======================
+	// Rain file
+	if (!XForcing.Rain.inputfile.empty())
+	{
+		// This part of the code only reads the meta data and data for initial step
+		// the full initialisation of the cuda array and texture is done in model initialisation
+		if (XForcing.Rain.uniform == 1)
+		{
+			// grid uniform time varying rain input
+			XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+		}
+		else
+		{
+			readDynforcing(XParam.totaltime, XForcing.Rain);
+		}
+	}
+
+	//======================
+	// Done
+	//======================
 }
 
 template void readforcing<float>(Param& XParam, Forcing<float>& XForcing);
@@ -135,7 +204,26 @@ void readstaticforcing(int step,T& Sforcing)
 }
 template void readstaticforcing<deformmap<float>>(int step, deformmap<float>& Sforcing);
 template void readstaticforcing<StaticForcingP<float>>(int step, StaticForcingP<float>& Sforcing);
-template void readstaticforcing<DynForcingP<float>>(int step, DynForcingP<float>& Sforcing);
+
+//template void readstaticforcing<DynForcingP<float>>(int step, DynForcingP<float>& Sforcing);
+void readDynforcing(double totaltime,DynForcingP<float>& Dforcing)
+{
+	Dforcing = readforcinghead(Dforcing);
+
+
+	if (Dforcing.nx > 0 && Dforcing.ny > 0)
+	{
+		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
+		readforcingdata(totaltime, Dforcing);
+	}
+	else
+	{
+		//Error message
+		log("Error while reading forcing map file: " + Dforcing.inputfile);
+	}
+}
+
+
 
 void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 {
@@ -245,7 +333,8 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	{
 		for (int n = 0; n < Bndinfo[i].wlevs.size(); n++)
 		{
-			Bndinfo[i].wlevs[n] = Bndinfo[i].wlevs[n] + XParam.zsoffset;
+			double addoffset = std::isnan(XParam.zsoffset) ? 0.0 : XParam.zsoffset;
+			Bndinfo[i].wlevs[n] = Bndinfo[i].wlevs[n] + addoffset;
 		}
 	}
 
@@ -333,8 +422,8 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 	return slbnd;
 }
 
-/*
-std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double bndxo, double bndxmax, double bndy)
+
+std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,double eps, double bndxo, double bndxmax, double bndy)
 {
 	// Prep boundary input vector from anorthe model output file
 	//this function works for botom top bnd as written but flips x and y for left and right bnds
@@ -351,7 +440,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 	int iswet;
 
 	// Read NC info
-	readgridncsize(ncfile, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax);
+	readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax);
 	
 	if (hor == 0)
 	{
@@ -515,7 +604,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, int hor ,double eps, double b
 	free(zsa);
 	return slbnd;
 }
-*/
+
 
 std::vector<Flowin> readFlowfile(std::string Flowfilename)
 {
@@ -784,7 +873,16 @@ void readforcingdata(int step,T forcing)
 }
 template void readforcingdata<StaticForcingP<float>>(int step, StaticForcingP<float> forcing);
 template void readforcingdata<deformmap<float>>(int step, deformmap<float> forcing);
-template void readforcingdata<DynForcingP<float>>(int step, DynForcingP<float> forcing);
+//template void readforcingdata<DynForcingP<float>>(int step, DynForcingP<float> forcing);
+
+
+void readforcingdata(double totaltime, DynForcingP<float>& forcing)
+{
+	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
+	readvardata(forcing.inputfile, forcing.varname, step, forcing.before);
+	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after);
+	InterpstepCPU(forcing.nx, forcing.ny, step, totaltime, forcing.dt, forcing.now, forcing.before, forcing.after);
+}
 
 
 DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
@@ -1202,4 +1300,24 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 }
 
 
+void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
+{
+	//float fac = 1.0;
+	float Uxo, Uxn;
 
+	/*Ums[tx]=Umask[ix];*/
+
+
+
+
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			Uxo = Uo[i + nx * j];
+			Uxn = Un[i + nx * j];
+
+			Ux[i + nx * j] = Uxo + (totaltime - hddt * hdstep) * (Uxn - Uxo) / hddt;
+		}
+	}
+}

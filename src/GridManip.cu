@@ -26,46 +26,99 @@
 
 
 
-template <class T> void InitArrayBUQ(int nblk, int blkwidth,int halo,  T initval, T*& Arr)
+template <class T,class F> void InitArrayBUQ(Param XParam, BlockP<F> XBlock,  T initval, T*& Arr)
 {
-	int blksize = utils::sq(blkwidth);
-	//inititiallise array with a single value
-	for (int bl = 0; bl < nblk; bl++)
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		for (int j = 0; j < blkwidth; j++)
+		ib = XBlock.active[ibl];
+
+		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			for (int i = 0; i < blkwidth; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i+halo) + (j+halo) * blkwidth + bl * blksize;
+				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
 				Arr[n] = initval;
 			}
 		}
 	}
 }
 
-template void InitArrayBUQ<float>(int nblk, int blkwidth, int halo, float initval, float*& Arr);
-template void InitArrayBUQ<double>(int nblk, int blkwidth, int halo, double initval, double*& Arr);
-template void InitArrayBUQ<int>(int nblk, int blkwidth, int halo, int initval, int*& Arr);
-template void InitArrayBUQ<bool>(int nblk, int blkwidth, int halo, bool initval, bool*& Arr);
+template void InitArrayBUQ<float,float>(Param XParam, BlockP<float> XBlock, float initval, float*& Arr);
+template void InitArrayBUQ<double, float>(Param XParam, BlockP<float> XBlock, double initval, double*& Arr);
+template void InitArrayBUQ<int, float>(Param XParam, BlockP<float> XBlock, int initval, int*& Arr);
+template void InitArrayBUQ<bool, float>(Param XParam, BlockP<float> XBlock, bool initval, bool*& Arr);
 
-template <class T> void CopyArrayBUQ(int nblk, int blkwidth, int halo, T* source, T*& dest)
+template void InitArrayBUQ<float, double>(Param XParam, BlockP<double> XBlock, float initval, float*& Arr);
+template void InitArrayBUQ<double, double>(Param XParam, BlockP<double> XBlock, double initval, double*& Arr);
+template void InitArrayBUQ<int, double>(Param XParam, BlockP<double> XBlock, int initval, int*& Arr);
+template void InitArrayBUQ<bool, double>(Param XParam, BlockP<double> XBlock, bool initval, bool*& Arr);
+
+
+
+template <class T, class F> void InitBlkBUQ(Param XParam, BlockP<F> XBlock, T initval, T*& Arr)
 {
-	int blksize = sq(blkwidth);
-	//
-	for (int bl = 0; bl < nblk; bl++)
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		for (int j = 0; j < blkwidth; j++)
+		ib = XBlock.active[ibl];
+
+		
+				Arr[ib] = initval;
+			
+	}
+}
+
+template void InitBlkBUQ<bool, float>(Param XParam, BlockP<float> XBlock, bool initval, bool*& Arr);
+template void InitBlkBUQ<int, float>(Param XParam, BlockP<float> XBlock, int initval, int*& Arr);
+template void InitBlkBUQ<float, float>(Param XParam, BlockP<float> XBlock, float initval, float*& Arr);
+template void InitBlkBUQ<double, float>(Param XParam, BlockP<float> XBlock, double initval, double*& Arr);
+
+template void InitBlkBUQ<bool, double>(Param XParam, BlockP<double> XBlock, bool initval, bool*& Arr);
+template void InitBlkBUQ<int, double>(Param XParam, BlockP<double> XBlock, int initval, int*& Arr);
+template void InitBlkBUQ<float, double>(Param XParam, BlockP<double> XBlock, float initval, float*& Arr);
+template void InitBlkBUQ<double, double>(Param XParam, BlockP<double> XBlock, double initval, double*& Arr);
+
+
+template <class T,class F> void CopyArrayBUQ(Param XParam,BlockP<F> XBlock, T* source, T* & dest)
+{
+	int ib,n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		
+		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			for (int i = 0; i < blkwidth; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i+halo) + (j+halo) * blkwidth + bl * blksize;
+				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+			
+				
 				dest[n] = source[n];
 			}
 		}
 	}
 }
+template void CopyArrayBUQ<bool, float>(Param XParam, BlockP<float> XBlock, bool* source, bool*& dest);
+template void CopyArrayBUQ<int, float>(Param XParam, BlockP<float> XBlock, int* source, int*& dest);
+template void CopyArrayBUQ<float, float>(Param XParam, BlockP<float> XBlock, float* source, float*& dest);
+template void CopyArrayBUQ<double, float>(Param XParam, BlockP<float> XBlock, double* source, double*& dest);
+
+template void CopyArrayBUQ<bool, double>(Param XParam, BlockP<double> XBlock, bool* source, bool*& dest);
+template void CopyArrayBUQ<int, double>(Param XParam, BlockP<double> XBlock, int* source, int*& dest);
+template void CopyArrayBUQ<float, double>(Param XParam, BlockP<double> XBlock, float* source, float*& dest);
+template void CopyArrayBUQ<double, double>(Param XParam, BlockP<double> XBlock, double* source, double*& dest);
 
 
+template <class T> void CopyArrayBUQ(Param XParam, BlockP<T> XBlock, EvolvingP<T> source, EvolvingP<T>& dest)
+{
+	CopyArrayBUQ(XParam, XBlock, source.h, dest.h);
+	CopyArrayBUQ(XParam, XBlock, source.u, dest.u);
+	CopyArrayBUQ(XParam, XBlock, source.v, dest.v);
+	CopyArrayBUQ(XParam, XBlock, source.zs, dest.zs);
+}
+template void CopyArrayBUQ<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> source, EvolvingP<float>& dest);
+template void CopyArrayBUQ<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> source, EvolvingP<double>& dest);
 
 
 template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
@@ -202,7 +255,8 @@ template void interp2BUQ<float, StaticForcingP<float>>(Param XParam, BlockP<floa
 template void interp2BUQ<double, StaticForcingP<float>>(Param XParam, BlockP<double> XBlock, StaticForcingP<float> forcing, double*& z);
 template void interp2BUQ<float, deformmap<float>>(Param XParam, BlockP<float> XBlock, deformmap<float> forcing, float*& z);
 template void interp2BUQ<double, deformmap<float>>(Param XParam, BlockP<double> XBlock, deformmap<float> forcing, double*& z);
-
+template void interp2BUQ<float, DynForcingP<float>>(Param XParam, BlockP<float> XBlock, DynForcingP<float> forcing, float*& z);
+template void interp2BUQ<double, DynForcingP<float>>(Param XParam, BlockP<double> XBlock, DynForcingP<float> forcing, double*& z);
 
 
 template <class T> void InterpstepCPU(int nx, int ny, int hdstep, T totaltime, T hddt, T *&Ux, T *Uo, T *Un)

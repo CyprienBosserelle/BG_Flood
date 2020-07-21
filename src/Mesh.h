@@ -18,8 +18,8 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing);
 
 
 template <class T>void InitMesh(Param& XParam, Forcing<float> XForcing, Model<T>& XModel);
-template <class T> void InitBlockinfo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock);
-void InitBlockadapt(Param XParam, AdaptP& XAdap);
+template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock);
+template <class T> void InitBlockadapt(Param XParam, BlockP<T> XBlock, AdaptP& XAdap);
 template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock);
 template <class T> void InitBlockneighbours(Param XParam, BlockP<T>& XBlock);
 template<class T> void Initmaparray(Model<T>& XModel);

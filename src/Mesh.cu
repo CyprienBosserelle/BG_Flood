@@ -113,7 +113,7 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 
 	//==============================
 	// Allocate CPU memory for the whole model
-	AllocateCPU(XParam.nblkmem, XParam.blksize+XParam.halowidth, XParam, XModel);
+	AllocateCPU(XParam.nblkmem, XParam.blkwidth, XParam, XModel);
 
 	//==============================
 	// Initialise blockinfo info
@@ -123,7 +123,8 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 	// Init. adaptation info if needed
 	if (XParam.maxlevel != XParam.minlevel)
 	{
-		InitBlockadapt(XParam, XModel.adapt);
+		
+		InitBlockadapt(XParam, XModel.blocks, XModel.adapt);
 	}
 
 	//==============================
@@ -140,29 +141,40 @@ template void InitMesh<double>(Param &XParam, Forcing<float> XForcing, Model<dou
 
 template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock)
 {
-	//========================
+	//============================
 	// Init active and level
 
 	// Initialise activeblk array as all inactive ( = -1 )
-	InitArrayBUQ(XParam.nblkmem, 1, 0, -1, XBlock.active);
+	// Here we cannot yet use the InitBlkBUQ function since none of the blk are active
+	//InitBlkBUQ(XParam, XBlock, XParam.initlevel, XBlock.level)
+	for (int ib = 0; ib < XParam.nblkmem; ib++)
+	{
+		XBlock.active[ib] = -1;
+		XBlock.level[ib] = XParam.initlevel;
+	}
+	
+	
 
-	// Initialise level info
-	InitArrayBUQ(XParam.nblkmem, 1, 0, XParam.initlevel, XBlock.level);
-
-	//========================
+	//============================
 	// Init xo, yo and active blk
 	InitBlockxoyo(XParam, XForcing, XBlock);
+	//============================
+	// Init neighbours
 	InitBlockneighbours(XParam, XBlock);
 
 
 }
 
-void InitBlockadapt(Param XParam, AdaptP& XAdap)
+template <class T> void InitBlockadapt(Param XParam, BlockP<T> XBlock, AdaptP& XAdap)
 {
-	
-		InitArrayBUQ(XParam.nblkmem, 1, 0, XParam.initlevel, XAdap.newlevel);
-		InitArrayBUQ(XParam.nblkmem, 1, 0, false, XAdap.coarsen);
-		InitArrayBUQ(XParam.nblkmem, 1, 0, false, XAdap.refine);
+		InitBlkBUQ(XParam, XBlock, XParam.initlevel, XAdap.newlevel);
+		InitBlkBUQ(XParam, XBlock, false, XAdap.coarsen);
+		InitBlkBUQ(XParam, XBlock, false, XAdap.refine);
+		//InitBlkBUQ(XParam, XBlock, XParam.initlevel, XBlock.level);
+		//InitBlkBUQ(XParam, XBlock, XParam.initlevel, XBlock.level);
+		//InitArrayBUQ(XParam.nblkmem, 1, 0, XParam.initlevel, XAdap.newlevel);
+		//InitArrayBUQ(XParam.nblkmem, 1, 0, false, XAdap.coarsen);
+		//InitArrayBUQ(XParam.nblkmem, 1, 0, false, XAdap.refine);
 
 
 		for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
@@ -174,6 +186,9 @@ void InitBlockadapt(Param XParam, AdaptP& XAdap)
 		}
 	
 }
+template void InitBlockadapt<float>(Param XParam, BlockP<float> XBlock, AdaptP& XAdap);
+template void InitBlockadapt<double>(Param XParam, BlockP<double> XBlock, AdaptP& XAdap);
+
 
 
 template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, BlockP<T> &XBlock)

@@ -494,7 +494,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		{
 			for (int i = 0; i < 16; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + bl * XParam.blksize;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + bl * XParam.blksize;
 				int r = i + j * 16;
 				if (smallnc > 0)
 				{
