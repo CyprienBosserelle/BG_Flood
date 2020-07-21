@@ -642,7 +642,78 @@ template <class T> void initmodelvar(Param XParam, Model<T> &XModel)
 
 }
 
-template <class T> void initForcing()
+template <class T> void initForcing(Param XParam, Forcing<float> XForcing, Model<T> XModel)
 {
-	//
+	//========================
+	// River discharge
+
+	if (XForcing.rivers.size() > 0)
+	{
+		//
+		double xx, yy;
+		int n;
+		double levdx;
+		log("Initializing rivers");
+		//For each rivers
+		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+		{
+			// find the cells where the river discharge will be applied
+			std::vector<int> idis, jdis, blockdis;
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
+			{
+				ib = XModel.block.active[ibl];
+				for (int j = 0; j < XParam.blkwidth; j++)
+				{
+					for (int i = 0; i < XParam.blkwidth; i++)
+					{
+						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+						
+						levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+						xx = XModel.blocks.xo[ib] + i * levdx;
+						yy = XModel.blocks.yo[ib] + j * levdx;
+						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+						if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+						{
+
+							// This cell belongs to the river discharge area
+							idis.push_back(i);
+							jdis.push_back(j);
+							blockdis.push_back(ib);
+
+						}
+					}
+				}
+
+			}
+
+			XForcing.rivers[Rin].i = idis;
+			XForcing.rivers[Rin].j = jdis;
+			XForcing.rivers[Rin].block = blockdis;
+			XForcing.rivers[Rin].disarea = idis.size() * levdx * levdx; // That is not valid for spherical grids
+
+			
+		}
+		//Now identify sort unique blocks where rivers are being inserted
+		std::vector<int> activeRiverBlk;
+
+		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+		{
+
+			activeRiverBlk.insert(std::end(activeRiverBlk), std::begin(XForcing.rivers[Rin].block), std::end(XForcing.rivers[Rin].block));
+		}
+		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
+		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
+		/*
+		Allocate1CPU(activeRiverBlk.size(), 1, Riverblk);
+
+		XParam.nriverblock = activeRiverBlk.size();
+
+		for (int b = 0; b < activeRiverBlk.size(); b++)
+		{
+			Riverblk[b] = activeRiverBlk[b];
+		}
+		*/
+	}
+
 }
