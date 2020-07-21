@@ -37,7 +37,7 @@ template <class T,class F> void InitArrayBUQ(Param XParam, BlockP<F> XBlock,  T 
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				Arr[n] = initval;
 			}
 		}
@@ -91,7 +91,7 @@ template <class T,class F> void CopyArrayBUQ(Param XParam,BlockP<F> XBlock, T* s
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 			
 				
 				dest[n] = source[n];
@@ -163,8 +163,8 @@ template <class T>  void setedgessideLR(Param XParam, int ib,int blkA, int blkB,
 		for (int j = jstart; j < jend; j++)
 		{
 			// read value at n and write at k
-			n = (iread + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
-			k = (iwrite + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+			n = (iread + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			k = (iwrite + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 			zb[k] = zb[n];
 
 		}
@@ -183,8 +183,8 @@ template <class T>  void setedgessideBT(Param XParam, int ib, int blkA, int blkB
 		for (int i = istart; i < iend; i++)
 		{
 			// read value at n and write at k
-			n = (i + XParam.halowidth) + (jread + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
-			k = (i + XParam.halowidth) + (jwrite + XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+			n = (i + XParam.halowidth) + (jread + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			k = (i + XParam.halowidth) + (jwrite + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 			zb[k] = zb[n];
 
 		}
@@ -208,7 +208,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				n = (i+XParam.halowidth) + (j+XParam.halowidth) * XParam.blkwidth + ib * XParam.blksize;
+				n = (i+XParam.halowidth) + (j+XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				x = XBlock.xo[ib] + i * blkdx;
 				y = XBlock.yo[ib] + j * blkdx;
 

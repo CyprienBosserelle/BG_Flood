@@ -348,11 +348,11 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	//short fillval = 32767
 	static size_t start2D[] = { 0, 0 }; // start at first value 
 	//static size_t count2D[] = { ny, nx };
-	static size_t count2D[] = { 16, 16 };
+	static size_t count2D[] = { XParam.blkwidth, XParam.blkwidth };
 
 	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
 	//static size_t count3D[] = { 1, ny, nx };
-	static size_t count3D[] = { 1, 16, 16 };
+	static size_t count3D[] = { 1, XParam.blkwidth, XParam.blkwidth };
 
 	nc_type VarTYPE;
 
@@ -490,12 +490,12 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		status = nc_inq_varid(ncid, varname.c_str(), &var_id);
 		if (status != NC_NOERR) handle_ncerror(status);
 
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			for (int i = 0; i < 16; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkwidth + bl * XParam.blksize;
-				int r = i + j * 16;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + bl * XParam.blksize;
+				int r = i + j * XParam.blkwidth;
 				if (smallnc > 0)
 				{
 					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
@@ -590,11 +590,11 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 	static size_t start2D[] = { 0, 0 }; // start at first value 
 	//static size_t count2D[] = { ny, nx };
-	static size_t count2D[] = { 16, 16 };
+	static size_t count2D[] = { XParam.blkwidth, XParam.blkwidth };
 
 	static size_t start3D[] = { 0, 0, 0 }; // start at first value // This is updated to nrec-1 further down
 	//static size_t count3D[] = { 1, ny, nx };
-	static size_t count3D[] = { 1, 16, 16 };
+	static size_t count3D[] = { 1, XParam.blkwidth, XParam.blkwidth };
 
 	int smallnc = XParam.smallnc;
 	float scalefactor = XParam.scalefactor;
@@ -642,12 +642,12 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		status = nc_inq_varid(ncid, varname.c_str(), &var_id);
 		if (status != NC_NOERR) handle_ncerror(status);
 
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			for (int i = 0; i < 16; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + bl * XParam.blksize;
-				int r = i + j * 16;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + bl * XParam.blksize;
+				int r = i + j * XParam.blkwidth;
 				if (smallnc > 0)
 				{
 					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)

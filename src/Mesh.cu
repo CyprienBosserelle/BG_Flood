@@ -41,9 +41,9 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
 			nmask = 0;
-			for (int i = 0; i < 16; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				for (int j = 0; j < 16; j++)
+				for (int j = 0; j < XParam.blkwidth; j++)
 				{
 					double x = XParam.xo + (i + XParam.blkwidth * nblkx) * levdx;
 					double y = XParam.yo + (j + XParam.blkwidth * nblky) * levdx;
@@ -113,7 +113,7 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 
 	//==============================
 	// Allocate CPU memory for the whole model
-	AllocateCPU(XParam.nblkmem, XParam.blkwidth, XParam, XModel);
+	AllocateCPU(XParam.nblkmem, XParam.blksize, XParam, XModel);
 
 	//==============================
 	// Initialise blockinfo info

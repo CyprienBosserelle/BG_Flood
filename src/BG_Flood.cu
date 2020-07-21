@@ -89,13 +89,12 @@ int main(int argc, char **argv)
 	// Prepare initial mesh layout
 	InitMesh(XParam, XForcing, XModel);
 
-
-	//log(std::to_string(XForcing.Bathy.val[50]));
-	TestingOutput(XParam, XModel);
-
 	//============================================
 	// Prepare initial conditions
 	InitialConditions(XParam, XForcing, XModel);
+
+	//log(std::to_string(XForcing.Bathy.val[50]));
+	TestingOutput(XParam, XModel);
 
 
 

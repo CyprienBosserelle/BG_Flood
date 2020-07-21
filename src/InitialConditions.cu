@@ -140,11 +140,11 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			for (int i = 0; i < 16; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				
 				XEv.u[n] = T(0.0);
 				XEv.v[n] = T(0.0);
@@ -190,11 +190,11 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			for (int i = 0; i < 16; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 
 				double levdx = calcres(XParam.dx, XBlock.level[ib]);
 				xi = XBlock.xo[ib] + i * levdx;
@@ -378,11 +378,11 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			for (int i = 0; i < 16; i++)
+			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 
 				if (XEv.h[n] > XParam.eps)
 				{
@@ -484,11 +484,11 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 		for (int ibl = 0; ibl < XParam.nblk; ibl++)
 		{
 			ib = XBlock.active[ibl];
-			for (int j = 0; j < 16; j++)
+			for (int j = 0; j < XParam.blkwidth; j++)
 			{
-				for (int i = 0; i < 16; i++)
+				for (int i = 0; i < XParam.blkwidth; i++)
 				{
-					int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+					int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 					XEv.zs[n] = utils::max(XEv.zs[n], zb[n]);
 					//unpacked_value = packed_value * scale_factor + add_offset
 				}
@@ -523,11 +523,11 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
 				ib = XBlock.active[ibl];
-				for (int j = 0; j < 16; j++)
+				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					for (int i = 0; i < 16; i++)
+					for (int i = 0; i < XParam.blkwidth; i++)
 					{
-						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						XEv.zs[n] = zb[n] + XEv.h[n];
 						//unpacked_value = packed_value * scale_factor + add_offset
 					}
@@ -555,11 +555,11 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
 				ib = XBlock.active[ibl];
-				for (int j = 0; j < 16; j++)
+				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					for (int i = 0; i < 16; i++)
+					for (int i = 0; i < XParam.blkwidth; i++)
 					{
-						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * 16 + ib * 256;
+						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 
 
 						XEv.h[n] = utils::max(XEv.zs[n] - zb[n], (T)XParam.eps);
@@ -640,4 +640,9 @@ template <class T> void initmodelvar(Param XParam, Model<T> &XModel)
 	//
 	
 
+}
+
+template <class T> void initForcing()
+{
+	//
 }

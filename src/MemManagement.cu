@@ -38,7 +38,7 @@ void AllocateCPU(int nx, int ny, GradientsP<T>& Grad)
 template void AllocateCPU<float>(int nx, int ny, GradientsP<float>& Grad);
 template void AllocateCPU<double>(int nx, int ny, GradientsP<double>& Grad);
 
-template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP<T> Ev)
+template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP<T> & Ev)
 {
 	AllocateCPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v);
 }
