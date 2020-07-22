@@ -14,7 +14,7 @@
 #include "Forcing.h"
 #include "Mesh.h"
 #include "InitialConditions.h"
-
+#include "Adaptation.h"
 
 #include "Testing.h"
 

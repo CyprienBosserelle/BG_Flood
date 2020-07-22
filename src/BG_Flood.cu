@@ -93,6 +93,10 @@ int main(int argc, char **argv)
 	// Prepare initial conditions
 	InitialConditions(XParam, XForcing, XModel);
 
+	//============================================
+	// Initial adaptation
+
+
 	//log(std::to_string(XForcing.Bathy.val[50]));
 	TestingOutput(XParam, XModel);
 
