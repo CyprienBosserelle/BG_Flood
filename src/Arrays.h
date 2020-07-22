@@ -75,9 +75,21 @@ struct AdaptP
 
 
 
-template <class T>
-struct ExternalParam
+struct BndblockP
 {
+	int nriverblk, nleftbndblk, nrightbndblk, ntopbndblk, nbotbndblk;
+	int* river;
+	//int * DrainSink;
+	//int * DrainSource;
+	//int * Bridges;
+
+	int* left;
+	int* right;
+	int* top;
+	int* bot;
+
+
+
 
 };
 
@@ -130,6 +142,8 @@ struct TexForcingP
 template <class T>
 struct TimeP
 {
+	double totaltime;
+	double dt;
 	T* dtmax;
 	T* arrmax, *arrmin;
 };
@@ -152,6 +166,8 @@ struct Model
 	// May need a better placeholder
 	T* datmpdx, *datmpdy;
 
+	TimeP<T> time;
+
 	//texture for boundary and map forcing
 	//is this OK on CPU?
 	TexForcingP<T> Tex;
@@ -160,7 +176,8 @@ struct Model
 	std::map<std::string, T *> OutputVarMap;
 
 	//other output
-	T* TSstore;//buffer for TS data so not to dave too often
+	std::vector< std::vector< Pointout > > TSallout;
+	T* TSstore;//buffer for TS data so not to save to disk too often
 	T* vort;
 	EvolvingP<T> evmean;
 	EvolvingP<T> evmax;
@@ -169,6 +186,12 @@ struct Model
 	BlockP<T> blocks;
 
 	AdaptP adapt;
+
+	BndblockP bndblk;
+
+
+	
+
 };
 
 

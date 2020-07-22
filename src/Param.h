@@ -68,7 +68,8 @@ public:
 
 	//Timeseries output
 	std::vector<TSoutnode> TSnodesout; // vector containing i and j of each variables
-									//Output variables
+	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
+
 	std::vector<std::string> outvars; //list of names of teh variables to output
 
 

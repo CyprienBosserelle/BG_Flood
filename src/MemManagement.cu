@@ -60,7 +60,8 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	AllocateCPU(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
 
-	AllocateCPU(nblk, blksize, XModel.cf);
+	AllocateCPU(nblk, blksize, XModel.cf, XModel.time.arrmax, XModel.time.arrmin, XModel.time.dtmax);
+	
 
 	//Allocate block info
 	AllocateCPU(nblk, 1, XModel.blocks.active);

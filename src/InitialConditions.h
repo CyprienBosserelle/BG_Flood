@@ -6,22 +6,20 @@
 #include "Param.h"
 #include "Forcing.h"
 #include "MemManagement.h"
-#include "Utils_GPU.h"
 #include "Util_CPU.h"
 #include "Arrays.h"
 #include "Write_txt.h"
 #include "GridManip.h"
-#include "Read_netcdf.h"
-#include "ReadForcing.h"
+#include "InitEvolv.cu"
 
 
 template <class T> void InitialConditions(Param XParam, Forcing<float> XForcing, Model<T> XModel);
-template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb);
-template <class T> int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv);
-template <class T> void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv);
-template <class T> int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T* zb);
 
-template <class T> int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb);
+template <class T> void initForcing(Param XParam, Forcing<float> XForcing, Model<T> &XModel);
+template<class T> void Initmaparray(Model<T> &XModel);
+template <class T> void initoutput(Param XParam, Model<T>& XModel);
+template <class T> void Initbnds(Param XParam, Model<T>& XModel);
+
 
 // End of global definition;
 #endif

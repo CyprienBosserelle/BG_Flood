@@ -127,9 +127,7 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 		InitBlockadapt(XParam, XModel.blocks, XModel.adapt);
 	}
 
-	//==============================
-	// Init. map array
-	Initmaparray(XModel);
+	
 
 	
 	
@@ -273,18 +271,21 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 template void InitBlockxoyo<float>(Param XParam, Forcing<float> XForcing, BlockP<float> &XBlock);
 template void InitBlockxoyo<double>(Param XParam, Forcing<float> XForcing, BlockP<double> & XBlockP);
 
-template <class T> void InitBlockneighbours(Param XParam,  BlockP<T>& XBlock)
+template <class T> void InitBlockneighbours(Param &XParam,  BlockP<T>& XBlock)
 {
 	// This function will only work if the blocks are uniform
 	// A separate function is used for adaptivity
 	T leftxo, rightxo, topxo, botxo, leftyo, rightyo, topyo, botyo;
 
+	//====================================
+	// First setp up neighbours
+
 	T levdx = calcres(XParam.dx, XParam.initlevel);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		 
+
 		int bl = XBlock.active[ibl];
-		T espdist = std::numeric_limits<T>::epsilon()*(T)10.0; // i.e. distances are calculated within 10x theoretical machine precision
+		T espdist = std::numeric_limits<T>::epsilon() * (T)10.0; // i.e. distances are calculated within 10x theoretical machine precision
 
 		leftxo = XBlock.xo[bl] - ((T)XParam.blkwidth) * levdx;
 
@@ -334,52 +335,70 @@ template <class T> void InitBlockneighbours(Param XParam,  BlockP<T>& XBlock)
 				XBlock.BotLeft[bl] = blb;
 			}
 		}
+	}
+		
+	//=====================================
+	// Find how many blocks are on each bnds
+	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
 
-		//printf("leftxo=%f\t leftyo=%f\t rightxo=%f\t rightyo=%f\t botxo=%f\t botyo=%f\t topxo=%f\t topyo=%f\n", leftxo, leftyo, rightxo, rightyo, botxo, botyo, topxo, topyo);
-		//printf("blk=%d\t blockxo=%f\t blockyo=%f\t leftblk=%d\t rightblk=%d\t botblk=%d\t topblk=%d\n",bl, blockxo_d[bl], blockyo_d[bl], leftblk[bl], rightblk[bl], botblk[bl], topblk[bl]);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		double espdist = 0.00000001;///WARMING
+
+		int ib = XBlock.active[ibl];
 
 
+		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
+
+		leftyo = XBlock.yo[ib];
+		rightxo = XBlock.xo[ib] + 15.0 * levdx;
+		rightyo = XBlock.yo[ib];
+		topxo = XBlock.xo[ib];
+		topyo = XBlock.yo[ib] + 15.0 * levdx;
+		botxo = XBlock.xo[ib];
+		botyo = XBlock.yo[ib];
+
+		if ((rightxo - XParam.xmax) > (-1.0 * levdx))
+		{
+			//
+			blbr++;
+			//bndrightblk[blbr] = bl;
+
+		}
+
+		if ((topyo - XParam.ymax) > (-1.0 * levdx))
+		{
+			//
+			blbt++;
+			//bndtopblk[blbt] = bl;
+
+		}
+		if ((XParam.yo - botyo) > (-1.0 * levdx))
+		{
+			//
+			blbb++;
+			//bndbotblk[blbb] = bl;
+
+		}
+		if ((XParam.xo - leftxo) > (-1.0 * levdx))
+		{
+			//
+			blbl++;
+			//bndleftblk[blbl] = bl;
+
+		}
 	}
 
+	XParam.leftbnd.nblk = blbl;
+	XParam.rightbnd.nblk = blbr;
+	XParam.topbnd.nblk = blbt;
+	XParam.botbnd.nblk = blbb;
+
+	//
+	
 
 }
-template void InitBlockneighbours<float>(Param XParam, BlockP<float>& XBlock);
-template void InitBlockneighbours<double>(Param XParam, BlockP<double>& XBlock);
-
-
-template<class T> void Initmaparray(Model<T>& XModel)
-{
-	XModel.OutputVarMap["zb"] = XModel.zb;
-	
-	XModel.OutputVarMap["u"] = XModel.evolv.u;
-	
-	XModel.OutputVarMap["v"] = XModel.evolv.v;
-	
-	XModel.OutputVarMap["zs"] = XModel.evolv.zs;
-	
-	XModel.OutputVarMap["h"] = XModel.evolv.h;
-	
-	XModel.OutputVarMap["hmean"] = XModel.evmean.h;
-	
-	XModel.OutputVarMap["hmax"] = XModel.evmax.h;
-	
-	XModel.OutputVarMap["zsmean"] = XModel.evmean.zs;
-	
-	XModel.OutputVarMap["zsmax"] = XModel.evmax.zs;
-	
-	XModel.OutputVarMap["umean"] = XModel.evmean.u;
-	
-	XModel.OutputVarMap["umax"] = XModel.evmax.u;
-	
-	XModel.OutputVarMap["vmean"] = XModel.evmean.v;
-	
-	XModel.OutputVarMap["vmax"] = XModel.evmax.v;
-	
-	XModel.OutputVarMap["vort"] = XModel.vort;
-	
-}
-
-template void Initmaparray<float>(Model<float>& XModel);
-template void Initmaparray<double>(Model<double>& XModel);
+template void InitBlockneighbours<float>(Param &XParam, BlockP<float>& XBlock);
+template void InitBlockneighbours<double>(Param &XParam, BlockP<double>& XBlock);
 
 
