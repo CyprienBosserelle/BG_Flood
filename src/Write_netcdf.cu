@@ -30,7 +30,7 @@ Param creatncfileBUQ(Param XParam,int * activeblk, int * level, T * blockxo, T *
 	{
 		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
 		{
-			printf("Warning! Outut file name already exist  ");
+			//printf("Warning! Outut file name already exist  ");
 			log("Warning! Outut file name already exist   ");
 			int fileinc = 1;
 			std::vector<std::string> extvec = split(XParam.outfile, '.');
@@ -50,8 +50,8 @@ Param creatncfileBUQ(Param XParam,int * activeblk, int * level, T * blockxo, T *
 				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
 				fileinc++;
 			}
-			printf("New file name: %s  ", XParam.outfile.c_str());
-			write_text_to_log_file("New file name: " + XParam.outfile);
+			//printf("New file name: %s  ", XParam.outfile.c_str());
+			log("New file name: " + XParam.outfile);
 
 		}
 		else
@@ -503,7 +503,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 				}
 				else
 				{
-					varblk[r] = var[n];
+					varblk[r] = (float)var[n];
 				}
 			}
 		}

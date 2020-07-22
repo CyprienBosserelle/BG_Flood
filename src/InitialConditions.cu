@@ -18,7 +18,7 @@
 
 #include "InitialConditions.h"
 
-template <class T> void InitialConditions(Param XParam, Forcing<float> XForcing, Model<T> XModel)
+template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {
 	//=====================================
 	// Initialise Bathy data
@@ -62,11 +62,15 @@ template <class T> void InitialConditions(Param XParam, Forcing<float> XForcing,
 
 }
 
-template void InitialConditions<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel);
-template void InitialConditions<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel);
+template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
+template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
 
 template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
+	
+	int ib;
+	T levdx;
+	FILE* fsSLTS;
 	// Initialise all storage involving parameters
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 	if (XParam.outmax)
@@ -89,18 +93,20 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 			//find the block where point belongs
 			for (int blk = 0; blk < XParam.nblk; blk++)
 			{
-				//
-				if (XParam.TSnodesout[o].x >= blockxo_d[blk] && XParam.TSnodesout[o].x <= (blockxo_d[blk] + (T)XParam.blkwidth * levdx) && XParam.TSnodesout[o].y >= blockyo_d[o] && XParam.TSnodesout[o].y <= (blockyo_d[blk] + (T)XParam.blkwidth * levdx))
+				
+				ib = XModel.blocks.active[blk];
+				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+				if (XParam.TSnodesout[o].x >= XModel.blocks.xo[ib] && XParam.TSnodesout[o].x <= (XModel.blocks.xo[ib] + (T)(XParam.blkwidth-1) * levdx) && XParam.TSnodesout[o].y >= XModel.blocks.yo[o] && XParam.TSnodesout[o].y <= (XModel.blocks.yo[ib] + (T)(XParam.blkwidth-1) * levdx))
 				{
-					XParam.TSnodesout[o].block = blk;
-					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - blockxo_d[blk]) / levdx), 0), XParam.blkwidth-1);
-					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - blockyo_d[blk]) / levdx), 0), XParam.blkwidth - 1);
+					XParam.TSnodesout[o].block = ib;
+					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XModel.blocks.xo[ib]) / levdx), 0), XParam.blkwidth - 1);
+					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XModel.blocks.yo[ib]) / levdx), 0), XParam.blkwidth - 1);
 					break;
 				}
 			}
 			//Overwrite existing files
-			fsSLTS = fopen(XParam.TSoutfile[o].c_str(), "w");
-			fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSoutfile[o].c_str());
+			fsSLTS = fopen(XParam.TSnodesout[o].outname.c_str(), "w");
+			fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%dt%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
 			fclose(fsSLTS);
 
 			// Add empty row for each output point
@@ -110,7 +116,7 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 
 
 	}
-
+	
 
 	//==============================
 	// Init. map array
@@ -118,12 +124,12 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	
 	//==============================
 	// Setup output netcdf file
-	XParam = creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
+	//XParam = creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 
 
 }
 
-template <class T> void initForcing(Param XParam, Forcing<float> XForcing, Model<T> &XModel)
+template <class T> void initForcing(Param XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {
 	//========================
 	// River discharge
@@ -132,7 +138,7 @@ template <class T> void initForcing(Param XParam, Forcing<float> XForcing, Model
 	{
 		//
 		double xx, yy;
-		int n;
+		int n,ib;
 		double levdx;
 		log("Initializing rivers");
 		//For each rivers
@@ -142,14 +148,15 @@ template <class T> void initForcing(Param XParam, Forcing<float> XForcing, Model
 			std::vector<int> idis, jdis, blockdis;
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
-				ib = XModel.block.active[ibl];
+				ib = XModel.blocks.active[ibl];
+				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
 					for (int i = 0; i < XParam.blkwidth; i++)
 					{
 						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						
-						levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+						
 						xx = XModel.blocks.xo[ib] + i * levdx;
 						yy = XModel.blocks.yo[ib] + j * levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
@@ -188,7 +195,7 @@ template <class T> void initForcing(Param XParam, Forcing<float> XForcing, Model
 		
 		AllocateCPU(activeRiverBlk.size(), 1, XModel.bndblk.river);
 
-		XModel.bndblk.nriverblock = activeRiverBlk.size();
+		XModel.bndblk.nriverblk = activeRiverBlk.size();
 
 		for (int b = 0; b < activeRiverBlk.size(); b++)
 		{
@@ -200,8 +207,8 @@ template <class T> void initForcing(Param XParam, Forcing<float> XForcing, Model
 
 }
 
-template void initForcing<float>(Param XParam, Forcing<float> XForcing, Model<float> &XModel);
-template void initForcing<double>(Param XParam, Forcing<float> XForcing, Model<double> &XModel);
+template void initForcing<float>(Param XParam, Forcing<float> &XForcing, Model<float> &XModel);
+template void initForcing<double>(Param XParam, Forcing<float> &XForcing, Model<double> &XModel);
 
 
 template<class T> void Initmaparray(Model<T>& XModel)
@@ -242,15 +249,17 @@ template void Initmaparray<double>(Model<double>& XModel);
 template <class T> void Initbnds(Param XParam, Model<T>& XModel)
 {
 	// Initialise bnd block info 
-	Allocate1CPU(XParam.leftbnd.nblk, 1, XModel.bndblk.left);
-	Allocate1CPU(XParam.rightbnd.nblk, 1, XModel.bndblk.right);
-	Allocate1CPU(XParam.topbnd.nblk, 1, XModel.bndblk.top);
-	Allocate1CPU(XParam.botbnd.nblk, 1, XModel.bndblk.bot);
-
+	//XParam.leftbnd.nblk were calculated in 
+	AllocateCPU(XParam.leftbnd.nblk, 1, XModel.bndblk.left);
+	AllocateCPU(XParam.rightbnd.nblk, 1, XModel.bndblk.right);
+	AllocateCPU(XParam.topbnd.nblk, 1, XModel.bndblk.top);
+	AllocateCPU(XParam.botbnd.nblk, 1, XModel.bndblk.bot);
+	
 	int blbr, blbb, blbl, blbt;
+	int leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
 
 	blbr = blbb = blbl = blbt = 0;
-	for (int ibl = 0; ibl < nblk; ibl++)
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		double espdist = 0.00000001;///WARMING
 		int ib = XModel.blocks.active[ibl];
@@ -270,7 +279,7 @@ template <class T> void Initbnds(Param XParam, Model<T>& XModel)
 		{
 			//
 
-			XModel.bndblk.right[blbr] = bl;
+			XModel.bndblk.right[blbr] = ib;
 			blbr++;
 
 		}
@@ -279,7 +288,7 @@ template <class T> void Initbnds(Param XParam, Model<T>& XModel)
 		{
 			//
 
-			XModel.bndblk.top[blbt] = bl;
+			XModel.bndblk.top[blbt] = ib;
 			blbt++;
 
 		}
@@ -287,7 +296,7 @@ template <class T> void Initbnds(Param XParam, Model<T>& XModel)
 		{
 			//
 
-			XModel.bndblk.bot[blbb] = bl;
+			XModel.bndblk.bot[blbb] = ib;
 			blbb++;
 
 		}
@@ -295,12 +304,13 @@ template <class T> void Initbnds(Param XParam, Model<T>& XModel)
 		{
 			//
 
-			XModel.bndblk.left[blbl] = bl;
+			XModel.bndblk.left[blbl] = ib;
 			blbl++;
 			
 
 		}
 	}
+	
 
 }
 template void Initbnds<float>(Param XParam, Model<float>& XModel);

@@ -137,7 +137,7 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 template void InitMesh<float>(Param &XParam, Forcing<float> XForcing, Model<float> &XModel);
 template void InitMesh<double>(Param &XParam, Forcing<float> XForcing, Model<double> &XModel);
 
-template <class T> void InitBlockInfo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock)
+template <class T> void InitBlockInfo(Param &XParam, Forcing<float> XForcing, BlockP<T>& XBlock)
 {
 	//============================
 	// Init active and level
