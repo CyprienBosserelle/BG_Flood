@@ -5,7 +5,31 @@
 
 
 
+template <class T> void Adaptation(Param& XParam, Model<T>& XModel)
+{
+	int oldnblk = 0;
+	if (XParam.maxlevel != XParam.minlevel)
+	{
+		while (oldnblk != XParam.nblk)
+			//for (int i=0; i<1;i++)
+		{
+			oldnblk = XParam.nblk;
+			//wetdrycriteria(XParam, refine, coarsen);
+			inrangecriteria(XParam, (T)-10.0, (T)-10.0, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen)
+			XParam = adapt(XParam);
+			if (!checkBUQsanity(XParam))
+			{
+				log("Bad BUQ mesh layout\n");
+				exit(2);
+				//break;
+			}
 
+
+		}
+
+	}
+}
 
 
 
@@ -122,7 +146,7 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 				{
 					//printf("Is it true?\t");
 					//if right, top and topright block teh same level and can coarsen
-					if (coarsen[XBlock..RightBot[ib]] == true && coarsen[XBlock.TopLeft[ib]] == true && coarsen[XBlock..RightBot[XBlock.TopRight[ib]]] == true)
+					if (coarsen[XBlock.RightBot[ib]] == true && coarsen[XBlock.TopLeft[ib]] == true && coarsen[XBlock.RightBot[XBlock.TopRight[ib]]] == true)
 					{
 						//Yes
 						//printf("Yes!\n");
@@ -164,4 +188,101 @@ int checkneighbourrefine(int neighbourib,int levelib, int levelneighbour, bool*&
 		coarsen [neighbourib]= false;
 	}
 	return iter;
+}
+
+/*! \fn bool checkBUQsanity(Param XParam)
+* Check the sanity of the BUQ mesh
+* This function mostly checks the level of neighbouring blocks
+*
+*	Needs improvements
+*/
+template <class T>
+bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
+{
+	bool check = true;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+
+		check=check && checklevel(ib, XBlock.level[ib], XBlock.LeftBot[ib], XBlock.level[XBlock.LeftBot[ib]]);
+
+
+
+
+
+
+		//check 1st order neighbours level
+		if (abs(XBlock.level[XBlock.leftblk[ib]] - (XBlock.level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; leftblk[ib]=%d; level[leftblk[ib]]=%d\n", ib, XBlock.level[ib], leftblk[ib], level[leftblk[ib]]);
+			check = false;
+		}
+		if (abs(level[rightblk[ib]] - (level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[ib]=%d; level[rightblk[ib]]=%d\n", ib, level[ib], rightblk[ib], level[rightblk[ib]]);
+			check = false;
+		}
+		if (abs(level[botblk[ib]] - (level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; botblk[ib]=%d; level[botblk[ib]]=%d\n", ib, level[ib], botblk[ib], level[botblk[ib]]);
+			check = false;
+		}
+		if (abs(level[topblk[ib]] - (level[ib])) > 1)
+		{
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[ib]=%d; level[topblk[ib]]=%d\n", ib, level[ib], topblk[ib], level[topblk[ib]]);
+
+			check = false;
+		}
+
+		if ((level[leftblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[topblk[leftblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[leftblk[ib]]=%d; level[topblk[leftblk[ib]]]=%d\n", ib, level[ib], topblk[leftblk[ib]], level[topblk[leftblk[ib]]]);
+				check = false;
+			}
+		}
+
+		if ((level[rightblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[topblk[rightblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[rightblk[ib]]=%d; level[topblk[rightblk[ib]]]=%d\n", ib, level[ib], topblk[rightblk[ib]], level[topblk[rightblk[ib]]]);
+				check = false;
+			}
+		}
+		if ((level[topblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[rightblk[topblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[topblk[ib]]=%d; level[rightblk[topblk[ib]]]=%d\n", ib, level[ib], rightblk[topblk[ib]], level[rightblk[topblk[ib]]]);
+				check = false;
+			}
+		}
+
+		if ((level[botblk[ib]] - level[ib]) == 1)
+		{
+			if (abs(level[rightblk[botblk[ib]]] - level[ib]) > 1)
+			{
+				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[botblk[ib]]=%d; level[rightblk[botblk[ib]]]=%d\n", ib, level[ib], rightblk[botblk[ib]], level[rightblk[botblk[ib]]]);
+				check = false;
+			}
+		}
+
+
+	}
+
+	return check;
+
+}
+
+bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
+{
+	bool check = true;
+	if (abs(levelneighbour - (levelib)) > 1)
+	{
+		log("Warning! Bad Neighbour Level. ib="+std::to_string(ib)+"; level[ib]="+ std::to_string(levelib)+"; neighbour[ib]="+ std::to_string(neighbourib) +"; level[leftblk[ib]]="+ std::to_string(levelneighbour));
+		check = false;
+	}
+	return check;
 }
