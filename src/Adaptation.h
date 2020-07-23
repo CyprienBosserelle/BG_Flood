@@ -10,7 +10,9 @@
 #include "Mesh.h"
 #include "AdaptCriteria.h"
 
+template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock, bool*& refine, bool*& coarsen);
 
+int checkneighbourrefine(int neighbourib, int levelib, int levelneighbour, bool*& refine, bool*& coarsen);
 
 
 // End of global definition
