@@ -17,7 +17,7 @@ template <class T> void AllocateCPU(int nblk, int blksize, Param XParam, Model<T
 
 
 template <class T> void ReallocArray(int nblk, int blksize, T*& zb);
-
+__inline__ int memloc(Param XParam, int i, int j, int ib);
 
 // End of global definition
 #endif

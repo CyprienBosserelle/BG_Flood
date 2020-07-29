@@ -16,7 +16,7 @@ template <class T> void Adaptation(Param& XParam, Model<T>& XModel)
 			oldnblk = XParam.nblk;
 			//wetdrycriteria(XParam, refine, coarsen);
 			inrangecriteria(XParam, (T)-10.0, (T)-10.0, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
-			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen)
+			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 			XParam = adapt(XParam);
 			if (!checkBUQsanity(XParam))
 			{
@@ -65,14 +65,14 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 		if (refine[ib] == true)
 		{
 			//Can probably get away with checking only the principal 4 ?
-			coarsen[Xblock.RightBot[ib]] = false;
-			coarsen[Xblock.RightTop[ib]] = false;
-			coarsen[Xblock.LeftBot[ib]] = false;
-			coarsen[Xblock.LeftTop[ib]] = false;
-			coarsen[Xblock.TopLeft[ib]] = false;
-			coarsen[Xblock.TopRight[ib]] = false;
-			coarsen[Xblock.BotLeft[ib]] = false;
-			coarsen[Xblock.BotRight[ib]] = false;
+			coarsen[XBlock.RightBot[ib]] = false;
+			coarsen[XBlock.RightTop[ib]] = false;
+			coarsen[XBlock.LeftBot[ib]] = false;
+			coarsen[XBlock.LeftTop[ib]] = false;
+			coarsen[XBlock.TopLeft[ib]] = false;
+			coarsen[XBlock.TopRight[ib]] = false;
+			coarsen[XBlock.BotLeft[ib]] = false;
+			coarsen[XBlock.BotRight[ib]] = false;
 		}
 	}
 
@@ -84,7 +84,7 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 		{
 			int levi = XBlock.level[ib];
 			//printf("ib=%d; leftblk[ib]=%d; rightblk[ib]=%d, topblk[ib]=%d, botblk[ib]=%d\n", ib, leftblk[ib], rightblk[ib], topblk[ib], botblk[ib]);
-			if (levi < XBlock.level[XBlock.LeftBot[ib]] ||  levi < XBlock.level[XBlock.RightBot[ib]] || levi < XBlock.level[XBlock.TopLeft[ib]] || levi < XBlock.level[Xblock.BotLeft[ib]])
+			if (levi < XBlock.level[XBlock.LeftBot[ib]] ||  levi < XBlock.level[XBlock.RightBot[ib]] || levi < XBlock.level[XBlock.TopLeft[ib]] || levi < XBlock.level[XBlock.BotLeft[ib]])
 			{
 				coarsen[ib] = false;
 			}
@@ -210,11 +210,11 @@ bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 
 
 
-
+		/*
 		//check 1st order neighbours level
 		if (abs(XBlock.level[XBlock.leftblk[ib]] - (XBlock.level[ib])) > 1)
 		{
-			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; leftblk[ib]=%d; level[leftblk[ib]]=%d\n", ib, XBlock.level[ib], leftblk[ib], level[leftblk[ib]]);
+			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; leftblk[ib]=%d; level[leftblk[ib]]=%d\n", ib, XBlock.level[ib], XBlock.LeftBot[ib], level[leftblk[ib]]);
 			check = false;
 		}
 		if (abs(level[rightblk[ib]] - (level[ib])) > 1)
@@ -268,7 +268,7 @@ bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 				check = false;
 			}
 		}
-
+		*/
 
 	}
 
