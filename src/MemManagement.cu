@@ -1,7 +1,7 @@
 
 #include "MemManagement.h"
 
-__inline__ int memloc(Param XParam, int i, int j, int ib)
+__host__ int memloc(Param XParam, int i, int j, int ib)
 {
 	return (i+XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 }

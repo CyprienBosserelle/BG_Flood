@@ -37,7 +37,8 @@ template <class T> int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 
-				int i = (ix + XParam.halowidth) + (iy + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				int i = memloc(XParam, ix, iy, ib);
+				//(ix + XParam.halowidth) + (iy + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				
 				if (z[i] > threshold)
 				{
