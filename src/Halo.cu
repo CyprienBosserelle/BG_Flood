@@ -640,3 +640,206 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 }
 
 
+
+template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+{
+	int jj, bb;
+	int read, write;
+	int ii, ir, it, itr;
+
+
+	if (XBlock.TopLeft[ib] == ib)//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+
+			read = memloc(XParam,j, XParam.blkwidth - 1, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			write = memloc(XParam,j, XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			z[write] = z[read];
+		}
+
+		if (XBlock.TopRight[ib] == ib) // boundary on the top half too
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, j, XParam.blkwidth - 1, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+		{
+
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				write = memloc(XParam, j, -1, ib);
+				jj = (j - 8) * 2;
+				ii = memloc(XParam, jj, 0, XBlock.TopRight[ib]);
+				ir = memloc(XParam, jj, 1, XBlock.TopRight[ib]);
+				it = memloc(XParam, jj + 1, 0, XBlock.TopRight[ib]);
+				itr = memloc(XParam, jj + 1, 1, XBlock.TopRight[ib]);
+
+				z[write] = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.TopLeft[ib]]) // LeftTop block does not exist
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			//
+
+			write = memloc(XParam, XParam.blkwidth, j, ib);
+			read = memloc(XParam, j, 0, XBlock.TopLeft[ib]);
+			z[write] = z[read];
+		}
+	}
+	else if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+	{
+
+		for (int j = 0; j < XParam.blkwidth / 2; j++)
+		{
+
+			write = memloc(XParam, j, XParam.blkwidth, ib);
+
+			jj = j * 2;
+			bb = XBlock.TopLeft[ib];
+
+			ii = memloc(XParam,jj, 0, bb);
+			ir = memloc(XParam,jj, 1, bb);
+			it = memloc(XParam,jj + 1, 0, bb);
+			itr = memloc(XParam,jj + 1, 1, bb);
+
+			z[write] = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+		}
+		//now find out aboy lefttop block
+		if (XBlock.TopRight[ib] == ib)
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam,j, XParam.blkwidth - 1, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+				jj = (j - 8) * 2;
+				bb = XBlock.TopLeft[ib];
+
+				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j , XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				//z[write] = z[read];
+				ii = memloc(XParam,jj, 0, bb);
+				ir = memloc(XParam,jj, 1, bb);
+				it = memloc(XParam,jj + 1, 0, bb);
+				itr = memloc(XParam,jj + 1, 1, bb);
+
+				z[write] = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			write = memloc(XParam,j, XParam.blkwidth, ib);
+
+			T w1, w2, w3;
+			T zi, zn1, zn2;
+
+			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			w1 = 1.0 / 3.0;
+			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
+			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
+
+			ii = memloc(XParam,j, XParam.blkwidth - 1, ib);
+			ir = memloc(XParam,jj, 0,  XBlock.RightBot[ib]);
+			it = memloc(XParam,jj-1, 0, XBlock.RightBot[ib]);
+			//2 scenarios here ib is the leftbot neighbour of the rightbot block or ib is the lefttop neighbour
+			if (XBlock.BotLeft[XBlock.TopLeft[ib]] == ib)
+			{
+				if (j == 0)
+				{
+					if (XBlock.LeftBot[XBlock.TopLeft[ib]] == XBlock.TopLeft[ib]) // no botom of leftbot block
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						ir = it;
+
+					}
+					else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] < XBlock.level[XBlock.TopLeft[ib]]) // exists but is coarser
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 5.0 / 10.0;
+						w3 = 1.0 / 10.0;
+						it = memloc(XParam, XParam.blkwidth - 1,0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+					}
+					else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] == XBlock.level[XBlock.TopLeft[ib]]) // exists with same level
+					{
+						it = memloc(XParam,  XParam.blkwidth - 1,0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+					}
+					else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] > XBlock.level[XBlock.TopLeft[ib]]) // exists with higher level
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						it = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+					}
+
+
+				}
+
+
+			}
+			else//
+			{
+				if (j == (XParam.blkwidth - 1))
+				{
+					if (XBlock.RightBot[XBlock.TopRight[ib]] == XBlock.TopRight[ib]) // no botom of leftbot block
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						ir = it;
+
+					}
+					else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] < XBlock.level[XBlock.TopRight[ib]]) // exists but is coarser
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 1.0 / 10.0;
+						w3 = 5.0 / 10.0;
+						ir = memloc(XParam, 0, 0, XBlock.RightBot[XBlock.TopRight[ib]]);
+					}
+					else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] == XBlock.level[XBlock.TopRight[ib]]) // exists with same level
+					{
+						ir = memloc(XParam, 0, 0, XBlock.RightBot[XBlock.TopRight[ib]]);
+					}
+					else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] > XBlock.level[XBlock.TopRight[ib]]) // exists with higher level
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						ir = memloc(XParam, XParam.blkwidth - 1,0, XBlock.RightBot[XBlock.TopRight[ib]]);
+					}
+				}
+				//
+			}
+
+
+			z[write] = w1 * z[ii] + w2 * z[ir] + w3 * z[it];
+		}
+	}
+
+
+
+}
+
