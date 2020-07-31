@@ -16,5 +16,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z);
+
+template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 // End of global definition
 #endif

@@ -204,72 +204,19 @@ bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 	{
 		int ib = XBlock.active[ibl];
 
-		check=check && checklevel(ib, XBlock.level[ib], XBlock.LeftBot[ib], XBlock.level[XBlock.LeftBot[ib]]);
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.LeftBot[ib], XBlock.level[XBlock.LeftBot[ib]]);
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.LeftTop[ib], XBlock.level[XBlock.LeftTop[ib]]);
+		
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.TopLeft[ib], XBlock.level[XBlock.TopLeft[ib]]);
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.TopRight[ib], XBlock.level[XBlock.TopRight[ib]]);
+		
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.RightTop[ib], XBlock.level[XBlock.RightTop[ib]]);
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.RightBot[ib], XBlock.level[XBlock.RightBot[ib]]);
 
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.BotRight[ib], XBlock.level[XBlock.BotRight[ib]]);
+		check = check && checklevel(ib, XBlock.level[ib], XBlock.BotLeft[ib], XBlock.level[XBlock.BotLeft[ib]]);
 
-
-
-
-		/*
-		//check 1st order neighbours level
-		if (abs(XBlock.level[XBlock.leftblk[ib]] - (XBlock.level[ib])) > 1)
-		{
-			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; leftblk[ib]=%d; level[leftblk[ib]]=%d\n", ib, XBlock.level[ib], XBlock.LeftBot[ib], level[leftblk[ib]]);
-			check = false;
-		}
-		if (abs(level[rightblk[ib]] - (level[ib])) > 1)
-		{
-			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[ib]=%d; level[rightblk[ib]]=%d\n", ib, level[ib], rightblk[ib], level[rightblk[ib]]);
-			check = false;
-		}
-		if (abs(level[botblk[ib]] - (level[ib])) > 1)
-		{
-			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; botblk[ib]=%d; level[botblk[ib]]=%d\n", ib, level[ib], botblk[ib], level[botblk[ib]]);
-			check = false;
-		}
-		if (abs(level[topblk[ib]] - (level[ib])) > 1)
-		{
-			printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[ib]=%d; level[topblk[ib]]=%d\n", ib, level[ib], topblk[ib], level[topblk[ib]]);
-
-			check = false;
-		}
-
-		if ((level[leftblk[ib]] - level[ib]) == 1)
-		{
-			if (abs(level[topblk[leftblk[ib]]] - level[ib]) > 1)
-			{
-				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[leftblk[ib]]=%d; level[topblk[leftblk[ib]]]=%d\n", ib, level[ib], topblk[leftblk[ib]], level[topblk[leftblk[ib]]]);
-				check = false;
-			}
-		}
-
-		if ((level[rightblk[ib]] - level[ib]) == 1)
-		{
-			if (abs(level[topblk[rightblk[ib]]] - level[ib]) > 1)
-			{
-				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; topblk[rightblk[ib]]=%d; level[topblk[rightblk[ib]]]=%d\n", ib, level[ib], topblk[rightblk[ib]], level[topblk[rightblk[ib]]]);
-				check = false;
-			}
-		}
-		if ((level[topblk[ib]] - level[ib]) == 1)
-		{
-			if (abs(level[rightblk[topblk[ib]]] - level[ib]) > 1)
-			{
-				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[topblk[ib]]=%d; level[rightblk[topblk[ib]]]=%d\n", ib, level[ib], rightblk[topblk[ib]], level[rightblk[topblk[ib]]]);
-				check = false;
-			}
-		}
-
-		if ((level[botblk[ib]] - level[ib]) == 1)
-		{
-			if (abs(level[rightblk[botblk[ib]]] - level[ib]) > 1)
-			{
-				printf("Warning! Bad Neighbour Level. ib=%d; level[ib]=%d; rightblk[botblk[ib]]=%d; level[rightblk[botblk[ib]]]=%d\n", ib, level[ib], rightblk[botblk[ib]], level[rightblk[botblk[ib]]]);
-				check = false;
-			}
-		}
-		*/
-
+		
 	}
 
 	return check;
@@ -286,3 +233,59 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 	}
 	return check;
 }
+
+/*! \fn void adapt(Param XParam)
+* perform refining/corasening
+*
+*
+*
+*/
+template <class T> void adapt(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T>& Xev)
+{
+	// This function works in several interconnected step
+	// At this stage it works but it can be hard to follow or debug
+	// while the function is not particularly well written it is a complex problem to breakup in small peices
+
+
+	//===================================================================
+	//	Calculate invactive blocks and cumsumblk
+	// invactiveblk is used to deasctivate the 3 stale block from a coarsened group and to identify which block in memory is available 
+	// cumsum will determine where the new blocks will be located in the memory
+	// availblk[csumblk[refine_block]]
+
+	int csum = -3;
+	int nrefineblk = 0;
+	int ncoarsenlk = 0;
+	int nnewblk = 0;
+
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		XAdapt.invactive[ibl] = -1;
+
+
+	}
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		XAdapt.invactive[ib] = ibl;
+
+		// When refining we need csum
+		if (XAdapt.refine[ib] == true)
+		{
+			nrefineblk++;
+			csum = csum + 3;
+
+		}
+		if (XAdapt.coarsen[ib] == true)
+		{
+			ncoarsenlk++;
+
+
+		}
+		XAdapt.csumblk[ib] = csum;
+	}
+
+
+}
+
+

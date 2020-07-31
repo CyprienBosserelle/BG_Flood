@@ -6,7 +6,8 @@ template <class T> void fillHalo(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 	fillLeft(XParam, ib, XBlock, z);
 	fillRight(XParam, ib, XBlock, z);
-	
+	fillTop(XParam, ib, XBlock, z);
+	fillBot(XParam, ib, XBlock, z);
 	//fill bot
 	//fill top
 	
@@ -14,6 +15,23 @@ template <class T> void fillHalo(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 }
 template void fillHalo<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
 template void fillHalo<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
+
+template <class T> void fillHaloTopRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+{
+	// for flux term and actually most terms, only top and right neighbours are needed!
+
+	//fillLeft(XParam, ib, XBlock, z);
+	fillRight(XParam, ib, XBlock, z);
+	fillTop(XParam, ib, XBlock, z);
+	//fillBot(XParam, ib, XBlock, z);
+	//fill bot
+	//fill top
+
+
+}
+template void fillHaloTopRight<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+template void fillHaloTopRight<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
+
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev)
 {
@@ -30,6 +48,50 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 }
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev);
+
+template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad)
+{
+	int ib;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		fillHalo(XParam, ib, XBlock, Grad.dhdx);
+		fillHalo(XParam, ib, XBlock, Grad.dudx);
+		fillHalo(XParam, ib, XBlock, Grad.dvdx);
+		fillHalo(XParam, ib, XBlock, Grad.dzsdx);
+
+		fillHalo(XParam, ib, XBlock, Grad.dhdy);
+		fillHalo(XParam, ib, XBlock, Grad.dudy);
+		fillHalo(XParam, ib, XBlock, Grad.dvdy);
+		fillHalo(XParam, ib, XBlock, Grad.dzsdy);
+	}
+}
+template void fillHalo<float>(Param XParam, BlockP<float> XBlock, GradientsP<float> Grad);
+template void fillHalo<double>(Param XParam, BlockP<double> XBlock, GradientsP<double> Grad);
+
+
+template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+{
+	int ib;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Fhu);
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Fhv);
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Fqux);
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Fquy);
+
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Fqvx);
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Fqvy);
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Su);
+		fillHaloTopRight(XParam, ib, XBlock, Flux.Sv);
+	}
+}
+template void fillHalo<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template void fillHalo<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+
 
 
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
@@ -843,3 +905,139 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 }
 
+
+
+template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+{
+	// Run only this function after the filling the other bit of halo (i.e. fctn fillleft...)
+	// Most of the time the cormers are not needed. they are when refining a cell! 
+
+	
+	T zz;
+	int write;
+	int ii, ir, it, itr;
+
+
+	// Bottom left corner
+	write = memloc(XParam, -1, -1, ib);
+	//check that there is a block there and if there is calculate the value depending on the level of that block
+	if (XBlock.LeftTop[XBlock.BotLeft[ib]] == XBlock.BotLeft[ib]) // There is no block
+	{
+		zz = T(0.5) * (z[memloc(XParam, -1, 0, ib)] + z[memloc(XParam, 0, -1, ib)]);
+	}
+	else if (XBlock.level[XBlock.LeftTop[XBlock.BotLeft[ib]]] == XBlock.level[ib])
+	{
+		zz = z[memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.LeftTop[XBlock.BotLeft[ib]])];
+	}
+	else if (XBlock.level[XBlock.LeftTop[XBlock.BotLeft[ib]]] > XBlock.level[ib])
+	{
+		ii = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.LeftTop[XBlock.BotLeft[ib]]);
+		ir = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 2, XBlock.LeftTop[XBlock.BotLeft[ib]]);
+		it = memloc(XParam, XParam.blkwidth - 2, XParam.blkwidth - 1, XBlock.LeftTop[XBlock.BotLeft[ib]]);
+		itr = memloc(XParam, XParam.blkwidth - 2, XParam.blkwidth - 2, XBlock.LeftTop[XBlock.BotLeft[ib]]);
+
+		zz = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+	}
+	else if (XBlock.level[XBlock.LeftTop[XBlock.BotLeft[ib]]] < XBlock.level[ib])
+	{
+		ii = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.LeftTop[XBlock.BotLeft[ib]]);
+		ir = memloc(XParam, - 1, 0, ib);
+		it = memloc(XParam,0, - 1, ib);
+		zz = T(0.5) * z[ii] + T(0.25) * (z[ir] + z[it]);
+	}
+
+	z[write] = zz;
+
+	// Top Left corner
+	write = memloc(XParam, -1, XParam.blkwidth, ib);
+	//check that there is a block there and if there is calculate the value depending on the level of that block
+	if (XBlock.LeftBot[XBlock.TopLeft[ib]] == XBlock.TopLeft[ib]) // There is no block
+	{
+		zz = T(0.5) * (z[memloc(XParam, -1, XParam.blkwidth-1, ib)] + z[memloc(XParam, 0, XParam.blkwidth, ib)]);
+	}
+	else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] == XBlock.level[ib])
+	{
+		zz = z[memloc(XParam, XParam.blkwidth - 1, 0, XBlock.LeftBot[XBlock.TopLeft[ib]])];
+	}
+	else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] > XBlock.level[ib])
+	{
+		ii = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+		ir = memloc(XParam, XParam.blkwidth - 1, 1, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+		it = memloc(XParam, XParam.blkwidth - 2, 0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+		itr = memloc(XParam, XParam.blkwidth - 2, 1, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+
+		zz = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+	}
+	else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] < XBlock.level[ib])
+	{
+		ii = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+		ir = memloc(XParam, -1, XParam.blkwidth - 1, ib);
+		it = memloc(XParam, 0, XParam.blkwidth, ib);
+		zz = T(0.5) * z[ii] + T(0.25) * (z[ir] + z[it]);
+	}
+
+	z[write] = zz;
+
+	//Top Right corner
+	write = memloc(XParam, XParam.blkwidth, XParam.blkwidth, ib);
+	//check that there is a block there and if there is calculate the value depending on the level of that block
+	if (XBlock.RightBot[XBlock.TopRight[ib]] == XBlock.TopRight[ib]) // There is no block
+	{
+		zz = T(0.5) * (z[memloc(XParam, XParam.blkwidth, XParam.blkwidth - 1, ib)] + z[memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth, ib)]);
+	}
+	else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] == XBlock.level[ib])
+	{
+		zz = z[memloc(XParam, 0, 0, XBlock.RightBot[XBlock.TopRight[ib]])];
+	}
+	else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] > XBlock.level[ib])
+	{
+		ii = memloc(XParam, 0, 0, XBlock.RightBot[XBlock.TopRight[ib]]);
+		ir = memloc(XParam, 0, 1, XBlock.RightBot[XBlock.TopRight[ib]]);
+		it = memloc(XParam, 1, 0, XBlock.RightBot[XBlock.TopRight[ib]]);
+		itr = memloc(XParam, 1, 1, XBlock.RightBot[XBlock.TopRight[ib]]);
+
+		zz = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+	}
+	else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] < XBlock.level[ib])
+	{
+		ii = memloc(XParam, 0, 0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+		ir = memloc(XParam, XParam.blkwidth, XParam.blkwidth - 1, ib);
+		it = memloc(XParam, XParam.blkwidth-1, XParam.blkwidth, ib);
+		zz = T(0.5) * z[ii] + T(0.25) * ( z[ir] +  z[it]);
+	}
+
+	z[write] = zz;
+
+	//Bot Right corner
+	write = memloc(XParam, XParam.blkwidth, -1, ib);
+	//check that there is a block there and if there is calculate the value depending on the level of that block
+	if (XBlock.RightBot[XBlock.BotRight[ib]] == XBlock.BotRight[ib]) // There is no block
+	{
+		zz = T(0.5) * (z[memloc(XParam, XParam.blkwidth-1, - 1, ib)] + z[memloc(XParam, XParam.blkwidth , 0, ib)]);
+	}
+	else if (XBlock.level[XBlock.RightBot[XBlock.BotRight[ib]]] == XBlock.level[ib])
+	{
+		zz = z[memloc(XParam, 0, XParam.blkwidth - 1, XBlock.RightBot[XBlock.BotRight[ib]])];
+	}
+	else if (XBlock.level[XBlock.RightBot[XBlock.BotRight[ib]]] > XBlock.level[ib])
+	{
+		ii = memloc(XParam, 0, XParam.blkwidth - 1, XBlock.RightBot[XBlock.BotRight[ib]]);
+		ir = memloc(XParam, 0, XParam.blkwidth - 2, XBlock.RightBot[XBlock.BotRight[ib]]);
+		it = memloc(XParam, 1, XParam.blkwidth - 1, XBlock.RightBot[XBlock.BotRight[ib]]);
+		itr = memloc(XParam, 1, XParam.blkwidth - 2, XBlock.RightBot[XBlock.BotRight[ib]]);
+
+		zz = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+	}
+	else if (XBlock.level[XBlock.RightBot[XBlock.BotRight[ib]]] < XBlock.level[ib])
+	{
+		ii = memloc(XParam, 0, XParam.blkwidth - 1, XBlock.LeftBot[XBlock.TopLeft[ib]]);
+		ir = memloc(XParam, XParam.blkwidth - 1, -1, ib);
+		it = memloc(XParam, XParam.blkwidth, 0, ib);
+		zz = T(0.5) * z[ii] + T(0.25) * (z[ir] + z[it]);
+	}
+
+	z[write] = zz;
+
+}
+template void fillCorners<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
+template void fillCorners<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
