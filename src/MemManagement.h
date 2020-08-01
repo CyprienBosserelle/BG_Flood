@@ -17,6 +17,10 @@ template <class T> void AllocateCPU(int nblk, int blksize, Param XParam, Model<T
 
 
 template <class T> void ReallocArray(int nblk, int blksize, T*& zb);
+template <class T> __host__ void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v);
+template <class T> __host__ void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev);
+template <class T> void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel);
+
 int memloc(Param XParam, int i, int j, int ib);
 
 // End of global definition

@@ -284,6 +284,28 @@ template <class T> void adapt(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, E
 		}
 		XAdapt.csumblk[ib] = csum;
 	}
+	//=========================================
+	//	Reconstruct availblk
+	XParam.navailblk = 0;
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		if (XAdapt.invactive[ibl] == -1)
+		{
+			XAdapt.availblk[XParam.navailblk] = ibl;
+			XParam.navailblk++;
+		}
+
+	}
+
+	// How many new block are needed
+	// This below would be ideal but I don't see how that could work.
+	// One issue is to make the newly coarsen blocks directly available in the section above but that would make the code even more confusingalthough we haven't taken them into account in the 
+	//nnewblk = 3*nrefineblk - ncoarsenlk*3;
+	// Below is conservative and keeps the peice of code above a bit more simple
+	nnewblk = 3 * nrefineblk;
+
+	log("There are"+ std::to_string(XParam.nblk) +"active blocks ("+ std::to_string(XParam.nblkmem) +" blocks allocated in memory), "+std::to_string(nrefineblk)+" blocks to be refined, "+std::to_string(ncoarsenlk)+" blocks to be coarsen (with neighbour); "+std::to_string(XParam.nblk - nrefineblk - 4 * ncoarsenlk)+" blocks untouched; "+std::to_string(ncoarsenlk * 3)+" blocks to be freed ("+ std::to_string(XParam.navailblk) +" are already available) "+std::to_string(nnewblk)+" new blocks will be created");
+
 
 
 }

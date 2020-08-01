@@ -128,7 +128,87 @@ template <class T> __host__ void ReallocArray(int nblk, int blksize, T* & zb)
 	//return nblkmem
 }
 
-template void ReallocArray<int>(int nblk, int blksize, int* & zb);
-template void ReallocArray<float>(int nblk, int blksize, float* & zb);
-template void ReallocArray<double>(int nblk, int blksize, double* & zb);
+template <class T> __host__ void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v)
+{
+	//
 
+	ReallocArray(nblk, blksize, zs);
+	ReallocArray(nblk, blksize, h);
+	ReallocArray(nblk, blksize, u);
+	ReallocArray(nblk, blksize, v);
+	//return nblkmem
+}
+
+template void ReallocArray<int>(int nblk, int blksize, int* & zs, int*& h, int*& u, int*& v);
+template void ReallocArray<float>(int nblk, int blksize, float* & zs, float*& h, float*& u, float*& v );
+template void ReallocArray<double>(int nblk, int blksize, double* & zs, double*& h, double*& u, double*& v);
+
+template <class T> __host__ void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev)
+{
+	ReallocArray(nblk, blksize, Ev.zs, Ev.h, Ev.u, Ev.v);
+}
+template void ReallocArray<float>(int nblk, int blksize, EvolvingP<float>& Ev);
+template void ReallocArray<double>(int nblk, int blksize, EvolvingP<double>& Ev);
+
+
+template <class T>
+void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
+{
+	// Allocate blocks data 
+	ReallocArray(nblk, blksize, XModel.evolv);
+	ReallocArray(nblk, blksize, XModel.evolv_o);
+
+	ReallocArray(nblk, blksize, XModel.grad.dhdy, XModel.grad.dzsdy, XModel.grad.dudy, XModel.grad.dvdy);
+
+	ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
+
+	ReallocArray(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+
+	ReallocArray(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
+
+	ReallocArray(nblk, blksize, XModel.cf, XModel.time.arrmax, XModel.time.arrmin, XModel.time.dtmax);
+
+
+	//Allocate block info
+	ReallocArray(nblk, 1, XModel.blocks.active);
+	ReallocArray(nblk, 1, XModel.blocks.level);
+
+	ReallocArray(nblk, 1, XModel.blocks.BotLeft, XModel.blocks.BotRight, XModel.blocks.LeftBot, XModel.blocks.LeftTop);
+	ReallocArray(nblk, 1, XModel.blocks.RightBot, XModel.blocks.RightTop, XModel.blocks.TopLeft, XModel.blocks.TopRight);
+
+	ReallocArray(nblk, 1, XModel.blocks.xo);
+	ReallocArray(nblk, 1, XModel.blocks.yo);
+
+	// If no adatptation ignore this!
+	if (XParam.maxlevel != XParam.minlevel)
+	{
+		ReallocArray(nblk, 1, XModel.adapt.availblk, XModel.adapt.csumblk, XModel.adapt.invactive, XModel.adapt.newlevel);
+		ReallocArray(nblk, 1, XModel.adapt.coarsen);
+		ReallocArray(nblk, 1, XModel.adapt.refine);
+	}
+
+
+	if (XParam.atmpforcing)
+	{
+		ReallocArray(nblk, blksize, XModel.datmpdx);
+		ReallocArray(nblk, blksize, XModel.datmpdy);
+	}
+
+
+	if (XParam.outmax)
+	{
+		ReallocArray(nblk, blksize, XModel.evmax);
+	}
+	if (XParam.outmean)
+	{
+		ReallocArray(nblk, blksize, XModel.evmean);
+	}
+
+	//ReallocArray(nx, ny, XModel.);
+
+
+
+}
+
+template void ReallocArray<float>(int nblk, int blksize, Param XParam, Model<float>& XModel);
+template void ReallocArray<double>(int nblk, int blksize, Param XParam, Model<double>& XModel);
