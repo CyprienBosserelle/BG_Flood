@@ -17,7 +17,10 @@ template <class T> void Adaptation(Param& XParam, Model<T>& XModel)
 			//wetdrycriteria(XParam, refine, coarsen);
 			inrangecriteria(XParam, (T)-10.0, (T)-10.0, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
-			XParam = adapt(XParam);
+			//XParam = adapt(XParam);
+			
+
+
 			if (!checkBUQsanity(XParam))
 			{
 				log("Bad BUQ mesh layout\n");
@@ -234,24 +237,30 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 	return check;
 }
 
-/*! \fn void adapt(Param XParam)
-* perform refining/corasening
+
+
+template <class T> void Adapt(Param XParam, Model<T>& XModel)
+{
+	int nnewblk = CalcAvailblk(XParam, XModel.blocks, XModel.adapt);
+	if (nnewblk > XParam.navailblk)
+	{
+		//Reallocate
+
+		// Recalculate Adapt variables
+
+	}
+
+}
+
+/*! \fn int CalcAvailblk(Param XParam, BlockP<T> XBlock, AdaptP& XAdapt)
+* 
 *
 *
 *
 */
-template <class T> void adapt(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T>& Xev)
+template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAdapt)
 {
-	// This function works in several interconnected step
-	// At this stage it works but it can be hard to follow or debug
-	// while the function is not particularly well written it is a complex problem to breakup in small peices
-
-
-	//===================================================================
-	//	Calculate invactive blocks and cumsumblk
-	// invactiveblk is used to deasctivate the 3 stale block from a coarsened group and to identify which block in memory is available 
-	// cumsum will determine where the new blocks will be located in the memory
-	// availblk[csumblk[refine_block]]
+	//
 
 	int csum = -3;
 	int nrefineblk = 0;
@@ -264,6 +273,7 @@ template <class T> void adapt(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, E
 
 
 	}
+	
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
@@ -284,6 +294,7 @@ template <class T> void adapt(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, E
 		}
 		XAdapt.csumblk[ib] = csum;
 	}
+	
 	//=========================================
 	//	Reconstruct availblk
 	XParam.navailblk = 0;
@@ -306,8 +317,9 @@ template <class T> void adapt(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, E
 
 	log("There are"+ std::to_string(XParam.nblk) +"active blocks ("+ std::to_string(XParam.nblkmem) +" blocks allocated in memory), "+std::to_string(nrefineblk)+" blocks to be refined, "+std::to_string(ncoarsenlk)+" blocks to be coarsen (with neighbour); "+std::to_string(XParam.nblk - nrefineblk - 4 * ncoarsenlk)+" blocks untouched; "+std::to_string(ncoarsenlk * 3)+" blocks to be freed ("+ std::to_string(XParam.navailblk) +" are already available) "+std::to_string(nnewblk)+" new blocks will be created");
 
-
+	return nnewblk;
 
 }
-
+template int CalcAvailblk<float>(Param &XParam, BlockP<float> XBlock, AdaptP& XAdapt);
+template int CalcAvailblk<double>(Param &XParam, BlockP<double> XBlock, AdaptP& XAdapt);
 
