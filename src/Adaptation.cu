@@ -242,13 +242,31 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 template <class T> void Adapt(Param XParam, Model<T>& XModel)
 {
 	int nnewblk = CalcAvailblk(XParam, XModel.blocks, XModel.adapt);
+
+	// Check if there are enough available block to refin 
 	if (nnewblk > XParam.navailblk)
 	{
 		//Reallocate
+		int nblkmem=AddBlocks(nnewblk, XParam, XModel);
 
-		// Recalculate Adapt variables
-
+		log("Reallocation complete: "+std::to_string(XParam.navailblk)+" new blocks are available ( "+std::to_string(nblkmem)+" blocks in memory) ");
 	}
+	//===========================================================
+	//	Start coarsening and refinement
+	// First Initialise newlevel (Do this every time because new level is reused later)
+
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		// Set newlevel
+		XModel.adapt.newlevel[ibl] = XModel.blocks.level[ibl];
+	}
+
+	//=========================================================
+	//	COARSEN
+	coarsen(XParam, XModel.blocks, XModel.adapt, XModel.evolv_o, XModel.evolv);
+
+
+
 
 }
 
@@ -322,4 +340,662 @@ template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAd
 }
 template int CalcAvailblk<float>(Param &XParam, BlockP<float> XBlock, AdaptP& XAdapt);
 template int CalcAvailblk<double>(Param &XParam, BlockP<double> XBlock, AdaptP& XAdapt);
+
+template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel)
+{
+	//
+	int nblkmem, oldblkmem;
+	oldblkmem = XParam.nblkmem;
+	nblkmem = (int)ceil((XParam.nblk + nnewblk) * XParam.membuffer);
+	XParam.nblkmem = nblkmem;
+	ReallocArray(nblkmem, XParam.blkmemwidth, XParam, XModel);
+
+
+	// Reconstruct blk info
+	XParam.navailblk = 0;
+	for (int ibl = 0; ibl < (XParam.nblkmem - XParam.nblk); ibl++)
+	{
+		XModel.blocks.active[XParam.nblk + ibl] = -1;
+		XModel.adapt.coarsen[XParam.nblk + ibl] = false;
+		XModel.adapt.refine[XParam.nblk + ibl] = false;
+
+		//printf("ibl=%d; availblk[ibl]=%d;\n",ibl, availblk[ibl]);
+
+	}
+
+	for (int ibl = 0; ibl < (XParam.nblkmem - oldblkmem); ibl++)
+	{
+		XModel.adapt.invactive[oldblkmem + ibl] = -1;
+
+
+	}
+
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		if (XModel.adapt.invactive[ibl] == -1)
+		{
+			XModel.blocks.active[XParam.navailblk] = ibl;
+			XParam.navailblk++;
+		}
+
+	}
+
+	
+	return nblkmem;
+}
+template int AddBlocks<float>(int nnewblk, Param& XParam, Model<float>& XModel);
+template int AddBlocks<double>(int nnewblk, Param& XParam, Model<double>& XModel);
+
+
+template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,EvolvingP<T> XEvo, EvolvingP<T>& XEv )
+{
+	//=========================================================
+	//	COARSEN
+	//=========================================================
+	// This is a 2 step process
+	// 1. First deal with the conserved variables (hh,uu,vv,zs,zb)
+	// 2. Deactivate the block
+	// 3. Fix neighbours
+
+	//____________________________________________________
+	//
+	// Step 1 & 2: Average conserved variables and deactivate the blocks
+
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		int i, ii, ir, it, itr;
+		if (XAdapt.coarsen[ib] == true)
+		{
+			double dxfac = calcres(XParam.dx, XBlock.level[ib]);
+			int xnode = int((XBlock.xo[ib] - XParam.xo) / dxfac / XParam.blkwidth);
+			int ynode = int((XBlock.yo[ib] - XParam.yo) / dxfac / XParam.blkwidth);
+
+			int oldright = XBlock.RightBot[XBlock.RightBot[ib]];
+			//int oldtopofright = topblk[oldright];
+			int oldtop = XBlock.TopLeft[XBlock.TopLeft[ib]];
+			//int oldrightoftop = rightblk[oldtop];
+			int oldleft = XBlock.LeftBot[ib];
+			//int oldtopofleft = topblk[oldleft];
+			int oldbot = XBlock.BotLeft[ib];
+			//int oldrightofbot = rightblk[oldbot];
+
+
+			for (int iy = 0; iy < XParam.blksize; iy++)
+			{
+				for (int ix = 0; ix < XParam.blksize; ix++)
+				{
+					i = memloc(XParam, ix, iy, ib);
+					
+					if (ix < (XParam.blksize / 2) && iy < (XParam.blksize/2))
+					{
+						ii = memloc(XParam, ix * 2, iy * 2, ib);// ix * 2 + (iy * 2) * 16 + ib * XParam.blksize;
+						ir = memloc(XParam, (ix * 2 + 1), (iy * 2), ib); //(ix * 2 + 1) + (iy * 2) * 16 + ib * XParam.blksize;
+						it = memloc(XParam, (ix * 2 ), (iy * 2 + 1), ib);// (ix) * 2 + (iy * 2 + 1) * 16 + ib * XParam.blksize;
+						itr = memloc(XParam, (ix * 2 + 1), (iy * 2 + 1), ib); //(ix * 2 + 1) + (iy * 2 + 1) * 16 + ib * XParam.blksize;
+					}
+					if (ix >= (XParam.blksize / 2) && iy < (XParam.blksize / 2))
+					{
+						ii = memloc(XParam, (ix - XParam.blksize / 2) * 2, iy * 2, XBlock.RightBot[ib]);//((ix - 8) * 2) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+						ir = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, iy * 2, XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+						it = memloc(XParam, (ix - XParam.blksize / 2) * 2, iy * 2 + 1, XBlock.RightBot[ib]);// ((ix - 8)) * 2 + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+						itr = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, (iy * 2 + 1), XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+					}
+					if (ix < (XParam.blksize / 2) && iy >= (XParam.blksize / 2))
+					{
+						ii = memloc(XParam, ix * 2, (iy - XParam.blksize / 2) * 2, XBlock.TopLeft[ib]);// ix * 2 + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+						ir = memloc(XParam, ix * 2 + 1, (iy - XParam.blksize / 2) * 2, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+						it = memloc(XParam, ix * 2, (iy - XParam.blksize / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix) * 2 + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+						itr = memloc(XParam, ix * 2 + 1, (iy - XParam.blksize / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+					}
+					if (ix >= (XParam.blksize / 2) && iy >= (XParam.blksize / 2))
+					{
+						ii = memloc(XParam, (ix - XParam.blksize / 2) * 2, (iy - XParam.blksize / 2) * 2, XBlock.RightBot[XBlock.TopRight[ib]]);// (ix - 8) * 2 + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						ir = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, iy - XParam.blksize / 2 * 2, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						it = memloc(XParam, (ix - XParam.blksize / 2) * 2, (iy - XParam.blksize / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//(ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						itr = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, (iy - XParam.blksize / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+					}
+
+
+					// These are the only guys that need to be coarsen, other are recalculated on the fly or interpolated from forcing
+					XEv.h[i] = 0.25 * (XEvo.h[ii] + XEvo.h[ir] + XEvo.h[it] + XEvo.h[itr]);
+					XEv.zs[i] = 0.25 * (XEvo.zs[ii] + XEvo.zs[ir] + XEvo.zs[it] + XEvo.zs[itr]);
+					XEv.u[i] = 0.25 * (XEvo.u[ii] + XEvo.u[ir] + XEvo.u[it] + XEvo.u[itr]);
+					XEv.v[i] = 0.25 * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
+					//zb will be interpolated from input grid later // I wonder is this makes the bilinear interpolation scheme crash at the refining step for zb?
+					// No because zb is also interpolated later from the original mesh data
+					//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
+
+
+				}
+			}
+
+			//Need more?
+
+			// Make right, top and top-right block available for refine step
+			XAdapt.availblk[XParam.navailblk] = XBlock.RightBot[ib];
+			XAdapt.availblk[XParam.navailblk + 1] = XBlock.TopLeft[ib];
+			XAdapt.availblk[XParam.navailblk + 2] = XBlock.RightBot[XBlock.TopRight[ib]];
+
+			XAdapt.newlevel[ib] = XBlock.level[ib] - 1;
+
+			//Do not comment! While this 3 line below seem irrelevant in a first order they are needed for the neighbours below (next step down) but then is not afterward
+			XAdapt.newlevel[XBlock.RightBot[ib]] = XBlock.level[ib] - 1;
+			XAdapt.newlevel[XBlock.TopLeft[ib]] = XBlock.level[ib] - 1;
+			XAdapt.newlevel[XBlock.RightBot[XBlock.TopRight[ib]]] = XBlock.level[ib] - 1;
+
+
+
+			// increment available block count
+			XParam.navailblk = XParam.navailblk + 3;
+
+			// Make right, top and top-right block inactive
+			XBlock.active[XAdapt.invactive[XBlock.RightBot[ib]]] = -1;
+			XBlock.active[XAdapt.invactive[XBlock.TopLeft[ib]]] = -1;
+			XBlock.active[XAdapt.invactive[XBlock.RightBot[XBlock.TopRight[ib]]]] = -1;
+
+			//check neighbour's (Full neighbour happens in the next big loop below)
+			if (XBlock.RightBot[ib] == oldright) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
+			{
+				XBlock.RightBot[ib] = ib;
+				//XBlock.RightTop[ib] = ib;
+			}
+			else
+			{
+				XBlock.RightBot[ib] = oldright;
+				//XBlock.RightTop[ib] = oldright;
+			}
+
+
+
+
+			if (XBlock.TopLeft[ib] == oldtop)//Ditto here
+			{
+				XBlock.TopLeft[ib] = ib;
+			}
+			else
+			{
+				XBlock.TopLeft[ib] = oldtop;
+			}
+			// Bot and left blk should remain unchanged at this stage(they will change if the neighbour themselves change)
+
+			XBlock.xo[ib] = XBlock.xo[ib] + calcres(XParam.dx, XBlock.level[ib] + 1);
+			XBlock.yo[ib] = XBlock.yo[ib] + calcres(XParam.dx, XBlock.level[ib] + 1);
+
+
+
+		}
+
+	}
+
+	//____________________________________________________
+	//
+	// Step 3: deal with neighbour
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		int i, ii, ir, it, itr;
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
+		{
+
+			
+
+			if (XAdapt.newlevel[XBlock.LeftBot[ib]] < XBlock.level[XBlock.LeftBot[ib]])
+			{
+				//left blk has coarsen
+				if (XAdapt.coarsen[XBlock.LeftBot[XBlock.LeftBot[ib]]])
+				{
+					XBlock.LeftBot[ib] = XBlock.LeftBot[XBlock.LeftBot[ib]];
+				}
+				else
+				{
+					XBlock.LeftBot[ib] = XBlock.BotLeft[XBlock.LeftBot[XBlock.LeftBot[ib]]];
+				}
+			}
+			
+
+
+
+			if (XAdapt.newlevel[XBlock.BotLeft[ib]] < XBlock.level[XBlock.BotLeft[ib]])
+			{
+				// botblk has coarsen
+				if (XAdapt.coarsen[XBlock.BotLeft[XBlock.BotLeft[ib]]])
+				{
+					XBlock.BotLeft[ib] = XBlock.BotLeft[XBlock.BotLeft[ib]];
+				}
+				else
+				{
+					XBlock.BotLeft[ib] = XBlock.LeftBot[XBlock.BotLeft[XBlock.BotLeft[ib]]];
+				}
+			}
+			
+
+
+			if (XAdapt.newlevel[XBlock.RightBot[ib]] < XBlock.level[XBlock.RightBot[ib]])
+			{
+				// right block has coarsen
+				if (!XAdapt.coarsen[XBlock.RightBot[ib]])
+				{
+					XBlock.RightBot[ib] = XBlock.BotLeft[XBlock.RightBot[ib]];
+				}
+				// else do nothing because the right block is the reference one
+			}
+
+
+			if (XAdapt.newlevel[XBlock.TopLeft[ib]] < XBlock.level[XBlock.TopLeft[ib]])
+			{
+				// top blk has coarsen
+				if (!XAdapt.coarsen[XBlock.TopLeft[ib]])
+				{
+					XBlock.TopLeft[ib] = XBlock.LeftBot[XBlock.TopLeft[ib]];
+				}
+
+
+			}
+
+
+		}
+	}
+
+	//____________________________________________________
+	//
+	// Step 4: deal with other neighbour pair
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		int i, ii, ir, it, itr;
+		if (ib >= 0 && (XAdapt.newlevel[ib] < XBlock.level[ib])) // ib can be -1 for newly inactive blocks
+		{
+			if (XAdapt.newlevel[XBlock.LeftBot[ib]] <= XAdapt.newlevel[ib])
+			{
+				XBlock.LeftTop[ib] = XBlock.LeftBot[ib]; // this is fine even if this is a boundary edge
+			}
+			else //(XAdapt.newlevel[XBlock.LeftBot[ib]] > XAdapt.newlevel[ib])
+			{
+				XBlock.LeftTop[ib] = XBlock.TopLeft[XBlock.LeftBot[ib]];
+			}
+
+			if (XAdapt.newlevel[XBlock.RightBot[ib]] <= XAdapt.newlevel[ib])
+			{
+				XBlock.RightTop[ib] = XBlock.RightBot[ib]; // this is fine even if this is a boundary edge
+			}
+			else //(XAdapt.newlevel[XBlock.LeftBot[ib]] > XAdapt.newlevel[ib])
+			{
+				XBlock.RightTop[ib] = XBlock.TopLeft[XBlock.RightBot[ib]];
+			}
+
+			if (XAdapt.newlevel[XBlock.BotLeft[ib]] <= XAdapt.newlevel[ib])
+			{
+				XBlock.BotRight[ib] = XBlock.BotLeft[ib];
+			}
+			else //(XAdapt.newlevel[XBlock.LeftBot[ib]] > XAdapt.newlevel[ib])
+			{
+				XBlock.BotRight[ib] = XBlock.RightBot[XBlock.BotLeft[ib]];
+			}
+
+
+			if (XAdapt.newlevel[XBlock.TopLeft[ib]] <= XAdapt.newlevel[ib])
+			{
+				XBlock.TopRight[ib] = XBlock.TopLeft[ib];
+			}
+			else //(XAdapt.newlevel[XBlock.TopBot[ib]] > XAdapt.newlevel[ib])
+			{
+				XBlock.TopRight[ib] = XBlock.RightBot[XBlock.TopLeft[ib]];
+			}
+
+
+		}
+	}
+}
+
+template void coarsen<float>(Param XParam, BlockP<float>& XBlock, AdaptP& XAdapt, EvolvingP<float> XEvo, EvolvingP<float>& XEv);
+template void coarsen<double>(Param XParam, BlockP<double>& XBlock, AdaptP& XAdapt, EvolvingP<double> XEvo, EvolvingP<double>& XEv);
+
+template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T> XEvo, EvolvingP<T>& XEv)
+{
+	//==========================================================================
+	//	REFINE
+	//==========================================================================
+	// This is also a multi step process:
+	//	1. Interpolate conserved variables (although zb is done here it is overwritten later down the code)
+	//	2. Set direct neighbours blockxo/yo and levels
+	//	3. Set wider neighbourhood
+	//	4. Activate new blocks 
+
+	//____________________________________________________
+	//
+	// Step 1. Interpolate conserved variables
+
+	int nblk = XParam.nblk;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//
+
+		int ib = XBlock.active[ibl];
+		int o, oo, ooo, oooo;
+		int  ii, ir, it,itr;
+
+
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
+		{
+			if (XAdapt.refine[ib])
+			{
+				
+				// Bilinear interpolation
+				for (int iy = 0; iy < XParam.blkwidth; iy++)
+				{
+					for (int ix = 0; ix < XParam.blkwidth; ix++)
+					{
+						int kx[] = { 0, XParam.blkwidth/2, 0, XParam.blkwidth/2 };
+						int ky[] = { 0, 0, XParam.blkwidth/2, XParam.blkwidth/2 };
+						int kb[] = { ib, XAdapt.availblk[XAdapt.csumblk[ib]], XAdapt.availblk[XAdapt.csumblk[ib] + 1], XAdapt.availblk[XAdapt.csumblk[ib] + 2] };
+
+						//double mx, my;
+
+						for (int kk = 0; kk < 4; kk++)
+						{
+
+							int cx, fx, cy, fy;
+							
+							T lx, ly, rx, ry;
+
+							lx = ix * 0.5 - 0.25;
+							ly = iy * 0.5 - 0.25;
+
+
+							fx = (int)floor(lx) + kx[kk];
+							cx = (int)ceil(lx) + kx[kk];
+							fy = (int)floor(ly) + ky[kk];
+							cy = (int)ceil(ly) + ky[kk];
+
+							rx = (lx)+(double)kx[kk];
+							ry = (ly)+(double)ky[kk];
+
+							o = memloc(XParam,ix,iy, kb[kk]);//ix + iy * 16 + kb[kk] * XParam.blksize;
+
+							ii = memloc(Xparam, fx, fy, ib);
+							ir = memloc(Xparam, cx, fy, ib);
+							it = memloc(Xparam, fx, cy, ib);
+							itr = memloc(Xparam, cx, cy, ib);
+
+
+							//printf("fx = %d; cx=%d; fy=%d; cy=%d; rx=%f; ry=%f\n", fx, cx, fy, cy,rx,ry);
+
+							//printf("First blk %f\n",BilinearInterpolation(h11, h12, h21, h22, fx, cx, fy, cy, rx, ry));
+
+							XEv.h[o] = BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.zs[o] = BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.u[o] = BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.v[o] = BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+
+
+						}
+
+					}
+				}
+			}
+		}
+	}
+
+	//____________________________________________________
+	//	
+	// Step 2. Set direct neighbours blockxo/yo and levels
+	//
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
+		{
+			if (XAdapt.refine[ib])
+			{
+				double delx = calcres(XParam.dx, XBlock.level[ib] + 1);
+				double xoblk = XBlock.xo[ib] - 0.5 * delx;
+				double yoblk = XBlock.yo[ib] - 0.5 * delx;
+
+				int oldtopleft, oldleftbot, oldrightbot, oldbotleft;
+				int oldtopright, oldlefttop, oldrighttop, oldbotright;
+
+
+				oldtopleft = XBlock.TopLeft[ib];
+				oldtopright = XBlock.TopRight[ib];
+
+				oldbotleft = XBlock.BotLeft[ib];
+				oldbotright = XBlock.BotRight[ib];
+
+				oldrightbot = XBlock.RightBot[ib];
+				oldrighttop = XBlock.RightTop[ib];
+
+				oldleftbot = XBlock.LeftBot[ib];
+				oldlefttop = XBlock.LeftTop[ib];
+
+				// One block becomes 4 blocks:
+				// ib is the starting blk and new bottom left blk
+				// ibr is the new bottom right blk
+				// ibtl is the new top left blk
+				// ibtr is the new top right block
+
+				int ibr, ibtl, ibtr;
+				ibr = XAdapt.availblk[XAdapt.csumblk[ib]];
+				ibtl = XAdapt.availblk[XAdapt.csumblk[ib] + 1];
+				ibtr = XAdapt.availblk[XAdapt.csumblk[ib] + 2];
+
+				// sort out block info
+				XAdapt.newlevel[ib] = XBlock.level[ib] + 1;
+				XAdapt.newlevel[ibr] = XBlock.level[ib] + 1;
+				XAdapt.newlevel[ibtl] = XBlock.level[ib] + 1;
+				XAdapt.newlevel[ibtr] = XBlock.level[ib] + 1;
+
+				XBlock.xo[ib] = xoblk;
+				XBlock.yo[ib] = yoblk;
+				//bottom right blk
+				XBlock.xo[ibr] = xoblk + (XParam.blkwidth) * delx;
+				XBlock.yo[ibr] = yoblk;
+				//top left blk
+				XBlock.xo[ibtl] = xoblk;
+				XBlock.yo[ibtl] = yoblk + (XParam.blkwidth) * delx;
+				//top right blk
+				XBlock.xo[ibtr] = xoblk + (XParam.blkwidth) * delx;
+				XBlock.yo[ibtr] = yoblk + (XParam.blkwidth) * delx;
+
+
+				//sort out internal blocks neighbour
+				// external neighbours are dealt with in the following loop
+
+				//top neighbours
+				XBlock.TopLeft[ib] = ibtl;
+				XBlock.TopRight[ib] = ibtl;
+
+				XBlock.TopLeft[ibtl] = oldtopleft;
+				XBlock.TopRight[ibtl] = oldtopleft;
+
+				XBlock.TopLeft[ibr] = ibtr;
+				XBlock.TopRight[ibr] = ibtr;
+
+				XBlock.TopLeft[ibtr] = oldtopright;
+				XBlock.TopRight[ibtr] = oldtopright;
+
+				// Right neighbours
+				XBlock.RightBot[ib] = ibr;
+				XBlock.RightTop[ib] = ibr;
+
+				XBlock.RightBot[ibr] = oldrightbot;
+				XBlock.RightTop[ibr] = oldrightbot;
+
+				XBlock.RightBot[ibtl] = ibtr;
+				XBlock.RightTop[ibtl] = ibtr;
+
+				XBlock.RightBot[ibtr] = oldrighttop;
+				XBlock.RightTop[ibtr] = oldrighttop;
+				
+				//Bottom Neighbours
+				XBlock.BotLeft[ibtl] = ib;
+				XBlock.BotRight[ibtl] = ib;
+
+				XBlock.BotLeft[ibtr] = ibr;
+				XBlock.BotRight[ibtr] = ibr;
+
+				XBlock.BotLeft[ibr] = oldbotright;
+				XBlock.BotRight[ibr] = oldbotright;
+				
+				//Left neightbour
+				XBlock.LeftBot[ibr] = ib;
+				XBlock.LeftTop[ibr] = ib;
+
+				XBlock.LeftBot[ibtr] = ibtl;
+				XBlock.LeftTop[ibtr] = ibtl;
+
+				XBlock.LeftBot[ibtl] = oldlefttop;
+				XBlock.LeftTop[ibtl] = oldlefttop;
+				
+				
+				
+				XParam.navailblk = XParam.navailblk - 3;
+			}
+		}
+
+	}
+
+
+	//____________________________________________________
+	//	
+	//	Step 3. Set wider neighbourhood
+	//
+	// set the external neighbours
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
+		{
+			if (XAdapt.refine[ib])
+			{
+				int oldtopleft, oldleftbot, oldrightbot, oldbotleft;
+				int oldtopright, oldlefttop, oldrighttop, oldbotright;
+
+				// One block becomes 4 blocks:
+				// ib is the starting blk and new bottom left blk
+				// ibr is the new bottom right blk
+				// ibtl is the new top left blk
+				// ibtr is the new top right block
+
+				int ibr, ibtl, ibtr;
+				ibr = XAdapt.availblk[XAdapt.csumblk[ib]];
+				ibtl = XAdapt.availblk[XAdapt.csumblk[ib] + 1];
+				ibtr = XAdapt.availblk[XAdapt.csumblk[ib] + 2];
+
+				oldtopleft = XBlock.TopLeft[ibtl];
+				oldtopright = XBlock.TopRight[ibtr];
+
+				oldbotleft = XBlock.BotLeft[ib];
+				oldbotright = XBlock.BotRight[ibr];
+
+				oldrightbot = XBlock.RightBot[ibr];
+				oldrighttop = XBlock.RightTop[ibtr];
+
+				oldleftbot = XBlock.LeftBot[ib];
+				oldlefttop = XBlock.LeftTop[ibtl];
+
+
+				// Deal with left neighbour first 
+				// This is F* tedious!
+				if (XAdapt.refine[oldleftbot])// is true and possibly the top left guy!!!
+				{
+					if (XAdapt.newlevel[oldleftbot] < XAdapt.newlevel[ib])
+					{
+						if (XBlock.RightBot[XBlock.RightBot[oldleftbot]] == ib) // bottom side
+						{
+							XBlock.LeftBot[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
+							XBlock.LeftTop[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
+
+							XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
+							XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
+						}
+						else //Top side
+						{
+							XBlock.LeftBot[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot] + 2];
+							XBlock.LeftTop[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot] + 2];
+
+							XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldleftbot] + 2];
+							XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldleftbot] + 2];
+						}
+					}
+					else
+					{
+						if (oldleftbot == ib)
+						{
+							XBlock.LeftBot[ib] = ib;
+							XBlock.LeftTop[ib] = ib;
+
+							if (oldlefttop == ib)
+							{
+								XBlock.LeftBot[ibtl] = ibtl;
+								XBlock.LeftTop[ibtl] = ibtl;
+							}
+							else if(XAdapt.refine[oldlefttop])
+							{
+								XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 1];
+								XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 2];
+							}
+							else
+							{
+								XBlock.LeftBot[ibtl] = oldlefttop;
+								XBlock.LeftTop[ibtl] = oldlefttop;
+							}
+							
+						}
+						else if (XAdapt.newlevel[oldleftbot] == XAdapt.newlevel[ib])
+						{
+							XBlock.LeftBot[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
+							XBlock.LeftTop[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
+
+							XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldleftbot] + 2];
+							XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldleftbot] + 2];
+						}
+						else
+						{
+							XBlock.LeftBot[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
+							XBlock.LeftTop[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot] + 2];
+							if (oldlefttop == ib)
+							{
+								XBlock.LeftBot[ibtl] = ibtl;
+								XBlock.LeftTop[ibtl] = ibtl;
+							}
+							else if (XAdapt.refine[oldlefttop])
+							{
+								XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 1];
+								XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 2];
+							}
+							else
+							{
+								XBlock.LeftBot[ibtl] = oldlefttop;
+								XBlock.LeftTop[ibtl] = oldlefttop;
+							}
+						}
+					}
+				}
+				else // oldleftbot did not refine (couldn't have corasen either)
+				{
+					if (XAdapt.newlevel[oldleftbot] < XAdapt.newlevel[ib])
+					{
+						//Don't  need to do this part (i.e. it is already the case)
+						//XBlock.LeftBot[ib] = oldleftbot;
+						//XBlock.LeftTop[ib] = oldleftbot;
+
+						//XBlock.LeftBot[ibtl] = oldleftbot;
+						//XBlock.LeftTop[ibtl] = oldleftbot;
+						XBlock.RightBot[oldleftbot] = ib;
+						XBlock.RightTop[oldleftbot] = ibtl;
+					}
+					else
+					{
+						///
+					}
+				}
+				
+			}
+		}
+	}
+}
+
+
 

@@ -15,6 +15,9 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock, bool*&
 int checkneighbourrefine(int neighbourib, int levelib, int levelneighbour, bool*& refine, bool*& coarsen);
 
 template <class T> int CalcAvailblk(Param& XParam, BlockP<T> XBlock, AdaptP& XAdapt);
+template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel);
+template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T> XEvo, EvolvingP<T>& XEv);
+
 
 // End of global definition
 #endif
