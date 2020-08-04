@@ -5,23 +5,34 @@
 
 
 
-template <class T> void Adaptation(Param& XParam, Model<T>& XModel)
+template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int oldnblk = 0;
+	fillHalo(XParam, XModel.blocks, XModel.evolv_o);
+	fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 	if (XParam.maxlevel != XParam.minlevel)
 	{
 		while (oldnblk != XParam.nblk)
 			//for (int i=0; i<1;i++)
 		{
-			oldnblk = XParam.nblk;
-			//wetdrycriteria(XParam, refine, coarsen);
-			inrangecriteria(XParam, (T)-10.0, (T)-10.0, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
-			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
-			//XParam = adapt(XParam);
+			// Fill halo and corners
+
+
+			//
+
+			fillHalo(XParam, XModel.blocks, XModel.evolv_o);
+			fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 			
 
+			oldnblk = XParam.nblk;
+			//wetdrycriteria(XParam, refine, coarsen);
+			inrangecriteria(XParam, (T)-1.0, (T)1.0, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+			//XParam = adapt(XParam);
+			Adapt(XParam, XForcing, XModel);
 
-			if (!checkBUQsanity(XParam))
+
+			if (!checkBUQsanity(XParam,XModel.blocks))
 			{
 				log("Bad BUQ mesh layout\n");
 				exit(2);
@@ -33,7 +44,8 @@ template <class T> void Adaptation(Param& XParam, Model<T>& XModel)
 
 	}
 }
-
+template void Adaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
+template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
 
 
 /*! \fn bool refinesanitycheck(Param XParam, bool*& refine, bool*& coarsen)
@@ -199,8 +211,7 @@ int checkneighbourrefine(int neighbourib,int levelib, int levelneighbour, bool*&
 *
 *	Needs improvements
 */
-template <class T>
-bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
+template <class T> bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 {
 	bool check = true;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -225,6 +236,8 @@ bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 	return check;
 
 }
+template bool checkBUQsanity<float>(Param XParam, BlockP<float> XBlock);
+template bool checkBUQsanity<double>(Param XParam, BlockP<double> XBlock);
 
 bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 {
@@ -239,7 +252,7 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 
 
 
-template <class T> void Adapt(Param XParam, Model<T>& XModel)
+template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int nnewblk = CalcAvailblk(XParam, XModel.blocks, XModel.adapt);
 
@@ -265,8 +278,62 @@ template <class T> void Adapt(Param XParam, Model<T>& XModel)
 	//	COARSEN
 	coarsen(XParam, XModel.blocks, XModel.adapt, XModel.evolv_o, XModel.evolv);
 
+	//=========================================================
+	//	REFINE
+	refine(XParam, XModel.blocks, XModel.adapt, XModel.evolv_o, XModel.evolv);
+
+	//=========================================================
+	// CLEAN-UP
+	Adaptationcleanup(XParam, XModel.blocks, XModel.adapt);
+
+	//____________________________________________________
+	//
+	//	Reinterpolate zb. 
+	//
+	//	Isn't it better to do that only for newly refined blk?
+	//  Not necessary if no coarsening/refinement occur
+	interp2BUQ(XParam, XModel.blocks, XForcing.Bathy, XModel.zb);
+
+	// Set edges
+	setedges(XParam, XModel.blocks, XModel.zb);
+
+	//____________________________________________________
+	//
+	//	Update hh and or zb
+	//
+	//	Recalculate hh from zs for fully wet cells and zs from zb for dry cells
+	//
+
+	// Because zb cannot be conserved through the refinement or coarsening
+	// We have to decide whtether to conserve elevation (zs) or Volume (hh)
+	// 
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam,ix,iy,ib);
+
+				if (XModel.evolv.h[i] > XParam.eps)
+				{
+					XModel.evolv.h[i] = max((float)XParam.eps, XModel.evolv.zs[i] - XModel.zb[i]);
+				}
+				else
+				{
+					// when refining dry area zs should be zb!
+					XModel.evolv.zs[i] = XModel.zb[i];
+				}
 
 
+
+			}
+		}
+	}
+	//copy back hh and zs to hho and zso
+	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 
 }
 
@@ -333,7 +400,7 @@ template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAd
 	// Below is conservative and keeps the peice of code above a bit more simple
 	nnewblk = 3 * nrefineblk;
 
-	log("There are"+ std::to_string(XParam.nblk) +"active blocks ("+ std::to_string(XParam.nblkmem) +" blocks allocated in memory), "+std::to_string(nrefineblk)+" blocks to be refined, "+std::to_string(ncoarsenlk)+" blocks to be coarsen (with neighbour); "+std::to_string(XParam.nblk - nrefineblk - 4 * ncoarsenlk)+" blocks untouched; "+std::to_string(ncoarsenlk * 3)+" blocks to be freed ("+ std::to_string(XParam.navailblk) +" are already available) "+std::to_string(nnewblk)+" new blocks will be created");
+	log("There are "+ std::to_string(XParam.nblk) +" active blocks ("+ std::to_string(XParam.nblkmem) +" blocks allocated in memory), "+std::to_string(nrefineblk)+" blocks to be refined, "+std::to_string(ncoarsenlk)+" blocks to be coarsen (with neighbour); "+std::to_string(XParam.nblk - nrefineblk - 4 * ncoarsenlk)+" blocks untouched; "+std::to_string(ncoarsenlk * 3)+" blocks to be freed ("+ std::to_string(XParam.navailblk) +" are already available) "+std::to_string(nnewblk)+" new blocks will be created");
 
 	return nnewblk;
 
@@ -348,7 +415,7 @@ template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel)
 	oldblkmem = XParam.nblkmem;
 	nblkmem = (int)ceil((XParam.nblk + nnewblk) * XParam.membuffer);
 	XParam.nblkmem = nblkmem;
-	ReallocArray(nblkmem, XParam.blkmemwidth, XParam, XModel);
+	ReallocArray(nblkmem, XParam.blksize, XParam, XModel);
 
 
 	// Reconstruct blk info
@@ -374,7 +441,7 @@ template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel)
 	{
 		if (XModel.adapt.invactive[ibl] == -1)
 		{
-			XModel.blocks.active[XParam.navailblk] = ibl;
+			XModel.adapt.availblk[XParam.navailblk] = ibl;
 			XParam.navailblk++;
 		}
 
@@ -714,20 +781,20 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 
 							o = memloc(XParam,ix,iy, kb[kk]);//ix + iy * 16 + kb[kk] * XParam.blksize;
 
-							ii = memloc(Xparam, fx, fy, ib);
-							ir = memloc(Xparam, cx, fy, ib);
-							it = memloc(Xparam, fx, cy, ib);
-							itr = memloc(Xparam, cx, cy, ib);
+							ii = memloc(XParam, fx, fy, ib);
+							ir = memloc(XParam, cx, fy, ib);
+							it = memloc(XParam, fx, cy, ib);
+							itr = memloc(XParam, cx, cy, ib);
 
 
 							//printf("fx = %d; cx=%d; fy=%d; cy=%d; rx=%f; ry=%f\n", fx, cx, fy, cy,rx,ry);
 
 							//printf("First blk %f\n",BilinearInterpolation(h11, h12, h21, h22, fx, cx, fy, cy, rx, ry));
 
-							XEv.h[o] = BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.zs[o] = BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.u[o] = BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.v[o] = BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.h[o] = 3.0;// BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.zs[o] = 3.0;//BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.u[o] = 3.0;//BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.v[o] = 3.0;//BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 
 
 						}
@@ -896,8 +963,11 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				oldlefttop = XBlock.LeftTop[ibtl];
 
 
-				// Deal with left neighbour first 
-				// This is F* tedious!
+				// Deal with neighbours 
+				// This is F@*%!ng tedious!
+
+				//_________________________________
+				// Left Neighbours
 				if (XAdapt.refine[oldleftbot])// is true and possibly the top left guy!!!
 				{
 					if (XAdapt.newlevel[oldleftbot] < XAdapt.newlevel[ib])
@@ -933,7 +1003,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							}
 							else if(XAdapt.refine[oldlefttop])
 							{
-								XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 1];
+								XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop]];
 								XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 2];
 							}
 							else
@@ -962,7 +1032,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							}
 							else if (XAdapt.refine[oldlefttop])
 							{
-								XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 1];
+								XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] ];
 								XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 2];
 							}
 							else
@@ -975,6 +1045,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				}
 				else // oldleftbot did not refine (couldn't have corasen either)
 				{
+
 					if (XAdapt.newlevel[oldleftbot] < XAdapt.newlevel[ib])
 					{
 						//Don't  need to do this part (i.e. it is already the case)
@@ -988,14 +1059,496 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 					}
 					else
 					{
+						XBlock.RightBot[oldleftbot] = ib;
+						XBlock.RightTop[oldleftbot] = ib;
+						if (oldlefttop != ib)
+						{
+							
+							if (!XAdapt.refine[oldlefttop])
+							{
+								XBlock.RightBot[oldlefttop] = ibtl;
+								XBlock.RightTop[oldlefttop] = ibtl;
+							}
+							else
+							{
+								XBlock.LeftBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop]];
+								XBlock.LeftTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldlefttop] + 2];
+							}
+						}
+						else
+						{
+							XBlock.LeftBot[ibtl] = ibtl;
+							XBlock.LeftTop[ibtl] = ibtl;
+						}
 						///
 					}
 				}
 				
+				//_________________________________
+				// Right Neighbours
+				if (XAdapt.refine[oldrightbot])// is true and possibly the top left guy!!!
+				{
+					if (XAdapt.newlevel[oldrightbot] < XAdapt.newlevel[ib])
+					{
+						if (XBlock.LeftBot[oldrightbot] == ib) // bottom side
+						{
+							XBlock.RightBot[ibr] = oldrightbot;
+							XBlock.RightTop[ibr] = oldrightbot;
+
+							XBlock.RightBot[ibtr] = oldrightbot;
+							XBlock.RightTop[ibtr] = oldrightbot;
+						}
+						else //Top side
+						{
+							XBlock.RightBot[ib] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							XBlock.RightTop[ib] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+
+							XBlock.RightBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							XBlock.RightTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+						}
+					}
+					else
+					{
+						if (oldrightbot == ib)
+						{
+							XBlock.RightBot[ibr] = ibr;
+							XBlock.RightTop[ibr] = ibr;
+
+							if (oldrighttop == ib)
+							{
+								XBlock.RightBot[ibtr] = ibtr;
+								XBlock.RightTop[ibtr] = ibtr;
+							}
+							else if (XAdapt.refine[oldrighttop])
+							{
+								XBlock.RightBot[ibtr] = oldrighttop;
+								XBlock.RightTop[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldrighttop] + 1];
+							}
+							else
+							{
+								XBlock.RightBot[ibtr] = oldrighttop;
+								XBlock.RightTop[ibtr] = oldrighttop;
+							}
+
+						}
+						else if (XAdapt.newlevel[oldrightbot] == XAdapt.newlevel[ib])
+						{
+							XBlock.RightBot[ibr] = oldrightbot;
+							XBlock.RightTop[ibr] = oldrightbot;
+
+							XBlock.RightBot[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							XBlock.RightTop[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+						}
+						else
+						{
+							XBlock.RightBot[ibr] = oldrightbot;
+							XBlock.RightTop[ibr] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							if (oldrighttop == ib)
+							{
+								XBlock.RightBot[ibtr] = ibtr;
+								XBlock.RightTop[ibtr] = ibtr;
+							}
+							else if (XAdapt.refine[oldrighttop])
+							{
+								XBlock.RightBot[ibtr] = oldrighttop;
+								XBlock.RightTop[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldrighttop] + 1];
+							}
+							else
+							{
+								XBlock.RightBot[ibtr] = oldrighttop;
+								XBlock.RightTop[ibtr] = oldrighttop;
+							}
+						}
+					}
+				}
+				else // oldleftbot did not refine (couldn't have corasen either)
+				{
+
+					if (XAdapt.newlevel[oldrightbot] < XAdapt.newlevel[ib])
+					{
+						//Don't  need to do this part (i.e. it is already the case)
+						//XBlock.LeftBot[ib] = oldleftbot;
+						//XBlock.LeftTop[ib] = oldleftbot;
+
+						//XBlock.LeftBot[ibtl] = oldleftbot;
+						//XBlock.LeftTop[ibtl] = oldleftbot;
+						XBlock.LeftBot[oldrightbot] = ibr;
+						XBlock.LeftTop[oldrightbot] = ibtr;
+					}
+					else
+					{
+						XBlock.LeftBot[oldrightbot] = ibr;
+						XBlock.LeftTop[oldrightbot] = ibr;
+						if (oldrighttop != ib)
+						{
+							
+							if (!XAdapt.refine[oldrighttop])
+							{
+								XBlock.LeftBot[oldrighttop] = ibtr;
+								XBlock.LeftTop[oldrighttop] = ibtr;
+							}
+							else
+							{
+								XBlock.RightBot[ibtl] = oldrighttop;
+								XBlock.RightTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldrighttop] + 1];
+							}
+						}
+						else
+						{
+							XBlock.RightBot[ibtr] = ibtr;
+							XBlock.RightTop[ibtr] = ibtr;
+						}
+						///
+					}
+				}
+
+
+				//_________________________________
+				// Bottom Neighbours
+				if (XAdapt.refine[oldbotleft])// is true and possibly the top left guy!!!
+				{
+					if (XAdapt.newlevel[oldbotleft] < XAdapt.newlevel[ib])
+					{
+						if (XBlock.TopLeft[XBlock.TopLeft[oldbotleft]] == ib) // left side
+						{
+							XBlock.BotLeft[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
+							XBlock.BotRight[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
+
+							XBlock.BotLeft[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
+							XBlock.BotRight[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
+						}
+						else //Right side
+						{
+							XBlock.BotLeft[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 2];
+							XBlock.BotRight[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 2];
+
+							XBlock.BotLeft[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 2];
+							XBlock.BotRight[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 2];
+						}
+					}
+					else
+					{
+						if (oldbotleft == ib)
+						{
+							XBlock.BotLeft[ib] = ib;
+							XBlock.BotRight[ib] = ib;
+
+							if (oldbotright == ib)
+							{
+								XBlock.BotLeft[ibr] = ibr;
+								XBlock.BotRight[ibr] = ibr;
+							}
+							else if (XAdapt.refine[oldbotright])
+							{
+								XBlock.BotLeft[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotright] + 1];
+								XBlock.BotRight[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotright] + 2];
+							}
+							else
+							{
+								XBlock.BotLeft[ibr] = oldbotright;
+								XBlock.BotRight[ibr] = oldbotright;
+							}
+
+						}
+						else if (XAdapt.newlevel[oldbotleft] == XAdapt.newlevel[ib])
+						{
+							XBlock.BotLeft[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
+							XBlock.BotRight[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
+
+							XBlock.BotLeft[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 2];
+							XBlock.BotRight[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 2];
+						}
+						else
+						{
+							XBlock.BotLeft[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
+							XBlock.BotRight[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 2];
+							if (oldbotright == ib)
+							{
+								XBlock.BotLeft[ibr] = ibr;
+								XBlock.BotRight[ibr] = ibr;
+							}
+							else if (XAdapt.refine[oldbotright])
+							{
+								XBlock.BotLeft[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotright] + 1];
+								XBlock.BotRight[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotright] + 2];
+							}
+							else
+							{
+								XBlock.BotLeft[ibr] = oldbotright;
+								XBlock.BotRight[ibr] = oldbotright;
+							}
+						}
+					}
+				}
+				else // oldleftbot did not refine (couldn't have corasen either)
+				{
+
+					if (XAdapt.newlevel[oldbotleft] < XAdapt.newlevel[ib])
+					{
+						//Don't  need to do this part (i.e. it is already the case)
+						//XBlock.LeftBot[ib] = oldleftbot;
+						//XBlock.LeftTop[ib] = oldleftbot;
+
+						//XBlock.LeftBot[ibtl] = oldleftbot;
+						//XBlock.LeftTop[ibtl] = oldleftbot;
+						XBlock.TopLeft[oldbotleft] = ib;
+						XBlock.TopRight[oldbotleft] = ibr;
+					}
+					else
+					{
+						XBlock.TopLeft[oldbotleft] = ib;
+						XBlock.TopRight[oldbotleft] = ib;
+						if (oldbotright != ib)
+						{
+
+							if (!XAdapt.refine[oldbotright])
+							{
+								XBlock.TopLeft[oldbotright] = ibr;
+								XBlock.TopRight[oldbotright] = ibr;
+							}
+							else
+							{
+								XBlock.BotLeft[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotright] + 1];
+								XBlock.BotRight[ibr] = XAdapt.availblk[XAdapt.csumblk[oldbotright] + 2];
+							}
+						}
+						else
+						{
+							XBlock.BotLeft[ibr] = ibr;
+							XBlock.BotRight[ibr] = ibr;
+						}
+						///
+					}
+				}
+
+				//_________________________________
+				// Top Neighbours
+				if (XAdapt.refine[oldtopleft])// is true and possibly the top left guy!!!
+				{
+					if (XAdapt.newlevel[oldtopleft] < XAdapt.newlevel[ib])
+					{
+						if (XBlock.BotLeft[oldtopleft] == ib) // left side
+						{
+							XBlock.TopLeft[ibtl] = oldtopleft;
+							XBlock.TopRight[ibtl] = oldtopleft;
+
+							XBlock.TopLeft[ibtr] = oldtopleft;
+							XBlock.TopRight[ibtr] = oldtopleft;
+						}
+						else //Right side
+						{
+							XBlock.TopLeft[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldtopleft]];
+							XBlock.TopRight[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldtopleft]];
+
+							XBlock.TopLeft[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldtopleft]];
+							XBlock.TopRight[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldtopleft]];
+						}
+					}
+					else
+					{
+						if (oldtopleft == ib)
+						{
+							XBlock.TopLeft[ibtl] = ibtl;
+							XBlock.TopRight[ibtl] = ibtl;
+
+							if (oldtopright == ib)
+							{
+								XBlock.TopLeft[ibtr] = ibtr;
+								XBlock.TopRight[ibtr] = ibtr;
+							}
+							else if (XAdapt.refine[oldtopright])
+							{
+								XBlock.TopLeft[ibtr] = oldtopright;
+								XBlock.TopRight[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldtopright]];
+							}
+							else
+							{
+								XBlock.TopLeft[ibtr] = oldbotright;
+								XBlock.TopRight[ibtr] = oldbotright;
+							}
+
+						}
+						else if (XAdapt.newlevel[oldtopleft] == XAdapt.newlevel[ib])
+						{
+							XBlock.TopLeft[ibtl] = oldtopleft;
+							XBlock.TopRight[ibtl] = oldtopleft;
+
+							XBlock.TopLeft[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldtopleft] ];
+							XBlock.TopRight[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldtopleft] ];
+						}
+						else
+						{
+							XBlock.TopLeft[ibtl] = oldtopleft;
+							XBlock.TopRight[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldtopleft]];
+							if (oldtopright == ib)
+							{
+								XBlock.TopLeft[ibtr] = ibtr;
+								XBlock.TopRight[ibtr] = ibtr;
+							}
+							else if (XAdapt.refine[oldtopright])
+							{
+								XBlock.TopLeft[ibtr] = oldtopright;
+								XBlock.TopRight[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldtopright]];
+							}
+							else
+							{
+								XBlock.TopLeft[ibr] = oldtopright;
+								XBlock.TopRight[ibr] = oldtopright;
+							}
+						}
+					}
+				}
+				else // oldleftbot did not refine (couldn't have corasen either)
+				{
+
+					if (XAdapt.newlevel[oldtopleft] < XAdapt.newlevel[ib])
+					{
+						//Don't  need to do this part (i.e. it is already the case)
+						//XBlock.LeftBot[ib] = oldleftbot;
+						//XBlock.LeftTop[ib] = oldleftbot;
+
+						//XBlock.LeftBot[ibtl] = oldleftbot;
+						//XBlock.LeftTop[ibtl] = oldleftbot;
+						XBlock.BotLeft[oldtopleft] = ibtl;
+						XBlock.BotRight[oldtopleft] = ibtr;
+					}
+					else
+					{
+						XBlock.BotLeft[oldtopleft] = ibtl;
+						XBlock.BotRight[oldtopleft] = ibtl;
+						if (oldtopright != ib)
+						{
+
+							if (!XAdapt.refine[oldtopright])
+							{
+								XBlock.BotLeft[oldtopright] = ibtr;
+								XBlock.BotRight[oldtopright] = ibtr;
+							}
+							else
+							{
+								XBlock.TopLeft[ibtr] = oldtopright;
+								XBlock.TopRight[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldtopright]];
+							}
+						}
+						else
+						{
+							XBlock.TopLeft[ibtr] = ibtr;
+							XBlock.TopRight[ibtr] = ibtr;
+						}
+						///
+					}
+				}
+
 			}
 		}
 	}
+	//____________________________________________________
+	//	
+	//	Step 4. Activate new blocks 
+	//
+
+	nblk = XParam.nblk;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//
+
+		int ib = XBlock.active[ibl];
+
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
+		{
+
+			if (XAdapt.refine[ib] == true)
+			{
+
+				//After that we are done so activate the new blocks
+				XBlock.active[nblk] = XAdapt.availblk[XAdapt.csumblk[ib]];
+				XBlock.active[nblk + 1] = XAdapt.availblk[XAdapt.csumblk[ib] + 1];
+				XBlock.active[nblk + 2] = XAdapt.availblk[XAdapt.csumblk[ib] + 2];
+
+
+
+				nblk = nblk + 3;
+			}
+		}
+	}
+
+	// Now clean up the mess
+}
+template void refine<float>(Param XParam, BlockP<float>& XBlock, AdaptP& XAdapt, EvolvingP<float> XEvo, EvolvingP<float>& XEv);
+template void refine<double>(Param XParam, BlockP<double>& XBlock, AdaptP& XAdapt, EvolvingP<double> XEvo, EvolvingP<double>& XEv);
+
+
+template <class T> void Adaptationcleanup(Param &XParam, BlockP<T>& XBlock, AdaptP& XAdapt)
+{
+	//===========================================================
+	// UPDATE all remaining variables and clean up
+
+	//____________________________________________________
+	//
+	//	Update level
+	//
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		//
+		int oldlevel;
+		int ib = XBlock.active[ibl];
+
+
+		if (ib >= 0) // ib can be -1 for newly inactive blocks
+		{
+
+
+			XBlock.level[ib] = XAdapt.newlevel[ib];
+
+
+		}
+	}
+
+	//____________________________________________________
+	//
+	//	Reorder activeblk
+	//
+	// 
+	int nblk = XParam.nblk;
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		//reuse newlevel as temporary storage for activeblk
+		XAdapt.newlevel[ibl] = XBlock.active[ibl];
+		XBlock.active[ibl] = -1;
+
+
+	}
+	// cleanup and Reorder active block list
+	int ib = 0;
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+
+		if (XAdapt.newlevel[ibl] != -1)//i.e. old activeblk
+		{
+			XBlock.active[ib] = XAdapt.newlevel[ibl];
+
+			ib++;
+		}
+	}
+
+	nblk = ib;
+
+	//____________________________________________________
+	//
+	//	Reset adaptive info
+	//
+	// 
+	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+	{
+		
+		XAdapt.newlevel[ibl] = 0;
+		XAdapt.refine[ibl] = false;
+		XAdapt.coarsen[ibl] = false;
+	}
+	XParam.nblk = nblk;
+	
 }
 
-
-
+template void Adaptationcleanup<float>(Param& XParam, BlockP<float>& XBlock, AdaptP& XAdapt);
+template void Adaptationcleanup<double>(Param& XParam, BlockP<double>& XBlock, AdaptP& XAdapt);

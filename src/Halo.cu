@@ -33,7 +33,7 @@ template void fillHaloTopRight<double>(Param XParam, int ib, BlockP<double> XBlo
 template void fillHaloTopRight<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
 
 
-template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev)
+template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> &Xev)
 {
 	int ib;
 
@@ -46,10 +46,10 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		fillHalo(XParam, ib, XBlock, Xev.v);
 	}
 }
-template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev);
-template void fillHalo<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev);
+template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> &Xev);
+template void fillHalo<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> &Xev);
 
-template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad)
+template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> &Grad)
 {
 	int ib;
 
@@ -67,11 +67,11 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> G
 		fillHalo(XParam, ib, XBlock, Grad.dzsdy);
 	}
 }
-template void fillHalo<float>(Param XParam, BlockP<float> XBlock, GradientsP<float> Grad);
-template void fillHalo<double>(Param XParam, BlockP<double> XBlock, GradientsP<double> Grad);
+template void fillHalo<float>(Param XParam, BlockP<float> XBlock, GradientsP<float> &Grad);
+template void fillHalo<double>(Param XParam, BlockP<double> XBlock, GradientsP<double> &Grad);
 
 
-template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> &Flux)
 {
 	int ib;
 
@@ -89,8 +89,11 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 		fillHaloTopRight(XParam, ib, XBlock, Flux.Sv);
 	}
 }
-template void fillHalo<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
-template void fillHalo<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+template void fillHalo<float>(Param XParam, BlockP<float> XBlock, FluxP<float> &Flux);
+template void fillHalo<double>(Param XParam, BlockP<double> XBlock, FluxP<double> &Flux);
+
+
+
 
 
 
@@ -904,6 +907,40 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 
 }
+
+
+template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, T*& z)
+{
+	int ib;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		fillCorners(XParam, ib, XBlock, z);
+		
+	}
+
+}
+template void fillCorners<float>(Param XParam, BlockP<float> XBlock, float*& z);
+template void fillCorners<double>(Param XParam, BlockP<double> XBlock, double*& z);
+
+
+template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, EvolvingP<T>& Xev)
+{
+	int ib;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		fillCorners(XParam, ib, XBlock, Xev.h);
+		fillCorners(XParam, ib, XBlock, Xev.zs);
+		fillCorners(XParam, ib, XBlock, Xev.u);
+		fillCorners(XParam, ib, XBlock, Xev.v);
+	}
+
+}
+template void fillCorners<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float>& Xev);
+template void fillCorners<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double>& Xev);
 
 
 

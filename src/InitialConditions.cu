@@ -48,7 +48,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	log("Initial condition:");
 	// First calculate the initial values for Evolving parameters (i.e. zs, h, u and v)
 	initevolv(XParam, XModel.blocks, XModel.evolv, XModel.zb);
-	
+	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 	//=====================================
 	// Initial forcing
 	initForcing(XParam, XForcing, XModel);

@@ -26,8 +26,8 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T> &
 	{
 		// hotstart
 		log("Hotstart file used : " + XParam.hotstartfile);
-		
-		hotstartsucess = readhotstartfile(XParam, XBlock,XEv,zb);
+
+		hotstartsucess = readhotstartfile(XParam, XBlock, XEv, zb);
 
 		//add offset if present
 		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
@@ -35,22 +35,23 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T> &
 			printf("add offset to zs and hh... ");
 			//
 			AddZSoffset(XParam, XBlock, XEv, zb);
-			
+
 		}
-		
-	}
-	if (hotstartsucess == 0)
-	{
-		printf("Failed...  ");
-		write_text_to_log_file("Hotstart failed switching to cold start");
+
+
+		if (hotstartsucess == 0)
+		{
+			printf("Failed...  ");
+			write_text_to_log_file("Hotstart failed switching to cold start");
+		}
 	}
 
 
 	
 	if (XParam.hotstartfile.empty() || hotstartsucess == 0)
 	{
-		printf("Cold start  ");
-		write_text_to_log_file("Cold start");
+		//printf("Cold start  ");
+		log("Cold start");
 		//Cold start
 		// 2 options:
 		//		(1) if zsinit is set, then apply zsinit everywhere
@@ -92,6 +93,10 @@ template void initevolv<double>(Param XParam, BlockP< double > XBlock, EvolvingP
 template <class T>
 int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 {
+	T zzini = std::isnan(XParam.zsinit)? T(0.0): T(XParam.zsinit);
+	T zzoffset = std::isnan(XParam.zsoffset) ? T(0.0) : T(XParam.zsoffset);
+	
+
 	
 	int coldstartsucess = 0;
 	int ib;
@@ -107,7 +112,8 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 				XEv.u[n] = T(0.0);
 				XEv.v[n] = T(0.0);
 				//zb[n] = 0.0f;
-				XEv.zs[n] = max(XParam.zsinit + XParam.zsoffset, zb[n]);
+				XEv.zs[n] = max(zzini + zzoffset, zb[n]);
+				
 				//if (i >= 64 && i < 82)
 				//{
 				//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);
