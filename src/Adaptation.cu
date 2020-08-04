@@ -8,8 +8,8 @@
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int oldnblk = 0;
-	fillHalo(XParam, XModel.blocks, XModel.evolv_o);
-	fillCorners(XParam, XModel.blocks, XModel.evolv_o);
+	//fillHalo(XParam, XModel.blocks, XModel.evolv_o);
+	//fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 	if (XParam.maxlevel != XParam.minlevel)
 	{
 		while (oldnblk != XParam.nblk)
@@ -307,7 +307,7 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 	// Because zb cannot be conserved through the refinement or coarsening
 	// We have to decide whtether to conserve elevation (zs) or Volume (hh)
 	// 
-
+	
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
@@ -332,6 +332,7 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 			}
 		}
 	}
+	
 	//copy back hh and zs to hho and zso
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 
