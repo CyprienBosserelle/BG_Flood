@@ -10,6 +10,7 @@
 #include "Mesh.h"
 #include "AdaptCriteria.h"
 #include "Halo.h"
+#include "InitialConditions.h"
 
 
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel);

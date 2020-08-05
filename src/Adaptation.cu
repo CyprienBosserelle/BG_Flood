@@ -448,7 +448,9 @@ template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel)
 
 	}
 
-	
+	//Because reallocation may be producing different pointers we need to update the output map array
+
+	Initmaparray(XModel);
 	return nblkmem;
 }
 template int AddBlocks<float>(int nnewblk, Param& XParam, Model<float>& XModel);
