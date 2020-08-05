@@ -20,8 +20,8 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 
 			//
 
-			fillHalo(XParam, XModel.blocks, XModel.evolv_o);
-			fillCorners(XParam, XModel.blocks, XModel.evolv_o);
+			//fillHalo(XParam, XModel.blocks, XModel.evolv_o);
+			//fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 			
 
 			oldnblk = XParam.nblk;
@@ -319,7 +319,7 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 
 				if (XModel.evolv.h[i] > XParam.eps)
 				{
-					XModel.evolv.h[i] = max((float)XParam.eps, XModel.evolv.zs[i] - XModel.zb[i]);
+					XModel.evolv.h[i] = max((T)XParam.eps, XModel.evolv.zs[i] - XModel.zb[i]);
 				}
 				else
 				{
@@ -335,7 +335,7 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 	
 	//copy back hh and zs to hho and zso
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
-
+	
 }
 
 /*! \fn int CalcAvailblk(Param XParam, BlockP<T> XBlock, AdaptP& XAdapt)
@@ -490,39 +490,39 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 			//int oldrightofbot = rightblk[oldbot];
 
 
-			for (int iy = 0; iy < XParam.blksize; iy++)
+			for (int iy = 0; iy < XParam.blkwidth; iy++)
 			{
-				for (int ix = 0; ix < XParam.blksize; ix++)
+				for (int ix = 0; ix < XParam.blkwidth; ix++)
 				{
 					i = memloc(XParam, ix, iy, ib);
 					
-					if (ix < (XParam.blksize / 2) && iy < (XParam.blksize/2))
+					if (ix < (XParam.blkwidth / 2) && iy < (XParam.blkwidth /2))
 					{
 						ii = memloc(XParam, ix * 2, iy * 2, ib);// ix * 2 + (iy * 2) * 16 + ib * XParam.blksize;
 						ir = memloc(XParam, (ix * 2 + 1), (iy * 2), ib); //(ix * 2 + 1) + (iy * 2) * 16 + ib * XParam.blksize;
 						it = memloc(XParam, (ix * 2 ), (iy * 2 + 1), ib);// (ix) * 2 + (iy * 2 + 1) * 16 + ib * XParam.blksize;
 						itr = memloc(XParam, (ix * 2 + 1), (iy * 2 + 1), ib); //(ix * 2 + 1) + (iy * 2 + 1) * 16 + ib * XParam.blksize;
 					}
-					if (ix >= (XParam.blksize / 2) && iy < (XParam.blksize / 2))
+					if (ix >= (XParam.blkwidth / 2) && iy < (XParam.blkwidth / 2))
 					{
-						ii = memloc(XParam, (ix - XParam.blksize / 2) * 2, iy * 2, XBlock.RightBot[ib]);//((ix - 8) * 2) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
-						ir = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, iy * 2, XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
-						it = memloc(XParam, (ix - XParam.blksize / 2) * 2, iy * 2 + 1, XBlock.RightBot[ib]);// ((ix - 8)) * 2 + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
-						itr = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, (iy * 2 + 1), XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+						ii = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, iy * 2, XBlock.RightBot[ib]);//((ix - 8) * 2) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+						ir = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, iy * 2, XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+						it = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, iy * 2 + 1, XBlock.RightBot[ib]);// ((ix - 8)) * 2 + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+						itr = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy * 2 + 1), XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
 					}
-					if (ix < (XParam.blksize / 2) && iy >= (XParam.blksize / 2))
+					if (ix < (XParam.blkwidth / 2) && iy >= (XParam.blkwidth / 2))
 					{
-						ii = memloc(XParam, ix * 2, (iy - XParam.blksize / 2) * 2, XBlock.TopLeft[ib]);// ix * 2 + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
-						ir = memloc(XParam, ix * 2 + 1, (iy - XParam.blksize / 2) * 2, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
-						it = memloc(XParam, ix * 2, (iy - XParam.blksize / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix) * 2 + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
-						itr = memloc(XParam, ix * 2 + 1, (iy - XParam.blksize / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+						ii = memloc(XParam, ix * 2, (iy - XParam.blkwidth / 2) * 2, XBlock.TopLeft[ib]);// ix * 2 + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+						ir = memloc(XParam, ix * 2 + 1, (iy - XParam.blkwidth / 2) * 2, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+						it = memloc(XParam, ix * 2, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix) * 2 + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+						itr = memloc(XParam, ix * 2 + 1, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
 					}
-					if (ix >= (XParam.blksize / 2) && iy >= (XParam.blksize / 2))
+					if (ix >= (XParam.blkwidth / 2) && iy >= (XParam.blkwidth / 2))
 					{
-						ii = memloc(XParam, (ix - XParam.blksize / 2) * 2, (iy - XParam.blksize / 2) * 2, XBlock.RightBot[XBlock.TopRight[ib]]);// (ix - 8) * 2 + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						ir = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, iy - XParam.blksize / 2 * 2, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						it = memloc(XParam, (ix - XParam.blksize / 2) * 2, (iy - XParam.blksize / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//(ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						itr = memloc(XParam, (ix - XParam.blksize / 2) * 2 + 1, (iy - XParam.blksize / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						ii = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, (iy - XParam.blkwidth / 2) * 2, XBlock.RightBot[XBlock.TopRight[ib]]);// (ix - 8) * 2 + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						ir = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy - XParam.blkwidth / 2) * 2, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						it = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//(ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						itr = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
 					}
 
 

@@ -57,6 +57,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateCPU(nblk, blksize, XModel.evolv_o);
 
 	AllocateCPU(nblk, blksize, XModel.grad.dhdy, XModel.grad.dzsdy, XModel.grad.dudy, XModel.grad.dvdy);
+	AllocateCPU(nblk, blksize, XModel.grad.dhdx, XModel.grad.dzsdx, XModel.grad.dudx, XModel.grad.dvdx);
 
 	AllocateCPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
@@ -114,7 +115,7 @@ template void AllocateCPU<double>(int nblk, int blksize, Param XParam, Model<dou
 
 
 
-template <class T> __host__ void ReallocArray(int nblk, int blksize, T* & zb)
+template <class T> void ReallocArray(int nblk, int blksize, T* & zb)
 {
 	//
 
@@ -128,7 +129,7 @@ template <class T> __host__ void ReallocArray(int nblk, int blksize, T* & zb)
 	//return nblkmem
 }
 
-template <class T> __host__ void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v)
+template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v)
 {
 	//
 
@@ -143,7 +144,7 @@ template void ReallocArray<int>(int nblk, int blksize, int* & zs, int*& h, int*&
 template void ReallocArray<float>(int nblk, int blksize, float* & zs, float*& h, float*& u, float*& v );
 template void ReallocArray<double>(int nblk, int blksize, double* & zs, double*& h, double*& u, double*& v);
 
-template <class T> __host__ void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev)
+template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev)
 {
 	ReallocArray(nblk, blksize, Ev.zs, Ev.h, Ev.u, Ev.v);
 }
@@ -159,6 +160,7 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	ReallocArray(nblk, blksize, XModel.evolv_o);
 
 	ReallocArray(nblk, blksize, XModel.grad.dhdy, XModel.grad.dzsdy, XModel.grad.dudy, XModel.grad.dvdy);
+	ReallocArray(nblk, blksize, XModel.grad.dhdx, XModel.grad.dzsdx, XModel.grad.dudx, XModel.grad.dvdx);
 
 	ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
