@@ -740,7 +740,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
 			{
 				write = memloc(XParam, j, XParam.blkwidth, ib);
-				jj = (j - 8) * 2;
+				jj = (j - (XParam.blkwidth / 2)) * 2;
 				ii = memloc(XParam, jj, 0, XBlock.TopRight[ib]);
 				ir = memloc(XParam, jj, 1, XBlock.TopRight[ib]);
 				it = memloc(XParam, jj + 1, 0, XBlock.TopRight[ib]);
@@ -797,7 +797,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
 			{
 				//
-				jj = (j - 8) * 2;
+				jj = (j - (XParam.blkwidth / 2)) * 2;
 				bb = XBlock.TopRight[ib];
 
 				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;

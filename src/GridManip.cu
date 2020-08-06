@@ -203,6 +203,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XBlock.active[ibl];
+		
 		double blkdx = calcres(XParam.dx, XBlock.level[ib]);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
