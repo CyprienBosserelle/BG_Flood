@@ -794,10 +794,10 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 
 							//printf("First blk %f\n",BilinearInterpolation(h11, h12, h21, h22, fx, cx, fy, cy, rx, ry));
 
-							XEv.h[o] = 3.0;// BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.zs[o] = 3.0;// BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.u[o] = 3.0;// BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.v[o] = 3.0;// BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.h[o] = BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.zs[o] = BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.u[o] = BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.v[o] = BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 
 
 						}

@@ -189,7 +189,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 			{
 				//
 				jj = (j - 8) * 2;
-				bb = XBlock.LeftBot[ib];
+				bb = XBlock.LeftTop[ib];
 
 				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				write = memloc(XParam, -1, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
@@ -332,7 +332,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
 			{
-				write = memloc(XParam, -1, j, ib);
+				write = memloc(XParam, XParam.blkwidth, j, ib);
 				jj = (j - 8) * 2;
 				ii = memloc(XParam, 0, jj, XBlock.RightTop[ib]);
 				ir = memloc(XParam, 1, jj, XBlock.RightTop[ib]);
@@ -391,7 +391,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			{
 				//
 				jj = (j - 8) * 2;
-				bb = XBlock.RightBot[ib];
+				bb = XBlock.RightTop[ib];
 
 				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				write = memloc(XParam, XParam.blkwidth, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
@@ -554,7 +554,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			//
 
 			write = memloc(XParam,j, -1, ib);
-			read = memloc(XParam, j, (XParam.blkwidth - 1), XBlock.LeftBot[ib]);
+			read = memloc(XParam, j, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
 			z[write] = z[read];
 		}
 	}
@@ -576,7 +576,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 			z[write] = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
 		}
-		//now find out aboy lefttop block
+		//now find out aboy botright block
 		if (XBlock.BotRight[ib] == ib)
 		{
 			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
@@ -594,7 +594,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			{
 				//
 				jj = (j - 8) * 2;
-				bb = XBlock.BotLeft[ib];
+				bb = XBlock.BotRight[ib];
 
 				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				write = memloc(XParam, j, -1, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
@@ -739,7 +739,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
 			{
-				write = memloc(XParam, j, -1, ib);
+				write = memloc(XParam, j, XParam.blkwidth, ib);
 				jj = (j - 8) * 2;
 				ii = memloc(XParam, jj, 0, XBlock.TopRight[ib]);
 				ir = memloc(XParam, jj, 1, XBlock.TopRight[ib]);
@@ -757,7 +757,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 		{
 			//
 
-			write = memloc(XParam, XParam.blkwidth, j, ib);
+			write = memloc(XParam, j, XParam.blkwidth, ib);
 			read = memloc(XParam, j, 0, XBlock.TopLeft[ib]);
 			z[write] = z[read];
 		}
@@ -798,7 +798,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			{
 				//
 				jj = (j - 8) * 2;
-				bb = XBlock.TopLeft[ib];
+				bb = XBlock.TopRight[ib];
 
 				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				write = memloc(XParam, j , XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
