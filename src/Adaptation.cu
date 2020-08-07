@@ -36,7 +36,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 			{
 				log("Bad BUQ mesh layout\n");
 				//exit(2);
-				//break;
+				break;
 			}
 
 
@@ -482,13 +482,17 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 			int xnode = int((XBlock.xo[ib] - XParam.xo) / dxfac / XParam.blkwidth);
 			int ynode = int((XBlock.yo[ib] - XParam.yo) / dxfac / XParam.blkwidth);
 
-			int oldright = XBlock.RightBot[XBlock.RightBot[ib]];
+			int oldrightbot = XBlock.RightBot[XBlock.RightBot[ib]];
+			int oldrighttop = XBlock.RightBot[XBlock.TopLeft[XBlock.RightBot[ib]]];
 			//int oldtopofright = topblk[oldright];
-			int oldtop = XBlock.TopLeft[XBlock.TopLeft[ib]];
+			int oldtopleft = XBlock.TopLeft[XBlock.TopLeft[ib]];
+			int oldtopright = XBlock.TopLeft[XBlock.TopLeft[XBlock.RightBot[ib]]];
 			//int oldrightoftop = rightblk[oldtop];
-			int oldleft = XBlock.LeftBot[ib];
+			int oldleftbot = XBlock.LeftBot[ib];
+			int oldlefttop = XBlock.LeftBot[XBlock.TopLeft[ib]];
 			//int oldtopofleft = topblk[oldleft];
-			int oldbot = XBlock.BotLeft[ib];
+			int oldbotleft = XBlock.BotLeft[ib];
+			int oldbotright = XBlock.BotLeft[XBlock.RightBot[ib]];
 			//int oldrightofbot = rightblk[oldbot];
 
 
@@ -532,7 +536,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 					XEv.h[i] = 0.25 * (XEvo.h[ii] + XEvo.h[ir] + XEvo.h[it] + XEvo.h[itr]);
 					XEv.zs[i] = 0.25 * (XEvo.zs[ii] + XEvo.zs[ir] + XEvo.zs[it] + XEvo.zs[itr]);
 					XEv.u[i] = 0.25 * (XEvo.u[ii] + XEvo.u[ir] + XEvo.u[it] + XEvo.u[itr]);
-					XEv.v[i] = 0.25 * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
+					XEv.v[i] = ib;// 0.25 * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
 					//zb will be interpolated from input grid later // I wonder is this makes the bilinear interpolation scheme crash at the refining step for zb?
 					// No because zb is also interpolated later from the original mesh data
 					//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
@@ -566,28 +570,50 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 			XBlock.active[XAdapt.invactive[XBlock.RightBot[XBlock.TopRight[ib]]]] = -1;
 
 			//check neighbour's (Full neighbour happens in the next big loop below)
-			if (XBlock.RightBot[ib] == oldright) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
+			if (XBlock.RightBot[ib] == oldrightbot) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
 			{
 				XBlock.RightBot[ib] = ib;
 				//XBlock.RightTop[ib] = ib;
 			}
 			else
 			{
-				XBlock.RightBot[ib] = oldright;
+				XBlock.RightBot[ib] = oldrightbot;
+				//XBlock.RightTop[ib] = oldright;
+			}
+			if (XBlock.TopRight[XBlock.RightBot[ib]] == oldrighttop) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
+			{
+				XBlock.RightTop[ib] = ib;
+				//XBlock.RightTop[ib] = ib;
+			}
+			else
+			{
+				XBlock.RightTop[ib] = oldrighttop;
 				//XBlock.RightTop[ib] = oldright;
 			}
 
 
 
-
-			if (XBlock.TopLeft[ib] == oldtop)//Ditto here
+			if (XBlock.TopLeft[ib] == oldtopleft)//Ditto here
 			{
 				XBlock.TopLeft[ib] = ib;
 			}
 			else
 			{
-				XBlock.TopLeft[ib] = oldtop;
+				XBlock.TopLeft[ib] = oldtopleft;
 			}
+			if (XBlock.TopRight[XBlock.RightBot[ib]] == oldtopright)//Ditto here
+			{
+				XBlock.TopRight[ib] = ib;
+			}
+			else
+			{
+				XBlock.TopRight[ib] = oldtopright;
+			}
+
+			//Also need to do lft and bottom!
+
+
+
 			// Bot and left blk should remain unchanged at this stage(they will change if the neighbour themselves change)
 
 			XBlock.xo[ib] = XBlock.xo[ib] + calcres(XParam.dx, XBlock.level[ib] + 1);
@@ -797,7 +823,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							XEv.h[o] = BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 							XEv.zs[o] = BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 							XEv.u[o] = BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.v[o] = ib;//BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.v[o] = kb[kk];//BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 
 
 						}
@@ -975,7 +1001,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				{
 					if (XAdapt.newlevel[oldleftbot] < XAdapt.newlevel[ib])
 					{
-						if (XBlock.RightBot[XBlock.RightBot[oldleftbot]] == ib) // bottom side
+						if (abs(XBlock.yo[ib] - XBlock.yo[oldleftbot]) < calcres(XParam.dx, XAdapt.newlevel[ib]))//(XBlock.RightBot[XBlock.RightBot[oldleftbot]] == ib) // bottom side
 						{
 							XBlock.LeftBot[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
 							XBlock.LeftTop[ib] = XAdapt.availblk[XAdapt.csumblk[oldleftbot]];
@@ -1013,6 +1039,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							{
 								XBlock.LeftBot[ibtl] = oldlefttop;
 								XBlock.LeftTop[ibtl] = oldlefttop;
+								XBlock.RightBot[oldlefttop] = ibtl;
+								XBlock.RightTop[oldlefttop] = ibtl;
 							}
 							
 						}
@@ -1042,6 +1070,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							{
 								XBlock.LeftBot[ibtl] = oldlefttop;
 								XBlock.LeftTop[ibtl] = oldlefttop;
+								XBlock.RightBot[oldlefttop] = ibtl;
+								XBlock.RightTop[oldlefttop] = ibtl;
 							}
 						}
 					}
@@ -1093,7 +1123,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				{
 					if (XAdapt.newlevel[oldrightbot] < XAdapt.newlevel[ib])
 					{
-						if (XBlock.LeftBot[oldrightbot] == ib) // bottom side
+						if (abs(XBlock.yo[ib]-XBlock.yo[oldrightbot])<calcres(XParam.dx, XAdapt.newlevel[ib])) //XBlock.LeftBot[oldrightbot] == ib// bottom side
 						{
 							XBlock.RightBot[ibr] = oldrightbot;
 							XBlock.RightTop[ibr] = oldrightbot;
@@ -1103,11 +1133,11 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 						}
 						else //Top side
 						{
-							XBlock.RightBot[ib] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
-							XBlock.RightTop[ib] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							XBlock.RightBot[ibr] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							XBlock.RightTop[ibr] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
 
-							XBlock.RightBot[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
-							XBlock.RightTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							XBlock.RightBot[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
+							XBlock.RightTop[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldrightbot] + 1];
 						}
 					}
 					else
@@ -1131,6 +1161,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							{
 								XBlock.RightBot[ibtr] = oldrighttop;
 								XBlock.RightTop[ibtr] = oldrighttop;
+								XBlock.LeftBot[oldrighttop] = ibtr;
+								XBlock.LeftTop[oldrighttop] = ibtr;
 							}
 
 						}
@@ -1160,11 +1192,13 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							{
 								XBlock.RightBot[ibtr] = oldrighttop;
 								XBlock.RightTop[ibtr] = oldrighttop;
+								XBlock.LeftBot[oldrighttop] = ibtr;
+								XBlock.LeftTop[oldrighttop] = ibtr;
 							}
 						}
 					}
 				}
-				else // oldleftbot did not refine (couldn't have corasen either)
+				else // oldrightbot did not refine (couldn't have corasen either)
 				{
 
 					if (XAdapt.newlevel[oldrightbot] < XAdapt.newlevel[ib])
@@ -1192,8 +1226,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							}
 							else
 							{
-								XBlock.RightBot[ibtl] = oldrighttop;
-								XBlock.RightTop[ibtl] = XAdapt.availblk[XAdapt.csumblk[oldrighttop] + 1];
+								XBlock.RightBot[ibtr] = oldrighttop;
+								XBlock.RightTop[ibtr] = XAdapt.availblk[XAdapt.csumblk[oldrighttop] + 1];
 							}
 						}
 						else
@@ -1212,7 +1246,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				{
 					if (XAdapt.newlevel[oldbotleft] < XAdapt.newlevel[ib])
 					{
-						if (XBlock.TopLeft[XBlock.TopLeft[oldbotleft]] == ib) // left side
+						if (abs(XBlock.xo[ib] - XBlock.xo[oldbotleft]) < calcres(XParam.dx, XAdapt.newlevel[ib]))//(XBlock.TopLeft[XBlock.TopLeft[oldbotleft]] == ib) // left side
 						{
 							XBlock.BotLeft[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
 							XBlock.BotRight[ib] = XAdapt.availblk[XAdapt.csumblk[oldbotleft] + 1];
@@ -1250,6 +1284,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							{
 								XBlock.BotLeft[ibr] = oldbotright;
 								XBlock.BotRight[ibr] = oldbotright;
+								XBlock.TopLeft[oldbotright] = ibr;
+								XBlock.TopRight[oldbotright] = ibr;
 							}
 
 						}
@@ -1279,6 +1315,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							{
 								XBlock.BotLeft[ibr] = oldbotright;
 								XBlock.BotRight[ibr] = oldbotright;
+								XBlock.TopLeft[oldbotright] = ibr;
+								XBlock.TopRight[oldbotright] = ibr;
 							}
 						}
 					}
@@ -1330,7 +1368,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				{
 					if (XAdapt.newlevel[oldtopleft] < XAdapt.newlevel[ib])
 					{
-						if (XBlock.BotLeft[oldtopleft] == ib) // left side
+						if (abs(XBlock.xo[ib] - XBlock.xo[oldtopleft]) < calcres(XParam.dx, XAdapt.newlevel[ib]))//(XBlock.BotLeft[oldtopleft] == ib) // left side
 						{
 							XBlock.TopLeft[ibtl] = oldtopleft;
 							XBlock.TopRight[ibtl] = oldtopleft;
@@ -1368,6 +1406,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							{
 								XBlock.TopLeft[ibtr] = oldbotright;
 								XBlock.TopRight[ibtr] = oldbotright;
+								XBlock.BotLeft[oldtopright] = ibtr;
+								XBlock.BotRight[oldtopright] = ibtr;
 							}
 
 						}
@@ -1395,8 +1435,10 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							}
 							else
 							{
-								XBlock.TopLeft[ibr] = oldtopright;
-								XBlock.TopRight[ibr] = oldtopright;
+								XBlock.TopLeft[ibtr] = oldtopright;
+								XBlock.TopRight[ibtr] = oldtopright;
+								XBlock.BotLeft[oldtopright] = ibtr;
+								XBlock.BotRight[oldtopright] = ibtr;
 							}
 						}
 					}
