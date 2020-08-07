@@ -35,7 +35,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 			if (!checkBUQsanity(XParam,XModel.blocks))
 			{
 				log("Bad BUQ mesh layout\n");
-				exit(2);
+				//exit(2);
 				//break;
 			}
 
@@ -244,7 +244,7 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 	bool check = true;
 	if (abs(levelneighbour - (levelib)) > 1)
 	{
-		log("Warning! Bad Neighbour Level. ib="+std::to_string(ib)+"; level[ib]="+ std::to_string(levelib)+"; neighbour[ib]="+ std::to_string(neighbourib) +"; level[leftblk[ib]]="+ std::to_string(levelneighbour));
+		log("Warning! Bad Neighbour Level. ib="+std::to_string(ib)+"; level[ib]="+ std::to_string(levelib)+"; neighbour[ib]="+ std::to_string(neighbourib) +"; level[neighbour[ib]]="+ std::to_string(levelneighbour));
 		check = false;
 	}
 	return check;
@@ -797,7 +797,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							XEv.h[o] = BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 							XEv.zs[o] = BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 							XEv.u[o] = BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.v[o] = BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.v[o] = ib;//BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 
 
 						}
