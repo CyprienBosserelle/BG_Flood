@@ -482,18 +482,25 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 			int xnode = int((XBlock.xo[ib] - XParam.xo) / dxfac / XParam.blkwidth);
 			int ynode = int((XBlock.yo[ib] - XParam.yo) / dxfac / XParam.blkwidth);
 
-			int oldrightbot = XBlock.RightBot[XBlock.RightBot[ib]];
-			int oldrighttop = XBlock.RightBot[XBlock.TopLeft[XBlock.RightBot[ib]]];
+			int ibr = XBlock.RightBot[ib];
+			int ibtl = XBlock.TopLeft[ib];
+			int ibtr = XBlock.TopLeft[XBlock.RightBot[ib]];
+
+
+			int oldrightbot = XBlock.RightBot[ibr];
+			int oldrighttop = XBlock.RightBot[ibtr];
 			//int oldtopofright = topblk[oldright];
-			int oldtopleft = XBlock.TopLeft[XBlock.TopLeft[ib]];
-			int oldtopright = XBlock.TopLeft[XBlock.TopLeft[XBlock.RightBot[ib]]];
+			int oldtopleft = XBlock.TopLeft[ibtl];
+			int oldtopright = XBlock.TopLeft[ibtr];
 			//int oldrightoftop = rightblk[oldtop];
 			int oldleftbot = XBlock.LeftBot[ib];
-			int oldlefttop = XBlock.LeftBot[XBlock.TopLeft[ib]];
+			int oldlefttop = XBlock.LeftBot[ibtl];
 			//int oldtopofleft = topblk[oldleft];
 			int oldbotleft = XBlock.BotLeft[ib];
-			int oldbotright = XBlock.BotLeft[XBlock.RightBot[ib]];
+			int oldbotright = XBlock.BotLeft[ibr];
 			//int oldrightofbot = rightblk[oldbot];
+
+			
 
 
 			for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -511,24 +518,24 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 					}
 					if (ix >= (XParam.blkwidth / 2) && iy < (XParam.blkwidth / 2))
 					{
-						ii = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, iy * 2, XBlock.RightBot[ib]);//((ix - 8) * 2) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
-						ir = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, iy * 2, XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
-						it = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, iy * 2 + 1, XBlock.RightBot[ib]);// ((ix - 8)) * 2 + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
-						itr = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy * 2 + 1), XBlock.RightBot[ib]);// ((ix - 8) * 2 + 1) + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+						ii = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, iy * 2, ibr);//((ix - 8) * 2) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+						ir = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, iy * 2, ibr);// ((ix - 8) * 2 + 1) + (iy * 2) * 16 + rightblk[ib] * XParam.blksize;
+						it = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, iy * 2 + 1, ibr);// ((ix - 8)) * 2 + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
+						itr = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy * 2 + 1), ibr);// ((ix - 8) * 2 + 1) + (iy * 2 + 1) * 16 + rightblk[ib] * XParam.blksize;
 					}
 					if (ix < (XParam.blkwidth / 2) && iy >= (XParam.blkwidth / 2))
 					{
-						ii = memloc(XParam, ix * 2, (iy - XParam.blkwidth / 2) * 2, XBlock.TopLeft[ib]);// ix * 2 + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
-						ir = memloc(XParam, ix * 2 + 1, (iy - XParam.blkwidth / 2) * 2, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
-						it = memloc(XParam, ix * 2, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix) * 2 + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
-						itr = memloc(XParam, ix * 2 + 1, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.TopLeft[ib]);//(ix * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+						ii = memloc(XParam, ix * 2, (iy - XParam.blkwidth / 2) * 2, ibtl);// ix * 2 + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+						ir = memloc(XParam, ix * 2 + 1, (iy - XParam.blkwidth / 2) * 2, ibtl);//(ix * 2 + 1) + ((iy - 8) * 2) * 16 + topblk[ib] * XParam.blksize;
+						it = memloc(XParam, ix * 2, (iy - XParam.blkwidth / 2) * 2 + 1, ibtl);//(ix) * 2 + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
+						itr = memloc(XParam, ix * 2 + 1, (iy - XParam.blkwidth / 2) * 2 + 1, ibtl);//(ix * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + topblk[ib] * XParam.blksize;
 					}
 					if (ix >= (XParam.blkwidth / 2) && iy >= (XParam.blkwidth / 2))
 					{
-						ii = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, (iy - XParam.blkwidth / 2) * 2, XBlock.RightBot[XBlock.TopRight[ib]]);// (ix - 8) * 2 + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						ir = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy - XParam.blkwidth / 2) * 2, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						it = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//(ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
-						itr = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy - XParam.blkwidth / 2) * 2 + 1, XBlock.RightBot[XBlock.TopRight[ib]]);//((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						ii = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, (iy - XParam.blkwidth / 2) * 2, ibtr);// (ix - 8) * 2 + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						ir = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy - XParam.blkwidth / 2) * 2, ibtr);//((ix - 8) * 2 + 1) + ((iy - 8) * 2) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						it = memloc(XParam, (ix - XParam.blkwidth / 2) * 2, (iy - XParam.blkwidth / 2) * 2 + 1, ibtr);//(ix - 8) * 2 + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
+						itr = memloc(XParam, (ix - XParam.blkwidth / 2) * 2 + 1, (iy - XParam.blkwidth / 2) * 2 + 1, ibtr);//((ix - 8) * 2 + 1) + ((iy - 8) * 2 + 1) * 16 + rightblk[topblk[ib]] * XParam.blksize;
 					}
 
 
@@ -548,16 +555,16 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 			//Need more?
 
 			// Make right, top and top-right block available for refine step
-			XAdapt.availblk[XParam.navailblk] = XBlock.RightBot[ib];
-			XAdapt.availblk[XParam.navailblk + 1] = XBlock.TopLeft[ib];
-			XAdapt.availblk[XParam.navailblk + 2] = XBlock.RightBot[XBlock.TopRight[ib]];
+			XAdapt.availblk[XParam.navailblk] = ibr;
+			XAdapt.availblk[XParam.navailblk + 1] = ibtl;
+			XAdapt.availblk[XParam.navailblk + 2] = ibtr;
 
 			XAdapt.newlevel[ib] = XBlock.level[ib] - 1;
 
 			//Do not comment! While this 3 line below seem irrelevant in a first order they are needed for the neighbours below (next step down) but then is not afterward
-			XAdapt.newlevel[XBlock.RightBot[ib]] = XBlock.level[ib] - 1;
-			XAdapt.newlevel[XBlock.TopLeft[ib]] = XBlock.level[ib] - 1;
-			XAdapt.newlevel[XBlock.RightBot[XBlock.TopRight[ib]]] = XBlock.level[ib] - 1;
+			XAdapt.newlevel[ibr] = XBlock.level[ib] - 1;
+			XAdapt.newlevel[ibtl] = XBlock.level[ib] - 1;
+			XAdapt.newlevel[ibtr] = XBlock.level[ib] - 1;
 
 
 
@@ -565,12 +572,12 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 			XParam.navailblk = XParam.navailblk + 3;
 
 			// Make right, top and top-right block inactive
-			XBlock.active[XAdapt.invactive[XBlock.RightBot[ib]]] = -1;
-			XBlock.active[XAdapt.invactive[XBlock.TopLeft[ib]]] = -1;
-			XBlock.active[XAdapt.invactive[XBlock.RightBot[XBlock.TopRight[ib]]]] = -1;
+			XBlock.active[XAdapt.invactive[ibr]] = -1;
+			XBlock.active[XAdapt.invactive[ibtl]] = -1;
+			XBlock.active[XAdapt.invactive[ibtr]] = -1;
 
 			//check neighbour's (Full neighbour happens in the next big loop below)
-			if (XBlock.RightBot[ib] == oldrightbot) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
+			if (ibr == oldrightbot) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
 			{
 				XBlock.RightBot[ib] = ib;
 				//XBlock.RightTop[ib] = ib;
@@ -580,7 +587,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 				XBlock.RightBot[ib] = oldrightbot;
 				//XBlock.RightTop[ib] = oldright;
 			}
-			if (XBlock.TopRight[XBlock.RightBot[ib]] == oldrighttop) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
+			if (ibtr == oldrighttop) // Surely that can never be true. if that was the case the coarsening would not have been allowed!
 			{
 				XBlock.RightTop[ib] = ib;
 				//XBlock.RightTop[ib] = ib;
@@ -593,7 +600,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 
 
 
-			if (XBlock.TopLeft[ib] == oldtopleft)//Ditto here
+			if (ibtl == oldtopleft)//Ditto here
 			{
 				XBlock.TopLeft[ib] = ib;
 			}
@@ -601,7 +608,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 			{
 				XBlock.TopLeft[ib] = oldtopleft;
 			}
-			if (XBlock.TopRight[XBlock.RightBot[ib]] == oldtopright)//Ditto here
+			if (ibtr == oldtopright)//Ditto here
 			{
 				XBlock.TopRight[ib] = ib;
 			}
@@ -610,6 +617,22 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 				XBlock.TopRight[ib] = oldtopright;
 			}
 
+
+
+			XBlock.LeftBot[ib] = oldleftbot;// It is that already but it clearer to spell it out
+			XBlock.LeftTop[ib] = oldlefttop;
+			if (oldlefttop == ibtl)
+			{
+				XBlock.LeftTop[ib] = ib;
+			}
+
+			XBlock.BotLeft[ib] = oldbotleft;
+			XBlock.BotRight[ib] = oldbotright;
+			if (oldbotright == ibr)
+			{
+				XBlock.BotRight[ib] = ib;
+			}
+			
 			//Also need to do lft and bottom!
 
 
@@ -643,10 +666,12 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 				if (XAdapt.coarsen[XBlock.LeftBot[XBlock.LeftBot[ib]]])
 				{
 					XBlock.LeftBot[ib] = XBlock.LeftBot[XBlock.LeftBot[ib]];
+					XBlock.LeftTop[ib] = XBlock.LeftBot[XBlock.LeftBot[ib]];
 				}
 				else
 				{
 					XBlock.LeftBot[ib] = XBlock.BotLeft[XBlock.LeftBot[XBlock.LeftBot[ib]]];
+					XBlock.LeftTop[ib] = XBlock.BotLeft[XBlock.LeftBot[XBlock.LeftBot[ib]]];
 				}
 			}
 			
@@ -659,10 +684,12 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 				if (XAdapt.coarsen[XBlock.BotLeft[XBlock.BotLeft[ib]]])
 				{
 					XBlock.BotLeft[ib] = XBlock.BotLeft[XBlock.BotLeft[ib]];
+					XBlock.BotRight[ib] = XBlock.BotLeft[XBlock.BotLeft[ib]];
 				}
 				else
 				{
 					XBlock.BotLeft[ib] = XBlock.LeftBot[XBlock.BotLeft[XBlock.BotLeft[ib]]];
+					XBlock.BotRight[ib] = XBlock.LeftBot[XBlock.BotLeft[XBlock.BotLeft[ib]]];
 				}
 			}
 			
@@ -674,6 +701,8 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 				if (!XAdapt.coarsen[XBlock.RightBot[ib]])
 				{
 					XBlock.RightBot[ib] = XBlock.BotLeft[XBlock.RightBot[ib]];
+					XBlock.RightTop[ib] = XBlock.BotLeft[XBlock.RightBot[ib]];
+
 				}
 				// else do nothing because the right block is the reference one
 			}
@@ -685,6 +714,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 				if (!XAdapt.coarsen[XBlock.TopLeft[ib]])
 				{
 					XBlock.TopLeft[ib] = XBlock.LeftBot[XBlock.TopLeft[ib]];
+					XBlock.TopRight[ib] = XBlock.LeftBot[XBlock.TopLeft[ib]];
 				}
 
 
