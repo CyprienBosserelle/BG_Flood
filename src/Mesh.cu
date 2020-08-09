@@ -88,7 +88,7 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 				}
 			}
-			if (nmask < XParam.blksize)
+			if (nmask < (XParam.blkwidth* XParam.blkwidth))
 				nblk++;
 		}
 	}
@@ -252,7 +252,7 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 
 				}
 			}
-			if (nmask < 256)
+			if (nmask < (XParam.blkwidth * XParam.blkwidth))
 			{
 				//
 				XBlock.xo[blkid] = XParam.xo + nblkx * ((T)XParam.blkwidth) * levdx;
