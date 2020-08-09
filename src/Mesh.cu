@@ -332,7 +332,7 @@ template <class T> void InitBlockneighbours(Param &XParam,  BlockP<T>& XBlock)
 			if (abs(XBlock.xo[blb] - botxo) < espdist && abs(XBlock.yo[blb] - botyo) < espdist)
 			{
 				XBlock.BotLeft[bl] = blb;
-				XBlock.BotLeft[bl] = blb;
+				XBlock.BotRight[bl] = blb;
 			}
 		}
 	}

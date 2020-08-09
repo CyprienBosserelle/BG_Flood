@@ -14,7 +14,7 @@
 #include "Mesh.h"
 
 template <class T> void TestingOutput(Param XParam, Model<T> XModel);
-
+template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z);
 
 
 // End of global definition

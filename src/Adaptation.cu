@@ -125,10 +125,13 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 			if (refine[ib] == true)
 			{
 				iter += checkneighbourrefine(XBlock.TopLeft[ib], XBlock.level[ib], XBlock.level[XBlock.TopLeft[ib]], refine, coarsen);
+				//iter += checkneighbourrefine(XBlock.TopRight[ib], XBlock.level[ib], XBlock.level[XBlock.TopRight[ib]], refine, coarsen);
 				iter += checkneighbourrefine(XBlock.BotLeft[ib], XBlock.level[ib], XBlock.level[XBlock.BotLeft[ib]], refine, coarsen);
+				//iter += checkneighbourrefine(XBlock.BotRight[ib], XBlock.level[ib], XBlock.level[XBlock.BotRight[ib]], refine, coarsen);
 				iter += checkneighbourrefine(XBlock.LeftBot[ib], XBlock.level[ib], XBlock.level[XBlock.LeftBot[ib]], refine, coarsen);
+				//iter += checkneighbourrefine(XBlock.LeftTop[ib], XBlock.level[ib], XBlock.level[XBlock.LeftTop[ib]], refine, coarsen);
 				iter += checkneighbourrefine(XBlock.RightBot[ib], XBlock.level[ib], XBlock.level[XBlock.RightBot[ib]], refine, coarsen);
-				
+				//iter += checkneighbourrefine(XBlock.RightTop[ib], XBlock.level[ib], XBlock.level[XBlock.RightTop[ib]], refine, coarsen);
 
 			}
 			
@@ -543,7 +546,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 					XEv.h[i] = 0.25 * (XEvo.h[ii] + XEvo.h[ir] + XEvo.h[it] + XEvo.h[itr]);
 					XEv.zs[i] = 0.25 * (XEvo.zs[ii] + XEvo.zs[ir] + XEvo.zs[it] + XEvo.zs[itr]);
 					XEv.u[i] = 0.25 * (XEvo.u[ii] + XEvo.u[ir] + XEvo.u[it] + XEvo.u[itr]);
-					XEv.v[i] = ib;// 0.25 * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
+					XEv.v[i] =  0.25 * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
 					//zb will be interpolated from input grid later // I wonder is this makes the bilinear interpolation scheme crash at the refining step for zb?
 					// No because zb is also interpolated later from the original mesh data
 					//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
@@ -658,63 +661,73 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 
+			int oldrightbot = XBlock.RightBot[ib];
+			
+			int oldtopleft = XBlock.TopLeft[ib];
+			
+			int oldleftbot = XBlock.LeftBot[ib];
+			
+			int oldbotleft = XBlock.BotLeft[ib];
 			
 
-			if (XAdapt.newlevel[XBlock.LeftBot[ib]] < XBlock.level[XBlock.LeftBot[ib]])
+
+
+
+			if (XAdapt.newlevel[oldleftbot] < XBlock.level[oldleftbot])
 			{
 				//left blk has coarsen
-				if (XAdapt.coarsen[XBlock.LeftBot[XBlock.LeftBot[ib]]])
+				if (XAdapt.coarsen[XBlock.LeftBot[oldleftbot]])
 				{
-					XBlock.LeftBot[ib] = XBlock.LeftBot[XBlock.LeftBot[ib]];
-					XBlock.LeftTop[ib] = XBlock.LeftBot[XBlock.LeftBot[ib]];
+					XBlock.LeftBot[ib] = XBlock.LeftBot[oldleftbot];
+					XBlock.LeftTop[ib] = XBlock.LeftBot[oldleftbot];
 				}
 				else
 				{
-					XBlock.LeftBot[ib] = XBlock.BotLeft[XBlock.LeftBot[XBlock.LeftBot[ib]]];
-					XBlock.LeftTop[ib] = XBlock.BotLeft[XBlock.LeftBot[XBlock.LeftBot[ib]]];
+					XBlock.LeftBot[ib] = XBlock.BotLeft[XBlock.LeftBot[oldleftbot]];
+					XBlock.LeftTop[ib] = XBlock.BotLeft[XBlock.LeftBot[oldleftbot]];
 				}
 			}
 			
 
 
 
-			if (XAdapt.newlevel[XBlock.BotLeft[ib]] < XBlock.level[XBlock.BotLeft[ib]])
+			if (XAdapt.newlevel[oldbotleft] < XBlock.level[oldbotleft])
 			{
 				// botblk has coarsen
-				if (XAdapt.coarsen[XBlock.BotLeft[XBlock.BotLeft[ib]]])
+				if (XAdapt.coarsen[XBlock.BotLeft[oldbotleft]])
 				{
-					XBlock.BotLeft[ib] = XBlock.BotLeft[XBlock.BotLeft[ib]];
-					XBlock.BotRight[ib] = XBlock.BotLeft[XBlock.BotLeft[ib]];
+					XBlock.BotLeft[ib] = XBlock.BotLeft[oldbotleft];
+					XBlock.BotRight[ib] = XBlock.BotLeft[oldbotleft];
 				}
 				else
 				{
-					XBlock.BotLeft[ib] = XBlock.LeftBot[XBlock.BotLeft[XBlock.BotLeft[ib]]];
-					XBlock.BotRight[ib] = XBlock.LeftBot[XBlock.BotLeft[XBlock.BotLeft[ib]]];
+					XBlock.BotLeft[ib] = XBlock.LeftBot[XBlock.BotLeft[oldbotleft]];
+					XBlock.BotRight[ib] = XBlock.LeftBot[XBlock.BotLeft[oldbotleft]];
 				}
 			}
 			
 
 
-			if (XAdapt.newlevel[XBlock.RightBot[ib]] < XBlock.level[XBlock.RightBot[ib]])
+			if (XAdapt.newlevel[oldrightbot] < XBlock.level[oldrightbot])
 			{
 				// right block has coarsen
-				if (!XAdapt.coarsen[XBlock.RightBot[ib]])
+				if (!XAdapt.coarsen[oldrightbot])
 				{
-					XBlock.RightBot[ib] = XBlock.BotLeft[XBlock.RightBot[ib]];
-					XBlock.RightTop[ib] = XBlock.BotLeft[XBlock.RightBot[ib]];
+					XBlock.RightBot[ib] = XBlock.BotLeft[oldrightbot];
+					XBlock.RightTop[ib] = XBlock.BotLeft[oldrightbot];
 
 				}
 				// else do nothing because the right block is the reference one
 			}
 
 
-			if (XAdapt.newlevel[XBlock.TopLeft[ib]] < XBlock.level[XBlock.TopLeft[ib]])
+			if (XAdapt.newlevel[oldtopleft] < XBlock.level[oldtopleft])
 			{
 				// top blk has coarsen
-				if (!XAdapt.coarsen[XBlock.TopLeft[ib]])
+				if (!XAdapt.coarsen[oldtopleft])
 				{
-					XBlock.TopLeft[ib] = XBlock.LeftBot[XBlock.TopLeft[ib]];
-					XBlock.TopRight[ib] = XBlock.LeftBot[XBlock.TopLeft[ib]];
+					XBlock.TopLeft[ib] = XBlock.LeftBot[oldtopleft];
+					XBlock.TopRight[ib] = XBlock.LeftBot[oldtopleft];
 				}
 
 
@@ -853,7 +866,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							XEv.h[o] = BilinearInterpolation(XEvo.h[ii], XEvo.h[it], XEvo.h[ir], XEvo.h[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 							XEv.zs[o] = BilinearInterpolation(XEvo.zs[ii], XEvo.zs[it], XEvo.zs[ir], XEvo.zs[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 							XEv.u[o] = BilinearInterpolation(XEvo.u[ii], XEvo.u[it], XEvo.u[ir], XEvo.u[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
-							XEv.v[o] = kb[kk];//BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
+							XEv.v[o] = BilinearInterpolation(XEvo.v[ii], XEvo.v[it], XEvo.v[ir], XEvo.v[itr], (T)fx, (T)cx, (T)fy, (T)cy, rx, ry);
 
 
 						}
@@ -1351,7 +1364,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 						}
 					}
 				}
-				else // oldleftbot did not refine (couldn't have corasen either)
+				else // oldbotleft did not refine (couldn't have corasen either)
 				{
 
 					if (XAdapt.newlevel[oldbotleft] < XAdapt.newlevel[ib])
