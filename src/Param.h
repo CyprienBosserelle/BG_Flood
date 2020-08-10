@@ -20,6 +20,12 @@ public:
 	bool windforcing = false;
 	bool atmpforcing = false;
 	bool rainforcing = false;
+
+	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
+	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
+	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
+	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
+
 	double Pa2m = 0.00009916; // if unit is hPa then user should use 0.009916;
 	double Paref = 101300.0; // if unit is hPa then user should use 1013.0 
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
@@ -77,13 +83,6 @@ public:
 	//std::vector<River> Rivers; // empty vector to hold river location and discharge time series
 	int nriverblock = 0;
 
-	//bnd
-	
-	
-	bndparam rightbnd;
-	bndparam leftbnd;
-	bndparam topbnd;
-	bndparam botbnd;
 	
 
 

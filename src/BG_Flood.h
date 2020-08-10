@@ -8,7 +8,7 @@
 #include "Write_txt.h"
 #include "ReadInput.h"
 #include "ReadForcing.h"
-#include "Utils_GPU.h"
+#include "Setup_GPU.h"
 #include "Util_CPU.h"
 #include "Arrays.h"
 #include "Forcing.h"

@@ -6,7 +6,6 @@
 #include "Param.h"
 #include "Forcing.h"
 #include "MemManagement.h"
-#include "Utils_GPU.h"
 #include "Util_CPU.h"
 #include "Arrays.h"
 #include "Write_txt.h"
@@ -21,7 +20,7 @@ template <class T> void InitMesh(Param& XParam, Forcing<float> XForcing, Model<T
 template <class T> void InitBlockInfo(Param &XParam, Forcing<float> XForcing, BlockP<T>& XBlock);
 template <class T> void InitBlockadapt(Param XParam, BlockP<T> XBlock, AdaptP& XAdap);
 template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, BlockP<T>& XBlock);
-template <class T> void InitBlockneighbours(Param &XParam, BlockP<T>& XBlock);
+template <class T> void InitBlockneighbours(Param& XParam, Forcing<float>& XForcing, BlockP<T>& XBlock);
 
 
 

@@ -94,47 +94,7 @@ struct BndblockP
 };
 
 
-struct bndTexP
-{
-	cudaArray* WLS;
-	cudaArray* Uvel;
-	cudaArray* Vvel;
 
-	cudaChannelFormatDesc channelDescwls = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-	cudaChannelFormatDesc channelDescuvel = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-	cudaChannelFormatDesc channelDescvvel = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-
-	texture<float, 2, cudaReadModeElementType> texWLS;
-	texture<float, 2, cudaReadModeElementType> texUVEL;
-	texture<float, 2, cudaReadModeElementType> texVVEL;
-};
-
-template <class T>
-struct TexSetP
-{
-	cudaArray* CudArr;
-	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
-	texture<float, 2, cudaReadModeElementType> tex;
-};
-
-
-template <class T>
-struct TexForcingP
-{
-	//map forcing textures
-	TexSetP<T> UWind;
-	TexSetP<T> VWind;
-	TexSetP<T> Patm;
-	TexSetP<T> Rain;
-
-	//bnd forcing textures
-	bndTexP leftbnd;
-	bndTexP rightbnd;
-	bndTexP topbnd;
-	bndTexP botbnd;
-
-
-};
 
 
 
@@ -168,9 +128,7 @@ struct Model
 
 	TimeP<T> time;
 
-	//texture for boundary and map forcing
-	//is this OK on CPU?
-	TexForcingP<T> Tex;
+	
 
 	// 
 	std::map<std::string, T *> OutputVarMap;

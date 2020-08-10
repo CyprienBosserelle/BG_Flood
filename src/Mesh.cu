@@ -158,7 +158,7 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> XForcing, Bl
 	InitBlockxoyo(XParam, XForcing, XBlock);
 	//============================
 	// Init neighbours
-	InitBlockneighbours(XParam, XBlock);
+	InitBlockneighbours(XParam, XForcing, XBlock);
 
 
 }
@@ -271,7 +271,7 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 template void InitBlockxoyo<float>(Param XParam, Forcing<float> XForcing, BlockP<float> &XBlock);
 template void InitBlockxoyo<double>(Param XParam, Forcing<float> XForcing, BlockP<double> & XBlockP);
 
-template <class T> void InitBlockneighbours(Param &XParam,  BlockP<T>& XBlock)
+template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForcing,  BlockP<T>& XBlock)
 {
 	// This function will only work if the blocks are uniform
 	// A separate function is used for adaptivity
@@ -389,16 +389,16 @@ template <class T> void InitBlockneighbours(Param &XParam,  BlockP<T>& XBlock)
 		}
 	}
 
-	XParam.leftbnd.nblk = blbl;
-	XParam.rightbnd.nblk = blbr;
-	XParam.topbnd.nblk = blbt;
-	XParam.botbnd.nblk = blbb;
+	XForcing.left.nblk = blbl;
+	XForcing.right.nblk = blbr;
+	XForcing.top.nblk = blbt;
+	XForcing.bot.nblk = blbb;
 
 	//
 	
 
 }
-template void InitBlockneighbours<float>(Param &XParam, BlockP<float>& XBlock);
-template void InitBlockneighbours<double>(Param &XParam, BlockP<double>& XBlock);
+template void InitBlockneighbours<float>(Param &XParam,  Forcing<float>& XForcing, BlockP<float>& XBlock);
+template void InitBlockneighbours<double>(Param &XParam, Forcing<float>& XForcing, BlockP<double>& XBlock);
 
 

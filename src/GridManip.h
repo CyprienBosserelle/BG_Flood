@@ -5,7 +5,6 @@
 #include "General.h"
 #include "Param.h"
 #include "Util_CPU.h"
-#include "Utils_GPU.h"
 #include "Forcing.h"
 #include "Arrays.h"
 

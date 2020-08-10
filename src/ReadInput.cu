@@ -365,64 +365,7 @@ Param readparamstr(std::string line, Param param)
 	}
 
 
-	parameterstr = "leftbndfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.leftbnd.inputfile = parametervalue;
-		param.leftbnd.on = 1;
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
-
-	parameterstr = "rightbndfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.rightbnd.inputfile = parametervalue;
-		param.rightbnd.on = 1;
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
-	parameterstr = "topbndfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.topbnd.inputfile = parametervalue;
-		param.topbnd.on = 1;
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
-	parameterstr = "botbndfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.botbnd.inputfile = parametervalue;
-		param.botbnd.on = 1;
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
-
-	parameterstr = "left";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.leftbnd.type = std::stoi(parametervalue);
-	}
-	parameterstr = "right";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.rightbnd.type = std::stoi(parametervalue);
-	}
-	parameterstr = "top";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.topbnd.type = std::stoi(parametervalue);
-	}
-	parameterstr = "bot";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.botbnd.type = std::stoi(parametervalue);
-	}
+	
 
 	parameterstr = "nx";
 	parametervalue = findparameter(parameterstr, line);
@@ -669,6 +612,231 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 	}
+
+
+	// Boundaries
+	parameterstr = "leftbndfile";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.left.type = std::stoi(items[0]);
+			
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.left.type = std::stoi(items[1]);
+			forcing.left.inputfile = items[0];
+			forcing.left.on = true;
+		}
+				
+	}
+
+	parameterstr = "leftbnd";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.left.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.left.type = std::stoi(items[1]);
+			forcing.left.inputfile = items[0];
+			forcing.left.on = true;
+		}
+
+	}
+	parameterstr = "left";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.left.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.left.type = std::stoi(items[1]);
+			forcing.left.inputfile = items[0];
+			forcing.left.on = true;
+		}
+
+	}
+
+	
+	parameterstr = "rightbndfile";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.right.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.right.type = std::stoi(items[1]);
+			forcing.right.inputfile = items[0];
+			forcing.right.on = true;
+		}
+
+	}
+	parameterstr = "rightbnd";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.right.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.right.type = std::stoi(items[1]);
+			forcing.right.inputfile = items[0];
+			forcing.right.on = true;
+		}
+
+	}
+	parameterstr = "right";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.right.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.right.type = std::stoi(items[1]);
+			forcing.right.inputfile = items[0];
+			forcing.right.on = true;
+		}
+
+	}
+
+	parameterstr = "topbndfile";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.top.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.top.type = std::stoi(items[1]);
+			forcing.top.inputfile = items[0];
+			forcing.top.on = true;
+		}
+
+	}
+	parameterstr = "top";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.top.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.top.type = std::stoi(items[1]);
+			forcing.top.inputfile = items[0];
+			forcing.top.on = true;
+		}
+
+	}
+	parameterstr = "topbnd";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.top.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.top.type = std::stoi(items[1]);
+			forcing.top.inputfile = items[0];
+			forcing.top.on = true;
+		}
+
+	}
+
+	parameterstr = "botbndfile";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.bot.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.bot.type = std::stoi(items[1]);
+			forcing.bot.inputfile = items[0];
+			forcing.bot.on = true;
+		}
+
+	}
+	parameterstr = "botbnd";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.bot.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.bot.type = std::stoi(items[1]);
+			forcing.bot.inputfile = items[0];
+			forcing.bot.on = true;
+		}
+
+	}
+	parameterstr = "bot";// or left or leftbnd
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> items = split(parametervalue, ',');
+		if (items.size() == 1)
+		{
+			forcing.bot.type = std::stoi(items[0]);
+
+		}
+		else if (items.size() >= 2)
+		{
+			forcing.bot.type = std::stoi(items[1]);
+			forcing.bot.inputfile = items[0];
+			forcing.bot.on = true;
+		}
+
+	}
+
 
 	//Tsunami deformation input files
 	parameterstr = "deform";
@@ -957,33 +1125,63 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	}
 
 
+	// CHeck whether a cuda compatible GPU is present
+	if (XParam.GPUDEVICE >= 0)
+	{
+		// Init GPU
+		// This should be in the sanity check
+		int nDevices;
+		cudaGetDeviceCount(&nDevices);
+		cudaDeviceProp prop;
+
+		if (XParam.GPUDEVICE > (nDevices - 1))
+		{
+			//  if no GPU device are present then use the CPU (GPUDEVICE = -1)
+			XParam.GPUDEVICE = (nDevices - 1);
+		}
+		cudaGetDeviceProperties(&prop, XParam.GPUDEVICE);
+		//printf("There are %d GPU devices on this machine\n", nDevices);
+		log("There are " + std::to_string(nDevices) + "GPU devices on this machine");
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			
+			log("Using Device: " + std::string(prop.name));
+		}
+		else
+		{
+			log("No GPU device were detected on this machine... Using CPU instead");
+		}
+
+	}
+
 	
 }
 
-double setendtime(Param XParam)
+double setendtime(Param XParam,Forcing<float> XForcing)
 {
 	//endtime cannot be bigger thn the smallest time set in a boundary
 	SLTS tempSLTS;
 	double endtime = XParam.endtime;
-	if (XParam.leftbnd.on)
+	if (XParam.leftbnd)
 	{
-		tempSLTS = XParam.leftbnd.data.back();
+		tempSLTS =XForcing.left.data.back();
 		endtime = utils::min( endtime, tempSLTS.time);
 		
 	}
-	if (XParam.rightbnd.on)
+	if (XParam.rightbnd)
 	{
-		tempSLTS = XParam.rightbnd.data.back();
+		tempSLTS = XForcing.right.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);
 	}
-	if (XParam.topbnd.on)
+	if (XParam.topbnd)
 	{
-		tempSLTS = XParam.topbnd.data.back();
+		tempSLTS = XForcing.top.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);
 	}
-	if (XParam.botbnd.on)
+	if (XParam.botbnd)
 	{
-		tempSLTS = XParam.botbnd.data.back();
+		tempSLTS = XForcing.bot.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);
 	}
 

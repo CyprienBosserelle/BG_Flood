@@ -47,7 +47,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	
 	log("Initial condition:");
 	// First calculate the initial values for Evolving parameters (i.e. zs, h, u and v)
-	initevolv(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+	initevolv(XParam, XModel.blocks,XForcing, XModel.evolv, XModel.zb);
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 	//=====================================
 	// Initial forcing
@@ -55,7 +55,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 	//=====================================
 	// Initial bndinfo
-	Initbnds(XParam, XModel);
+	Initbnds(XParam, XForcing, XModel);
 	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
@@ -246,14 +246,14 @@ template<class T> void Initmaparray(Model<T>& XModel)
 template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
-template <class T> void Initbnds(Param XParam, Model<T>& XModel)
+template <class T> void Initbnds(Param XParam,Forcing<float> XForcing, Model<T>& XModel)
 {
 	// Initialise bnd block info 
 	//XParam.leftbnd.nblk were calculated in 
-	AllocateCPU(XParam.leftbnd.nblk, 1, XModel.bndblk.left);
-	AllocateCPU(XParam.rightbnd.nblk, 1, XModel.bndblk.right);
-	AllocateCPU(XParam.topbnd.nblk, 1, XModel.bndblk.top);
-	AllocateCPU(XParam.botbnd.nblk, 1, XModel.bndblk.bot);
+	AllocateCPU(XForcing.left.nblk, 1, XModel.bndblk.left);
+	AllocateCPU(XForcing.right.nblk, 1, XModel.bndblk.right);
+	AllocateCPU(XForcing.top.nblk, 1, XModel.bndblk.top);
+	AllocateCPU(XForcing.bot.nblk, 1, XModel.bndblk.bot);
 	
 	int blbr, blbb, blbl, blbt;
 	int leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
@@ -313,5 +313,5 @@ template <class T> void Initbnds(Param XParam, Model<T>& XModel)
 	
 
 }
-template void Initbnds<float>(Param XParam, Model<float>& XModel);
-template void Initbnds<double>(Param XParam, Model<double>& XModel);
+template void Initbnds<float>(Param XParam, Forcing<float> XForcing, Model<float>& XModel);
+template void Initbnds<double>(Param XParam, Forcing<float> XForcing, Model<double>& XModel);

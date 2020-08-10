@@ -138,10 +138,11 @@ void SaveParamtolog(Param XParam)
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Boundaries");
 	write_text_to_log_file("# 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d ");
-	write_text_to_log_file("right = " + std::to_string(XParam.rightbnd.type) + ";");
-	write_text_to_log_file("left = " + std::to_string(XParam.leftbnd.type) + ";");
-	write_text_to_log_file("top = " + std::to_string(XParam.topbnd.type) + ";");
-	write_text_to_log_file("bot = " + std::to_string(XParam.botbnd.type) + ";");
+	/*
+	//write_text_to_log_file("right = " + std::to_string(XParam.rightbnd.type) + ";");
+	//write_text_to_log_file("left = " + std::to_string(XParam.leftbnd.type) + ";");
+	//write_text_to_log_file("top = " + std::to_string(XParam.topbnd.type) + ";");
+	//write_text_to_log_file("bot = " + std::to_string(XParam.botbnd.type) + ";");
 
 	if (!XParam.rightbnd.inputfile.empty())
 		write_text_to_log_file("rightbndfile = " + XParam.rightbnd.inputfile + ";");
@@ -151,7 +152,7 @@ void SaveParamtolog(Param XParam)
 		write_text_to_log_file("topbndfile = " + XParam.topbnd.inputfile + ";");
 	if (!XParam.botbnd.inputfile.empty())
 		write_text_to_log_file("botbndfile = " + XParam.botbnd.inputfile + ";");
-
+*/
 	/*
 	std::string rightbndfile;
 	std::string leftbndfile;

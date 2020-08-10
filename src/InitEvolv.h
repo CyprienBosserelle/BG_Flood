@@ -15,9 +15,9 @@
 
 
 
-template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb);
+template <class T> void initevolv(Param XParam, BlockP<T> XBlock, Forcing<float> XForcing, EvolvingP<T>& XEv, T*& zb);
 template <class T> int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv);
-template <class T> void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv);
+template <class T> void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv);
 template <class T> int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T* zb);
 
 template <class T> int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb);

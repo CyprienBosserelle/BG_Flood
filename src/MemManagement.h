@@ -5,7 +5,7 @@
 #include "General.h"
 #include "Param.h"
 #include "Arrays.h"
-
+#include "Setup_GPU.h"
 
 
 template <class T> void AllocateCPU(int nx, int ny, T*& zb);
@@ -22,6 +22,8 @@ template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev);
 template <class T> void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel);
 
 int memloc(Param XParam, int i, int j, int ib);
+
+
 
 // End of global definition
 #endif

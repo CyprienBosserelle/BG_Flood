@@ -35,7 +35,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 			if (!checkBUQsanity(XParam,XModel.blocks))
 			{
 				log("Bad BUQ mesh layout\n");
-				//exit(2);
+				exit(2);
 				break;
 			}
 
@@ -46,6 +46,15 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 }
 template void Adaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
 template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
+
+//Initial adaptation also reruns initial conditions
+template <class T> void InitialAdaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
+{
+	Adaptation(XParam, XForcing, XModel);
+	InitialConditions(XParam, XForcing, XModel);
+}
+template void InitialAdaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
+template void InitialAdaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
 
 
 /*! \fn bool refinesanitycheck(Param XParam, bool*& refine, bool*& coarsen)

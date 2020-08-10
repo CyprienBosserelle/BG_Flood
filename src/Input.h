@@ -71,15 +71,7 @@ public:
 
 
 
-class bndparam {
-public:
-	std::vector<SLTS> data;
-	bool on = false;
-	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gredient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
-	std::string inputfile;
-	int nblk = 0; //number of blocks where this bnd applies
-	int side = 0; // 0: top bnd, 1: rightbnd, 2: bot bnd, 3, Left bnd
-};
+
 
 // used as vector class to store Time series outputs
 class Pointout {

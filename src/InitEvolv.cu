@@ -18,7 +18,7 @@
 
 #include "InitEvolv.h"
 
-template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv,T* &zb)
+template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> XForcing, EvolvingP<T> &XEv,T* &zb)
 {
 	//move this to a subroutine
 	int hotstartsucess = 0;
@@ -51,7 +51,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T> &
 	if (XParam.hotstartfile.empty() || hotstartsucess == 0)
 	{
 		//printf("Cold start  ");
-		log("Cold start");
+		//log("Cold start");
 		//Cold start
 		// 2 options:
 		//		(1) if zsinit is set, then apply zsinit everywhere
@@ -62,7 +62,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T> &
 
 		//case 0 (i.e. zsinint not specified by user and no boundaries were specified)
 		
-		if (std::isnan(XParam.zsinit) && (!XParam.leftbnd.on && !XParam.rightbnd.on && !XParam.topbnd.on && !XParam.botbnd.on)) //zsinit is default
+		if (std::isnan(XParam.zsinit) && (!XParam.leftbnd && !XParam.rightbnd && !XParam.topbnd && !XParam.botbnd)) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value than nan
 		}
@@ -80,14 +80,14 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock, EvolvingP<T> &
 		else // lukewarm start i.e. inv. dist interpolation of zs at bnds // Argggh!
 		{
 			log("Warm start");
-			warmstart(XParam, XBlock, zb, XEv);
+			warmstart(XParam, XForcing, XBlock, zb, XEv);
 			
 		}// end else
 		
 	}
 }
-template void initevolv<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> &XEv, float* &zb);
-template void initevolv<double>(Param XParam, BlockP< double > XBlock, EvolvingP< double > &XEv, double* &zb);
+template void initevolv<float>(Param XParam, BlockP<float> XBlock, Forcing<float> XForcing, EvolvingP<float> &XEv, float* &zb);
+template void initevolv<double>(Param XParam, BlockP< double > XBlock, Forcing<float> XForcing, EvolvingP< double > &XEv, double* &zb);
 
 
 template <class T>
@@ -129,7 +129,7 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 
 
 template <class T>
-void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
+void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
 	// This function read water level boundary if they have nbeen setup and calculate thedistance to the boundary 
 	// toward the end the water level value is calculated as an inverse distnace to the available boundaries.
@@ -172,7 +172,7 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 				jj = (yi - XParam.yo) / (XParam.ymax - XParam.yo);
 				ii = (xi - XParam.xo) / (XParam.xmax - XParam.xo);
 
-				if (XParam.leftbnd.on)
+				if (XForcing.left.on)
 				{
 					lefthere = 1.0;
 					int SLstepinbnd = 1;
@@ -181,17 +181,17 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 
 					// Do this for all the corners
 					//Needs limiter in case WLbnd is empty
-					double difft = XParam.leftbnd.data[SLstepinbnd].time - XParam.totaltime;
+					double difft = XForcing.left.data[SLstepinbnd].time - XParam.totaltime;
 
 					while (difft < 0.0)
 					{
 						SLstepinbnd++;
-						difft = XParam.leftbnd.data[SLstepinbnd].time - XParam.totaltime;
+						difft = XForcing.left.data[SLstepinbnd].time - XParam.totaltime;
 					}
 					std::vector<double> zsbndvec;
-					for (int k = 0; k < XParam.leftbnd.data[SLstepinbnd].wlevs.size(); k++)
+					for (int k = 0; k < XForcing.left.data[SLstepinbnd].wlevs.size(); k++)
 					{
-						zsbndvec.push_back(interptime(XParam.leftbnd.data[SLstepinbnd].wlevs[k], XParam.leftbnd.data[SLstepinbnd - 1].wlevs[k], XParam.leftbnd.data[SLstepinbnd].time - XParam.leftbnd.data[SLstepinbnd - 1].time, XParam.totaltime - XParam.leftbnd.data[SLstepinbnd - 1].time));
+						zsbndvec.push_back(interptime(XForcing.left.data[SLstepinbnd].wlevs[k], XForcing.left.data[SLstepinbnd - 1].wlevs[k], XForcing.left.data[SLstepinbnd].time - XForcing.left.data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.left.data[SLstepinbnd - 1].time));
 
 					}
 					if (zsbndvec.size() == 1)
@@ -208,7 +208,7 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 
 				}
 
-				if (XParam.rightbnd.on)
+				if (XForcing.right.on)
 				{
 					int SLstepinbnd = 1;
 					righthere = 1.0;
@@ -216,17 +216,17 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 
 					// Do this for all the corners
 					//Needs limiter in case WLbnd is empty
-					double difft = XParam.rightbnd.data[SLstepinbnd].time - XParam.totaltime;
+					double difft = XForcing.right.data[SLstepinbnd].time - XParam.totaltime;
 
 					while (difft < 0.0)
 					{
 						SLstepinbnd++;
-						difft = XParam.rightbnd.data[SLstepinbnd].time - XParam.totaltime;
+						difft = XForcing.right.data[SLstepinbnd].time - XParam.totaltime;
 					}
 					std::vector<double> zsbndvec;
-					for (int k = 0; k < XParam.rightbnd.data[SLstepinbnd].wlevs.size(); k++)
+					for (int k = 0; k < XForcing.right.data[SLstepinbnd].wlevs.size(); k++)
 					{
-						zsbndvec.push_back(interptime(XParam.rightbnd.data[SLstepinbnd].wlevs[k], XParam.rightbnd.data[SLstepinbnd - 1].wlevs[k], XParam.rightbnd.data[SLstepinbnd].time - XParam.rightbnd.data[SLstepinbnd - 1].time, XParam.totaltime - XParam.rightbnd.data[SLstepinbnd - 1].time));
+						zsbndvec.push_back(interptime(XForcing.right.data[SLstepinbnd].wlevs[k], XForcing.right.data[SLstepinbnd - 1].wlevs[k], XForcing.right.data[SLstepinbnd].time - XForcing.right.data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.right.data[SLstepinbnd - 1].time));
 
 					}
 					if (zsbndvec.size() == 1)
@@ -243,7 +243,7 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 
 
 				}
-				if (XParam.botbnd.on)
+				if (XForcing.bot.on)
 				{
 					int SLstepinbnd = 1;
 					bothere = 1.0;
@@ -253,17 +253,17 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 
 					// Do this for all the corners
 					//Needs limiter in case WLbnd is empty
-					double difft = XParam.botbnd.data[SLstepinbnd].time - XParam.totaltime;
+					double difft = XForcing.bot.data[SLstepinbnd].time - XParam.totaltime;
 
 					while (difft < 0.0)
 					{
 						SLstepinbnd++;
-						difft = XParam.botbnd.data[SLstepinbnd].time - XParam.totaltime;
+						difft = XForcing.bot.data[SLstepinbnd].time - XParam.totaltime;
 					}
 					std::vector<double> zsbndvec;
-					for (int k = 0; k < XParam.botbnd.data[SLstepinbnd].wlevs.size(); k++)
+					for (int k = 0; k < XForcing.bot.data[SLstepinbnd].wlevs.size(); k++)
 					{
-						zsbndvec.push_back(interptime(XParam.botbnd.data[SLstepinbnd].wlevs[k], XParam.botbnd.data[SLstepinbnd - 1].wlevs[k], XParam.botbnd.data[SLstepinbnd].time - XParam.botbnd.data[SLstepinbnd - 1].time, XParam.totaltime - XParam.botbnd.data[SLstepinbnd - 1].time));
+						zsbndvec.push_back(interptime(XForcing.bot.data[SLstepinbnd].wlevs[k], XForcing.bot.data[SLstepinbnd - 1].wlevs[k], XForcing.bot.data[SLstepinbnd].time - XForcing.bot.data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.bot.data[SLstepinbnd - 1].time));
 
 					}
 					if (zsbndvec.size() == 1)
@@ -279,7 +279,7 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 					}
 
 				}
-				if (XParam.topbnd.on)
+				if (XForcing.top.on)
 				{
 					int SLstepinbnd = 1;
 					tophere = 1.0;
@@ -289,17 +289,17 @@ void warmstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 
 					// Do this for all the corners
 					//Needs limiter in case WLbnd is empty
-					double difft = XParam.topbnd.data[SLstepinbnd].time - XParam.totaltime;
+					double difft = XForcing.top.data[SLstepinbnd].time - XParam.totaltime;
 
 					while (difft < 0.0)
 					{
 						SLstepinbnd++;
-						difft = XParam.topbnd.data[SLstepinbnd].time - XParam.totaltime;
+						difft = XForcing.top.data[SLstepinbnd].time - XParam.totaltime;
 					}
 					std::vector<double> zsbndvec;
-					for (int k= 0; k < XParam.topbnd.data[SLstepinbnd].wlevs.size(); k++)
+					for (int k= 0; k < XForcing.top.data[SLstepinbnd].wlevs.size(); k++)
 					{
-						zsbndvec.push_back(interptime(XParam.topbnd.data[SLstepinbnd].wlevs[k], XParam.topbnd.data[SLstepinbnd - 1].wlevs[k], XParam.topbnd.data[SLstepinbnd].time - XParam.topbnd.data[SLstepinbnd - 1].time, XParam.totaltime - XParam.topbnd.data[SLstepinbnd - 1].time));
+						zsbndvec.push_back(interptime(XForcing.top.data[SLstepinbnd].wlevs[k], XForcing.top.data[SLstepinbnd - 1].wlevs[k], XForcing.top.data[SLstepinbnd].time - XForcing.top.data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.top.data[SLstepinbnd - 1].time));
 
 					}
 					if (zsbndvec.size() == 1)

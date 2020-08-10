@@ -33,31 +33,31 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// Read bnd files
 	log("Read Bnd data...");
 
-	if (!XParam.leftbnd.inputfile.empty())
+	if (!XForcing.left.inputfile.empty())
 	{
 		//XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);
-		XParam.leftbnd.data = readbndfile(XParam.leftbnd.inputfile, XParam, 0);
+		XForcing.left.data = readbndfile(XForcing.left.inputfile, XParam, 0);
 
-		XParam.leftbnd.on = 1; // redundant?
+		XParam.leftbnd = true; // redundant?
 	}
-	if (!XParam.rightbnd.inputfile.empty())
+	if (!XForcing.right.inputfile.empty())
 	{
-		XParam.rightbnd.data = readbndfile(XParam.rightbnd.inputfile, XParam, 2);
-		XParam.rightbnd.on = 1;
+		XForcing.right.data = readbndfile(XForcing.right.inputfile, XParam, 2);
+		XParam.rightbnd = true;
 	}
-	if (!XParam.topbnd.inputfile.empty())
+	if (!XForcing.top.inputfile.empty())
 	{
-		XParam.topbnd.data = readbndfile(XParam.topbnd.inputfile, XParam, 3);
-		XParam.topbnd.on = 1;
+		XForcing.top.data = readbndfile(XForcing.top.inputfile, XParam, 3);
+		XParam.topbnd = true;
 	}
-	if (!XParam.botbnd.inputfile.empty())
+	if (!XForcing.bot.inputfile.empty())
 	{
-		XParam.botbnd.data = readbndfile(XParam.botbnd.inputfile, XParam, 1);
-		XParam.botbnd.on = 1;
+		XForcing.bot.data = readbndfile(XForcing.bot.inputfile, XParam, 1);
+		XParam.botbnd = true;
 	}
 
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
-	XParam.endtime = setendtime(XParam);
+	XParam.endtime = setendtime(XParam, XForcing);
 
 	log("...done");
 

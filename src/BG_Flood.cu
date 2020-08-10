@@ -95,7 +95,12 @@ int main(int argc, char **argv)
 
 	//============================================
 	// Initial adaptation
-	Adaptation(XParam, XForcing, XModel);
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	//============================================
+	// Setup GPU
+
+
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
 	TestingOutput(XParam, XModel);

@@ -5,6 +5,22 @@
 #include "General.h"
 #include "Input.h"
 
+struct TexSetP
+{
+	cudaArray* CudArr;
+	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
+	//texture<float, 2, cudaReadModeElementType> tex;
+	struct cudaResourceDesc resDesc;
+	struct cudaTextureDesc texDesc;
+	cudaTextureObject_t tex = 0;
+};
+
+struct bndTexP
+{
+	TexSetP WLS;
+	TexSetP Uvel;
+	TexSetP Vvel;
+};
 
 class forcingmap : public inputmap {
 public:
@@ -15,6 +31,8 @@ public:
 	double dt;
 	std::string inputfile;
 	std::vector<Windin> unidata; // only used if uniform forcing
+
+	TexSetP GPU;
 
 };
 
@@ -49,6 +67,24 @@ struct StaticForcingP : public inputmap
 
 };
 
+//bnd
+class bndparam {
+public:
+	std::vector<SLTS> data;
+	bool on = false;
+	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gredient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
+	std::string inputfile;
+	int nblk = 0; //number of blocks where this bnd applies
+	int side = 0; // 0: top bnd, 1: rightbnd, 2: bot bnd, 3, Left bnd
+	bndTexP gpu;
+};
+
+
+
+
+
+
+
 template <class T>
 struct Forcing
 {
@@ -64,6 +100,11 @@ struct Forcing
 
 	std::vector<River> rivers;
 
+	bndparam right;
+	bndparam left;
+	bndparam top;
+	bndparam bot;
+	
 };
 
 
