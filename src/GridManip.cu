@@ -58,7 +58,7 @@ template void InitArrayBUQ<bool, double>(Param XParam, BlockP<double> XBlock, bo
 
 template <class T, class F> void InitBlkBUQ(Param XParam, BlockP<F> XBlock, T initval, T*& Arr)
 {
-	int ib, n;
+	int ib;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
@@ -124,7 +124,7 @@ template void CopyArrayBUQ<double>(Param XParam, BlockP<double> XBlock, Evolving
 template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 {
 	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
-	int n,k;
+
 	// here the bathy of the outter most cells of the domain are "set" to the same value as the second outter most.
 	// this also applies to the blocks with no neighbour
 	for (int bl = 0; bl < XParam.nblk; bl++)

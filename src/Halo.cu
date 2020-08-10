@@ -211,10 +211,10 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 			write = memloc(XParam, -1, j, ib);
 
 			T w1, w2, w3;
-			T zi, zn1, zn2;
+			
 
 			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib?ceil(j * (T)0.5): ceil(j * (T)0.5)+ XParam.blkwidth/2;
-			w1 = 1.0 / 3.0;
+			w1 = (T)1.0 / (T)3.0;
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
 						
@@ -228,16 +228,16 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 				{
 					if (XBlock.BotRight[XBlock.LeftBot[ib]] == XBlock.LeftBot[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = (T)0.5 * (1.0 - w1);
 						w2 = w3;
 						ir = it;
 
 					}
 					else if (XBlock.level[XBlock.BotRight[XBlock.LeftBot[ib]]] < XBlock.level[XBlock.LeftBot[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 5.0 / 10.0;
-						w3 = 1.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(5.0 / 10.0);
+						w3 = T(1.0 / 10.0);
 						it = memloc(XParam, XParam.blkwidth-1, XParam.blkwidth - 1, XBlock.BotRight[XBlock.LeftBot[ib]]);
 					}
 					else if (XBlock.level[XBlock.BotRight[XBlock.LeftBot[ib]]] == XBlock.level[XBlock.LeftBot[ib]]) // exists with same level
@@ -246,9 +246,9 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 					}
 					else if (XBlock.level[XBlock.BotRight[XBlock.LeftBot[ib]]] > XBlock.level[XBlock.LeftBot[ib]]) // exists with higher level
 					{
-						w1 = 1.0 / 4.0;
-						w2 = 1.0 / 2.0;
-						w3 = 1.0 / 4.0;
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
 						it = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.BotRight[XBlock.LeftBot[ib]]);
 					}
 					
@@ -413,7 +413,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			write = memloc(XParam, XParam.blkwidth, j, ib);
 
 			T w1, w2, w3;
-			T zi, zn1, zn2;
+			
 
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
 			w1 = 1.0 / 3.0;
@@ -616,7 +616,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			write = memloc(XParam, j, -1, ib);
 
 			T w1, w2, w3;
-			T zi, zn1, zn2;
+			
 
 			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
 			w1 = 1.0 / 3.0;
@@ -820,7 +820,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			write = memloc(XParam,j, XParam.blkwidth, ib);
 
 			T w1, w2, w3;
-			T zi, zn1, zn2;
+			
 
 			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
 			w1 = 1.0 / 3.0;

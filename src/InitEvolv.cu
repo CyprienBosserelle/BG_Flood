@@ -346,7 +346,7 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				int n = memloc(XParam, i, j, ib);
 
 				if (XEv.h[n] > XParam.eps)
 				{
@@ -367,14 +367,13 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
-	int status, zserror, herror, uerror, verror, zerror, sferr, oferr, xerror, yerror;
+	int status;
 	int ncid, varid, ndims;
-	int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
-	int nx, ny, nt, ib;
-	T* xcoord, * ycoord, * varinfile; // Not necessarily identical to any prevoious ones
+	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
+	int ib;
 	double scalefac = 1.0;
 	double offset = 0.0;
-	size_t* ddim;
+	
 	std::string zbname, zsname, hname, uname, vname, xname, yname;
 	// Open the file for read access
 	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
@@ -499,7 +498,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 			}
 
 		}
-		free(ddim);
+		
 
 
 	}
@@ -523,7 +522,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 				{
 					for (int i = 0; i < XParam.blkwidth; i++)
 					{
-						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+						int n = memloc(XParam, i, j, ib);
 
 
 						XEv.h[n] = utils::max(XEv.zs[n] - zb[n], (T)XParam.eps);
