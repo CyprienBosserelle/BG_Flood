@@ -246,7 +246,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
-template <class T> void Initbnds(Param XParam,Forcing<float> XForcing, Model<T>& XModel)
+template <class T> void Initbnds(Param XParam,Forcing<float>& XForcing, Model<T>& XModel)
 {
 	// Initialise bnd block info 
 	//XParam.leftbnd.nblk were calculated in 
@@ -313,5 +313,5 @@ template <class T> void Initbnds(Param XParam,Forcing<float> XForcing, Model<T>&
 	
 
 }
-template void Initbnds<float>(Param XParam, Forcing<float> XForcing, Model<float>& XModel);
-template void Initbnds<double>(Param XParam, Forcing<float> XForcing, Model<double>& XModel);
+template void Initbnds<float>(Param XParam, Forcing<float> &XForcing, Model<float>& XModel);
+template void Initbnds<double>(Param XParam, Forcing<float> &XForcing, Model<double>& XModel);

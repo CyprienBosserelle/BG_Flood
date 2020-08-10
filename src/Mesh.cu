@@ -97,7 +97,7 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 }
 
 template <class T>
-void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
+void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 {
 	//=============================
 	// Calculate an initial number of block
@@ -134,10 +134,10 @@ void InitMesh(Param &XParam, Forcing<float> XForcing, Model<T> &XModel)
 	
 }
 
-template void InitMesh<float>(Param &XParam, Forcing<float> XForcing, Model<float> &XModel);
-template void InitMesh<double>(Param &XParam, Forcing<float> XForcing, Model<double> &XModel);
+template void InitMesh<float>(Param &XParam, Forcing<float>& XForcing, Model<float> &XModel);
+template void InitMesh<double>(Param &XParam, Forcing<float>& XForcing, Model<double> &XModel);
 
-template <class T> void InitBlockInfo(Param &XParam, Forcing<float> XForcing, BlockP<T>& XBlock)
+template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, BlockP<T>& XBlock)
 {
 	//============================
 	// Init active and level
@@ -163,7 +163,7 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> XForcing, Bl
 
 }
 
-template <class T> void InitBlockadapt(Param XParam, BlockP<T> XBlock, AdaptP& XAdap)
+template <class T> void InitBlockadapt(Param &XParam, BlockP<T> XBlock, AdaptP& XAdap)
 {
 		InitBlkBUQ(XParam, XBlock, XParam.initlevel, XAdap.newlevel);
 		InitBlkBUQ(XParam, XBlock, false, XAdap.coarsen);
@@ -184,8 +184,8 @@ template <class T> void InitBlockadapt(Param XParam, BlockP<T> XBlock, AdaptP& X
 		}
 	
 }
-template void InitBlockadapt<float>(Param XParam, BlockP<float> XBlock, AdaptP& XAdap);
-template void InitBlockadapt<double>(Param XParam, BlockP<double> XBlock, AdaptP& XAdap);
+template void InitBlockadapt<float>(Param &XParam, BlockP<float> XBlock, AdaptP& XAdap);
+template void InitBlockadapt<double>(Param &XParam, BlockP<double> XBlock, AdaptP& XAdap);
 
 
 
@@ -209,8 +209,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 			{
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					double x = XParam.xo + (i + XParam.blkwidth * nblkx)*levdx;
-					double y = XParam.yo + (j + XParam.blkwidth * nblky)*levdx;
+					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx)*levdx;
+					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky)*levdx;
 
 					//x = max(min(x, XParam.Bathymetry.xmax), XParam.Bathymetry.xo);
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);

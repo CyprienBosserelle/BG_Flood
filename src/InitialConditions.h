@@ -19,7 +19,7 @@ template <class T> void initForcing(Param XParam, Forcing<float> &XForcing, Mode
 template<class T> void Initmaparray(Model<T> &XModel);
 template <class T> void initoutput(Param &XParam, Model<T>& XModel);
 
-template <class T> void Initbnds(Param XParam, Forcing<float> XForcing, Model<T>& XModel);
+template <class T> void Initbnds(Param XParam, Forcing<float>& XForcing, Model<T>& XModel);
 
 
 // End of global definition;

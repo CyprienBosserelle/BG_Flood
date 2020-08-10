@@ -51,7 +51,7 @@ template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<d
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	Adaptation(XParam, XForcing, XModel);
-	InitialConditions(XParam, XForcing, XModel);
+	//InitialConditions(XParam, XForcing, XModel);
 }
 template void InitialAdaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
 template void InitialAdaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);

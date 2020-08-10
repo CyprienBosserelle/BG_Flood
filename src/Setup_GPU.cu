@@ -16,7 +16,7 @@ void CUDA_CHECK(cudaError CUDerr)
 	}
 }
 
-
+/*
 void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 {
 
@@ -41,7 +41,7 @@ void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 
 
 }
-
+*/
 
 
 

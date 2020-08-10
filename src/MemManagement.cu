@@ -101,6 +101,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateCPU(nblk, blksize, XModel.evmean);
 	}
+	
 	if (XParam.outvort)
 	{
 		AllocateCPU(nblk, blksize, XModel.vort);
