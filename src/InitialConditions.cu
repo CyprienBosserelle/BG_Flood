@@ -84,25 +84,12 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	
 	if (XParam.TSnodesout.size() > 0)
 	{
+		FindTSoutNodes(XParam, XModel.blocks);
 		
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)
 		{
 
-
-			//find the block where point belongs
-			for (int blk = 0; blk < XParam.nblk; blk++)
-			{
-				
-				ib = XModel.blocks.active[blk];
-				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
-				if (XParam.TSnodesout[o].x >= XModel.blocks.xo[ib] && XParam.TSnodesout[o].x <= (XModel.blocks.xo[ib] + (T)(XParam.blkwidth-1) * levdx) && XParam.TSnodesout[o].y >= XModel.blocks.yo[o] && XParam.TSnodesout[o].y <= (XModel.blocks.yo[ib] + (T)(XParam.blkwidth-1) * levdx))
-				{
-					XParam.TSnodesout[o].block = ib;
-					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XModel.blocks.xo[ib]) / levdx), 0), XParam.blkwidth - 1);
-					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XModel.blocks.yo[ib]) / levdx), 0), XParam.blkwidth - 1);
-					break;
-				}
-			}
+						
 			//Overwrite existing files
 			fsSLTS = fopen(XParam.TSnodesout[o].outname.c_str(), "w");
 			fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%dt%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
@@ -128,46 +115,40 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 
 }
 
-template <class T> void Resetoutput(Param& XParam, Model<T>& XModel)
+template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock)
 {
 	int ib;
 	T levdx;
-	FILE* fsSLTS;
+	
 	// Initialise all storage involving parameters
-	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
-	if (XParam.outmax)
-	{
-		CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evmax);
-	}
-	if (XParam.outmean)
-	{
-		CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evmean);
-	}
-	if (XParam.TSnodesout.size() > 0)
+	
+	
+	for (int o = 0; o < XParam.TSnodesout.size(); o++)
 	{
 
-		for (int o = 0; o < XParam.TSnodesout.size(); o++)
+
+		//find the block where point belongs
+		for (int blk = 0; blk < XParam.nblk; blk++)
 		{
 
-
-			//find the block where point belongs
-			for (int blk = 0; blk < XParam.nblk; blk++)
+			ib = XBlock.active[blk];
+			levdx = calcres(XParam.dx,XBlock.level[ib]);
+			if (XParam.TSnodesout[o].x >= XBlock..xo[ib] && XParam.TSnodesout[o].x <= (XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= XBlock.yo[o] && XParam.TSnodesout[o].y <= (XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
 			{
-
-				ib = XModel.blocks.active[blk];
-				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
-				if (XParam.TSnodesout[o].x >= XModel.blocks.xo[ib] && XParam.TSnodesout[o].x <= (XModel.blocks.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= XModel.blocks.yo[o] && XParam.TSnodesout[o].y <= (XModel.blocks.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
-				{
-					XParam.TSnodesout[o].block = ib;
-					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XModel.blocks.xo[ib]) / levdx), 0), XParam.blkwidth - 1);
-					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XModel.blocks.yo[ib]) / levdx), 0), XParam.blkwidth - 1);
-					break;
-				}
+				XParam.TSnodesout[o].block = ib;
+				XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XModel.blocks.xo[ib]) / levdx), 0), XParam.blkwidth - 1);
+				XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XModel.blocks.yo[ib]) / levdx), 0), XParam.blkwidth - 1);
+				break;
 			}
 		}
 	}
+	
 
 }
+template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock);
+template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock);
+
+
 
 template <class T> void initForcing(Param XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {

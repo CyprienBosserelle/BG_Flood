@@ -21,6 +21,8 @@ template <class T> void initoutput(Param &XParam, Model<T>& XModel);
 
 template <class T> void Initbnds(Param XParam, Forcing<float> XForcing, Model<T>& XModel);
 
+template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock);
+
 
 // End of global definition;
 #endif

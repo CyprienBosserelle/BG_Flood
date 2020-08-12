@@ -113,8 +113,17 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		int storage = XParam.maxTSstorage;
 		AllocateCPU(storage, 1, XModel.TSstore);
 	}
-
-
+	if (XParam.nrivers > 0)
+	{
+		//this will be eventually reallocated later
+		AllocateCPU(1, 1, XModel.bndblk.river);
+	}
+	// preallocate 1 block along all bnds
+	//this will be eventually reallocated later
+	AllocateCPU(1, 1, XModel.bndblk.left);
+	AllocateCPU(1, 1, XModel.bndblk.right);
+	AllocateCPU(1, 1, XModel.bndblk.top);
+	AllocateCPU(1, 1, XModel.bndblk.bot);
 
 }
 

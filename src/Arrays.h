@@ -77,7 +77,7 @@ struct AdaptP
 
 struct BndblockP
 {
-	int nriverblk, nleftbndblk, nrightbndblk, ntopbndblk, nbotbndblk;
+	int nblkriver, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
 	int* river;
 	//int * DrainSink;
 	//int * DrainSource;
