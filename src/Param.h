@@ -81,8 +81,14 @@ public:
 
 	//Rivers
 	//std::vector<River> Rivers; // empty vector to hold river location and discharge time series
-	int nriverblock = 0;
+	int nrivers = 0;
+	int nblkriver = 0;
 
+	// length of bnd blk, redundant from XForcing but useful
+	int nbndblkleft = 0;
+	int nbndblkright = 0;
+	int nbndblktop = 0;
+	int nbndblkbot = 0;
 	
 
 

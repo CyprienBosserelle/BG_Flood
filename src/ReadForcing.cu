@@ -27,7 +27,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// Read Bathymetry
 	readbathydata(XParam.posdown,XForcing.Bathy);
 	
-
+	bool gpgpu = XParam.GPUDEVICE >= 0;
 
 	//=================
 	// Read bnd files
@@ -39,21 +39,39 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		XForcing.left.data = readbndfile(XForcing.left.inputfile, XParam, 0);
 
 		XParam.leftbnd = true; // redundant?
+		if (gpgpu)
+		{
+			AllocateBndTEX(XForcing.left);
+		}
+		
+
 	}
 	if (!XForcing.right.inputfile.empty())
 	{
 		XForcing.right.data = readbndfile(XForcing.right.inputfile, XParam, 2);
 		XParam.rightbnd = true;
+		if (gpgpu)
+		{
+			AllocateBndTEX(XForcing.right);
+		}
 	}
 	if (!XForcing.top.inputfile.empty())
 	{
 		XForcing.top.data = readbndfile(XForcing.top.inputfile, XParam, 3);
 		XParam.topbnd = true;
+		if (gpgpu)
+		{
+			AllocateBndTEX(XForcing.top);
+		}
 	}
 	if (!XForcing.bot.inputfile.empty())
 	{
 		XForcing.bot.data = readbndfile(XForcing.bot.inputfile, XParam, 1);
 		XParam.botbnd = true;
+		if (gpgpu)
+		{
+			AllocateBndTEX(XForcing.bot);
+		}
 	}
 
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
@@ -121,8 +139,10 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		else
 		{
 			//
-			readDynforcing(XParam.totaltime, XForcing.UWind);
-			readDynforcing(XParam.totaltime, XForcing.VWind);
+			readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
+			readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
+
+			
 		}
 
 	}
@@ -141,7 +161,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			readDynforcing(XParam.totaltime, XForcing.Atmp);
+			readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
 
@@ -158,7 +178,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			readDynforcing(XParam.totaltime, XForcing.Rain);
+			readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		}
 	}
 
@@ -206,7 +226,7 @@ template void readstaticforcing<deformmap<float>>(int step, deformmap<float>& Sf
 template void readstaticforcing<StaticForcingP<float>>(int step, StaticForcingP<float>& Sforcing);
 
 //template void readstaticforcing<DynForcingP<float>>(int step, DynForcingP<float>& Sforcing);
-void readDynforcing(double totaltime,DynForcingP<float>& Dforcing)
+void readDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing);
 
@@ -215,6 +235,12 @@ void readDynforcing(double totaltime,DynForcingP<float>& Dforcing)
 	{
 		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
 		readforcingdata(totaltime, Dforcing);
+		if (gpgpu)
+		{ 
+			// Allocate and bind textures
+			AllocateTEX(Dforcing.nx, Dforcing.ny, Dforcing.GPU, Dforcing.now);
+		}
+		
 	}
 	else
 	{

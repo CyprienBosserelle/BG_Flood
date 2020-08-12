@@ -76,7 +76,7 @@ public:
 	std::string inputfile;
 	int nblk = 0; //number of blocks where this bnd applies
 	int side = 0; // 0: top bnd, 1: rightbnd, 2: bot bnd, 3, Left bnd
-	bndTexP gpu;
+	bndTexP GPU;
 };
 
 

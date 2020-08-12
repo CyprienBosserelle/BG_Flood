@@ -72,7 +72,7 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	T levdx;
 	FILE* fsSLTS;
 	// Initialise all storage involving parameters
-	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
+	//CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 	if (XParam.outmax)
 	{
 		CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evmax);
@@ -84,8 +84,7 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	
 	if (XParam.TSnodesout.size() > 0)
 	{
-		// Allocate storage memory
-		AllocateCPU(XParam.maxTSstorage, 1.0, XModel.TSstore);
+		
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)
 		{
 
@@ -126,6 +125,47 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	// Setup output netcdf file
 	//XParam = creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 
+
+}
+
+template <class T> void Resetoutput(Param& XParam, Model<T>& XModel)
+{
+	int ib;
+	T levdx;
+	FILE* fsSLTS;
+	// Initialise all storage involving parameters
+	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
+	if (XParam.outmax)
+	{
+		CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evmax);
+	}
+	if (XParam.outmean)
+	{
+		CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evmean);
+	}
+	if (XParam.TSnodesout.size() > 0)
+	{
+
+		for (int o = 0; o < XParam.TSnodesout.size(); o++)
+		{
+
+
+			//find the block where point belongs
+			for (int blk = 0; blk < XParam.nblk; blk++)
+			{
+
+				ib = XModel.blocks.active[blk];
+				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+				if (XParam.TSnodesout[o].x >= XModel.blocks.xo[ib] && XParam.TSnodesout[o].x <= (XModel.blocks.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= XModel.blocks.yo[o] && XParam.TSnodesout[o].y <= (XModel.blocks.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
+				{
+					XParam.TSnodesout[o].block = ib;
+					XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XModel.blocks.xo[ib]) / levdx), 0), XParam.blkwidth - 1);
+					XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XModel.blocks.yo[ib]) / levdx), 0), XParam.blkwidth - 1);
+					break;
+				}
+			}
+		}
+	}
 
 }
 
@@ -246,7 +286,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
-template <class T> void Initbnds(Param XParam,Forcing<float>& XForcing, Model<T>& XModel)
+template <class T> void Initbnds(Param XParam,Forcing<float> XForcing, Model<T>& XModel)
 {
 	// Initialise bnd block info 
 	//XParam.leftbnd.nblk were calculated in 
@@ -313,5 +353,5 @@ template <class T> void Initbnds(Param XParam,Forcing<float>& XForcing, Model<T>
 	
 
 }
-template void Initbnds<float>(Param XParam, Forcing<float> &XForcing, Model<float>& XModel);
-template void Initbnds<double>(Param XParam, Forcing<float> &XForcing, Model<double>& XModel);
+template void Initbnds<float>(Param XParam, Forcing<float> XForcing, Model<float>& XModel);
+template void Initbnds<double>(Param XParam, Forcing<float> XForcing, Model<double>& XModel);

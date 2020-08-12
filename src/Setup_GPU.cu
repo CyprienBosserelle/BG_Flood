@@ -16,7 +16,7 @@ void CUDA_CHECK(cudaError CUDerr)
 	}
 }
 
-/*
+
 void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 {
 
@@ -41,7 +41,64 @@ void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 
 
 }
-*/
+
+
+void AllocateBndTEX(bndparam & side)
+{
+	int nbndtimes = (int)side.data.size();
+	int nbndvec = (int)side.data[0].wlevs.size();
+	
+	float* lWLS;
+	lWLS = (float*)malloc(nbndtimes * nbndvec * sizeof(float));
+
+	for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+	{
+		for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+		{
+			//
+			lWLS[ibndt + ibndv * nbndtimes] = (float)side.data[ibndt].wlevs[ibndv];
+		}
+	}
+	AllocateTEX(nbndtimes, nbndvec, side.GPU.WLS, lWLS);
+	
+	// In case of Nesting U and V are also prescribed
+
+	// If uu information is available in the boundary we can assume it is a nesting type of bnd
+	int nbndvecuu = (int)side.data[0].uuvel.size();
+	if (nbndvecuu == nbndvec)
+	{
+		//
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				lWLS[ibndt + ibndv * nbndtimes] = (float)side.data[ibndt].uuvel[ibndv];
+			}
+		}
+		AllocateTEX(nbndtimes, nbndvec, side.GPU.Uvel, lWLS);
+		
+	}
+	//V velocity side
+	int nbndvecvv = (int)side.data[0].vvvel.size();
+
+	if (nbndvecvv == nbndvec)
+	{
+		for (int ibndv = 0; ibndv < nbndvec; ibndv++)
+		{
+			for (int ibndt = 0; ibndt < nbndtimes; ibndt++)
+			{
+				//
+				lWLS[ibndt + ibndv * nbndtimes] = (float)side.data[ibndt].vvvel[ibndv];
+			}
+		}
+		AllocateTEX(nbndtimes, nbndvec, side.GPU.Vvel, lWLS);
+	}
+
+	free(lWLS);
+
+
+}
 
 
 

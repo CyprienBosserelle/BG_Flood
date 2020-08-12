@@ -41,6 +41,19 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 
 
 		}
+		//=====================================
+		// Initialise Friction map
+
+		if (!XForcing.cf.inputfile.empty())
+		{
+			interp2BUQ(XParam, XModel.blocks, XForcing.cf, XModel.cf);
+		}
+		else
+		{
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.cf, XModel.cf);
+		}
+		// Set edges of friction map
+		setedges(XParam, XModel.blocks, XModel.cf);
 
 	}
 }
@@ -51,7 +64,8 @@ template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<d
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	Adaptation(XParam, XForcing, XModel);
-	//InitialConditions(XParam, XForcing, XModel);
+	
+
 }
 template void InitialAdaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
 template void InitialAdaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);

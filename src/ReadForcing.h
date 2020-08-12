@@ -9,6 +9,7 @@
 #include "read_netcdf.h"
 #include "Forcing.h"
 #include "Util_CPU.h"
+#include "Setup_GPU.h"
 
 template<class T> void readforcing(Param& XParam, Forcing<T> & XForcing);
 
@@ -21,7 +22,7 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename);
 std::vector<Windin> readINfileUNI(std::string filename);
 std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 
-void readDynforcing(double totaltime, DynForcingP<float>& Dforcing);
+void readDynforcing(bool gpgpu,double totaltime, DynForcingP<float>& Dforcing);
 
 template<class T> T readforcinghead(T Fmap);
 //template<class T> T readBathyhead(T BathyParam);
