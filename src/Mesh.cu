@@ -161,7 +161,7 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, B
 	//============================
 	// Init neighbours
 	InitBlockneighbours(XParam, XForcing, XBlock);
-	Calcbndblks(XParam, XForcing, XBlock)
+	Calcbndblks(XParam, XForcing, XBlock);
 
 }
 
@@ -354,7 +354,7 @@ template <class T> void Calcbndblks(Param &XParam, Forcing<float>& XForcing, Blo
 	//=====================================
 	// Find how many blocks are on each bnds
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
-
+	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
 
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
 
@@ -429,6 +429,8 @@ template <class T> void Findbndblks(Param XParam, Model<T> &XModel)
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
 	BlockP<T> XBlock = XModel.blocks;
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
+	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+
 
 	// Reallocate array if necessary
 	ReallocArray(XParam.nbndblkleft, 1, XModel.bndblk.left);

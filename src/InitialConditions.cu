@@ -133,11 +133,11 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock)
 
 			ib = XBlock.active[blk];
 			levdx = calcres(XParam.dx,XBlock.level[ib]);
-			if (XParam.TSnodesout[o].x >= XBlock..xo[ib] && XParam.TSnodesout[o].x <= (XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= XBlock.yo[o] && XParam.TSnodesout[o].y <= (XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
+			if (XParam.TSnodesout[o].x >= XBlock.xo[ib] && XParam.TSnodesout[o].x <= (XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= XBlock.yo[o] && XParam.TSnodesout[o].y <= (XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
 			{
 				XParam.TSnodesout[o].block = ib;
-				XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XModel.blocks.xo[ib]) / levdx), 0), XParam.blkwidth - 1);
-				XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XModel.blocks.yo[ib]) / levdx), 0), XParam.blkwidth - 1);
+				XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - XBlock.xo[ib]) / levdx), 0), XParam.blkwidth - 1);
+				XParam.TSnodesout[o].j = min(max((int)round((XParam.TSnodesout[o].y - XBlock.yo[ib]) / levdx), 0), XParam.blkwidth - 1);
 				break;
 			}
 		}
@@ -214,9 +214,9 @@ template <class T> void initForcing(Param XParam, Forcing<float> &XForcing, Mode
 		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
 		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
 		
-		AllocateCPU(activeRiverBlk.size(), 1, XModel.bndblk.river);
+		ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
 
-		XModel.bndblk.nriverblk = activeRiverBlk.size();
+		XModel.bndblk.nblkriver = activeRiverBlk.size();
 
 		for (int b = 0; b < activeRiverBlk.size(); b++)
 		{
@@ -271,10 +271,10 @@ template <class T> void Initbnds(Param XParam,Forcing<float> XForcing, Model<T>&
 {
 	// Initialise bnd block info 
 	//XParam.leftbnd.nblk were calculated in 
-	AllocateCPU(XForcing.left.nblk, 1, XModel.bndblk.left);
-	AllocateCPU(XForcing.right.nblk, 1, XModel.bndblk.right);
-	AllocateCPU(XForcing.top.nblk, 1, XModel.bndblk.top);
-	AllocateCPU(XForcing.bot.nblk, 1, XModel.bndblk.bot);
+	ReallocArray(XForcing.left.nblk, 1, XModel.bndblk.left);
+	ReallocArray(XForcing.right.nblk, 1, XModel.bndblk.right);
+	ReallocArray(XForcing.top.nblk, 1, XModel.bndblk.top);
+	ReallocArray(XForcing.bot.nblk, 1, XModel.bndblk.bot);
 	
 	int blbr, blbb, blbl, blbt;
 	int leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
