@@ -68,11 +68,6 @@ public:
 };
 
 
-
-
-
-
-
 // used as vector class to store Time series outputs
 class Pointout {
 public:

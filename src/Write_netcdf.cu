@@ -16,8 +16,9 @@ void handle_ncerror(int status) {
 }
 
 template<class T>
-Param creatncfileBUQ(Param XParam,int * activeblk, int * level, T * blockxo, T * blockyo)
+void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo)
 {
+
 	int status;
 	int nx, ny;
 	//double dx = XParam.dx;
@@ -314,15 +315,23 @@ Param creatncfileBUQ(Param XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
 
-	return XParam;
+	
 
 
-	//return XParam;
+	//return XParam;void
 }
 
-template Param creatncfileBUQ<float>(Param XParam, int* activeblk, int* level, float* blockxo, float* blockyo);
-template Param creatncfileBUQ<double>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo);
+template void creatncfileBUQ<float>(Param &XParam, int* activeblk, int* level, float* blockxo, float* blockyo);
+template void creatncfileBUQ<double>(Param &XParam, int* activeblk, int* level, double* blockxo, double* blockyo);
 
+
+template<class T>
+void creatncfileBUQ(Param &XParam, BlockP<T> XBlock)
+{
+	creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo);
+}
+template void creatncfileBUQ<float>(Param &XParam, BlockP<float> XBlock);
+template void creatncfileBUQ<double>(Param &XParam, BlockP<double> XBlock);
 
 template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, T * blockxo, T *blockyo, std::string varst, int vdim, T * var)
 {
@@ -717,3 +726,57 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 template void writencvarstepBUQ<float>(Param XParam, int vdim, int * activeblk, int* level, float * blockxo, float *blockyo, std::string varst, float * var);
 template void writencvarstepBUQ<double>(Param XParam, int vdim, int * activeblk, int* level, double * blockxo, double *blockyo, std::string varst, double * var);
+
+extern "C" void writenctimestep(std::string outfile, double totaltime)
+{
+	int status, ncid, recid, time_id;
+	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+	static size_t nrec;
+	static size_t tst[] = { 0 };
+	//read id from time dimension
+	status = nc_inq_unlimdim(ncid, &recid);
+	if (status != NC_NOERR) handle_ncerror(status);
+	status = nc_inq_dimlen(ncid, recid, &nrec);
+	if (status != NC_NOERR) handle_ncerror(status);
+	status = nc_inq_varid(ncid, "time", &time_id);
+	if (status != NC_NOERR) handle_ncerror(status);
+	tst[0] = nrec;
+	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
+	if (status != NC_NOERR) handle_ncerror(status);
+	//close and save
+	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+}
+
+template <class T> void InitSave2Netcdf(Param XParam, Model<T> XModel)
+{
+	if (!XParam.outvars.empty())
+	{
+		log("Create netCDF output file...");
+		creatncfileBUQ(XParam, XModel.blocks);
+		//creatncfileBUQ(XParam);
+		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+		{
+
+			defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], 3, XModel.OutputVarMap[XParam.outvars[ivar]]);
+
+		}
+	}
+}
+template void InitSave2Netcdf<float>(Param XParam, Model<float> XModel);
+template void InitSave2Netcdf<double>(Param XParam, Model<double> XModel);
+
+
+template <class T> void Save2Netcdf(Param XParam, Model<T> XModel)
+{
+	if (!XParam.outvars.empty())
+	{
+		writenctimestep(XParam.outfile, XParam.totaltime);
+		//creatncfileBUQ(XParam);
+		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+		{
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]]);
+		}
+	}
+}

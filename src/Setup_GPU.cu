@@ -12,6 +12,16 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel, Model<T>& XModel
 
 		// Copy arrays from CPU to GPU
 		CopytoGPU(XParam.nblk, XParam.blksize, XParam, XModel, XModel_g);
+
+		// Reset GPU mean and max arrays
+		if (XParam.outmax)
+		{
+			//ResetmaxvarGPU(XParam);
+		}
+		if (XParam.outmean)
+		{
+			//ResetmeanvarGPU(XParam);
+		}
 	}
 }
 template void SetupGPU<float>(Param XParam, Model<float> XModel, Model<float>& XModel_g);
@@ -194,6 +204,8 @@ void AllocateBndTEX(bndparam & side)
 
 }
 
+template <class T> void ResetvarGPU(Param XParam, EvolvingP<T>& XEV)
+{
 
-
+}
 

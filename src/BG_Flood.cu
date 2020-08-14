@@ -99,15 +99,37 @@ int main(int argc, char **argv)
 
 	//============================================
 	// Setup GPU (bypassed within the function if no suitable GPU is available)
+	SetupGPU(XParam, XModel, XModel_g);
 
+	//
+
+	//===========================================
+	//   End of Initialisation time
+	//===========================================
+	XParam.setupcputime = clock();
+	//============================================
+	// MainLoop
+	if (XParam.GPUDEVICE < 0)
+	{
+		//MainloopCPU
+	}
+	else
+	{
+		//MainloopGPU
+	}
 
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
 	TestingOutput(XParam, XModel);
 
-
-
 	
+
+	//===========================================
+	//   End of Model
+	//===========================================
+	XParam.endcputime = clock();
+	//============================================
+	// Cleanup and free memory
 
 	exit(0);
 }

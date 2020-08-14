@@ -5,7 +5,7 @@
 #include "General.h"
 #include "Input.h"
 #include "Param.h"
-#include "Write_txt.h"
+#include "Write_txtlog.h"
 #include "read_netcdf.h"
 #include "Forcing.h"
 #include "Util_CPU.h"

@@ -15,7 +15,7 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.         //
 //////////////////////////////////////////////////////////////////////////////////
 
-#include "Write_txt.h"
+#include "Write_txtlog.h"
 
 
 

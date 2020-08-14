@@ -5,7 +5,7 @@
 #include "General.h"
 #include "Input.h"
 #include "ReadInput.h"
-#include "Write_txt.h"
+#include "Write_txtlog.h"
 #include "Write_netcdf.h"
 #include "Util_CPU.h"
 #include "GridManip.h"

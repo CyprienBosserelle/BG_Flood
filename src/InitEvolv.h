@@ -8,7 +8,7 @@
 #include "MemManagement.h"
 #include "Util_CPU.h"
 #include "Arrays.h"
-#include "Write_txt.h"
+#include "Write_txtlog.h"
 #include "GridManip.h"
 #include "Read_netcdf.h"
 #include "ReadForcing.h"

@@ -152,7 +152,40 @@ struct Model
 
 };
 
+// structure of useful variable for runing the main loop
+template <class T>
+struct Loop
+{
+	double nextoutputtime;
+	double dt;
+	double dtmax;
+	double totaltime;
+	// Needed to average mean varable for output
+	int nstep = 0;
 
+	// usefull for Time series output
+	int nTSsteps = 0;
+	std::vector< std::vector< Pointout > > TSAllout;
+
+	int windstep = 1;
+	int atmpstep = 1;
+	int rainstep = 1;
+
+	bool winduniform;
+	bool rainuniform;
+	bool atmpuniform;
+
+	T uwinduni = T(0.0);
+	T vwinduni = T(0.0);
+	T atmpuni;
+	T rainuni = T(0.0);
+
+	dim3 blockDim;// (16, 16, 1);
+	dim3 gridDim;
+
+
+
+};
 
 
 

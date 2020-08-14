@@ -103,7 +103,7 @@ public:
 	//std::string deformfile;
 	int hotstep = 0; //step to read if hotstart file has multiple steps
 	//other
-	clock_t startcputime, endcputime;
+	clock_t startcputime, endcputime, setupcputime;
 	
 	//Netcdf parameters
 	int smallnc = 1;//default save as short integer if smallnc=0 then save all variables as float

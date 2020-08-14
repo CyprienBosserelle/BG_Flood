@@ -5,7 +5,7 @@
 
 #include "General.h"
 #include "Param.h"
-#include "Write_txt.h"
+#include "Write_txtlog.h"
 #include "ReadInput.h"
 #include "ReadForcing.h"
 #include "Setup_GPU.h"

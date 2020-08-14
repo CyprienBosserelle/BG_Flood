@@ -1,6 +1,6 @@
 
-#ifndef WRITETXT_H
-#define WRITETXT_H
+#ifndef WRITETXTLOG_H
+#define WRITETXTLOG_H
 
 #include "General.h"
 #include "Param.h"

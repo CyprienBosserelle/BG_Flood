@@ -87,22 +87,12 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	if (XParam.TSnodesout.size() > 0)
 	{
 		FindTSoutNodes(XParam, XModel.blocks);
-		
+
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)
 		{
-
-						
-			//Overwrite existing files
-			fsSLTS = fopen(XParam.TSnodesout[o].outname.c_str(), "w");
-			fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%dt%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
-			fclose(fsSLTS);
-
 			// Add empty row for each output point
 			XModel.TSallout.push_back(std::vector<Pointout>());
-
 		}
-
-
 	}
 	
 
@@ -115,6 +105,21 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	//XParam = creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 
 
+}
+
+void InitTSOutput(Param XParam)
+{
+	for (int o = 0; o < XParam.TSnodesout.size(); o++)
+	{
+		FILE* fsSLTS;
+
+		//Overwrite existing files
+		fsSLTS = fopen(XParam.TSnodesout[o].outname.c_str(), "w");
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%dt%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
+		fclose(fsSLTS);
+		
+
+	}
 }
 
 template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock)

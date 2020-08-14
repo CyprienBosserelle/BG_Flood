@@ -13,7 +13,7 @@ void TestingOutput(Param XParam, Model<T> XModel)
 {
 	std::string outvar;
 	//log(std::to_string(XForcing.Bathy.val[50]));
-	XParam = creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
+	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 	outvar = "h";
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar]);
 	outvar = "u";
