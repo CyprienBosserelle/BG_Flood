@@ -14,7 +14,7 @@
 
 
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel);
-template <class T> void InitialAdaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel);
+template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel);
 template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock, bool*& refine, bool*& coarsen);
 int checkneighbourrefine(int neighbourib, int levelib, int levelneighbour, bool*& refine, bool*& coarsen);
 

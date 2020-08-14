@@ -61,14 +61,24 @@ template void Adaptation<float>(Param& XParam, Forcing<float> XForcing, Model<fl
 template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
 
 //Initial adaptation also reruns initial conditions
-template <class T> void InitialAdaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
+template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel)
 {
 	Adaptation(XParam, XForcing, XModel);
+
+	//recalculate river positions (They may belong to a different block)
+	InitRivers(XParam, XForcing, XModel);
 	
+	//rerun boundary block (there may be new bnd block and old ones that do not belong anymore)
+	//Initbnds(XParam, XForcing, XModel);
+	Calcbndblks(XParam, XForcing, XModel.blocks);
+	Findbndblks(XParam, XModel);
+
+	// Re run initial contions to avoid dry/wet issues
+	initevolv(XParam, XModel.blocks, XForcing, XModel.evolv, XModel.zb);
 
 }
-template void InitialAdaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
-template void InitialAdaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
+template void InitialAdaptation<float>(Param& XParam, Forcing<float> &XForcing, Model<float>& XModel);
+template void InitialAdaptation<double>(Param& XParam, Forcing<float> &XForcing, Model<double>& XModel);
 
 
 /*! \fn bool refinesanitycheck(Param XParam, bool*& refine, bool*& coarsen)

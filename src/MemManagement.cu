@@ -236,7 +236,7 @@ template void ReallocArray<double>(int nblk, int blksize, Param XParam, Model<do
 
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g)
 {
-	CUDA_CHECK(cudaMalloc((void**)& z_g, nx * ny * sizeof(T)));
+	CUDA_CHECK(cudaMalloc((void**)& z_g, T(nx) * T(ny) * sizeof(T)));
 }
 
 template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v)
@@ -335,7 +335,7 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateGPU(storage, 1, XModel.TSstore);
 	}
 
-	// Allocate textures for boundary and forcing is done in ... Forcing GPU
+	// Allocate textures for boundary and forcing is done in init forcing
 
 
 

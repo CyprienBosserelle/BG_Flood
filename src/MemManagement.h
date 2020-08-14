@@ -23,7 +23,7 @@ template <class T> void ReallocArray(int nblk, int blksize, Param XParam, Model<
 
 int memloc(Param XParam, int i, int j, int ib);
 
-
+template <class T> void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel);
 
 // End of global definition
 #endif

@@ -15,6 +15,7 @@
 #include "Mesh.h"
 #include "InitialConditions.h"
 #include "Adaptation.h"
+#include "Setup_GPU.h"
 
 #include "Testing.h"
 

@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 	InitialAdaptation(XParam, XForcing, XModel);
 
 	//============================================
-	// Setup GPU
+	// Setup GPU (bypassed within the function if no suitable GPU is available)
 
 
 

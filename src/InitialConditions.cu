@@ -51,11 +51,13 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 	//=====================================
 	// Initial forcing
-	initForcing(XParam, XForcing, XModel);
+	InitRivers(XParam, XForcing, XModel);
 
 	//=====================================
 	// Initial bndinfo
-	Initbnds(XParam, XForcing, XModel);
+	Calcbndblks(XParam, XForcing, XModel.blocks);
+	Findbndblks(XParam, XModel);
+
 	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
@@ -150,7 +152,7 @@ template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock);
 
 
 
-template <class T> void initForcing(Param XParam, Forcing<float> &XForcing, Model<T> &XModel)
+template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {
 	//========================
 	// River discharge
@@ -213,8 +215,10 @@ template <class T> void initForcing(Param XParam, Forcing<float> &XForcing, Mode
 		}
 		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
 		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
-		
-		ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
+		if (activeRiverBlk.size() > XModel.bndblk.nblkriver)
+		{
+			ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
+		}
 
 		XModel.bndblk.nblkriver = activeRiverBlk.size();
 
@@ -228,8 +232,8 @@ template <class T> void initForcing(Param XParam, Forcing<float> &XForcing, Mode
 
 }
 
-template void initForcing<float>(Param XParam, Forcing<float> &XForcing, Model<float> &XModel);
-template void initForcing<double>(Param XParam, Forcing<float> &XForcing, Model<double> &XModel);
+template void InitRivers<float>(Param XParam, Forcing<float> &XForcing, Model<float> &XModel);
+template void InitRivers<double>(Param XParam, Forcing<float> &XForcing, Model<double> &XModel);
 
 
 template<class T> void Initmaparray(Model<T>& XModel)
@@ -267,72 +271,148 @@ template<class T> void Initmaparray(Model<T>& XModel)
 template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
-template <class T> void Initbnds(Param XParam,Forcing<float> XForcing, Model<T>& XModel)
-{
-	// Initialise bnd block info 
-	//XParam.leftbnd.nblk were calculated in 
-	ReallocArray(XForcing.left.nblk, 1, XModel.bndblk.left);
-	ReallocArray(XForcing.right.nblk, 1, XModel.bndblk.right);
-	ReallocArray(XForcing.top.nblk, 1, XModel.bndblk.top);
-	ReallocArray(XForcing.bot.nblk, 1, XModel.bndblk.bot);
-	
-	int blbr, blbb, blbl, blbt;
-	int leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
 
-	blbr = blbb = blbl = blbt = 0;
+
+template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
+{
+	//=====================================
+	// Find how many blocks are on each bnds
+	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
+	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+
+	T initlevdx = calcres(XParam.dx, XParam.initlevel);
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		double espdist = 0.00000001;///WARMING
-		int ib = XModel.blocks.active[ibl];
 
-		T levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+		int ib = XBlock.active[ibl];
 
-		leftxo = XModel.blocks.xo[ib]; // in adaptive this shoulbe be a range
-		leftyo = XModel.blocks.yo[ib];
-		rightxo = XModel.blocks.xo[ib] + (XParam.blkwidth-1) * levdx;
-		rightyo = XModel.blocks.yo[ib];
-		topxo = XModel.blocks.xo[ib];
-		topyo = XModel.blocks.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XModel.blocks.xo[ib];
-		botyo = XModel.blocks.yo[ib];
+		T levdx = calcres(XParam.dx, XBlock.level[ib]);
 
-		if ((rightxo - XParam.xmax) > (-1.0 * levdx))
+		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
+
+		leftyo = XBlock.yo[ib];
+		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
+		rightyo = XBlock.yo[ib];
+		topxo = XBlock.xo[ib];
+		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
+		botxo = XBlock.xo[ib];
+		botyo = XBlock.yo[ib];
+
+		if ((rightxo - XParam.xmax) > (-1.0 * initlevdx))
 		{
 			//
+			blbr++;
+			//bndrightblk[blbr] = bl;
 
+		}
+
+		if ((topyo - XParam.ymax) > (-1.0 * initlevdx))
+		{
+			//
+			blbt++;
+			//bndtopblk[blbt] = bl;
+
+		}
+		if ((XParam.yo - botyo) > (-1.0 * initlevdx))
+		{
+			//
+			blbb++;
+			//bndbotblk[blbb] = bl;
+
+		}
+		if ((XParam.xo - leftxo) > (-1.0 * initlevdx))
+		{
+			//
+			blbl++;
+			//bndleftblk[blbl] = bl;
+
+		}
+	}
+
+	// fill
+	XForcing.left.nblk = blbl;
+	XForcing.right.nblk = blbr;
+	XForcing.top.nblk = blbt;
+	XForcing.bot.nblk = blbb;
+
+	XParam.nbndblkleft = blbl;
+	XParam.nbndblkright = blbr;
+	XParam.nbndblktop = blbt;
+	XParam.nbndblkbot = blbb;
+
+
+}
+
+
+template <class T> void Findbndblks(Param XParam, Model<T>& XModel)
+{
+	//=====================================
+	// Find how many blocks are on each bnds
+	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
+	BlockP<T> XBlock = XModel.blocks;
+	T initlevdx = calcres(XParam.dx, XParam.initlevel);
+	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+
+
+	// Reallocate array if necessary
+	ReallocArray(XParam.nbndblkleft, 1, XModel.bndblk.left);
+	ReallocArray(XParam.nbndblkright, 1, XModel.bndblk.right);
+	ReallocArray(XParam.nbndblktop, 1, XModel.bndblk.top);
+	ReallocArray(XParam.nbndblkbot, 1, XModel.bndblk.bot);
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		double espdist = 0.00000001;///WARMING
+
+		int ib = XBlock.active[ibl];
+		T levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
+
+		leftyo = XBlock.yo[ib];
+		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
+		rightyo = XBlock.yo[ib];
+		topxo = XBlock.xo[ib];
+		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
+		botxo = XBlock.xo[ib];
+		botyo = XBlock.yo[ib];
+
+		if ((rightxo - XParam.xmax) > (-1.0 * initlevdx))
+		{
+			//
 			XModel.bndblk.right[blbr] = ib;
 			blbr++;
 
 		}
 
-		if ((topyo - XParam.ymax) > (-1.0 * levdx))
+		if ((topyo - XParam.ymax) > (-1.0 * initlevdx))
 		{
 			//
-
 			XModel.bndblk.top[blbt] = ib;
 			blbt++;
 
 		}
-		if ((XParam.yo - botyo) > (-1.0 * levdx))
+		if ((XParam.yo - botyo) > (-1.0 * initlevdx))
 		{
 			//
-
 			XModel.bndblk.bot[blbb] = ib;
 			blbb++;
 
 		}
-		if ((XParam.xo - leftxo) > (-1.0 * levdx))
+		if ((XParam.xo - leftxo) > (-1.0 * initlevdx))
 		{
 			//
-
 			XModel.bndblk.left[blbl] = ib;
 			blbl++;
-			
 
 		}
 	}
-	
+
+
+
 
 }
-template void Initbnds<float>(Param XParam, Forcing<float> XForcing, Model<float>& XModel);
-template void Initbnds<double>(Param XParam, Forcing<float> XForcing, Model<double>& XModel);
+

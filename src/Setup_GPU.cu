@@ -1,6 +1,23 @@
 
 #include "Setup_GPU.h"
 
+
+
+template <class T> void SetupGPU(Param XParam, Model<T> XModel, Model<T>& XModel_g)
+{
+	if (XParam.GPUDEVICE >= 0)
+	{
+		//Allocate memory for the model on the GPU
+		AllocateGPU(XParam.nblk, XParam.blksize, XParam, XModel_g);
+
+		// Copy arrays from CPU to GPU
+		CopytoGPU(XParam.nblk, XParam.blksize, XParam, XModel, XModel_g);
+	}
+}
+template void SetupGPU<float>(Param XParam, Model<float> XModel, Model<float>& XModel_g);
+template void SetupGPU<double>(Param XParam, Model<double> XModel, Model<double>& XModel_g);
+
+
 void CUDA_CHECK(cudaError CUDerr)
 {
 
@@ -15,6 +32,83 @@ void CUDA_CHECK(cudaError CUDerr)
 
 	}
 }
+
+
+template <class T> void CopytoGPU(int nblk, int blksize, T * z_cpu, T* &z_gpu)
+{
+	CUDA_CHECK(cudaMemcpy(z_gpu, z_cpu, nblk * blksize * sizeof(T), cudaMemcpyHostToDevice));
+}
+template void CopytoGPU<bool>(int nblk, int blksize, bool* z_cpu, bool* &z_gpu);
+template void CopytoGPU<int>(int nblk, int blksize, int* z_cpu, int* &z_gpu);
+template void CopytoGPU<float>(int nblk, int blksize, float* z_cpu, float* &z_gpu);
+template void CopytoGPU<double>(int nblk, int blksize, double* z_cpu, double* &z_gpu);
+
+template <class T> void CopytoGPU(int nblk, int blksize, EvolvingP<T> XEv_cpu, EvolvingP<T> &XEv_gpu)
+{
+	CopytoGPU(nblk, blksize, XEv_cpu.h, XEv_gpu.h);
+	CopytoGPU(nblk, blksize, XEv_cpu.zs, XEv_gpu.zs);
+	CopytoGPU(nblk, blksize, XEv_cpu.u, XEv_gpu.u);
+	CopytoGPU(nblk, blksize, XEv_cpu.v, XEv_gpu.v);
+}
+template <class T> void CopytoGPU(int nblk, int blksize, GradientsP<T> XGrad_cpu, GradientsP<T>& XGrad_gpu)
+{
+	CopytoGPU(nblk, blksize, XGrad_cpu.dhdx, XGrad_gpu.dhdx);
+	CopytoGPU(nblk, blksize, XGrad_cpu.dhdy, XGrad_gpu.dhdy);
+	CopytoGPU(nblk, blksize, XGrad_cpu.dudx, XGrad_gpu.dudx);
+	CopytoGPU(nblk, blksize, XGrad_cpu.dudy, XGrad_gpu.dudy);
+	CopytoGPU(nblk, blksize, XGrad_cpu.dvdx, XGrad_gpu.dvdx);
+	CopytoGPU(nblk, blksize, XGrad_cpu.dvdy, XGrad_gpu.dvdy);
+	CopytoGPU(nblk, blksize, XGrad_cpu.dzsdx, XGrad_gpu.dzsdx);
+	CopytoGPU(nblk, blksize, XGrad_cpu.dzsdy, XGrad_gpu.dzsdy);
+}
+
+
+template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> XModel_cpu, Model<T>& XModel_gpu)
+{
+	CopytoGPU(nblk, blksize, XModel_cpu.zb, XModel_gpu.zb);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evolv);
+	//CopytoGPU(nblk, blksize, XModel_cpu.evolv_o, XModel_gpu.evolv_o);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evolv);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.cf, XModel_gpu.cf);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.zb, XModel_gpu.zb);
+
+
+	//Block info
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.active, XModel_gpu.blocks.active);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.level, XModel_gpu.blocks.level);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.xo, XModel_gpu.blocks.xo);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.yo, XModel_gpu.blocks.yo);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.BotLeft, XModel_gpu.blocks.BotLeft);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.BotRight, XModel_gpu.blocks.BotRight);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.TopLeft, XModel_gpu.blocks.TopLeft);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.TopRight, XModel_gpu.blocks.TopRight);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.LeftBot, XModel_gpu.blocks.LeftBot);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.LeftTop, XModel_gpu.blocks.LeftTop);
+
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.RightBot, XModel_gpu.blocks.RightBot);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.RightTop, XModel_gpu.blocks.RightTop);
+	
+
+	if (XParam.outmax)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evmax);
+	}
+	if (XParam.outmean)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evmean);
+	}
+
+}
+template void CopytoGPU<float>(int nblk, int blksize, Param XParam, Model<float> XModel_cpu, Model<float>& XModel_gpu);
+template void CopytoGPU<double>(int nblk, int blksize, Param XParam, Model<double> XModel_cpu, Model<double>& XModel_gpu);
 
 
 void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
