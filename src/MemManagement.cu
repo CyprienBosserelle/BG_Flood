@@ -6,6 +6,11 @@ __host__ int memloc(Param XParam, int i, int j, int ib)
 	return (i+XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 }
 
+__device__ int memloc(int halowidth, int blkmemwidth,int  blksize, int i, int j, int ib)
+{
+	return (i + halowidth) + (j + halowidth) * blkmemwidth + ib * blksize;
+}
+
 template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zb)
 {
 	zb = (T *)malloc(nx*ny * sizeof(T));

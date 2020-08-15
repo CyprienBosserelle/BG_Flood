@@ -22,6 +22,7 @@ template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev);
 template <class T> void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel);
 
 int memloc(Param XParam, int i, int j, int ib);
+__device__ int memloc(int halowidth, int blkmemwidth, int  blksize, int i, int j, int ib);
 
 template <class T> void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel);
 
