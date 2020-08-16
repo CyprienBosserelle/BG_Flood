@@ -2,21 +2,23 @@
 
 
 
-template <class T> void MainLoopCPU(Param XParam, Forcing<float> XForcing, Model<T> XModel)
+template <class T> void MainLoop(Param XParam, Forcing<float> XForcing, Model<T> XModel)
 {
 	//Define some useful variables 
 	BlockP<T> XBlock = XModel.blocks;
 	Loop<T> XLoop = InitLoop(XParam,XModel);
 
-	while (XLoop.totaltime < XParam.endtime)
+	//while (XLoop.totaltime < XParam.endtime)
 	{
-
+		//
 	}
 
 }
+template void MainLoop<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel);
+template void MainLoop<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel);
 
  
-template <class T> Loop<T> InitLoop(Param XParam, Model<T> XModel)
+template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 {
 	Loop<T> XLoop;
 	XLoop.atmpuni = XParam.Paref;
@@ -30,50 +32,61 @@ template <class T> Loop<T> InitLoop(Param XParam, Model<T> XModel)
 	// GPU stuff
 	if (XParam.GPUDEVICE >= 0)
 	{
-		XLoop.blockDim = make_int3(16, 16, 1);
-		XLoop.gridDim= make_int3(XParam.nblk, 1, 1);
+		XLoop.blockDim = (16, 16, 1);
+		XLoop.gridDim = (XParam.nblk, 1, 1);
 	}
 
 	//Reset mean
-	if (XParam.GPUDEVICE >= 0)
-	{
-		//
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.evmean.h);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.evmean.zs);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.evmean.u);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.evmean.v);
-		CUDA_CHECK(cudaDeviceSynchronize());
-	}
-	else
-	{
-		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evmean.h);
-		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evmean.zs);
-		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evmean.u);
-		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evmean.v);
-	}
+	resetmean(XParam, XLoop, XModel.blocks, XModel.evmean);
 
 	//Reset Max
-	if (XParam.GPUDEVICE >= 0)
-	{
-		//
-		reset_var <<<XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, std::numeric_limits<T>::min(), XModel.evmax.h);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, std::numeric_limits<T>::min(), XModel.evmax.zs);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, std::numeric_limits<T>::min(), XModel.evmax.u);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, std::numeric_limits<T>::min(), XModel.evmax.v);
-		CUDA_CHECK(cudaDeviceSynchronize());
-	}
-	else
-	{
-		InitArrayBUQ(XParam, XModel.blocks, std::numeric_limits<T>::min(), XModel.evmax.h);
-		InitArrayBUQ(XParam, XModel.blocks, std::numeric_limits<T>::min(), XModel.evmax.zs);
-		InitArrayBUQ(XParam, XModel.blocks, std::numeric_limits<T>::min(), XModel.evmax.u);
-		InitArrayBUQ(XParam, XModel.blocks, std::numeric_limits<T>::min(), XModel.evmax.v);
-	}
+	resetmax(XParam, XLoop, XModel.blocks, XModel.evmax);
 
 	return XLoop;
 
 }
 
+
+template <class T> void resetmax(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP<T>& XEv)
+{
+	if (XParam.GPUDEVICE >= 0)
+	{
+		//
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.h);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.zs);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.u);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.v);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.h);
+		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.zs);
+		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.u);
+		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.v);
+	}
+}
+
+
+template <class T> void resetmean(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP<T> & XEv)
+{
+	if (XParam.GPUDEVICE >= 0)
+	{
+		//
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.h);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.zs);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.u);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.v);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		InitArrayBUQ(XParam, XBlock, T(0.0), XEv.h);
+		InitArrayBUQ(XParam, XBlock, T(0.0), XEv.zs);
+		InitArrayBUQ(XParam, XBlock, T(0.0), XEv.u);
+		InitArrayBUQ(XParam, XBlock, T(0.0), XEv.v);
+	}
+}
 
 
 template <class T>
@@ -91,3 +104,5 @@ __global__ void reset_var(unsigned int halowidth, unsigned int * active, T reset
 
 	Var[n] = resetval;
 }
+template __global__ void reset_var<float>(unsigned int halowidth, unsigned int* active, float resetval, float* Var);
+template __global__ void reset_var<double>(unsigned int halowidth, unsigned int* active, double resetval, double* Var);
