@@ -3,15 +3,32 @@
 
 
 
-template <class T> void SetupGPU(Param XParam, Model<T> XModel, Model<T>& XModel_g)
+template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &XForcing, Model<T>& XModel_g)
 {
 	if (XParam.GPUDEVICE >= 0)
 	{
 		//Allocate memory for the model on the GPU
 		AllocateGPU(XParam.nblk, XParam.blksize, XParam, XModel_g);
-
+		
 		// Copy arrays from CPU to GPU
-		CopytoGPU(XParam.nblk, XParam.blksize, XParam, XModel, XModel_g);
+		CopytoGPU(XParam.nblk, XParam.blksize,XParam, XModel, XModel_g);
+
+		//=============================
+		// Same for Bnds
+
+
+		// Allocate memory for the boundary blk
+		AllocateGPU(XForcing.left.nblk, 1, XForcing.left.blks_g);
+		//copy bnd blk info on GPU
+		CopytoGPU(XForcing.left.nblk, 1, XForcing.left.blks, XForcing.left.blks_g);
+
+		AllocateGPU(XForcing.right.nblk, 1, XForcing.right.blks_g);
+		CopytoGPU(XForcing.right.nblk, 1, XForcing.right.blks, XForcing.right.blks_g);
+		AllocateGPU(XForcing.top.nblk, 1, XForcing.top.blks_g);
+		CopytoGPU(XForcing.top.nblk, 1, XForcing.top.blks, XForcing.top.blks_g);
+		AllocateGPU(XForcing.bot.nblk, 1, XForcing.bot.blks_g);
+		CopytoGPU(XForcing.bot.nblk, 1, XForcing.bot.blks, XForcing.bot.blks_g);
+
 
 		// Reset GPU mean and max arrays
 		if (XParam.outmax)
@@ -24,8 +41,8 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel, Model<T>& XModel
 		}
 	}
 }
-template void SetupGPU<float>(Param XParam, Model<float> XModel, Model<float>& XModel_g);
-template void SetupGPU<double>(Param XParam, Model<double> XModel, Model<double>& XModel_g);
+template void SetupGPU<float>(Param XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);
+template void SetupGPU<double>(Param XParam, Model<double> XModel, Forcing<float>& XForcing, Model<double>& XModel_g);
 
 
 void CUDA_CHECK(cudaError CUDerr)
@@ -204,8 +221,5 @@ void AllocateBndTEX(bndparam & side)
 
 }
 
-template <class T> void ResetvarGPU(Param XParam, EvolvingP<T>& XEV)
-{
 
-}
 

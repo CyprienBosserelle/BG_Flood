@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
 	//============================================
 	// Setup GPU (bypassed within the function if no suitable GPU is available)
-	SetupGPU(XParam, XModel, XModel_g);
+	SetupGPU(XParam, XModel,XForcing, XModel_g);
 
 	//
 

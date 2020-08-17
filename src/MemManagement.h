@@ -26,6 +26,6 @@ int memloc(Param XParam, int i, int j, int ib);
 __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int ib);
 
 template <class T> void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel);
-
+template <class T> void AllocateGPU(int nx, int ny, T*& z_g);
 // End of global definition
 #endif

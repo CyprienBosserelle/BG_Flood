@@ -31,7 +31,7 @@ template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-
+		Flowbnd(XParam, XLoop, XForcing.left, -1, 0, XModel.evolv, XModel.zb);
 		// Forcing
 
 		// Core engine

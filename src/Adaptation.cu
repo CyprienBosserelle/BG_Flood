@@ -71,7 +71,8 @@ template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcin
 	//rerun boundary block (there may be new bnd block and old ones that do not belong anymore)
 	//Initbnds(XParam, XForcing, XModel);
 	Calcbndblks(XParam, XForcing, XModel.blocks);
-	Findbndblks(XParam, XModel);
+	
+	Findbndblks(XParam, XModel, XForcing);
 
 	// Re run initial contions to avoid dry/wet issues
 	initevolv(XParam, XModel.blocks, XForcing, XModel.evolv, XModel.zb);

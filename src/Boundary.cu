@@ -10,13 +10,13 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int
 	if (isright == 0)
 	{
 		//top or bottom
-		un = &XEv.v;
-		ut = &XEv.u;
+		un = XEv.v;
+		ut = XEv.u;
 	}
 	else
 	{
-		un = &XEv.u;
-		ut = &XEv.v;
+		un = XEv.u;
+		ut = XEv.v;
 	}
 
 	if (side.on)
@@ -54,6 +54,7 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int
 			
 			// No slip wall
 			noslipbnd << <gridDimBBND, blockDim, 0 >> > (XParam.halowidth,isright, istop, side.blks_g, XEv.zs, XEv.h, un);
+			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else if (side.type == 1)
 		{
@@ -64,6 +65,9 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int
 
 
 }
+
+template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, bndparam side, int isright, int istop, EvolvingP<float>& XEv, float*& zb);
+template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, bndparam side, int isright, int istop, EvolvingP<double>& XEv, double*& zb);
 
 template <class T> __global__ void noslipbnd(int halowidth,int isright, int istop, int* bndblck, T* zs, T* h, T* un)
 {

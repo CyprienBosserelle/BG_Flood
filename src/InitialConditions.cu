@@ -56,7 +56,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Initial bndinfo
 	Calcbndblks(XParam, XForcing, XModel.blocks);
-	Findbndblks(XParam, XModel);
+	Findbndblks(XParam, XModel, XForcing);
 
 	//=====================================
 	// Initialize output variables
@@ -351,7 +351,7 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 }
 
 
-template <class T> void Findbndblks(Param XParam, Model<T>& XModel)
+template <class T> void Findbndblks(Param XParam,Model<T> XModel,Forcing<float> &XForcing)
 {
 	//=====================================
 	// Find how many blocks are on each bnds
@@ -362,10 +362,10 @@ template <class T> void Findbndblks(Param XParam, Model<T>& XModel)
 
 
 	// Reallocate array if necessary
-	ReallocArray(XParam.nbndblkleft, 1, XModel.bndblk.left);
-	ReallocArray(XParam.nbndblkright, 1, XModel.bndblk.right);
-	ReallocArray(XParam.nbndblktop, 1, XModel.bndblk.top);
-	ReallocArray(XParam.nbndblkbot, 1, XModel.bndblk.bot);
+	ReallocArray(XParam.nbndblkleft, 1, XForcing.left.blks);
+	ReallocArray(XParam.nbndblkright, 1, XForcing.right.blks);
+	ReallocArray(XParam.nbndblktop, 1, XForcing.top.blks);
+	ReallocArray(XParam.nbndblkbot, 1, XForcing.bot.blks);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -388,7 +388,7 @@ template <class T> void Findbndblks(Param XParam, Model<T>& XModel)
 		if ((rightxo - XParam.xmax) > (-1.0 * initlevdx))
 		{
 			//
-			XModel.bndblk.right[blbr] = ib;
+			XForcing.right.blks[blbr] = ib;
 			blbr++;
 
 		}
@@ -396,21 +396,21 @@ template <class T> void Findbndblks(Param XParam, Model<T>& XModel)
 		if ((topyo - XParam.ymax) > (-1.0 * initlevdx))
 		{
 			//
-			XModel.bndblk.top[blbt] = ib;
+			XForcing.top.blks[blbt] = ib;
 			blbt++;
 
 		}
 		if ((XParam.yo - botyo) > (-1.0 * initlevdx))
 		{
 			//
-			XModel.bndblk.bot[blbb] = ib;
+			XForcing.bot.blks[blbb] = ib;
 			blbb++;
 
 		}
 		if ((XParam.xo - leftxo) > (-1.0 * initlevdx))
 		{
 			//
-			XModel.bndblk.left[blbl] = ib;
+			XForcing.left.blks[blbl] = ib;
 			blbl++;
 
 		}

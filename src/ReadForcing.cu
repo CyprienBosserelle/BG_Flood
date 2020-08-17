@@ -33,6 +33,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// Read bnd files
 	log("Read Bnd data...");
 
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+	
+
 	if (!XForcing.left.inputfile.empty())
 	{
 		//XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);

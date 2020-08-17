@@ -126,10 +126,10 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later
-	AllocateCPU(1, 1, XModel.bndblk.left);
-	AllocateCPU(1, 1, XModel.bndblk.right);
-	AllocateCPU(1, 1, XModel.bndblk.top);
-	AllocateCPU(1, 1, XModel.bndblk.bot);
+	//AllocateCPU(1, 1, XModel.bndblk.left);
+	//AllocateCPU(1, 1, XModel.bndblk.right);
+	//AllocateCPU(1, 1, XModel.bndblk.top);
+	//AllocateCPU(1, 1, XModel.bndblk.bot);
 
 }
 
