@@ -109,18 +109,11 @@ int main(int argc, char **argv)
 	XParam.setupcputime = clock();
 	//============================================
 	// MainLoop
-	if (XParam.GPUDEVICE < 0)
-	{
-		//MainloopCPU
-	}
-	else
-	{
-		//MainloopGPU
-	}
+	MainLoop(XParam, XForcing, XModel, XModel_g);
 
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
-	TestingOutput(XParam, XModel);
+	//TestingOutput(XParam, XModel);
 
 	
 

@@ -16,6 +16,7 @@
 #include "InitialConditions.h"
 #include "Adaptation.h"
 #include "Setup_GPU.h"
+#include "Mainloop.h"
 
 #include "Testing.h"
 

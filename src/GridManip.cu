@@ -37,7 +37,8 @@ template <class T,class F> void InitArrayBUQ(Param XParam, BlockP<F> XBlock,  T 
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				//n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				n = memloc(XParam, i, j, ib);
 				Arr[n] = initval;
 			}
 		}

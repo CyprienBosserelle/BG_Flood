@@ -29,7 +29,7 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	//max nb of blocks is ceil(nx/16)*ceil(ny/16)
 	int nblk = 0;
 	int nmask = 0;
-	int mloc = 0;
+	//int mloc = 0;
 
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 

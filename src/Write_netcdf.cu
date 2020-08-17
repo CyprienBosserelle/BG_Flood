@@ -749,7 +749,7 @@ extern "C" void writenctimestep(std::string outfile, double totaltime)
 	if (status != NC_NOERR) handle_ncerror(status);
 }
 
-template <class T> void InitSave2Netcdf(Param XParam, Model<T> XModel)
+template <class T> void InitSave2Netcdf(Param &XParam, Model<T> XModel)
 {
 	if (!XParam.outvars.empty())
 	{
@@ -764,8 +764,8 @@ template <class T> void InitSave2Netcdf(Param XParam, Model<T> XModel)
 		}
 	}
 }
-template void InitSave2Netcdf<float>(Param XParam, Model<float> XModel);
-template void InitSave2Netcdf<double>(Param XParam, Model<double> XModel);
+template void InitSave2Netcdf<float>(Param &XParam, Model<float> XModel);
+template void InitSave2Netcdf<double>(Param &XParam, Model<double> XModel);
 
 
 template <class T> void Save2Netcdf(Param XParam, Model<T> XModel)

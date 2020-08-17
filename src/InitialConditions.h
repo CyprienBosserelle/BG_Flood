@@ -18,7 +18,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model<T> &XModel);
 template<class T> void Initmaparray(Model<T> &XModel);
 template <class T> void initoutput(Param &XParam, Model<T>& XModel);
-
+void InitTSOutput(Param XParam);
 //template <class T> void Initbnds(Param XParam, Forcing<float> XForcing, Model<T>& XModel);
 
 template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock);

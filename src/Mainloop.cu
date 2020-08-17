@@ -2,20 +2,89 @@
 
 
 
-template <class T> void MainLoop(Param XParam, Forcing<float> XForcing, Model<T> XModel)
+template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T> &XModel_g)
+{
+	if (XParam.GPUDEVICE < 0)
+	{
+		MainLoop(XParam, XForcing, XModel);
+	}
+	else
+	{
+		MainLoop(XParam, XForcing, XModel_g);
+	}
+
+	
+
+}
+template void MainLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
+template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
+
+
+
+
+template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	//Define some useful variables 
 	BlockP<T> XBlock = XModel.blocks;
-	Loop<T> XLoop = InitLoop(XParam,XModel);
+	Loop<T> XLoop = InitLoop(XParam, XModel);
 
-	//while (XLoop.totaltime < XParam.endtime)
+	while (XLoop.totaltime < XParam.endtime)
 	{
-		//
+		// Bnd stuff here
+
+		// Forcing
+
+		// Core engine
+
+		// River 
+
+		// Time keeping
+
+		// Do Sum & Max variables Here
+
+		// Check for TSoutput
+
+		// Check for map output
+
 	}
 
+
+
 }
-template void MainLoop<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel);
-template void MainLoop<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel);
+template void MainLoop<float>(Param &XParam, Forcing<float> XForcing, Model<float> &XModel);
+template void MainLoop<double>(Param &XParam, Forcing<float> XForcing, Model<double> &XModel);
+
+template <class T> void MainLoopGPU(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
+{
+	//Define some useful variables 
+	BlockP<T> XBlock = XModel.blocks;
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	while (XLoop.totaltime < XParam.endtime)
+	{
+		// Bnd stuff here
+
+		// Forcing
+
+		// Core engine
+
+		// River 
+
+		// Time keeping
+
+		// Do Sum & Max variables Here
+
+		// Check for TSoutput
+
+		// Check for map output
+
+	}
+
+
+
+}
+template void MainLoopGPU<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
+template void MainLoopGPU<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
 
  
 template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
@@ -37,10 +106,18 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	}
 
 	//Reset mean
-	resetmean(XParam, XLoop, XModel.blocks, XModel.evmean);
+	if (XParam.outmean)
+	{
+		resetmean(XParam, XLoop, XModel.blocks, XModel.evmean);
+	}
+	
+	
 
 	//Reset Max
-	resetmax(XParam, XLoop, XModel.blocks, XModel.evmax);
+	if (XParam.outmax)
+	{
+		resetmax(XParam, XLoop, XModel.blocks, XModel.evmax);
+	}
 
 	return XLoop;
 
@@ -87,10 +164,12 @@ template <class T> void resetmean(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 		InitArrayBUQ(XParam, XBlock, T(0.0), XEv.v);
 	}
 }
+template void resetmean<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, EvolvingP<float>& XEv);
+template void resetmean<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, EvolvingP<double>& XEv);
 
 
-template <class T>
-__global__ void reset_var(unsigned int halowidth, unsigned int * active, T resetval, T* Var)
+
+template <class T> __global__ void reset_var(int halowidth, int * active, T resetval, T* Var)
 {
 	
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
@@ -100,9 +179,10 @@ __global__ void reset_var(unsigned int halowidth, unsigned int * active, T reset
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
-	int n = memloc(halowidth, blkmemwidth, blksize, ix, iy, ib);
-
+	int n = memloc(halowidth, blkmemwidth,  ix, iy, ib);
+	//int n= (ix + halowidth) + (iy + halowidth) * blkmemwidth + ib * blksize;
 	Var[n] = resetval;
 }
-template __global__ void reset_var<float>(unsigned int halowidth, unsigned int* active, float resetval, float* Var);
-template __global__ void reset_var<double>(unsigned int halowidth, unsigned int* active, double resetval, double* Var);
+template __global__ void reset_var<float>(int halowidth, int* active, float resetval, float* Var);
+template __global__ void reset_var<double>(int halowidth, int* active, double resetval, double* Var);
+

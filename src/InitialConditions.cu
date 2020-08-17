@@ -72,7 +72,7 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	
 	int ib;
 	T levdx;
-	FILE* fsSLTS;
+	//FILE* fsSLTS;
 	// Initialise all storage involving parameters
 	//CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
 	if (XParam.outmax)

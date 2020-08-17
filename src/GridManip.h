@@ -7,6 +7,7 @@
 #include "Util_CPU.h"
 #include "Forcing.h"
 #include "Arrays.h"
+#include "MemManagement.h"
 
 template <class T, class F> void CopyArrayBUQ(Param XParam, BlockP<F> XBlock, T* source, T*& dest);
 template <class T> void CopyArrayBUQ(Param XParam, BlockP<T> XBlock, EvolvingP<T> source, EvolvingP<T>& dest);

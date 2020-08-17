@@ -323,7 +323,7 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh", "hhmean", "zsmean", "uumean", "vvmean", "hhmax", "zsmax", "uumax", "vvmax" ,"vort"};
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort"};
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -339,13 +339,13 @@ Param readparamstr(std::string line, Param param)
 
 			param.outmean = (vvar.compare("hhmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("zsmean") == 0) ? true : param.outmean;
-			param.outmean = (vvar.compare("uumean") == 0) ? true : param.outmean;
-			param.outmean = (vvar.compare("vvmean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("umean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("vmean") == 0) ? true : param.outmean;
 
 			param.outmax = (vvar.compare("hhmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("zsmax") == 0) ? true : param.outmax;
-			param.outmax = (vvar.compare("uumax") == 0) ? true : param.outmax;
-			param.outmax = (vvar.compare("vvmax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("umax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("vmax") == 0) ? true : param.outmax;
 
 			param.outvort = (vvar.compare("vort") == 0) ? true : param.outvort;
 		}
@@ -1115,7 +1115,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	if (XParam.outvars.empty() && XParam.outputtimestep > 0.0)
 	{
 		//a nc file was specified but no output variable were specified
-		std::vector<std::string> SupportedVarNames = { "zb", "zs", "uu", "vv", "hh" }; 
+		std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h" }; 
 		for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 		{
 			XParam.outvars.push_back(SupportedVarNames[isup]);
