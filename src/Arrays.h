@@ -185,11 +185,13 @@ struct Loop
 	dim3 blockDim;// (16, 16, 1);
 	dim3 gridDim;
 
-	//const int num_streams = 4;
+	const int num_streams = 4;
 
 	cudaStream_t streams[4];
 
-
+	T epsilon;
+	T hugeposval;
+	T hugenegval;
 
 };
 

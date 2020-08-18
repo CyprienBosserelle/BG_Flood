@@ -105,23 +105,23 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 
 	//Block info
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.active, XModel_gpu.blocks.active);
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.level, XModel_gpu.blocks.level);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.active, XModel_gpu.blocks.active);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.level, XModel_gpu.blocks.level);
 
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.xo, XModel_gpu.blocks.xo);
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.yo, XModel_gpu.blocks.yo);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.xo, XModel_gpu.blocks.xo);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.yo, XModel_gpu.blocks.yo);
 
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.BotLeft, XModel_gpu.blocks.BotLeft);
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.BotRight, XModel_gpu.blocks.BotRight);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.BotLeft, XModel_gpu.blocks.BotLeft);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.BotRight, XModel_gpu.blocks.BotRight);
 
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.TopLeft, XModel_gpu.blocks.TopLeft);
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.TopRight, XModel_gpu.blocks.TopRight);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.TopLeft, XModel_gpu.blocks.TopLeft);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.TopRight, XModel_gpu.blocks.TopRight);
 
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.LeftBot, XModel_gpu.blocks.LeftBot);
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.LeftTop, XModel_gpu.blocks.LeftTop);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.LeftBot, XModel_gpu.blocks.LeftBot);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.LeftTop, XModel_gpu.blocks.LeftTop);
 
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.RightBot, XModel_gpu.blocks.RightBot);
-	CopytoGPU(nblk, blksize, XModel_cpu.blocks.RightTop, XModel_gpu.blocks.RightTop);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.RightBot, XModel_gpu.blocks.RightBot);
+	CopytoGPU(nblk, 1, XModel_cpu.blocks.RightTop, XModel_gpu.blocks.RightTop);
 	
 
 	if (XParam.outmax)

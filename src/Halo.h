@@ -29,5 +29,8 @@ template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, T*& z);
 template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, EvolvingP<T>& Xev);
 
 
+// GPU versions
+template <class T> __global__ void fillLeft(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, T* a);
+
 // End of global definition
 #endif

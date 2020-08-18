@@ -1,9 +1,9 @@
 ﻿#include "Boundary.h"
 
 
-template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int isright, int istop, EvolvingP<T> &XEv, T*&zb)
+template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int isright, int istop, EvolvingP<T> XEv, T*zb)
 {
-	dim3 blockDim(16, 16, 1);
+	dim3 blockDim(16, 16, 1);// this should be only 16,1 or 1,16!!
 	dim3 gridDimBBND(side.nblk, 1, 1);
 
 	T* un, * ut;
@@ -66,8 +66,8 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int
 
 }
 
-template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, bndparam side, int isright, int istop, EvolvingP<float>& XEv, float*& zb);
-template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, bndparam side, int isright, int istop, EvolvingP<double>& XEv, double*& zb);
+template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, bndparam side, int isright, int istop, EvolvingP<float> XEv, float* zb);
+template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, bndparam side, int isright, int istop, EvolvingP<double> XEv, double* zb);
 
 template <class T> __global__ void noslipbnd(int halowidth,int isright, int istop, int* bndblck, T* zs, T* h, T* un)
 {

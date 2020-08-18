@@ -4,14 +4,47 @@
 
 template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T> &XModel_g)
 {
-	if (XParam.GPUDEVICE < 0)
+	
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	//Define some useful variables 
+	if (XParam.outmean)
 	{
-		MainLoop(XParam, XForcing, XModel);
+		resetmean(XParam, XLoop, XModel.blocks, XModel.evmean);
 	}
-	else
+
+	//Reset Max
+	if (XParam.outmax)
 	{
-		MainLoop(XParam, XForcing, XModel_g);
+		resetmax(XParam, XLoop, XModel.blocks, XModel.evmax);
 	}
+
+	//while (XLoop.totaltime < XParam.endtime)
+	{
+		// Bnd stuff here
+		Flowbnd(XParam, XLoop, XForcing.left, -1, 0, XModel.evolv, XModel.zb);
+		Flowbnd(XParam, XLoop, XForcing.right, 1, 0, XModel.evolv, XModel.zb);
+		Flowbnd(XParam, XLoop, XForcing.top, 0, 1, XModel.evolv, XModel.zb);
+		Flowbnd(XParam, XLoop, XForcing.bot, 0, -1, XModel.evolv, XModel.zb);
+
+		// Forcing
+		FlowGPU(XParam, XLoop, XModel_g);
+
+		// Core engine
+
+
+		// River 
+
+		// Time keeping
+
+		// Do Sum & Max variables Here
+
+		// Check for TSoutput
+
+		// Check for map output
+
+	}
+	
 
 	
 
@@ -21,70 +54,6 @@ template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<dou
 
 
 
-
-template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
-{
-	//Define some useful variables 
-	BlockP<T> XBlock = XModel.blocks;
-	Loop<T> XLoop = InitLoop(XParam, XModel);
-
-	while (XLoop.totaltime < XParam.endtime)
-	{
-		// Bnd stuff here
-		Flowbnd(XParam, XLoop, XForcing.left, -1, 0, XModel.evolv, XModel.zb);
-		// Forcing
-
-		// Core engine
-
-		// River 
-
-		// Time keeping
-
-		// Do Sum & Max variables Here
-
-		// Check for TSoutput
-
-		// Check for map output
-
-	}
-
-
-
-}
-template void MainLoop<float>(Param &XParam, Forcing<float> XForcing, Model<float> &XModel);
-template void MainLoop<double>(Param &XParam, Forcing<float> XForcing, Model<double> &XModel);
-
-template <class T> void MainLoopGPU(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
-{
-	//Define some useful variables 
-	BlockP<T> XBlock = XModel.blocks;
-	Loop<T> XLoop = InitLoop(XParam, XModel);
-
-	while (XLoop.totaltime < XParam.endtime)
-	{
-		// Bnd stuff here
-
-		// Forcing
-
-		// Core engine
-
-		// River 
-
-		// Time keeping
-
-		// Do Sum & Max variables Here
-
-		// Check for TSoutput
-
-		// Check for map output
-
-	}
-
-
-
-}
-template void MainLoopGPU<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
-template void MainLoopGPU<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
 
  
 template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
@@ -105,19 +74,10 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 		XLoop.gridDim = (XParam.nblk, 1, 1);
 	}
 
-	//Reset mean
-	if (XParam.outmean)
-	{
-		resetmean(XParam, XLoop, XModel.blocks, XModel.evmean);
-	}
-	
-	
+	XLoop.hugenegval = std::numeric_limits<T>::min();
 
-	//Reset Max
-	if (XParam.outmax)
-	{
-		resetmax(XParam, XLoop, XModel.blocks, XModel.evmax);
-	}
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
 	return XLoop;
 
@@ -129,18 +89,18 @@ template <class T> void resetmax(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, 
 	if (XParam.GPUDEVICE >= 0)
 	{
 		//
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.h);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.zs);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.u);
-		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, std::numeric_limits<T>::min(), XEv.v);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.h);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.zs);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.u);
+		reset_var << <XLoop.gridDim, XLoop.blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.v);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
-		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.h);
-		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.zs);
-		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.u);
-		InitArrayBUQ(XParam, XBlock, std::numeric_limits<T>::min(), XEv.v);
+		InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.h);
+		InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.zs);
+		InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.u);
+		InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.v);
 	}
 }
 
@@ -167,22 +127,4 @@ template <class T> void resetmean(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 template void resetmean<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, EvolvingP<float>& XEv);
 template void resetmean<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, EvolvingP<double>& XEv);
 
-
-
-template <class T> __global__ void reset_var(int halowidth, int * active, T resetval, T* Var)
-{
-	
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
-
-	int n = memloc(halowidth, blkmemwidth,  ix, iy, ib);
-	//int n= (ix + halowidth) + (iy + halowidth) * blkmemwidth + ib * blksize;
-	Var[n] = resetval;
-}
-template __global__ void reset_var<float>(int halowidth, int* active, float resetval, float* Var);
-template __global__ void reset_var<double>(int halowidth, int* active, double resetval, double* Var);
 

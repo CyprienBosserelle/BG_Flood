@@ -121,11 +121,35 @@ template double BarycentricInterpolation(double q1, double x1, double y1, double
 
 
 template <class T>
-__host__ __device__ double calcres(T dx, int level)
+__host__ __device__ T calcres(T dx, int level)
 {
 	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
 }
 
 template __host__ __device__ double calcres<double>(double dx, int level);
-template __host__ __device__ double calcres<float>(float dx, int level);
+template __host__ __device__ float calcres<float>(float dx, int level);
 
+template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2)
+{
+	//theta should be used as a global var 
+	// can be used to tune the limiting (theta=1
+	//gives minmod, the most dissipative limiter and theta = 2 gives
+	//	superbee, the least dissipative).
+	//float theta = 1.3f;
+	if (s0 < s1 && s1 < s2) {
+		T d1 = theta * (s1 - s0);
+		T d2 = (s2 - s0) / T(2.0);
+		T d3 = theta * (s2 - s1);
+		if (d2 < d1) d1 = d2;
+		return min(d1, d3);
+	}
+	if (s0 > s1 && s1 > s2) {
+		T d1 = theta * (s1 - s0), d2 = (s2 - s0) / T(2.0), d3 = theta * (s2 - s1);
+		if (d2 > d1) d1 = d2;
+		return max(d1, d3);
+	}
+	return T(0.0);
+}
+
+template __host__ __device__ float minmod2(float theta, float s0, float s1, float s2);
+template __host__ __device__ double minmod2(double theta, double s0, double s1, double s2);

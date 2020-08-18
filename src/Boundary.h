@@ -15,7 +15,7 @@ template <class T> __global__ void ABS1D(int halowidth, int isright, int istop, 
 template <class T> __host__ void ABS1D(Param XParam, std::vector<double> zsbndvec, int isright, int istop, int nbnd, T itime, BlockP<T> XBlock, int* bndblk, T* zs, T* zb, T* h, T* un, T* ut);
 
 
-template <class T> void Flowbnd(Param XParam, Loop<T>& XLoop, bndparam side, int isright, int istop, EvolvingP<T>& XEv, T*& zb);
+template <class T> void Flowbnd(Param XParam, Loop<T>& XLoop, bndparam side, int isright, int istop, EvolvingP<T> XEv, T* zb);
 __host__ __device__ int Inside(int halowidth, int blkmemwidth, int isright, int istop, int ix, int iy, int ib);
 __host__ __device__ bool isbnd(int isright, int istop, int blkwidth, int ix, int iy);
 
