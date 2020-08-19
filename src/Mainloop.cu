@@ -28,7 +28,15 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		Flowbnd(XParam, XLoop, XForcing.bot, 0, -1, XModel.evolv, XModel.zb);
 
 		// Forcing
-		FlowGPU(XParam, XLoop, XModel_g);
+		if (XParam.GPUDEVICE >= 0)
+		{
+			FlowGPU(XParam, XLoop, XModel_g);
+		}
+		else
+		{
+			FlowCPU(XParam, XLoop, XModel);
+		}
+		
 
 		// Core engine
 

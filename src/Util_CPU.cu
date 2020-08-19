@@ -28,7 +28,7 @@ namespace utils {
 	/*! \fn template <class T> T sq(T a)
 	* Generic squaring function
 	*/
-	template <class T> T sq(T a) {
+	template <class T> __host__ __device__ T sq(T a) {
 		return (a*a);
 	}
 
@@ -55,9 +55,9 @@ namespace utils {
 	template const float& max<float>(const float& a, const float& b);
 	template const double& max<double>(const double& a, const double& b);
 
-	template int sq<int>(int a);
-	template float sq<float>(float a);
-	template double sq<double>(double a);
+	template int __host__ __device__ sq<int>(int a);
+	template float __host__ __device__ sq<float>(float a);
+	template double __host__ __device__ sq<double>(double a);
 
 	
 

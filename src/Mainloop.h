@@ -11,6 +11,7 @@
 #include "MemManagement.h"
 #include "Boundary.h"
 #include "FlowGPU.h"
+#include "FlowCPU.h"
 
 template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);
 

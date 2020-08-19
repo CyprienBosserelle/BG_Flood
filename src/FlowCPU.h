@@ -1,5 +1,5 @@
-#ifndef FLOWGPU_H
-#define FLOWGPU_H
+#ifndef FLOWCPU_H
+#define FLOWCPU_H
 
 #include "General.h"
 #include "Param.h"
@@ -7,11 +7,12 @@
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "MemManagement.h"
+#include "Halo.h"
+#include "GridManip.h"
 #include "Gradients.h"
 #include "Kurganov.h"
 
-template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);
-
-template <class T> __global__ void reset_var(int halowidth, int* active, T resetval, T* Var);
 // End of global definition
+template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);
+
 #endif
