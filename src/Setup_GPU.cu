@@ -70,6 +70,15 @@ template void CopytoGPU<int>(int nblk, int blksize, int* z_cpu, int* &z_gpu);
 template void CopytoGPU<float>(int nblk, int blksize, float* z_cpu, float* &z_gpu);
 template void CopytoGPU<double>(int nblk, int blksize, double* z_cpu, double* &z_gpu);
 
+template <class T> void CopyGPUtoCPU(int nblk, int blksize, T* z_cpu, T* z_gpu)
+{
+	CUDA_CHECK(cudaMemcpy(z_cpu, z_gpu, nblk * blksize * sizeof(T), cudaMemcpyDeviceToHost));
+}
+template void CopyGPUtoCPU<bool>(int nblk, int blksize, bool* z_cpu, bool* z_gpu);
+template void CopyGPUtoCPU<int>(int nblk, int blksize, int* z_cpu, int* z_gpu);
+template void CopyGPUtoCPU<float>(int nblk, int blksize, float* z_cpu, float* z_gpu);
+template void CopyGPUtoCPU<double>(int nblk, int blksize, double* z_cpu, double* z_gpu);
+
 template <class T> void CopytoGPU(int nblk, int blksize, EvolvingP<T> XEv_cpu, EvolvingP<T> &XEv_gpu)
 {
 	CopytoGPU(nblk, blksize, XEv_cpu.h, XEv_gpu.h);

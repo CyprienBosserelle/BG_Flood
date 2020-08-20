@@ -109,12 +109,12 @@ int main(int argc, char **argv)
 	XParam.setupcputime = clock();
 	//============================================
 	// MainLoop
-	MainLoop(XParam, XForcing, XModel, XModel_g);
+	//MainLoop(XParam, XForcing, XModel, XModel_g);
 
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
 	//TestingOutput(XParam, XModel);
-
+	CompareCPUvsGPU(XParam, XForcing, XModel, XModel_g);
 	
 
 	//===========================================

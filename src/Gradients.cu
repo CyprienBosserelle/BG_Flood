@@ -12,12 +12,13 @@ template <class T> void gradientGPU(Param XParam, Loop<T>& XLoop, BlockP<T>XBloc
 	{
 		CUDA_CHECK(cudaStreamCreate(&streams[i]));
 	}
+	dim3 blockDim(16, 16, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
 
-
-	gradient << < XLoop.gridDim, XLoop.blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	gradient << < XLoop.gridDim, XLoop.blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	gradient << < XLoop.gridDim, XLoop.blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
-	gradient << < XLoop.gridDim, XLoop.blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	gradient << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	gradient << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	gradient << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+	gradient << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
 
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -84,7 +85,11 @@ template <class T> __global__ void gradient(int halowidth, int* active, int* lev
 	a_s[sx][sy] = a[i];
 	//__syncthreads;
 	//syncthread is needed here ?
-
+	if (blockIdx.x == 0 && threadIdx.x == 0 && threadIdx.y == 0)
+	{
+		printf("i= %i\t a=%f\n", i, a_s[sx][sy]);
+	}
+	
 
 	// read the halo around the tile
 	if (threadIdx.x == blockDim.x - 1)
