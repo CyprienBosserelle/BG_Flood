@@ -4,7 +4,9 @@
 template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 {
 	
-
+	//============================================
+	//  
+	fillHalo(XParam, XModel.blocks, XModel.evolv);
 
 	//============================================
 	// Reset DTmax

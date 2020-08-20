@@ -78,21 +78,24 @@ template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, M
 	dim3 blockDim(16, 16, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 	//gradientGPU(XParam, XLoop, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	fillHalo(XParam, XModel.blocks, XModel.evolv);
 
 	//CPU
 	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv, XModel.grad);
 
 	
 	// calculate difference
-	diffArray(XParam, XLoop, XModel.blocks, XModel.grad.dhdx, XModel_g.grad.dhdx, XModel.evolv_o.h);
+	//diffArray(XParam, XLoop, XModel.blocks, XModel.grad.dhdx, XModel_g.grad.dhdx, XModel.evolv_o.h);
 
 	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 	//outvar = "h";
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx_CPU", 3, XModel.grad.dhdx);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx_GPU", 3, XModel.evolv_o.h);
-
+	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx_GPU", 3, XModel.evolv_o.h);
+	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h_CPU", 3, XModel.evolv.h);
+	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "ho_CPU", 3, XModel.evolv_o.h);
 }
 template void CompareCPUvsGPU<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void CompareCPUvsGPU<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
