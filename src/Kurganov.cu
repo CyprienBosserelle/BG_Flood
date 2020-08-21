@@ -150,9 +150,9 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 	{
 		ib = XBlock.active[ibl];
 		delta = calcres(XParam.dx, XBlock.level[ib]);
-		for (int iy = 0; iy < 16; iy++)
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
-			for (int ix = 0; ix < 16; ix++)
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 
 
@@ -396,9 +396,9 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 	{
 		ib = XBlock.active[ibl];
 		delta = calcres(XParam.dx, XBlock.level[ib]);
-		for (int iy = 0; iy < 16; iy++)
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
-			for (int ix = 0; ix < 16; ix++)
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
