@@ -7,11 +7,12 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 {
 	if (XParam.GPUDEVICE >= 0)
 	{
+		cudaSetDevice(XParam.GPUDEVICE);
 		//Allocate memory for the model on the GPU
-		AllocateGPU(XParam.nblk, XParam.blksize, XParam, XModel_g);
+		AllocateGPU(XParam.nblkmem, XParam.blksize, XParam, XModel_g);
 		
 		// Copy arrays from CPU to GPU
-		CopytoGPU(XParam.nblk, XParam.blksize,XParam, XModel, XModel_g);
+		CopytoGPU(XParam.nblkmem, XParam.blksize,XParam, XModel, XModel_g);
 
 		//=============================
 		// Same for Bnds

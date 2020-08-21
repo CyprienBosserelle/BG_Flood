@@ -7,7 +7,7 @@
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "Setup_GPU.h"
-#include "MemManagement.h";
+#include "MemManagement.h"
 #include "Halo.h"
 
 template <class T> void gradientGPU(Param XParam, Loop<T>& XLoop, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad);

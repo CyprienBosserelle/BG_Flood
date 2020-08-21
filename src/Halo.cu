@@ -351,7 +351,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 					{
 						w3 = (T)0.5 * (1.0 - w1);
 						w2 = w3;
-						ir = it;
+						it = ir;
 
 					}
 					else if (XBlock.level[XBlock.BotRight[XBlock.LeftBot[ib]]] < XBlock.level[XBlock.LeftBot[ib]]) // exists but is coarser
@@ -531,7 +531,7 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 				{
 					w3 = (T)0.5 * (1.0 - w1);
 					w2 = w3;
-					ir = it;
+					it = ir;
 				}
 				else if (levBRLB < levLB)
 				{
@@ -571,7 +571,7 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 					w3 = 5.0 / 10.0;
 					ir = memloc(halowidth, blkmemwidth, blockDim.y - 1, 0, TRLT);
 				}
-				else if (levTRLT < levLT)
+				else if (levTRLT == levLT)
 				{
 					ir = memloc(halowidth, blkmemwidth, blockDim.y - 1, 0, TRLT);
 				}
@@ -727,7 +727,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					{
 						w3 = 0.5 * (1.0 - w1);
 						w2 = w3;
-						ir = it;
+						it = ir;
 
 					}
 					else if (XBlock.level[XBlock.BotLeft[XBlock.RightBot[ib]]] < XBlock.level[XBlock.RightBot[ib]]) // exists but is coarser
@@ -911,7 +911,7 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 				{
 					w3 = 0.5 * (1.0 - w1);
 					w2 = w3;
-					ir = it;
+					it = ir;
 				}
 				else if (levBLRB < levRB)
 				{
@@ -1107,7 +1107,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					{
 						w3 = 0.5 * (1.0 - w1);
 						w2 = w3;
-						ir = it;
+						it = ir;
 
 					}
 					else if (XBlock.level[XBlock.LeftTop[XBlock.BotLeft[ib]]] < XBlock.level[XBlock.BotLeft[ib]]) // exists but is coarser
@@ -1281,7 +1281,7 @@ template <class T> __global__ void fillBot(int halowidth, int* active, int* leve
 				{
 					w3 = 0.5 * (1.0 - w1);
 					w2 = w3;
-					ir = it;
+					it = ir;
 				}
 				else if (levLTBL < levBL)
 				{
@@ -1474,7 +1474,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					{
 						w3 = 0.5 * (1.0 - w1);
 						w2 = w3;
-						ir = it;
+						it = ir;
 
 					}
 					else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] < XBlock.level[XBlock.TopLeft[ib]]) // exists but is coarser
@@ -1565,7 +1565,7 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 	int levLBTL = level[LBTL];
 	int levRBTR = level[RBTR];
 
-	int write = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int write = memloc(halowidth, blkmemwidth, ix, blockDim.x, ib);
 	int read;
 	int jj, ii, ir, it, itr;
 	T a_read;
@@ -1650,7 +1650,7 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 				{
 					w3 = 0.5 * (1.0 - w1);
 					w2 = w3;
-					ir = it;
+					it = ir;
 				}
 				else if (levLBTL < levTL)
 				{

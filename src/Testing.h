@@ -16,6 +16,7 @@
 #include "Setup_GPU.h"
 #include "Gradients.h"
 
+
 template <class T> void TestingOutput(Param XParam, Model<T> XModel);
 template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
