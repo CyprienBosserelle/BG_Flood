@@ -14,6 +14,9 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		// Copy arrays from CPU to GPU
 		CopytoGPU(XParam.nblkmem, XParam.blksize,XParam, XModel, XModel_g);
 
+		//
+		fillHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv);
+
 		//=============================
 		// Same for Bnds
 
@@ -113,6 +116,7 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	CopytoGPU(nblk, blksize, XModel_cpu.zb, XModel_gpu.zb);
 
+	
 
 	//Block info
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.active, XModel_gpu.blocks.active);

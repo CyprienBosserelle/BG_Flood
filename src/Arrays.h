@@ -124,7 +124,7 @@ struct Model
 	
 	// Used for external forcing too
 	// May need a better placeholder
-	T* datmpdx, *datmpdy;
+	T* Patm, *datmpdx, *datmpdy;
 
 	TimeP<T> time;
 

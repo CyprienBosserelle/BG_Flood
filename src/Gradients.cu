@@ -85,11 +85,7 @@ template <class T> __global__ void gradient(int halowidth, int* active, int* lev
 	a_s[sx][sy] = a[i];
 	//__syncthreads;
 	//syncthread is needed here ?
-	if (blockIdx.x == 0 && threadIdx.x == 0 && threadIdx.y == 0)
-	{
-		printf("i= %i\t a=%f\n", i, a_s[sx][sy]);
-	}
-	
+		
 
 	// read the halo around the tile
 	if (threadIdx.x == blockDim.x - 1)

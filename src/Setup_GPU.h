@@ -7,6 +7,7 @@
 #include "Param.h"
 #include "Arrays.h"
 #include "MemManagement.h"
+#include "Halo.h"
 
 void CUDA_CHECK(cudaError CUDerr);
 

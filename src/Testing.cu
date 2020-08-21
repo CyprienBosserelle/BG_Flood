@@ -73,6 +73,14 @@ template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, M
 	XLoop.hugeposval = std::numeric_limits<T>::max();
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
+
+	T* gpureceive;
+	T* diff;
+
+	AllocateCPU(XParam.nblkmem, XParam.blksize, gpureceive);
+	AllocateCPU(XParam.nblkmem, XParam.blksize, diff);
+
+
 	//============================================
 	// Compare gradients for evolving parameters
 	cudaSetDevice(0);
@@ -81,27 +89,52 @@ template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, M
 	dim3 gridDim(XParam.nblk, 1, 1);
 	//gradientGPU(XParam, XLoop, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
 
-	fillHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv);
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientGPU(XParam, XLoop, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
+
+	//============================================
+	// Synchronise all ongoing streams
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	updateKurgXGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax);
+	//updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	updateKurgYGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	fillHalo(XParam, XModel.blocks, XModel.evolv);
 
 	//CPU
 	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv, XModel.grad);
-
+	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	
 	// calculate difference
 	//diffArray(XParam, XLoop, XModel.blocks, XModel.evolv.h, XModel_g.evolv.h, XModel.evolv_o.u);
-	diffArray(XParam, XLoop, XModel.blocks, XModel.grad.dhdx, XModel_g.grad.dhdx, XModel.evolv_o.u, XModel.evolv_o.v);
 
 	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
-	//outvar = "h";
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx_CPU", 3, XModel.grad.dhdx);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx_GPU", 3, XModel.evolv_o.u);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx_diff", 3, XModel.evolv_o.v);
-	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h_CPU", 3, XModel.evolv.h);
-	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h_GPU", 3, XModel.evolv_o.u);
+
+	//Check evolving param
+	diffArray(XParam, XLoop, XModel.blocks, "h", XModel.evolv.h, XModel_g.evolv.h, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "zs", XModel.evolv.zs, XModel_g.evolv.zs, gpureceive, diff);
+	//check gradients
+	diffArray(XParam, XLoop, XModel.blocks, "dhdx", XModel.grad.dhdx, XModel_g.grad.dhdx, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "dhdy", XModel.grad.dhdy, XModel_g.grad.dhdy, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "dzsdx", XModel.grad.dzsdx, XModel_g.grad.dzsdx, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "dzsdy", XModel.grad.dzsdy, XModel_g.grad.dzsdy, gpureceive, diff);
+
+	//Check Kurganov
+	diffArray(XParam, XLoop, XModel.blocks,"Fhu", XModel.flux.Fhu, XModel_g.flux.Fhu, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "Fqux", XModel.flux.Fqux, XModel_g.flux.Fqux, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "Su", XModel.flux.Su, XModel_g.flux.Su, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "Fqvx", XModel.flux.Fqvx, XModel_g.flux.Fqvx, gpureceive, diff);
+
+	diffArray(XParam, XLoop, XModel.blocks, "Fhv", XModel.flux.Fhv, XModel_g.flux.Fhv, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "Fqvy", XModel.flux.Fqvy, XModel_g.flux.Fqvy, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "Sv", XModel.flux.Sv, XModel_g.flux.Sv, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "Fquy", XModel.flux.Fquy, XModel_g.flux.Fquy, gpureceive, diff);
+
+	free(gpureceive);
+	free(diff);
+	
 }
 template void CompareCPUvsGPU<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void CompareCPUvsGPU<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
@@ -109,7 +142,7 @@ template void CompareCPUvsGPU<double>(Param XParam, Forcing<float> XForcing, Mod
 
 
 
-template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* cpu, T* gpu, T* dummy, T* out)
+template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, T* cpu, T* gpu, T* dummy, T* out)
 {
 	T diff, maxdiff, rmsdiff;
 	unsigned int nit = 0;
@@ -139,8 +172,22 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 		}
 	}
 	rmsdiff = rmsdiff / nit;
-	log("Epsilon: " + std::to_string(XLoop.epsilon));
-	log("RMS difference: " + std::to_string(rmsdiff));
-	log("Max difference: " + std::to_string(maxdiff));
+
+	
+
+	if (maxdiff < (XLoop.epsilon * 2))
+	{
+		log(varname + " PASS");
+	}
+	else
+	{
+		log(varname + " FAIL: " + " Max difference: " + std::to_string(maxdiff) + " RMS difference: " + std::to_string(rmsdiff) + " Eps: " + std::to_string(XLoop.epsilon));
+		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_CPU", 3, cpu);
+		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_GPU", 3, dummy);
+		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_diff", 3, out);
+	}
+	
+
+
 
 }
