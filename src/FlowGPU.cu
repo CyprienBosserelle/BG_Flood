@@ -11,6 +11,9 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	}
 	
 
+	fillHaloGPU(XParam, XModel.blocks, XModel.evolv);
+
+
 	//============================================
 	// Reset DTmax
 	reset_var <<< gridDim, blockDim, 0, XLoop.streams[0] >>> (XParam.halowidth,XModel.blocks.active,XLoop.hugeposval,XModel.time.dtmax);
