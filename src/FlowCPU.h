@@ -11,6 +11,7 @@
 #include "GridManip.h"
 #include "Gradients.h"
 #include "Kurganov.h"
+#include "Advection.h"
 
 // End of global definition
 template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);

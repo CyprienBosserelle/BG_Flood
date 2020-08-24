@@ -9,6 +9,7 @@
 #include "MemManagement.h"
 #include "Gradients.h"
 #include "Kurganov.h"
+#include "Advection.h"
 
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);
 

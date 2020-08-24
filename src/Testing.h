@@ -14,8 +14,8 @@
 #include "Mesh.h"
 
 #include "Setup_GPU.h"
-#include "Gradients.h"
-#include "Kurganov.h"
+#include "FlowCPU.h"
+#include "FlowGPU.h"
 
 template <class T> void TestingOutput(Param XParam, Model<T> XModel);
 template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z);

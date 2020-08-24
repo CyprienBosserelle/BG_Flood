@@ -73,6 +73,10 @@ template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, M
 	XLoop.hugeposval = std::numeric_limits<T>::max();
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
+	XLoop.totaltime = 0.0;
+
+	XLoop.nextoutputtime = 3600.0;
+
 
 	T* gpureceive;
 	T* diff;
@@ -83,38 +87,44 @@ template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, M
 
 	//============================================
 	// Compare gradients for evolving parameters
-	cudaSetDevice(0);
-	//GPU
-	dim3 blockDim(16, 16, 1);
-	dim3 gridDim(XParam.nblk, 1, 1);
-	//gradientGPU(XParam, XLoop, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
-
-	gradientGPU(XParam, XLoop, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
-
-	//============================================
-	// Synchronise all ongoing streams
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	updateKurgXGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax);
-	//updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	fillHalo(XParam, XModel.blocks, XModel.evolv);
-
-	//CPU
-	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv, XModel.grad);
-	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	
+	// GPU
+	FlowGPU(XParam, XLoop, XModel_g);
+	T dtgpu = XLoop.dt;
+	// CPU
+	FlowCPU(XParam, XLoop, XModel);
+	T dtcpu = XLoop.dt;
 	// calculate difference
 	//diffArray(XParam, XLoop, XModel.blocks, XModel.evolv.h, XModel_g.evolv.h, XModel.evolv_o.u);
 
 	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 
+	
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", 3, XModel.evolv_o.h);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", 3, XModel.evolv_o.u);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", 3, XModel.evolv_o.v);
+
+
+	std::string varname = "dt";
+	if (abs(dtgpu - dtcpu) < (XLoop.epsilon * 2))
+	{
+		log(varname + " PASS");
+	}
+	else
+	{
+		log(varname + " FAIL: " + " GPU(" + std::to_string(dtgpu) + ") - CPU("+std::to_string(dtcpu) +") =  difference: "+  std::to_string(abs(dtgpu - dtcpu)) + " Eps: " + std::to_string(XLoop.epsilon));
+		
+	}
+
 	//Check evolving param
-	diffArray(XParam, XLoop, XModel.blocks, "h", XModel.evolv.h, XModel_g.evolv.h, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "zs", XModel.evolv.zs, XModel_g.evolv.zs, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "h", XModel.evolv_o.h, XModel_g.evolv_o.h, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "zs", XModel.evolv_o.zs, XModel_g.evolv_o.zs, gpureceive, diff);
+
+	diffArray(XParam, XLoop, XModel.blocks, "u", XModel.evolv_o.u, XModel_g.evolv_o.u, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "v", XModel.evolv_o.v, XModel_g.evolv_o.v, gpureceive, diff);
+	
+
+	
 	//check gradients
 	diffArray(XParam, XLoop, XModel.blocks, "dhdx", XModel.grad.dhdx, XModel_g.grad.dhdx, gpureceive, diff);
 	diffArray(XParam, XLoop, XModel.blocks, "dhdy", XModel.grad.dhdy, XModel_g.grad.dhdy, gpureceive, diff);
@@ -132,6 +142,13 @@ template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, M
 	diffArray(XParam, XLoop, XModel.blocks, "Sv", XModel.flux.Sv, XModel_g.flux.Sv, gpureceive, diff);
 	diffArray(XParam, XLoop, XModel.blocks, "Fquy", XModel.flux.Fquy, XModel_g.flux.Fquy, gpureceive, diff);
 
+	diffArray(XParam, XLoop, XModel.blocks, "dh", XModel.adv.dh, XModel_g.adv.dh, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "dhu", XModel.adv.dhu, XModel_g.adv.dhu, gpureceive, diff);
+	diffArray(XParam, XLoop, XModel.blocks, "dhv", XModel.adv.dhv, XModel_g.adv.dhv, gpureceive, diff);
+
+
+
+	
 	free(gpureceive);
 	free(diff);
 	
@@ -175,7 +192,7 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 
 	
 
-	if (maxdiff < (XLoop.epsilon * 2))
+	if (maxdiff <= (XLoop.epsilon))
 	{
 		log(varname + " PASS");
 	}

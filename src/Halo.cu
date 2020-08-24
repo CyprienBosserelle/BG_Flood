@@ -335,7 +335,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 			
 
 			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib?ceil(j * (T)0.5): ceil(j * (T)0.5)+ XParam.blkwidth/2;
-			w1 = (T)1.0 / (T)3.0;
+			w1 = T(1.0 / 3.0);
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
 						

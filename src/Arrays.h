@@ -102,8 +102,8 @@ struct BndblockP
 template <class T>
 struct TimeP
 {
-	double totaltime;
-	double dt;
+	T totaltime;
+	T dt;
 	T* dtmax;
 	T* arrmax, *arrmin;
 };
