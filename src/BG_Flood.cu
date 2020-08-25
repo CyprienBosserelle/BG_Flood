@@ -113,8 +113,8 @@ int main(int argc, char **argv)
 
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
-	//TestingOutput(XParam, XModel);
-	CompareCPUvsGPU(XParam, XForcing, XModel, XModel_g);
+	TestingOutput(XParam, XModel);
+	//CompareCPUvsGPU(XParam, XForcing, XModel, XModel_g);
 	
 
 	//===========================================
