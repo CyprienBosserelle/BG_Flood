@@ -2,7 +2,7 @@
 
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 {
-	dim3 blockDim(16, 16, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	for (int i = 0; i < XLoop.num_streams; i++)
@@ -26,13 +26,17 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	// Synchronise all ongoing streams
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	updateKurgXGPU << < gridDim, blockDim, 0, XLoop.streams[0] >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYGPU << < gridDim, blockDim, 0, XLoop.streams[1] >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	dim3 blockDimKX(XParam.blkwidth+XParam.halowidth, XParam.blkwidth, 1);
+	dim3 blockDimKY(XParam.blkwidth , XParam.blkwidth + XParam.halowidth, 1);
+	//dim3 gridDim(XParam.nblk, 1, 1);
+
+	updateKurgXGPU << < gridDim, blockDimKX, 0, XLoop.streams[0] >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	updateKurgYGPU << < gridDim, blockDimKY, 0, XLoop.streams[1] >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	//updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	
 	XLoop.dt = double(CalctimestepGPU(XParam, XModel.blocks, XModel.time));
@@ -51,7 +55,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Corrector step
-	/*
+	
 	gradientGPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
@@ -59,14 +63,14 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	updateKurgYGPU << < gridDim, blockDim, 0, XLoop.streams[1] >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	AdvkernelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	*/
+	
 	cleanupGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	

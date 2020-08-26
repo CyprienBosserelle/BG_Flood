@@ -5,14 +5,14 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 {
 	
 	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
-
-	T eps = T(XParam.eps);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps)+epsi;
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
@@ -31,7 +31,7 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 	T hi = XEv.h[i];
 
 	T hn = XEv.h[ileft];
-	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	
 
 	if (hi > eps || hn > eps)
 	{
@@ -136,11 +136,12 @@ template __global__ void updateKurgXGPU<double>(Param XParam, BlockP<double> XBl
 template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax)
 {
 
-	T eps = T(XParam.eps);
+	
 	T delta;
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps)+epsi;
 
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -152,7 +153,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 		delta = calcres(XParam.dx, XBlock.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
-			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			for (int ix = 0; ix < (XParam.blkwidth + XParam.halowidth); ix++)
 			{
 
 
@@ -285,11 +286,12 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
 
-	T eps = T(XParam.eps);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps)+epsi;
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
-	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix , iy-1, ib);
@@ -382,11 +384,12 @@ template __global__ void updateKurgYGPU<double>(Param XParam, BlockP<double> XBl
 template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax)
 {
 
-	T eps = T(XParam.eps);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps)+epsi;
 	T delta;
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
-	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	
 
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -396,7 +399,7 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 	{
 		ib = XBlock.active[ibl];
 		delta = calcres(XParam.dx, XBlock.level[ib]);
-		for (int iy = 0; iy < (XParam.blkwidth); iy++)
+		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
@@ -411,6 +414,9 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 				T hi = XEv.h[i];
 				T hn = XEv.h[ibot];
 				T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, ga;
+
+
+				
 
 				if (hi > eps || hn > eps)
 				{
@@ -462,7 +468,10 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 					#### Topographic source term
 
 					In the case of adaptive refinement, care must be taken to ensure
-					well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+					well-balancing at coarse/fine faces */
+
+
+
 					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
 					sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
 
