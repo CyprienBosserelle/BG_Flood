@@ -116,7 +116,7 @@ template void copyID2var<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 
-template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
 	T x, y,delta;
 	T cc = 100.0;
@@ -133,7 +133,9 @@ template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Mode
 
 	XLoop.totaltime = 0.0;
 
-	XLoop.nextoutputtime = 0.2;
+	XParam.endtime = 600.0;
+	XParam.outputtimestep = 30.0;
+	XLoop.nextoutputtime = 30.0;
 
 	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
 
@@ -159,13 +161,6 @@ template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Mode
 		}
 	}
 
-
-	for (int a = 0; a < 100; a++)
-	{
-		FlowCPU(XParam, XLoop, XModel);
-	}
-	
-
 	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 
 
@@ -173,6 +168,39 @@ template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Mode
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs);
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", 3, XModel.evolv.u);
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", 3, XModel.evolv.v);
+
+
+	CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
+
+	while (XLoop.totaltime < XParam.endtime)
+	{
+		
+		FlowGPU(XParam, XLoop, XModel_g);
+
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		{
+
+			CUDA_CHECK(cudaMemcpy(XModel.evolv.h, XModel_g.evolv.h, XParam.nblkmem* XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+			CUDA_CHECK(cudaMemcpy(XModel.evolv.zs, XModel_g.evolv.zs, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+			CUDA_CHECK(cudaMemcpy(XModel.evolv.u, XModel_g.evolv.u, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+			CUDA_CHECK(cudaMemcpy(XModel.evolv.v, XModel_g.evolv.v, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+
+
+			writenctimestep(XParam.outfile, XLoop.totaltime);
+
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", XModel.evolv.h);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", XModel.evolv.zs);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", XModel.evolv.u);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", XModel.evolv.v);
+
+			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
+		}
+	}
+	
+
+	
 
 
 }
