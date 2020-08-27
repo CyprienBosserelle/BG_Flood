@@ -136,9 +136,9 @@ template <class T> void gradient(Param XParam, BlockP<T> XBlock, T* a, T*& dadx,
 	{
 		ib = XBlock.active[ibl];
 		delta = calcres(XParam.dx, XBlock.level[ib]);
-		for (int iy = 0; iy < 16; iy++)
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
-			for (int ix = 0; ix < 16; ix++)
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 				i = memloc(XParam, ix,iy,ib);
 				

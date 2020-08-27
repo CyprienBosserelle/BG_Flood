@@ -386,11 +386,11 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	if (status != NC_NOERR) handle_ncerror(status);
 
 
-	varblk = (float *)malloc(XParam.blksize * sizeof(float));
+	varblk = (float *)malloc(XParam.blkwidth* XParam.blkwidth * sizeof(float));
 	if (smallnc > 0)
 	{
 
-		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		varblk_s = (short *)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(short));
 	}
 
 
@@ -619,11 +619,11 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 	start3D[0] = nrec - 1;
 
-	varblk = (float *)malloc(XParam.blksize * sizeof(float));
+	varblk = (float *)malloc(XParam.blkwidth* XParam.blkwidth * sizeof(float));
 	if (smallnc > 0)
 	{
 
-		varblk_s = (short *)malloc(XParam.blksize * sizeof(short));
+		varblk_s = (short *)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(short));
 	}
 
 

@@ -947,7 +947,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-
+	
 
 	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
 	// This was successfully tested with a range of grid size
@@ -1023,7 +1023,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	//corrector setp
 	//update again
 
-
+	
 	gradientGPUXYBUQSM << <gridDim, blockDim, 0, streams[0] >> >((float)XParam.theta, (float)XParam.delta, leftblk_g, rightblk_g, topblk_g, botblk_g, hho_g, dhdx_g, dhdy_g);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -1063,7 +1063,7 @@ double FlowGPU(Param XParam, double nextoutputtime)
 	//
 	Advkernel << <gridDim, blockDim, 0 >> >((float)XParam.dt, (float)XParam.eps, hh_g, zb_g, uu_g, vv_g, dh_g, dhu_g, dhv_g, zso_g, hho_g, uuo_g, vvo_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
-
+	
 	//cleanup(nx, ny, hho, zso, uuo, vvo, hh, zs, uu, vv);
 	cleanupGPU << <gridDim, blockDim, 0 >> >(hho_g, zso_g, uuo_g, vvo_g, hh_g, zs_g, uu_g, vv_g);
 	CUDA_CHECK(cudaDeviceSynchronize());

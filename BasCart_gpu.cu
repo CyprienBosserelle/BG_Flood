@@ -1559,6 +1559,26 @@ void mainloopGPU(Param XParam) // float, metric coordinate
 					}
 				}
 			}
+			/*
+			CUDA_CHECK(cudaMemcpy(Fhu, Fhu_g, XParam.nblk * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+			CUDA_CHECK(cudaMemcpy(Fhv, Fhv_g, XParam.nblk * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+
+			CUDA_CHECK(cudaMemcpy(dhdx, dhdx_g, XParam.nblk * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+			CUDA_CHECK(cudaMemcpy(dhdy, dhdy_g, XParam.nblk * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+
+			CUDA_CHECK(cudaMemcpy(dzsdx, dzsdx_g, XParam.nblk * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+			CUDA_CHECK(cudaMemcpy(dzsdy, dzsdy_g, XParam.nblk * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+
+			writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, "dhdx", dhdx);
+			writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, "dhdy", dhdy);
+
+			writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, "dzsdx", dzsdx);
+			writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, "dzsdy", dzsdy);
+
+
+			writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, "Fhu", Fhu);
+			writencvarstepBUQ(XParam, 3, activeblk, level, blockxo_d, blockyo_d, "Fhv", Fhv);
+			*/
 
 			nextoutputtime = min(nextoutputtime + XParam.outputtimestep, XParam.endtime);
 
@@ -4379,6 +4399,19 @@ int main(int argc, char **argv)
 		}
 
 	}
+	/*
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "dhdx", 3, dhdx);
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "dhdy", 3, dhdy);
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "dzsdx", 3, dzsdx);
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "dzsdy", 3, dzsdy);
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "dudx", 3, dudx);
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "dudy", 3, dudy);
+	
+
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "Fhu", 3, Fhu);
+	defncvarBUQ(XParam, activeblk, level, blockxo_d, blockyo_d, "Fhv", 3, Fhv);
+	*/
+
 	//create2dnc(nx, ny, dx, dx, 0.0, xx, yy, hh);
 
 	printf("done \n");

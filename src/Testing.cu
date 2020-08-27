@@ -30,7 +30,7 @@ void TestingOutput(Param XParam, Model<T> XModel)
 
 	XLoop.totaltime = 0.0;
 
-	XLoop.nextoutputtime = 3600.0;
+	XLoop.nextoutputtime = 0.2;
 
 	//FlowCPU(XParam, XLoop, XModel);
 

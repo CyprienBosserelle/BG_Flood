@@ -59,8 +59,8 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	gradientGPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
-	updateKurgXGPU << < gridDim, blockDim, 0, XLoop.streams[0] >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYGPU << < gridDim, blockDim, 0, XLoop.streams[1] >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
+	updateKurgXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
+	updateKurgYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
