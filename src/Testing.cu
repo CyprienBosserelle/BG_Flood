@@ -116,7 +116,40 @@ template void copyID2var<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 
+template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+{
+	Loop<T> XLoop;
 
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+
+	XLoop.nextoutputtime = 0.2;
+
+	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XModel.blocks.active[ibl];
+
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+			}
+		}
+	}
+
+
+
+
+}
 
 
 template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
