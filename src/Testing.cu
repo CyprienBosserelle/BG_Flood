@@ -118,6 +118,12 @@ template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z)
 
 template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
+	T x, y,delta;
+	T cc = 100.0;
+	T a = 0.2;
+
+	T xorigin = XParam.xo + 0.5 * (XParam.xmax - XParam.xo);
+	T yorigin = XParam.yo + 0.5 * (XParam.ymax - XParam.yo);
 	Loop<T> XLoop;
 
 	XLoop.hugenegval = std::numeric_limits<T>::min();
@@ -135,6 +141,7 @@ template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Mode
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
+		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -142,14 +149,36 @@ template <class T> void Gaussianhump(Param XParam, Forcing<float> XForcing, Mode
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 				//
+				int n = memloc(XParam, ix, iy, ib);
+				x = XModel.blocks.xo[ib] + ix * delta;
+				y = XModel.blocks.yo[ib] + iy * delta;
+				XModel.evolv.zs[n] = T(0.0) + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
+
+				XModel.evolv.h[n] = XModel.evolv.zs[n] - XModel.zb[n];
 			}
 		}
 	}
 
 
+	for (int a = 0; a < 100; a++)
+	{
+		FlowCPU(XParam, XLoop, XModel);
+	}
+	
+
+	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
+
+
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", 3, XModel.evolv.h);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", 3, XModel.evolv.u);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", 3, XModel.evolv.v);
 
 
 }
+template void Gaussianhump<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
+template void Gaussianhump<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
+
 
 
 template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
