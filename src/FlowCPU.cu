@@ -21,8 +21,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	//============================================
 	// First step in reimann solver
 	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 
+	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 	//fillHalo(XParam, XModel.blocks, XModel.flux);
 	
 	XLoop.dt = double(CalctimestepCPU(XParam, XModel.blocks, XModel.time));
@@ -44,8 +46,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
 
 	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 
+	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 	//fillHalo(XParam, XModel.blocks, XModel.flux);
 
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);

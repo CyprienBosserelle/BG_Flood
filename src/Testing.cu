@@ -134,8 +134,8 @@ template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Mod
 	XLoop.totaltime = 0.0;
 
 	XParam.endtime = 600.0;
-	XParam.outputtimestep = 30.0;
-	XLoop.nextoutputtime = 30.0;
+	XParam.outputtimestep = 1.0;
+	XLoop.nextoutputtime = 1.0;
 
 	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
 

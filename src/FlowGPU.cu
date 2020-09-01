@@ -30,13 +30,16 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	dim3 blockDimKY(XParam.blkwidth , XParam.blkwidth + XParam.halowidth, 1);
 	//dim3 gridDim(XParam.nblk, 1, 1);
 
-	updateKurgXGPU << < gridDim, blockDimKX, 0, XLoop.streams[0] >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYGPU << < gridDim, blockDimKY, 0, XLoop.streams[1] >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	updateKurgXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+
+	updateKurgYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 	//updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	
 	XLoop.dt = double(CalctimestepGPU(XParam, XModel.blocks, XModel.time));
@@ -60,11 +63,14 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	gradientGPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
-	updateKurgXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
-	updateKurgYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
+	updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+
+	updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
+	AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());

@@ -40,8 +40,8 @@ template <class T> void fillHaloTopRight(Param XParam, int ib, BlockP<T> XBlock,
 	// for flux term and actually most terms, only top and right neighbours are needed!
 
 	//fillLeft(XParam, ib, XBlock, z);
-	fillRight(XParam, ib, XBlock, z);
-	fillTop(XParam, ib, XBlock, z);
+	fillRightFlux(XParam, ib, XBlock, z);
+	fillTopFlux(XParam, ib, XBlock, z);
 	//fillBot(XParam, ib, XBlock, z);
 	//fill bot
 	//fill top
@@ -60,9 +60,9 @@ template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cuda
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	//fillLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, a);
-	fillRight << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
+	fillRightFlux << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
 	//fillBot << <gridDim, blockDimHaloBT, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, a);
-	fillTop << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
+	fillTopFlux << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
 
 	CUDA_CHECK(cudaStreamSynchronize(stream));
 
@@ -594,6 +594,10 @@ template __global__ void fillLeft<float>(int halowidth, int* active, int* level,
 template __global__ void fillLeft<double>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, double* a);
 
 
+
+
+
+
 template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -797,6 +801,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 }
 
 
+
 template <class T> __global__ void fillRight(int halowidth, int* active, int* level, int * rightbot,int* righttop,int * leftbot,int*botleft,int* topleft, T* a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
@@ -971,6 +976,251 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 
 template __global__ void fillRight<float>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, float* a);
 template __global__ void fillRight<double>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
+
+template <class T> void fillRightFlux(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+{
+	int jj, bb;
+	int read, write;
+	int ii, ir, it, itr;
+
+
+	if (XBlock.RightBot[ib] == ib)//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+
+			read = memloc(XParam, XParam.blkwidth - 1, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			write = memloc(XParam, XParam.blkwidth, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			z[write] = z[read];
+		}
+
+		if (XBlock.RightTop[ib] == ib) // boundary on the top half too
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, XParam.blkwidth - 1, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, XParam.blkwidth, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+		{
+
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				write = memloc(XParam, XParam.blkwidth, j, ib);
+				jj = (j - 8) * 2;
+				ii = memloc(XParam, 0, jj, XBlock.RightTop[ib]);
+				//ir = memloc(XParam, 1, jj, XBlock.RightTop[ib]);
+				it = memloc(XParam, 0, jj + 1, XBlock.RightTop[ib]);
+				//itr = memloc(XParam, 1, jj + 1, XBlock.RightTop[ib]);
+
+				z[write] = T(0.5) * (z[ii] + z[it]);
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.RightBot[ib]]) // LeftTop block does not exist
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			//
+
+			write = memloc(XParam, XParam.blkwidth, j, ib);
+			read = memloc(XParam, 0, j, XBlock.RightBot[ib]);
+			z[write] = z[read];
+		}
+	}
+	else if (XBlock.level[XBlock.RightBot[ib]] > XBlock.level[ib])
+	{
+
+		for (int j = 0; j < XParam.blkwidth / 2; j++)
+		{
+
+			write = memloc(XParam, XParam.blkwidth, j, ib);
+
+			jj = j * 2;
+			bb = XBlock.RightBot[ib];
+
+			ii = memloc(XParam, 0, jj, bb);
+			//ir = memloc(XParam, 1, jj, bb);
+			it = memloc(XParam, 0, jj + 1, bb);
+			//itr = memloc(XParam, 1, jj + 1, bb);
+
+			//z[write] = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+			z[write] = T(0.5) * (z[ii] + z[it]);
+		}
+		//now find out aboy lefttop block
+		if (XBlock.RightTop[ib] == ib)
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, XParam.blkwidth - 1, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, XParam.blkwidth, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+				jj = (j - 8) * 2;
+				bb = XBlock.RightTop[ib];
+
+				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, XParam.blkwidth, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				//z[write] = z[read];
+				ii = memloc(XParam, 0, jj, bb);
+				//ir = memloc(XParam, 1, jj, bb);
+				it = memloc(XParam, 0, jj + 1, bb);
+				//itr = memloc(XParam, 1, jj + 1, bb);
+				z[write] = T(0.5) * (z[ii] + z[it]);
+				//z[write] = T(0.25) * (z[ii] + z[ir] + z[it] + z[itr]);
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			write = memloc(XParam, XParam.blkwidth, j, ib);
+
+
+			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+
+			ii = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
+
+			z[write] = z[ii];
+		}
+	}
+
+
+
+}
+
+template void fillRightFlux<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
+template void fillRightFlux<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+
+
+
+template <class T> __global__ void fillRightFlux(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
+{
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = blockDim.y - 1;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = active[ibl];
+
+	int RB = rightbot[ib];
+	int RT = righttop[ib];
+	int LB = leftbot[ib];
+	int BL = botleft[ib];
+	int LBRB = leftbot[RB];
+	int TLRT = topleft[RT];
+	int BLRB = botleft[RB];
+
+
+	int lev = level[ib];
+	int levRB = level[RB];
+	int levRT = level[RT];
+	int levBLRB = level[BLRB];
+	int levTLRT = level[TLRT];
+
+	int write = memloc(halowidth, blkmemwidth, blockDim.y, iy, ib);
+	int read;
+	int jj, ii, ir, it, itr;
+	T a_read;
+	T w1, w2, w3;
+
+
+	if (RB == ib)
+	{
+		if (iy < (blockDim.y / 2))
+		{
+			read = memloc(halowidth, blkmemwidth, blockDim.y - 1, iy, ib);
+			a_read = a[read];
+		}
+		else
+		{
+			if (RT == ib)
+			{
+				read = memloc(halowidth, blkmemwidth, blockDim.y - 1, iy, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				jj = (iy - (blockDim.y / 2)) * 2;
+				ii = memloc(halowidth, blkmemwidth, 0, jj, RT);
+				//ir = memloc(halowidth, blkmemwidth, 1, jj, RT);
+				it = memloc(halowidth, blkmemwidth, 0, jj + 1, RT);
+				//itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RT);
+
+				a_read = T(0.5) * (a[ii] + a[it]);
+			}
+		}
+	}
+	else if (levRB == lev)
+	{
+		read = memloc(halowidth, blkmemwidth, 0, iy, RB);
+		a_read = a[read];
+	}
+	else if (levRB > lev)
+	{
+		if (iy < (blockDim.y / 2))
+		{
+			jj = iy * 2;
+
+
+			ii = memloc(halowidth, blkmemwidth, 0, jj, RB);
+			//ir = memloc(halowidth, blkmemwidth, 1, jj, RB);
+			it = memloc(halowidth, blkmemwidth, 0, jj + 1, RB);
+			//itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RB);
+
+			a_read = T(0.5) * (a[ii] + a[it]);
+		}
+		else
+		{
+			if (RT == ib)
+			{
+				read = memloc(halowidth, blkmemwidth, blockDim.y - 1, iy, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				jj = (iy - (blockDim.y / 2)) * 2;
+
+				ii = memloc(halowidth, blkmemwidth, 0, jj, RT);
+				//ir = memloc(halowidth, blkmemwidth, 1, jj, RT);
+				it = memloc(halowidth, blkmemwidth, 0, jj + 1, RT);
+				//itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RT);
+
+				a_read = T(0.5) * (a[ii] + a[it] );
+			}
+		}
+	}
+	else if (levRB < lev)
+	{
+		//
+		jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + blockDim.y / 2;
+		
+		
+		ir = memloc(halowidth, blkmemwidth, 0, jj, RB);
+		
+		
+
+		a_read = a[ir];
+	}
+	a[write] = a_read;
+}
+template __global__ void fillRightFlux<float>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, float* a);
+template __global__ void fillRightFlux<double>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
 
 
 
@@ -1709,6 +1959,240 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 
 template __global__ void fillTop<float>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, float* a);
 template __global__ void fillTop<double>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
+
+template <class T> void fillTopFlux(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+{
+	int jj, bb;
+	int read, write;
+	int ii, ir, it, itr;
+
+
+	if (XBlock.TopLeft[ib] == ib)//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+
+			read = memloc(XParam, j, XParam.blkwidth - 1, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			write = memloc(XParam, j, XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			z[write] = z[read];
+		}
+
+		if (XBlock.TopRight[ib] == ib) // boundary on the top half too
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, j, XParam.blkwidth - 1, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+		{
+
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				write = memloc(XParam, j, XParam.blkwidth, ib);
+				jj = (j - (XParam.blkwidth / 2)) * 2;
+				ii = memloc(XParam, jj, 0, XBlock.TopRight[ib]);
+				//ir = memloc(XParam, jj, 1, XBlock.TopRight[ib]);
+				it = memloc(XParam, jj + 1, 0, XBlock.TopRight[ib]);
+				//itr = memloc(XParam, jj + 1, 1, XBlock.TopRight[ib]);
+
+				z[write] = T(0.5) * (z[ii] + z[it] );
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.TopLeft[ib]]) // LeftTop block does not exist
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			//
+
+			write = memloc(XParam, j, XParam.blkwidth, ib);
+			read = memloc(XParam, j, 0, XBlock.TopLeft[ib]);
+			z[write] = z[read];
+		}
+	}
+	else if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+	{
+
+		for (int j = 0; j < XParam.blkwidth / 2; j++)
+		{
+
+			write = memloc(XParam, j, XParam.blkwidth, ib);
+
+			jj = j * 2;
+			bb = XBlock.TopLeft[ib];
+
+			ii = memloc(XParam, jj, 0, bb);
+			//ir = memloc(XParam, jj, 1, bb);
+			it = memloc(XParam, jj + 1, 0, bb);
+			//itr = memloc(XParam, jj + 1, 1, bb);
+
+			z[write] = T(0.5) * (z[ii]  + z[it]);
+		}
+		//now find out aboy lefttop block
+		if (XBlock.TopRight[ib] == ib)
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, j, XParam.blkwidth - 1, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+				jj = (j - (XParam.blkwidth / 2)) * 2;
+				bb = XBlock.TopRight[ib];
+
+				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, XParam.blkwidth, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				//z[write] = z[read];
+				ii = memloc(XParam, jj, 0, bb);
+				//ir = memloc(XParam, jj, 1, bb);
+				it = memloc(XParam, jj + 1, 0, bb);
+				//itr = memloc(XParam, jj + 1, 1, bb);
+
+				z[write] = T(0.5) * (z[ii]  + z[it]);
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			write = memloc(XParam, j, XParam.blkwidth, ib);
+			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+						
+			ir = memloc(XParam, jj, 0, XBlock.TopLeft[ib]);
+			
+			
+
+
+			z[write] = z[ir];
+		}
+	}
+
+
+
+}
+template void fillTopFlux<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
+template void fillTopFlux<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+
+template <class T> __global__ void fillTopFlux(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
+{
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = blockDim.x - 1;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = active[ibl];
+
+	int TL = topleft[ib];
+	int TR = topright[ib];
+	int LBTL = leftbot[TL];
+	int BLTL = botleft[TL];
+	int RBTR = rightbot[TR];
+
+
+	int lev = level[ib];
+	int levTL = level[TL];
+	int levTR = level[TR];
+	int levLBTL = level[LBTL];
+	int levRBTR = level[RBTR];
+
+	int write = memloc(halowidth, blkmemwidth, ix, blockDim.x, ib);
+	int read;
+	int jj, ii, ir, it, itr;
+	T a_read;
+	T w1, w2, w3;
+
+	if (TL == ib)
+	{
+		if (ix < (blockDim.x / 2))
+		{
+			read = memloc(halowidth, blkmemwidth, ix, blockDim.x - 1, ib);
+			a_read = a[read];
+		}
+		else
+		{
+			if (TR == ib)
+			{
+				read = memloc(halowidth, blkmemwidth, ix, blockDim.x - 1, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				jj = (ix - (blockDim.x / 2)) * 2;
+				ii = memloc(halowidth, blkmemwidth, jj, 0, TR);
+				//ir = memloc(halowidth, blkmemwidth, jj, 1, TR);
+				it = memloc(halowidth, blkmemwidth, jj + 1, 0, TR);
+				//itr = memloc(halowidth, blkmemwidth, jj + 1, 1, TR);
+
+				a_read = T(0.5) * (a[ii]  + a[it] );
+			}
+		}
+	}
+	else if (levTL == lev)
+	{
+		read = memloc(halowidth, blkmemwidth, ix, 0, TL);
+		a_read = a[read];
+	}
+	else if (levTL > lev)
+	{
+		if (ix < (blockDim.x / 2))
+		{
+			jj = ix * 2;
+
+
+			ii = memloc(halowidth, blkmemwidth, jj, 0, TL);
+			//ir = memloc(halowidth, blkmemwidth, jj, 1, TL);
+			it = memloc(halowidth, blkmemwidth, jj + 1, 0, TL);
+			//itr = memloc(halowidth, blkmemwidth, jj + 1, 1, TL);
+			a_read = T(0.5) * (a[ii] + a[it]);
+		}
+		else
+		{
+			if (TR == ib)
+			{
+				read = memloc(halowidth, blkmemwidth, ix, blockDim.x - 1, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				jj = (ix - (blockDim.x / 2)) * 2;
+				ii = memloc(halowidth, blkmemwidth, jj, 0, TR);
+				//ir = memloc(halowidth, blkmemwidth, jj, 1, TR);
+				it = memloc(halowidth, blkmemwidth, jj + 1, 0, TR);
+				//itr = memloc(halowidth, blkmemwidth, jj + 1, 1, TR);
+				a_read = T(0.5) * (a[ii] + a[it]);
+			}
+		}
+	}
+	else if (levTL < lev)
+	{
+		jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
+		
+		ir = memloc(halowidth, blkmemwidth, jj, 0, TL);
+				
+		a_read =  a[ir];
+	}
+	a[write] = a_read;
+}
+
+template __global__ void fillTopFlux<float>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, float* a);
+template __global__ void fillTopFlux<double>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
+
 
 
 template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, T*& z)
