@@ -134,8 +134,8 @@ template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Mod
 	XLoop.totaltime = 0.0;
 
 	XParam.endtime = 600.0;
-	XParam.outputtimestep = 1.0;
-	XLoop.nextoutputtime = 1.0;
+	XParam.outputtimestep = 30.0;
+	XLoop.nextoutputtime = 30.0;
 
 	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
 
@@ -169,31 +169,66 @@ template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Mod
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", 3, XModel.evolv.u);
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", 3, XModel.evolv.v);
 
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqux", 3, XModel.flux.Fqux);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fquy", 3, XModel.flux.Fquy);
 
-	CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvx", 3, XModel.flux.Fqvx);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvy", 3, XModel.flux.Fqvy);
+
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhu", 3, XModel.flux.Su);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhv", 3, XModel.flux.Sv);
+
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Su", 3, XModel.flux.Su);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Sv", 3, XModel.flux.Sv);
+
+
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dh", 3, XModel.adv.dh);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", 3, XModel.adv.dhu);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", 3, XModel.adv.dhv);
+
+
+	//CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
 
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		
-		FlowGPU(XParam, XLoop, XModel_g);
+		FlowCPU(XParam, XLoop, XModel);
 
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 
 		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
 		{
-
+			/*
 			CUDA_CHECK(cudaMemcpy(XModel.evolv.h, XModel_g.evolv.h, XParam.nblkmem* XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			CUDA_CHECK(cudaMemcpy(XModel.evolv.zs, XModel_g.evolv.zs, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			CUDA_CHECK(cudaMemcpy(XModel.evolv.u, XModel_g.evolv.u, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			CUDA_CHECK(cudaMemcpy(XModel.evolv.v, XModel_g.evolv.v, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 
-
+			*/
 			writenctimestep(XParam.outfile, XLoop.totaltime);
 
 			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", XModel.evolv.h);
 			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", XModel.evolv.zs);
 			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", XModel.evolv.u);
 			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", XModel.evolv.v);
+
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqux", XModel.flux.Fqux);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fquy", XModel.flux.Fquy);
+
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvx", XModel.flux.Fqvx);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvy", XModel.flux.Fqvy);
+
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhu", XModel.flux.Su);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhv", XModel.flux.Sv);
+
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Su", XModel.flux.Su);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Sv", XModel.flux.Sv);
+
+
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo,  "dh", XModel.adv.dh);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", XModel.adv.dhu);
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", XModel.adv.dhv);
+
 
 			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
 		}

@@ -405,7 +405,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 						w1 = 1.0 / 4.0;
 						w2 = 1.0 / 2.0;
 						w3 = 1.0 / 4.0;
-						ir = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.TopRight[XBlock.LeftTop[ib]]);
+						ir = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.TopRight[XBlock.LeftTop[ib]]);
 					}
 				}
 				//
@@ -580,7 +580,7 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 					w1 = 1.0 / 4.0;
 					w2 = 1.0 / 2.0;
 					w3 = 1.0 / 4.0;
-					ir = memloc(halowidth, blkmemwidth, blockDim.y - 1, blockDim.y - 1, TRLT);
+					ir = memloc(halowidth, blkmemwidth, blockDim.y - 1, 0, TRLT);
 					
 				}
 			}
@@ -785,7 +785,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 						w1 = 1.0 / 4.0;
 						w2 = 1.0 / 2.0;
 						w3 = 1.0 / 4.0;
-						ir = memloc(XParam, 0, XParam.blkwidth - 1, XBlock.TopLeft[XBlock.RightTop[ib]]);
+						ir = memloc(XParam, 0, 0, XBlock.TopLeft[XBlock.RightTop[ib]]);
 					}
 				}
 				//
@@ -964,7 +964,7 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 					w1 = 1.0 / 4.0;
 					w2 = 1.0 / 2.0;
 					w3 = 1.0 / 4.0;
-					ir = memloc(halowidth, blkmemwidth, 0, blockDim.y - 1, TLRT);
+					ir = memloc(halowidth, blkmemwidth, 0, 0, TLRT);
 				}
 			}
 		}
@@ -1400,18 +1400,18 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 						w1 = 4.0 / 10.0;
 						w2 = 1.0 / 10.0;
 						w3 = 5.0 / 10.0;
-						ir = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.RightTop[XBlock.BotRight[ib]]);
+						ir = memloc(XParam, 0,XParam.blkwidth - 1, XBlock.RightTop[XBlock.BotRight[ib]]);
 					}
 					else if (XBlock.level[XBlock.RightTop[XBlock.BotRight[ib]]] == XBlock.level[XBlock.BotRight[ib]]) // exists with same level
 					{
-						ir = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.RightTop[XBlock.BotRight[ib]]);
+						ir = memloc(XParam,0, XParam.blkwidth - 1, XBlock.RightTop[XBlock.BotRight[ib]]);
 					}
 					else if (XBlock.level[XBlock.RightTop[XBlock.BotRight[ib]]] > XBlock.level[XBlock.BotRight[ib]]) // exists with higher level
 					{
 						w1 = 1.0 / 4.0;
 						w2 = 1.0 / 2.0;
 						w3 = 1.0 / 4.0;
-						ir = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.RightTop[XBlock.BotRight[ib]]);
+						ir = memloc(XParam,0,XParam.blkwidth - 1, XBlock.RightTop[XBlock.BotRight[ib]]);
 					}
 				}
 				//
@@ -1568,18 +1568,18 @@ template <class T> __global__ void fillBot(int halowidth, int* active, int* leve
 					w1 = 4.0 / 10.0;
 					w2 = 1.0 / 10.0;
 					w3 = 5.0 / 10.0;
-					ir = memloc(halowidth, blkmemwidth, blockDim.x - 1, 0, RTBR);
+					ir = memloc(halowidth, blkmemwidth,0, blockDim.x - 1, RTBR);
 				}
 				else if (levRTBR == levBR)
 				{
-					ir = memloc(halowidth, blkmemwidth, blockDim.x - 1, 0, RTBR);
+					ir = memloc(halowidth, blkmemwidth,0, blockDim.x - 1, RTBR);
 				}
 				else if (levRTBR > levBR)
 				{
 					w1 = 1.0 / 4.0;
 					w2 = 1.0 / 2.0;
 					w3 = 1.0 / 4.0;
-					ir = memloc(halowidth, blkmemwidth, blockDim.x - 1, blockDim.x - 1, RTBR);
+					ir = memloc(halowidth, blkmemwidth, 0, blockDim.x - 1, RTBR);
 				}
 			}
 		}
@@ -1778,7 +1778,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 						w1 = 1.0 / 4.0;
 						w2 = 1.0 / 2.0;
 						w3 = 1.0 / 4.0;
-						ir = memloc(XParam, XParam.blkwidth - 1,0, XBlock.RightBot[XBlock.TopRight[ib]]);
+						ir = memloc(XParam, 0,0, XBlock.RightBot[XBlock.TopRight[ib]]);
 					}
 				}
 				//
@@ -1948,7 +1948,7 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 					w1 = 1.0 / 4.0;
 					w2 = 1.0 / 2.0;
 					w3 = 1.0 / 4.0;
-					ir = memloc(halowidth, blkmemwidth, blockDim.x - 1, 0, RBTR);
+					ir = memloc(halowidth, blkmemwidth,0, 0, RBTR);
 				}
 			}
 		}
