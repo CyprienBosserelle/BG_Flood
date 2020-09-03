@@ -41,7 +41,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 
 	// Corrector step
-	
+	/*
 	fillHalo(XParam, XModel.blocks, XModel.evolv_o);
 
 	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
@@ -56,7 +56,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
-	
+	*/
 
 	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 
