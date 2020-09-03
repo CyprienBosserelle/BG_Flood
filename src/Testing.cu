@@ -122,10 +122,12 @@ template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Mod
 	T cc = 100.0;
 	T a = 0.2;
 
+	T* diff;
+
 	T xorigin = XParam.xo + 0.5 * (XParam.xmax - XParam.xo);
 	T yorigin = XParam.yo + 0.5 * (XParam.ymax - XParam.yo);
 	Loop<T> XLoop;
-
+	AllocateCPU(XParam.nblkmem, XParam.blksize, diff);
 	XLoop.hugenegval = std::numeric_limits<T>::min();
 
 	XLoop.hugeposval = std::numeric_limits<T>::max();
@@ -186,14 +188,16 @@ template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Mod
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", 3, XModel.adv.dhu);
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", 3, XModel.adv.dhv);
 
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "diff", 3, diff);
 
-	CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
+	//CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
 
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		
 		//FlowCPU(XParam, XLoop, XModel);
 		FlowCPU(XParam, XLoop, XModel);
+		diffdh(XParam, XModel.blocks, XModel.flux.Fhv, diff);
 
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 
@@ -230,6 +234,7 @@ template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Mod
 			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", XModel.adv.dhu);
 			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", XModel.adv.dhv);
 
+			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "diff", diff);
 
 			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
 		}
@@ -238,7 +243,7 @@ template <class T> void Gaussianhump(Param  XParam, Forcing<float> XForcing, Mod
 
 	
 
-
+	free(diff);
 }
 template void Gaussianhump<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void Gaussianhump<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
@@ -357,7 +362,29 @@ template <class T> void CompareCPUvsGPU(Param XParam, Forcing<float> XForcing, M
 template void CompareCPUvsGPU<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void CompareCPUvsGPU<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
+template <class T> void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* output)
+{
+	int iright, itop;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XBlock.active[ibl];
 
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				iright = memloc(XParam.halowidth, XParam.blkmemwidth, ix + 1, iy, ib);
+				itop = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy + 1, ib);
+
+				output[i] = input[itop] - input[i];
+			}
+		}
+	}
+}
 
 
 template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, T* cpu, T* gpu, T* dummy, T* out)
