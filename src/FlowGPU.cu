@@ -58,6 +58,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Corrector step
+	
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv_o);
 
 	gradientGPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);

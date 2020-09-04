@@ -679,7 +679,7 @@ template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XB
 		if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
 		{
 			int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
-			int ibc = memloc(halowidth, blkmemwidth, jj, blockDim.y - 1, BL);
+			int ibc = memloc(halowidth, blkmemwidth, jj, blockDim.x - 1, BL);
 			hn = XEv.h[ibc];
 			zn = zb[ibc];
 		}

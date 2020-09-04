@@ -1096,7 +1096,7 @@ template <class T> void fillRightFlux(Param XParam, int ib, BlockP<T> XBlock, T*
 
 			ii = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
 
-			z[write] = z[ii];
+			//z[write] = z[ii];
 		}
 	}
 
@@ -1215,7 +1215,7 @@ template <class T> __global__ void fillRightFlux(int halowidth, int* active, int
 		
 		
 
-		a_read = a[ir];
+		a_read = a[write];
 	}
 	a[write] = a_read;
 }
@@ -2079,7 +2079,7 @@ template <class T> void fillTopFlux(Param XParam, int ib, BlockP<T> XBlock, T*& 
 			
 
 
-			z[write] = z[ir];
+			//z[write] = z[ir];
 		}
 	}
 
@@ -2185,7 +2185,7 @@ template <class T> __global__ void fillTopFlux(int halowidth, int* active, int* 
 		
 		ir = memloc(halowidth, blkmemwidth, jj, 0, TL);
 				
-		a_read =  a[ir];
+		a_read =  a[write];
 	}
 	a[write] = a_read;
 }
