@@ -83,7 +83,10 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	
-
+	for (int i = 0; i < XLoop.num_streams; i++)
+	{
+		cudaStreamDestroy(XLoop.streams[i]);
+	}
 
 }
 template void FlowGPU<float>(Param XParam, Loop<float>& XLoop, Model<float> XModel);
