@@ -142,7 +142,8 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 	XParam.outputtimestep = 30;
 	XLoop.nextoutputtime = 30;
 
-	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
+	//InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
+	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.zs);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -159,7 +160,7 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 				int n = memloc(XParam, ix, iy, ib);
 				x = XModel.blocks.xo[ib] + ix * delta;
 				y = XModel.blocks.yo[ib] + iy * delta;
-				XModel.evolv.zs[n] = T(0.0) + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
+				XModel.evolv.zs[n] = XModel.evolv.zs[n] + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
 
 				XModel.evolv.h[n] = XModel.evolv.zs[n] - XModel.zb[n];
 			}
