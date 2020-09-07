@@ -2,7 +2,7 @@
 
 
 
-template <class T> __global__ void bottomfrictionGPU(Param XParam, BlockP<T> XBlock, T* cf,EvolvingP<T> XEvolv)
+template <class T> __global__ void bottomfrictionGPU(Param XParam, BlockP<T> XBlock, T dt, T* cf,EvolvingP<T> XEvolv)
 {
 	// Shear stress equation:
 	// Taub=cf*rho*U*sqrt(U^2+V^2)
@@ -59,11 +59,14 @@ template __global__ void bottomfrictionGPU<double>(Param XParam, BlockP<double> 
 
 
 
-template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock, T* cf, EvolvingP<T> XEvolv)
+template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock,T dt, T* cf, EvolvingP<T> XEvolv)
 {
 	T eps = T(XParam.eps);
 	T g = T(XParam.g);
 
+	int smart = XParam.frictionmodel;
+
+	T hi, ui, vi,normu;
 
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -139,5 +142,5 @@ template <class T> __host__ __device__ T smartfriction(T hi,T zo)
 template <class T> __host__ __device__ T manningfriction(T g, T hi, T n)
 {
 	T cfi= g * n * n / cbrt(hi);
-	return cfi
+	return cfi;
 }
