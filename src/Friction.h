@@ -7,8 +7,8 @@
 #include "Forcing.h"
 #include "MemManagement.h"
 
-template <class T> __global__ void bottomfriction(Param XParam, BlockP<T> XBlock, T* cf, EvolvingP<T> XEvolv);
-template <class T> __host__ void bottomfriction(Param XParam, BlockP<T> XBlock, T* cf, EvolvingP<T> XEvolv);
+template <class T> __global__ void bottomfrictionGPU(Param XParam, BlockP<T> XBlock, T* cf, EvolvingP<T> XEvolv);
+template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock, T* cf, EvolvingP<T> XEvolv);
 
 
 

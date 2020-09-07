@@ -2,7 +2,7 @@
 
 
 
-template <class T> __global__ void bottomfriction(Param XParam, BlockP<T> XBlock, T* cf,EvolvingP<T> XEvolv)
+template <class T> __global__ void bottomfrictionGPU(Param XParam, BlockP<T> XBlock, T* cf,EvolvingP<T> XEvolv)
 {
 	// Shear stress equation:
 	// Taub=cf*rho*U*sqrt(U^2+V^2)
@@ -23,7 +23,7 @@ template <class T> __global__ void bottomfriction(Param XParam, BlockP<T> XBlock
 
 
 	T normu, hi, ui, vi;
-	T ee = T(2.71828182845905);
+	
 	
 
 	hi = XEvolv.h[i];
@@ -33,25 +33,16 @@ template <class T> __global__ void bottomfriction(Param XParam, BlockP<T> XBlock
 	{
 		normu = sqrt(ui * ui + vi * vi);
 			
-		T cfi = cf[i];
+		T cfi;
 		if (smart == 1)//Smart friction formulation
 		{
-			T zo = cfi;
-			T Hbar = hi / zo;
-			if (Hbar <= ee)
-			{
-				cfi = T(1.0) / (T(0.46) * Hbar);
-			}
-			else
-			{
-				cfi = T(1.0) / (T(2.5) * (log(Hbar) - T(1.0) + T(1.359) / Hbar));
-			}
-			cfi = cfi * cfi; // 
+			cfi = smartfriction(hi, cf[i]);
+
 		}
 		if (smart == -1)// Manning friction formulation
 		{
-			T n = cfi;
-			cfi = g * n * n / cbrt(hi);
+			cfi = manningfriction(g, hi, cf[i]);
+
 
 		}
 
@@ -63,15 +54,14 @@ template <class T> __global__ void bottomfriction(Param XParam, BlockP<T> XBlock
 	
 
 }
-template __global__ void bottomfriction<float>(Param XParam, BlockP<float> XBlock, float* cf, EvolvingP<float> XEvolv);
-template __global__ void bottomfriction<double>(Param XParam, BlockP<double> XBlock, double* cf, EvolvingP<double> XEvolv);
+template __global__ void bottomfrictionGPU<float>(Param XParam, BlockP<float> XBlock, float* cf, EvolvingP<float> XEvolv);
+template __global__ void bottomfrictionGPU<double>(Param XParam, BlockP<double> XBlock, double* cf, EvolvingP<double> XEvolv);
 
 
 
-template <class T> __host__ void bottomfriction(Param XParam, BlockP<T> XBlock, T* cf, EvolvingP<T> XEvolv)
+template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock, T* cf, EvolvingP<T> XEvolv)
 {
 	T eps = T(XParam.eps);
-	T delta;
 	T g = T(XParam.g);
 
 
@@ -82,7 +72,7 @@ template <class T> __host__ void bottomfriction(Param XParam, BlockP<T> XBlock, 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		delta = calcres(XParam.dx, XBlock.level[ib]);
+		
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
@@ -97,25 +87,18 @@ template <class T> __host__ void bottomfriction(Param XParam, BlockP<T> XBlock, 
 				{
 					normu = sqrt(ui * ui + vi * vi);
 
-					T cfi = cf[i];
+					T cfi;
 					if (smart == 1)//Smart friction formulation
 					{
-						T zo = cfi;
-						T Hbar = hi / zo;
-						if (Hbar <= ee)
-						{
-							cfi = T(1.0) / (T(0.46) * Hbar);
-						}
-						else
-						{
-							cfi = T(1.0) / (T(2.5) * (log(Hbar) - T(1.0) + T(1.359) / Hbar));
-						}
-						cfi = cfi * cfi; // 
+						
+						cfi = smartfriction(hi, cf[i]);
+
 					}
 					if (smart == -1)// Manning friction formulation
 					{
 						T n = cfi;
-						cfi = g * n * n / cbrt(hi);
+						cfi = manningfriction(g, hi, n);
+
 
 					}
 
@@ -129,5 +112,32 @@ template <class T> __host__ void bottomfriction(Param XParam, BlockP<T> XBlock, 
 
 
 }
-template __host__ void bottomfriction<float>(Param XParam, BlockP<float> XBlock, float* cf, EvolvingP<float> XEvolv);
-template __host__ void bottomfriction<double>(Param XParam, BlockP<double> XBlock, double* cf, EvolvingP<double> XEvolv);
+template __host__ void bottomfrictionCPU<float>(Param XParam, BlockP<float> XBlock, float* cf, EvolvingP<float> XEvolv);
+template __host__ void bottomfrictionCPU<double>(Param XParam, BlockP<double> XBlock, double* cf, EvolvingP<double> XEvolv);
+
+
+
+template <class T> __host__ __device__ T smartfriction(T hi,T zo)
+{
+	T cfi;
+	T ee = T(2.71828182845905);
+
+	T Hbar = hi / zo;
+	if (Hbar <= ee)
+	{
+		cfi = T(1.0) / (T(0.46) * Hbar);
+	}
+	else
+	{
+		cfi = T(1.0) / (T(2.5) * (log(Hbar) - T(1.0) + T(1.359) / Hbar));
+	}
+	cfi = cfi * cfi; //
+
+	return cfi;
+}
+
+template <class T> __host__ __device__ T manningfriction(T g, T hi, T n)
+{
+	T cfi= g * n * n / cbrt(hi);
+	return cfi
+}
