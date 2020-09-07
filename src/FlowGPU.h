@@ -10,6 +10,7 @@
 #include "Gradients.h"
 #include "Kurganov.h"
 #include "Advection.h"
+#include "Friction.h"
 
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);
 
