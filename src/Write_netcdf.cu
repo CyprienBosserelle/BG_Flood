@@ -436,9 +436,9 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 			if (status != NC_NOERR) handle_ncerror(status);
 		}
 
-		status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
+		status = nc_put_att_float(ncid, var_id, "_FillValue", VarTYPE, 1, &fillval);
 		if (status != NC_NOERR) handle_ncerror(status);
-		status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+		status = nc_put_att_float(ncid, var_id, "missingvalue", VarTYPE, 1, &fillval);
 
 		if (status != NC_NOERR) handle_ncerror(status);
 
