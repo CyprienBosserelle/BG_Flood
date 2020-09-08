@@ -2,15 +2,28 @@
 
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 {
+	//============================================
+	// construct threads abnd block parameters
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
+	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
+	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
+	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
+
+	//============================================
+	// Build cuda threads for multitasking on the GPU
 	for (int i = 0; i < XLoop.num_streams; i++)
 	{
 		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[i]));
 	}
 	
+	//============================================
+	// Predictor step in reimann solver
+	//============================================
 
+	//============================================
+	//  Fill the halo for gradient reconstruction
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv);
 
 
@@ -26,60 +39,89 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	// Synchronise all ongoing streams
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	dim3 blockDimKX(XParam.blkwidth+XParam.halowidth, XParam.blkwidth, 1);
-	dim3 blockDimKY(XParam.blkwidth , XParam.blkwidth + XParam.halowidth, 1);
-	//dim3 gridDim(XParam.nblk, 1, 1);
-
+	
+	
+	//============================================
+	// Flux and Source term reconstruction
+	// X- direction
 	updateKurgXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 
+	// Y- direction
 	updateKurgYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 	//updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	//============================================
+	// Fill Halo for flux from fine to coarse
 	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
-	
-	XLoop.dt = double(CalctimestepGPU(XParam, XModel.blocks, XModel.time));
+	//============================================
+	// Reduce minimum timestep
+	XLoop.dt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
 
-	if (ceil((XLoop.nextoutputtime - XLoop.totaltime) / XLoop.dt) > 0.0)
-	{
-		XLoop.dt = (XLoop.nextoutputtime - XLoop.totaltime) / ceil((XLoop.nextoutputtime - XLoop.totaltime) / XLoop.dt);
-	}
+	
 
 	XModel.time.dt = T(XLoop.dt);
 
-	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
+	//============================================
+	// Update advection terms (dh dhu dhv) 
+	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	AdvkernelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.time.dt*T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	//============================================
+	//Update evolving variable by 1/2 time step
+	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt*T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	// Corrector step
-	
+	//============================================
+	// Corrector step in reimann solver
+	//============================================
+
+	//============================================
+	//  Fill the halo for gradient reconstruction
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv_o);
 
+	//============================================
+	// Calculate gradient for evolving parameters
 	gradientGPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
+	//============================================
+	// Flux and Source term reconstruction
+	// X- direction
 	updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 
+	// Y- direction
 	updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	//============================================
+	// Fill Halo for flux from fine to coarse
 	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
-	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
+	//============================================
+	// Update advection terms (dh dhu dhv) 
+	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
-	AdvkernelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	//============================================
+	//Update evolving variable by 1 full time step
+	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	
-	cleanupGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
+
+	//============================================
+	// Add bottom friction
+	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//============================================
+	//Copy updated evolving variable back
+	cleanupGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	

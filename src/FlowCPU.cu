@@ -3,64 +3,92 @@
 
 template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 {
-	
 	//============================================
-	//  
+	// Predictor step in reimann solver
+	//============================================
+
+	//============================================
+	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv);
 
 	//============================================
 	// Reset DTmax
 	InitArrayBUQ(XParam, XModel.blocks, XLoop.hugeposval, XModel.time.dtmax);
 	
-
 	//============================================
 	// Calculate gradient for evolving parameters
 	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv, XModel.grad);
 
-
 	//============================================
-	// First step in reimann solver
+	// Flux and Source term reconstruction
+	// X- direction
 	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 
+	// Y- direction
 	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+
+	//============================================
+	// Fill Halo for flux from fine to coarse
 	fillHalo(XParam, XModel.blocks, XModel.flux);
 	
-	XLoop.dt = double(CalctimestepCPU(XParam, XModel.blocks, XModel.time));
-		
-	if (ceil((XLoop.nextoutputtime - XLoop.totaltime) / XLoop.dt) > 0.0)
-	{
-		XLoop.dt = (XLoop.nextoutputtime - XLoop.totaltime) / ceil((XLoop.nextoutputtime - XLoop.totaltime) / XLoop.dt);
-	}
-
+	//============================================
+	// Reduce minimum timestep
+	XLoop.dt = double(CalctimestepCPU(XParam,XLoop, XModel.blocks, XModel.time));
 	XModel.time.dt = T(XLoop.dt);
 
+	//============================================
+	// Update advection terms (dh dhu dhv) 
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
 
+	//============================================
+	//Update evolving variable by 1/2 time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 
-	// Corrector step
-	
+	//============================================
+	// Corrector step in reimann solver
+	//============================================
+
+	//============================================
+	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv_o);
 
+	//============================================
+	// Calculate gradient for evolving parameters
 	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
 
+	//============================================
+	// Flux and Source term reconstruction
+	// X- direction
 	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
-
+	
+	// Y- direction
 	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax);
 	AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+
+	//============================================
+	// Fill Halo for flux from fine to coarse
 	fillHalo(XParam, XModel.blocks, XModel.flux);
 
+	//============================================
+	// Update advection terms (dh dhu dhv) 
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	
+	//============================================
+	//Update evolving variable by 1 full time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	
+	//============================================
+	// Add bottom friction
+	bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
 
+	//============================================
+	//Copy updated evolving variable back
 	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 
-
+	
 
 
 

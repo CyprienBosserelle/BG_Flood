@@ -317,7 +317,7 @@ template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, Evol
 template __host__ void cleanupCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, EvolvingP<float> XEv_o);
 template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, EvolvingP<double> XEv_o);
 
-template <class T> __host__ T CalctimestepCPU(Param XParam, BlockP<T> XBlock, TimeP<T> XTime)
+template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -344,15 +344,20 @@ template <class T> __host__ T CalctimestepCPU(Param XParam, BlockP<T> XBlock, Ti
 		}
 	}
 
+	if (ceil((XLoop.nextoutputtime - XLoop.totaltime) / dt) > 0.0)
+	{
+		dt = (XLoop.nextoutputtime - XLoop.totaltime) / ceil((XLoop.nextoutputtime - XLoop.totaltime) / dt);
+	}
+
 	return dt;
 
 	
 }
-template __host__ float CalctimestepCPU<float>(Param XParam, BlockP<float> XBlock, TimeP<float> XTime);
-template __host__ double CalctimestepCPU<double>(Param XParam, BlockP<double> XBlock, TimeP<double> XTime);
+template __host__ float CalctimestepCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
+template __host__ double CalctimestepCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
 
 
-template <class T> __host__ T CalctimestepGPU(Param XParam, BlockP<T> XBlock, TimeP<T> XTime)
+template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
 	T* dummy;
 	AllocateCPU(32, 1, dummy);
@@ -408,12 +413,18 @@ template <class T> __host__ T CalctimestepGPU(Param XParam, BlockP<T> XBlock, Ti
 
 	CUDA_CHECK(cudaMemcpy(dummy, XTime.arrmin, 32 * sizeof(T), cudaMemcpyDeviceToHost));
 
+	if (ceil((XLoop.nextoutputtime - XLoop.totaltime) / dummy[0]) > 0.0)
+	{
+		dummy[0] = (XLoop.nextoutputtime - XLoop.totaltime) / ceil((XLoop.nextoutputtime - XLoop.totaltime) / dummy[0]);
+	}
+
+
 	return dummy[0];
 
 	free(dummy);
 }
-template __host__ float CalctimestepGPU<float>(Param XParam, BlockP<float> XBlock, TimeP<float> XTime);
-template __host__ double CalctimestepGPU<double>(Param XParam, BlockP<double> XBlock, TimeP<double> XTime);
+template __host__ float CalctimestepGPU<float>(Param XParam,Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
+template __host__ double CalctimestepGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
 
 
 

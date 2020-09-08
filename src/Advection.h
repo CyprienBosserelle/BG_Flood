@@ -16,8 +16,8 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 template <class T> __global__ void cleanupGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, EvolvingP<T> XEv_o);
 template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, EvolvingP<T> XEv_o);
 
-template <class T> __host__ T CalctimestepCPU(Param XParam, BlockP<T> XBlock, TimeP<T> XTime);
-template <class T> __host__ T CalctimestepGPU(Param XParam, BlockP<T> XBlock, TimeP<T> XTime);
+template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime);
+template <class T> __host__ T CalctimestepGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime);
 
 
 
