@@ -463,7 +463,6 @@ template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned i
 }
 
 
-
 template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_idata, T* g_odata)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -479,3 +478,124 @@ template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_
 
 	g_odata[o] = g_idata[i];
 }
+
+
+template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T Rainhh ;
+
+	T x = XBlock.xo[ib] + ix * delta;
+	T y = XBlock.yo[ib] + iy * delta;
+
+	T irain = (x - T(Rain.xo)) / T(Rain.dx) + T(0.5);
+	T jrain = (y - T(Rain.yo)) / T(Rain.dx) + T(0.5);
+
+
+	if (Rain.uniform)
+	{
+		Rainhh = T(Rain.nowvalue);
+	}
+	else
+	{
+		Rainhh = T(tex2D(Rain.GPU.tex, irain, jrain));
+	}
+
+	
+	
+	Rainhh = Rainhh / T(1000.0) / T(3600.0) ; // convert from mm/hrs to m/s
+
+	XAdv.dh[i] += Rainhh;
+}
+
+template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T uwindi,vwindi;
+
+	T x = XBlock.xo[ib] + ix * delta;
+	T y = XBlock.yo[ib] + iy * delta;
+
+	
+
+
+	if (Uwind.uniform)
+	{
+		uwindi = T(Uwind.nowvalue);
+	}
+	else
+	{
+		T iuw = (x - T(Uwind.xo)) / T(Uwind.dx) + T(0.5);
+		T juw = (y - T(Uwind.yo)) / T(Uwind.dx) + T(0.5);
+		uwindi = T(tex2D(Uwind.GPU.tex, iuw, juw));
+	}
+	if (Vwind.uniform)
+	{
+		vwindi = T(Vwind.nowvalue);
+	}
+	else
+	{
+		T ivw = (x - T(Vwind.xo)) / T(Vwind.dx) + T(0.5);
+		T jvw = (y - T(Vwind.yo)) / T(Vwind.dx) + T(0.5);
+		vwindi = T(tex2D(Vwind.GPU.tex, ivw, jvw));
+	}
+
+
+	//Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
+
+	//XAdv.dh[i] += Rainhh;
+}
+
+
+template <class T> __device__ T readDynforcing(T x, T y, DynForcingP<float> Forcing)
+{
+	T read;
+	if (Forcing.uniform)
+	{
+		read = T(Forcing.nowvalue);
+	}
+	else
+	{
+		T ivw = (x - T(Forcing.xo)) / T(Forcing.dx) + T(0.5);
+		T jvw = (y - T(Forcing.yo)) / T(Forcing.dx) + T(0.5);
+		read = T(tex2D(Forcing.GPU.tex, ivw, jvw));
+	}
+}
+/*
+template <class T> __host__ T readDynforcing(T x, T y, DynForcingP<float> Forcing)
+{
+	T read;
+	if (Forcing.uniform)
+	{
+		read = T(Forcing.nowvalue)
+	}
+	else
+	{
+		T ivw = (x - T(Forcing.xo)) / T(Forcing.dx) + T(0.5);
+		T jvw = (y - T(Forcing.yo)) / T(Forcing.dx) + T(0.5);
+		///
+	}
+}
+*/

@@ -26,12 +26,12 @@ class forcingmap : public inputmap {
 public:
 	
 	int nt;
-	int uniform = 0;
+	bool uniform = false;
 	double to, tmax;
 	double dt;
 	std::string inputfile;
 	std::vector<Windin> unidata; // only used if uniform forcing
-
+	double nowvalue; // temporary storage for value at a given time
 	TexSetP GPU;
 
 };
