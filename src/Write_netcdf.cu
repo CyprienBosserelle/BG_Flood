@@ -780,3 +780,5 @@ template <class T> void Save2Netcdf(Param XParam, Model<T> XModel)
 		}
 	}
 }
+template void Save2Netcdf<float>(Param XParam, Model<float> XModel);
+template void Save2Netcdf<double>(Param XParam, Model<double> XModel);

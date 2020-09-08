@@ -243,6 +243,7 @@ template void InitRivers<double>(Param XParam, Forcing<float> &XForcing, Model<d
 
 template<class T> void Initmaparray(Model<T>& XModel)
 {
+	//Main Parameters
 	XModel.OutputVarMap["zb"] = XModel.zb;
 
 	XModel.OutputVarMap["u"] = XModel.evolv.u;
@@ -253,6 +254,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["h"] = XModel.evolv.h;
 
+	//Mean Max parameters
 	XModel.OutputVarMap["hmean"] = XModel.evmean.h;
 
 	XModel.OutputVarMap["hmax"] = XModel.evmax.h;
@@ -271,6 +273,57 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["vort"] = XModel.vort;
 
+	//others
+
+	XModel.OutputVarMap["uo"] = XModel.evolv_o.u;
+
+	XModel.OutputVarMap["vo"] = XModel.evolv_o.v;
+
+	XModel.OutputVarMap["zso"] = XModel.evolv_o.zs;
+
+	XModel.OutputVarMap["ho"] = XModel.evolv_o.h;
+
+	// Gradients
+
+	XModel.OutputVarMap["dhdx"] = XModel.grad.dhdx;
+
+	XModel.OutputVarMap["dhdy"] = XModel.grad.dhdy;
+
+	XModel.OutputVarMap["dudx"] = XModel.grad.dudx;
+
+	XModel.OutputVarMap["dudy"] = XModel.grad.dudy;
+
+	XModel.OutputVarMap["dvdx"] = XModel.grad.dvdx;
+
+	XModel.OutputVarMap["dvdy"] = XModel.grad.dvdy;
+
+	XModel.OutputVarMap["dzsdx"] = XModel.grad.dzsdx;
+
+	XModel.OutputVarMap["dzsdy"] = XModel.grad.dzsdy;
+
+	//Flux
+	XModel.OutputVarMap["Fhu"] = XModel.flux.Fhu;
+
+	XModel.OutputVarMap["Fhv"] = XModel.flux.Fhv;
+
+	XModel.OutputVarMap["Fqux"] = XModel.flux.Fqux;
+
+	XModel.OutputVarMap["Fqvy"] = XModel.flux.Fqvy;
+
+	XModel.OutputVarMap["Fquy"] = XModel.flux.Fquy;
+
+	XModel.OutputVarMap["Fqvx"] = XModel.flux.Fqvx;
+
+	XModel.OutputVarMap["Su"] = XModel.flux.Su;
+
+	XModel.OutputVarMap["Sv"] = XModel.flux.Sv;
+
+	//Advance
+	XModel.OutputVarMap["dh"] = XModel.adv.dh;
+
+	XModel.OutputVarMap["dhu"] = XModel.adv.dhu;
+
+	XModel.OutputVarMap["dhv"] = XModel.adv.dhv;
 }
 
 template void Initmaparray<float>(Model<float>& XModel);

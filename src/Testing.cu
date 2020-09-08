@@ -142,6 +142,17 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 	XParam.outputtimestep = 30;
 	XLoop.nextoutputtime = 30;
 
+	std::string outvi[15] = {"h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+
+	std::vector<std::string> outv;
+
+	for (int nv = 0; nv < 15; nv++)
+	{
+		outv.push_back(outvi[nv]);
+	}
+		   
+	XParam.outvars = outv;
+
 	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.zs);
 
@@ -167,102 +178,55 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 		}
 	}
 
+	if (XParam.GPUDEVICE >= 0)
+	{
+		CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
+	}
 
-	CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
+	InitSave2Netcdf(XParam, XModel);
 
-	/*
-	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
-
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", 3, XModel.evolv.h);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", 3, XModel.evolv.u);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", 3, XModel.evolv.v);
-
-	CompareCPUvsGPU(XParam, XModel, XModel_g);
-	*/
-	
-	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
-
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", 3, XModel.evolv.h);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", 3, XModel.evolv.u);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", 3, XModel.evolv.v);
-	
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqux", 3, XModel.flux.Fqux);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fquy", 3, XModel.flux.Fquy);
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvx", 3, XModel.flux.Fqvx);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvy", 3, XModel.flux.Fqvy);
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhu", 3, XModel.flux.Su);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhv", 3, XModel.flux.Sv);
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Su", 3, XModel.flux.Su);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Sv", 3, XModel.flux.Sv);
-
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dh", 3, XModel.adv.dh);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", 3, XModel.adv.dhu);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", 3, XModel.adv.dhv);
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "diff", 3, diff);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "shuffle", 3, shuffle);
+	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "diff", 3, diff);
+	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "shuffle", 3, shuffle);
 	
 
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		
-		//FlowCPU(XParam, XLoop, XModel);
-		FlowGPU(XParam, XLoop, XModel_g);
+		if (XParam.GPUDEVICE >= 0)
+		{
+			FlowGPU(XParam, XLoop, XModel_g);
+		}
+		else
+		{
+			FlowCPU(XParam, XLoop, XModel);
+		}
+		
+
+		
 		//diffdh(XParam, XModel.blocks, XModel.flux.Su, diff, shuffle);
 		//diffSource(XParam, XModel.blocks, XModel.flux.Fqux, XModel.flux.Su, diff);
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 
 		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
 		{
+			if (XParam.GPUDEVICE >= 0)
+			{
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+				}
+			}
 			
-			CUDA_CHECK(cudaMemcpy(XModel.evolv.h, XModel_g.evolv.h, XParam.nblkmem* XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
-			CUDA_CHECK(cudaMemcpy(XModel.evolv.zs, XModel_g.evolv.zs, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
-			CUDA_CHECK(cudaMemcpy(XModel.evolv.u, XModel_g.evolv.u, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
-			CUDA_CHECK(cudaMemcpy(XModel.evolv.v, XModel_g.evolv.v, XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+			Save2Netcdf(XParam, XModel);
 			
-			
-			writenctimestep(XParam.outfile, XLoop.totaltime);
 
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", XModel.evolv.h);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", XModel.evolv.zs);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", XModel.evolv.u);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", XModel.evolv.v);
-			/*
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqux", XModel.flux.Fqux);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fquy", XModel.flux.Fquy);
-
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvx", XModel.flux.Fqvx);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvy", XModel.flux.Fqvy);
-
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhu", XModel.flux.Su);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhv", XModel.flux.Sv);
-
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Su", XModel.flux.Su);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Sv", XModel.flux.Sv);
-
-
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo,  "dh", XModel.adv.dh);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", XModel.adv.dhu);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", XModel.adv.dhv);
-
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "diff", diff);
-			writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "shuffle", shuffle);
-			*/
 			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
 		}
 	}
 	
 	
 	
-
+	free(shuffle);
 	free(diff);
 }
 template void Gaussianhump<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
