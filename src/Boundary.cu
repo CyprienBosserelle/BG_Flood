@@ -1,13 +1,13 @@
 ﻿#include "Boundary.h"
 
 
-template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int isright, int istop, EvolvingP<T> XEv, T*zb)
+template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, EvolvingP<T> XEv, T*zb)
 {
 	dim3 blockDim(16, 1, 1);
 	dim3 gridDimBBND(side.nblk, 1, 1);
 
 	T* un, * ut;
-	if (isright == 0)
+	if (side.isright == 0)
 	{
 		//top or bottom
 		un = XEv.v;
@@ -53,7 +53,7 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int
 
 			
 			// No slip wall
-			noslipbnd << <gridDimBBND, blockDim, 0 >> > (XParam.halowidth,isright, istop, side.blks_g, XEv.zs, XEv.h, un);
+			noslipbnd << <gridDimBBND, blockDim, 0 >> > (XParam.halowidth,side, XEv.zs, XEv.h, un);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else if (side.type == 1)
@@ -66,10 +66,10 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int
 
 }
 
-template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, bndparam side, int isright, int istop, EvolvingP<float> XEv, float* zb);
-template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, bndparam side, int isright, int istop, EvolvingP<double> XEv, double* zb);
+template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, bndparam side, EvolvingP<float> XEv, float* zb);
+template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, bndparam side, EvolvingP<double> XEv, double* zb);
 
-template <class T> __global__ void noslipbnd(Param XParam,int isright, int istop, int* bndblck, T* zs, T* h, T* un)
+template <class T> __global__ void noslipbnd(Param XParam, bndparam side, T* zs, T* h, T* un)
 {
 	//
 
@@ -77,79 +77,70 @@ template <class T> __global__ void noslipbnd(Param XParam,int isright, int istop
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
 	
-	unsigned int i, j;
+	unsigned int ix, iy;
 
-	if (isright == 0)
+	if (side.isright == 0)
 	{
-		i = threadIdx.x;
-		j = istop < 0 ? 0 : (blockDim.x - 1);
+		ix = threadIdx.x;
+		iy = side.istop < 0 ? 0 : (blockDim.x - 1);
 	}
 	else
 	{
-		j = threadIdx.x;
-		i = iright < 0 ? 0 : (blockDim.x - 1);
+		iy = threadIdx.x;
+		ix = side.iright < 0 ? 0 : (blockDim.x - 1);
 	}
 
-
-	 
-	//unsigned int j = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
-	//unsigned int ib = XBlock.active[ibl];
-
-
-
-
+	
 	int ib = bndblck[ibl];
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	
-
-	int inside= Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
-
-
-	if (isbnd(isright, istop, blockDim.x, ix, iy))
-	{
-
-
-		un[i] = T(0.0);
-		zs[i] = zs[inside];
-		//ut[i] = ut[inside];
-		h[i] = h[inside];
-	}
-
+	int inside= Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+	   	
+	un[i] = T(0.0);
+	zs[i] = zs[inside];
+	//ut[i] = ut[inside];
+	h[i] = h[inside];
+	
 }
 
-template <class T> __host__ void noslipbnd(Param XParam, int isright, int istop, int* bndblck, T* zs, T* h, T* un)
+template <class T> __host__ void noslipbnd(Param XParam, bndparam side, T* zs, T* h, T* un)
 {
 
 	//
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+
+
+	for (int ibl = 0; ibl < side.nblk; ibl++)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = bndblck[ibl];
-
-		
-		for (int iy = 0; iy < XParam.blkwidth; iy++)
-		{
-			for (int ix = 0; ix < XParam.blkwidth; ix++)
-			{
-
-
-
-				int i = memloc(XParam, ix, iy, ib);
-				int inside = Inside(XParam.halowidth, XParam.blkmemwidth, isright, istop, ix, iy, ib);
-
 				
-				if (isbnd(isright, istop, XParam.blkwidth, ix, iy))
-				{
+		for (int tx = 0; tx < XParam.blkwidth; Tx++)
+		{
 
+			unsigned int ix, iy;
 
-					un[i] = T(0.0);
-					zs[i] = zs[inside];
-					//ut[i] = ut[inside];
-					h[i] = h[inside];
-				}
+			if (side.isright == 0)
+			{
+				ix = tx;
+				iy = side.istop < 0 ? 0 : (XParam.blkwidth - 1);
 			}
+			else
+			{
+				iy = tx;
+				ix = side.iright < 0 ? 0 : (XParam.blkwidth - 1);
+			}
+				
+			int i = memloc(XParam, ix, iy, ib);
+			int inside = Inside(XParam.halowidth, XParam.blkmemwidth, side.isright, side.istop, ix, iy, ib);
+								
+			un[i] = T(0.0);
+			zs[i] = zs[inside];
+			//ut[i] = ut[inside];
+			h[i] = h[inside];
+				
 		}
+		
 	}
 
 }

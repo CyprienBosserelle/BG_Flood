@@ -76,6 +76,8 @@ public:
 	std::string inputfile;
 	int nblk = 0; //number of blocks where this bnd applies
 	int side = 0; // 0: top bnd, 1: rightbnd, 2: bot bnd, 3, Left bnd
+	int isright = 0;
+	int istop = 0;
 	bndTexP GPU;
 	int* blks; // array of block where bnd applies 
 	int* blks_g; // Also needed for GPU (because it should be a gpu allocated pointer) This is not pretty at all! In the future maybe using pagelocked memory or other new type may be beneficial 
