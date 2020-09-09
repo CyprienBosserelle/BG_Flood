@@ -10,7 +10,7 @@
 #include "Mesh.h"
 #include "MemManagement.h"
 
-template <class T> void fillHalo(Param XParam, int ib, BlockP<T> XBlock, T* z);
+template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev);
@@ -22,7 +22,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, GradientsP<T
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
 
-template <class T> void fillHaloTopRight(Param XParam, int ib, BlockP<T> XBlock, T* z);
+template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
 
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T*& z);

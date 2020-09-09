@@ -35,20 +35,6 @@ template <class T> void gradientGPU(Param XParam, Loop<T>& XLoop, BlockP<T>XBloc
 template void gradientGPU<float>(Param XParam, Loop<float>& XLoop, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
 template void gradientGPU<double>(Param XParam, Loop<double>& XLoop, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
 
-template <class T> void gradientCPU(Param XParam, Loop<T>& XLoop, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
-{
-	
-
-	gradient(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	gradient(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	gradient(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-	gradient(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
-
-	
-	fillHalo(XParam, XBlock, XGrad);
-}
-template void gradientCPU<float>(Param XParam, Loop<float>& XLoop, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
-template void gradientCPU<double>(Param XParam, Loop<double>& XLoop, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
 
 template <class T> __global__ void gradient(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 {
@@ -124,7 +110,7 @@ template <class T> __global__ void gradient(int halowidth, int* active, int* lev
 }
 
 
-template <class T> void gradient(Param XParam, BlockP<T> XBlock, T* a, T*& dadx, T*& dady)
+template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx, T* dady)
 {
 
 	int i,ib;
@@ -158,7 +144,25 @@ template <class T> void gradient(Param XParam, BlockP<T> XBlock, T* a, T*& dadx,
 
 
 }
+template void gradientC<float>(Param XParam, BlockP<float> XBlock, float* a, float* dadx, float* dady);
+template void gradientC<double>(Param XParam, BlockP<double> XBlock, double* a, double* dadx, double* dady);
+
+template <class T> void gradientCPU(Param XParam, Loop<T> XLoop, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
+{
 
 
+	std::thread t0(&gradientC<T>, XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	std::thread t1(&gradientC<T>, XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	std::thread t2(&gradientC<T>, XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	std::thread t3(&gradientC<T>, XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
+	t0.join();
+	t1.join();
+	t2.join();
+	t3.join();
+
+	fillHalo(XParam, XBlock, XGrad);
+}
+template void gradientCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
+template void gradientCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
 

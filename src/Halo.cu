@@ -1,6 +1,6 @@
 ﻿#include "Halo.h"
 
-template <class T> void fillHalo(Param XParam, int ib, BlockP<T> XBlock, T* z)
+template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
 	
 
@@ -13,8 +13,21 @@ template <class T> void fillHalo(Param XParam, int ib, BlockP<T> XBlock, T* z)
 	
 
 }
-template void fillHalo<double>(Param XParam, int ib, BlockP<double> XBlock, double* z);
-template void fillHalo<float>(Param XParam, int ib, BlockP<float> XBlock, float* z);
+template void fillHaloD<double>(Param XParam, int ib, BlockP<double> XBlock, double* z);
+template void fillHaloD<float>(Param XParam, int ib, BlockP<float> XBlock, float* z);
+
+template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int ib;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		fillHaloD(XParam, ib, XBlock, z);
+	}
+}
+template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
+template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
@@ -35,21 +48,26 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, cudaStrea
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
 
-template <class T> void fillHaloTopRight(Param XParam, int ib, BlockP<T> XBlock, T* z)
+template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 {
 	// for flux term and actually most terms, only top and right neighbours are needed!
 
 	//fillLeft(XParam, ib, XBlock, z);
-	fillRightFlux(XParam, ib, XBlock, z);
-	fillTopFlux(XParam, ib, XBlock, z);
+	int ib;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		fillRightFlux(XParam, ib, XBlock, z);
+		fillTopFlux(XParam, ib, XBlock, z);
+	}
 	//fillBot(XParam, ib, XBlock, z);
 	//fill bot
 	//fill top
 
 
 }
-template void fillHaloTopRight<double>(Param XParam, int ib, BlockP<double> XBlock, double* z);
-template void fillHaloTopRight<float>(Param XParam, int ib, BlockP<float> XBlock, float* z);
+template void fillHaloTopRightC<double>(Param XParam, BlockP<double> XBlock, double* z);
+template void fillHaloTopRightC<float>(Param XParam, BlockP<float> XBlock, float* z);
 
 
 template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
@@ -73,19 +91,23 @@ template void fillHaloTopRightGPU<float>(Param XParam, BlockP<float> XBlock, cud
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev)
 {
-	int ib;
+	
+		std::thread t0(fillHaloC<T>,XParam, XBlock, Xev.h);
+		std::thread t1(fillHaloC<T>,XParam, XBlock, Xev.zs);
+		std::thread t2(fillHaloC<T>,XParam, XBlock, Xev.u);
+		std::thread t3(fillHaloC<T>,XParam, XBlock, Xev.v);
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		ib = XBlock.active[ibl];
-		fillHalo(XParam, ib, XBlock, Xev.h);
-		fillHalo(XParam, ib, XBlock, Xev.zs);
-		fillHalo(XParam, ib, XBlock, Xev.u);
-		fillHalo(XParam, ib, XBlock, Xev.v);
-	}
+		t0.join();
+		t1.join();
+		t2.join();
+		t3.join();
+	
 }
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev);
+
+
+
 
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev)
 {
@@ -114,21 +136,27 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad)
 {
-	int ib;
+	
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		ib = XBlock.active[ibl];
-		fillHalo(XParam, ib, XBlock, Grad.dhdx);
-		fillHalo(XParam, ib, XBlock, Grad.dudx);
-		fillHalo(XParam, ib, XBlock, Grad.dvdx);
-		fillHalo(XParam, ib, XBlock, Grad.dzsdx);
+	std::thread t0(fillHaloC<T>,XParam, XBlock, Grad.dhdx);
+	std::thread t1(fillHaloC<T>,XParam, XBlock, Grad.dudx);
+	std::thread t2(fillHaloC<T>,XParam, XBlock, Grad.dvdx);
+	std::thread t3(fillHaloC<T>,XParam, XBlock, Grad.dzsdx);
 
-		fillHalo(XParam, ib, XBlock, Grad.dhdy);
-		fillHalo(XParam, ib, XBlock, Grad.dudy);
-		fillHalo(XParam, ib, XBlock, Grad.dvdy);
-		fillHalo(XParam, ib, XBlock, Grad.dzsdy);
-	}
+	std::thread t4(fillHaloC<T>,XParam, XBlock, Grad.dhdy);
+	std::thread t5(fillHaloC<T>,XParam, XBlock, Grad.dudy);
+	std::thread t6(fillHaloC<T>,XParam, XBlock, Grad.dvdy);
+	std::thread t7(fillHaloC<T>,XParam, XBlock, Grad.dzsdy);
+
+	t0.join();
+	t1.join();
+	t2.join();
+	t3.join();
+	t4.join();
+	t5.join();
+	t6.join();
+	t7.join();
+	
 }
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, GradientsP<float> Grad);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, GradientsP<double> Grad);
@@ -166,21 +194,27 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, Gradients
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 {
-	int ib;
+	
+		
+	std::thread t0(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fhu);
+	std::thread t1(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fhv);
+	std::thread t2(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fqux);
+	std::thread t3(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fquy);
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		ib = XBlock.active[ibl];
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Fhu);
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Fhv);
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Fqux);
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Fquy);
+	std::thread t4(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fqvx);
+	std::thread t5(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fqvy);
+	std::thread t6(fillHaloTopRightC<T>, XParam, XBlock, Flux.Su);
+	std::thread t7(fillHaloTopRightC<T>, XParam, XBlock, Flux.Sv);
 
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Fqvx);
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Fqvy);
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Su);
-		fillHaloTopRight(XParam, ib, XBlock, Flux.Sv);
-	}
+	t0.join();
+	t1.join();
+	t2.join();
+	t3.join();
+	t4.join();
+	t5.join();
+	t6.join();
+	t7.join();
+	
 }
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
