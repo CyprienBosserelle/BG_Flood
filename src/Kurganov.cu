@@ -1,7 +1,7 @@
 #include "Kurganov.h"
 
 
-template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax)
+template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb)
 {
 	
 	unsigned int halowidth = XParam.halowidth;
@@ -11,9 +11,20 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int RB, LBRB, LB, RBLB, levRB, levLB;
+	RB = XBlock.RightBot[ib];
+	levRB = XBlock.level[RB];
+	LBRB = XBlock.LeftBot[RB];
+
+	LB = XBlock.LeftBot[ib];
+	levLB = XBlock.level[LB];
+	RBLB = XBlock.RightBot[LB];
+
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps)+epsi;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.dx), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	// This is based on kurganov and Petrova 2007
@@ -21,6 +32,8 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix-1, iy, ib);
+
+	
 
 	
 	T dhdxi = XGrad.dhdx[i];
@@ -103,17 +116,32 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 		*/
 		/*
 		#### Topographic source term
-
+		
 		In the case of adaptive refinement, care must be taken to ensure
-		well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
+		well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+		if ((ix == blockDim.y) && levRB < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + blockDim.y / 2;
+			int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
+			hi = XEv.h[iright];
+			zi = zb[iright];
+		}
+		if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + blockDim.y / 2;
+			int ilc = memloc(halowidth, blkmemwidth, blockDim.y - 1, jj, LB);
+			hn = XEv.h[ilc];
+			zn = zb[ilc];
+		}
+
 		sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
 		sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
-		*/
+		
 		////Flux update
 
 		XFlux.Fhu[i] = fmu * fh;
-		XFlux.Fqux[i] = fmu * fu;// (fu - sl);
-		XFlux.Su[i] = fmu * fu;// (fu - sr);
+		XFlux.Fqux[i] = fmu * (fu - sl);
+		XFlux.Su[i] = fmu * (fu - sr);
 		XFlux.Fqvx[i] = fmu * fv;
 	}
 	else
@@ -129,8 +157,8 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 
 
 }
-template __global__ void updateKurgXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax);
-template __global__ void updateKurgXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax);
+template __global__ void updateKurgXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb);
+template __global__ void updateKurgXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
 
 template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T * zb)
@@ -234,7 +262,7 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 template __global__ void AddSlopeSourceXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* zb);
 template __global__ void AddSlopeSourceXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* zb);
 
-template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax)
+template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb)
 {
 
 	
@@ -248,10 +276,23 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
+	int RB, LBRB, LB, RBLB, levRB, levLB;
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		delta = calcres(XParam.dx, XBlock.level[ib]);
+		int lev = XBlock.level[ib];
+		delta = calcres(XParam.dx, lev);
+
+		// neighbours for source term
+		
+		RB = XBlock.RightBot[ib];
+		levRB = XBlock.level[RB];
+		LBRB = XBlock.LeftBot[RB];
+
+		LB = XBlock.LeftBot[ib];
+		levLB = XBlock.level[LB];
+		RBLB = XBlock.RightBot[LB];
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth + XParam.halowidth); ix++)
@@ -349,14 +390,30 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 					In the case of adaptive refinement, care must be taken to ensure
 					well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+
+					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
+					{
+						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
+						hi = XEv.h[iright];
+						zi = zb[iright];
+					}
+					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
+					{
+						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+						hn = XEv.h[ilc];
+						zn = zb[ilc];
+					}
+
 					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
 					sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
 
 					////Flux update
 
 					XFlux.Fhu[i] = fmu * fh;
-					XFlux.Fqux[i] = fmu * fu;// (fu - sl);
-					XFlux.Su[i] = fmu * fu;// (fu - sr);
+					XFlux.Fqux[i] = fmu * (fu - sl);
+					XFlux.Su[i] = fmu * (fu - sr);
 					XFlux.Fqvx[i] = fmu * fv;
 				}
 				else
@@ -374,8 +431,8 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 
 }
-template __host__ void updateKurgXCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax);
-template __host__ void updateKurgXCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax);
+template __host__ void updateKurgXCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
+template __host__ void updateKurgXCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
 
 template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
@@ -493,7 +550,7 @@ template __host__ void AddSlopeSourceXCPU<double>(Param XParam, BlockP<double> X
 
 
 
-template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax)
+template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
@@ -503,9 +560,20 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
 
+	int lev = XBlock.level[ib];
+
+	int TL, BLTL, BL, TLBL, levTL, levBL;
+	TL = XBlock.TopLeft[ib];
+	levTL = XBlock.level[TL];
+	BLTL = XBlock.BotLeft[TL];
+
+	BL = XBlock.BotLeft[ib];
+	levBL = XBlock.level[BL];
+	TLBL = XBlock.TopLeft[BL];
+
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps)+epsi;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.dx), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	
@@ -578,11 +646,33 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 		//sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
 		//sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
 
+		//#### Topographic source term
+		//In the case of adaptive refinement, care must be taken to ensure
+		//	well - balancing at coarse / fine faces(see[notes / balanced.tm]()). * /
+
+		if ((iy == blockDim.x) && levTL < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
+			int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);;
+			hi = XEv.h[itop];
+			zi = zb[itop];
+		}
+		if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
+			int ibc = memloc(halowidth, blkmemwidth, jj, blockDim.x - 1, BL);
+			hn = XEv.h[ibc];
+			zn = zb[ibc];
+		}
+
+		sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
+		sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
+
 		////Flux update
 
 		XFlux.Fhv[i] = fmv * fh;
-		XFlux.Fqvy[i] = fmv * fu;// (fu - sl);
-		XFlux.Sv[i] = fmv * fu;// (fu - sr);
+		XFlux.Fqvy[i] = fmv * (fu - sl);
+		XFlux.Sv[i] = fmv * (fu - sr);
 		XFlux.Fquy[i] = fmv * fv;
 	}
 	else
@@ -595,8 +685,8 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 	}
 
 }
-template __global__ void updateKurgYGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax);
-template __global__ void updateKurgYGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax);
+template __global__ void updateKurgYGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb);
+template __global__ void updateKurgYGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
 
 template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
@@ -699,7 +789,7 @@ template __global__ void AddSlopeSourceYGPU<double>(Param XParam, BlockP<double>
 
 
 
-template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax)
+template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax,T*zb)
 {
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
@@ -713,10 +803,27 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
+	int TL, BLTL, BL, TLBL, levTL, levBL, lev;
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		delta = calcres(XParam.dx, XBlock.level[ib]);
+		
+
+
+		
+		TL = XBlock.TopLeft[ib];
+		levTL = XBlock.level[TL];
+		BLTL = XBlock.BotLeft[TL];
+
+		BL = XBlock.BotLeft[ib];
+		levBL = XBlock.level[BL];
+		TLBL = XBlock.TopLeft[BL];
+
+		lev = XBlock.level[ib];
+
+		delta = calcres(XParam.dx, lev);
+
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
@@ -788,7 +895,20 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 					In the case of adaptive refinement, care must be taken to ensure
 					well-balancing at coarse/fine faces */
 
-
+					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the right halo
+					{
+						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);;
+						hi = XEv.h[itop];
+						zi = zb[itop];
+					}
+					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
+					{
+						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
+						hn = XEv.h[ibc];
+						zn = zb[ibc];
+					}
 
 					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
 					sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
@@ -796,8 +916,8 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 					////Flux update
 
 					XFlux.Fhv[i] = fmv * fh;
-					XFlux.Fqvy[i] = fmv * fu;// (fu - sl);
-					XFlux.Sv[i] = fmv * fu;// (fu - sr);
+					XFlux.Fqvy[i] = fmv *  (fu - sl);
+					XFlux.Sv[i] = fmv * (fu - sr);
 					XFlux.Fquy[i] = fmv * fv;
 				}
 				else
@@ -812,8 +932,8 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 		}
 	}
 }
-template __host__ void updateKurgYCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax);
-template __host__ void updateKurgYCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax);
+template __host__ void updateKurgYCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
+template __host__ void updateKurgYCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
 template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
 {
