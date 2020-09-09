@@ -3,7 +3,7 @@
 
 template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int isright, int istop, EvolvingP<T> XEv, T*zb)
 {
-	dim3 blockDim(16, 16, 1);// this should be only 16,1 or 1,16!!
+	dim3 blockDim(16, 1, 1);
 	dim3 gridDimBBND(side.nblk, 1, 1);
 
 	T* un, * ut;
@@ -69,18 +69,41 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, bndparam side, int
 template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, bndparam side, int isright, int istop, EvolvingP<float> XEv, float* zb);
 template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, bndparam side, int isright, int istop, EvolvingP<double> XEv, double* zb);
 
-template <class T> __global__ void noslipbnd(int halowidth,int isright, int istop, int* bndblck, T* zs, T* h, T* un)
+template <class T> __global__ void noslipbnd(Param XParam,int isright, int istop, int* bndblck, T* zs, T* h, T* un)
 {
 	//
 
-	int ix = threadIdx.x;
-	int iy = threadIdx.y;
-	int ibl = blockIdx.x;
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
+	unsigned int i, j;
+
+	if (isright == 0)
+	{
+		i = threadIdx.x;
+		j = istop < 0 ? 0 : (blockDim.x - 1);
+	}
+	else
+	{
+		j = threadIdx.x;
+		i = iright < 0 ? 0 : (blockDim.x - 1);
+	}
+
+
+	 
+	//unsigned int j = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	//unsigned int ib = XBlock.active[ibl];
+
+
+
 
 	int ib = bndblck[ibl];
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	
 
-	int i = memloc(halowidth, halowidth + blockDim.x, ix , iy , ib);
-	int inside= Inside(halowidth, halowidth + blockDim.x, isright, istop, ix, iy, ib);
+	int inside= Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
 
 	if (isbnd(isright, istop, blockDim.x, ix, iy))
