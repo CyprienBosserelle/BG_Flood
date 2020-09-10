@@ -41,6 +41,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 
 		// Forcing
 
+
 		// Core engine
 		if (XParam.GPUDEVICE >= 0)
 		{
@@ -54,6 +55,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// River 
 
 		// Time keeping
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 
 		// Do Sum & Max variables Here
 
