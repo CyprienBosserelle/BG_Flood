@@ -41,7 +41,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		//XParam.leftbnd.data = readWLfile(XParam.leftbnd.inputfile);
 		XForcing.left.data = readbndfile(XForcing.left.inputfile, XParam, 0);
 
-		XParam.leftbnd = true; // redundant?
+		XForcing.left.on = true; 
+		XForcing.left.nbnd = XForcing.left.data.size();
+
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.left);
@@ -52,7 +54,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	if (!XForcing.right.inputfile.empty())
 	{
 		XForcing.right.data = readbndfile(XForcing.right.inputfile, XParam, 2);
-		XParam.rightbnd = true;
+		XForcing.right.on = true;
+		XForcing.right.nbnd = XForcing.top.data.size();
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.right);
@@ -61,7 +64,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	if (!XForcing.top.inputfile.empty())
 	{
 		XForcing.top.data = readbndfile(XForcing.top.inputfile, XParam, 3);
-		XParam.topbnd = true;
+		XForcing.top.on = true;
+		XForcing.top.nbnd = XForcing.top.data.size();
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.top);
@@ -70,7 +74,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	if (!XForcing.bot.inputfile.empty())
 	{
 		XForcing.bot.data = readbndfile(XForcing.bot.inputfile, XParam, 1);
-		XParam.botbnd = true;
+		XForcing.bot.on = true;
+		XForcing.bot.nbnd = XForcing.bot.data.size();
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.bot);

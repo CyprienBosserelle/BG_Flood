@@ -10,7 +10,7 @@
 #include "Arrays.h"
 #include "Write_txtlog.h"
 #include "GridManip.h"
-#include "InitEvolv.cu"
+#include "InitEvolv.h"
 
 
 template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel);

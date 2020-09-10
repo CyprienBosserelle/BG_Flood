@@ -1072,9 +1072,22 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		}
 	}
 
-	
+	//setup extra infor about boundaries
+	XForcing.left.side = 3;
+	XForcing.left.isright = -1;
+	XForcing.left.istop = 0;
 
+	XForcing.right.side = 1;
+	XForcing.right.isright = 1;
+	XForcing.right.istop = 0;
 
+	XForcing.top.side = 0;
+	XForcing.top.isright = 0;
+	XForcing.top.istop = 1;
+
+	XForcing.bot.side = 2;
+	XForcing.bot.isright = 0;
+	XForcing.bot.istop = -1;
 
 
 	// Check whether endtime was specified by the user

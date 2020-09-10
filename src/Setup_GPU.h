@@ -8,6 +8,7 @@
 #include "Arrays.h"
 #include "MemManagement.h"
 #include "Halo.h"
+#include "InitialConditions.h"
 
 void CUDA_CHECK(cudaError CUDerr);
 

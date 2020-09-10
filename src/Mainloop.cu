@@ -22,12 +22,26 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	//while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-		Flowbnd(XParam, XLoop, XForcing.left, -1, 0, XModel.evolv, XModel.zb);
-		Flowbnd(XParam, XLoop, XForcing.right, 1, 0, XModel.evolv, XModel.zb);
-		Flowbnd(XParam, XLoop, XForcing.top, 0, 1, XModel.evolv, XModel.zb);
-		Flowbnd(XParam, XLoop, XForcing.bot, 0, -1, XModel.evolv, XModel.zb);
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XModel_g.evolv);
+		}
+		else
+		{
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XModel.evolv);
+		}
+		
 
 		// Forcing
+
+		// Core engine
 		if (XParam.GPUDEVICE >= 0)
 		{
 			FlowGPU(XParam, XLoop, XModel_g);
@@ -37,10 +51,6 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 			FlowCPU(XParam, XLoop, XModel);
 		}
 		
-
-		// Core engine
-
-
 		// River 
 
 		// Time keeping
