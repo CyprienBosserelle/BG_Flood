@@ -71,7 +71,7 @@ public:
 // used as vector class to store Time series outputs
 class Pointout {
 public:
-	double time, zs, hh, uu,vv;
+	double time, zs, h, u,v;
 };
 
 

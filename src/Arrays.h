@@ -77,8 +77,9 @@ struct AdaptP
 
 struct BndblockP
 {
-	int nblkriver, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
+	int nblkriver, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
 	int* river;
+	int* Tsout;
 	//int * DrainSink;
 	//int * DrainSource;
 	//int * Bridges;
@@ -134,7 +135,7 @@ struct Model
 	std::map<std::string, T *> OutputVarMap;
 
 	//other output
-	std::vector< std::vector< Pointout > > TSallout;
+	//std::vector< std::vector< Pointout > > TSallout;
 	T* TSstore;//buffer for TS data so not to save to disk too often
 	T* vort;
 	EvolvingP<T> evmean;

@@ -86,13 +86,9 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	
 	if (XParam.TSnodesout.size() > 0)
 	{
-		FindTSoutNodes(XParam, XModel.blocks);
+		FindTSoutNodes(XParam, XModel.blocks,XModel.bndblk);
 
-		for (int o = 0; o < XParam.TSnodesout.size(); o++)
-		{
-			// Add empty row for each output point
-			XModel.TSallout.push_back(std::vector<Pointout>());
-		}
+		
 	}
 	
 
@@ -122,11 +118,14 @@ void InitTSOutput(Param XParam)
 	}
 }
 
-template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock)
+template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP & bnd)
 {
 	int ib;
 	T levdx;
-	
+	bnd.nblkTs = XParam.TSnodesout.size();
+
+	AllocateCPU(bnd.nblkTs, 1, bnd.Tsout);
+
 	// Initialise all storage involving parameters
 	
 	
@@ -148,12 +147,13 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock)
 				break;
 			}
 		}
+		bnd.Tsout[o] = ib;
 	}
 	
 
 }
-template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock);
-template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock);
+template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock, BndblockP& bnd);
+template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock, BndblockP& bnd);
 
 
 
