@@ -35,7 +35,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 
 		// Do Sum & Max variables Here
-		
+		Calcmeanmax(XParam, XLoop, XModel, XModel_g);
 
 		// Check & collect TSoutput
 		pointoutputstep(XParam, XLoop, XModel, XModel_g);
@@ -43,6 +43,8 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Check for map output
 		mapoutput(XParam, XLoop, XModel, XModel_g);
 
+		// Reset mean/Max if needed
+		
 	}
 	
 
@@ -108,6 +110,7 @@ template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XF
 }
 
 
+
 template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP<T>& XEv)
 {
 	dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
@@ -161,7 +164,77 @@ template void resetmeanGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float>
 template void resetmeanGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, EvolvingP<double>& XEv);
 
 
-template <class T> void resetmeanmax(Param XParam, Loop<T> XLoop, Model<T> XModel, Model<T> XModel_g)
+
+
+template <class T> void Calcmeanmax(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
+{
+	dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim = (XParam.nblk, 1, 1);
+
+	if (XParam.outmean)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.h, XModel_g.evolv.h);
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.zs, XModel_g.evolv.zs);
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.u, XModel_g.evolv.u);
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.v, XModel_g.evolv.v);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			addavg_varCPU(XParam, XModel.blocks, XModel.evmean.h, XModel.evolv.h);
+			addavg_varCPU(XParam, XModel.blocks, XModel.evmean.zs, XModel.evolv.zs);
+			addavg_varCPU(XParam, XModel.blocks, XModel.evmean.u, XModel.evolv.u);
+			addavg_varCPU(XParam, XModel.blocks, XModel.evmean.v, XModel.evolv.v);
+		}
+
+		XLoop.nstep++;
+
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001))
+		{
+			// devide by number of steps
+			if (XParam.GPUDEVICE >= 0)
+			{
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.h);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.zs);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.u);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.v);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			else
+			{
+				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.h);
+				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.zs);
+				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.u);
+				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.v);
+			}
+
+			//XLoop.nstep will be reset after a save to the disk which occurs in a different function
+		}
+
+	}
+	if (XParam.outmax)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.h, XModel_g.evolv.h);
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.zs, XModel_g.evolv.zs);
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.u, XModel_g.evolv.u);
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.v, XModel_g.evolv.v);
+		}
+		else
+		{
+			max_varCPU(XParam, XModel.blocks, XModel.evmax.h, XModel.evolv.h);
+			max_varCPU(XParam, XModel.blocks, XModel.evmax.zs, XModel.evolv.zs);
+			max_varCPU(XParam, XModel.blocks, XModel.evmax.u, XModel.evolv.u);
+			max_varCPU(XParam, XModel.blocks, XModel.evmax.v, XModel.evolv.v);
+		}
+	}
+}
+
+
+template <class T> void resetmeanmax(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	// Reset mean and or max only at output steps
 	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001))
@@ -177,6 +250,7 @@ template <class T> void resetmeanmax(Param XParam, Loop<T> XLoop, Model<T> XMode
 			{
 				resetmeanCPU(XParam, XLoop, XModel.blocks, XModel.evmean);
 			}
+			XLoop.nstep = 0;
 		}
 
 		//Reset Max 
@@ -344,3 +418,113 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 		store[3 + outnode * 4 + istep * noutnodes * 4] = XEv.v[i];
 	}
 }
+
+template <class T> __global__ void addavg_varGPU(Param XParam,BlockP<T> XBlock, T* Varmean, T* Var)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+
+	Varmean[i] = Varmean[i] + Var[i];
+	
+}
+
+template <class T> __host__ void addavg_varCPU(Param XParam, BlockP<T> XBlock, T* Varmean, T* Var)
+{
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				Varmean[i] = Varmean[i] + Var[i];
+			}
+		}
+	}
+
+}
+
+template <class T> __global__ void divavg_varGPU(Param XParam, BlockP<T> XBlock, T ntdiv, T* Varmean)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	
+	Varmean[i] = Varmean[i] / ntdiv;
+
+}
+
+template <class T> __host__ void divavg_varCPU(Param XParam, BlockP<T> XBlock, T ntdiv, T* Varmean)
+{
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				Varmean[i] = Varmean[i] / ntdiv;
+			}
+		}
+	}
+
+}
+
+template <class T> __global__ void max_varGPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	Varmax[i] = max(Varmax[i], Var[i]);
+
+}
+
+template <class T> __host__ void max_varCPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var)
+{
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				Varmax[i] = utils::max(Varmax[i], Var[i]);
+			}
+		}
+	}
+
+}
+
