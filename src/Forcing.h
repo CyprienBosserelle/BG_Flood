@@ -29,6 +29,7 @@ public:
 	bool uniform = false;
 	double to, tmax;
 	double dt;
+	int instep = 0; // last step that was read
 	std::string inputfile;
 	std::vector<Windin> unidata; // only used if uniform forcing
 	double nowvalue; // temporary storage for value at a given time
@@ -45,7 +46,7 @@ public:
 	double startime = 0.0;
 	double duration = 0.0;
 	T* val;
-
+	T* val_g;
 };
 
 
@@ -55,7 +56,10 @@ struct DynForcingP: public forcingmap
 	T *now;
 	T *before, *after;
 	T* val; // useful for reading from file
-	//Add map here?
+	
+	// gpu version of these array
+	T* now_g;
+	T* before_g, * after_g;
 
 };
 

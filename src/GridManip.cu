@@ -287,3 +287,42 @@ template void InterpstepCPU<int>(int nx, int ny, int hdstep, int totaltime, int 
 template void InterpstepCPU<float>(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
 template void InterpstepCPU<double>(int nx, int ny, int hdstep, double totaltime, double hddt, double *&Ux, double *Uo, double *Un);
 
+template <class T> __global__ void InterpstepGPU(int nx, int ny, int hdstp, T totaltime, T hddt, T*Ux, T* Uo, T* Un)
+{
+	unsigned int ix = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int iy = blockIdx.y * blockDim.y + threadIdx.y;
+	unsigned int tx = threadIdx.x;
+	unsigned int ty = threadIdx.y;
+
+	__shared__ T Uxo[16][16];
+	__shared__ T Uxn[16][16];
+	//	__shared__ float Ums[16];
+
+
+
+	if (ix < nx && iy < ny)
+	{
+		Uxo[tx][ty] = Uo[ix + nx * iy]/**Ums[tx]*/;
+		Uxn[tx][ty] = Un[ix + nx * iy]/**Ums[tx]*/;
+
+		Ux[ix + nx * iy] = Uxo[tx][ty] + (totaltime - hddt * hdstp) * (Uxn[tx][ty] - Uxo[tx][ty]) / hddt;
+	}
+}
+//template __global__ void InterpstepGPU<int>(int nx, int ny, int hdstp, T totaltime, T hddt, T* Ux, T* Uo, T* Un);
+template __global__ void InterpstepGPU<float>(int nx, int ny, int hdstp, float totaltime, float hddt, float* Ux, float* Uo, float* Un);
+template __global__ void InterpstepGPU<double>(int nx, int ny, int hdstp, double totaltime, double hddt, double* Ux, double* Uo, double* Un);
+
+template <class T> void Copy2CartCPU(int nx, int ny, T* dest, T* src)
+{
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			dest[i + nx * j] = src[i + nx * j];
+		}
+	}
+}
+template void Copy2CartCPU<int>(int nx, int ny, int* dest, int* src);
+template void Copy2CartCPU<bool>(int nx, int ny, bool* dest, bool* src);
+template void Copy2CartCPU<float>(int nx, int ny, float* dest, float* src);
+template void Copy2CartCPU<double>(int nx, int ny, double* dest, double* src);

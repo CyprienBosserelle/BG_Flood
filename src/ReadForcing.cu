@@ -142,7 +142,20 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		if (XForcing.UWind.uniform == 1)
 		{
 			// grid uniform time varying wind input: wlevs[0] is wind speed and wlev[1] is direction
+			XForcing.VWind.inputfile = XForcing.UWind.inputfile;
 			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.grdalpha);
+			XForcing.VWind.unidata = readWNDfileUNI(XForcing.VWind.inputfile, XParam.grdalpha);
+
+			// this below is a bit ugly but it simplifies the other functions
+			for (int n = 0; n < XForcing.VWind.unidata.size(); n++)
+			{
+				XForcing.VWind.unidata[n].wspeed = XForcing.VWind.unidata[n].vwind;
+			}
+			for (int n = 0; n < XForcing.UWind.unidata.size(); n++)
+			{
+				XForcing.UWind.unidata[n].wspeed = XForcing.UWind.unidata[n].uwind;
+			}
+			
 		}
 		else
 		{
@@ -234,7 +247,7 @@ template void readstaticforcing<deformmap<float>>(int step, deformmap<float>& Sf
 template void readstaticforcing<StaticForcingP<float>>(int step, StaticForcingP<float>& Sforcing);
 
 //template void readstaticforcing<DynForcingP<float>>(int step, DynForcingP<float>& Sforcing);
-void readDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
+void InitDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing);
 
@@ -245,10 +258,40 @@ void readDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
 		readforcingdata(totaltime, Dforcing);
 		if (gpgpu)
 		{ 
+			AllocateGPU(Dforcing.nx, Dforcing.ny, Dforcing.now_g);
+			AllocateGPU(Dforcing.nx, Dforcing.ny, Dforcing.before_g);
+			AllocateGPU(Dforcing.nx, Dforcing.ny, Dforcing.after_g);
+			CopytoGPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.now_g);
+			CopytoGPU(Dforcing.nx, Dforcing.ny, Dforcing.before, Dforcing.before_g);
+			CopytoGPU(Dforcing.nx, Dforcing.ny, Dforcing.after, Dforcing.after_g);
+
 			// Allocate and bind textures
 			AllocateTEX(Dforcing.nx, Dforcing.ny, Dforcing.GPU, Dforcing.now);
 		}
 		
+	}
+	else
+	{
+		//Error message
+		log("Error while reading forcing map file: " + Dforcing.inputfile);
+	}
+}
+
+void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
+{
+	Dforcing = readforcinghead(Dforcing);
+
+
+	if (Dforcing.nx > 0 && Dforcing.ny > 0)
+	{
+		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
+		readforcingdata(totaltime, Dforcing);
+		if (gpgpu)
+		{
+			// Allocate and bind textures
+			AllocateTEX(Dforcing.nx, Dforcing.ny, Dforcing.GPU, Dforcing.now);
+		}
+
 	}
 	else
 	{
