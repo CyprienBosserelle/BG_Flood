@@ -353,6 +353,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
 	float fillval = 9.9692e+36f;
+	short fillval_s = (short)round((9.9692e+36f - addoffset) / scalefactor);
 	//short Sfillval = 32767;
 	//short fillval = 32767
 	static size_t start2D[] = { 0, 0 }; // start at first value 
@@ -436,12 +437,23 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 			if (status != NC_NOERR) handle_ncerror(status);
 		}
 
-		status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
-		if (status != NC_NOERR) handle_ncerror(status);
-		status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+		if (smallnc > 0)
+		{
 
-		if (status != NC_NOERR) handle_ncerror(status);
+			status = nc_put_att_short(ncid, var_id, "_FillValue", NC_SHORT, 1, &fillval_s);
+			if (status != NC_NOERR) handle_ncerror(status);
+			status = nc_put_att_short(ncid, var_id, "missingvalue", NC_SHORT, 1, &fillval_s);
 
+			if (status != NC_NOERR) handle_ncerror(status);
+		}
+		else
+		{
+			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_ncerror(status);
+			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+
+			if (status != NC_NOERR) handle_ncerror(status);
+		}
 		
 
 		if (smallnc > 0)
