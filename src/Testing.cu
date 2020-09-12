@@ -6,6 +6,16 @@
 
 
 
+/*! \fn bool testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+* Wrapping function for all the inbuilt test
+* This function is the entry point to the software
+*/
+template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+{
+	//
+}
+
+
 /*! \fn int main(int argc, char **argv)
 * Main function 
 * This function is the entry point to the software

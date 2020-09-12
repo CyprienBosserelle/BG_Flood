@@ -107,10 +107,19 @@ int main(int argc, char **argv)
 	//   End of Initialisation time
 	//===========================================
 	XParam.setupcputime = clock();
-	//============================================
-	// MainLoop
-	MainLoop(XParam, XForcing, XModel, XModel_g);
 
+	if (XParam.test < 0)
+	{
+		//============================================
+		// MainLoop
+		MainLoop(XParam, XForcing, XModel, XModel_g);
+	}
+	else
+	{
+		//============================================
+		// Testing
+
+	}
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
 	//TestingOutput(XParam, XModel);

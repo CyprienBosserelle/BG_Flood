@@ -8,6 +8,7 @@
 class Param {
 public:
 	//general parameters
+	int test = -1;//-1:no test; 0:some test; 1:test 0 and XX test
 	double g=9.81; // Gravity
 	double rho=1025.0; // fluid density
 	double eps= 0.0001; // //drying height in m
