@@ -33,11 +33,14 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		AllocateGPU(XForcing.bot.nblk, 1, XForcing.bot.blks_g);
 		CopytoGPU(XForcing.bot.nblk, 1, XForcing.bot.blks, XForcing.bot.blks_g);
 
-		// things are quite different for Time Series output. Why is that?. 
-		AllocateCPU(XModel.bndblk.nblkTs, 1, XModel_g.bndblk.Tsout);
-		CopytoGPU(XModel.bndblk.nblkTs, 1, XModel.bndblk.Tsout, XModel_g.bndblk.Tsout);
+		// things are quite different for Time Series output. Why is that?.
+		if (XModel.bndblk.nblkTs > 0)
+		{
 
+			AllocateGPU(XModel.bndblk.nblkTs, 1, XModel_g.bndblk.Tsout);
+			CopytoGPU(XModel.bndblk.nblkTs, 1, XModel.bndblk.Tsout, XModel_g.bndblk.Tsout);
 
+		}
 
 		// Reset GPU mean and max arrays
 		if (XParam.outmax)

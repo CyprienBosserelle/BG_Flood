@@ -130,6 +130,8 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 {
 	T x, y,delta;
 	T cc = 100.0;
+	
+
 	T a = 0.2;
 
 	T* diff,*shuffle;
@@ -152,7 +154,7 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 	XParam.outputtimestep = 30;
 	XLoop.nextoutputtime = 30;
 
-	std::string outvi[15] = {"h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+	std::string outvi[16] = {"zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
 
 	std::vector<std::string> outv;
 
@@ -183,6 +185,9 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 				y = XModel.blocks.yo[ib] + iy * delta;
 				XModel.evolv.zs[n] = XModel.evolv.zs[n] + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
 
+				T azb = 2.0;
+				T cczb = 500.0;
+				XModel.zb[n] = XModel.zb[n] - azb * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cczb * cczb));
 				XModel.evolv.h[n] = XModel.evolv.zs[n] - XModel.zb[n];
 			}
 		}
