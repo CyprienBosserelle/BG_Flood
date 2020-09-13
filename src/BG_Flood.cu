@@ -118,6 +118,7 @@ int main(int argc, char **argv)
 	{
 		//============================================
 		// Testing
+		Gaussianhump(XParam, XModel, XModel_g);
 
 	}
 

@@ -118,6 +118,13 @@ Param readparamstr(std::string line, Param param)
 	//
 
 
+	parameterstr = "test";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.test = std::stoi(parametervalue);
+	}
+
 	parameterstr = "gpudevice";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
