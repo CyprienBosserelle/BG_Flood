@@ -118,7 +118,7 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 				//{
 				//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);
 				//}
-				XEv.h[n] = max(XEv.zs[n] - zb[n], XParam.eps);//0.0?
+				XEv.h[n] = max(XEv.zs[n] - zb[n], T(0.0));//0.0?
 			}
 		}
 	}
@@ -322,7 +322,7 @@ void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, Ev
 
 
 				XEv.zs[n] = utils::max(zsbnd, zb[n]);
-				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(XParam.eps));
+				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
 				XEv.u[n] = T(0.0);
 				XEv.v[n] = T(0.0);
 
@@ -353,7 +353,7 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 
 					XEv.zs[n] = max(XEv.zs[n] + T(XParam.zsoffset), zb[n]);
 
-					XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(XParam.eps));
+					XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
 				}
 			}
 
@@ -525,7 +525,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 						int n = memloc(XParam, i, j, ib);
 
 
-						XEv.h[n] = utils::max(XEv.zs[n] - zb[n], (T)XParam.eps);
+						XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
 					}
 
 				}
