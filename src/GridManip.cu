@@ -211,8 +211,8 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				n = (i+XParam.halowidth) + (j+XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-				x = XBlock.xo[ib] + i * blkdx;
-				y = XBlock.yo[ib] + j * blkdx;
+				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
+				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
 
 				//if (x >= xo && x <= xmax && y >= yo && y <= ymax)
 				{

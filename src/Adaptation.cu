@@ -191,7 +191,7 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 		if (coarsen[ib] == true)
 		{
 			//if this block is a lower left corner block of teh potentialy coarser block
-			if (((int((XBlock.xo[ib] - XParam.xo) / dxfac / XParam.blkwidth) % 2) == 0 && (int((XBlock.yo[ib] - XParam.yo) / dxfac / XParam.blkwidth) % 2) == 0 && XBlock.RightBot[ib] != ib &&  XBlock.TopLeft[ib] != ib && XBlock.RightBot[XBlock.TopRight[ib]] != XBlock.TopRight[ib]))
+			if (((int((XBlock.xo[ib]) / dxfac / XParam.blkwidth) % 2) == 0 && (int((XBlock.yo[ib]) / dxfac / XParam.blkwidth) % 2) == 0 && XBlock.RightBot[ib] != ib &&  XBlock.TopLeft[ib] != ib && XBlock.RightBot[XBlock.TopRight[ib]] != XBlock.TopRight[ib]))
 			{
 				//if all the neighbour blocks ar at the same level
 				if (XBlock.level[ib] == XBlock.level[XBlock.RightBot[ib]] && XBlock.level[ib] == XBlock.level[XBlock.TopLeft[ib]] && XBlock.level[ib] == XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]])
@@ -516,8 +516,8 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 		if (XAdapt.coarsen[ib] == true)
 		{
 			double dxfac = calcres(XParam.dx, XBlock.level[ib]);
-			int xnode = int((XBlock.xo[ib] - XParam.xo) / dxfac / XParam.blkwidth);
-			int ynode = int((XBlock.yo[ib] - XParam.yo) / dxfac / XParam.blkwidth);
+			int xnode = int((XBlock.xo[ib]) / dxfac / XParam.blkwidth);
+			int ynode = int((XBlock.yo[ib]) / dxfac / XParam.blkwidth);
 
 			int ibr = XBlock.RightBot[ib];
 			int ibtl = XBlock.TopLeft[ib];

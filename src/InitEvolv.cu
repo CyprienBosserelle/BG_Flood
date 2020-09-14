@@ -161,8 +161,8 @@ void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, Ev
 				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 
 				double levdx = calcres(XParam.dx, XBlock.level[ib]);
-				xi = XBlock.xo[ib] + i * levdx;
-				yi = XBlock.yo[ib] + j * levdx;
+				xi = XParam.xo + XBlock.xo[ib] + i * levdx;
+				yi = XParam.yo + XBlock.yo[ib] + j * levdx;
 
 				disttop = max((XParam.ymax - yi) / levdx, 0.1);//max((double)(ny - 1) - j, 0.1);// WTF is that 0.1? // distleft cannot be 0 //theoretical minumun is 0.5?
 				distbot = max((yi - XParam.yo) / levdx, 0.1);

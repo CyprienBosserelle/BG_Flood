@@ -119,11 +119,11 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 
 	if (side.isright == 0)
 	{
-		itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+		itx = (xx) / (XParam.xmax - XParam.xo) * side.nbnd;
 	}
 	else
 	{
-		itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+		itx = (yy) / (XParam.ymax - XParam.yo) * side.nbnd;
 	}
 
 
@@ -230,11 +230,11 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 
 			if (side.isright == 0)
 			{
-				itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+				itx = (xx) / (XParam.xmax - XParam.xo) * side.nbnd;
 			}
 			else
 			{
-				itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+				itx = (yy) / (XParam.ymax - XParam.yo) * side.nbnd;
 			}
 
 

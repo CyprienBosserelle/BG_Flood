@@ -496,8 +496,8 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 
 	T Rainhh ;
 
-	T x = XBlock.xo[ib] + ix * delta;
-	T y = XBlock.yo[ib] + iy * delta;
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
 	T irain = (x - T(Rain.xo)) / T(Rain.dx) + T(0.5);
 	T jrain = (y - T(Rain.yo)) / T(Rain.dx) + T(0.5);
@@ -535,8 +535,8 @@ template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBl
 
 	T uwindi,vwindi;
 
-	T x = XBlock.xo[ib] + ix * delta;
-	T y = XBlock.yo[ib] + iy * delta;
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
 	
 
