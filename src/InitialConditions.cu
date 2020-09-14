@@ -373,14 +373,14 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 			//bndtopblk[blbt] = bl;
 
 		}
-		if ((botyo) > (-1.0 * initlevdx))
+		if (botyo < (2.0*levdx))
 		{
 			//
 			blbb++;
 			//bndbotblk[blbb] = bl;
 
 		}
-		if ((leftxo) > (-1.0 * initlevdx))
+		if (leftxo < (2.0 * levdx))
 		{
 			//
 			blbl++;
@@ -395,6 +395,7 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	XForcing.top.nblk = blbt;
 	XForcing.bot.nblk = blbb;
 
+
 	XParam.nbndblkleft = blbl;
 	XParam.nbndblkright = blbr;
 	XParam.nbndblktop = blbt;
@@ -402,9 +403,48 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 
 }
+/*
+template <class T> void CalcMaskblk(Param XParam, Model<T> XModel, Forcing<float>& XForcing)
+{
+	int nmask = 0;
+	bool hasghost = false;
+	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+	T initlevdx = calcres(XParam.dx, XParam.initlevel);
 
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		T levdx = calcres(XParam.dx, XBlock.level[ib]);
 
-template <class T> void Findbndblks(Param XParam,Model<T> XModel,Forcing<float> &XForcing)
+		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
+
+		leftyo = XBlock.yo[ib];
+		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
+		rightyo = XBlock.yo[ib];
+		topxo = XBlock.xo[ib];
+		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
+		botxo = XBlock.xo[ib];
+		botyo = XBlock.yo[ib];
+
+		if ((XModel.blocks.LeftBot[ib] == ib || XModel.blocks.LeftTop[ib] == ib) && leftxo > initlevdx)
+		{
+			hasghost = true;
+		}
+		if ((XModel.blocks.BotLeft[ib] == ib || XModel.blocks.BotRight[ib] == ib) && botyo > initlevdx)
+		{
+			hasghost = true;
+		}
+		if ((XModel.blocks.TopLeft[ib] == ib || XModel.blocks.TopRight[ib] == ib) && ((topyo - (XParam.ymax - XParam.yo)) < (-1.0 * initlevdx)))
+		{
+
+		
+
+	}
+}
+
+*/
+
+template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
 {
 	//=====================================
 	// Find how many blocks are on each bnds
@@ -453,14 +493,14 @@ template <class T> void Findbndblks(Param XParam,Model<T> XModel,Forcing<float> 
 			blbt++;
 
 		}
-		if ((botyo) > (-1.0 * initlevdx))
+		if (botyo < initlevdx)
 		{
 			//
 			XForcing.bot.blks[blbb] = ib;
 			blbb++;
 
 		}
-		if ((leftxo) > (-1.0 * initlevdx))
+		if (leftxo < initlevdx)
 		{
 			//
 			XForcing.left.blks[blbl] = ib;

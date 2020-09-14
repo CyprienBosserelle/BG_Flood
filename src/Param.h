@@ -91,7 +91,7 @@ public:
 	int nbndblktop = 0;
 	int nbndblkbot = 0;
 	
-
+	int nmaskblk = 0;
 
 	//hot start
 	double zsinit = nan(""); //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
