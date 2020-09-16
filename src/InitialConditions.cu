@@ -403,11 +403,12 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 
 }
-/*
+
+
 template <class T> void CalcMaskblk(Param XParam, Model<T> XModel, Forcing<float>& XForcing)
 {
 	int nmask = 0;
-	bool hasghost = false;
+	bool neighbourmask = false;
 	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
 
@@ -428,21 +429,25 @@ template <class T> void CalcMaskblk(Param XParam, Model<T> XModel, Forcing<float
 
 		if ((XModel.blocks.LeftBot[ib] == ib || XModel.blocks.LeftTop[ib] == ib) && leftxo > initlevdx)
 		{
-			hasghost = true;
+			neighbourmask = true;
 		}
 		if ((XModel.blocks.BotLeft[ib] == ib || XModel.blocks.BotRight[ib] == ib) && botyo > initlevdx)
 		{
-			hasghost = true;
+			neighbourmask = true;
 		}
 		if ((XModel.blocks.TopLeft[ib] == ib || XModel.blocks.TopRight[ib] == ib) && ((topyo - (XParam.ymax - XParam.yo)) < (-1.0 * initlevdx)))
 		{
-
-		
+			neighbourmask = true;
+		}
+		if ((XModel.blocks.RightBot[ib] == ib || XModel.blocks.RightBot[ib] == ib) && ((rightxo - (XParam.xmax - XParam.xo)) < (-1.0 * initlevdx)))
+		{
+			neighbourmask = true;
+		}
 
 	}
 }
 
-*/
+
 
 template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
 {

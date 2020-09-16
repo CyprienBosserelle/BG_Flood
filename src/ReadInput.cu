@@ -15,11 +15,21 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.         //
 //////////////////////////////////////////////////////////////////////////////////
 
-
-
-
 #include "ReadInput.h"
 
+// Collection of functions to read input to the model
+
+
+/*! \fn T readfileinfo(std::string input,T outinfo)
+* convert file name into name and extension
+* This is used for various input classes
+*
+* template inputmap readfileinfo<inputmap>(std::string input, inputmap outinfo);
+* template forcingmap readfileinfo<forcingmap>(std::string input, forcingmap outinfo);
+* template StaticForcingP<float> readfileinfo<StaticForcingP<float>>(std::string input, StaticForcingP<float> outinfo);
+* template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input, DynForcingP<float> outinfo);
+* template deformmap<float> readfileinfo<deformmap<float>>(std::string input, deformmap<float> outinfo);
+*/
 template <class T> T readfileinfo(std::string input,T outinfo)
 {
 	// Outinfo is based on an inputmap (or it's sub classes)
@@ -61,9 +71,9 @@ template deformmap<float> readfileinfo<deformmap<float>>(std::string input, defo
 
 
 
-/*! \fn Param Readparamfile(Param XParam)
+/*! \fn void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 * Open the BG_param.txt file and read the parameters
-* save the parameter in the Param structure and return an XParam.
+* save the parameter in the Param class and or Forcing class.
 */
 void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 {
@@ -106,7 +116,10 @@ void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 
 
 
-
+/*! \fn Param readparamstr(std::string line, Param param)
+* Read BG_param.txt line and convert parameter to the righ parameter in teh class
+* retrun an updated Param class 
+*/
 Param readparamstr(std::string line, Param param)
 {
 
@@ -583,6 +596,12 @@ Param readparamstr(std::string line, Param param)
 	return param;
 }
 
+
+
+/*! \fn Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
+* Read BG_param.txt line and convert parameter to the righ parameter in the class
+* return an updated Param class
+*/
 template <class T>
 Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 {
@@ -987,6 +1006,11 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	return forcing;
 }
 
+
+/*! \fn void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
+* Check the Sanity of both Param and Forcing class
+* If required some parameter are infered 
+*/
 void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 {
 	Param DefaultParams;
@@ -1178,6 +1202,10 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	
 }
 
+/*! \fn double setendtime(Param XParam,Forcing<float> XForcing)
+* Calculate/modify endtime based on maximum time in forcing 
+*
+*/
 double setendtime(Param XParam,Forcing<float> XForcing)
 {
 	//endtime cannot be bigger thn the smallest time set in a boundary
@@ -1208,6 +1236,10 @@ double setendtime(Param XParam,Forcing<float> XForcing)
 	return endtime;
 }
 
+/*! \fn std::string findparameter(std::string parameterstr, std::string line)
+* separate parameter from value
+*
+*/
 std::string findparameter(std::string parameterstr, std::string line)
 {
 	std::size_t found;
@@ -1238,6 +1270,10 @@ std::string findparameter(std::string parameterstr, std::string line)
 	return trim(parameternumber, " ");
 }
 
+/*! \fn void split(const std::string &s, char delim, std::vector<std::string> &elems)
+* split string based in character
+*
+*/
 void split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss;
 	ss.str(s);
@@ -1251,13 +1287,21 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	}
 }
 
-
+/*! \fn std::vector<std::string> split(const std::string &s, char delim)
+* split string based in character
+*
+*/
 std::vector<std::string> split(const std::string &s, char delim) {
 	std::vector<std::string> elems;
 	split(s, delim, elems);
 	return elems;
 }
 
+
+/*! \fn std::string trim(const std::string& str, const std::string& whitespace)
+* remove leading and trailing space in a string
+*
+*/
 std::string trim(const std::string& str, const std::string& whitespace)
 {
 	const auto strBegin = str.find_first_not_of(whitespace);
