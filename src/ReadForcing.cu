@@ -20,6 +20,11 @@
 
 #include "ReadForcing.h"
 
+
+/*! \fn void readforcing(Param & XParam, Forcing<T> & XForcing)
+* wrapping function for reading all the forcing data
+* 
+*/
 template <class T>
 void readforcing(Param & XParam, Forcing<T> & XForcing)
 {
@@ -211,8 +216,11 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 template void readforcing<float>(Param& XParam, Forcing<float>& XForcing);
 //template void readforcing<double>(Param& XParam, Forcing<double>& XForcing);
 
-template <class T>
-void readstaticforcing(T& Sforcing)
+/*! \fn  void readstaticforcing(T& Sforcing)
+* 
+*
+*/
+template <class T> void readstaticforcing(T& Sforcing)
 {
 	readstaticforcing(0, Sforcing);
 }
@@ -220,8 +228,11 @@ void readstaticforcing(T& Sforcing)
 template void readstaticforcing<deformmap<float>>(deformmap<float>& Sforcing);
 template void readstaticforcing<StaticForcingP<float>>(StaticForcingP<float>& Sforcing);
 
-template <class T>
-void readstaticforcing(int step,T& Sforcing)
+/*! \fn  void readstaticforcing(int step,T& Sforcing)
+*
+*
+*/
+template <class T> void readstaticforcing(int step,T& Sforcing)
 {
 	Sforcing=readforcinghead(Sforcing);
 	
