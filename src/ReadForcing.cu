@@ -217,8 +217,8 @@ template void readforcing<float>(Param& XParam, Forcing<float>& XForcing);
 //template void readforcing<double>(Param& XParam, Forcing<double>& XForcing);
 
 /*! \fn  void readstaticforcing(T& Sforcing)
-* 
-*
+*  single parameter version of  readstaticforcing(int step,T& Sforcing)
+* readstaticforcing(0, Sforcing);
 */
 template <class T> void readstaticforcing(T& Sforcing)
 {
@@ -229,8 +229,8 @@ template void readstaticforcing<deformmap<float>>(deformmap<float>& Sforcing);
 template void readstaticforcing<StaticForcingP<float>>(StaticForcingP<float>& Sforcing);
 
 /*! \fn  void readstaticforcing(int step,T& Sforcing)
-*
-*
+* Allocate and read static (i.e. not varying in time) forcing
+* Used for Bathy, roughness, deformation
 */
 template <class T> void readstaticforcing(int step,T& Sforcing)
 {
@@ -257,7 +257,10 @@ template <class T> void readstaticforcing(int step,T& Sforcing)
 template void readstaticforcing<deformmap<float>>(int step, deformmap<float>& Sforcing);
 template void readstaticforcing<StaticForcingP<float>>(int step, StaticForcingP<float>& Sforcing);
 
-//template void readstaticforcing<DynForcingP<float>>(int step, DynForcingP<float>& Sforcing);
+/*! \fn void InitDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
+* 
+* Used for Rain, wind, Atm pressure
+*/
 void InitDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing);
@@ -312,7 +315,10 @@ void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
 }
 
 
-
+/*! \fn  void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
+* special case of readstaticforcing(Sforcing);
+* where the data 
+*/
 void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 {
 	readstaticforcing(Sforcing);
@@ -336,7 +342,7 @@ void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 
 
 /*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
-* Read boundary files
+* Read boundary forcing files
 * 
 */
 std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
@@ -430,6 +436,11 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	return Bndinfo;
 }
 
+
+/*! \fn std::vector<SLTS> readWLfile(std::string WLfilename)
+* Read boundary water level data
+*
+*/
 std::vector<SLTS> readWLfile(std::string WLfilename)
 {
 	std::vector<SLTS> slbnd;
@@ -511,6 +522,10 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 }
 
 
+/*! \fn std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,double eps, double bndxo, double bndxmax, double bndy)
+* Read boundary Nesting data
+*
+*/
 std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,double eps, double bndxo, double bndxmax, double bndy)
 {
 	// Prep boundary input vector from anorthe model output file
@@ -693,7 +708,10 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	return slbnd;
 }
 
-
+/*! \fn std::vector<Flowin> readFlowfile(std::string Flowfilename)
+* Read flow data for river forcing
+*
+*/
 std::vector<Flowin> readFlowfile(std::string Flowfilename)
 {
 	std::vector<Flowin> slbnd;
@@ -772,6 +790,10 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 }
 
 
+/*! \fn std::vector<Windin> readINfileUNI(std::string filename)
+* Read rain/atmpressure data for spatially uniform forcing
+*
+*/
 std::vector<Windin> readINfileUNI(std::string filename)
 {
 	std::vector<Windin> wndinput;
@@ -837,6 +859,10 @@ std::vector<Windin> readINfileUNI(std::string filename)
 }
 
 
+/*! \fn std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
+* Read wind data for spatially uniform forcing
+*
+*/
 std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 {
 	// Warning grdapha is expected in radian here
@@ -929,7 +955,10 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 }
 
 
-
+/*! \fn void readforcingdata(int step,T forcing)
+* Read static forcing data 
+*
+*/
 template <class T>
 void readforcingdata(int step,T forcing)
 {
@@ -963,7 +992,10 @@ template void readforcingdata<StaticForcingP<float>>(int step, StaticForcingP<fl
 template void readforcingdata<deformmap<float>>(int step, deformmap<float> forcing);
 //template void readforcingdata<DynForcingP<float>>(int step, DynForcingP<float> forcing);
 
-
+/*! \fn void readforcingdata(double totaltime, DynForcingP<float>& forcing)
+* Read Dynamic forcing data
+*
+*/
 void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 {
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
