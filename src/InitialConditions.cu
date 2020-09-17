@@ -414,18 +414,18 @@ template <class T> void CalcMaskblk(Param XParam, Model<T> XModel, Forcing<float
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		int ib = XBlock.active[ibl];
-		T levdx = calcres(XParam.dx, XBlock.level[ib]);
+		int ib = XModel.blocks.active[ibl];
+		T levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
 
-		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
+		leftxo = XModel.blocks.xo[ib]; // in adaptive this shoulbe be a range 
 
-		leftyo = XBlock.yo[ib];
-		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
-		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
-		botyo = XBlock.yo[ib];
+		leftyo = XModel.blocks.yo[ib];
+		rightxo = XModel.blocks.xo[ib] + (XParam.blkwidth - 1) * levdx;
+		rightyo = XModel.blocks.yo[ib];
+		topxo = XModel.blocks.xo[ib];
+		topyo = XModel.blocks.yo[ib] + (XParam.blkwidth - 1) * levdx;
+		botxo = XModel.blocks.xo[ib];
+		botyo = XModel.blocks.yo[ib];
 
 		if ((XModel.blocks.LeftBot[ib] == ib || XModel.blocks.LeftTop[ib] == ib) && leftxo > initlevdx)
 		{
