@@ -1004,7 +1004,10 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	InterpstepCPU(forcing.nx, forcing.ny, step, totaltime, forcing.dt, forcing.now, forcing.before, forcing.after);
 }
 
-
+/*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
+* Read Dynamic forcing meta/header data
+*
+*/
 DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 {
 	// Read critical parameter for the forcing map
@@ -1032,7 +1035,10 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 
 
 
-
+/*! \fn T readforcinghead(T ForcingParam)
+* Read Static forcing meta/header data
+*
+*/
 template<class T> T readforcinghead(T ForcingParam)
 {
 	//std::string fileext;
@@ -1115,6 +1121,10 @@ template forcingmap readforcinghead<forcingmap>(forcingmap BathyParam);
 template StaticForcingP<float> readforcinghead<StaticForcingP<float>>(StaticForcingP<float> ForcingParam);
 
 
+/*! \fn void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
+* Read MD file header data
+*
+*/
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
 {
 	
@@ -1170,6 +1180,10 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 }
 
 
+/*! \fn void readbathyMD(std::string filename, float*& zb)
+* Read MD file data
+*
+*/
 void readbathyMD(std::string filename, float*& zb)
 {
 	// Shit that doesn'y wor... Needs fixing 
@@ -1243,7 +1257,10 @@ void readbathyMD(std::string filename, float*& zb)
 }
 
 
-
+/*! \fn  void readXBbathy(std::string filename, int nx,int ny, float *&zb)
+* Read XBeach style file data
+*
+*/
  void readXBbathy(std::string filename, int nx,int ny, float *&zb)
 {
 	//read input data:
@@ -1278,9 +1295,10 @@ void readbathyMD(std::string filename, float*& zb)
 
 
 
-
-
-
+ /*! \fn  void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha)
+ * Read ASC file meta/header data
+ *
+ */
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha)
 {
 	std::ifstream fs(filename);
@@ -1382,7 +1400,10 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 }
 
 
-
+/*! \fn void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
+* Read ASC file data
+*
+*/
 void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 {
 	//
@@ -1420,6 +1441,12 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 }
 
 
+
+/*! \fn void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
+* linearly interpolate between 2 cartesian arrays (of the same size)
+* This is used to interpolate dynamic forcing to a current time step 
+*
+*/
 void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
 {
 	//float fac = 1.0;
