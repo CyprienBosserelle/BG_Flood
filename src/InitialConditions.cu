@@ -405,47 +405,6 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 }
 
 
-template <class T> void CalcMaskblk(Param XParam, Model<T> XModel, Forcing<float>& XForcing)
-{
-	int nmask = 0;
-	bool neighbourmask = false;
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
-	T initlevdx = calcres(XParam.dx, XParam.initlevel);
-
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		int ib = XModel.blocks.active[ibl];
-		T levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
-
-		leftxo = XModel.blocks.xo[ib]; // in adaptive this shoulbe be a range 
-
-		leftyo = XModel.blocks.yo[ib];
-		rightxo = XModel.blocks.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XModel.blocks.yo[ib];
-		topxo = XModel.blocks.xo[ib];
-		topyo = XModel.blocks.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XModel.blocks.xo[ib];
-		botyo = XModel.blocks.yo[ib];
-
-		if ((XModel.blocks.LeftBot[ib] == ib || XModel.blocks.LeftTop[ib] == ib) && leftxo > initlevdx)
-		{
-			neighbourmask = true;
-		}
-		if ((XModel.blocks.BotLeft[ib] == ib || XModel.blocks.BotRight[ib] == ib) && botyo > initlevdx)
-		{
-			neighbourmask = true;
-		}
-		if ((XModel.blocks.TopLeft[ib] == ib || XModel.blocks.TopRight[ib] == ib) && ((topyo - (XParam.ymax - XParam.yo)) < (-1.0 * initlevdx)))
-		{
-			neighbourmask = true;
-		}
-		if ((XModel.blocks.RightBot[ib] == ib || XModel.blocks.RightBot[ib] == ib) && ((rightxo - (XParam.xmax - XParam.xo)) < (-1.0 * initlevdx)))
-		{
-			neighbourmask = true;
-		}
-
-	}
-}
 
 
 

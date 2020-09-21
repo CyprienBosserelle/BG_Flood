@@ -47,6 +47,18 @@ struct AdvanceP
 	T* dhv;
 };
 
+
+class maskbnd {
+public:
+
+
+	int nblk = 0; //number of blocks where this bnd applies
+
+	int* blks; // array of block where bnd applies 
+
+	int* side; // 0: left; 1: top; 2: right; 3: bot
+};
+
 template <class T>
 struct BlockP
 {
@@ -59,6 +71,7 @@ struct BlockP
 	int* level;
 	int* active;
 
+	maskbnd mask;
 	
 };
 

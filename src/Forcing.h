@@ -88,18 +88,6 @@ public:
 	int* blks_g; // Also needed for GPU (because it should be a gpu allocated pointer) This is not pretty at all! In the future maybe using pagelocked memory or other new type may be beneficial 
 };
 
-class maskbnd {
-public:
-	
-	bool on = false;
-	int type = 0; // 0:Wall (no slip); 1:neumann (zeros gredient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
-	
-	
-	int nblk = 0; //number of blocks where this bnd applies
-	
-	int* blks; // array of block where bnd applies 
-	int* blks_g; // Also needed for GPU (because it should be a gpu allocated pointer) This is not pretty at all! In the future maybe using pagelocked memory or other new type may be beneficial 
-};
 
 
 
@@ -125,7 +113,7 @@ struct Forcing
 	bndparam top;
 	bndparam bot;
 
-	maskbnd mask;
+	
 	
 };
 
