@@ -1,7 +1,7 @@
 #include "FlowCPU.h"
 
 
-template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
+template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XForcing, Model<T> XModel)
 {
 	//============================================
 	// Predictor step in reimann solver
@@ -43,6 +43,18 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
 
 	//============================================
+	// Add forcing (Rain, Wind)
+	if (!XForcing.Rain.inputfile.empty())
+	{
+		AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
+	}
+	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
+	{
+		AddwindforcingCPU(XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
+	}
+
+
+	//============================================
 	//Update evolving variable by 1/2 time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 
@@ -81,6 +93,17 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	
 	//============================================
+	// Add forcing (Rain, Wind)
+	if (!XForcing.Rain.inputfile.empty())
+	{
+		AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
+	}
+	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
+	{
+		AddwindforcingCPU(XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
+	}
+
+	//============================================
 	// Add bottom friction
 	bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
 
@@ -94,7 +117,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel)
 
 
 }
-template void FlowCPU<float>(Param XParam, Loop<float>& XLoop, Model<float> XModel);
-template void FlowCPU<double>(Param XParam, Loop<double>& XLoop, Model<double> XModel);
+template void FlowCPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
+template void FlowCPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
 

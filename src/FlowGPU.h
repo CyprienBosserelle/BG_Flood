@@ -11,8 +11,9 @@
 #include "Kurganov.h"
 #include "Advection.h"
 #include "Friction.h"
+#include "Updateforcing.h"
 
-template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);
+template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel);
 
 template <class T> __global__ void reset_var(int halowidth, int* active, T resetval, T* Var);
 // End of global definition

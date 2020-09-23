@@ -23,11 +23,11 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Core engine
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop, XModel_g);
+			FlowGPU(XParam, XLoop, XForcing, XModel_g);
 		}
 		else
 		{
-			FlowCPU(XParam, XLoop, XModel);
+			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
 		
 		

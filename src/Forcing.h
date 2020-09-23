@@ -7,6 +7,9 @@
 
 struct TexSetP
 {
+	float xo, yo, dx; // used to calculate coordinates insode the device function
+	float nowvalue;
+	bool uniform;
 	cudaArray* CudArr;
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 	//texture<float, 2, cudaReadModeElementType> tex;

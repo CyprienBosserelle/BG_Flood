@@ -13,8 +13,9 @@
 #include "Kurganov.h"
 #include "Advection.h"
 #include "Friction.h"
+#include "Updateforcing.h"
 
 // End of global definition
-template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);
+template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel);
 
 #endif

@@ -27,11 +27,7 @@ void TestingOutput(Param XParam, Model<T> XModel)
 
 	Loop<T> XLoop;
 	// GPU stuff
-	if (XParam.GPUDEVICE >= 0)
-	{
-		XLoop.blockDim = (16, 16, 1);
-		XLoop.gridDim = (XParam.nblk, 1, 1);
-	}
+	
 
 	XLoop.hugenegval = std::numeric_limits<T>::min();
 
@@ -41,6 +37,8 @@ void TestingOutput(Param XParam, Model<T> XModel)
 	XLoop.totaltime = 0.0;
 
 	XLoop.nextoutputtime = 0.2;
+
+	Forcing<float> XForcing;
 
 	//FlowCPU(XParam, XLoop, XModel);
 
@@ -59,7 +57,7 @@ void TestingOutput(Param XParam, Model<T> XModel)
 	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar]);
 
 
-	FlowCPU(XParam, XLoop, XModel);
+	FlowCPU(XParam, XLoop, XForcing, XModel);
 
 
 	//outvar = "cf";
@@ -193,6 +191,11 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 		}
 	}
 
+	// make an empty forcing
+	Forcing<float> XForcing;
+
+
+
 	if (XParam.GPUDEVICE >= 0)
 	{
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
@@ -209,11 +212,11 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 		
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop, XModel_g);
+			FlowGPU(XParam, XLoop, XForcing, XModel_g);
 		}
 		else
 		{
-			FlowCPU(XParam, XLoop, XModel);
+			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
 		
 
@@ -253,11 +256,7 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 {
 	Loop<T> XLoop;
 	// GPU stuff
-	if (XParam.GPUDEVICE >= 0)
-	{
-		XLoop.blockDim = (16, 16, 1);
-		XLoop.gridDim = (XParam.nblk, 1, 1);
-	}
+	
 
 	XLoop.hugenegval = std::numeric_limits<T>::min();
 
@@ -272,6 +271,8 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 	T* gpureceive;
 	T* diff;
 
+	Forcing<float> XForcing;
+
 	AllocateCPU(XParam.nblkmem, XParam.blksize, gpureceive);
 	AllocateCPU(XParam.nblkmem, XParam.blksize, diff);
 
@@ -280,10 +281,10 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 	// Compare gradients for evolving parameters
 	
 	// GPU
-	FlowGPU(XParam, XLoop, XModel_g);
+	FlowGPU(XParam, XLoop, XForcing, XModel_g);
 	T dtgpu = XLoop.dt;
 	// CPU
-	FlowCPU(XParam, XLoop, XModel);
+	FlowCPU(XParam, XLoop, XForcing, XModel);
 	T dtcpu = XLoop.dt;
 	// calculate difference
 	//diffArray(XParam, XLoop, XModel.blocks, XModel.evolv.h, XModel_g.evolv.h, XModel.evolv_o.u);

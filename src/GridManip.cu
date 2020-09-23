@@ -197,7 +197,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 {
 	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
 
-	double x, y;
+	T x, y;
 	int n;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -214,38 +214,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
 				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
 
-				//if (x >= xo && x <= xmax && y >= yo && y <= ymax)
-				{
-					//this is safer!
-					x = utils::max(utils::min(x, forcing.xmax), forcing.xo);
-					y = utils::max(utils::min(y, forcing.ymax), forcing.yo);
-					// cells that falls off this domain are assigned 
-					double x1, x2, y1, y2;
-					double q11, q12, q21, q22;
-					int cfi, cfip, cfj, cfjp;
-
-
-
-					cfi = utils::min(utils::max((int)floor((x - forcing.xo) / forcing.dx), 0), forcing.nx - 2);
-					cfip = cfi + 1;
-
-					x1 = forcing.xo + forcing.dx * cfi;
-					x2 = forcing.xo + forcing.dx * cfip;
-
-					cfj = utils::min(utils::max((int)floor((y - forcing.yo) / forcing.dx), 0), forcing.ny - 2);
-					cfjp = cfj + 1;
-
-					y1 = forcing.yo + forcing.dx * cfj;
-					y2 = forcing.yo + forcing.dx * cfjp;
-
-					q11 = forcing.val[cfi + cfj * forcing.nx];
-					q12 = forcing.val[cfi + cfjp * forcing.nx];
-					q21 = forcing.val[cfip + cfj * forcing.nx];
-					q22 = forcing.val[cfip + cfjp * forcing.nx];
-
-					z[n] = (T)BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
-					//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
-				}
+				z[n] = interp2BUQ(x, y, forcing);
 
 			}
 		}
@@ -259,6 +228,48 @@ template void interp2BUQ<float, deformmap<float>>(Param XParam, BlockP<float> XB
 template void interp2BUQ<double, deformmap<float>>(Param XParam, BlockP<double> XBlock, deformmap<float> forcing, double*& z);
 template void interp2BUQ<float, DynForcingP<float>>(Param XParam, BlockP<float> XBlock, DynForcingP<float> forcing, float*& z);
 template void interp2BUQ<double, DynForcingP<float>>(Param XParam, BlockP<double> XBlock, DynForcingP<float> forcing, double*& z);
+
+template <class T, class F> T interp2BUQ(T x, T y, F forcing)
+{
+	//this is safer!
+
+	double xi, yi;
+
+	xi = utils::max(utils::min(double(x), forcing.xmax), forcing.xo);
+	yi = utils::max(utils::min(double(y), forcing.ymax), forcing.yo);
+	// cells that falls off this domain are assigned 
+	double x1, x2, y1, y2;
+	double q11, q12, q21, q22;
+	int cfi, cfip, cfj, cfjp;
+
+
+
+	cfi = utils::min(utils::max((int)floor((xi - forcing.xo) / forcing.dx), 0), forcing.nx - 2);
+	cfip = cfi + 1;
+
+	x1 = forcing.xo + forcing.dx * cfi;
+	x2 = forcing.xo + forcing.dx * cfip;
+
+	cfj = utils::min(utils::max((int)floor((yi - forcing.yo) / forcing.dx), 0), forcing.ny - 2);
+	cfjp = cfj + 1;
+
+	y1 = forcing.yo + forcing.dx * cfj;
+	y2 = forcing.yo + forcing.dx * cfjp;
+
+	q11 = forcing.val[cfi + cfj * forcing.nx];
+	q12 = forcing.val[cfi + cfjp * forcing.nx];
+	q21 = forcing.val[cfip + cfj * forcing.nx];
+	q22 = forcing.val[cfip + cfjp * forcing.nx];
+
+	return T(BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, xi, yi));
+	//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
+}
+template float interp2BUQ<float, StaticForcingP<float>>(float x, float y, StaticForcingP<float> forcing);
+template double interp2BUQ<double, StaticForcingP<float>>(double x, double y, StaticForcingP<float> forcing);
+template float interp2BUQ<float, deformmap<float>>(float x, float y, deformmap<float> forcing);
+template double interp2BUQ<double, deformmap<float>>(double x, double y, deformmap<float> forcing);
+template float interp2BUQ<float, DynForcingP<float>>(float x, float y, DynForcingP<float> forcing);
+template double interp2BUQ<double, DynForcingP<float>>(double x, double y, DynForcingP<float> forcing);
 
 
 template <class T> void InterpstepCPU(int nx, int ny, int hdstep, T totaltime, T hddt, T *&Ux, T *Uo, T *Un)
@@ -326,3 +337,5 @@ template void Copy2CartCPU<int>(int nx, int ny, int* dest, int* src);
 template void Copy2CartCPU<bool>(int nx, int ny, bool* dest, bool* src);
 template void Copy2CartCPU<float>(int nx, int ny, float* dest, float* src);
 template void Copy2CartCPU<double>(int nx, int ny, double* dest, double* src);
+
+

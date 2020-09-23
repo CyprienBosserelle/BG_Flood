@@ -23,6 +23,9 @@ template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float
 template void updateforcing<float>(Param XParam, Loop<float> XLoop, Forcing<float>& XForcing);
 template void updateforcing<double>(Param XParam, Loop<double> XLoop, Forcing<float>& XForcing);
 
+
+
+
 template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP<float> &XDynForcing)
 {
 	dim3 blockDimDF(16, 16, 1);
@@ -105,4 +108,171 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 	//return rainuni;
 }
 
+
+
+
+
+template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T Rainhh;
+
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+	Rainhh = T(interpDyn2BUQ(x, y, Rain.GPU));
+
+
+
+	Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
+
+	XAdv.dh[i] += Rainhh;
+}
+template __global__ void AddrainforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
+template __global__ void AddrainforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
+
+
+template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
+{
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+				T Rainhh;
+
+				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				Rainhh = interp2BUQ(x, y, Rain);
+
+
+
+				Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
+
+				XAdv.dh[i] += Rainhh;
+			}
+		}
+	}
+}
+template __host__ void AddrainforcingCPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
+template __host__ void AddrainforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
+
+
+template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T uwindi, vwindi;
+
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+	T rhoairrhowater = T(0.00121951); // density ratio rho(air)/rho(water) 
+
+	uwindi = interpDyn2BUQ(x, y, Uwind.GPU);
+	vwindi = interpDyn2BUQ(x, y, Vwind.GPU);
+
+	XAdv.dhu[i] += rhoairrhowater * T(XParam.Cd) * uwindi * abs(uwindi);
+	XAdv.dhv[i] += rhoairrhowater * T(XParam.Cd) * vwindi * abs(vwindi);
+
+	//Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
+
+	//XAdv.dh[i] += Rainhh;
+}
+template __global__ void AddwindforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<float> XAdv);
+template __global__ void AddwindforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<double> XAdv);
+
+
+
+template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
+{
+	//
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+				T uwindi, vwindi;
+
+				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				T rhoairrhowater = T(0.00121951); // density ratio rho(air)/rho(water) 
+
+				uwindi = interp2BUQ(x, y, Uwind);
+				vwindi = interp2BUQ(x, y, Vwind);
+
+				XAdv.dhu[i] += rhoairrhowater * T(XParam.Cd) * uwindi * abs(uwindi);
+				XAdv.dhv[i] += rhoairrhowater * T(XParam.Cd) * vwindi * abs(vwindi);
+
+			}
+		}
+	}
+}
+template __host__ void AddwindforcingCPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<float> XAdv);
+template __host__ void AddwindforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<double> XAdv);
+
+
+template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing)
+{
+	T read;
+	if (Forcing.uniform)
+	{
+		read = T(Forcing.nowvalue);
+	}
+	else
+	{
+		float ivw = float((x - T(Forcing.xo)) / T(Forcing.dx) + T(0.5));
+		float jvw = float((y - T(Forcing.yo)) / T(Forcing.dx) + T(0.5));
+		read = tex2D<float>(Forcing.tex, ivw, jvw);
+	}
+	return read;
+}
+template __device__ float interpDyn2BUQ<float>(float x, float y, TexSetP Forcing);
+template __device__ double interpDyn2BUQ<double>(double x, double y, TexSetP Forcing);
 
