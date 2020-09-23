@@ -281,6 +281,14 @@ void InitDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
 
 			// Allocate and bind textures
 			AllocateTEX(Dforcing.nx, Dforcing.ny, Dforcing.GPU, Dforcing.now);
+
+			// below might seem redundant but it simplifies the 
+			// template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing)
+			// function
+			Dforcing.GPU.xo = float(Dforcing.xo);
+			Dforcing.GPU.yo = float(Dforcing.yo);
+			Dforcing.GPU.uniform = Dforcing.uniform;
+			Dforcing.GPU.dx = float(Dforcing.dx);
 		}
 		
 	}
