@@ -28,8 +28,10 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 
 		AllocateGPU(XForcing.right.nblk, 1, XForcing.right.blks_g);
 		CopytoGPU(XForcing.right.nblk, 1, XForcing.right.blks, XForcing.right.blks_g);
+
 		AllocateGPU(XForcing.top.nblk, 1, XForcing.top.blks_g);
 		CopytoGPU(XForcing.top.nblk, 1, XForcing.top.blks, XForcing.top.blks_g);
+
 		AllocateGPU(XForcing.bot.nblk, 1, XForcing.bot.blks_g);
 		CopytoGPU(XForcing.bot.nblk, 1, XForcing.bot.blks, XForcing.bot.blks_g);
 
@@ -40,6 +42,14 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 			AllocateGPU(XModel.bndblk.nblkTs, 1, XModel_g.bndblk.Tsout);
 			CopytoGPU(XModel.bndblk.nblkTs, 1, XModel.bndblk.Tsout, XModel_g.bndblk.Tsout);
 
+		}
+
+		// River are a bit of a special case too
+		if (XForcing.rivers.size() > 0)
+		{
+			//
+			AllocateGPU(XModel.bndblk.nblkriver, 1, XModel_g.bndblk.river);
+			CopytoGPU(XModel.bndblk.nblkriver, 1, XModel.bndblk.river, XModel_g.bndblk.river);
 		}
 
 		// Reset GPU mean and max arrays

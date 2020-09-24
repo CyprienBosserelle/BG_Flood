@@ -108,9 +108,106 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 	//return rainuni;
 }
 
+template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, std::vector<River> XRivers, Model<T> XModel)
+{
+	dim3 gridDimRiver(XModel.bndblk.nblkriver, 1, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	T qnow;
+	for (int Rin = 0; Rin < XRivers.size(); Rin++)
+	{
+		//
+		int bndstep = 0;
+		double difft = XRivers[Rin].flowinput[bndstep].time - XLoop.totaltime;
+		while (difft <= 0.0) // danger?
+		{
+			bndstep++;
+			difft = XRivers[Rin].flowinput[bndstep].time - XLoop.totaltime;
+		}
+
+		qnow = T(interptime(XRivers[Rin].flowinput[bndstep].q, XRivers[Rin].flowinput[max(bndstep - 1, 0)].q, XRivers[Rin].flowinput[bndstep].time - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time, XLoop.totaltime - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time));
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			InjectRiverGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
+		}
+		else
+		{
+			InjectRiverCPU(XParam, XRivers[Rin], qnow, XModel.bndblk.nblkriver, XModel.bndblk.river, XModel.blocks, XModel.adv);
+		}
+	}
+}
+template __host__ void AddRiverForcing<float>(Param XParam, Loop<float> XLoop, std::vector<River> XRivers, Model<float> XModel);
+template __host__ void AddRiverForcing<double>(Param XParam, Loop<double> XLoop, std::vector<River> XRivers, Model<double> XModel);
+
+
+template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T qnow, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = Riverblks[ibl];
 
 
 
+
+	int i = ix + iy * blockDim.x + ibl * (blockDim.x * blockDim.y);
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+	if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+	{
+		XAdv.dh[i] += qnow  / XRiver.disarea;
+		
+	}
+
+
+
+}
+template __global__ void InjectRiverGPU<float>(Param XParam, River XRiver, float qnow, int* Riverblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
+template __global__ void InjectRiverGPU<double>(Param XParam, River XRiver, double qnow, int* Riverblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
+
+template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qnow, int nblkriver, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
+{
+	unsigned int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	for (int ibl = 0; ibl < nblkriver; ibl++)
+	{
+		ib = Riverblks[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+				T Rainhh;
+
+				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+				{
+					XAdv.dh[i] += qnow / XRiver.disarea;
+
+				}
+			}
+		}
+	}
+
+
+}
+template __host__ void InjectRiverCPU<float>(Param XParam, River XRiver, float qnow, int nblkriver, int* Riverblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
+template __host__ void InjectRiverCPU<double>(Param XParam, River XRiver, double qnow, int nblkriver, int* Riverblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
 template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
 {

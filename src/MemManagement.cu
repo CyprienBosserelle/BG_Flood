@@ -312,6 +312,8 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	}
 	*/
 
+	
+
 	if (XParam.atmpforcing)
 	{
 		AllocateGPU(nblk, blksize, XModel.datmpdx);
