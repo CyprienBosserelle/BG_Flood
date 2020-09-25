@@ -52,7 +52,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	{
 		AddwindforcingCPU(XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
 	}
-
+	if (XForcing.rivers.size() > 0)
+	{
+		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
+	}
 
 	//============================================
 	//Update evolving variable by 1/2 time step
@@ -101,6 +104,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingCPU(XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
+	}
+	if (XForcing.rivers.size() > 0)
+	{
+		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
 
 	//============================================

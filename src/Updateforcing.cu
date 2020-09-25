@@ -19,6 +19,7 @@ template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float
 		Forcingthisstep(XParam, XLoop, XForcing.UWind);
 		Forcingthisstep(XParam, XLoop, XForcing.VWind);
 	}
+
 }
 template void updateforcing<float>(Param XParam, Loop<float> XLoop, Forcing<float>& XForcing);
 template void updateforcing<double>(Param XParam, Loop<double> XLoop, Forcing<float>& XForcing);
@@ -129,6 +130,7 @@ template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, st
 		if (XParam.GPUDEVICE >= 0)
 		{
 			InjectRiverGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
+			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
 		{

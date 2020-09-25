@@ -81,6 +81,10 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		AddwindforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
 	}
+	if (XForcing.rivers.size() > 0)
+	{
+		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
+	}
 
 	//============================================
 	//Update evolving variable by 1/2 time step
@@ -135,7 +139,10 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		AddwindforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
 	}
-
+	if (XForcing.rivers.size() > 0)
+	{
+		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
+	}
 
 	//============================================
 	// Add bottom friction
