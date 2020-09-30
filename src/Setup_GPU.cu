@@ -48,6 +48,7 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		if (XForcing.rivers.size() > 0)
 		{
 			//
+			XModel_g.bndblk.nblkriver = XModel.bndblk.nblkriver;
 			AllocateGPU(XModel.bndblk.nblkriver, 1, XModel_g.bndblk.river);
 			CopytoGPU(XModel.bndblk.nblkriver, 1, XModel.bndblk.river, XModel_g.bndblk.river);
 		}

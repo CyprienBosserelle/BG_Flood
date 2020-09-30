@@ -185,8 +185,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						
 						
-						xx = XModel.blocks.xo[ib] + i * levdx;
-						yy = XModel.blocks.yo[ib] + j * levdx;
+						xx = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
+						yy = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
 						if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
@@ -220,12 +220,13 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		}
 		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
 		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
-		if (activeRiverBlk.size() > XModel.bndblk.nblkriver)
+		if (activeRiverBlk.size() > size_t(XModel.bndblk.nblkriver))
 		{
 			ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
+			XModel.bndblk.nblkriver = activeRiverBlk.size();
 		}
 
-		XModel.bndblk.nblkriver = activeRiverBlk.size();
+		
 
 		for (int b = 0; b < activeRiverBlk.size(); b++)
 		{

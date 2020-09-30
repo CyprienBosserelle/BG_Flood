@@ -155,7 +155,7 @@ template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T q
 
 
 
-	int i = ix + iy * blockDim.x + ibl * (blockDim.x * blockDim.y);
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 	T x = XParam.xo + XBlock.xo[ib] + ix * delta;

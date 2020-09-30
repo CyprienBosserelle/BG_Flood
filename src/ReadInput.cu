@@ -1121,6 +1121,11 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XForcing.bot.istop = -1;
 
 
+	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
+	XParam.nrivers = XForcing.rivers.size();
+
+
+
 	// Check whether endtime was specified by the user
 	//No; i.e. endtimne =0.0
 	//so the following conditions are useless
