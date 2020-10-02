@@ -131,6 +131,18 @@ template <class T> bool GaussianHumptest(T zsnit)
 		}
 	}
 
+	Loop<T> XLoop;
+
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+
+
+	XLoop.nextoutputtime = XParam.outputtimestep;
+
 	while (XLoop.totaltime < XParam.endtime)
 	{
 
@@ -273,7 +285,7 @@ template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z)
 
 
 
-template <class T> void Gaussianhump(Param  XParam, Model<T> XModel)
+/*template <class T> void Gaussianhump(Param  XParam, Model<T> XModel)
 {
 	T x, y,delta;
 	T cc = 100.0;
@@ -361,7 +373,7 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel)
 }
 template void Gaussianhump<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
 template void Gaussianhump<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
-
+*/
 
 
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g)
