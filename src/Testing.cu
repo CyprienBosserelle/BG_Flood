@@ -12,13 +12,13 @@
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	bool test;
+	bool toto;
 	if (XParam.test == 0)
 	{
 		// Test 0 is pure bump test
 		
 		
-		test=GaussianHumptest(0.1f);
+		toto=GaussianHumptest(0.1f);
 
 
 	}
@@ -32,6 +32,7 @@ template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<doubl
 
 template <class T> bool GaussianHumptest(T zsnit)
 {
+	
 	// this is a preplica of the tutorial case for Basilisk
 	Param XParam;
 
@@ -47,12 +48,14 @@ template <class T> bool GaussianHumptest(T zsnit)
 
 	XParam.xmax = 0.5;
 	XParam.ymax = 0.5;
-
-	XParam.dx = 1 / 256;
+	//level 8 is 
+	XParam.dx = 1.0 / ((1<<8)-1);
 
 	XParam.initlevel = 0;
 	XParam.minlevel = 0;
 	XParam.maxlevel = 0;
+
+	
 
 	//Output times for comparisons
 	XParam.endtime = 30.0;
@@ -99,10 +102,12 @@ template <class T> bool GaussianHumptest(T zsnit)
 		}
 	}
 
+	checkparamsanity(XParam, XForcing);
+
 	InitMesh(XParam, XForcing, XModel);
 
 	// Recreate the initia;l conditions
-
+	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.zb);
 	InitArrayBUQ(XParam, XModel.blocks, zsnit, XModel.evolv.zs);
 
 	T xorigin = T(0.0);
@@ -140,7 +145,7 @@ template <class T> bool GaussianHumptest(T zsnit)
 
 	XLoop.totaltime = 0.0;
 
-
+	InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
 
 	while (XLoop.totaltime < XParam.endtime)
@@ -163,11 +168,22 @@ template <class T> bool GaussianHumptest(T zsnit)
 
 		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
 		{
-			// perform comparison
+			if (XParam.GPUDEVICE >= 0)
+			{
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+				}
+			}
+
+			Save2Netcdf(XParam, XModel);
+
+
+			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
 
 		}
 	}
-
+	
 	return true;
 }
 template bool GaussianHumptest<float>(float zsnit);
