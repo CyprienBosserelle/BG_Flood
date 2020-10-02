@@ -12,13 +12,160 @@
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	//
+	bool test;
+	if (XParam.test == 0)
+	{
+		// Test 0 is pure bump test
+		
+		
+		test=GaussianHumptest(0.1f);
+
+
+	}
+
+	
+
 }
+template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
+template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
 
-/*! \fn int main(int argc, char **argv)
-* Main function 
-* This function is the entry point to the software
+template <class T> bool GaussianHumptest(T zsnit)
+{
+	// this is a preplica of the tutorial case for Basilisk
+	Param XParam;
+
+	T x, y, delta;
+	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
+	
+
+	T a = T(1.0); //Gaussian wave amplitude
+
+	// initialise domain and required resolution
+	XParam.xo = -0.5;
+	XParam.yo = -0.5;
+
+	XParam.xmax = 0.5;
+	XParam.ymax = 0.5;
+
+	XParam.dx = 1 / 256;
+
+	XParam.initlevel = 0;
+	XParam.minlevel = 0;
+	XParam.maxlevel = 0;
+
+	//Output times for comparisons
+	XParam.endtime = 30.0;
+	XParam.outputtimestep = 1.0;
+
+	// Enforece GPU/CPU
+	XParam.GPUDEVICE = -1;
+
+	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+
+	std::vector<std::string> outv;
+
+	for (int nv = 0; nv < 15; nv++)
+	{
+		outv.push_back(outvi[nv]);
+	}
+
+	XParam.outvars = outv;
+
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	Forcing<float> XForcing;
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy.xo = -1.0;
+	XForcing.Bathy.yo = -1.0;
+
+	XForcing.Bathy.xmax = 1.0;
+	XForcing.Bathy.ymax = 1.0;
+	XForcing.Bathy.nx = 3;
+	XForcing.Bathy.ny = 3;
+
+	XForcing.Bathy.dx = 1.0;
+
+	AllocateCPU(XForcing.Bathy.nx, XForcing.Bathy.ny, XForcing.Bathy.val);
+
+	for (int j = 0; j < XForcing.Bathy.ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy.nx; i++)
+		{
+			XForcing.Bathy.val[i + j * XForcing.Bathy.nx] = 0.0f;
+		}
+	}
+
+	InitMesh(XParam, XForcing, XModel);
+
+	// Recreate the initia;l conditions
+
+	InitArrayBUQ(XParam, XModel.blocks, zsnit, XModel.evolv.zs);
+
+	T xorigin = T(0.0);
+	T yorigin = T(0.0);
+
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XModel.blocks.active[ibl];
+		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				x = XModel.blocks.xo[ib] + ix * delta;
+				y = XModel.blocks.yo[ib] + iy * delta;
+				XModel.evolv.zs[n] = XModel.evolv.zs[n] + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
+
+				
+			}
+		}
+	}
+
+	while (XLoop.totaltime < XParam.endtime)
+	{
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+		}
+		else
+		{
+			FlowCPU(XParam, XLoop, XForcing, XModel);
+		}
+
+
+
+		//diffdh(XParam, XModel.blocks, XModel.flux.Su, diff, shuffle);
+		//diffSource(XParam, XModel.blocks, XModel.flux.Fqux, XModel.flux.Su, diff);
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		{
+			// perform comparison
+
+		}
+	}
+
+	return true;
+}
+template bool GaussianHumptest<float>(float zsnit);
+template bool GaussianHumptest<double>(double zsnit);
+
+
+
+/*! \fn TestingOutput(Param XParam, Model<T> XModel)
+*  
+* 
 */
 template <class T>
 void TestingOutput(Param XParam, Model<T> XModel)
@@ -124,7 +271,9 @@ template void copyID2var<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 
-template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XModel_g)
+
+
+template <class T> void Gaussianhump(Param  XParam, Model<T> XModel)
 {
 	T x, y,delta;
 	T cc = 100.0;
@@ -148,49 +297,12 @@ template <class T> void Gaussianhump(Param  XParam, Model<T> XModel, Model<T> XM
 
 	XLoop.totaltime = 0.0;
 
-	XParam.endtime = 600.0;
-	XParam.outputtimestep = 30;
-	XLoop.nextoutputtime = 30;
+	
+	XLoop.nextoutputtime = XParam.outputtimestep;
 
-	std::string outvi[16] = {"zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
-
-	std::vector<std::string> outv;
-
-	for (int nv = 0; nv < 15; nv++)
-	{
-		outv.push_back(outvi[nv]);
-	}
-		   
-	XParam.outvars = outv;
-
-	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
-	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.zs);
-
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
-		int ib = XModel.blocks.active[ibl];
-		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
-
-
-		for (int iy = 0; iy < XParam.blkwidth; iy++)
-		{
-			for (int ix = 0; ix < XParam.blkwidth; ix++)
-			{
-				//
-				int n = memloc(XParam, ix, iy, ib);
-				x = XModel.blocks.xo[ib] + ix * delta;
-				y = XModel.blocks.yo[ib] + iy * delta;
-				XModel.evolv.zs[n] = XModel.evolv.zs[n] + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
-
-				T azb = 2.0;
-				T cczb = 500.0;
-				XModel.zb[n] = XModel.zb[n] - azb * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cczb * cczb));
-				XModel.evolv.h[n] = XModel.evolv.zs[n] - XModel.zb[n];
-			}
-		}
-	}
-
+	
+	//InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
+	
 	// make an empty forcing
 	Forcing<float> XForcing;
 

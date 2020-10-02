@@ -17,6 +17,11 @@
 #include "FlowCPU.h"
 #include "FlowGPU.h"
 
+template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
+
+bool GaussianHumptest(Param XParam);
+
+
 template <class T> void TestingOutput(Param XParam, Model<T> XModel);
 template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g);
