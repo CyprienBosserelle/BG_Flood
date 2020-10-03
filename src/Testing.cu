@@ -55,7 +55,8 @@ template <class T> bool GaussianHumptest(T zsnit)
 	XParam.minlevel = 0;
 	XParam.maxlevel = 0;
 
-	
+	XParam.zsinit = zsnit;
+	XParam.zsoffset = 0.0;
 
 	//Output times for comparisons
 	XParam.endtime = 30.0;
@@ -92,6 +93,8 @@ template <class T> bool GaussianHumptest(T zsnit)
 
 	XForcing.Bathy.dx = 1.0;
 
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
 	AllocateCPU(XForcing.Bathy.nx, XForcing.Bathy.ny, XForcing.Bathy.val);
 
 	for (int j = 0; j < XForcing.Bathy.ny; j++)
@@ -107,8 +110,10 @@ template <class T> bool GaussianHumptest(T zsnit)
 	InitMesh(XParam, XForcing, XModel);
 
 	// Recreate the initia;l conditions
-	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.zb);
-	InitArrayBUQ(XParam, XModel.blocks, zsnit, XModel.evolv.zs);
+	//InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.zb);
+	//InitArrayBUQ(XParam, XModel.blocks, zsnit, XModel.evolv.zs);
+
+	InitialConditions(XParam, XForcing, XModel);
 
 	T xorigin = T(0.0);
 	T yorigin = T(0.0);
