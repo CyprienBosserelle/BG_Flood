@@ -103,3 +103,48 @@ int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool*&
 template int inrangecriteria<float>(Param XParam, float zmin, float zmax, float* z, BlockP<float> XBlock, bool*& refine, bool*& coarsen);
 template int inrangecriteria<double>(Param XParam, double zmin, double zmax, double* z, BlockP<double> XBlock, bool*& refine, bool*& coarsen);
 
+/*! \fn 
+*/
+template<class T>
+int targetlevelcriteria(Param XParam, T* z, BlockP<T> XBlock, StaticForcingP<float> targetlevelmap, bool*& refine, bool*& coarsen)
+{
+	float targetlevel;
+	bool uplevel = false;
+	T delta, x, y;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+
+		delta = calcres(XParam.dx, XBlock.level[ib]);
+
+		refine[ib] = false; // only refine if all are wet
+		coarsen[ib] = true; // always try to coarsen
+		
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				targetlevel = float(interp2BUQ(x, y, targetlevelmap));
+
+				if (targetlevel >= XBlock.level[ib])
+				{
+					uplevel = true;
+				}
+
+			}
+		}
+
+		if (uplevel)
+		{
+			refine[ib] = true; // only refine if all are wet
+			coarsen[ib] = false;
+		}
+	}
+
+}
+

@@ -12,14 +12,15 @@
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	bool toto;
+	bool bumptest;
 	if (XParam.test == 0)
 	{
 		// Test 0 is pure bump test
 		
 		
-		toto=GaussianHumptest(0.1);
-
+		bumptest = GaussianHumptest(0.1);
+		std::string result = bumptest ? "successful" : "failed";
+		log("Gaussian Test: " + result);
 
 	}
 
