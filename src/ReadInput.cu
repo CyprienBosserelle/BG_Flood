@@ -1042,13 +1042,13 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 
 	if (std::isnan(XParam.xo))
-		XParam.xo = XForcing.Bathy.xo;
+		XParam.xo = XForcing.Bathy.xo-(0.5* XForcing.Bathy.dx);
 	if (std::isnan(XParam.xmax))
-		XParam.xmax = XForcing.Bathy.xmax;
+		XParam.xmax = XForcing.Bathy.xmax + (0.5 * XForcing.Bathy.dx);
 	if(std::isnan(XParam.yo))
-		XParam.yo = XForcing.Bathy.yo;
+		XParam.yo = XForcing.Bathy.yo - (0.5 * XForcing.Bathy.dx);
 	if (std::isnan(XParam.ymax))
-		XParam.ymax = XForcing.Bathy.ymax;
+		XParam.ymax = XForcing.Bathy.ymax + (0.5 * XForcing.Bathy.dx);
 
 	if (std::isnan(XParam.dx))
 		XParam.dx = XForcing.Bathy.dx;
@@ -1072,17 +1072,17 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	//printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, calcres(1.0, XParam.initlevel));
 
 	// First estimate nx and ny
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?
+	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
+	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
 
 
 	// Adjust xmax and ymax so that nx and ny are a factor of XParam.blkwidth [16]
-	XParam.xmax = XParam.xo + (ceil(XParam.nx / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth) - 1) * levdx;
-	XParam.ymax = XParam.yo + (ceil(XParam.ny / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth) - 1) * levdx;
+	XParam.xmax = XParam.xo + (ceil(XParam.nx / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth)) * levdx;
+	XParam.ymax = XParam.yo + (ceil(XParam.ny / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth)) * levdx;
 
 	// Update nx and ny 
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx)+1;
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx)+1; //+1?
+	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
+	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
 
 	if (XParam.spherical < 1)
 	{
@@ -1190,7 +1190,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		}
 		cudaGetDeviceProperties(&prop, XParam.GPUDEVICE);
 		//printf("There are %d GPU devices on this machine\n", nDevices);
-		log("There are " + std::to_string(nDevices) + "GPU devices on this machine");
+		log("There are " + std::to_string(nDevices) + " GPU devices on this machine");
 
 		if (XParam.GPUDEVICE >= 0)
 		{

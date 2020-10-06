@@ -211,8 +211,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 			{
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx)*levdx;
-					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky)*levdx;
+					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx)*levdx + 0.5 * levdx;
+					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky)*levdx + 0.5 * levdx;
 
 					//x = max(min(x, XParam.Bathymetry.xmax), XParam.Bathymetry.xo);
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
@@ -257,8 +257,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 			if (nmask < (XParam.blkwidth * XParam.blkwidth))
 			{
 				//
-				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * levdx;
-				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * levdx;
+				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * levdx + 0.5 * levdx;
+				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * levdx + 0.5 * levdx;
 				XBlock.active[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;

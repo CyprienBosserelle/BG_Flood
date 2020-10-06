@@ -24,7 +24,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("Gaussian Test CPU: " + result);
 
 		// Check if there is indeed a suitable GPU available
-		int nDevices;
+		int nDevices=0;
 		cudaGetDeviceCount(&nDevices);
 
 		if (nDevices > 0)
@@ -66,11 +66,11 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 8));
-	XParam.xo = -0.5 + 0.5 * XParam.dx;
-	XParam.yo = -0.5 + 0.5 * XParam.dx;
+	XParam.xo = -0.5;
+	XParam.yo = -0.5;
 
-	XParam.xmax = 0.5 - 0.5 * XParam.dx;
-	XParam.ymax = 0.5 - 0.5 * XParam.dx;
+	XParam.xmax = 0.5;
+	XParam.ymax = 0.5;
 	//level 8 is 
 	
 
