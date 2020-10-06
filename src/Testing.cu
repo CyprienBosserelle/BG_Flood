@@ -18,7 +18,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		// Test 0 is pure bump test
 		
 		
-		toto=GaussianHumptest(0.1f);
+		toto=GaussianHumptest(0.1);
 
 
 	}
@@ -32,24 +32,35 @@ template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<doubl
 
 template <class T> bool GaussianHumptest(T zsnit)
 {
-	
+
 	// this is a preplica of the tutorial case for Basilisk
 	Param XParam;
 
 	T x, y, delta;
 	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
-	
+
 
 	T a = T(1.0); //Gaussian wave amplitude
 
-	// initialise domain and required resolution
-	XParam.xo = -0.5;
-	XParam.yo = -0.5;
+	// Verification data
+	// This is a transect across iy=15:16:127 at ix=127 (or vice versa because the solution is symetrical)
+	// These values are based on single precision output from Netcdf file so are only accurate to 10-7 
+	double ZsVerification[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
+	
 
-	XParam.xmax = 0.5;
-	XParam.ymax = 0.5;
+
+	
+
+
+	// initialise domain and required resolution
+	XParam.dx = 1.0 / ((1 << 8));
+	XParam.xo = -0.5 + 0.5 * XParam.dx;
+	XParam.yo = -0.5 + 0.5 * XParam.dx;
+
+	XParam.xmax = 0.5 - 0.5 * XParam.dx;
+	XParam.ymax = 0.5 - 0.5 * XParam.dx;
 	//level 8 is 
-	XParam.dx = 1.0 / ((1<<8)-1);
+	
 
 	XParam.initlevel = 0;
 	XParam.minlevel = 0;
@@ -59,8 +70,13 @@ template <class T> bool GaussianHumptest(T zsnit)
 	XParam.zsoffset = 0.0;
 
 	//Output times for comparisons
-	XParam.endtime = 30.0;
-	XParam.outputtimestep = 1.0;
+	XParam.endtime = 1.0;
+	XParam.outputtimestep = 0.1;
+
+	XParam.smallnc = 0;
+
+	XParam.cf = 0.0;
+	XParam.frictionmodel = 0;
 
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = -1;
@@ -132,10 +148,10 @@ template <class T> bool GaussianHumptest(T zsnit)
 			{
 				//
 				int n = memloc(XParam, ix, iy, ib);
-				x = XModel.blocks.xo[ib] + ix * delta;
-				y = XModel.blocks.yo[ib] + iy * delta;
+				x = XParam.xo + XModel.blocks.xo[ib] + ix * delta;
+				y = XParam.yo + XModel.blocks.yo[ib] + iy * delta;
 				XModel.evolv.zs[n] = XModel.evolv.zs[n] + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
-
+				XModel.evolv.h[n] = utils::max(XModel.evolv.zs[n] - XModel.zb[n],T(0.0));
 				
 			}
 		}
@@ -150,10 +166,13 @@ template <class T> bool GaussianHumptest(T zsnit)
 
 	XLoop.totaltime = 0.0;
 
-	InitSave2Netcdf(XParam, XModel);
+	//InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
 
-	while (XLoop.totaltime < XParam.endtime)
+
+	bool modelgood = true;
+
+	while (XLoop.totaltime < XLoop.nextoutputtime)
 	{
 
 		if (XParam.GPUDEVICE >= 0)
@@ -181,15 +200,50 @@ template <class T> bool GaussianHumptest(T zsnit)
 				}
 			}
 
-			Save2Netcdf(XParam, XModel);
+			//Save2Netcdf(XParam, XModel);
+			// Verify the Validity of results
+			
 
 
-			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
+			for (int iv = 0; iv < 8; iv++)
+			{
+				int ix, iy, ib, ii, jj,ibx,iby,nbx,nby;
+				jj = 127;
+				ii = (iv + 1) * 16 - 1;
+
+				// Theoretical size is 255x255
+				nbx = 256 / 16;
+				nby = 256 / 16;
+
+				ibx = floor(ii / 16);
+				iby = floor(jj / 16);
+
+				ib = (iby - 1) * nbx + ibx;
+
+				ix = ii - ibx*16;
+				iy = jj - iby*16;
+
+				int n = memloc(XParam, ix, iy, ib);
+
+				double diff = abs(T(XModel.evolv.h[n]) - ZsVerification[iv]);
+
+				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
+				{
+					modelgood = false;
+				}
+
+
+
+			}
+
+
+
+			//XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
 
 		}
 	}
 	
-	return true;
+	return modelgood;
 }
 template bool GaussianHumptest<float>(float zsnit);
 template bool GaussianHumptest<double>(double zsnit);
