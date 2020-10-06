@@ -17,11 +17,22 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	{
 		// Test 0 is pure bump test
 		
+		//set gpu is -1 for cpu test
 		
-		bumptest = GaussianHumptest(0.1);
+		bumptest = GaussianHumptest(0.1,-1);
 		std::string result = bumptest ? "successful" : "failed";
-		log("Gaussian Test: " + result);
+		log("Gaussian Test CPU: " + result);
 
+		// Check if there is indeed a suitable GPU available
+		int nDevices;
+		cudaGetDeviceCount(&nDevices);
+
+		if (nDevices > 0)
+		{
+			bumptest = GaussianHumptest(0.1, 0);
+			std::string result = bumptest ? "successful" : "failed";
+			log("Gaussian Test GPU: " + result);
+		}
 	}
 
 	
@@ -31,7 +42,7 @@ template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float>
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
 
-template <class T> bool GaussianHumptest(T zsnit)
+template <class T> bool GaussianHumptest(T zsnit, int gpu)
 {
 
 	// this is a preplica of the tutorial case for Basilisk
@@ -80,7 +91,7 @@ template <class T> bool GaussianHumptest(T zsnit)
 	XParam.frictionmodel = 0;
 
 	// Enforece GPU/CPU
-	XParam.GPUDEVICE = -1;
+	XParam.GPUDEVICE = gpu;
 
 	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
 
@@ -157,6 +168,8 @@ template <class T> bool GaussianHumptest(T zsnit)
 			}
 		}
 	}
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	Loop<T> XLoop;
 
@@ -251,8 +264,8 @@ template <class T> bool GaussianHumptest(T zsnit)
 	
 	return modelgood;
 }
-template bool GaussianHumptest<float>(float zsnit);
-template bool GaussianHumptest<double>(double zsnit);
+template bool GaussianHumptest<float>(float zsnit, int gpu);
+template bool GaussianHumptest<double>(double zsnit, int gpu);
 
 
 
