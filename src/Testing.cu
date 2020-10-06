@@ -204,9 +204,10 @@ template <class T> bool GaussianHumptest(T zsnit)
 			// Verify the Validity of results
 			
 
-
+			double diff;
 			for (int iv = 0; iv < 8; iv++)
 			{
+				
 				int ix, iy, ib, ii, jj,ibx,iby,nbx,nby;
 				jj = 127;
 				ii = (iv + 1) * 16 - 1;
@@ -218,17 +219,21 @@ template <class T> bool GaussianHumptest(T zsnit)
 				ibx = floor(ii / 16);
 				iby = floor(jj / 16);
 
-				ib = (iby - 1) * nbx + ibx;
+				ib = (iby) * nbx + ibx;
 
 				ix = ii - ibx*16;
 				iy = jj - iby*16;
 
 				int n = memloc(XParam, ix, iy, ib);
 
-				double diff = abs(T(XModel.evolv.h[n]) - ZsVerification[iv]);
+				diff = abs(T(XModel.evolv.zs[n]) - ZsVerification[iv]);
+
+
 
 				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
 				{
+
+					//printf("ib=%d, ix=%d, iy=%d; diff=%f", ib, ix, iy, diff);
 					modelgood = false;
 				}
 
