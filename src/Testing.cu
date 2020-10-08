@@ -393,10 +393,10 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
 	XLoop.totaltime = 0.0;
-	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	
 	//InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
-
+	XLoop.dtmax = initdt(XParam, XLoop, XModel);
 	initVol = T(0.0);
 	// Calculate initial water volume
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
