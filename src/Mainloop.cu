@@ -5,6 +5,8 @@
 template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T> &XModel_g)
 {
 	
+	log("Launching model main loop");
+	
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
 	//Define some useful variables 
@@ -86,6 +88,9 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 
 	XLoop.hugeposval = std::numeric_limits<T>::max();
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+
+	XLoop.dtmax = initdt(XParam, XLoop, XModel);
 
 	return XLoop;
 
@@ -252,3 +257,71 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 }
 
 
+template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> XModel)
+{
+	//dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
+	//dim3 gridDim = (XParam.nblk, 1, 1);
+
+	double initdt;
+
+	XLoop.dtmax = XLoop.hugeposval;
+
+
+	BlockP<T> XBlock = XModel.blocks;
+
+
+	//if (XParam.GPUDEVICE >= 0)
+	//{
+	//	CalcInitdtGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.time.dtmax);
+	//	initdt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
+	//}
+	//else
+	//{
+		CalcInitdtCPU(XParam, XModel.blocks, XModel.evolv, XModel.time.dtmax);
+		initdt = double(CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time));
+
+	//}
+
+	
+	return initdt;
+}
+template __host__ double initdt<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
+template __host__ double initdt<double>(Param XParam, Loop<double> XLoop, Model<double> XModel);
+
+template <class T> __host__ void CalcInitdtCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv, T* dtmax)
+{
+	int ib;
+	T delta;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		delta = calcres(XParam.dx, XBlock.level[ib]);
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				dtmax[i] = delta / sqrt(XParam.g * std::max(XEvolv.h[i],T(XParam.eps)));
+			}
+		}
+	}
+}
+
+template <class T> __global__ void CalcInitdtGPU(Param XParam, BlockP<T> XBlock,EvolvingP<T> XEvolv, T* dtmax)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	T delta = calcres(XParam.dx, XBlock.level[ib]);
+
+	dtmax[i] = delta / sqrt(XParam.g * max(XEvolv.h[i],T(XParam.eps)));
+}

@@ -7,6 +7,9 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 {
 	if (XParam.GPUDEVICE >= 0)
 	{
+		log("Setting up GPU");
+
+
 		cudaSetDevice(XParam.GPUDEVICE);
 		//Allocate memory for the model on the GPU
 		AllocateGPU(XParam.nblkmem, XParam.blksize, XParam, XModel_g);

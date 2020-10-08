@@ -78,6 +78,7 @@ template deformmap<float> readfileinfo<deformmap<float>>(std::string input, defo
 void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 {
 	//
+	log("\nReading BG_param.txt ...");
 	std::ifstream fs("BG_param.txt");
 
 	if (fs.fail()) {
@@ -1083,6 +1084,10 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	// Update nx and ny 
 	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
 	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+
+	log("\nAdjusted model domain (xo/xmax/yo/ymax): ");
+	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax) );
+	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx) );
 
 	if (XParam.spherical < 1)
 	{

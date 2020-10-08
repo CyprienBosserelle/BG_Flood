@@ -30,13 +30,14 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 {
 	//=================
 	// Read Bathymetry
+	log("\nReading bathymetry grid data...");
 	readbathydata(XParam.posdown,XForcing.Bathy);
 	
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
 	//=================
 	// Read bnd files
-	log("Read Bnd data...");
+	log("\nReading boundary data...");
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 	
@@ -90,25 +91,25 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
 	XParam.endtime = setendtime(XParam, XForcing);
 
-	log("...done");
+	//log("...done");
 
 	//==================
 	// Friction maps 
 		
 	if (!XForcing.cf.inputfile.empty())
 	{
-		log("Read Roughness map (cf) data...");
+		log("\nRead Roughness map (cf) data...");
 		// roughness map was specified!
 		readstaticforcing(XForcing.cf);
 
-		log("...done");
+		//log("...done");
 	}
 	
 	//=====================
 	// Deformation (tsunami generation)
 	if (XForcing.deform.size() > 0)
 	{
-		log("Read deform data...");
+		log("\nRead deform data...");
 		// Deformation files was specified!
 
 		for (int nd = 0; nd < XForcing.deform.size(); nd++)
@@ -119,7 +120,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			
 			XParam.deformmaxtime = utils::max(XParam.deformmaxtime, XForcing.deform[nd].startime + XForcing.deform[nd].duration);
 		}
-		log("...done");
+		//log("...done");
 
 	}
 
@@ -129,7 +130,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		// This part of the code only reads the meta data and data 
 		// the full initialisation and detection of river blocks is done in model initialisation
-		log("Preparing rivers (" + std::to_string(XForcing.rivers.size()) + " rivers)");
+		log("\nPreparing rivers (" + std::to_string(XForcing.rivers.size()) + " rivers)");
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
 			// Now read the discharge input and store to  
@@ -141,7 +142,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//======================
 	// Wind file(s)
 	if (!XForcing.UWind.inputfile.empty())
-	{
+	{	
+		log("\nPreparing Wind forcing");
 		// This part of the code only reads the meta data and data for initial step
 		// the full initialisation of the cuda array and texture is done in model initialisation
 		if (XForcing.UWind.uniform == 1)
@@ -177,6 +179,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// ATM file
 	if (!XForcing.Atmp.inputfile.empty())
 	{
+		log("\nPreparing Atmospheric pressure forcing");
 		// This part of the code only reads the meta data and data for initial step
 		// the full initialisation of the cuda array and texture is done in model initialisation
 		XForcing.Atmp.uniform = (XForcing.Atmp.extension.compare("nc") == 0) ? 0 : 1;
@@ -195,6 +198,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// Rain file
 	if (!XForcing.Rain.inputfile.empty())
 	{
+		log("\nPreparing Rain forcing");
 		// This part of the code only reads the meta data and data for initial step
 		// the full initialisation of the cuda array and texture is done in model initialisation
 		if (XForcing.Rain.uniform == 1)
@@ -1057,14 +1061,14 @@ template<class T> T readforcinghead(T ForcingParam)
 	{
 		//printf("bathy: %s\n", BathyParam.inputfile.c_str());
 
-		log("Reading forcing metadata. file: " + ForcingParam.inputfile);
+		log("Reading forcing metadata. file: " + ForcingParam.inputfile + " extension: " + ForcingParam.extension);
 
 		
 
-		log("Forcing file extension: " + ForcingParam.extension);
+		
 		if (ForcingParam.extension.compare("md") == 0)
 		{
-			log("'md' file");
+			//log("'md' file");
 			readbathyHeadMD(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.grdalpha);
 			ForcingParam.xo = 0.0;
 			ForcingParam.yo = 0.0;
@@ -1076,7 +1080,7 @@ template<class T> T readforcinghead(T ForcingParam)
 		{
 			int dummy;
 			double dummya, dummyb, dummyc;
-			log("netcdf file");
+			//log("netcdf file");
 			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc);
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
@@ -1091,7 +1095,7 @@ template<class T> T readforcinghead(T ForcingParam)
 		if (ForcingParam.extension.compare("asc") == 0)
 		{
 			//
-			log("asc file");
+			//log("asc file");
 			readbathyASCHead(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, ForcingParam.grdalpha);
 			ForcingParam.xmax = ForcingParam.xo + (ForcingParam.nx-1)* ForcingParam.dx;
 			ForcingParam.ymax = ForcingParam.yo + (ForcingParam.ny-1)* ForcingParam.dx;
@@ -1106,7 +1110,7 @@ template<class T> T readforcinghead(T ForcingParam)
 
 
 		//printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%lf\talpha=%f\txo=%lf\tyo=%lf\txmax=%lf\tymax=%lf\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo, BathyParam.xmax, BathyParam.ymax);
-		log("Grid info: nx=" + std::to_string(ForcingParam.nx) + " ny=" + std::to_string(ForcingParam.ny) + " dx=" + std::to_string(ForcingParam.dx) + " grdalpha=" + std::to_string(ForcingParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(ForcingParam.xo) + " xmax=" + std::to_string(ForcingParam.xmax) + " yo=" + std::to_string(ForcingParam.yo) + " ymax=" + std::to_string(ForcingParam.ymax));
+		log("Forcing grid info: nx=" + std::to_string(ForcingParam.nx) + " ny=" + std::to_string(ForcingParam.ny) + " dx=" + std::to_string(ForcingParam.dx) + " grdalpha=" + std::to_string(ForcingParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(ForcingParam.xo) + " xmax=" + std::to_string(ForcingParam.xmax) + " yo=" + std::to_string(ForcingParam.yo) + " ymax=" + std::to_string(ForcingParam.ymax));
 
 
 

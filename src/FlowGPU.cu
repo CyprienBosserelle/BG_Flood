@@ -61,7 +61,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	//============================================
 	// Reduce minimum timestep
 	XLoop.dt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
-
+	XLoop.dtmax = XLoop.dt;
 	
 
 	XModel.time.dt = T(XLoop.dt);
@@ -124,10 +124,6 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
-	//============================================
-	//Update evolving variable by 1 full time step
-	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
-	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//============================================
 	// Add forcing (Rain, Wind)
@@ -144,6 +140,13 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
 
+
+	//============================================
+	//Update evolving variable by 1 full time step
+	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
 	//============================================
 	// Add bottom friction
 	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);

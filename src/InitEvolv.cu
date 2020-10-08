@@ -25,14 +25,14 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 	if (!XParam.hotstartfile.empty())
 	{
 		// hotstart
-		log("Hotstart file used : " + XParam.hotstartfile);
+		log("\tHotstart file used : " + XParam.hotstartfile);
 
 		hotstartsucess = readhotstartfile(XParam, XBlock, XEv, zb);
 
 		//add offset if present
 		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
 		{
-			printf("add offset to zs and hh... ");
+			printf("\t\tadd offset to zs and hh... ");
 			//
 			AddZSoffset(XParam, XBlock, XEv, zb);
 
@@ -41,8 +41,8 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 
 		if (hotstartsucess == 0)
 		{
-			printf("Failed...  ");
-			write_text_to_log_file("Hotstart failed switching to cold start");
+			printf("\t\tFailed...  ");
+			write_text_to_log_file("\tHotstart failed switching to cold start");
 		}
 	}
 
@@ -71,7 +71,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		
 		if (!std::isnan(XParam.zsinit)) // apply specified zsinit
 		{
-			log("Cold start");
+			log("\tCold start");
 			int coldstartsucess = 0;
 			coldstartsucess = coldstart(XParam, XBlock, zb, XEv);
 			
@@ -79,7 +79,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		// case 2 warm start
 		else // lukewarm start i.e. inv. dist interpolation of zs at bnds // Argggh!
 		{
-			log("Warm start");
+			log("\tWarm start");
 			warmstart(XParam, XForcing, XBlock, zb, XEv);
 			
 		}// end else

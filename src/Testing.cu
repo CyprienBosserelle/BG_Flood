@@ -12,28 +12,38 @@
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	bool bumptest;
-	if (XParam.test == 0)
+	
+
+	log("\nRunning internal test(s):");
+	if (XParam.test >= 0)
 	{
+		bool bumptest;
 		// Test 0 is pure bump test
-		
+		log("\t Gaussian wave on Cartesian grid");
 		//set gpu is -1 for cpu test
 		
 		bumptest = GaussianHumptest(0.1,-1);
 		std::string result = bumptest ? "successful" : "failed";
-		log("Gaussian Test CPU: " + result);
+		log("\t\tCPU test: " + result);
 
-		// Check if there is indeed a suitable GPU available
-		int nDevices=0;
-		cudaGetDeviceCount(&nDevices);
-
-		if (nDevices > 0)
+		// If origiinal XParam tried to use GPU we try also
+		if (XParam.GPUDEVICE >= 0)
 		{
-			bumptest = GaussianHumptest(0.1, 0);
+			bumptest = GaussianHumptest(0.1, XParam.GPUDEVICE);
 			std::string result = bumptest ? "successful" : "failed";
-			log("Gaussian Test GPU: " + result);
+			log("\t\tGPU test: " + result);
 		}
 	}
+	if (XParam.test >= 1)
+	{
+		bool rivertest;
+		// Test 0 is pure bump test
+		log("\t River Mass conservation grid");
+		rivertest = Rivertest(0.1, -1);
+		std::string result = rivertest ? "successful" : "failed";
+		log("\t\tCPU test: " + result);
+	}
+
 
 	
 
@@ -44,7 +54,7 @@ template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<doubl
 
 template <class T> bool GaussianHumptest(T zsnit, int gpu)
 {
-
+	log("#####");
 	// this is a preplica of the tutorial case for Basilisk
 	Param XParam;
 
@@ -182,7 +192,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 
 	//InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
-
+	XLoop.dtmax = initdt(XParam, XLoop, XModel);
 
 	bool modelgood = true;
 
@@ -261,13 +271,212 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 
 		}
 	}
-	
+	log("#####");
 	return modelgood;
 }
 template bool GaussianHumptest<float>(float zsnit, int gpu);
 template bool GaussianHumptest<double>(double zsnit, int gpu);
 
 
+template <class T> bool Rivertest(T zsnit, int gpu)
+{
+	log("#####");
+	Param XParam;
+	T delta, initVol, finalVol, TheoryInput;
+	// initialise domain and required resolution
+	XParam.dx = 1.0 / ((1 << 8));
+	XParam.xo = -0.5;
+	XParam.yo = -0.5;
+
+	XParam.xmax = 0.5;
+	XParam.ymax = 0.5;
+	//level 8 is 
+
+
+	XParam.initlevel = 0;
+	XParam.minlevel = 0;
+	XParam.maxlevel = 0;
+
+	XParam.zsinit = zsnit;
+	XParam.zsoffset = 0.0;
+
+	//Output times for comparisons
+	XParam.endtime = 1.0;
+	XParam.outputtimestep = 0.1;
+
+	XParam.smallnc = 0;
+
+	XParam.cf = 0.0;
+	XParam.frictionmodel = 0;
+
+	// Enforece GPU/CPU
+	XParam.GPUDEVICE = gpu;
+
+	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+
+	std::vector<std::string> outv;
+
+	for (int nv = 0; nv < 15; nv++)
+	{
+		outv.push_back(outvi[nv]);
+	}
+
+	XParam.outvars = outv;
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	Forcing<float> XForcing;
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy.xo = -1.0;
+	XForcing.Bathy.yo = -1.0;
+
+	XForcing.Bathy.xmax = 1.0;
+	XForcing.Bathy.ymax = 1.0;
+	XForcing.Bathy.nx = 3;
+	XForcing.Bathy.ny = 3;
+
+	XForcing.Bathy.dx = 1.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy.nx, XForcing.Bathy.ny, XForcing.Bathy.val);
+
+	for (int j = 0; j < XForcing.Bathy.ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy.nx; i++)
+		{
+			XForcing.Bathy.val[i + j * XForcing.Bathy.nx] = 0.0f;
+		}
+	}
+	//
+	//
+	// 
+	T Q = 0.001;
+	TheoryInput = Q * XParam.outputtimestep;
+	
+
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = -1.0*XParam.dx*3.0;
+	thisriver.xend = XParam.dx * 3.0;
+	thisriver.ystart = -1.0 * XParam.dx * 3.0;
+	thisriver.yend = XParam.dx * 3.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	Loop<T> XLoop;
+
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	//InitSave2Netcdf(XParam, XModel);
+	XLoop.nextoutputtime = XParam.outputtimestep;
+
+	initVol = T(0.0);
+	// Calculate initial water volume
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XModel.blocks.active[ibl];
+		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				initVol = initVol+XModel.evolv.h[n] * delta * delta;
+			}
+		}
+	}
+
+
+	//InitSave2Netcdf(XParam, XModel);
+	bool modelgood = true;
+
+	while (XLoop.totaltime < XLoop.nextoutputtime)
+	{
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+		}
+		else
+		{
+			FlowCPU(XParam, XLoop, XForcing, XModel);
+		}
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+		//Save2Netcdf(XParam, XModel);
+
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		{
+			if (XParam.GPUDEVICE >= 0)
+			{
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+				}
+			}
+
+			//Save2Netcdf(XParam, XModel);
+			// Verify the Validity of results
+			finalVol = T(0.0);
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
+			{
+				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+				int ib = XModel.blocks.active[ibl];
+				delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+				for (int iy = 0; iy < XParam.blkwidth; iy++)
+				{
+					for (int ix = 0; ix < XParam.blkwidth; ix++)
+					{
+						//
+						int n = memloc(XParam, ix, iy, ib);
+						finalVol = finalVol + XModel.evolv.h[n] * delta * delta;
+					}
+				}
+			}
+			T error = (finalVol - initVol) - TheoryInput;
+
+			modelgood = error / TheoryInput < 0.05;
+		}
+
+		
+	}
+	log("#####");
+	return modelgood;
+}
+template bool Rivertest<float>(float zsnit, int gpu);
+template bool Rivertest<double>(double zsnit, int gpu);
 
 /*! \fn TestingOutput(Param XParam, Model<T> XModel)
 *  

@@ -36,6 +36,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Reduce minimum timestep
 	XLoop.dt = double(CalctimestepCPU(XParam,XLoop, XModel.blocks, XModel.time));
+	XLoop.dtmax = XLoop.dt;
 	XModel.time.dt = T(XLoop.dt);
 
 	//============================================
@@ -92,10 +93,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	
 	//============================================
-	//Update evolving variable by 1 full time step
-	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
-	
-	//============================================
 	// Add forcing (Rain, Wind)
 	if (!XForcing.Rain.inputfile.empty())
 	{
@@ -109,6 +106,12 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
+
+	//============================================
+	//Update evolving variable by 1 full time step
+	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	
+	
 
 	//============================================
 	// Add bottom friction

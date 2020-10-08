@@ -55,6 +55,8 @@ void create_logfile()
 	log("BG_Flood v0.5");
 	log("#################################");
 	log("model started at " + s);
+	log("#################################");
+	log("#");
 }
 
 void write_text_to_log_file(std::string text)

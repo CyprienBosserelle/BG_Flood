@@ -344,10 +344,18 @@ template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, Block
 		}
 	}
 
+	// also don't allow dt to be larger than 1.5*dtmax (usually the last time step or smallest delta/sqrt(gh) if the first step)
+	if (dt > (1.5 * XLoop.dtmax))
+	{
+		dt = (1.5 * XLoop.dtmax);
+	}
+
 	if (ceil((XLoop.nextoutputtime - XLoop.totaltime) / dt) > 0.0)
 	{
 		dt = (XLoop.nextoutputtime - XLoop.totaltime) / ceil((XLoop.nextoutputtime - XLoop.totaltime) / dt);
 	}
+
+	
 
 	return dt;
 

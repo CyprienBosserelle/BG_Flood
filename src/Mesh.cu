@@ -101,6 +101,8 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 {
 	//=============================
 	// Calculate an initial number of block
+
+	log("\nInitializing mesh");
 	int nblk;
 
 	nblk= CalcInitnblk(XParam, XForcing);
@@ -109,7 +111,7 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 	// allocate a few extra blocks for adaptation
 	XParam.nblkmem = (int)ceil(nblk * XParam.membuffer); //5% buffer on the memory for adaptation 
 
-	log("Initial number of blocks: " + std::to_string(nblk) + "; Will be allocating " + std::to_string(XParam.nblkmem) + " in memory.");
+	log("\tInitial number of blocks: " + std::to_string(nblk) + "; Will be allocating " + std::to_string(XParam.nblkmem) + " in memory.");
 
 	//==============================
 	// Allocate CPU memory for the whole model

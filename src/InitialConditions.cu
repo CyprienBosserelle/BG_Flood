@@ -45,7 +45,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Initial Condition
 	
-	log("Initial condition:");
+	log("\nInitial condition:");
 	// First calculate the initial values for Evolving parameters (i.e. zs, h, u and v)
 	initevolv(XParam, XModel.blocks,XForcing, XModel.evolv, XModel.zb);
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
@@ -168,7 +168,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		double xx, yy;
 		int n,ib;
 		double levdx;
-		log("Initializing rivers");
+		double dischargeArea = 0.0;
+		log("\tInitializing rivers");
 		//For each rivers
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
@@ -196,7 +197,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 							idis.push_back(i);
 							jdis.push_back(j);
 							blockdis.push_back(ib);
-
+							dischargeArea = dischargeArea + levdx * levdx;
 						}
 					}
 				}
@@ -206,7 +207,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			XForcing.rivers[Rin].i = idis;
 			XForcing.rivers[Rin].j = jdis;
 			XForcing.rivers[Rin].block = blockdis;
-			XForcing.rivers[Rin].disarea = idis.size() * levdx * levdx; // That is not valid for spherical grids
+			XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
 
 			
 		}

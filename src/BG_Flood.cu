@@ -102,7 +102,8 @@ int main(int argc, char **argv)
 	SetupGPU(XParam, XModel,XForcing, XModel_g);
 
 	//
-
+	log("\nModel setup complete");
+	log("#################################");
 	//===========================================
 	//   End of Initialisation time
 	//===========================================

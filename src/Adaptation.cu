@@ -8,18 +8,17 @@
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int oldnblk = 0;
+
+	int niteration = 0;
 	//fillHalo(XParam, XModel.blocks, XModel.evolv_o);
 	//fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 	if (XParam.maxlevel != XParam.minlevel)
 	{
 		while (oldnblk != XParam.nblk)
-			//for (int i=0; i<1;i++)
 		{
+			niteration++;
+			log("\t Iteration " + std::to_string(niteration));
 			// Fill halo and corners
-
-
-			//
-
 			fillHalo(XParam, XModel.blocks, XModel.evolv_o);
 			fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 			
@@ -34,7 +33,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 
 			if (!checkBUQsanity(XParam,XModel.blocks))
 			{
-				log("Bad BUQ mesh layout\n");
+				log("\tBad BUQ mesh layout\n");
 				exit(2);
 				break;
 			}
@@ -63,20 +62,23 @@ template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<d
 //Initial adaptation also reruns initial conditions
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel)
 {
-	Adaptation(XParam, XForcing, XModel);
+	if (XParam.maxlevel != XParam.minlevel)
+	{
+		log("Adapting mesh");
+		Adaptation(XParam, XForcing, XModel);
 
-	//recalculate river positions (They may belong to a different block)
-	InitRivers(XParam, XForcing, XModel);
-	
-	//rerun boundary block (there may be new bnd block and old ones that do not belong anymore)
-	//Initbnds(XParam, XForcing, XModel);
-	Calcbndblks(XParam, XForcing, XModel.blocks);
-	
-	Findbndblks(XParam, XModel, XForcing);
+		//recalculate river positions (They may belong to a different block)
+		InitRivers(XParam, XForcing, XModel);
 
-	// Re run initial contions to avoid dry/wet issues
-	initevolv(XParam, XModel.blocks, XForcing, XModel.evolv, XModel.zb);
+		//rerun boundary block (there may be new bnd block and old ones that do not belong anymore)
+		//Initbnds(XParam, XForcing, XModel);
+		Calcbndblks(XParam, XForcing, XModel.blocks);
 
+		Findbndblks(XParam, XModel, XForcing);
+
+		// Re run initial contions to avoid dry/wet issues
+		initevolv(XParam, XModel.blocks, XForcing, XModel.evolv, XModel.zb);
+	}
 }
 template void InitialAdaptation<float>(Param& XParam, Forcing<float> &XForcing, Model<float>& XModel);
 template void InitialAdaptation<double>(Param& XParam, Forcing<float> &XForcing, Model<double>& XModel);
@@ -299,7 +301,7 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 		//Reallocate
 		int nblkmem=AddBlocks(nnewblk, XParam, XModel);
 
-		log("Reallocation complete: "+std::to_string(XParam.navailblk)+" new blocks are available ( "+std::to_string(nblkmem)+" blocks in memory) ");
+		log("\t\tReallocation complete: "+std::to_string(XParam.navailblk)+" new blocks are available ( "+std::to_string(nblkmem)+" blocks in memory) ");
 	}
 	//===========================================================
 	//	Start coarsening and refinement
@@ -438,7 +440,7 @@ template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAd
 	// Below is conservative and keeps the peice of code above a bit more simple
 	nnewblk = 3 * nrefineblk;
 
-	log("There are "+ std::to_string(XParam.nblk) +" active blocks ("+ std::to_string(XParam.nblkmem) +" blocks allocated in memory), "+std::to_string(nrefineblk)+" blocks to be refined, "+std::to_string(ncoarsenlk)+" blocks to be coarsen (with neighbour); "+std::to_string(XParam.nblk - nrefineblk - 4 * ncoarsenlk)+" blocks untouched; "+std::to_string(ncoarsenlk * 3)+" blocks to be freed ("+ std::to_string(XParam.navailblk) +" are already available) "+std::to_string(nnewblk)+" new blocks will be created");
+	log("\t\tThere are "+ std::to_string(XParam.nblk) +" active blocks ("+ std::to_string(XParam.nblkmem) +" blocks allocated in memory), "+std::to_string(nrefineblk)+" blocks to be refined, "+std::to_string(ncoarsenlk)+" blocks to be coarsen (with neighbour); "+std::to_string(XParam.nblk - nrefineblk - 4 * ncoarsenlk)+" blocks untouched; "+std::to_string(ncoarsenlk * 3)+" blocks to be freed ("+ std::to_string(XParam.navailblk) +" are already available) "+std::to_string(nnewblk)+" new blocks will be created");
 
 	return nnewblk;
 

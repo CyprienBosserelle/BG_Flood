@@ -14,6 +14,7 @@
 #include "Mesh.h"
 
 #include "Setup_GPU.h"
+#include "Mainloop.h"
 #include "FlowCPU.h"
 #include "FlowGPU.h"
 
