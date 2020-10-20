@@ -245,6 +245,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 			if (abs(diffdt) > T(100.0) * (XLoop.epsilon))
 			{
 				printf("Timestep Difference=%f\n", diffdt);
+
+				compare = false;
 			}
 			CompareCPUvsGPU(XParam, XModel, XModel_g);
 		}
