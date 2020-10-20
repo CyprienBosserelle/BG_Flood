@@ -421,6 +421,11 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 
 	CUDA_CHECK(cudaMemcpy(dummy, XTime.arrmin, 32 * sizeof(T), cudaMemcpyDeviceToHost));
 
+	if (dummy[0] > (1.5 * XLoop.dtmax))
+	{
+		dummy[0] = (1.5 * XLoop.dtmax);
+	}
+
 	if (ceil((XLoop.nextoutputtime - XLoop.totaltime) / dummy[0]) > 0.0)
 	{
 		dummy[0] = (XLoop.nextoutputtime - XLoop.totaltime) / ceil((XLoop.nextoutputtime - XLoop.totaltime) / dummy[0]);

@@ -269,14 +269,15 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 
 	BlockP<T> XBlock = XModel.blocks;
 
-
-	//if (XParam.GPUDEVICE >= 0)
-	//{
-	//	CalcInitdtGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.time.dtmax);
-	//	initdt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
-	//}
-	//else
-	//{
+	/*
+	if (XParam.GPUDEVICE >= 0)
+	{
+		CalcInitdtGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.time.dtmax);
+		initdt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
+	}
+	else
+	{
+	*/
 		CalcInitdtCPU(XParam, XModel.blocks, XModel.evolv, XModel.time.dtmax);
 		initdt = double(CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time));
 

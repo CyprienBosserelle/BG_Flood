@@ -15,6 +15,24 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	
 
 	log("\nRunning internal test(s):");
+
+	if (XParam.test == 2)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			bool GPUvsCPUtest;
+			log("\t Gaussian wave on Cartesian grid: CPU vs GPU");
+			GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE,true);
+			std::string result = GPUvsCPUtest ? "successful" : "failed";
+			log("\t\tCPU vs GPU test: " + result);
+		}
+		else
+		{
+			log("Specify GPU device to run test 2 (CPU vs GPU comparison)");
+		}
+	}
+
+
 	if (XParam.test >= 0)
 	{
 		bool bumptest;
@@ -22,14 +40,14 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t Gaussian wave on Cartesian grid");
 		//set gpu is -1 for cpu test
 		
-		bumptest = GaussianHumptest(0.1,-1);
+		bumptest = GaussianHumptest(0.1, -1, false);
 		std::string result = bumptest ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
 
 		// If origiinal XParam tried to use GPU we try also
 		if (XParam.GPUDEVICE >= 0)
 		{
-			bumptest = GaussianHumptest(0.1, XParam.GPUDEVICE);
+			bumptest = GaussianHumptest(0.1, XParam.GPUDEVICE,false);
 			std::string result = bumptest ? "successful" : "failed";
 			log("\t\tGPU test: " + result);
 		}
@@ -52,7 +70,7 @@ template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float>
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
 
-template <class T> bool GaussianHumptest(T zsnit, int gpu)
+template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 {
 	log("#####");
 	// this is a preplica of the tutorial case for Basilisk
@@ -103,11 +121,11 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "ho", "vo" };
 
 	std::vector<std::string> outv;
 
-	for (int nv = 0; nv < 15; nv++)
+	for (int nv = 0; nv < 16; nv++)
 	{
 		outv.push_back(outvi[nv]);
 	}
@@ -182,17 +200,29 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	Loop<T> XLoop;
+	Loop<T> XLoop_g;
+
 
 	XLoop.hugenegval = std::numeric_limits<T>::min();
-
 	XLoop.hugeposval = std::numeric_limits<T>::max();
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
-
 	XLoop.totaltime = 0.0;
 
 	//InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
 	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+
+	//XLoop_g = XLoop;
+	XLoop_g.hugenegval = std::numeric_limits<T>::min();
+	XLoop_g.hugeposval = std::numeric_limits<T>::max();
+	XLoop_g.epsilon = std::numeric_limits<T>::epsilon();
+	XLoop_g.totaltime = 0.0;
+
+	//InitSave2Netcdf(XParam, XModel);
+	XLoop_g.nextoutputtime = XParam.outputtimestep;
+	XLoop_g.dtmax = XLoop.dtmax;
+
+
 
 	bool modelgood = true;
 
@@ -201,14 +231,17 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+			FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
 		}
 		else
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
-
-
+		if (XParam.GPUDEVICE >= 0 && compare)
+		{
+			FlowCPU(XParam, XLoop, XForcing, XModel);
+			CompareCPUvsGPU(XParam, XModel, XModel_g);
+		}
 
 		//diffdh(XParam, XModel.blocks, XModel.flux.Su, diff, shuffle);
 		//diffSource(XParam, XModel.blocks, XModel.flux.Fqux, XModel.flux.Su, diff);
@@ -257,7 +290,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
 				{
 
-					//printf("ib=%d, ix=%d, iy=%d; diff=%f", ib, ix, iy, diff);
+					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%f\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerification[iv], diff);
 					modelgood = false;
 				}
 
@@ -274,8 +307,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu)
 	log("#####");
 	return modelgood;
 }
-template bool GaussianHumptest<float>(float zsnit, int gpu);
-template bool GaussianHumptest<double>(double zsnit, int gpu);
+template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare);
+template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare);
 
 
 template <class T> bool Rivertest(T zsnit, int gpu)
@@ -707,37 +740,17 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 	//============================================
 	// Compare gradients for evolving parameters
 	
-	// GPU
-	FlowGPU(XParam, XLoop, XForcing, XModel_g);
-	T dtgpu = XLoop.dt;
-	// CPU
-	FlowCPU(XParam, XLoop, XForcing, XModel);
-	T dtcpu = XLoop.dt;
 	// calculate difference
 	//diffArray(XParam, XLoop, XModel.blocks, XModel.evolv.h, XModel_g.evolv.h, XModel.evolv_o.u);
 
 	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 
-	
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "h", 3, XModel.evolv_o.h);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "u", 3, XModel.evolv_o.u);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "v", 3, XModel.evolv_o.v);
+	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+	{
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], 3, XModel.OutputVarMap[XParam.outvars[ivar]]);
+	}
 
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqux", 3, XModel.flux.Fqux);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fquy", 3, XModel.flux.Fquy);
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvx", 3, XModel.flux.Fqvx);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvy", 3, XModel.flux.Fqvy);
-
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Su", 3, XModel.flux.Su);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Sv", 3, XModel.flux.Sv);
-
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dh", 3, XModel.adv.dh);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", 3, XModel.adv.dhu);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", 3, XModel.adv.dhv);
-
+	/*
 	std::string varname = "dt";
 	if (abs(dtgpu - dtcpu) < (XLoop.epsilon * 2))
 	{
@@ -748,39 +761,14 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 		log(varname + " FAIL: " + " GPU(" + std::to_string(dtgpu) + ") - CPU("+std::to_string(dtcpu) +") =  difference: "+  std::to_string(abs(dtgpu - dtcpu)) + " Eps: " + std::to_string(XLoop.epsilon));
 		
 	}
-
+	*/
 	//Check evolving param
-	diffArray(XParam, XLoop, XModel.blocks, "h", XModel.evolv_o.h, XModel_g.evolv_o.h, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "zs", XModel.evolv_o.zs, XModel_g.evolv_o.zs, gpureceive, diff);
-
-	diffArray(XParam, XLoop, XModel.blocks, "u", XModel.evolv_o.u, XModel_g.evolv_o.u, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "v", XModel.evolv_o.v, XModel_g.evolv_o.v, gpureceive, diff);
+	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+	{
+		diffArray(XParam, XLoop, XModel.blocks, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], gpureceive, diff);
+	}
 	
-
 	
-	//check gradients
-	diffArray(XParam, XLoop, XModel.blocks, "dhdx", XModel.grad.dhdx, XModel_g.grad.dhdx, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "dhdy", XModel.grad.dhdy, XModel_g.grad.dhdy, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "dzsdx", XModel.grad.dzsdx, XModel_g.grad.dzsdx, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "dzsdy", XModel.grad.dzsdy, XModel_g.grad.dzsdy, gpureceive, diff);
-
-	//Check Kurganov
-	diffArray(XParam, XLoop, XModel.blocks,"Fhu", XModel.flux.Fhu, XModel_g.flux.Fhu, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "Fqux", XModel.flux.Fqux, XModel_g.flux.Fqux, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "Su", XModel.flux.Su, XModel_g.flux.Su, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "Fqvx", XModel.flux.Fqvx, XModel_g.flux.Fqvx, gpureceive, diff);
-
-	diffArray(XParam, XLoop, XModel.blocks, "Fhv", XModel.flux.Fhv, XModel_g.flux.Fhv, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "Fqvy", XModel.flux.Fqvy, XModel_g.flux.Fqvy, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "Sv", XModel.flux.Sv, XModel_g.flux.Sv, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "Fquy", XModel.flux.Fquy, XModel_g.flux.Fquy, gpureceive, diff);
-
-	diffArray(XParam, XLoop, XModel.blocks, "dh", XModel.adv.dh, XModel_g.adv.dh, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "dhu", XModel.adv.dhu, XModel_g.adv.dhu, gpureceive, diff);
-	diffArray(XParam, XLoop, XModel.blocks, "dhv", XModel.adv.dhv, XModel_g.adv.dhv, gpureceive, diff);
-
-
-
 	
 	free(gpureceive);
 	free(diff);
