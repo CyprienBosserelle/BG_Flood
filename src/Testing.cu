@@ -240,6 +240,12 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		if (XParam.GPUDEVICE >= 0 && compare)
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
+
+			T diffdt = XLoop_g.dt - XLoop.dt;
+			if (abs(diffdt) > T(100.0) * (XLoop.epsilon))
+			{
+				printf("Timestep Difference=%f\n", diffdt);
+			}
 			CompareCPUvsGPU(XParam, XModel, XModel_g);
 		}
 
