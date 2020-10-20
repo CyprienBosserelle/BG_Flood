@@ -70,7 +70,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	// Update advection terms (dh dhu dhv) 
 	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	/*
+	
 	//============================================
 	// Add forcing (Rain, Wind)
 	if (!XForcing.Rain.inputfile.empty())

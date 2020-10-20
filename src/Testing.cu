@@ -731,7 +731,7 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 	T* gpureceive;
 	T* diff;
 
-	Forcing<float> XForcing;
+	//Forcing<float> XForcing;
 
 	AllocateCPU(XParam.nblkmem, XParam.blksize, gpureceive);
 	AllocateCPU(XParam.nblkmem, XParam.blksize, diff);
