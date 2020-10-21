@@ -626,9 +626,12 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XMo
 		T reducedtgpu=CalctimestepGPU(XParam, XLoop, XModel_g.blocks, XModel_g.time);
 		testgpu = abs(reducedtgpu - mininput) < T(100.0) * (XLoop.epsilon);
 
-		
-			log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu));
-		
+		if (!testgpu)
+		{
+			char buffer[256]; sprintf(buffer, "%e", abs(reducedtgpu - mininput));
+			std::string str(buffer);
+			log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
+		}
 
 
 
