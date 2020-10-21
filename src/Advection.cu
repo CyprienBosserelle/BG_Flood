@@ -373,11 +373,13 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 	// densify dtmax (i.e. remove empty block and halo that may sit in the middle of the memory structure)
 	int s = XParam.nblk * (XParam.blkwidth* XParam.blkwidth); // Not blksize wich includes Halo
 
-	dim3 blockDim(16, 16, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	densify <<< gridDim, blockDim, 0 >>>(XParam, XBlock, XTime.dtmax, XTime.arrmin);
 	CUDA_CHECK(cudaDeviceSynchronize());
+	
+
 	CUDA_CHECK(cudaMemcpy(XTime.dtmax, XTime.arrmin, s * sizeof(T), cudaMemcpyDeviceToDevice));
 
 
@@ -419,7 +421,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 	}
 
 
-	CUDA_CHECK(cudaMemcpy(dummy, XTime.arrmin, 32 * sizeof(T), cudaMemcpyDeviceToHost));
+	CUDA_CHECK(cudaMemcpy(dummy, XTime.arrmin, 32 * sizeof(T), cudaMemcpyDeviceToHost)); // replace 32 by word here?
 
 	if (dummy[0] > (1.5 * XLoop.dtmax))
 	{

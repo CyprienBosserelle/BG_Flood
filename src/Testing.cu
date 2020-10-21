@@ -31,7 +31,26 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("Specify GPU device to run test 2 (CPU vs GPU comparison)");
 		}
 	}
+	if (XParam.test == 3)
+	{
+		
+			bool testresults;
+			bool testreduction=true;
 
+			// Iterate this test niter times:
+			int niter = 100;
+
+			log("\t Reduction Test");
+			for (int iter = 0; iter < niter; iter++)
+			{
+				testresults = reductiontest(XParam, XModel, XModel_g);
+				testreduction = testreduction && testresults;
+			}
+			
+			std::string result = testreduction ? "successful" : "failed";
+			log("\t\tReduction test: " + result);
+		
+	}
 
 	if (XParam.test >= 0)
 	{
@@ -69,7 +88,14 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
-
+/*! \fn bool GaussianHumptest(T zsnit, int gpu, bool compare)
+*
+* This function tests the full hydrodynamics model and compares the results with pre-conmputed (Hard wired) values
+*	The function creates it own model setup and mesh independantly to what the user might want to do
+*	The setup consist of and centrally located gaussian hump radiating away
+*	The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk
+*	This function also compares the result of the GPU and CPU code (until they diverge) 
+*/
 template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 {
 	log("#####");
@@ -318,7 +344,13 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare);
 template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare);
 
-
+/*! \fn bool Rivertest(T zsnit, int gpu)
+*
+* This function tests the mass conservation of the vertical injection (used for rivers)
+*	The function creates it own model setup and mesh independantly to what the user might want to do
+*	This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results 
+*	with zsnit=0.1 that is approx 20 steps
+*/
 template <class T> bool Rivertest(T zsnit, int gpu)
 {
 	log("#####");
@@ -519,9 +551,99 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 template bool Rivertest<float>(float zsnit, int gpu);
 template bool Rivertest<double>(double zsnit, int gpu);
 
+
+
+/*! \fn reductiontest()
+*
+*	Test the reduction algorithm on the user grid layout
+*/
+template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XModel_g)
+{
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+	srand((unsigned)time(NULL));
+	T mininput = T(rand())/T(RAND_MAX);
+	bool test = true;
+
+	Loop<T> XLoop;
+
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+
+	//InitSave2Netcdf(XParam, XModel);
+	XLoop.nextoutputtime = mininput*T(1000.0);
+	XLoop.dtmax = mininput * T(10);
+
+	// Fill in dtmax with random values that are larger than  mininput
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+			
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+					//
+				int n = memloc(XParam, ix, iy, ib);
+				XModel.time.dtmax[n] = mininput * T(1.1) + utils::max(T(rand()) / T(RAND_MAX),T(0.0));
+			}
+		}
+	}
+
+	// randomly select a block a i and a j were the maximum value will be relocated
+	int ibbl = floor(T(rand()) / T(RAND_MAX) * XParam.nblk);
+	int ibb = XModel.blocks.active[ibbl];
+	int ixx = floor(T(rand()) / T(RAND_MAX) * XParam.blkwidth);
+	int iyy = floor(T(rand()) / T(RAND_MAX) * XParam.blkwidth);
+
+	int nn= memloc(XParam, ixx, iyy, ibb);
+
+	XModel.time.dtmax[nn] = mininput;
+
+	T reducedt = CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time);
+
+	test = abs(reducedt - mininput) < T(100.0) * (XLoop.epsilon);
+	bool testgpu;
+
+	if (!test)
+	{
+		char buffer[256]; sprintf(buffer, "%e", abs(reducedt - mininput));
+		std::string str(buffer);
+		log("\t\t CPU testfailed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt)+ ";  error=" +str);
+	}
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+
+		reset_var <<< gridDim, blockDim, 0>>> (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		CopytoGPU(XParam.nblk, XParam.blksize, XModel.time.dtmax, XModel_g.time.dtmax);
+		T reducedtgpu=CalctimestepGPU(XParam, XLoop, XModel_g.blocks, XModel_g.time);
+		testgpu = abs(reducedtgpu - mininput) < T(100.0) * (XLoop.epsilon);
+
+		
+			log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu));
+		
+
+
+
+		test = test && testgpu;
+	}
+	
+
+	return test;
+}
+template bool reductiontest<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
+template bool reductiontest<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
+
 /*! \fn TestingOutput(Param XParam, Model<T> XModel)
 *  
-* 
+*	OUTDATED?
 */
 template <class T>
 void TestingOutput(Param XParam, Model<T> XModel)
@@ -627,97 +749,6 @@ template void copyID2var<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 
-
-
-/*template <class T> void Gaussianhump(Param  XParam, Model<T> XModel)
-{
-	T x, y,delta;
-	T cc = 100.0;
-	
-
-	T a = 0.2;
-
-	T* diff,*shuffle;
-
-	AllocateCPU(XParam.nblkmem, XParam.blksize, diff);
-	AllocateCPU(XParam.nblkmem, XParam.blksize, shuffle);
-
-	T xorigin = XParam.xo + 0.5 * (XParam.xmax - XParam.xo);
-	T yorigin = XParam.yo + 0.5 * (XParam.ymax - XParam.yo);
-	Loop<T> XLoop;
-	
-	XLoop.hugenegval = std::numeric_limits<T>::min();
-
-	XLoop.hugeposval = std::numeric_limits<T>::max();
-	XLoop.epsilon = std::numeric_limits<T>::epsilon();
-
-	XLoop.totaltime = 0.0;
-
-	
-	XLoop.nextoutputtime = XParam.outputtimestep;
-
-	
-	//InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
-	
-	// make an empty forcing
-	Forcing<float> XForcing;
-
-
-
-	if (XParam.GPUDEVICE >= 0)
-	{
-		CopytoGPU(XParam.nblkmem, XParam.blksize, XParam, XModel, XModel_g);
-	}
-
-	InitSave2Netcdf(XParam, XModel);
-
-	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "diff", 3, diff);
-	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "shuffle", 3, shuffle);
-	
-
-	while (XLoop.totaltime < XParam.endtime)
-	{
-		
-		if (XParam.GPUDEVICE >= 0)
-		{
-			FlowGPU(XParam, XLoop, XForcing, XModel_g);
-		}
-		else
-		{
-			FlowCPU(XParam, XLoop, XForcing, XModel);
-		}
-		
-
-		
-		//diffdh(XParam, XModel.blocks, XModel.flux.Su, diff, shuffle);
-		//diffSource(XParam, XModel.blocks, XModel.flux.Fqux, XModel.flux.Su, diff);
-		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
-
-		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
-		{
-			if (XParam.GPUDEVICE >= 0)
-			{
-				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
-				{
-					CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
-				}
-			}
-			
-			Save2Netcdf(XParam, XModel);
-			
-
-			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
-		}
-	}
-	
-	
-	
-	free(shuffle);
-	free(diff);
-}
-template void Gaussianhump<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
-template void Gaussianhump<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
-*/
 
 
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g)
@@ -885,3 +916,5 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 
 
 }
+
+
