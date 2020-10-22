@@ -649,6 +649,24 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XMo
 template bool reductiontest<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
 template bool reductiontest<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
 
+template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T * z)
+{
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				z[n] =  T(rand()) / T(RAND_MAX);
+			}
+		}
+	}
+}
+
 /*! \fn TestingOutput(Param XParam, Model<T> XModel)
 *  
 *	OUTDATED?
