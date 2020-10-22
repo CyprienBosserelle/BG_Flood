@@ -38,8 +38,8 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			bool testreduction=true;
 
 			// Iterate this test niter times:
-			int niter = 100;
-
+			int niter = 1000;
+			srand(time(0));
 			log("\t Reduction Test");
 			for (int iter = 0; iter < niter; iter++)
 			{
@@ -555,13 +555,13 @@ template bool Rivertest<double>(double zsnit, int gpu);
 
 /*! \fn reductiontest()
 *
-*	Test the reduction algorithm on the user grid layout
+*	Test the algorithm for reducing the global time step on the user grid layout
 */
 template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XModel_g)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
-	srand((unsigned)time(NULL));
+	//srand(seed);
 	T mininput = T(rand())/T(RAND_MAX);
 	bool test = true;
 
@@ -575,8 +575,8 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XMo
 	XLoop.totaltime = 0.0;
 
 	//InitSave2Netcdf(XParam, XModel);
-	XLoop.nextoutputtime = mininput*T(1000.0);
-	XLoop.dtmax = mininput * T(10);
+	XLoop.nextoutputtime = mininput*T(2.0);
+	XLoop.dtmax = mininput * T(10.0);
 
 	// Fill in dtmax with random values that are larger than  mininput
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -613,7 +613,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XMo
 	{
 		char buffer[256]; sprintf(buffer, "%e", abs(reducedt - mininput));
 		std::string str(buffer);
-		log("\t\t CPU testfailed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt)+ ";  error=" +str);
+		//log("\t\t CPU testfailed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt)+ ";  error=" +str);
 	}
 
 	if (XParam.GPUDEVICE >= 0)
@@ -622,7 +622,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XMo
 		reset_var <<< gridDim, blockDim, 0>>> (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		CopytoGPU(XParam.nblk, XParam.blksize, XModel.time.dtmax, XModel_g.time.dtmax);
+		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.time.dtmax, XModel_g.time.dtmax);
 		T reducedtgpu=CalctimestepGPU(XParam, XLoop, XModel_g.blocks, XModel_g.time);
 		testgpu = abs(reducedtgpu - mininput) < T(100.0) * (XLoop.epsilon);
 
@@ -630,10 +630,15 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XMo
 		{
 			char buffer[256]; sprintf(buffer, "%e", abs(reducedtgpu - mininput));
 			std::string str(buffer);
-			log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
+			//log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
 		}
 
-
+		if (abs(reducedtgpu - reducedt) > T(100.0) * (XLoop.epsilon))
+		{
+			char buffer[256]; sprintf(buffer, "%e", abs(reducedtgpu - reducedt));
+			std::string str(buffer);
+			log("\t\t CPU vs GPU test failed! : Expected=" + std::to_string(reducedt) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
+		}
 
 		test = test && testgpu;
 	}
