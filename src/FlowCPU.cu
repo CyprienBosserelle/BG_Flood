@@ -17,7 +17,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	
 	//============================================
 	// Calculate gradient for evolving parameters
-	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv, XModel.grad);
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad);
 
 	//============================================
 	// Flux and Source term reconstruction
@@ -72,7 +72,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Calculate gradient for evolving parameters
-	gradientCPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
+	gradientCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad);
 
 	//============================================
 	// Flux and Source term reconstruction

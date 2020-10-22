@@ -52,6 +52,14 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		
 	}
 
+	if (XParam.test == 4)
+	{
+		//
+		bool testresults;
+		testresults= CPUGPUtest(XParam, XModel, XModel_g);
+
+	}
+
 	if (XParam.test >= 0)
 	{
 		bool bumptest;
@@ -274,7 +282,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 				compare = false;
 			}
-			CompareCPUvsGPU(XParam, XModel, XModel_g);
+			CompareCPUvsGPU(XParam, XModel, XModel_g, outv,false);
 		}
 
 		//diffdh(XParam, XModel.blocks, XModel.flux.Su, diff, shuffle);
@@ -649,6 +657,143 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel,Model<T> XMo
 template bool reductiontest<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
 template bool reductiontest<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
 
+/*! \fn CPUGPUtest(Param XParam, Model<float> XModel, Model<float> XModel_g)
+*	Perform a series of test between the CPU and GPU Flow functions
+*	This test only occurs if a valid GPU is specified by user
+*/
+template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	bool test = true;
+
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
+	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
+	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
+
+	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(-1.0), XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	// Create some usefull vectors
+	std::string evolvst[4] = {"h","zs","u","v"};
+
+	std::vector<std::string> evolvVar;
+
+	for (int nv = 0; nv < 4; nv++)
+	{
+		evolvVar.push_back(evolvst[nv]);
+	}
+	
+	// Check fillhalo function
+
+	// fill with all evolv array with random value
+	fillrandom(XParam, XModel.blocks, XModel.evolv.zs);
+	fillrandom(XParam, XModel.blocks, XModel.evolv.h);
+	fillrandom(XParam, XModel.blocks, XModel.evolv.u);
+	fillrandom(XParam, XModel.blocks, XModel.evolv.v);
+
+	//copy to GPU
+	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv, XModel_g.evolv);
+
+	//============================================
+	//  Fill the halo for gradient reconstruction
+	fillHalo(XParam, XModel.blocks, XModel.evolv);
+	fillHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv);
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, evolvVar, true);
+
+	//============================================
+	//perform gradient reconstruction
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad);
+	gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
+
+	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
+
+	std::vector<std::string> gradVar;
+
+	for (int nv = 0; nv < 8; nv++)
+	{
+		gradVar.push_back(gradst[nv]);
+	}
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, false);
+
+	//============================================
+	// Kurganov scheme
+
+	std::string fluxst[8] = { "Fhu","Su","Fqux","Fqvx","Fhv","Sv","Fqvy","Fquy" };
+
+	std::vector<std::string> fluxVar;
+
+	for (int nv = 0; nv < 8; nv++)
+	{
+		fluxVar.push_back(fluxst[nv]);
+	}
+
+	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		
+	//GPU part
+	updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	
+	
+	// Y- direction
+	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+
+	updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, fluxVar, false);
+
+
+	fillHalo(XParam, XModel.blocks, XModel.flux);
+	fillHaloGPU(XParam, XModel_g.blocks, XModel_g.flux);
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, fluxVar, true);
+
+
+	//============================================
+	// Update step
+	std::string advst[3] = { "dh","dhu","dhv"};
+
+	std::vector<std::string> advVar;
+
+	for (int nv = 0; nv < 3; nv++)
+	{
+		advVar.push_back(advst[nv]);
+	}
+	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
+	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.flux, XModel_g.adv);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, advVar, false);
+
+	//============================================
+	// Advance step
+	std::string evost[4] = { "zso","ho","uo","vo" };
+
+	std::vector<std::string> evoVar;
+
+	for (int nv = 0; nv < 4; nv++)
+	{
+		evoVar.push_back(evost[nv]);
+	}
+	AdvkernelCPU(XParam, XModel.blocks, T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	AdvkernelGPU << < gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.5), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
+
+
+
+
+	return test;
+}
+
+
+
+
 template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T * z)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -666,6 +811,42 @@ template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T * z)
 		}
 	}
 }
+template void fillrandom<float>(Param XParam, BlockP<float> XBlock, float* z);
+template void fillrandom<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> void fillgauss(Param XParam, BlockP<T> XBlock,T amp, T* z)
+{
+	T delta, x, y;
+	T cc = T(0.05) * (XParam.xmax - XParam.xo);
+	T xorigin = XParam.xo + T(0.5) * (XParam.xmax - XParam.xo);
+	T yorigin = XParam.yo + T(0.5) * (XParam.ymax - XParam.yo);
+
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XBlock.active[ibl];
+		delta = calcres(XParam.dx, XBlock.level[ib]);
+
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				z[n] =  amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
+				
+
+			}
+		}
+	}
+}
+template void fillgauss<float>(Param XParam, BlockP<float> XBlock, float amp, float* z);
+template void fillgauss<double>(Param XParam, BlockP<double> XBlock, double amp, double* z);
+
 
 /*! \fn TestingOutput(Param XParam, Model<T> XModel)
 *  
@@ -777,7 +958,7 @@ template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z)
 
 
 
-template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g)
+template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo)
 {
 	Loop<T> XLoop;
 	// GPU stuff
@@ -810,9 +991,9 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 
 	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
 
-	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+	for (int ivar = 0; ivar < varlist.size(); ivar++)
 	{
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], 3, XModel.OutputVarMap[XParam.outvars[ivar]]);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varlist[ivar], 3, XModel.OutputVarMap[varlist[ivar]]);
 	}
 
 	/*
@@ -827,10 +1008,10 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 		
 	}
 	*/
-	//Check evolving param
-	for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+	//Check variable
+	for (int ivar = 0; ivar < varlist.size(); ivar++)
 	{
-		diffArray(XParam, XLoop, XModel.blocks, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], gpureceive, diff);
+		diffArray(XParam, XLoop, XModel.blocks, varlist[ivar], checkhalo, XModel.OutputVarMap[varlist[ivar]], XModel_g.OutputVarMap[varlist[ivar]], gpureceive, diff);
 	}
 	
 	
@@ -893,7 +1074,7 @@ template <class T> void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* S
 }
 
 
-template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, T* cpu, T* gpu, T* dummy, T* out)
+template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname,bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
 {
 	T diff, maxdiff, rmsdiff;
 	unsigned int nit = 0;
@@ -908,10 +1089,15 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XBlock.active[ibl];
 
+		int yst = checkhalo ? -1 : 0;
+		int ynd = checkhalo ? XParam.blkwidth + 1 : XParam.blkwidth;
 
-		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		int xst = checkhalo ? -1 : 0;
+		int xnd = checkhalo ? XParam.blkwidth + 1 : XParam.blkwidth;
+
+		for (int iy = yst; iy < ynd; iy++)
 		{
-			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			for (int ix = xst; ix < xnd; ix++)
 			{
 				int n = memloc(XParam, ix, iy, ib);
 				diff = dummy[n] - cpu[n];
@@ -921,7 +1107,10 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 				out[n] = diff;
 			}
 		}
+
 	}
+
+
 	rmsdiff = rmsdiff / nit;
 
 	

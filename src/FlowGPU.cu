@@ -33,7 +33,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	
 	//============================================
 	// Calculate gradient for evolving parameters for predictor step
-	gradientGPU(XParam, XLoop, XModel.blocks, XModel.evolv, XModel.grad);
+	gradientGPU(XParam, XModel.blocks, XModel.evolv, XModel.grad);
 	
 	//============================================
 	// Synchronise all ongoing streams
@@ -101,7 +101,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Calculate gradient for evolving parameters
-	gradientGPU(XParam, XLoop, XModel.blocks, XModel.evolv_o, XModel.grad);
+	gradientGPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	//============================================

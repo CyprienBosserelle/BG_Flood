@@ -2,7 +2,7 @@
 
 
 
-template <class T> void gradientGPU(Param XParam, Loop<T>& XLoop, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
+template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
 {
 	const int num_streams = 4;
 
@@ -32,8 +32,8 @@ template <class T> void gradientGPU(Param XParam, Loop<T>& XLoop, BlockP<T>XBloc
 
 	fillHaloGPU(XParam, XBlock, XGrad);
 }
-template void gradientGPU<float>(Param XParam, Loop<float>& XLoop, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
-template void gradientGPU<double>(Param XParam, Loop<double>& XLoop, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
+template void gradientGPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
+template void gradientGPU<double>(Param XParam,  BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
 
 
 template <class T> __global__ void gradient(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
@@ -147,7 +147,7 @@ template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx,
 template void gradientC<float>(Param XParam, BlockP<float> XBlock, float* a, float* dadx, float* dady);
 template void gradientC<double>(Param XParam, BlockP<double> XBlock, double* a, double* dadx, double* dady);
 
-template <class T> void gradientCPU(Param XParam, Loop<T> XLoop, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
+template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
 {
 
 
@@ -163,6 +163,6 @@ template <class T> void gradientCPU(Param XParam, Loop<T> XLoop, BlockP<T>XBlock
 
 	fillHalo(XParam, XBlock, XGrad);
 }
-template void gradientCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
-template void gradientCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
+template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
+template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
 
