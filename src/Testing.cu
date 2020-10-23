@@ -60,7 +60,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 	}
 
-	if (XParam.test >= 0)
+	if (XParam.test == 0)
 	{
 		bool bumptest;
 		// Test 0 is pure bump test
@@ -74,12 +74,12 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		// If origiinal XParam tried to use GPU we try also
 		if (XParam.GPUDEVICE >= 0)
 		{
-			bumptest = GaussianHumptest(0.1, XParam.GPUDEVICE,false);
+			bumptest = GaussianHumptest(0.1, XParam.GPUDEVICE,true);
 			std::string result = bumptest ? "successful" : "failed";
 			log("\t\tGPU test: " + result);
 		}
 	}
-	if (XParam.test >= 1)
+	if (XParam.test == 1)
 	{
 		bool rivertest;
 		// Test 0 is pure bump test
@@ -128,11 +128,11 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 8));
-	XParam.xo = -0.5;
-	XParam.yo = -0.5;
+	XParam.xo = -0.50;
+	XParam.yo = -0.50;
 
-	XParam.xmax = 0.5;
-	XParam.ymax = 0.5;
+	XParam.xmax = 0.50;
+	XParam.ymax = 0.50;
 	//level 8 is 
 	
 
@@ -145,7 +145,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 	//Output times for comparisons
 	XParam.endtime = 1.0;
-	XParam.outputtimestep = 0.1;
+	XParam.outputtimestep = 0.1;// 0.1;
 
 	XParam.smallnc = 0;
 
@@ -155,11 +155,11 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "ho", "vo" };
+	std::string outvi[18] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "ho", "vo", "uo", "cf" };
 
 	std::vector<std::string> outv;
 
-	for (int nv = 0; nv < 16; nv++)
+	for (int nv = 0; nv < 18; nv++)
 	{
 		outv.push_back(outvi[nv]);
 	}
@@ -257,7 +257,10 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	XLoop_g.dtmax = XLoop.dtmax;
 
 
-
+	if (XParam.GPUDEVICE >= 0 && compare)
+	{
+		CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
+	}
 	bool modelgood = true;
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
@@ -266,6 +269,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		if (XParam.GPUDEVICE >= 0)
 		{
 			FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+			XLoop.dt = XLoop_g.dt;
 		}
 		else
 		{
@@ -332,7 +336,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
 				{
 
-					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%f\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerification[iv], diff);
+					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerification[iv], diff);
 					modelgood = false;
 				}
 
@@ -684,7 +688,8 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	{
 		evolvVar.push_back(evolvst[nv]);
 	}
-	
+
+		
 	// Check fillhalo function
 
 	// fill with all evolv array with random value
@@ -692,6 +697,11 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	fillrandom(XParam, XModel.blocks, XModel.evolv.h);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.u);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.v);
+
+	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.zs);
+	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.h);
+	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.u);
+	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.v);
 
 	//copy to GPU
 	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv, XModel_g.evolv);
@@ -779,14 +789,66 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	{
 		evoVar.push_back(evost[nv]);
 	}
-	AdvkernelCPU(XParam, XModel.blocks, T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
-	AdvkernelGPU << < gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.5), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
+	AdvkernelCPU(XParam, XModel.blocks, T(0.0005), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	AdvkernelGPU << < gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.0005), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
+	
+	//============================================
+	// Bottom friction
+
+	bottomfrictionCPU(XParam, XModel.blocks, T(0.0005), XModel.cf, XModel.evolv_o);
+
+	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.5), XModel_g.cf, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
 
 
+	//============================================
+	// Repeat the full test
+	Loop<T> XLoop;
+	Loop<T> XLoop_g;
 
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+
+	//InitSave2Netcdf(XParam, XModel);
+	XLoop.nextoutputtime = XParam.outputtimestep;
+	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+
+	XLoop_g.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop_g.hugeposval = std::numeric_limits<T>::max();
+	XLoop_g.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop_g.totaltime = 0.0;
+
+	//InitSave2Netcdf(XParam, XModel);
+	XLoop_g.nextoutputtime = XLoop.nextoutputtime;
+	XLoop_g.dtmax = XLoop.dtmax;
+
+	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
+	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.u);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	Forcing<float> XForcing;
+	for (int i = 0; i < 10; i++)
+	{
+		FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+		FlowCPU(XParam, XLoop, XForcing, XModel);
+		CompareCPUvsGPU(XParam, XModel, XModel_g, evolvVar, false);
+	}
+	
 
 	return test;
 }
@@ -989,7 +1051,7 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 	// calculate difference
 	//diffArray(XParam, XLoop, XModel.blocks, XModel.evolv.h, XModel_g.evolv.h, XModel.evolv_o.u);
 
-	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
+	creatncfileBUQ(XParam, XModel.blocks);
 
 	for (int ivar = 0; ivar < varlist.size(); ivar++)
 	{

@@ -47,7 +47,7 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 	unsigned int ib = XBlock.active[ibl];
 
 	T eps = T(XParam.eps);
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(XParam.dx, XBlock.level[ib]);
 	T g = T(XParam.g);
 	
 

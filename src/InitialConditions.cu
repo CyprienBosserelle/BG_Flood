@@ -326,6 +326,8 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["dhu"] = XModel.adv.dhu;
 
 	XModel.OutputVarMap["dhv"] = XModel.adv.dhv;
+
+	XModel.OutputVarMap["cf"] = XModel.cf;
 }
 
 template void Initmaparray<float>(Model<float>& XModel);
