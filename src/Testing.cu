@@ -693,11 +693,12 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	// Check fillhalo function
 
 	// fill with all evolv array with random value
+	/*
 	fillrandom(XParam, XModel.blocks, XModel.evolv.zs);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.h);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.u);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.v);
-
+	*/
 	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.zs);
 	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.h);
 	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.u);
@@ -798,7 +799,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	//============================================
 	// Bottom friction
 
-	bottomfrictionCPU(XParam, XModel.blocks, T(0.0005), XModel.cf, XModel.evolv_o);
+	bottomfrictionCPU(XParam, XModel.blocks, T(0.5), XModel.cf, XModel.evolv_o);
 
 	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.5), XModel_g.cf, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());

@@ -243,7 +243,7 @@ template void ReallocArray<double>(int nblk, int blksize, Param XParam, Model<do
 
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g)
 {
-	CUDA_CHECK(cudaMalloc((void**)& z_g, T(nx) * T(ny) * sizeof(T)));
+	CUDA_CHECK(cudaMalloc((void**)& z_g, nx * ny * sizeof(T)));
 }
 
 template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v)
@@ -281,9 +281,7 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateGPU(nblk, blksize, XModel.evolv);
 	AllocateGPU(nblk, blksize, XModel.evolv_o);
 
-	AllocateGPU(nblk, blksize, XModel.grad.dhdy, XModel.grad.dzsdy, XModel.grad.dudy, XModel.grad.dvdy);
-	AllocateGPU(nblk, blksize, XModel.grad.dhdx, XModel.grad.dzsdx, XModel.grad.dudx, XModel.grad.dvdx);
-
+	AllocateGPU(nblk, blksize, XModel.grad);
 	AllocateGPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
 	AllocateGPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
