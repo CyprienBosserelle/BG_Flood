@@ -834,6 +834,16 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	XLoop_g.nextoutputtime = XLoop.nextoutputtime;
 	XLoop_g.dtmax = XLoop.dtmax;
 
+	std::string outvi[18] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "ho", "vo", "uo", "cf" };
+
+	std::vector<std::string> outv;
+
+	for (int nv = 0; nv < 18; nv++)
+	{
+		outv.push_back(outvi[nv]);
+	}
+
+	/*
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.u);
@@ -841,13 +851,13 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
-
+	*/
 	Forcing<float> XForcing;
 	for (int i = 0; i < 10; i++)
 	{
 		FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
 		FlowCPU(XParam, XLoop, XForcing, XModel);
-		CompareCPUvsGPU(XParam, XModel, XModel_g, evolvVar, false);
+		CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
 	}
 	
 
