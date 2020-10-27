@@ -57,7 +57,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		//
 		bool testresults;
 		testresults= CPUGPUtest(XParam, XModel, XModel_g);
-
+		exit(1);
 	}
 
 	if (XParam.test == 0)
@@ -851,7 +851,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	*/
+	
 	Forcing<float> XForcing;
 	for (int i = 0; i < 10; i++)
 	{
@@ -859,7 +859,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 		FlowCPU(XParam, XLoop, XForcing, XModel);
 		CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
 	}
-	
+	*/
 
 	return test;
 }
