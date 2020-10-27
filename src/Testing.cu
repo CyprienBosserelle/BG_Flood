@@ -843,7 +843,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 		outv.push_back(outvi[nv]);
 	}
 
-	/*
+	
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.u);
@@ -859,7 +859,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 		FlowCPU(XParam, XLoop, XForcing, XModel);
 		CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
 	}
-	*/
+	
 
 	return test;
 }

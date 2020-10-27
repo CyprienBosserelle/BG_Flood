@@ -48,7 +48,57 @@ template void gradientGPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<fl
 template void gradientGPU<double>(Param XParam,  BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
 
 
+
 template <class T> __global__ void gradient(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
+{
+	//int *leftblk,int *rightblk,int* topblk, int * botblk,
+
+	//int ix = threadIdx.x+1;
+	//int iy = threadIdx.y+1;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = active[ibl];
+
+	int lev = level[ib];
+
+	T delta = calcres(dx, lev);
+
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	int iright, ileft, itop, ibot;
+	// shared array index to make the code bit more readable
+	unsigned int sx = ix + halowidth;
+	unsigned int sy = iy + halowidth;
+
+
+	T a_l, a_t, a_r, a_b,a_i;
+
+	a_i = a[i];
+
+
+	a_l = a[memloc(halowidth, blkmemwidth, ix - 1, iy, ib)];
+	a_t = a[memloc(halowidth, blkmemwidth, ix , iy+1, ib)];
+	a_r = a[memloc(halowidth, blkmemwidth, ix + 1, iy, ib)];
+	a_b = a[memloc(halowidth, blkmemwidth, ix, iy-1, ib)];
+	//__shared__ T a_s[18][18];
+
+
+
+	__syncthreads();
+	//__syncwarp;
+
+	dadx[i] = minmod2(theta, a_l, a_i, a_r) / delta;
+	
+	dady[i] = minmod2(theta, a_b, a_i, a_t) / delta;
+
+
+}
+
+template <class T> __global__ void gradientSM(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 {
 	//int *leftblk,int *rightblk,int* topblk, int * botblk,
 
