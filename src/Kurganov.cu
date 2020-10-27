@@ -282,7 +282,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(XParam.dx, lev);
+		delta = calcres(T(XParam.dx), lev);
 
 		// neighbours for source term
 		
