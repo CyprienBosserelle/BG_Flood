@@ -853,13 +853,13 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	Forcing<float> XForcing;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
 		FlowCPU(XParam, XLoop, XForcing, XModel);
-		CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
+		//CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
 	}
-	
+	CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
 
 	return test;
 }
