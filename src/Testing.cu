@@ -111,7 +111,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	Param XParam;
 
 	T x, y, delta;
-	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
+	T cc = T(50.0);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
 
 
 	T a = T(1.0); //Gaussian wave amplitude
@@ -119,20 +119,20 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Verification data
 	// This is a transect across iy=15:16:127 at ix=127 (or vice versa because the solution is symetrical)
 	// These values are based on single precision output from Netcdf file so are only accurate to 10-7 
-	double ZsVerification[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
-	
+	//double ZsVerification[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
+	double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
 
-
+		
 	
 
 
 	// initialise domain and required resolution
-	XParam.dx = 1.0 / ((1 << 8));
-	XParam.xo = -0.50;
-	XParam.yo = -0.50;
+	XParam.dx = 1024.0 / ((1 << 8));
+	XParam.xo = -512;
+	XParam.yo = -512;
 
-	XParam.xmax = 0.50;
-	XParam.ymax = 0.50;
+	XParam.xmax = 512.0;
+	XParam.ymax = 512.0;
 	//level 8 is 
 	
 
@@ -144,8 +144,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	XParam.zsoffset = 0.0;
 
 	//Output times for comparisons
-	XParam.endtime = 1.0;
-	XParam.outputtimestep = 0.1;// 0.1;
+	XParam.endtime = 600.0;
+	XParam.outputtimestep = 160.0;// 0.1;
 
 	XParam.smallnc = 0;
 
@@ -173,11 +173,11 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	Forcing<float> XForcing;
 
 	// initialise forcing bathymetry to 0
-	XForcing.Bathy.xo = -1.0;
-	XForcing.Bathy.yo = -1.0;
+	XForcing.Bathy.xo = -1024.0;
+	XForcing.Bathy.yo = -1024.0;
 
-	XForcing.Bathy.xmax = 1.0;
-	XForcing.Bathy.ymax = 1.0;
+	XForcing.Bathy.xmax = 1024.0;
+	XForcing.Bathy.ymax = 1024.0;
 	XForcing.Bathy.nx = 3;
 	XForcing.Bathy.ny = 3;
 
@@ -202,7 +202,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Recreate the initia;l conditions
 	//InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.zb);
 	//InitArrayBUQ(XParam, XModel.blocks, zsnit, XModel.evolv.zs);
-
+	//zs is initialised here:
 	InitialConditions(XParam, XForcing, XModel);
 
 	T xorigin = T(0.0);
