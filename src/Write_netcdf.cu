@@ -68,10 +68,10 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	double initdx = calcres(XParam.dx, XParam.initlevel);
 	double xmin, xmax, ymin, ymax;
 
-	xmin = XParam.xo - initdx / 2.0;
-	xmax = XParam.xmax + initdx / 2.0;
-	ymin = XParam.yo - initdx / 2.0;
-	ymax = XParam.ymax + initdx / 2.0;
+	xmin = XParam.xo ;
+	xmax = XParam.xmax ;
+	ymin = XParam.yo ;
+	ymax = XParam.ymax ;
 
 	// Define global attributes
 	status = nc_put_att_int(ncid, NC_GLOBAL, "maxlevel", NC_INT, 1, &XParam.maxlevel);
@@ -145,11 +145,11 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		double initdx= calcres(XParam.dx, XParam.initlevel);
 		double xxmax, xxmin, yymax, yymin;
 
-		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
+		xxmax = XParam.xmax - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax - calcres(XParam.dx, lev + 1);
 
-		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
+		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo + calcres(XParam.dx, lev + 1);
 
 		nx = (xxmax - xxmin) / ddx + 1;
 		ny = (yymax - yymin) / ddx + 1;
@@ -251,11 +251,11 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 		double xxmax, xxmin, yymax, yymin;
 
-		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev + 1);
+		xxmax = XParam.xmax - calcres(XParam.dx, lev + 1);
+		yymax = XParam.ymax - calcres(XParam.dx, lev + 1);
 
-		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev + 1);
+		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
+		yymin = XParam.yo  + calcres(XParam.dx, lev + 1);
 
 		nx = (xxmax - xxmin) / ddx + 1;
 		ny = (yymax - yymin) / ddx + 1;
@@ -487,11 +487,16 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		double xxmin, yymin;
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
-		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
+		//xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
+		//yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
 
-		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
-		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
+		xxmax = XParam.xmax - calcres(XParam.dx, lev) / 2.0;
+		yymax = XParam.ymax - calcres(XParam.dx, lev )/2.0;
+
+		//xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
+		//yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
+		xxmin = XParam.xo + calcres(XParam.dx, lev) / 2.0;
+		yymin = XParam.yo + calcres(XParam.dx, lev )/2.0;
 
 
 
@@ -652,11 +657,15 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev) / 2.0;
-		yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev) / 2.0;
+		//xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev) / 2.0;
+		//yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev) / 2.0;
+		xxmax = XParam.xmax - calcres(XParam.dx, lev) / 2.0;
+		yymax = XParam.ymax - calcres(XParam.dx, lev) / 2.0;
 
-		xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev) / 2.0;
-		yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev) / 2.0;
+		//xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev) / 2.0;
+		//yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev) / 2.0;
+		xxmin = XParam.xo + calcres(XParam.dx, lev) / 2.0;
+		yymin = XParam.yo + calcres(XParam.dx, lev) / 2.0;
 
 		varname = varst + "_" + sign + std::to_string(abs(lev));
 

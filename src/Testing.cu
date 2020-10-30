@@ -669,6 +669,9 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 {
 	bool test = true;
 
+	T initdepth = T(0.1);
+	T testamp = T(1.0);
+
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
@@ -676,8 +679,14 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
 	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
 
-	InitArrayBUQ(XParam, XModel.blocks, T(-1.0), XModel.zb);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(-1.0), XModel_g.zb);
+	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.zb);
+	InitArrayBUQ(XParam, XModel.blocks, T(initdepth), XModel.evolv.zs);
+	InitArrayBUQ(XParam, XModel.blocks, T(initdepth), XModel.evolv.h);
+	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
+	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
+
+
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	// Create some usefull vectors
 	std::string evolvst[4] = {"h","zs","u","v"};
@@ -699,10 +708,10 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	fillrandom(XParam, XModel.blocks, XModel.evolv.u);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.v);
 	*/
-	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.zs);
-	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.h);
-	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.u);
-	fillgauss(XParam, XModel.blocks, T(0.1), XModel.evolv.v);
+	fillgauss(XParam, XModel.blocks, testamp, XModel.evolv.zs);
+	fillgauss(XParam, XModel.blocks, testamp, XModel.evolv.h);
+	fillgauss(XParam, XModel.blocks, T(0.5* testamp), XModel.evolv.u);
+	fillgauss(XParam, XModel.blocks, T(0.5* testamp), XModel.evolv.v);
 
 	//copy to GPU
 	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv, XModel_g.evolv);
@@ -812,6 +821,10 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	Loop<T> XLoop;
 	Loop<T> XLoop_g;
 
+	XParam.endtime = utils::min(0.5 * (XParam.ymax - XParam.yo), 0.5 * (XParam.xmax - XParam.xo)) / (sqrt(XParam.g * (testamp + initdepth)));
+	XParam.outputtimestep = XParam.endtime / 10.0;
+
+
 	XLoop.hugenegval = std::numeric_limits<T>::min();
 
 	XLoop.hugeposval = std::numeric_limits<T>::max();
@@ -853,13 +866,21 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	Forcing<float> XForcing;
-	for (int i = 0; i < 1000; i++)
+	while (XLoop.totaltime < XParam.endtime)
 	{
 		FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
 		FlowCPU(XParam, XLoop, XForcing, XModel);
-		//CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
+
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+		XLoop_g.totaltime = XLoop_g.totaltime + XLoop_g.dt;
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		{
+			CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
+			XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
+			XLoop_g.nextoutputtime = XLoop.nextoutputtime;
+		}
 	}
-	CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
+	
 
 	return test;
 }
@@ -910,7 +931,7 @@ template <class T> void fillgauss(Param XParam, BlockP<T> XBlock,T amp, T* z)
 				int n = memloc(XParam, ix, iy, ib);
 				x = XParam.xo + XBlock.xo[ib] + ix * delta;
 				y = XParam.yo + XBlock.yo[ib] + iy * delta;
-				z[n] =  amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
+				z[n] = z[n] + amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
 				
 
 			}
