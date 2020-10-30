@@ -790,11 +790,11 @@ template void InitSave2Netcdf<float>(Param &XParam, Model<float> XModel);
 template void InitSave2Netcdf<double>(Param &XParam, Model<double> XModel);
 
 
-template <class T> void Save2Netcdf(Param XParam, Model<T> XModel)
+template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
 {
 	if (!XParam.outvars.empty())
 	{
-		writenctimestep(XParam.outfile, XParam.totaltime);
+		writenctimestep(XParam.outfile, XLoop.totaltime);
 		//creatncfileBUQ(XParam);
 		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 		{
@@ -802,5 +802,5 @@ template <class T> void Save2Netcdf(Param XParam, Model<T> XModel)
 		}
 	}
 }
-template void Save2Netcdf<float>(Param XParam, Model<float> XModel);
-template void Save2Netcdf<double>(Param XParam, Model<double> XModel);
+template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
+template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double> XModel);

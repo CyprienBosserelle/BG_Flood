@@ -176,6 +176,8 @@ struct Loop
 	double totaltime;
 	// Needed to average mean varable for output
 	int nstep = 0;
+	//useful for calculating avg timestep
+	int nstepout = 0;
 
 	// usefull for Time series output
 	int nTSsteps = 0;

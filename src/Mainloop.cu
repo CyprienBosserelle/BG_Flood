@@ -47,6 +47,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 
 		// Reset mean/Max if needed
 		resetmeanmax(XParam, XLoop, XModel, XModel_g);
+
 	}
 	
 
@@ -117,10 +118,17 @@ template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XF
 
 
 
-template <class T> void mapoutput(Param XParam, Loop<T> XLoop,Model<T> XModel, Model<T> XModel_g)
+template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, Model<T> XModel_g)
 {
+	XLoop.nstepout++;
+
 	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
 	{
+		char buffer[256];
+		sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
+		std::string str(buffer);
+
+		log("Output to map. Totaltime = "+ std::to_string(XLoop.totaltime) +" s; Mean dt = " + str + " s");
 		if (XParam.GPUDEVICE >= 0)
 		{
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -128,11 +136,13 @@ template <class T> void mapoutput(Param XParam, Loop<T> XLoop,Model<T> XModel, M
 				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			}
 		}
-
-		Save2Netcdf(XParam, XModel);
+		
+		Save2Netcdf(XParam, XLoop, XModel);
 
 
 		XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
+
+		XLoop.nstepout = 0;
 	}
 }
 
@@ -187,7 +197,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 	{
 
 		//Flush to disk
-		if (XParam.GPUDEVICE >= 0)
+		if (XParam.GPUDEVICE >= 0 && XParam.TSnodesout.size() > 0)
 		{
 			CUDA_CHECK(cudaMemcpy(XModel.TSstore, XModel_g.TSstore, XParam.maxTSstorage * sizeof(T), cudaMemcpyDeviceToHost));
 			int oo;
