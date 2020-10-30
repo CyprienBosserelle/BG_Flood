@@ -256,7 +256,8 @@ template <class T> bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-
+		int nib;
+		// check that levels are consistent
 		check = check && checklevel(ib, XBlock.level[ib], XBlock.LeftBot[ib], XBlock.level[XBlock.LeftBot[ib]]);
 		check = check && checklevel(ib, XBlock.level[ib], XBlock.LeftTop[ib], XBlock.level[XBlock.LeftTop[ib]]);
 		
@@ -269,7 +270,26 @@ template <class T> bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 		check = check && checklevel(ib, XBlock.level[ib], XBlock.BotRight[ib], XBlock.level[XBlock.BotRight[ib]]);
 		check = check && checklevel(ib, XBlock.level[ib], XBlock.BotLeft[ib], XBlock.level[XBlock.BotLeft[ib]]);
 
-		
+		//check that neighbour distance makes sense with level
+		nib = XBlock.LeftBot[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.xo[ib], nib, XBlock.level[nib], XBlock.xo[nib], false);
+		nib = XBlock.LeftTop[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.xo[ib], nib, XBlock.level[nib], XBlock.xo[nib], false);
+
+		nib = XBlock.RightTop[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.xo[ib], nib, XBlock.level[nib], XBlock.xo[nib], true);
+		nib = XBlock.RightBot[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.xo[ib], nib, XBlock.level[nib], XBlock.xo[nib], true);
+
+		nib = XBlock.TopRight[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.yo[ib], nib, XBlock.level[nib], XBlock.yo[nib], true);
+		nib = XBlock.TopLeft[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.yo[ib], nib, XBlock.level[nib], XBlock.yo[nib], true);
+
+		nib = XBlock.BotLeft[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.yo[ib], nib, XBlock.level[nib], XBlock.yo[nib], false);
+		nib = XBlock.BotRight[ib];
+		check = check && checkneighbourdistance(XParam.dx, ib, XBlock.level[ib], XBlock.yo[ib], nib, XBlock.level[nib], XBlock.yo[nib], false);
 	}
 
 	return check;
@@ -287,6 +307,33 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 		check = false;
 	}
 	return check;
+}
+
+template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T blocko, int neighbourib, int levelneighbour, T neighbourblocko, bool rightortop )
+{
+	T expecteddistance= blocko;
+	bool test;
+	if (neighbourib != ib)
+	{
+		if (rightortop)
+		{
+			expecteddistance = blocko + calcres(T(dx), levelib) * 15.5 + 0.5 * calcres(T(dx), levelneighbour);
+		}
+		else
+		{
+			expecteddistance = blocko - calcres(T(dx), levelib) * 0.5 - 15.5 * calcres(T(dx), levelneighbour);
+		}
+
+	}
+
+	test= abs(expecteddistance - neighbourblocko) < (calcres(T(dx), levelib) * 0.01);
+	if (!test)
+	{
+		log("Warning! Bad Neighbour distance. ib=" + std::to_string(ib) + "; level[ib]=" + std::to_string(levelib) + "; neighbour[ib]=" + std::to_string(neighbourib) + "; level[neighbour[ib]]=" + std::to_string(levelneighbour));
+	}
+
+	return test;
+
 }
 
 
@@ -1418,6 +1465,10 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 					{
 						XBlock.TopLeft[oldbotleft] = ib;
 						XBlock.TopRight[oldbotleft] = ib;
+
+						/// How did we miss that before
+						XBlock.BotRight[ib] = oldbotleft;
+
 						if (oldbotright != ib)
 						{
 
