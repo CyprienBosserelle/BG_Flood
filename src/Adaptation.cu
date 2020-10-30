@@ -1204,6 +1204,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				}
 				else // oldleftbot did not refine (couldn't have corasen either)
 				{
+					XBlock.LeftTop[ib] = oldleftbot;
 
 					if (XAdapt.newlevel[oldleftbot] < XAdapt.newlevel[ib])
 					{
@@ -1326,7 +1327,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				}
 				else // oldrightbot did not refine (couldn't have corasen either)
 				{
-
+					//XBlock.RightTop[ib] = oldrightbot;
 					if (XAdapt.newlevel[oldrightbot] < XAdapt.newlevel[ib])
 					{
 						//Don't  need to do this part (i.e. it is already the case)
@@ -1449,6 +1450,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				}
 				else // oldbotleft did not refine (couldn't have corasen either)
 				{
+					/// How did we miss that before
+					XBlock.BotRight[ib] = oldbotleft;
 
 					if (XAdapt.newlevel[oldbotleft] < XAdapt.newlevel[ib])
 					{
@@ -1465,9 +1468,6 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 					{
 						XBlock.TopLeft[oldbotleft] = ib;
 						XBlock.TopRight[oldbotleft] = ib;
-
-						/// How did we miss that before
-						XBlock.BotRight[ib] = oldbotleft;
 
 						if (oldbotright != ib)
 						{
@@ -1575,7 +1575,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				}
 				else // oldleftbot did not refine (couldn't have corasen either)
 				{
-
+					//XBlock.TopRight[ib] = oldtopleft;
 					if (XAdapt.newlevel[oldtopleft] < XAdapt.newlevel[ib])
 					{
 						//Don't  need to do this part (i.e. it is already the case)
