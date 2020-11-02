@@ -61,7 +61,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.right.data = readbndfile(XForcing.right.inputfile, XParam, 2);
 		XForcing.right.on = true;
-		XForcing.right.nbnd = XForcing.top.data.size();
+		XForcing.right.nbnd = XForcing.right.data.size();
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.right);
