@@ -362,7 +362,7 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
-		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * initlevdx))
+		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * levdx))
 		{
 			//
 			blbr++;
@@ -370,21 +370,21 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 		}
 
-		if ((topyo - (XParam.ymax - XParam.yo)) > (-1.0 * initlevdx))
+		if ((topyo - (XParam.ymax - XParam.yo)) > (-1.0 * levdx))
 		{
 			//
 			blbt++;
 			//bndtopblk[blbt] = bl;
 
 		}
-		if (botyo < (2.0*levdx))
+		if (botyo < levdx)
 		{
 			//
 			blbb++;
 			//bndbotblk[blbb] = bl;
 
 		}
-		if (leftxo < (2.0 * levdx))
+		if (leftxo < levdx)
 		{
 			//
 			blbl++;
@@ -446,7 +446,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 		botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
-		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * initlevdx))
+		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * levdx))
 		{
 			//
 			XForcing.right.blks[blbr] = ib;
@@ -454,21 +454,21 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 		}
 
-		if ((topyo - (XParam.ymax-XParam.yo)) > (-1.0 * initlevdx))
+		if ((topyo - (XParam.ymax-XParam.yo)) > (-1.0 * levdx))
 		{
 			//
 			XForcing.top.blks[blbt] = ib;
 			blbt++;
 
 		}
-		if (botyo < initlevdx)
+		if (botyo < levdx)
 		{
 			//
 			XForcing.bot.blks[blbb] = ib;
 			blbb++;
 
 		}
-		if (leftxo < initlevdx)
+		if (leftxo < levdx)
 		{
 			//
 			XForcing.left.blks[blbl] = ib;

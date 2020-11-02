@@ -45,7 +45,7 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop,BlockP<T> XBlock, b
 			zsbndleft.push_back(interptime(side.data[SLstepinbnd].wlevs[n], side.data[SLstepinbnd - 1].wlevs[n], side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time, XLoop.totaltime - side.data[SLstepinbnd - 1].time));
 
 		}
-		// Reapeat for uu and vv only if needed (otherwise values may not exist!)
+		// Repeat for u and v only if needed (otherwise values may not exist!)
 		if (side.type == 4)
 		{
 			for (int n = 0; n < side.data[SLstepinbnd].uuvel.size(); n++)
