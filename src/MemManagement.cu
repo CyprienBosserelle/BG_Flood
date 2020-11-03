@@ -83,6 +83,11 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateCPU(nblk, 1, XModel.blocks.xo);
 	AllocateCPU(nblk, 1, XModel.blocks.yo);
 
+	// do allocate 1 mask block (block with at least 1 empty neighbourhood) 
+	// this will be reallocated eventually
+	AllocateCPU(1, 1, XModel.blocks.mask.side);
+	AllocateCPU(1, 1, XModel.blocks.mask.blks);
+
 	// If no adatptation ignore this!
 	if (XParam.maxlevel != XParam.minlevel)
 	{

@@ -38,6 +38,14 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		AllocateGPU(XForcing.bot.nblk, 1, XForcing.bot.blks_g);
 		CopytoGPU(XForcing.bot.nblk, 1, XForcing.bot.blks, XForcing.bot.blks_g);
 
+		// Also for mask
+		XModel_g.blocks.mask.nblk = XModel.blocks.mask.nblk;
+		AllocateGPU(XModel_g.blocks.mask.nblk, 1, XModel_g.blocks.mask.side);
+		AllocateGPU(XModel_g.blocks.mask.nblk, 1, XModel_g.blocks.mask.blks);
+		CopytoGPU(XModel_g.blocks.mask.nblk, 1, XModel.blocks.mask.side, XModel_g.blocks.mask.side);
+		CopytoGPU(XModel_g.blocks.mask.nblk, 1, XModel.blocks.mask.blks, XModel_g.blocks.mask.blks);
+
+
 		// things are quite different for Time Series output. Why is that?.
 		if (XModel.bndblk.nblkTs > 0)
 		{

@@ -48,15 +48,14 @@ struct AdvanceP
 };
 
 
-class maskbnd {
-public:
-
+struct maskinfo 
+{
 
 	int nblk = 0; //number of blocks where this bnd applies
 
 	int* blks; // array of block where bnd applies 
-
-	int* side; // 0: left; 1: top; 2: right; 3: bot
+	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
+	int* side; // e.g. 11000000 for the entire left side being a mask
 };
 
 template <class T>
@@ -71,7 +70,7 @@ struct BlockP
 	int* level;
 	int* active;
 
-	maskbnd mask;
+	maskinfo mask;
 	
 };
 

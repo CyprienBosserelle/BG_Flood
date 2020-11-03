@@ -321,8 +321,211 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 template __host__ void bndCPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, float* zs, float* h, float* un, float* ut);
 template __host__ void bndCPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, double* zs, double* h, double* un, double* ut);
 
+// function to apply bnd at the boundary with masked blocked
+// here a wall is applied in the halo 
+template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = XParam.blkmemwidth;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	int isright,istop;
+	
+	T zsinside,zsnew,hnew,vnew,unew,zbnew;
+
+	bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
 
 
+	for (int ibl = 0; ibl <XBlock.mask.nblk ; ibl++)
+	{
+
+		int ib = XBlock.mask.blks[ibl];
+		int lev = XBlock.level[ib];
+		T delta = calcres(T(XParam.dx), lev);
+
+		// find where the mask applies
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		//leftside
+		if (isleftbot | islefttop )//?
+		{
+			isright = -1;
+			istop = 0;
+					
+			int ix = -1;
+
+			int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
+			int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+			for (int iy = yst; iy < ynd; iy++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.zs[i];
+				zbnew = zb[i];
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				
+				Xev.u[i]=unew;
+				Xev.v[i]=vnew;
+				Xev.zs[i]=zsnew;
+				Xev.zs[i]=hnew;
+				zb[i]=zbnew;
+
+			}
+
+		}
+		//topside
+		if (istopleft | istopright)//?
+		{
+			isright = 0;
+			istop = 1;
+
+			int iy = XParam.blkwidth;
+
+			int xst = istopleft ? 0 : XParam.blkwidth * 0.5;
+			int xnd = istopright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+			for (int ix = xst; ix < xnd; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.zs[i];
+				zbnew = zb[i];
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.zs[i] = hnew;
+				zb[i] = zbnew;
+
+			}
+
+		}
+		//rightside
+		if (isrighttop | isrightbot)//?
+		{
+			isright = 1;
+			istop = 0;
+
+			int ix = XParam.blkwidth;
+
+			int yst = isrightbot ? 0 : XParam.blkwidth * 0.5;
+			int ynd = isrighttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+			for (int iy = yst; iy < ynd; iy++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.zs[i];
+				zbnew = zb[i];
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.zs[i] = hnew;
+				zb[i] = zbnew;
+
+			}
+
+		}
+		//botside
+		if (isbotright | isbotleft)//?
+		{
+			isright = 0;
+			istop = -1;
+
+			int iy = -1;
+
+			int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
+			int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+			for (int ix = xst; ix < xnd; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.zs[i];
+				zbnew = zb[i];
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.zs[i] = hnew;
+				zb[i] = zbnew;
+
+			}
+
+		}
+
+
+
+	}
+}
+
+__device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop, bool& istopleft, bool& istopright, bool& isrighttop, bool& isrightbot, bool& isbotright, bool& isbotleft)
+{
+	int lb = 0b10000000;
+	int lt = 0b01000000;
+	int tl = 0b00100000;
+	int tr = 0b00010000;
+	int rt = 0b00001000;
+	int rb = 0b00000100;
+	int br = 0b00000010;
+	int bl = 0b00000001;
+	
+	isleftbot = (side & lb) == lb;
+	islefttop = (side & lt) == lt;
+
+	istopleft = (side & tl) == tl;
+	istopright = (side & tr) == tr;
+
+	isrighttop = (side & rt) == rt;
+	isrightbot = (side & rb) == rb;
+
+	isbotright = (side & br) == br;
+	isbotleft = (side & bl) == bl;
+}
+
+
+
+
+template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T& zs, T& h,T&zb)
+{
+	// This function is used to make a wall on the halo to act as a wall
+	// It may be more suitable/stable than the noslip as a wall boundary
+	un = T(0.0);
+	zs = zsinside;
+	ut = T(0.0);
+	h = T(0.0);
+	zb = zsinside;
+
+}
 
 
 template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un, T &ut,T &zs, T &h)
@@ -331,8 +534,8 @@ template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un
 	// 
 	un = T(0.0);
 	zs = zsinside;
-	//ut[i] = ut[inside];
-	h = hinside;
+	//ut[i] = ut[inside];//=0.0?
+	h = hinside;//=0.0?
 
 }
 
