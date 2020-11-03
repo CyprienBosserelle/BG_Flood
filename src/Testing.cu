@@ -718,8 +718,8 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//============================================
 	//  Fill the halo for gradient reconstruction
-	fillHalo(XParam, XModel.blocks, XModel.evolv);
-	fillHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv);
+	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+	fillHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel.zb);
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evolvVar, true);
 

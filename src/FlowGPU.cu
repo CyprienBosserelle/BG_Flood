@@ -24,7 +24,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	//  Fill the halo for gradient reconstruction
-	fillHaloGPU(XParam, XModel.blocks, XModel.evolv);
+	fillHaloGPU(XParam, XModel.blocks, XModel.evolv, XModel.zb);
 
 
 	//============================================
@@ -97,8 +97,8 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	//============================================
 
 	//============================================
-	//  Fill the halo for gradient reconstruction
-	fillHaloGPU(XParam, XModel.blocks, XModel.evolv_o);
+	//  Fill the halo for gradient reconstruction also wall boundary for masked block
+	fillHaloGPU(XParam, XModel.blocks, XModel.evolv_o, XModel.zb);
 
 	//============================================
 	// Calculate gradient for evolving parameters

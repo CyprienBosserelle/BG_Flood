@@ -9,12 +9,15 @@
 #include "Arrays.h"
 #include "Mesh.h"
 #include "MemManagement.h"
+#include "Boundary.h"
 
 template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
 
+template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev,T*zb);
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev);
+template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad);
