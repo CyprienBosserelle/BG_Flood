@@ -148,13 +148,15 @@ template void AllocateCPU<double>(int nblk, int blksize, Param XParam, Model<dou
 template <class T> void ReallocArray(int nblk, int blksize, T* & zb)
 {
 	//
-
-	zb = (T*)realloc(zb, nblk * blksize * sizeof(T));
-	if (zb == NULL)
+	if (nblk > 0)
 	{
-		fprintf(stderr, "Memory reallocation failure\n");
+		zb = (T*)realloc(zb, nblk * blksize * sizeof(T));
+		if (zb == NULL)
+		{
+			fprintf(stderr, "Memory reallocation failure\n");
 
-		exit(EXIT_FAILURE);
+			exit(EXIT_FAILURE);
+		}
 	}
 	//return nblkmem
 }

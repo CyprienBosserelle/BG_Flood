@@ -412,98 +412,101 @@ template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 {
 
 	XBlock.mask.nblk = CalcMaskblk(XParam, XBlock);
-	int nmask = 0;
-	bool neighbourmask = false;
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
-
-	// Reallocate array if necessary
-	ReallocArray(XBlock.mask.nblk, 1, XBlock.mask.side);
-	ReallocArray(XBlock.mask.nblk, 1, XBlock.mask.blks);
-
-
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	if (XBlock.mask.nblk > 0)
 	{
-		int ib = XBlock.active[ibl];
-		T levdx = calcres(XParam.dx, XBlock.level[ib]);
+		int nmask = 0;
+		bool neighbourmask = false;
+		T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
 
-		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
+		// Reallocate array if necessary
+		ReallocArray(XBlock.mask.nblk, 1, XBlock.mask.side);
+		ReallocArray(XBlock.mask.nblk, 1, XBlock.mask.blks);
 
-		leftyo = XBlock.yo[ib];
-		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
-		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
-		botyo = XBlock.yo[ib];
 
-		neighbourmask = false;
-
-		if (nmask < XBlock.mask.nblk)
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
 		{
-			XBlock.mask.side[nmask] = 0b00000000;
+			int ib = XBlock.active[ibl];
+			T levdx = calcres(XParam.dx, XBlock.level[ib]);
+
+			leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
+
+			leftyo = XBlock.yo[ib];
+			rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
+			rightyo = XBlock.yo[ib];
+			topxo = XBlock.xo[ib];
+			topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
+			botxo = XBlock.xo[ib];
+			botyo = XBlock.yo[ib];
+
+			neighbourmask = false;
+
+			if (nmask < XBlock.mask.nblk)
+			{
+				XBlock.mask.side[nmask] = 0b00000000;
+			}
+
+
+			if ((XBlock.LeftBot[ib] == ib || XBlock.LeftTop[ib] == ib) && leftxo > levdx)
+			{
+				XBlock.mask.blks[nmask] = ib;
+
+				if (XBlock.LeftBot[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b10000000;
+				}
+				if (XBlock.LeftTop[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b01000000;
+				}
+				neighbourmask = true;
+			}
+
+			if ((XBlock.TopLeft[ib] == ib || XBlock.TopRight[ib] == ib) && ((topyo - (XParam.ymax - XParam.yo)) < (-1.0 * levdx)))
+			{
+				XBlock.mask.blks[nmask] = ib;
+				if (XBlock.TopLeft[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00100000;
+				}
+				if (XBlock.TopRight[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00010000;
+				}
+
+				neighbourmask = true;
+			}
+			if ((XBlock.RightBot[ib] == ib || XBlock.RightBot[ib] == ib) && ((rightxo - (XParam.xmax - XParam.xo)) < (-1.0 * levdx)))
+			{
+				XBlock.mask.blks[nmask] = ib;
+				if (XBlock.RightTop[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00001000;
+				}
+				if (XBlock.RightBot[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00000100;
+				}
+				neighbourmask = true;
+			}
+			if ((XBlock.BotLeft[ib] == ib || XBlock.BotRight[ib] == ib) && botyo > levdx)
+			{
+				XBlock.mask.blks[nmask] = ib;
+				if (XBlock.BotRight[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00000010;
+				}
+				if (XBlock.BotLeft[ib] == ib)
+				{
+					XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00000001;
+				}
+				neighbourmask = true;
+			}
+
+			int nadd = neighbourmask ? 1 : 0;
+
+			nmask = nmask + nadd;
+
 		}
-
-
-		if ((XBlock.LeftBot[ib] == ib || XBlock.LeftTop[ib] == ib) && leftxo > levdx)
-		{
-			XBlock.mask.blks[nmask] = ib;
-
-			if (XBlock.LeftBot[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b10000000;
-			}
-			if (XBlock.LeftTop[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b01000000;
-			}
-			neighbourmask = true;
-		}
-
-		if ((XBlock.TopLeft[ib] == ib || XBlock.TopRight[ib] == ib) && ((topyo - (XParam.ymax - XParam.yo)) < (-1.0 * levdx)))
-		{
-			XBlock.mask.blks[nmask] = ib;
-			if (XBlock.TopLeft[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00100000;
-			}
-			if (XBlock.TopRight[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00010000;
-			}
-			
-			neighbourmask = true;
-		}
-		if ((XBlock.RightBot[ib] == ib || XBlock.RightBot[ib] == ib) && ((rightxo - (XParam.xmax - XParam.xo)) < (-1.0 * levdx)))
-		{
-			XBlock.mask.blks[nmask] = ib;
-			if (XBlock.RightTop[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00001000;
-			}
-			if (XBlock.RightBot[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00000100;
-			}
-			neighbourmask = true;
-		}
-		if ((XBlock.BotLeft[ib] == ib || XBlock.BotRight[ib] == ib) && botyo > levdx)
-		{
-			XBlock.mask.blks[nmask] = ib;
-			if (XBlock.BotRight[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00000010;
-			}
-			if (XBlock.BotLeft[ib] == ib)
-			{
-				XBlock.mask.side[nmask] = XBlock.mask.side[nmask] | 0b00000001;
-			}
-			neighbourmask = true;
-		}
-
-		int nadd = neighbourmask ? 1 : 0;
-
-		nmask = nmask + nadd;
-
 	}
 }
 template void FindMaskblk<float>(Param XParam, BlockP<float> &XBlock);
