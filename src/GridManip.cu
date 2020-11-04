@@ -220,14 +220,58 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 		}
 	}
 }
-
-
 template void interp2BUQ<float, StaticForcingP<float>>(Param XParam, BlockP<float> XBlock, StaticForcingP<float> forcing, float*& z);
+template void interp2BUQ<double, StaticForcingP<float>>(Param XParam, BlockP<double> XBlock, StaticForcingP<float> forcing, double*& z);
+//template void interp2BUQ<float, StaticForcingP<float>>(Param XParam, BlockP<float> XBlock, std::vector<StaticForcingP<float>> forcing, float*& z);
 template void interp2BUQ<double, StaticForcingP<float>>(Param XParam, BlockP<double> XBlock, StaticForcingP<float> forcing, double*& z);
 template void interp2BUQ<float, deformmap<float>>(Param XParam, BlockP<float> XBlock, deformmap<float> forcing, float*& z);
 template void interp2BUQ<double, deformmap<float>>(Param XParam, BlockP<double> XBlock, deformmap<float> forcing, double*& z);
 template void interp2BUQ<float, DynForcingP<float>>(Param XParam, BlockP<float> XBlock, DynForcingP<float> forcing, float*& z);
 template void interp2BUQ<double, DynForcingP<float>>(Param XParam, BlockP<double> XBlock, DynForcingP<float> forcing, double*& z);
+
+template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<StaticForcingP<float>> forcing, T* z)
+{
+	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
+
+	T x, y;
+	int n;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XBlock.active[ibl];
+
+		double blkdx = calcres(XParam.dx, XBlock.level[ib]);
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
+				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
+				
+				// Interpolate to fill in values from the whole domain (even if the domain outspan the domain fo the bathy)
+				z[n] = interp2BUQ(x, y, forcing[0]);
+
+				// now interpolat to other grids
+				for (int nf = 0; nf < forcing.size(); nf++)
+				{
+					if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
+					{
+						z[n] = interp2BUQ(x, y, forcing[nf]);
+					}
+				}
+				
+
+			}
+		}
+	}
+}
+template void interp2BUQ<float>(Param XParam, BlockP<float> XBlock, std::vector<StaticForcingP<float>> forcing, float* z);
+template void interp2BUQ<double>(Param XParam, BlockP<double> XBlock, std::vector<StaticForcingP<float>> forcing, double* z);
+
+
+
 
 template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 {

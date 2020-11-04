@@ -23,7 +23,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Initialise Bathy data
 
-	interp2BUQ(XParam, XModel.blocks, XForcing.Bathy[0], XModel.zb);
+	interp2BUQ(XParam, XModel.blocks, XForcing.Bathy, XModel.zb);
 
 	// Set edges
 	setedges(XParam, XModel.blocks, XModel.zb);

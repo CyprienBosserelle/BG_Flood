@@ -16,7 +16,7 @@ template <class T, class F> void InitBlkBUQ(Param XParam, BlockP<F> XBlock, T in
 template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T*& zb);
 
 
-
+template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<StaticForcingP<float>> forcing, T* z);
 template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F forcing, T*& z);
 template <class T, class F> T interp2BUQ(T x, T y, F forcing);
 
