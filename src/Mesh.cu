@@ -57,22 +57,22 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 
 
-						cfi = utils::min(utils::max((int)floor((x - XForcing.Bathy.xo) / XForcing.Bathy.dx), 0), XForcing.Bathy.nx - 2);
+						cfi = utils::min(utils::max((int)floor((x - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx), 0), XForcing.Bathy[0].nx - 2);
 						cfip = cfi + 1;
 
-						x1 = XForcing.Bathy.xo + XForcing.Bathy.dx * cfi;
-						x2 = XForcing.Bathy.xo + XForcing.Bathy.dx * cfip;
+						x1 = XForcing.Bathy[0].xo + XForcing.Bathy[0].dx * cfi;
+						x2 = XForcing.Bathy[0].xo + XForcing.Bathy[0].dx * cfip;
 
-						cfj = utils::min(utils::max((int)floor((y - XForcing.Bathy.yo) / XForcing.Bathy.dx), 0), XForcing.Bathy.ny - 2);
+						cfj = utils::min(utils::max((int)floor((y - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx), 0), XForcing.Bathy[0].ny - 2);
 						cfjp = cfj + 1;
 
-						y1 = XForcing.Bathy.yo + XForcing.Bathy.dx * cfj;
-						y2 = XForcing.Bathy.yo + XForcing.Bathy.dx * cfjp;
+						y1 = XForcing.Bathy[0].yo + XForcing.Bathy[0].dx * cfj;
+						y2 = XForcing.Bathy[0].yo + XForcing.Bathy[0].dx * cfjp;
 
-						q11 = XForcing.Bathy.val[cfi + cfj * XForcing.Bathy.nx];
-						q12 = XForcing.Bathy.val[cfi + cfjp * XForcing.Bathy.nx];
-						q21 = XForcing.Bathy.val[cfip + cfj * XForcing.Bathy.nx];
-						q22 = XForcing.Bathy.val[cfip + cfjp * XForcing.Bathy.nx];
+						q11 = XForcing.Bathy[0].val[cfi + cfj * XForcing.Bathy[0].nx];
+						q12 = XForcing.Bathy[0].val[cfi + cfjp * XForcing.Bathy[0].nx];
+						q21 = XForcing.Bathy[0].val[cfip + cfj * XForcing.Bathy[0].nx];
+						q22 = XForcing.Bathy[0].val[cfip + cfjp * XForcing.Bathy[0].nx];
 
 						q = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 						//printf("q = %f\n", q);
@@ -222,8 +222,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
 					
 					{
-						x = utils::max(utils::min(x, XForcing.Bathy.xmax), XForcing.Bathy.xo);
-						y = utils::max(utils::min(y, XForcing.Bathy.ymax), XForcing.Bathy.yo);
+						x = utils::max(utils::min(x, XForcing.Bathy[0].xmax), XForcing.Bathy[0].xo);
+						y = utils::max(utils::min(y, XForcing.Bathy[0].ymax), XForcing.Bathy[0].yo);
 						// cells that falls off this domain are assigned
 						double x1, x2, y1, y2;
 						double q11, q12, q21, q22, q;
@@ -231,22 +231,22 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 
 
 
-						cfi = utils::min(utils::max((int)floor((x - XForcing.Bathy.xo) / XForcing.Bathy.dx), 0), XForcing.Bathy.nx - 2);
+						cfi = utils::min(utils::max((int)floor((x - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx), 0), XForcing.Bathy[0].nx - 2);
 						cfip = cfi + 1;
 
-						x1 = XForcing.Bathy.xo + XForcing.Bathy.dx*cfi;
-						x2 = XForcing.Bathy.xo + XForcing.Bathy.dx*cfip;
+						x1 = XForcing.Bathy[0].xo + XForcing.Bathy[0].dx*cfi;
+						x2 = XForcing.Bathy[0].xo + XForcing.Bathy[0].dx*cfip;
 
-						cfj = utils::min(utils::max((int)floor((y - XForcing.Bathy.yo) / XForcing.Bathy.dx), 0), XForcing.Bathy.ny - 2);
+						cfj = utils::min(utils::max((int)floor((y - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx), 0), XForcing.Bathy[0].ny - 2);
 						cfjp = cfj + 1;
 
-						y1 = XForcing.Bathy.yo + XForcing.Bathy.dx*cfj;
-						y2 = XForcing.Bathy.yo + XForcing.Bathy.dx*cfjp;
+						y1 = XForcing.Bathy[0].yo + XForcing.Bathy[0].dx*cfj;
+						y2 = XForcing.Bathy[0].yo + XForcing.Bathy[0].dx*cfjp;
 
-						q11 = XForcing.Bathy.val[cfi + cfj*XForcing.Bathy.nx];
-						q12 = XForcing.Bathy.val[cfi + cfjp*XForcing.Bathy.nx];
-						q21 = XForcing.Bathy.val[cfip + cfj*XForcing.Bathy.nx];
-						q22 = XForcing.Bathy.val[cfip + cfjp*XForcing.Bathy.nx];
+						q11 = XForcing.Bathy[0].val[cfi + cfj*XForcing.Bathy[0].nx];
+						q12 = XForcing.Bathy[0].val[cfi + cfjp*XForcing.Bathy[0].nx];
+						q21 = XForcing.Bathy[0].val[cfip + cfj*XForcing.Bathy[0].nx];
+						q22 = XForcing.Bathy[0].val[cfip + cfjp*XForcing.Bathy[0].nx];
 
 						q = BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 						//printf("q = %f\t q11=%f\t, q12=%f\t, q21=%f\t, q22=%f\t, x1=%f\t, x2=%f\t, y1=%f\t, y2=%f\t, x=%f\t, y=%f\t\n", q, q11, q12, q21, q22, x1, x2, y1, y2, x, y);

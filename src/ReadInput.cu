@@ -612,7 +612,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
+		StaticForcingP<float> infobathy;
+		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -620,7 +621,9 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
+		StaticForcingP<float> infobathy;
+		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
+		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -628,7 +631,9 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
+		StaticForcingP<float> infobathy;
+		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
+		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
@@ -637,7 +642,9 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
+		StaticForcingP<float> infobathy;
+		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
+		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
 	}
 
 
@@ -1043,28 +1050,28 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 
 	if (std::isnan(XParam.xo))
-		XParam.xo = XForcing.Bathy.xo-(0.5* XForcing.Bathy.dx);
+		XParam.xo = XForcing.Bathy[0].xo-(0.5* XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.xmax))
-		XParam.xmax = XForcing.Bathy.xmax + (0.5 * XForcing.Bathy.dx);
+		XParam.xmax = XForcing.Bathy[0].xmax + (0.5 * XForcing.Bathy[0].dx);
 	if(std::isnan(XParam.yo))
-		XParam.yo = XForcing.Bathy.yo - (0.5 * XForcing.Bathy.dx);
+		XParam.yo = XForcing.Bathy[0].yo - (0.5 * XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.ymax))
-		XParam.ymax = XForcing.Bathy.ymax + (0.5 * XForcing.Bathy.dx);
+		XParam.ymax = XForcing.Bathy[0].ymax + (0.5 * XForcing.Bathy[0].dx);
 
 	if (std::isnan(XParam.dx))
-		XParam.dx = XForcing.Bathy.dx;
+		XParam.dx = XForcing.Bathy[0].dx;
 	
 	if (std::isnan(XParam.grdalpha))
-		XParam.grdalpha = XForcing.Bathy.grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
+		XParam.grdalpha = XForcing.Bathy[0].grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
 
 
 	//Check Bathy input type
-	if (XForcing.Bathy.extension.compare("dep") == 0 || XForcing.Bathy.extension.compare("bot") == 0)
+	if (XForcing.Bathy[0].extension.compare("dep") == 0 || XForcing.Bathy[0].extension.compare("bot") == 0)
 	{
 		if (std::isnan(XParam.dx))
 		{
 			//std::cerr << "FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." << bathyext << " file" << std::endl;
-			log("FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." + XForcing.Bathy.extension + " file");
+			log("FATAL ERROR: nx or ny or dx were not specified. These parameters are required when using ." + XForcing.Bathy[0].extension + " file");
 			exit(1);
 		}
 	}

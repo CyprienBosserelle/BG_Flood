@@ -171,27 +171,29 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	Model<T> XModel_g;
 
 	Forcing<float> XForcing;
+	StaticForcingP<float> bathy;
 
+	XForcing.Bathy.push_back(bathy);
 	// initialise forcing bathymetry to 0
-	XForcing.Bathy.xo = -1.0;
-	XForcing.Bathy.yo = -1.0;
+	XForcing.Bathy[0].xo = -1.0;
+	XForcing.Bathy[0].yo = -1.0;
 
-	XForcing.Bathy.xmax = 1.0;
-	XForcing.Bathy.ymax = 1.0;
-	XForcing.Bathy.nx = 3;
-	XForcing.Bathy.ny = 3;
+	XForcing.Bathy[0].xmax = 1.0;
+	XForcing.Bathy[0].ymax = 1.0;
+	XForcing.Bathy[0].nx = 3;
+	XForcing.Bathy[0].ny = 3;
 
-	XForcing.Bathy.dx = 1.0;
+	XForcing.Bathy[0].dx = 1.0;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
-	AllocateCPU(XForcing.Bathy.nx, XForcing.Bathy.ny, XForcing.Bathy.val);
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 
-	for (int j = 0; j < XForcing.Bathy.ny; j++)
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
-		for (int i = 0; i < XForcing.Bathy.nx; i++)
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			XForcing.Bathy.val[i + j * XForcing.Bathy.nx] = 0.0f;
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0f;
 		}
 	}
 
@@ -413,26 +415,30 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 
 	Forcing<float> XForcing;
 
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
 	// initialise forcing bathymetry to 0
-	XForcing.Bathy.xo = -1.0;
-	XForcing.Bathy.yo = -1.0;
+	XForcing.Bathy[0].xo = -1.0;
+	XForcing.Bathy[0].yo = -1.0;
 
-	XForcing.Bathy.xmax = 1.0;
-	XForcing.Bathy.ymax = 1.0;
-	XForcing.Bathy.nx = 3;
-	XForcing.Bathy.ny = 3;
+	XForcing.Bathy[0].xmax = 1.0;
+	XForcing.Bathy[0].ymax = 1.0;
+	XForcing.Bathy[0].nx = 3;
+	XForcing.Bathy[0].ny = 3;
 
-	XForcing.Bathy.dx = 1.0;
+	XForcing.Bathy[0].dx = 1.0;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
-	AllocateCPU(XForcing.Bathy.nx, XForcing.Bathy.ny, XForcing.Bathy.val);
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 
-	for (int j = 0; j < XForcing.Bathy.ny; j++)
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
-		for (int i = 0; i < XForcing.Bathy.nx; i++)
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			XForcing.Bathy.val[i + j * XForcing.Bathy.nx] = 0.0f;
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0f;
 		}
 	}
 	//

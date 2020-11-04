@@ -67,14 +67,14 @@ void write_text_to_log_file(std::string text)
 	log_file.close(); //destructor implicitly does it
 }
 
-void SaveParamtolog(Param XParam)
+void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 {
 	write_text_to_log_file("\n");
 	write_text_to_log_file("###################################");
 	write_text_to_log_file("### Summary of model parameters ###");
 	write_text_to_log_file("###################################");
 	write_text_to_log_file("# Bathymetry file");
-	write_text_to_log_file("bathy = " + XParam.Bathymetry.inputfile + ";");
+	//write_text_to_log_file("bathy = " + XParam.Bathymetry.inputfile + ";");
 	write_text_to_log_file("posdown = " + std::to_string(XParam.posdown) + ";");
 	//write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
 	//write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");

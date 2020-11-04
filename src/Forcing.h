@@ -104,7 +104,7 @@ struct Forcing
 	DynForcingP<T> Rain;
 	DynForcingP<T> Atmp;
 
-	StaticForcingP<T> Bathy; //Should be a vector at some point
+	std::vector<StaticForcingP<T>> Bathy; //Should be a vector at some point
 	StaticForcingP<T> cf;
 
 	std::vector<deformmap<T>> deform;

@@ -380,7 +380,7 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 	//
 	//	Isn't it better to do that only for newly refined blk?
 	//  Not necessary if no coarsening/refinement occur
-	interp2BUQ(XParam, XModel.blocks, XForcing.Bathy, XModel.zb);
+	interp2BUQ(XParam, XModel.blocks, XForcing.Bathy[0], XModel.zb);
 
 	// Set edges
 	setedges(XParam, XModel.blocks, XModel.zb);

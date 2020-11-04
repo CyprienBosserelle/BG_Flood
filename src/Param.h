@@ -65,7 +65,7 @@ public:
 	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
 	//files
 	//std::string Bathymetryfile;// bathymetry file name
-	inputmap Bathymetry;
+	//inputmap Bathymetry;
 	std::string outfile="Output.nc"; // netcdf output file name
 	
 	//Timekeeping

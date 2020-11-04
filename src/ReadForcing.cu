@@ -31,7 +31,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//=================
 	// Read Bathymetry
 	log("\nReading bathymetry grid data...");
-	readbathydata(XParam.posdown,XForcing.Bathy);
+	readbathydata(XParam.posdown,XForcing.Bathy[0]);
 	
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
