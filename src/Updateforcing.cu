@@ -350,9 +350,22 @@ template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBloc
 				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
 				T rhoairrhowater = T(0.00121951); // density ratio rho(air)/rho(water) 
-
-				uwindi = interp2BUQ(x, y, Uwind);
-				vwindi = interp2BUQ(x, y, Vwind);
+				if (Uwind.uniform)
+				{
+					uwindi = Uwind.nowvalue;
+				}
+				else
+				{
+					uwindi = interp2BUQ(x, y, Uwind);
+				}
+				if (Vwind.uniform)
+				{
+					vwindi = Vwind.nowvalue;
+				}
+				else
+				{
+					vwindi = interp2BUQ(x, y, Vwind);
+				}
 
 				XAdv.dhu[i] += rhoairrhowater * T(XParam.Cd) * uwindi * abs(uwindi);
 				XAdv.dhv[i] += rhoairrhowater * T(XParam.Cd) * vwindi * abs(vwindi);
