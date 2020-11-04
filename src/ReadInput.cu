@@ -1141,17 +1141,14 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	{
 		//No; i.e. endtimne =0.0
 		XParam.endtime = 1.0 / tiny; //==huge
-		
-	//	if (slbnd.back().time>0.0 && wndbnd.back().time > 0.0)
-	//	{
-	//		XParam.endtime = min(slbnd.back().time, wndbnd.back().time);
-	//	}
-	//
-	//	
 	}
+
+	XParam.endtime = setendtime(XParam, XForcing);
 	
-	// Endtime is checked versus the bnd input i.e. model cannot go further than secified bnd (actually in GPU case it can but it probably shoudn't)
-	// This is done in a separate function.
+		
+	
+	
+	
 
 
 
@@ -1221,23 +1218,23 @@ double setendtime(Param XParam,Forcing<float> XForcing)
 	//endtime cannot be bigger thn the smallest time set in a boundary
 	SLTS tempSLTS;
 	double endtime = XParam.endtime;
-	if (XParam.leftbnd)
+	if (XForcing.left.on)
 	{
 		tempSLTS =XForcing.left.data.back();
 		endtime = utils::min( endtime, tempSLTS.time);
 		
 	}
-	if (XParam.rightbnd)
+	if (XForcing.right.on)
 	{
 		tempSLTS = XForcing.right.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);
 	}
-	if (XParam.topbnd)
+	if (XForcing.top.on)
 	{
 		tempSLTS = XForcing.top.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);
 	}
-	if (XParam.botbnd)
+	if (XForcing.bot.on)
 	{
 		tempSLTS = XForcing.bot.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);

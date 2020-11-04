@@ -89,7 +89,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	}
 
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
-	XParam.endtime = setendtime(XParam, XForcing);
+	// Removed. This is better done in the sanity check!
+	////XParam.endtime = setendtime(XParam, XForcing);
 
 	//log("...done");
 
