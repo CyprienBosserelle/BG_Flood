@@ -266,7 +266,15 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
-				Rainhh = interp2BUQ(x, y, Rain);
+				if (Rain.uniform)
+				{
+					Rainhh = Rain.nowvalue;
+				}
+				else
+				{
+					Rainhh = interp2BUQ(x, y, Rain);
+				}
+				
 
 
 
