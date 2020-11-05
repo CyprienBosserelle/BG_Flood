@@ -10,11 +10,13 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 	int oldnblk = 0;
 
 	int niteration = 0;
+
+	int maxiteration = 20;
 	//fillHalo(XParam, XModel.blocks, XModel.evolv_o);
 	//fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 	if (XParam.maxlevel != XParam.minlevel)
 	{
-		while (oldnblk != XParam.nblk)
+		while (oldnblk != XParam.nblk && niteration< maxiteration)
 		{
 			niteration++;
 			log("\t Iteration " + std::to_string(niteration));
@@ -25,7 +27,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 
 			oldnblk = XParam.nblk;
 			//wetdrycriteria(XParam, refine, coarsen);
-			inrangecriteria(XParam, (T)-1.0, (T)1.0, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+			inrangecriteria(XParam, (T)-5.2, (T)0.2, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 			//XParam = adapt(XParam);
 			Adapt(XParam, XForcing, XModel);
