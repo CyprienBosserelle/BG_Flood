@@ -11,7 +11,7 @@
 #include "AdaptCriteria.h"
 #include "Halo.h"
 #include "InitialConditions.h"
-
+#include "Testing.h"
 
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel);
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel);

@@ -35,7 +35,33 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 
 			if (!checkBUQsanity(XParam,XModel.blocks))
 			{
-				log("\tBad BUQ mesh layout\n");
+
+				XParam.outfile = "Bad_mesh.nc";
+				log("\tERROR!!!  Bad BUQ mesh layout! See file: "+ XParam.outfile);
+				copyID2var(XParam, XModel.blocks, XModel.flux.Fhu);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.LeftBot, XModel.grad.dhdx);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.LeftTop, XModel.grad.dhdy);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.TopLeft, XModel.grad.dzsdx);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.TopRight, XModel.grad.dzsdy);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.RightTop, XModel.grad.dudx);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.RightBot, XModel.grad.dudy);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotRight, XModel.grad.dvdx);
+				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotLeft, XModel.grad.dvdy);
+
+				creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "blockID", 3, XModel.flux.Fhu);
+				
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftBot", 3, XModel.grad.dhdx);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftTop", 3, XModel.grad.dhdy);
+
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopLeft", 3, XModel.grad.dzsdx);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopRight", 3, XModel.grad.dzsdy);
+				
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightTop", 3, XModel.grad.dudx);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightBot", 3, XModel.grad.dudy);
+
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotLeft", 3, XModel.grad.dvdx);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotRight", 3, XModel.grad.dvdy);
 				exit(2);
 				break;
 			}

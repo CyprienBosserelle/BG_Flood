@@ -25,7 +25,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu,bool compare);
 
 template <class T> void TestingOutput(Param XParam, Model<T> XModel);
 template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z);
-template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g);
+template <class T> void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z);
+template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo);
 //template <class T> void Gaussianhump(Param XParam, Model<T> XModel, Model<T> XModel_g);
 // End of global definition
 #endif

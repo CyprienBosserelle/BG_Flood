@@ -1055,6 +1055,25 @@ template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
 template void copyID2var<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z);
 
+template <class T> void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z)
+{
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		int info = blkinfo[ib];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int n = memloc(XParam, ix, iy, ib);
+				z[n] = T(info);
+			}
+		}
+	}
+
+}
+template void copyBlockinfo2var<float>(Param XParam, BlockP<float> XBlock, int* blkinfo, float* z);
+template void copyBlockinfo2var<double>(Param XParam, BlockP<double> XBlock, int* blkinfo, double* z);
 
 
 
@@ -1120,8 +1139,9 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 	free(diff);
 	
 }
-template void CompareCPUvsGPU<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
-template void CompareCPUvsGPU<double>(Param XParam,  Model<double> XModel, Model<double> XModel_g);
+template void CompareCPUvsGPU<float>(Param XParam, Model<float> XModel, Model<float> XModel_g, std::vector<std::string> varlist, bool checkhalo);
+template void CompareCPUvsGPU<double>(Param XParam, Model<double> XModel, Model<double> XModel_g, std::vector<std::string> varlist, bool checkhalo);
+
 
 template <class T> void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* output,T* shuffle)
 {
