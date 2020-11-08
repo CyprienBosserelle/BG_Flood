@@ -545,12 +545,13 @@ template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel)
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
+		/*
 		if (ib == -1)
 		{
 			XModel.adapt.coarsen[ib] = false;
 			XModel.adapt.refine[ib] = false;
 		}
-		
+		*/
 
 		//printf("ibl=%d; availblk[ibl]=%d;\n",ibl, availblk[ibl]);
 
