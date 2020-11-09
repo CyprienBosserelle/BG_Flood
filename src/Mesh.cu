@@ -45,8 +45,8 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 			{
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					double x = XParam.xo + (i + XParam.blkwidth * nblkx) * levdx;
-					double y = XParam.yo + (j + XParam.blkwidth * nblky) * levdx;
+					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx) * levdx + 0.5 * levdx;
+					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky) * levdx + 0.5 * levdx;
 
 					//if (x >= XForcing.Bathy.xo && x <= XForcing.Bathy.xmax && y >= XForcing.Bathy.yo && y <= XForcing.Bathy.ymax)
 					{
@@ -55,7 +55,8 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 						double q11, q12, q21, q22, q;
 						int cfi, cfip, cfj, cfjp;
 
-
+						x = utils::max(utils::min(x, XForcing.Bathy[0].xmax), XForcing.Bathy[0].xo);
+						y = utils::max(utils::min(y, XForcing.Bathy[0].ymax), XForcing.Bathy[0].yo);
 
 						cfi = utils::min(utils::max((int)floor((x - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx), 0), XForcing.Bathy[0].nx - 2);
 						cfip = cfi + 1;
