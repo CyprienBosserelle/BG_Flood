@@ -5,14 +5,14 @@
 template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T> &XModel_g)
 {
 	
-	log("Launching model main loop");
+	log("Initialising model main loop");
 	
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
-	
-
+	log("\t\tCompleted");
+	log("Model Running...");
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here

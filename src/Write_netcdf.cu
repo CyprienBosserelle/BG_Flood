@@ -26,7 +26,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	int ncid, xx_dim, yy_dim, time_dim, blockid_dim;
 	double * xval, *yval;
 	// create the netcdf datasetXParam.outfile.c_str()
-	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
+	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER|NC_NETCDF4, &ncid);
 	if (status != NC_NOERR)
 	{
 		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
@@ -48,7 +48,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 				}
 				newname = newname + "_" + std::to_string(fileinc) + "." + bathyext;
 				XParam.outfile = newname;
-				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER, &ncid);
+				status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER|NC_NETCDF4, &ncid);
 				fileinc++;
 			}
 			//printf("New file name: %s  ", XParam.outfile.c_str());

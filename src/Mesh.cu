@@ -204,11 +204,12 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
 	
+	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
+	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
 
-
-	for (int nblky = 0; nblky < ceil(XParam.ny / ((double)XParam.blkwidth)); nblky++)
+	for (int nblky = 0; nblky < maxnby; nblky++)
 	{
-		for (int nblkx = 0; nblkx < ceil(XParam.nx / ((double)XParam.blkwidth)); nblkx++)
+		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
