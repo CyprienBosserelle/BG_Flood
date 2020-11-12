@@ -143,6 +143,13 @@ public:
 	//std::vector<deformmap> deform;
 	double deformmaxtime = 0.0; // time after which no deformation occurs (internal parameter to cut some of the loops)
 
+
+	// This here should be stored in a structure at a later stage
+	std::string AdatpCrit;
+	int* AdatpCrit_funct_pointer;
+	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
+
+
 };
 
 

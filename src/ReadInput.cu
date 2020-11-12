@@ -593,6 +593,27 @@ Param readparamstr(std::string line, Param param)
 		param.frictionmodel = std::stoi(parametervalue);
 	}
 	
+	parameterstr = "Adaptation";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> adaptpar = split(parametervalue, ',');
+
+		if (!adaptpar.empty())
+		{
+			param.AdatpCrit = adaptpar[0];
+			if (adaptpar.size() > 1)
+				param.Adapt_arg1 = adaptpar[1];
+			if (adaptpar.size() > 2)
+				param.Adapt_arg2 = adaptpar[2];
+			if (adaptpar.size() > 3)
+				param.Adapt_arg3 = adaptpar[3];
+			if (adaptpar.size() > 4)
+				param.Adapt_arg4 = adaptpar[4];
+			if (adaptpar.size() > 5)
+				param.Adapt_arg5 = adaptpar[5];
+		}
+	}
 
 	return param;
 }

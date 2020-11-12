@@ -4,6 +4,23 @@
 #include "AdaptCriteria.h"
 
 
+template <class T> int AdaptCriteria(Param XParam, Model<T> XModel)
+{
+	int success = 0;
+	if (XParam.AdatpCrit.compare("Threshold") == 0)
+	{
+		success = Thresholdcriteria(XParam, T(std::stod(XParam.Adapt_arg1)), XModel.OutputVarMap["XParam.Adapt_arg2"], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+	}
+	if (XParam.AdatpCrit.compare("Inrange") == 0)
+	{
+		success = inrangecriteria(XParam, T(std::stod(XParam.Adapt_arg1)), T(std::stod(XParam.Adapt_arg2)), XModel.OutputVarMap["XParam.Adapt_arg3"], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+	}
+	return success;
+}
+template int AdaptCriteria<float>(Param XParam, Model<float> XModel);
+template int AdaptCriteria<double>(Param XParam, Model<double> XModel);
+
+
 /*! \fn int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<T> XBlock,  bool*& refine, bool*& coarsen)
 * Threshold criteria is a general form of wet dry criteria
 * Simple wet/.dry refining criteria.
@@ -11,7 +28,7 @@
 * if the block is dry -> coarsen is true
 * beware the refinement sanity check is meant to be done after running this function
 */
-template <class T> int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<T> XBlock, bool*& refine, bool*& coarsen)
+template <class T> int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
 	// Threshold criteria is a general form of wet dry criteria where esp is the threshold and h is the parameter tested
 	// Below is written as a wet dry analogy where wet is vlaue above threshold and dry is below
@@ -55,8 +72,8 @@ template <class T> int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<
 	}
 	return success;
 }
-template  int Thresholdcriteria<float>(Param XParam, float threshold, float* z, BlockP<float> XBlock, bool*& refine, bool*& coarsen);
-template  int Thresholdcriteria<double>(Param XParam, double threshold, double* z, BlockP<double> XBlock, bool*& refine, bool*& coarsen);
+template  int Thresholdcriteria<float>(Param XParam, float threshold, float* z, BlockP<float> XBlock, bool* refine, bool* coarsen);
+template  int Thresholdcriteria<double>(Param XParam, double threshold, double* z, BlockP<double> XBlock, bool* refine, bool* coarsen);
 
 /*! \fn int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool*& refine, bool*& coarsen)
 * Simple in-range refining criteria.
@@ -65,7 +82,7 @@ template  int Thresholdcriteria<double>(Param XParam, double threshold, double* 
 * beware the refinement sanity check is meant to be done after running this function
 */
 template<class T>
-int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool*& refine, bool*& coarsen)
+int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
 	// First use a simple refining criteria: zb>zmin && zb<zmax refine otherwise corasen
 	int success = 0;
@@ -100,13 +117,13 @@ int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool*&
 	}
 	return success;
 }
-template int inrangecriteria<float>(Param XParam, float zmin, float zmax, float* z, BlockP<float> XBlock, bool*& refine, bool*& coarsen);
-template int inrangecriteria<double>(Param XParam, double zmin, double zmax, double* z, BlockP<double> XBlock, bool*& refine, bool*& coarsen);
+template int inrangecriteria<float>(Param XParam, float zmin, float zmax, float* z, BlockP<float> XBlock, bool* refine, bool* coarsen);
+template int inrangecriteria<double>(Param XParam, double zmin, double zmax, double* z, BlockP<double> XBlock, bool* refine, bool* coarsen);
 
 /*! \fn 
 */
 template<class T>
-int targetlevelcriteria(Param XParam, T* z, BlockP<T> XBlock, StaticForcingP<float> targetlevelmap, bool*& refine, bool*& coarsen)
+int targetlevelcriteria(Param XParam, T* z, BlockP<T> XBlock, StaticForcingP<float> targetlevelmap, bool* refine, bool* coarsen)
 {
 	float targetlevel;
 	bool uplevel = false;
