@@ -4,7 +4,7 @@
 #include "AdaptCriteria.h"
 
 
-template <class T> int AdaptCriteria(Param XParam, Model<T> XModel)
+template <class T> int AdaptCriteria(Param XParam, Forcing<float> XForcing, Model<T> XModel)
 {
 	int success = 0;
 	if (XParam.AdatpCrit.compare("Threshold") == 0)
@@ -15,10 +15,17 @@ template <class T> int AdaptCriteria(Param XParam, Model<T> XModel)
 	{
 		success = inrangecriteria(XParam, T(std::stod(XParam.Adapt_arg1)), T(std::stod(XParam.Adapt_arg2)), XModel.OutputVarMap["XParam.Adapt_arg3"], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 	}
+	if (XParam.AdatpCrit.compare("Targetlevel") == 0)
+	{
+		for (int ig = 0; ig < XForcing.targetadapt.size(); ig++)
+		{
+			targetlevelcriteria(XParam, XForcing.targetadapt[ig], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+		}
+	}
 	return success;
 }
-template int AdaptCriteria<float>(Param XParam, Model<float> XModel);
-template int AdaptCriteria<double>(Param XParam, Model<double> XModel);
+template int AdaptCriteria<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel);
+template int AdaptCriteria<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel);
 
 
 /*! \fn int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<T> XBlock,  bool*& refine, bool*& coarsen)
@@ -123,11 +130,13 @@ template int inrangecriteria<double>(Param XParam, double zmin, double zmax, dou
 /*! \fn 
 */
 template<class T>
-int targetlevelcriteria(Param XParam, T* z, BlockP<T> XBlock, StaticForcingP<float> targetlevelmap, bool* refine, bool* coarsen)
+int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
 	float targetlevel;
 	bool uplevel = false;
 	T delta, x, y;
+	int success = 0;
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
@@ -162,6 +171,7 @@ int targetlevelcriteria(Param XParam, T* z, BlockP<T> XBlock, StaticForcingP<flo
 			coarsen[ib] = false;
 		}
 	}
-
+	return success;
 }
-
+template int targetlevelcriteria<float>(Param XParam, StaticForcingP<int> targetlevelmap, BlockP<float> XBlock, bool* refine, bool* coarsen);
+template int targetlevelcriteria<double>(Param XParam, StaticForcingP<int> targetlevelmap, BlockP<double> XBlock, bool* refine, bool* coarsen);

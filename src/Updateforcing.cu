@@ -97,7 +97,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 		}
 		else
 		{
-			InterpstepCPU(XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, float(XLoop.totaltime), float(XDynForcing.dt), XDynForcing.now, XDynForcing.before, XDynForcing.after);
+			InterpstepCPU(XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, XLoop.totaltime, XDynForcing.dt, XDynForcing.now, XDynForcing.before, XDynForcing.after);
 		}
 		//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
 		//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);

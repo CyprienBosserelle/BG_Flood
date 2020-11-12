@@ -27,7 +27,8 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 
 			oldnblk = XParam.nblk;
 			//wetdrycriteria(XParam, refine, coarsen);
-			inrangecriteria(XParam, (T)-5.2, (T)0.2, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+			//inrangecriteria(XParam, (T)-5.2, (T)0.2, XModel.zb, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+			AdaptCriteria(XParam, XForcing, XModel);
 			refinesanitycheck(XParam, XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 			//XParam = adapt(XParam);
 			Adapt(XParam, XForcing, XModel);

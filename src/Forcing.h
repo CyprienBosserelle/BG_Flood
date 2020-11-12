@@ -107,6 +107,8 @@ struct Forcing
 	std::vector<StaticForcingP<T>> Bathy; //Should be a vector at some point
 	StaticForcingP<T> cf;
 
+	std::vector<StaticForcingP<int>> targetadapt;
+
 	std::vector<deformmap<T>> deform;
 
 	std::vector<River> rivers;

@@ -310,13 +310,15 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 }
 template float interp2BUQ<float, StaticForcingP<float>>(float x, float y, StaticForcingP<float> forcing);
 template double interp2BUQ<double, StaticForcingP<float>>(double x, double y, StaticForcingP<float> forcing);
+template float interp2BUQ<float, StaticForcingP<int>>(float x, float y, StaticForcingP<int> forcing);
+template double interp2BUQ<double, StaticForcingP<int>>(double x, double y, StaticForcingP<int> forcing);
 template float interp2BUQ<float, deformmap<float>>(float x, float y, deformmap<float> forcing);
 template double interp2BUQ<double, deformmap<float>>(double x, double y, deformmap<float> forcing);
 template float interp2BUQ<float, DynForcingP<float>>(float x, float y, DynForcingP<float> forcing);
 template double interp2BUQ<double, DynForcingP<float>>(double x, double y, DynForcingP<float> forcing);
 
 
-template <class T> void InterpstepCPU(int nx, int ny, int hdstep, T totaltime, T hddt, T *&Ux, T *Uo, T *Un)
+template <class T, class F> void InterpstepCPU(int nx, int ny, int hdstep, F totaltime, F hddt, T *&Ux, T *Uo, T *Un)
 {
 	//float fac = 1.0;
 	T Uxo, Uxn;
@@ -337,10 +339,13 @@ template <class T> void InterpstepCPU(int nx, int ny, int hdstep, T totaltime, T
 		}
 	}
 }
+template void InterpstepCPU<int,float>(int nx, int ny, int hdstep, float totaltime, float hddt, int *&Ux, int *Uo, int *Un);
+template void InterpstepCPU<float, float>(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
+template void InterpstepCPU<double, float>(int nx, int ny, int hdstep, float totaltime, float hddt, double *&Ux, double *Uo, double *Un);
+template void InterpstepCPU<int, double>(int nx, int ny, int hdstep, double totaltime, double hddt, int*& Ux, int* Uo, int* Un);
+template void InterpstepCPU<float, double>(int nx, int ny, int hdstep, double totaltime, double hddt, float*& Ux, float* Uo, float* Un);
+template void InterpstepCPU<double, double>(int nx, int ny, int hdstep, double totaltime, double hddt, double*& Ux, double* Uo, double* Un);
 
-template void InterpstepCPU<int>(int nx, int ny, int hdstep, int totaltime, int hddt, int *&Ux, int *Uo, int *Un);
-template void InterpstepCPU<float>(int nx, int ny, int hdstep, float totaltime, float hddt, float *&Ux, float *Uo, float *Un);
-template void InterpstepCPU<double>(int nx, int ny, int hdstep, double totaltime, double hddt, double *&Ux, double *Uo, double *Un);
 
 template <class T> __global__ void InterpstepGPU(int nx, int ny, int hdstp, T totaltime, T hddt, T*Ux, T* Uo, T* Un)
 {

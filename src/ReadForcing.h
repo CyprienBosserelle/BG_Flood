@@ -32,14 +32,14 @@ template <class T> void readstaticforcing(int step, T& Sforcing);
 template <class T> void readforcingdata(int step, T forcing);
 void readforcingdata(double totaltime, DynForcingP<float>& forcing);
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha);
-extern "C" void readbathyMD(std::string filename, float *&zb);
-extern "C" void readXBbathy(std::string filename, int nx, int ny, float *&zb);
+template <class T> void readbathyMD(std::string filename, T*& zb);
+template <class T> void readXBbathy(std::string filename, int nx, int ny, T*& zb);
 
 
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
-void readbathyASCzb(std::string filename, int nx, int ny, float* &zb);
+template <class T> void readbathyASCzb(std::string filename, int nx, int ny, T*& zb);
 
-void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un);
+template <class T> void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, T*& Ux, T* Uo, T* Un);
 
 // End of global definition
 #endif

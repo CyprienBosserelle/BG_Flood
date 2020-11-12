@@ -31,7 +31,10 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//=================
 	// Read Bathymetry
 	log("\nReading bathymetry grid data...");
-	readbathydata(XParam.posdown,XForcing.Bathy[0]);
+	for (int ib = 0; ib < XForcing.Bathy.size(); ib++)
+	{
+		readbathydata(XParam.posdown, XForcing.Bathy[ib]);
+	}
 	
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
@@ -124,6 +127,19 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		//log("...done");
 
 	}
+	
+	//=====================
+	// Target level
+	if (XParam.AdatpCrit.compare("Targetlevel") == 0)
+	{
+		log("\nRead Target level data...");
+		for (int nd = 0; nd < XForcing.targetadapt.size(); nd++)
+		{
+			//
+			readstaticforcing(XForcing.targetadapt[nd]);
+		}
+	}
+	
 
 	//======================
 	// Rivers
@@ -232,6 +248,7 @@ template <class T> void readstaticforcing(T& Sforcing)
 
 template void readstaticforcing<deformmap<float>>(deformmap<float>& Sforcing);
 template void readstaticforcing<StaticForcingP<float>>(StaticForcingP<float>& Sforcing);
+template void readstaticforcing<StaticForcingP<int>>(StaticForcingP<int>& Sforcing);
 
 /*! \fn  void readstaticforcing(int step,T& Sforcing)
 * Allocate and read static (i.e. not varying in time) forcing
@@ -261,6 +278,7 @@ template <class T> void readstaticforcing(int step,T& Sforcing)
 }
 template void readstaticforcing<deformmap<float>>(int step, deformmap<float>& Sforcing);
 template void readstaticforcing<StaticForcingP<float>>(int step, StaticForcingP<float>& Sforcing);
+template void readstaticforcing<StaticForcingP<int>>(int step, StaticForcingP<int>& Sforcing);
 
 /*! \fn void InitDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
 * 
@@ -1003,6 +1021,7 @@ void readforcingdata(int step,T forcing)
 }
 template void readforcingdata<StaticForcingP<float>>(int step, StaticForcingP<float> forcing);
 template void readforcingdata<deformmap<float>>(int step, deformmap<float> forcing);
+template void readforcingdata<StaticForcingP<int>>(int step, StaticForcingP<int> forcing);
 //template void readforcingdata<DynForcingP<float>>(int step, DynForcingP<float> forcing);
 
 /*! \fn void readforcingdata(double totaltime, DynForcingP<float>& forcing)
@@ -1197,7 +1216,7 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 * Read MD file data
 *
 */
-void readbathyMD(std::string filename, float*& zb)
+template <class T> void readbathyMD(std::string filename, T*& zb)
 {
 	// Shit that doesn'y wor... Needs fixing 
 	int nx, ny;
@@ -1259,7 +1278,7 @@ void readbathyMD(std::string filename, float*& zb)
 			lineelements = split(line, '\t');
 			for (int i = 0; i < nx; i++)
 			{
-				zb[i + j * nx] = std::stof(lineelements[0]);
+				zb[i + j * nx] = T(std::stof(lineelements[0]));
 			}
 			j++;
 		}
@@ -1268,13 +1287,14 @@ void readbathyMD(std::string filename, float*& zb)
 	fs.close();
 
 }
-
+template void readbathyMD<int>(std::string filename, int*& zb);
+template void readbathyMD<float>(std::string filename, float*& zb);
 
 /*! \fn  void readXBbathy(std::string filename, int nx,int ny, float *&zb)
 * Read XBeach style file data
 *
 */
- void readXBbathy(std::string filename, int nx,int ny, float *&zb)
+template <class T> void readXBbathy(std::string filename, int nx,int ny, T *&zb)
 {
 	//read input data:
 	//printf("bathy: %s\n", filename);
@@ -1305,7 +1325,8 @@ void readbathyMD(std::string filename, float*& zb)
 	fs.close();
 	//fclose(fid);
 }
-
+template void readXBbathy<int>(std::string filename, int nx, int ny, int*& zb);
+template void readXBbathy<float>(std::string filename, int nx, int ny, float*& zb);
 
 
  /*! \fn  void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha)
@@ -1417,7 +1438,7 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 * Read ASC file data
 *
 */
-void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
+template <class T> void readbathyASCzb(std::string filename,int nx, int ny, T* &zb)
 {
 	//
 	std::ifstream fs(filename);
@@ -1452,7 +1473,8 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 
 	fs.close();
 }
-
+template void readbathyASCzb<int>(std::string filename, int nx, int ny, int*& zb);
+template void readbathyASCzb<float>(std::string filename, int nx, int ny, float*& zb);
 
 
 /*! \fn void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
@@ -1460,24 +1482,26 @@ void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
 * This is used to interpolate dynamic forcing to a current time step 
 *
 */
-void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
-{
-	//float fac = 1.0;
-	float Uxo, Uxn;
-
-	/*Ums[tx]=Umask[ix];*/
-
-
-
-
-	for (int i = 0; i < nx; i++)
-	{
-		for (int j = 0; j < ny; j++)
-		{
-			Uxo = Uo[i + nx * j];
-			Uxn = Un[i + nx * j];
-
-			Ux[i + nx * j] = Uxo + (totaltime - hddt * hdstep) * (Uxn - Uxo) / hddt;
-		}
-	}
-}
+//template <class T> void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, T*& Ux, T* Uo, T* Un)
+//{
+//	//float fac = 1.0;
+//	T Uxo, Uxn;
+//
+//	/*Ums[tx]=Umask[ix];*/
+//
+//
+//
+//
+//	for (int i = 0; i < nx; i++)
+//	{
+//		for (int j = 0; j < ny; j++)
+//		{
+//			Uxo = Uo[i + nx * j];
+//			Uxn = Un[i + nx * j];
+//
+//			Ux[i + nx * j] = Uxo + (totaltime - hddt * hdstep) * (Uxn - Uxo) / hddt;
+//		}
+//	}
+//}
+//template void InterpstepCPU<int>(int nx, int ny, int hdstep, float totaltime, float hddt, int*& Ux, int* Uo, int* Un);
+//template void InterpstepCPU<float>(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un);

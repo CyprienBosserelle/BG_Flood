@@ -35,7 +35,13 @@ inline int nc_get_var_T(int ncid, int varid, double * &zb)
 }
 
 
+inline int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, int*& zb)
+{
+	int status;
+	status = nc_get_vara_int(ncid, varid, startp, countp, zb);
+	return status;
 
+}
 inline int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, float * &zb)
 {
 	int status;
@@ -624,7 +630,7 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 	return status;
 
 }
-
+template int readvardata<int>(std::string filename, std::string Varname, int step, int*& vardata);
 template int readvardata<float>(std::string filename, std::string Varname, int step, float * &vardata);
 template int readvardata<double>(std::string filename, std::string Varname, int step, double * &vardata);
 
