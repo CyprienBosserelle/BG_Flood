@@ -112,13 +112,13 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 				XEv.u[n] = T(0.0);
 				XEv.v[n] = T(0.0);
 				//zb[n] = 0.0f;
-				XEv.zs[n] = max(zzini + zzoffset, zb[n]);
+				XEv.zs[n] = utils::max(zzini + zzoffset, zb[n]);
 				
 				//if (i >= 64 && i < 82)
 				//{
 				//	zs[n] = max(zsbnd+0.2f, zb[i + j*nx]);
 				//}
-				XEv.h[n] = max(XEv.zs[n] - zb[n], T(0.0));//0.0?
+				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));//0.0 or XParam.eps ??
 			}
 		}
 	}
