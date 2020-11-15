@@ -1234,6 +1234,16 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	}
 
+
+	if (XParam.minlevel != XParam.maxlevel)
+	{
+		if (XParam.AdatpCrit.empty())
+		{
+			XParam.AdatpCrit = "Threshold";
+			XParam.Adapt_arg1 = "0.0";
+			XParam.Adapt_arg2 = "h";
+		}
+	}
 	
 }
 

@@ -9,11 +9,11 @@ template <class T> int AdaptCriteria(Param XParam, Forcing<float> XForcing, Mode
 	int success = 0;
 	if (XParam.AdatpCrit.compare("Threshold") == 0)
 	{
-		success = Thresholdcriteria(XParam, T(std::stod(XParam.Adapt_arg1)), XModel.OutputVarMap["XParam.Adapt_arg2"], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+		success = Thresholdcriteria(XParam, T(std::stod(XParam.Adapt_arg1)), XModel.OutputVarMap[XParam.Adapt_arg2], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 	}
 	if (XParam.AdatpCrit.compare("Inrange") == 0)
 	{
-		success = inrangecriteria(XParam, T(std::stod(XParam.Adapt_arg1)), T(std::stod(XParam.Adapt_arg2)), XModel.OutputVarMap["XParam.Adapt_arg3"], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
+		success = inrangecriteria(XParam, T(std::stod(XParam.Adapt_arg1)), T(std::stod(XParam.Adapt_arg2)), XModel.OutputVarMap[XParam.Adapt_arg3], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 	}
 	if (XParam.AdatpCrit.compare("Targetlevel") == 0)
 	{
