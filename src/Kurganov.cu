@@ -895,14 +895,14 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 					In the case of adaptive refinement, care must be taken to ensure
 					well-balancing at coarse/fine faces */
 
-					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the right halo
+					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the top halo
 					{
 						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
-						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);;
+						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
 						hi = XEv.h[itop];
 						zi = zb[itop];
 					}
-					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
+					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
 					{
 						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
