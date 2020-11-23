@@ -109,6 +109,17 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		t2.join();
 		t3.join();
 
+		int ib;
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		{
+			ib = XBlock.active[ibl];
+			CheckwetdryLeft(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock, Xev, zb);
+			CheckwetdryRight(XParam, ib, XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock, Xev, zb);
+			CheckwetdryTop(XParam, ib, XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock, Xev, zb);
+			CheckwetdryBot(XParam, ib, XBlock.BotLeft[ib], XBlock.BotRight[ib], XBlock, Xev, zb);
+		}
+
+
 		maskbnd(XParam, XBlock, Xev, zb);
 	
 }
@@ -128,6 +139,7 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 	t2.join();
 	t3.join();
 
+	
 	//maskbnd(XParam, XBlock, Xev, zb);
 
 }
@@ -2459,3 +2471,179 @@ template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& 
 }
 template void fillCorners<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
 template void fillCorners<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+
+
+template <class T> void Checkwetdry(Param XParam, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
+{
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, writezs;
+
+	int write;
+
+	write = memloc(XParam.halowidth, XParam.blkmemwidth, ihalo, jhalo, ib);
+	//jj = j * 2;
+	ii = memloc(XParam.halowidth, XParam.blkmemwidth, i, j, ibn);
+	ir = memloc(XParam.halowidth, XParam.blkmemwidth, i + 1, j, ibn);
+	it = memloc(XParam.halowidth, XParam.blkmemwidth, i, j + 1, ibn);
+	itr = memloc(XParam.halowidth, XParam.blkmemwidth, i + 1, j + 1, ibn);
+
+	iiwet = h[ii] > XParam.eps ? h[ii] : T(0.0);
+	irwet = h[ir] > XParam.eps ? h[ir] : T(0.0);
+	itwet = h[it] > XParam.eps ? h[it] : T(0.0);
+	itrwet = h[itr] > XParam.eps ? h[itr] : T(0.0);
+
+	zswet = iiwet * (zb[ii] + h[ii]) + irwet * (zb[ir] + h[ir]) + itwet * (zb[it] + h[it]) + itrwet * (zb[itr] + h[itr]);
+
+	if ((iiwet + irwet + itwet + itrwet) > T(0.0))// can't be 0 either
+	{
+
+		//zswet = T(1.0 / (iiwet + irwet + itwet + itrwet)) * (zs[ii] * iiwet + zs[ir] * irwet + zs[it] * itwet + zs[itr] * itrwet);
+
+		//writezs = zswet;// utils::max(zswet, zb[write]);
+		//writezs = utils::max(zswet, zb[write]);
+		writezs = zswet / (iiwet + irwet + itwet + itrwet);
+		//writeh = T(1.0 / (iiwet + irwet + itwet + itrwet)) * (h[ii] * iiwet + h[ir] * irwet + h[it] * itwet + h[itr] * itrwet);// utils::max(zswet - zb[write], T(XParam.eps));
+		//writeh = utils::max(zswet - zb[write], T(0.0));
+		//T writezb = T(1.0 / (iiwet + irwet + itwet + itrwet)) * (zb[ii] * iiwet + zb[ir] * irwet + zb[it] * itwet + zb[itr] * itrwet);
+		//h[write] = writeh;
+		zs[write] = utils::max(T(0.0), writezs - zb[write]) + zb[write];
+		//zb[write] = writezb;
+
+		h[write] = utils::max(T(0.0), writezs - zb[write]);
+	}
+	else
+	{
+		//zs[write] = zb[write];
+		h[write] = T(0.0);
+	}
+
+}
+
+
+
+template <class T> void CheckwetdryLeft(Param XParam,int ib, int ibLB, int ibLT, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int ii, ir, it, itr,jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, writezs, writeh;
+	
+	int write;
+
+	if (XBlock.level[ib] < XBlock.level[ibLB])
+	{
+		for (int j = 0; j < XParam.blkwidth / 2; j++)
+		{
+			Checkwetdry(XParam, ib, ibLB, -1, j, XParam.blkwidth-2, j*2, XEv.h, XEv.zs, zb);
+		}
+
+	}
+	if (XBlock.level[ib] < XBlock.level[ibLT])
+	{
+		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+		{
+			Checkwetdry(XParam, ib, ibLT, -1, j, XParam.blkwidth-2, (j - (XParam.blkwidth / 2)) * 2, XEv.h, XEv.zs, zb);
+		}
+
+	}
+}
+
+
+template <class T> void CheckwetdryRight(Param XParam, int ib, int ibRB, int ibRT, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, writezs, writeh;
+
+	int write;
+
+	if (XBlock.level[ib] < XBlock.level[ibRB])
+	{
+		for (int j = 0; j < XParam.blkwidth / 2; j++)
+		{
+			Checkwetdry(XParam, ib, ibRB, XParam.blkwidth, j, 0, j*2, XEv.h, XEv.zs, zb);
+		}
+
+	}
+	if (XBlock.level[ib] < XBlock.level[ibRT])
+	{
+		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+		{
+			Checkwetdry(XParam, ib, ibRT, XParam.blkwidth, j, 0, (j - (XParam.blkwidth / 2)) * 2, XEv.h, XEv.zs, zb);
+		}
+
+	}
+}
+
+
+template <class T> void CheckwetdryTop(Param XParam, int ib, int ibTL, int ibTR, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, writezs, writeh;
+
+	int write;
+
+	if (XBlock.level[ib] < XBlock.level[ibTL])
+	{
+		for (int i = 0; i < XParam.blkwidth / 2; i++)
+		{
+			Checkwetdry(XParam, ib, ibTL, i, XParam.blkwidth, i*2, 0, XEv.h, XEv.zs, zb);
+		}
+
+	}
+	if (XBlock.level[ib] < XBlock.level[ibTR])
+	{
+		for (int i = (XParam.blkwidth / 2); i < (XParam.blkwidth); i++)
+		{
+			Checkwetdry(XParam, ib, ibTR, i, XParam.blkwidth, (i - (XParam.blkwidth / 2)) * 2, 0, XEv.h, XEv.zs, zb);
+		}
+
+	}
+}
+
+template <class T> void CheckwetdryBot(Param XParam, int ib, int ibBL, int ibBR, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, writezs, writeh;
+
+	int write;
+
+	if (XBlock.level[ib] < XBlock.level[ibBL])
+	{
+		for (int i = 0; i < XParam.blkwidth / 2; i++)
+		{
+			Checkwetdry(XParam, ib, ibBL, i,-1, i * 2, XParam.blkwidth-2, XEv.h, XEv.zs, zb);
+		}
+
+	}
+	if (XBlock.level[ib] < XBlock.level[ibBR])
+	{
+		for (int i = (XParam.blkwidth / 2); i < (XParam.blkwidth); i++)
+		{
+			Checkwetdry(XParam, ib, ibBR, i, -1, (i - (XParam.blkwidth / 2)) * 2, XParam.blkwidth-2, XEv.h, XEv.zs, zb);
+		}
+
+	}
+}
+
+/*
+static void prolongation_elevation(Point point, scalar h)
+{
+	bool wet = true;
+	foreach_neighbor(1)
+		if (h[] <= dry)
+			wet = false, break;
+	if (wet)
+		refine_linear(point, h);
+	else {
+		double hc = h[], zc = zb[];
+		foreach_child() {
+			h[] = hc;
+			zb[] = zc;
+		}
+	}
+}
+*/
+
