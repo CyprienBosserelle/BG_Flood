@@ -12,6 +12,7 @@
 #include "Boundary.h"
 
 template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z);
+template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev,T*zb);
@@ -33,8 +34,8 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 
-template <class T> void fillTopFlux(Param XParam, int ib, BlockP<T> XBlock, T*& z);
-template <class T> void fillRightFlux(Param XParam, int ib, BlockP<T> XBlock, T*& z);
+template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z);
+template <class T> void fillRightFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z);
 
 template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 

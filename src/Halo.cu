@@ -1467,7 +1467,7 @@ template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongat
 		ir = memloc(halowidth, blkmemwidth, 0, jj, RB);
 		
 		if (doProlongation)
-			aread = a[ir];
+			a_read = a[ir];
 		
 		else
 			a_read = a[write];
@@ -2470,8 +2470,8 @@ template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, B
 
 
 }
-template void fillTopFlux<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
-template void fillTopFlux<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+template void fillTopFlux<float>(Param XParam, bool doProlongation, int ib, BlockP<float> XBlock, float*& z);
+template void fillTopFlux<double>(Param XParam, bool doProlongation, int ib, BlockP<double> XBlock, double*& z);
 
 template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
 {
