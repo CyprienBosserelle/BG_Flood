@@ -28,21 +28,21 @@ template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 
-template <class T> void fillHaloF(Param XParam, BlockP<T> XBlock, T* z)
+template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
 {
 	int ib;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		fillLeftFlux(XParam, ib, XBlock, z);
-		fillBotFlux(XParam, ib, XBlock, z);
-		fillRightFlux(XParam, ib, XBlock, z);
-		fillTopFlux(XParam, ib, XBlock, z);
+		fillLeftFlux(XParam, doProlongation, ib, XBlock, z);
+		fillBotFlux(XParam, doProlongation, ib, XBlock, z);
+		fillRightFlux(XParam, doProlongation, ib, XBlock, z);
+		fillTopFlux(XParam, doProlongation, ib, XBlock, z);
 	
 	}
 }
-template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
-template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
+template void fillHaloF<float>(Param XParam, bool doProlongation, BlockP<float> XBlock, float* z);
+template void fillHaloF<double>(Param XParam, bool doProlongation, BlockP<double> XBlock, double* z);
 
 
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
@@ -80,8 +80,8 @@ template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		fillRightFlux(XParam, ib, XBlock, z);
-		fillTopFlux(XParam, ib, XBlock, z);
+		fillRightFlux(XParam,false, ib, XBlock, z);
+		fillTopFlux(XParam,false, ib, XBlock, z);
 	}
 	//fillBot(XParam, ib, XBlock, z);
 	//fill bot
@@ -101,9 +101,9 @@ template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cuda
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	//fillLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, a);
-	fillRightFlux << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
+	fillRightFlux << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
 	//fillBot << <gridDim, blockDimHaloBT, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, a);
-	fillTopFlux << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
+	fillTopFlux << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
 
 	CUDA_CHECK(cudaStreamSynchronize(stream));
 
@@ -117,8 +117,8 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 	
 		std::thread t0(fillHaloC<T>,XParam, XBlock, Xev.h);
 		std::thread t1(fillHaloC<T>,XParam, XBlock, Xev.zs);
-		std::thread t2(fillHaloC<T>,XParam, XBlock, Xev.u);
-		std::thread t3(fillHaloC<T>,XParam, XBlock, Xev.v);
+		std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
+		std::thread t3(fillHaloF<T>,XParam,true, XBlock, Xev.v);
 
 		t0.join();
 		t1.join();
@@ -147,8 +147,8 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 
 	std::thread t0(fillHaloC<T>, XParam, XBlock, Xev.h);
 	std::thread t1(fillHaloC<T>, XParam, XBlock, Xev.zs);
-	std::thread t2(fillHaloC<T>, XParam, XBlock, Xev.u);
-	std::thread t3(fillHaloC<T>, XParam, XBlock, Xev.v);
+	std::thread t2(fillHaloF<T>, XParam, true, XBlock, Xev.u);
+	std::thread t3(fillHaloF<T>, XParam, true, XBlock, Xev.v);
 
 	t0.join();
 	t1.join();
@@ -227,15 +227,15 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> G
 {
 	
 
-	std::thread t0(fillHaloC<T>,XParam, XBlock, Grad.dhdx);
-	std::thread t1(fillHaloC<T>,XParam, XBlock, Grad.dudx);
-	std::thread t2(fillHaloC<T>,XParam, XBlock, Grad.dvdx);
-	std::thread t3(fillHaloC<T>,XParam, XBlock, Grad.dzsdx);
+	std::thread t0(fillHaloF<T>,XParam, true, XBlock, Grad.dhdx);
+	std::thread t1(fillHaloF<T>,XParam, true, XBlock, Grad.dudx);
+	std::thread t2(fillHaloF<T>,XParam, true, XBlock, Grad.dvdx);
+	std::thread t3(fillHaloF<T>,XParam, true, XBlock, Grad.dzsdx);
 
-	std::thread t4(fillHaloC<T>,XParam, XBlock, Grad.dhdy);
-	std::thread t5(fillHaloC<T>,XParam, XBlock, Grad.dudy);
-	std::thread t6(fillHaloC<T>,XParam, XBlock, Grad.dvdy);
-	std::thread t7(fillHaloC<T>,XParam, XBlock, Grad.dzsdy);
+	std::thread t4(fillHaloF<T>,XParam, true, XBlock, Grad.dhdy);
+	std::thread t5(fillHaloF<T>,XParam, true, XBlock, Grad.dudy);
+	std::thread t6(fillHaloF<T>,XParam, true, XBlock, Grad.dvdy);
+	std::thread t7(fillHaloF<T>,XParam, true, XBlock, Grad.dzsdy);
 
 	t0.join();
 	t1.join();
