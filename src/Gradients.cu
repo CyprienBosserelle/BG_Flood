@@ -207,7 +207,10 @@ template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx,
 
 
 		}
+
+
 	}
+
 
 
 }
@@ -229,6 +232,9 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	t3.join();
 
 	fillHalo(XParam, XBlock, XGrad);
+
+	conserveElevationGradHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	conserveElevationGradHalo(XParam, XBlock, XEv.h, XGrad.dzsdx, XGrad.dzsdy);
 }
 template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
 template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);

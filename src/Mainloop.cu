@@ -11,6 +11,20 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
+
+	// fill halo for zb
+	// only need to do that once 
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	if (XParam.GPUDEVICE >= 0)
+	{
+		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
+		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
+
+		cudaStreamDestroy(XLoop.streams[0]);
+	}
+
+
+
 	log("\t\tCompleted");
 	log("Model Running...");
 	while (XLoop.totaltime < XParam.endtime)

@@ -47,6 +47,15 @@ namespace utils {
 	}
 
 
+	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b, const T& c) {
+		return abs(b - c) > abs(a - c) ? a : b;     // Nearest element to c
+	}
+
+	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b) {
+		return abs(b) > abs(a) ? a : b;     // Nearest element to 0.0
+	}
+
+
 	template const int& min<int>(const int& a, const int& b);
 	template const float& min<float>(const float& a, const float& b);
 	template const double& min<double>(const double& a, const double& b);
@@ -59,7 +68,13 @@ namespace utils {
 	template float __host__ __device__ sq<float>(float a);
 	template double __host__ __device__ sq<double>(double a);
 
-	
+	template __host__ __device__ const int& nearest<int>(const int& a, const int& b, const int& c);
+	template __host__ __device__ const float& nearest<float>(const float& a, const float& b, const float& c);
+	template __host__ __device__ const double& nearest<double>(const double& a, const double& b, const double& c);
+
+	template __host__ __device__ const int& nearest<int>(const int& a, const int& b);
+	template __host__ __device__ const float& nearest<float>(const float& a, const float& b);
+	template __host__ __device__ const double& nearest<double>(const double& a, const double& b);
 
 }
 
