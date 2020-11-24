@@ -24,20 +24,20 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 
-		conserveElevationLeftGPU<<<gridDim, blockDimHaloLR, 0>>> (XParam, XBlock, XEv, zb);
+		conserveElevationLeft<<<gridDim, blockDimHaloLR, 0>>> (XParam, XBlock, XEv, zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
-		conserveElevationRightGPU<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
+		conserveElevationRight<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
-		conserveElevationTopGPU<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
+		conserveElevationTop<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
-		conserveElevationBotGPU<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
+		conserveElevationBot<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	
 }
 template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
-template <class T> __host__ void conserveElevation(Param XParam, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
+template <class T> __host__ __device__ void conserveElevation(int halowidth,int blkmemwidth,T eps, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
 {
 	int ii, ir, it, itr, jj;
 	T iiwet, irwet, itwet, itrwet;
@@ -45,17 +45,17 @@ template <class T> __host__ void conserveElevation(Param XParam, int ib, int ibn
 
 	int write;
 
-	write = memloc(XParam.halowidth, XParam.blkmemwidth, ihalo, jhalo, ib);
+	write = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
 	//jj = j * 2;
-	ii = memloc(XParam.halowidth, XParam.blkmemwidth, i, j, ibn);
-	ir = memloc(XParam.halowidth, XParam.blkmemwidth, i + 1, j, ibn);
-	it = memloc(XParam.halowidth, XParam.blkmemwidth, i, j + 1, ibn);
-	itr = memloc(XParam.halowidth, XParam.blkmemwidth, i + 1, j + 1, ibn);
+	ii = memloc(halowidth, blkmemwidth, i, j, ibn);
+	ir = memloc(halowidth, blkmemwidth, i + 1, j, ibn);
+	it = memloc(halowidth, blkmemwidth, i, j + 1, ibn);
+	itr = memloc(halowidth, blkmemwidth, i + 1, j + 1, ibn);
 
-	iiwet = h[ii] > XParam.eps ? h[ii] : T(0.0);
-	irwet = h[ir] > XParam.eps ? h[ir] : T(0.0);
-	itwet = h[it] > XParam.eps ? h[it] : T(0.0);
-	itrwet = h[itr] > XParam.eps ? h[itr] : T(0.0);
+	iiwet = h[ii] > eps ? h[ii] : T(0.0);
+	irwet = h[ir] > eps ? h[ir] : T(0.0);
+	itwet = h[it] > eps ? h[it] : T(0.0);
+	itrwet = h[itr] > eps ? h[itr] : T(0.0);
 
 	hwet = (iiwet + irwet + itwet + itrwet);
 	zswet = iiwet * (zb[ii] + h[ii]) + irwet * (zb[ir] + h[ir]) + itwet * (zb[it] + h[it]) + itrwet * (zb[itr] + h[itr]);
@@ -68,7 +68,6 @@ template <class T> __host__ void conserveElevation(Param XParam, int ib, int ibn
 
 }
 
-
 template <class T> __host__ __device__ void conserveElevation(T zb, T& zswet, T& hwet)
 {
 	
@@ -76,8 +75,6 @@ template <class T> __host__ __device__ void conserveElevation(T zb, T& zswet, T&
 	{
 		zswet = zswet / hwet;
 		hwet = utils::max(T(0.0), zswet - zb);
-
-		
 
 	}
 	else
@@ -205,7 +202,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	{
 		for (int j = 0; j < XParam.blkwidth / 2; j++)
 		{
-			conserveElevation(XParam, ib, ibLB, -1, j, XParam.blkwidth-2, j*2, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibLB, -1, j, XParam.blkwidth-2, j*2, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -213,7 +210,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	{
 		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
 		{
-			conserveElevation(XParam, ib, ibLT, -1, j, XParam.blkwidth-2, (j - (XParam.blkwidth / 2)) * 2, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibLT, -1, j, XParam.blkwidth-2, (j - (XParam.blkwidth / 2)) * 2, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -221,7 +218,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 
 template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
@@ -232,9 +229,34 @@ template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T>
 	int LB = XBlock.LeftBot[ib];
 	int LT = XBlock.LeftTop[ib];
 
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, hwet;
 
+	int ihalo , jhalo, i, j, ibn, write;
+
+	ihalo = -1;
+	jhalo = iy;
+	i = XParam.blkwidth - 2;
+
+	if (lev < XBlock.level[LB] && iy < (blockDim.y / 2))
+	{
+		ibn = LB;
+		j = iy * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
+	if (lev < XBlock.level[LT] && iy >= (XParam.blkwidth / 2))
+	{
+		ibn = LT;
+		j = (iy - (XParam.blkwidth / 2)) * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
 
 }
+
+
 
 template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, int ibRT, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
@@ -248,7 +270,7 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 	{
 		for (int j = 0; j < XParam.blkwidth / 2; j++)
 		{
-			conserveElevation(XParam, ib, ibRB, XParam.blkwidth, j, 0, j*2, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibRB, XParam.blkwidth, j, 0, j*2, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -256,12 +278,52 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 	{
 		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
 		{
-			conserveElevation(XParam, ib, ibRT, XParam.blkwidth, j, 0, (j - (XParam.blkwidth / 2)) * 2, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibRT, XParam.blkwidth, j, 0, (j - (XParam.blkwidth / 2)) * 2, XEv.h, XEv.zs, zb);
 		}
 
 	}
 }
 
+template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = blockDim.y - 1;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int RB = XBlock.RightBot[ib];
+	int RT = XBlock.RightTop[ib];
+
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, hwet;
+
+	int ihalo, jhalo, i, j, ibn, write;
+
+	ihalo = blockDim.y;
+	jhalo = iy;
+
+	i = 0;
+
+	if (lev < XBlock.level[RB] && iy < (blockDim.y / 2))
+	{
+		ibn = RB;
+		j = iy * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
+	if (lev < XBlock.level[RT] && iy >= (blockDim.y / 2))
+	{
+		ibn = RT;
+		j = (iy - (blockDim.y / 2)) * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
+
+}
 
 template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int ibTR, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
@@ -275,7 +337,7 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 	{
 		for (int i = 0; i < XParam.blkwidth / 2; i++)
 		{
-			conserveElevation(XParam, ib, ibTL, i, XParam.blkwidth, i*2, 0, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibTL, i, XParam.blkwidth, i*2, 0, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -283,10 +345,51 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 	{
 		for (int i = (XParam.blkwidth / 2); i < (XParam.blkwidth); i++)
 		{
-			conserveElevation(XParam, ib, ibTR, i, XParam.blkwidth, (i - (XParam.blkwidth / 2)) * 2, 0, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibTR, i, XParam.blkwidth, (i - (XParam.blkwidth / 2)) * 2, 0, XEv.h, XEv.zs, zb);
 		}
 
 	}
+}
+
+template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int iy = blockDim.x - 1;
+	unsigned int ix = threadIdx.x;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int TL = XBlock.TopLeft[ib];
+	int TR = XBlock.TopRight[ib];
+
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, hwet;
+
+	int ihalo, jhalo, i, j, ibn, write;
+
+	ihalo = ix;
+	jhalo = blockDim.x;
+	j = 0;
+
+	if (lev < XBlock.level[TL] && iy < (blockDim.x / 2))
+	{
+		ibn = TL;
+		
+		i = ix * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
+	if (lev < XBlock.level[TR] && iy >= (blockDim.x / 2))
+	{
+		ibn = TR;
+		i = (ix - (blockDim.x / 2)) * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
+
 }
 
 template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int ibBR, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
@@ -301,7 +404,7 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 	{
 		for (int i = 0; i < XParam.blkwidth / 2; i++)
 		{
-			conserveElevation(XParam, ib, ibBL, i,-1, i * 2, XParam.blkwidth-2, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibBL, i,-1, i * 2, XParam.blkwidth-2, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -309,9 +412,50 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 	{
 		for (int i = (XParam.blkwidth / 2); i < (XParam.blkwidth); i++)
 		{
-			conserveElevation(XParam, ib, ibBR, i, -1, (i - (XParam.blkwidth / 2)) * 2, XParam.blkwidth-2, XEv.h, XEv.zs, zb);
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibBR, i, -1, (i - (XParam.blkwidth / 2)) * 2, XParam.blkwidth-2, XEv.h, XEv.zs, zb);
 		}
 
 	}
 }
 
+
+template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int iy = 0;
+	unsigned int ix = threadIdx.x;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int TL = XBlock.TopLeft[ib];
+	int TR = XBlock.TopRight[ib];
+
+	int ii, ir, it, itr, jj;
+	T iiwet, irwet, itwet, itrwet;
+	T zswet, hwet;
+
+	int ihalo, jhalo, i, j, ibn, write;
+
+	ihalo = ix;
+	jhalo = -1;
+	j = blockDim.x-2;
+
+	if (lev < XBlock.level[TL] && iy < (blockDim.x / 2))
+	{
+		ibn = TL;
+
+		i = ix * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
+	if (lev < XBlock.level[TR] && iy >= (blockDim.x / 2))
+	{
+		ibn = TR;
+		i = (ix - (blockDim.x / 2)) * 2;
+
+		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
+	}
+
+}
