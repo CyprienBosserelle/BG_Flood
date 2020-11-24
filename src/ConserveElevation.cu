@@ -60,13 +60,32 @@ template <class T> __host__ __device__ void conserveElevation(int halowidth,int 
 	hwet = (iiwet + irwet + itwet + itrwet);
 	zswet = iiwet * (zb[ii] + h[ii]) + irwet * (zb[ir] + h[ir]) + itwet * (zb[it] + h[it]) + itrwet * (zb[itr] + h[itr]);
 
-	conserveElevation(zb[write], zswet, hwet);
+	//conserveElevation(zb[write], zswet, hwet);
+	if (hwet > T(0.0))
+	{
+		zswet = zswet / hwet;
+		hwet = utils::max(T(0.0), zswet - zb[write]);
+
+	}
+	else
+	{
+		hwet = T(0.0);
+
+	}
+
+	//zswet = hwet + zb;
 
 	h[write] = hwet;
-	zs[write] = zswet;
+	zs[write] = hwet + zb[write];
 
 
 }
+template __host__ __device__ void conserveElevation<float>(int halowidth, int blkmemwidth, float eps, int ib, int ibn, int ihalo, int jhalo, int i, int j, float* h, float* zs, float* zb);
+template __host__ __device__ void conserveElevation<double>(int halowidth, int blkmemwidth, double eps, int ib, int ibn, int ihalo, int jhalo, int i, int j, double* h, double* zs, double* zb);
+
+
+
+
 
 template <class T> __host__ __device__ void conserveElevation(T zb, T& zswet, T& hwet)
 {
