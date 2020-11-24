@@ -16,11 +16,32 @@ template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, Evolvi
 template void conserveElevation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
-template <class T> void conserveElevation(Param XParam, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
+
+template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	dim3 blockDimHaloLR(1, 16, 1);
+	dim3 blockDimHaloBT(16, 1, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+
+		conserveElevationLeftGPU<<<gridDim, blockDimHaloLR, 0>>> (XParam, XBlock, XEv, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		conserveElevationRightGPU<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		conserveElevationTopGPU<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		conserveElevationBotGPU<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	
+}
+template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
+template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+
+template <class T> __host__ void conserveElevation(Param XParam, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
 {
 	int ii, ir, it, itr, jj;
 	T iiwet, irwet, itwet, itrwet;
-	T zswet, writezs;
+	T zswet, hwet;
 
 	int write;
 
@@ -36,34 +57,36 @@ template <class T> void conserveElevation(Param XParam, int ib, int ibn,int ihal
 	itwet = h[it] > XParam.eps ? h[it] : T(0.0);
 	itrwet = h[itr] > XParam.eps ? h[itr] : T(0.0);
 
+	hwet = (iiwet + irwet + itwet + itrwet);
 	zswet = iiwet * (zb[ii] + h[ii]) + irwet * (zb[ir] + h[ir]) + itwet * (zb[it] + h[it]) + itrwet * (zb[itr] + h[itr]);
 
-	if ((iiwet + irwet + itwet + itrwet) > T(0.0))//
-	{
+	conserveElevation(zb[write], zswet, hwet);
 
-		//T swet = T(1.0 / (iiwet + irwet + itwet + itrwet)) * (zs[ii] * iiwet + zs[ir] * irwet + zs[it] * itwet + zs[itr] * itrwet);
+	h[write] = hwet;
+	zs[write] = zswet;
+
+
+}
+
+
+template <class T> __host__ __device__ void conserveElevation(T zb, T& zswet, T& hwet)
+{
+	
+	if (hwet > 0.0)
+	{
+		zswet = zswet / hwet;
+		hwet = utils::max(T(0.0), zswet - zb);
 
 		
 
-		//writezs = zswet;// utils::max(zswet, zb[write]);
-		//writezs = utils::max(zswet, zb[write]);
-		writezs = zswet / (iiwet + irwet + itwet + itrwet);
-
-		// Weighted averaged depth
-
-		h[write] = utils::max(T(0.0), writezs - zb[write]);
-		zs[write] =  h[write] + zb[write];
-
-		//printf("i=%d; j=%d; ib=%d; h[]=%f; zswrite=%f; zs[]=%f\n", ihalo, jhalo, ib, h[write], writezs, zs[write]);
-
-		//zs[write] = utils::max(writezs, zb[write]);
 	}
 	else
 	{
-		//zs[write] = zb[write];
-		h[write] = T(0.0);
+		hwet = T(0.0);
+		
 	}
 
+	zswet = hwet + zb;
 }
 
 template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
@@ -196,6 +219,22 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	}
 }
 
+template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = 0;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int LB = XBlock.LeftBot[ib];
+	int LT = XBlock.LeftTop[ib];
+
+
+
+}
 
 template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, int ibRT, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
