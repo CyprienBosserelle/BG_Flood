@@ -16,7 +16,7 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 
 template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy);
 
-
+template <class T> void conserveElevationGradHaloGPU(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy);
 
 
 
