@@ -624,8 +624,8 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 	unsigned int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
-	int TL = XBlock.TopLeft[ib];
-	int TR = XBlock.TopRight[ib];
+	int BL = XBlock.BotLeft[ib];
+	int BR = XBlock.BotRight[ib];
 
 	int ii, ir, it, itr, jj;
 	T iiwet, irwet, itwet, itrwet;
@@ -637,17 +637,17 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 	jhalo = -1;
 	j = blockDim.x-2;
 
-	if (lev < XBlock.level[TL] && iy < (blockDim.x / 2))
+	if (lev < XBlock.level[BL] && iy < (blockDim.x / 2))
 	{
-		ibn = TL;
+		ibn = BL;
 
 		i = ix * 2;
 
 		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
 	}
-	if (lev < XBlock.level[TR] && iy >= (blockDim.x / 2))
+	if (lev < XBlock.level[BR] && iy >= (blockDim.x / 2))
 	{
-		ibn = TR;
+		ibn = BR;
 		i = (ix - (blockDim.x / 2)) * 2;
 
 		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
