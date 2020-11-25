@@ -161,6 +161,54 @@ template <class T> __host__ __device__ void conserveElevationGradHalo(int halowi
 		dhdx[write] = utils::nearest(utils::nearest(utils::nearest(dhdx[ii], dhdx[ir]), dhdx[it]), dhdx[itr]);
 	}
 }
+
+template <class T> __host__ __device__ void conserveElevationGradHaloA(int halowidth, int blkmemwidth, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, int iq, int jq, T theta, T delta, T* h, T* dhdx)
+{
+	//int pii, pir, pit, pitr;
+	int qii, qir, qit, qitr;
+	
+	T p, q;
+	T s0, s1, s2;
+
+	int write, pii;
+	write = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
+	pii = memloc(halowidth, blkmemwidth, ip, jp, ib);
+	
+	
+	
+
+	//pii = memloc(halowidth, blkmemwidth, ip, jp, ibn);
+	//pir = memloc(halowidth, blkmemwidth, ip + 1, jp, ibn);
+	//pit = memloc(halowidth, blkmemwidth, ip, jp + 1, ibn);
+	//pitr = memloc(halowidth, blkmemwidth, ip + 1, jp + 1, ibn);
+
+	qii = memloc(halowidth, blkmemwidth, iq, jq, ibn);
+	qir = memloc(halowidth, blkmemwidth, iq + 1, jq, ibn);
+	qit = memloc(halowidth, blkmemwidth, iq, jq + 1, ibn);
+	qitr = memloc(halowidth, blkmemwidth, iq + 1, jq + 1, ibn);
+
+	s1 = h[write];
+	p = h[pii];
+	q = T(0.25) * (h[qii] + h[qir] + h[qit] + h[qitr]);
+
+	
+
+	if (ip > ihalo || jp > jhalo )
+	{
+		s0 = q;
+		s2 = p;
+	}
+	else
+	{
+		s2 = q;
+		s0 = p;
+	}
+
+	dhdx[write] = minmod2(theta,s0,s1,s2)/ delta;
+	//dhdx[write] = utils::nearest(utils::nearest(utils::nearest(dhdx[ii], dhdx[ir]), dhdx[it]), dhdx[itr]);
+	
+}
+
 template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, int ibLT, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
 {
 	if (XBlock.level[ib] < XBlock.level[ibLB])
