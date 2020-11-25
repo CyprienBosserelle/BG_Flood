@@ -45,7 +45,9 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	fillHaloGPU(XParam, XBlock, XGrad);
 
 	conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XGrad.dzsdx, XGrad.dzsdy);
+	conserveElevationGradHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	conserveElevationGradHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	conserveElevationGradHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
 }
 template void gradientGPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
@@ -238,7 +240,11 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	fillHalo(XParam, XBlock, XGrad);
 
 	conserveElevationGradHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	conserveElevationGradHalo(XParam, XBlock, XEv.h, XGrad.dzsdx, XGrad.dzsdy);
+	conserveElevationGradHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	conserveElevationGradHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	conserveElevationGradHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+
 }
 template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
 template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
