@@ -569,7 +569,7 @@ template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> 
 	jhalo = blockDim.x;
 	j = 0;
 
-	if (lev < XBlock.level[TL] && iy < (blockDim.x / 2))
+	if (lev < XBlock.level[TL] && ix < (blockDim.x / 2))
 	{
 		ibn = TL;
 		
@@ -577,7 +577,7 @@ template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> 
 
 		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
 	}
-	if (lev < XBlock.level[TR] && iy >= (blockDim.x / 2))
+	if (lev < XBlock.level[TR] && ix >= (blockDim.x / 2))
 	{
 		ibn = TR;
 		i = (ix - (blockDim.x / 2)) * 2;
