@@ -731,8 +731,8 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//============================================
 	//perform gradient reconstruction
-	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad);
-	gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel.zb);
 
 	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
 

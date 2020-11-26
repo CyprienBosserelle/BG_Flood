@@ -37,6 +37,26 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
+template <class T> __host__ __device__ void ProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int il, int jl, int ip, int jp, T* h, T* zs, T* zb)
+{
+	int ii, pp, halo;
+	pp = memloc(halowidth, blkmemwidth, ip, jp, ibn);
+	ii = memloc(halowidth, blkmemwidth, il, jl, ib);
+
+	halo = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
+	//Check if parent is dry or any of close neighbour
+
+	if (!(h[ii] > eps && h[ii] > eps))
+	{
+		
+		h[halo] = utils::max(T(0.0), zs[pp] - zb[halo]);
+		zs[halo] = h[halo] + zb[halo];
+	}
+	
+
+
+}
+
 template <class T> __host__ __device__ void conserveElevation(int halowidth,int blkmemwidth,T eps, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
 {
 	int ii, ir, it, itr, jj;
@@ -105,42 +125,42 @@ template <class T> __host__ __device__ void conserveElevation(T zb, T& zswet, T&
 	zswet = hwet + zb;
 }
 
-template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy)
 {
 	int ib;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		conserveElevationGHLeft(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock, h, dhdx, dhdy);
-		conserveElevationGHRight(XParam, ib, XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock, h, dhdx, dhdy);
-		conserveElevationGHTop(XParam, ib, XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock, h, dhdy, dhdx);
-		conserveElevationGHBot(XParam, ib, XBlock.BotLeft[ib], XBlock.BotRight[ib], XBlock, h, dhdy, dhdx);
+		conserveElevationGHLeft(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock, h, zs, zb, dhdx, dzsdx);
+		conserveElevationGHRight(XParam, ib, XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock, h, zs, zb, dhdx, dzsdx);
+		conserveElevationGHTop(XParam, ib, XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock, h, zs, zb, dhdy, dzsdy);
+		conserveElevationGHBot(XParam, ib, XBlock.BotLeft[ib], XBlock.BotRight[ib], XBlock, h, zs, zb, dhdy, dzsdy);
 	}
 }
-template void conserveElevationGradHalo<float>(Param XParam, BlockP<float> XBlock, float* h, float* dhdx, float* dhdy);
-template void conserveElevationGradHalo<double>(Param XParam, BlockP<double> XBlock, double* h, double* dhdx, double* dhdy);
+template void conserveElevationGradHalo<float>(Param XParam, BlockP<float> XBlock, float* h, float* zs, float* zb, float* dhdx, float* dzsdx, float* dhdy, float* dzsdy);
+template void conserveElevationGradHalo<double>(Param XParam, BlockP<double> XBlock, double* h, double* zs, double* zb, double* dhdx, double* dzsdx, double* dhdy, double* dzsdy);
 
-template <class T> void conserveElevationGradHaloGPU(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> void conserveElevationGradHaloGPU(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy)
 {
 	dim3 blockDimHaloLR(1, 16, 1);
 	dim3 blockDimHaloBT(16, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
-	conserveElevationGHLeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, h, dhdx, dhdy);
+	conserveElevationGHLeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, h, zs, zb, dhdx, dzsdx);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	conserveElevationGHRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, h, dhdx, dhdy);
+	conserveElevationGHRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, h, zs, zb, dhdx, dzsdx);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	conserveElevationGHTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, h, dhdy, dhdx);
+	conserveElevationGHTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, h, zs, zb, dhdy, dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	conserveElevationGHBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, h, dhdy, dhdx);
+	conserveElevationGHBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, h, zs, zb, dhdy, dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 }
-template void conserveElevationGradHaloGPU<float>(Param XParam, BlockP<float> XBlock, float* h, float* dhdx, float* dhdy);
-template void conserveElevationGradHaloGPU<double>(Param XParam, BlockP<double> XBlock, double* h, double* dhdx, double* dhdy);
+template void conserveElevationGradHaloGPU<float>(Param XParam, BlockP<float> XBlock, float* h, float* zs, float* zb, float* dhdx, float* dzsdx, float* dhdy, float* dzsdy);
+template void conserveElevationGradHaloGPU<double>(Param XParam, BlockP<double> XBlock, double* h, double* zs, double* zb, double* dhdx, double* dzsdx, double* dhdy, double* dzsdy);
 
 template <class T> __host__ __device__ void conserveElevationGradHalo(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo,int i, int j, T* h, T* dhdx, T* dhdy)
 {
@@ -162,20 +182,21 @@ template <class T> __host__ __device__ void conserveElevationGradHalo(int halowi
 	}
 }
 
+
 template <class T> __host__ __device__ void conserveElevationGradHaloA(int halowidth, int blkmemwidth, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, int iq, int jq, T theta, T delta, T* h, T* dhdx)
 {
 	//int pii, pir, pit, pitr;
 	int qii, qir, qit, qitr;
-	
+
 	T p, q;
 	T s0, s1, s2;
 
 	int write, pii;
 	write = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
 	pii = memloc(halowidth, blkmemwidth, ip, jp, ib);
-	
-	
-	
+
+
+
 
 	//pii = memloc(halowidth, blkmemwidth, ip, jp, ibn);
 	//pir = memloc(halowidth, blkmemwidth, ip + 1, jp, ibn);
@@ -191,9 +212,9 @@ template <class T> __host__ __device__ void conserveElevationGradHaloA(int halow
 	p = h[pii];
 	q = T(0.25) * (h[qii] + h[qir] + h[qit] + h[qitr]);
 
-	
 
-	if (ip > ihalo || jp > jhalo )
+
+	if (ip > ihalo || jp > jhalo)
 	{
 		s0 = q;
 		s2 = p;
@@ -204,12 +225,87 @@ template <class T> __host__ __device__ void conserveElevationGradHaloA(int halow
 		s0 = p;
 	}
 
-	dhdx[write] = minmod2(theta,s0,s1,s2)/ delta;
+	dhdx[write] = minmod2(theta, s0, s1, s2) / delta;
+	//dhdx[write] = utils::nearest(utils::nearest(utils::nearest(dhdx[ii], dhdx[ir]), dhdx[it]), dhdx[itr]);
+
+}
+
+template <class T> __host__ __device__ void conserveElevationGradHaloB(int halowidth, int blkmemwidth, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, int iq, int jq, T theta, T delta, T eps, T* h, T* zs, T* zb, T* dhdx, T* dzsdx)
+{
+	//int pii, pir, pit, pitr;
+	int qii, qir, qit, qitr;
+	
+	T hp, hq,zsp,zsq, zbq;
+	T hs0, hs1, hs2,zss0, zss1, zss2;
+
+	T hwet, zswet;
+	int write, pii;
+	int iiwet, irwet, itwet, itrwet;
+	write = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
+	pii = memloc(halowidth, blkmemwidth, ip, jp, ib);
+	
+	//pii = memloc(halowidth, blkmemwidth, ip, jp, ibn);
+	//pir = memloc(halowidth, blkmemwidth, ip + 1, jp, ibn);
+	//pit = memloc(halowidth, blkmemwidth, ip, jp + 1, ibn);
+	//pitr = memloc(halowidth, blkmemwidth, ip + 1, jp + 1, ibn);
+
+	qii = memloc(halowidth, blkmemwidth, iq, jq, ibn);
+	qir = memloc(halowidth, blkmemwidth, iq + 1, jq, ibn);
+	qit = memloc(halowidth, blkmemwidth, iq, jq + 1, ibn);
+	qitr = memloc(halowidth, blkmemwidth, iq + 1, jq + 1, ibn);
+
+	
+
+	
+	zbq = T(0.25) * (zb[qii] + zb[qir] + zb[qit] + zb[qitr]);
+
+	iiwet = h[qii] > eps ? h[qii] : T(0.0);
+	irwet = h[qir] > eps ? h[qir] : T(0.0);
+	itwet = h[qit] > eps ? h[qit] : T(0.0);
+	itrwet = h[qitr] > eps ? h[qitr] : T(0.0);
+
+	hwet = (iiwet + irwet + itwet + itrwet);
+	zswet = iiwet * (zb[qii] + h[qii]) + irwet * (zb[qir] + h[qir]) + itwet * (zb[qit] + h[qit]) + itrwet * (zb[qitr] + h[qitr]);
+	
+	if (hwet > T(0.0))
+	{
+		zswet = zswet / hwet;
+		hq = utils::max(T(0.0), zswet - zbq);
+		
+	}
+	else
+	{
+		hq = T(0.0);
+	}
+
+	hs1 = h[write];
+	zss1= zs[write];
+	hp = h[pii];
+	zsp = zs[pii];
+	zsq = hq + zsq;
+
+	if (ip > ihalo || jp > jhalo )
+	{
+		hs0 = hq;
+		hs2 = hp;
+		zss0 = zsq;
+		zss2 = zsp;
+	}
+	else
+	{
+		hs2 = hq;
+		hs0 = hp;
+		zss2 = zsq;
+		zss0 = zsp;
+	}
+
+	dhdx[write] = minmod2(theta,hs0,hs1,hs2)/ delta;
+	dzsdx[write] = minmod2(theta, zss0, zss1, zss2) / delta;
 	//dhdx[write] = utils::nearest(utils::nearest(utils::nearest(dhdx[ii], dhdx[ir]), dhdx[it]), dhdx[itr]);
 	
 }
 
-template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, int ibLT, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, int ibLT, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx)
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
@@ -228,8 +324,8 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 			iq = XParam.blkwidth - 4;
 			jq = j * 2;
 			ibn = ibLB;
-
-			conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibLB,  -1, j, XParam.blkwidth - 2, j * 2, h, dhdx, dhdy);
 		}
 	}
@@ -243,14 +339,15 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 			jq = (j - (XParam.blkwidth / 2)) * 2;
 			ibn = ibLT;
 
-			conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibLT, -1, j, XParam.blkwidth - 2, (j - (XParam.blkwidth / 2)) * 2, h, dhdx, dhdy);
 		}
 	}
 }
 
-template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<T> XBlock, T* h, T*zs, T*zb, T* dhdx, T* dzsdx)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
@@ -278,7 +375,8 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 	{
 		ibn = LB;
 		jq = iy * 2;
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
 	}
@@ -286,12 +384,13 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 	{
 		ibn = LT;
 		jq = (iy - (blockDim.y / 2)) * 2;
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 	}
 }
 
-template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB, int ibRT, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB, int ibRT, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx)
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
@@ -308,7 +407,8 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 			iq = 2;
 			jq = j * 2;
 			ibn = ibRB;
-			conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibRB, XParam.blkwidth, j, 0, j * 2, h, dhdx, dhdy);
 		}
 	}
@@ -321,14 +421,15 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 			iq = 2;
 			jq = (j - (XParam.blkwidth / 2)) * 2;
 			ibn = ibRT;
-			conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibRT, XParam.blkwidth, j, 0, (j - (XParam.blkwidth / 2)) * 2, h, dhdx, dhdy);
 		}
 	}
 }
 
-template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP<T> XBlock, T* h, T*zs, T*zb, T* dhdx, T* dzsdx)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
@@ -357,7 +458,8 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 	{
 		ibn = RB;
 		jq = iy * 2;
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
 	}
@@ -365,12 +467,13 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 	{
 		ibn = RT;
 		jq = (iy - (XParam.blkwidth / 2)) * 2;
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
 	}
 }
 
-template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, int ibTR, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, int ibTR, BlockP<T> XBlock, T* h, T*zs, T*zb, T* dhdx, T* dzsdx)
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
@@ -387,7 +490,8 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 			jq = 2;
 			iq = i * 2;
 			ibn = ibTL;
-			conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibTL, i, XParam.blkwidth, i * 2, 0, h, dhdx, dhdy);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibTL, i, XParam.blkwidth, i * 2, 0, h, dhdx, dhdy);
 		}
 	}
 	if (XBlock.level[ib] < XBlock.level[ibTR])
@@ -399,14 +503,15 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 			jq = 2;
 			iq = (i - (XParam.blkwidth / 2)) * 2;
 			ibn = ibTR;
-			conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibTR, i, XParam.blkwidth, (i - (XParam.blkwidth / 2)) * 2, 0, h, dhdx, dhdy);
 		}
 	}
 }
 
-template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T> XBlock, T* h, T*zs, T*zb, T* dhdx, T* dzsdx)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
@@ -428,13 +533,14 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 	jhalo = iy+1;
 	jp = iy;
 	ip = ix;
-	iq = ix;
+	jq = 2;
 
 	if (XBlock.level[ib] < XBlock.level[TL] && ix < (blockDim.x / 2))
 	{
 		ibn = TL;
 		iq = ix * 2;
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
 	}
@@ -442,12 +548,13 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 	{
 		ibn = TR;
 		iq = (ix - (blockDim.x / 2)) * 2;;
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
 	}
 }
 
-template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, int ibBR, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, int ibBR, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx)
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
@@ -464,7 +571,8 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 			iq = i * 2;
 			jq = XParam.blkwidth - 4;
 			ibn = ibBL;
-			conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibBL, i, -1, i * 2, XParam.blkwidth - 2, h, dhdx, dhdy);
 		}
@@ -478,14 +586,15 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 			iq = (i - (XParam.blkwidth / 2)) * 2;;
 			jq = XParam.blkwidth - 4;
 			ibn = ibBR;
-			conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+			conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+			//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 
 			//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibBR, i, -1, (i - (XParam.blkwidth / 2)) * 2, XParam.blkwidth - 2, h, dhdx, dhdy);
 		}
 	}
 }
 
-template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy)
+template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
@@ -513,31 +622,46 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 	{
 		ibn = BL;
 		iq = ix * 2;
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
 	}
 	if (XBlock.level[ib] < XBlock.level[BR] && ix >= (blockDim.x / 2))
 	{
 		ibn = BR;
 		iq = (ix - (blockDim.x / 2)) * 2;
-		conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
+		conserveElevationGradHaloB(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, T(XParam.eps), h, zs, zb, dhdx, dzsdx);
+		//conserveElevationGradHaloA(XParam.halowidth, XParam.blkmemwidth, ib, ibn, ihalo, jhalo, ip, jp, iq, jq, T(XParam.theta), delta, h, dhdx);
 		//conserveElevationGradHalo(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, h, dhdx, dhdy);
 	}
 }
 
 template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int ibLT, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	int ii, ir, it, itr,jj;
-	T iiwet, irwet, itwet, itrwet;
-	T zswet, writezs, writeh;
+	int ihalo,jhalo,ibn,ip, jp;
 	
-	int write;
+	ihalo = -1;
 
+	if (XBlock.level[ib] > XBlock.level[ibLB])
+	{
+		//
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			//
+
+		}
+
+	}
+
+	ip = XParam.blkwidth - 2;
 	if (XBlock.level[ib] < XBlock.level[ibLB])
 	{
 		for (int j = 0; j < XParam.blkwidth / 2; j++)
 		{
-			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibLB, -1, j, XParam.blkwidth-2, j*2, XEv.h, XEv.zs, zb);
+			jhalo = j;
+			jp = j * 2;
+			ibn = ibLB;
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -545,7 +669,10 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	{
 		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
 		{
-			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibLT, -1, j, XParam.blkwidth-2, (j - (XParam.blkwidth / 2)) * 2, XEv.h, XEv.zs, zb);
+			jhalo = j;
+			jp = (j - (XParam.blkwidth / 2)) * 2;
+			ibn = ibLT;
+			conserveElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
 		}
 
 	}

@@ -411,6 +411,12 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 					////Flux update
 
+					if (abs(fh)>T(0.1))//
+					{
+						printf("ib=%d, fh=%f, hp=%f, hm=%f, zi=%f, hi=%f, dzsdx=%f, dhdx=%f, XEv.zs[ileft]=%f \n", ib, fh, hp, hm, zi,hi, XGrad.dzsdx[i], XGrad.dhdx[i], XEv.zs[ileft]);
+						printf("ib=%d, fh=%f, hp=%f, hm=%f, zi=%f, hi=%f, dzsdx=%f, dhdx=%f \n", ib, fh, hp, hm, zi, hi, XGrad.dzsdx[i], XGrad.dhdx[i]);
+					}
+
 					XFlux.Fhu[i] = fmu * fh;
 					XFlux.Fqux[i] = fmu * (fu - sl);
 					XFlux.Su[i] = fmu * (fu - sr);
