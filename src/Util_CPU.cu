@@ -55,6 +55,10 @@ namespace utils {
 		return abs(b) > abs(a) ? a : b;     // Nearest element to 0.0
 	}
 
+	template <class T> __host__ __device__ const T& floor(const T& a) {
+		return abs(b) > abs(a) ? a : b;    
+	}
+
 
 	template __host__ __device__ const int& min<int>(const int& a, const int& b);
 	template __host__ __device__ const float& min<float>(const float& a, const float& b);
