@@ -893,6 +893,100 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 
 
+/*! \fn 
+*	Simulate the first predictive step and check wether the lake at rest is preserved
+*	
+*/
+template <class T> void LakeAtRest(Param XParam, Model<T> XModel)
+{
+	T epsi = 0.000001;
+	//============================================
+	// Predictor step in reimann solver
+	//============================================
+
+	//============================================
+	//  Fill the halo for gradient reconstruction
+	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+
+	//============================================
+	// Reset DTmax
+	InitArrayBUQ(XParam, XModel.blocks, XLoop.hugeposval, XModel.time.dtmax);
+
+	//============================================
+	// Calculate gradient for evolving parameters
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+
+	//============================================
+	// Flux and Source term reconstruction
+	// X- direction
+	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+
+	// Y- direction
+	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+	
+	//============================================
+	// Fill Halo for flux from fine to coarse
+	fillHalo(XParam, XModel.blocks, XModel.flux);
+
+
+	// Check Fhu and Fhv (they should be zero)
+	int i, ibot, itop, iright, ileft;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth + XParam.halowidth); ix++)
+			{
+				i = memloc(XParam, ix, iy, ib);
+				iright = memloc(XParam, ix+1, iy, ib);
+				ileft = memloc(XParam, ix-1, iy, ib);
+				itop = memloc(XParam, ix, iy+1, ib);
+				ibot = memloc(XParam, ix, iy-1, ib);
+
+				if (abs(XModel.flux.Fhu[n]) > epsi)
+				{
+					log("Fhu is not zero. Lake at rest not preserved!!!");
+				}
+				
+				if (abs(XModel.flux.Fhv[n]) > epsi)
+				{
+					log("Fhv is not zero. Lake at rest not preserved!!!");
+				}
+
+				T dhus = (XModel.flux.Fqux[i] - XModel.flux.Fqux[iright]);
+				if (abs(dhus) > epsi)
+				{
+					log("dhu is not zero. Lake at rest not preserved!!!");
+
+					printf("Fqux[i]=%f; Fqux[iright]=%f; \n,"XModel.flux.Fqux[i], XModel.flux.Fqux[iright]);
+				}
+
+			}
+		}
+	}
+
+	//============================================
+	// Reduce minimum timestep
+	XLoop.dt = double(CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time));
+	XLoop.dtmax = XLoop.dt;
+	XModel.time.dt = T(XLoop.dt);
+
+	//============================================
+	// Update advection terms (dh dhu dhv) 
+	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
+
+	//============================================
+	//Update evolving variable by 1/2 time step
+	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+
+	//============================================
+	//Copy updated evolving variable back
+	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
+}
+
 
 template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T * z)
 {
