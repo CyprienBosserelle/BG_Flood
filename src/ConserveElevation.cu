@@ -1047,10 +1047,10 @@ template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T
 
 		conserveElevation(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, i, j, XEv.h, XEv.zs, zb);
 	}
-
+	
 	// Prolongation
 	int ip, jp, il, jl;
-	ihalo = -1;
+	//ihalo = -1;
 
 	if (lev > XBlock.level[RB])
 	{
@@ -1059,17 +1059,17 @@ template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T
 		jhalo = iy;
 		ibn = RB;
 
-		il = XParam.blkwidth - 1;
-		jl = j;
+		il = blockDim.y - 1;
+		jl = iy;
 
 		ip = 0;
-		jp = XBlock.LeftBot[ibn] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
+		jp = XBlock.LeftBot[ibn] == ib ? floor(iy * T(0.5)) : (floor(iy * T(0.5)) + blockDim.y / 2);
 
 		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
 
 
 	}
-
+	
 }
 
 template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int ibTR, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
@@ -1161,20 +1161,20 @@ template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> 
 
 	// Prolongation
 	int ip, jp, il, jl;
-	ihalo = -1;
+	
 
 	if (lev > XBlock.level[TL])
 	{
 		//
 
-		ihalo = i;
+		ihalo = ix;
 		ibn = TL;
 
-		il = i;
-		jl = XParam.blkwidth - 1;
+		il = ix;
+		jl = blockDim.x - 1;
 
 		jp = 0;
-		ip = XBlock.BotLeft[ibn] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
+		ip = XBlock.BotLeft[ibn] == ib ? floor(ix * T(0.5)) : (floor(ix * T(0.5)) + blockDim.x / 2);
 
 		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
 
@@ -1274,7 +1274,7 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 
 	// Prolongation
 	int ip, jp, il, jl;
-	jhalo = -1;
+	//jhalo = -1;
 
 	if (lev > XBlock.level[BL])
 	{
@@ -1286,8 +1286,8 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 		il = ix;
 		jl = 0;
 
-		jp = XParam.blkwidth - 1;
-		ip = XBlock.TopLeft[ibn] == ib ? floor(ix *T(0.5)) : (floor(ix*T(0.5)) + XParam.blkwidth / 2);
+		jp = blockDim.x - 1;
+		ip = XBlock.TopLeft[ibn] == ib ? floor(ix *T(0.5)) : (floor(ix*T(0.5)) + blockDim.x / 2);
 
 
 		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
