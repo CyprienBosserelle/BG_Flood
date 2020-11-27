@@ -66,6 +66,8 @@ template <class T> __host__ __device__ void ProlongationElevationGH(int halowidt
 	halo = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
 	//Check if parent is dry or any of close neighbour
 
+
+	
 	if (!(h[ll] > eps && h[halo] > eps && h[pp] > eps))
 	{
 
@@ -302,7 +304,7 @@ template <class T> __host__ __device__ void conserveElevationGradHaloB(int halow
 	zss1= zs[write];
 	hp = h[pii];
 	zsp = zs[pii];
-	zsq = hq + zsq;
+	zsq = hq + zbq;
 
 	if (ip > ihalo || jp > jhalo )
 	{
@@ -848,7 +850,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	int ihalo,jhalo,ibn,ip, jp;
 	
 	// Restriction
-
+	ihalo = -1;
 	ip = XParam.blkwidth - 2;
 	if (XBlock.level[ib] < XBlock.level[ibLB])
 	{
