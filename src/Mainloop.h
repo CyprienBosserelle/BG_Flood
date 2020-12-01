@@ -19,7 +19,7 @@ template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T
 
 template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> XModel);
 
-
+template <class T> Loop<T> InitLoop(Param& XParam, Model<T>& XModel);
 
 // End of global definition
 #endif
