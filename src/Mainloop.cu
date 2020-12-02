@@ -99,9 +99,10 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 		XLoop.gridDim = (XParam.nblk, 1, 1);
 	}
 
-	XLoop.hugenegval = std::numeric_limits<T>::min();
+	//XLoop.hugenegval = std::numeric_limits<T>::min();
 
 	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.hugenegval = T(-1.0)* XLoop.hugeposval;
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
 

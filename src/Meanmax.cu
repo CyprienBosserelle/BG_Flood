@@ -4,9 +4,10 @@
 
 template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XModel, Model<T> XModel_g)
 {
-	dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
-	dim3 gridDim = (XParam.nblk, 1, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
 
+	
 	if (XParam.outmean)
 	{
 		if (XParam.GPUDEVICE >= 0)
@@ -58,6 +59,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			max_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.zs, XModel_g.evolv.zs);
 			max_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.u, XModel_g.evolv.u);
 			max_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.v, XModel_g.evolv.v);
+			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
 		{
@@ -123,8 +125,8 @@ template void Initmeanmax<double>(Param XParam, Loop<double> XLoop, Model<double
 
 template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP<T>& XEv)
 {
-	dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
-	dim3 gridDim = (XParam.nblk, 1, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
 
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.h);
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.zs);
@@ -159,8 +161,8 @@ template void resetmeanCPU<double>(Param XParam, Loop<double> XLoop, BlockP<doub
 
 template <class T> void resetmeanGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP<T>& XEv)
 {
-	dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
-	dim3 gridDim = (XParam.nblk, 1, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
 	//
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.h);
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.zs);

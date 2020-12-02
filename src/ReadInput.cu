@@ -358,12 +358,12 @@ Param readparamstr(std::string line, Param param)
 
 			}
 
-			param.outmean = (vvar.compare("hhmean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("hmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("zsmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("umean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("vmean") == 0) ? true : param.outmean;
 
-			param.outmax = (vvar.compare("hhmax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("hmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("zsmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("umax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("vmax") == 0) ? true : param.outmax;
