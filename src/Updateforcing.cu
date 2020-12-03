@@ -20,6 +20,7 @@ template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float
 		Forcingthisstep(XParam, XLoop, XForcing.VWind);
 	}
 
+	
 }
 template void updateforcing<float>(Param XParam, Loop<float> XLoop, Forcing<float>& XForcing);
 template void updateforcing<double>(Param XParam, Loop<double> XLoop, Forcing<float>& XForcing);
@@ -387,12 +388,146 @@ template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing)
 	}
 	else
 	{
-		float ivw = float((x - T(Forcing.xo)) / T(Forcing.dx) + T(0.5));
-		float jvw = float((y - T(Forcing.yo)) / T(Forcing.dx) + T(0.5));
-		read = tex2D<float>(Forcing.tex, ivw, jvw);
+		read = interp2BUQ(x, y, Forcing);
 	}
 	return read;
 }
 template __device__ float interpDyn2BUQ<float>(float x, float y, TexSetP Forcing);
 template __device__ double interpDyn2BUQ<double>(double x, double y, TexSetP Forcing);
+
+
+template <class T> __device__ T interp2BUQ(T x, T y, TexSetP Forcing)
+{
+	T read;
+	
+	float ivw = float((x - T(Forcing.xo)) / T(Forcing.dx) + T(0.5));
+	float jvw = float((y - T(Forcing.yo)) / T(Forcing.dx) + T(0.5));
+	read = tex2D<float>(Forcing.tex, ivw, jvw);
+	
+	return read;
+}
+template __device__ float interp2BUQ<float>(float x, float y, TexSetP Forcing);
+template __device__ double interp2BUQ<double>(double x, double y, TexSetP Forcing);
+
+
+template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel, Model<T> XModel_g)
+{
+	if (XParam.GPUDEVICE < 0)
+	{
+		deformstep(XParam, XLoop, deform, XModel);
+	}
+	else
+	{
+		deformstep(XParam, XLoop, deform, XModel_g);
+	}
+}
+
+template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel)
+{
+	dim3 gridDim(XParam.nblk, 1, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+
+	bool updatezbhalo = false;
+
+	for (int nd = 0; nd < deform.size(); nd++)
+	{
+		//
+		if ((XLoop.totaltime - deform[nd].startime) <= XLoop.dt && (XLoop.totaltime - deform[nd].startime) > 0.0)
+		{
+			updatezbhalo = true;
+
+			T scale = (deform[nd].duration > 0.0) ? T(1.0 / deform[nd].duration * (XLoop.totaltime - deform[nd].startime)) : T(1.0);
+
+			if (XParam.GPUDEVICE < 0)
+			{
+				AddDeformCPU(XParam, XModel.blocks, deform[nd], scale, XModel.evolv.zs, XModel.zb);
+			}
+			else
+			{
+				AddDeformGPU <<<gridDim, blockDim, 0 >>> (XParam, XModel.blocks, deform[nd], scale, XModel.evolv.zs, XModel.zb);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+
+
+		}
+
+	}
+	//Redo the halo if needed
+	if (updatezbhalo)
+	{
+		
+		if (XParam.GPUDEVICE >= 0)
+		{
+			CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
+			fillHaloGPU(XParam, XModel.blocks, XLoop.streams[0], XModel.zb);
+
+			cudaStreamDestroy(XLoop.streams[0]);
+		}
+		else
+		{
+			fillHaloC(XParam, XModel.blocks, XModel.zb);
+		}
+	}
+
+
+}
+
+
+template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<T> defmap, T scale, T* zs, T* zb)
+{
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+	int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+	T def;
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+	def= interpDyn2BUQ(x, y, defmap.GPU);
+
+	zs[i] = zs[i] + def * scale;
+	zb[i] = zb[i] + def * scale;
+
+
+
+}
+
+template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<T> defmap, T scale, T* zs, T* zb)
+{
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	T def;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+				
+
+				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				def = interp2BUQ(x, y, defmap);
+
+				zs[i] = zs[i] + def * scale;
+				zb[i] = zb[i] + def * scale;
+			}
+		}
+	}
+
+}
+
+
 
