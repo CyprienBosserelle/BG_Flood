@@ -1046,6 +1046,15 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	double tiny = 0.0000001;
 
+	// Sanity check for model levels
+	int minlev = XParam.minlevel;
+	int maxlev = XParam.maxlevel;
+
+	XParam.maxlevel = utils::max(maxlev, minlev);
+	XParam.minlevel = utils::min(maxlev, minlev);
+
+	XParam.initlevel = utils::min(utils::max(XParam.minlevel, XParam.initlevel), XParam.maxlevel);
+
 	//force double for Rain on grid cases
 	if (!XForcing.Rain.inputfile.empty())
 	{
