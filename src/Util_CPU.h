@@ -7,9 +7,12 @@
 
 namespace utils {
 	template <class T> __host__ __device__ T sq(T a);
-	template <class T> const T& max(const T& a, const T& b);
-	template <class T> const T& min(const T& a, const T& b);
+	template <class T> __host__ __device__ const T& max(const T& a, const T& b);
+	template <class T> __host__ __device__ const T& min(const T& a, const T& b);
+	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b, const T& c);
+	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b);
 
+	//template <>
 	
 }
 

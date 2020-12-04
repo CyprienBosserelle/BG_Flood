@@ -410,7 +410,6 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 					sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
 
 					////Flux update
-
 					XFlux.Fhu[i] = fmu * fh;
 					XFlux.Fqux[i] = fmu * (fu - sl);
 					XFlux.Su[i] = fmu * (fu - sr);

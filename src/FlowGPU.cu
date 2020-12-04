@@ -34,7 +34,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Calculate gradient for evolving parameters for predictor step
-	gradientGPU(XParam, XModel.blocks, XModel.evolv, XModel.grad);
+	gradientGPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
 	
 	//============================================
 	// Synchronise all ongoing streams
@@ -57,7 +57,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Reduce minimum timestep
@@ -92,6 +92,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt*T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
+	
 	//============================================
 	// Corrector step in reimann solver
 	//============================================
@@ -102,7 +103,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Calculate gradient for evolving parameters
-	gradientGPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad);
+	gradientGPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	//============================================
@@ -118,7 +119,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 
@@ -146,7 +147,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	//Update evolving variable by 1 full time step
 	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
-
+	
 	
 	//============================================
 	// Add bottom friction

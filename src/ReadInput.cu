@@ -358,12 +358,12 @@ Param readparamstr(std::string line, Param param)
 
 			}
 
-			param.outmean = (vvar.compare("hhmean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("hmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("zsmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("umean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("vmean") == 0) ? true : param.outmean;
 
-			param.outmax = (vvar.compare("hhmax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("hmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("zsmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("umax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("vmax") == 0) ? true : param.outmax;
@@ -1045,6 +1045,15 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	Param DefaultParams;
 
 	double tiny = 0.0000001;
+
+	// Sanity check for model levels
+	int minlev = XParam.minlevel;
+	int maxlev = XParam.maxlevel;
+
+	XParam.maxlevel = utils::max(maxlev, minlev);
+	XParam.minlevel = utils::min(maxlev, minlev);
+
+	XParam.initlevel = utils::min(utils::max(XParam.minlevel, XParam.initlevel), XParam.maxlevel);
 
 	//force double for Rain on grid cases
 	if (!XForcing.Rain.inputfile.empty())

@@ -2,7 +2,7 @@
 
 
 
-template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
+template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad,T* zb)
 {
 	const int num_streams = 4;
 	/*
@@ -43,9 +43,15 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 
 
 	fillHaloGPU(XParam, XBlock, XGrad);
+
+	conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
+	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
 }
-template void gradientGPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
-template void gradientGPU<double>(Param XParam,  BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
+template void gradientGPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb);
+template void gradientGPU<double>(Param XParam,  BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb);
 
 
 
@@ -207,14 +213,17 @@ template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx,
 
 
 		}
+
+
 	}
+
 
 
 }
 template void gradientC<float>(Param XParam, BlockP<float> XBlock, float* a, float* dadx, float* dady);
 template void gradientC<double>(Param XParam, BlockP<double> XBlock, double* a, double* dadx, double* dady);
 
-template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad)
+template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 
 
@@ -229,7 +238,14 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	t3.join();
 
 	fillHalo(XParam, XBlock, XGrad);
+
+	conserveElevationGradHalo(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
+	//conserveElevationGradHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	//conserveElevationGradHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	//conserveElevationGradHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+
 }
-template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad);
-template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad);
+template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb);
+template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb);
 

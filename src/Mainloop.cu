@@ -11,6 +11,20 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
+
+	// fill halo for zb
+	// only need to do that once 
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	if (XParam.GPUDEVICE >= 0)
+	{
+		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
+		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
+
+		cudaStreamDestroy(XLoop.streams[0]);
+	}
+
+
+
 	log("\t\tCompleted");
 	log("Model Running...");
 	while (XLoop.totaltime < XParam.endtime)
@@ -31,10 +45,12 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
-		
-		
+				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+
+		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
+		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
 
 		// Do Sum & Max variables Here
 		Calcmeanmax(XParam, XLoop, XModel, XModel_g);
@@ -48,6 +64,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Reset mean/Max if needed
 		resetmeanmax(XParam, XLoop, XModel, XModel_g);
 
+		modelstatus(XLoop.totaltime, XLoop.dt);
 	}
 	
 
@@ -85,9 +102,10 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 		XLoop.gridDim = (XParam.nblk, 1, 1);
 	}
 
-	XLoop.hugenegval = std::numeric_limits<T>::min();
+	//XLoop.hugenegval = std::numeric_limits<T>::min();
 
 	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.hugenegval = T(-1.0)* XLoop.hugeposval;
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
 
@@ -335,4 +353,13 @@ template <class T> __global__ void CalcInitdtGPU(Param XParam, BlockP<T> XBlock,
 	T delta = calcres(XParam.dx, XBlock.level[ib]);
 
 	dtmax[i] = delta / sqrt(XParam.g * max(XEvolv.h[i],T(XParam.eps)));
+}
+
+
+template <class T> void modelstatus(T totaltime, T dt)
+{
+	std::cout << "\r\e[K" << std::flush;
+	std::cout << "\rtotaltime = "<< std::to_string(totaltime) << "   dt = " << std::to_string(dt) << std::flush;
+	std::cout << "\r" << std::flush;
+	//std::cout << std::endl; // all done
 }

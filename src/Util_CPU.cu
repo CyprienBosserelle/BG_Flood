@@ -35,31 +35,50 @@ namespace utils {
 	/*! \fn template <class T> const T& max(const T& a, const T& b)
 	* Generic max function
 	*/
-	template <class T> const T& max(const T& a, const T& b) {
+	template <class T> __host__ __device__ const T& max(const T& a, const T& b) {
 		return (a<b) ? b : a;     // or: return comp(a,b)?b:a; for version (2)
 	}
 
 	/*! \fn template <class T> const T& min(const T& a, const T& b)
 	* Generic min function
 	*/
-	template <class T> const T& min(const T& a, const T& b) {
+	template <class T> __host__ __device__ const T& min(const T& a, const T& b) {
 		return !(b<a) ? a : b;     // or: return comp(a,b)?b:a; for version (2)
 	}
 
 
-	template const int& min<int>(const int& a, const int& b);
-	template const float& min<float>(const float& a, const float& b);
-	template const double& min<double>(const double& a, const double& b);
+	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b, const T& c) {
+		return abs(b - c) > abs(a - c) ? a : b;     // Nearest element to c
+	}
 
-	template const int& max<int>(const int& a, const int& b);
-	template const float& max<float>(const float& a, const float& b);
-	template const double& max<double>(const double& a, const double& b);
+	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b) {
+		return abs(b) > abs(a) ? a : b;     // Nearest element to 0.0
+	}
+
+	template <class T> __host__ __device__ const T& floor(const T& a) {
+		return abs(b) > abs(a) ? a : b;    
+	}
+
+
+	template __host__ __device__ const int& min<int>(const int& a, const int& b);
+	template __host__ __device__ const float& min<float>(const float& a, const float& b);
+	template __host__ __device__ const double& min<double>(const double& a, const double& b);
+
+	template __host__ __device__ const int& max<int>(const int& a, const int& b);
+	template __host__ __device__ const float& max<float>(const float& a, const float& b);
+	template __host__ __device__ const double& max<double>(const double& a, const double& b);
 
 	template int __host__ __device__ sq<int>(int a);
 	template float __host__ __device__ sq<float>(float a);
 	template double __host__ __device__ sq<double>(double a);
 
-	
+	template __host__ __device__ const int& nearest<int>(const int& a, const int& b, const int& c);
+	template __host__ __device__ const float& nearest<float>(const float& a, const float& b, const float& c);
+	template __host__ __device__ const double& nearest<double>(const double& a, const double& b, const double& c);
+
+	template __host__ __device__ const int& nearest<int>(const int& a, const int& b);
+	template __host__ __device__ const float& nearest<float>(const float& a, const float& b);
+	template __host__ __device__ const double& nearest<double>(const double& a, const double& b);
 
 }
 

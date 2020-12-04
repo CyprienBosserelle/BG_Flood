@@ -28,6 +28,22 @@ template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 
+template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
+{
+	int ib;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		fillLeftFlux(XParam, doProlongation, ib, XBlock, z);
+		fillBotFlux(XParam, doProlongation, ib, XBlock, z);
+		fillRightFlux(XParam, doProlongation, ib, XBlock, z);
+		fillTopFlux(XParam, doProlongation, ib, XBlock, z);
+	
+	}
+}
+template void fillHaloF<float>(Param XParam, bool doProlongation, BlockP<float> XBlock, float* z);
+template void fillHaloF<double>(Param XParam, bool doProlongation, BlockP<double> XBlock, double* z);
+
 
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
@@ -64,8 +80,8 @@ template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		fillRightFlux(XParam, ib, XBlock, z);
-		fillTopFlux(XParam, ib, XBlock, z);
+		fillRightFlux(XParam,false, ib, XBlock, z);
+		fillTopFlux(XParam,false, ib, XBlock, z);
 	}
 	//fillBot(XParam, ib, XBlock, z);
 	//fill bot
@@ -85,9 +101,9 @@ template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cuda
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	//fillLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, a);
-	fillRightFlux << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
+	fillRightFlux << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
 	//fillBot << <gridDim, blockDimHaloBT, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, a);
-	fillTopFlux << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
+	fillTopFlux << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
 
 	CUDA_CHECK(cudaStreamSynchronize(stream));
 
@@ -101,13 +117,16 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 	
 		std::thread t0(fillHaloC<T>,XParam, XBlock, Xev.h);
 		std::thread t1(fillHaloC<T>,XParam, XBlock, Xev.zs);
-		std::thread t2(fillHaloC<T>,XParam, XBlock, Xev.u);
-		std::thread t3(fillHaloC<T>,XParam, XBlock, Xev.v);
+		std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
+		std::thread t3(fillHaloF<T>,XParam,true, XBlock, Xev.v);
 
 		t0.join();
 		t1.join();
 		t2.join();
 		t3.join();
+
+		conserveElevation(XParam, XBlock, Xev, zb);
+
 
 		maskbnd(XParam, XBlock, Xev, zb);
 	
@@ -120,14 +139,15 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 
 	std::thread t0(fillHaloC<T>, XParam, XBlock, Xev.h);
 	std::thread t1(fillHaloC<T>, XParam, XBlock, Xev.zs);
-	std::thread t2(fillHaloC<T>, XParam, XBlock, Xev.u);
-	std::thread t3(fillHaloC<T>, XParam, XBlock, Xev.v);
+	std::thread t2(fillHaloF<T>, XParam, true, XBlock, Xev.u);
+	std::thread t3(fillHaloF<T>, XParam, true, XBlock, Xev.v);
 
 	t0.join();
 	t1.join();
 	t2.join();
 	t3.join();
 
+	
 	//maskbnd(XParam, XBlock, Xev, zb);
 
 }
@@ -180,11 +200,14 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
+	conserveElevationGPU(XParam, XBlock, Xev, zb);
+
+
 	maskbndGPUleft << <gridDim, blockDimHalo, 0 , streams[0] >> > (XParam, XBlock,  Xev, zb);
 	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Xev, zb);
 	maskbndGPUright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Xev, zb);
 	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Xev, zb);
-
+	CUDA_CHECK(cudaDeviceSynchronize());
 	for (int i = 0; i < num_streams; i++)
 	{
 		cudaStreamDestroy(streams[i]);
@@ -198,16 +221,27 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad)
 {
 	
+	/*
+	std::thread t0(fillHaloF<T>,XParam, true, XBlock, Grad.dhdx);
+	std::thread t1(fillHaloF<T>,XParam, true, XBlock, Grad.dudx);
+	std::thread t2(fillHaloF<T>,XParam, true, XBlock, Grad.dvdx);
+	std::thread t3(fillHaloF<T>,XParam, true, XBlock, Grad.dzsdx);
 
-	std::thread t0(fillHaloC<T>,XParam, XBlock, Grad.dhdx);
-	std::thread t1(fillHaloC<T>,XParam, XBlock, Grad.dudx);
-	std::thread t2(fillHaloC<T>,XParam, XBlock, Grad.dvdx);
-	std::thread t3(fillHaloC<T>,XParam, XBlock, Grad.dzsdx);
+	std::thread t4(fillHaloF<T>,XParam, true, XBlock, Grad.dhdy);
+	std::thread t5(fillHaloF<T>,XParam, true, XBlock, Grad.dudy);
+	std::thread t6(fillHaloF<T>,XParam, true, XBlock, Grad.dvdy);
+	std::thread t7(fillHaloF<T>,XParam, true, XBlock, Grad.dzsdy);
 
-	std::thread t4(fillHaloC<T>,XParam, XBlock, Grad.dhdy);
-	std::thread t5(fillHaloC<T>,XParam, XBlock, Grad.dudy);
-	std::thread t6(fillHaloC<T>,XParam, XBlock, Grad.dvdy);
-	std::thread t7(fillHaloC<T>,XParam, XBlock, Grad.dzsdy);
+	*/
+	std::thread t0(fillHaloC<T>, XParam, XBlock, Grad.dhdx);
+	std::thread t1(fillHaloC<T>, XParam, XBlock, Grad.dudx);
+	std::thread t2(fillHaloC<T>, XParam, XBlock, Grad.dvdx);
+	std::thread t3(fillHaloC<T>, XParam, XBlock, Grad.dzsdx);
+
+	std::thread t4(fillHaloC<T>, XParam, XBlock, Grad.dhdy);
+	std::thread t5(fillHaloC<T>, XParam, XBlock, Grad.dudy);
+	std::thread t6(fillHaloC<T>, XParam, XBlock, Grad.dvdy);
+	std::thread t7(fillHaloC<T>, XParam, XBlock, Grad.dzsdy);
 
 	t0.join();
 	t1.join();
@@ -217,6 +251,7 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> G
 	t5.join();
 	t6.join();
 	t7.join();
+
 	
 }
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, GradientsP<float> Grad);
@@ -689,7 +724,137 @@ template __global__ void fillLeft<float>(int halowidth, int* active, int* level,
 template __global__ void fillLeft<double>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, double* a);
 
 
+template <class T> void fillLeftFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
+{
+	int jj, bb;
+	int read, write;
+	int ii, ir, it, itr;
 
+
+	if (XBlock.LeftBot[ib] == ib)//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+
+			read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			write = memloc(XParam, -1, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			z[write] = z[read];
+		}
+
+		if (XBlock.LeftTop[ib] == ib) // boundary on the top half too
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, -1, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+		{
+
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				write = memloc(XParam, -1, j, ib);
+				jj = (j - XParam.blkwidth / 2) * 2;
+				ii = memloc(XParam, (XParam.blkwidth - 1), jj, XBlock.LeftTop[ib]);
+				//ir = memloc(XParam, (XParam.blkwidth - 2), jj, XBlock.LeftTop[ib]);
+				it = memloc(XParam, (XParam.blkwidth - 1), jj + 1, XBlock.LeftTop[ib]);
+				//itr = memloc(XParam, (XParam.blkwidth - 2), jj + 1, XBlock.LeftTop[ib]);
+
+				z[write] = T(0.5) * (z[ii]  + z[it]);
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.LeftBot[ib]]) // LeftTop block does not exist
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			//
+
+			write = memloc(XParam, -1, j, ib);
+			read = memloc(XParam, (XParam.blkwidth - 1), j, XBlock.LeftBot[ib]);
+			z[write] = z[read];
+		}
+	}
+	else if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])
+	{
+
+		for (int j = 0; j < XParam.blkwidth / 2; j++)
+		{
+
+			write = memloc(XParam, -1, j, ib);
+
+			jj = j * 2;
+			bb = XBlock.LeftBot[ib];
+
+			ii = memloc(XParam, (XParam.blkwidth - 1), jj, bb);
+			//ir = memloc(XParam, (XParam.blkwidth - 2), jj, bb);
+			it = memloc(XParam, (XParam.blkwidth - 1), jj + 1, bb);
+			//itr = memloc(XParam, (XParam.blkwidth - 2), jj + 1, bb);
+
+			z[write] = T(0.5) * (z[ii] + z[it]);
+		}
+		//now find out aboy lefttop block
+		if (XBlock.LeftTop[ib] == ib)
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, -1, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+				jj = (j - 8) * 2;
+				bb = XBlock.LeftTop[ib];
+
+				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, -1, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				//z[write] = z[read];
+				ii = memloc(XParam, (XParam.blkwidth - 1), jj, bb);
+				//ir = memloc(XParam, (XParam.blkwidth - 2), jj, bb);
+				it = memloc(XParam, (XParam.blkwidth - 1), jj + 1, bb);
+				//itr = memloc(XParam, (XParam.blkwidth - 2), jj + 1, bb);
+
+				z[write] = T(0.5) * (z[ii] + z[it]);
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			write = memloc(XParam, -1, j, ib);
+
+			T w1, w2, w3;
+
+
+			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			
+
+			ii = memloc(XParam, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
+			if (doProlongation)
+				z[write] = z[ii];
+
+
+			
+		}
+	}
+
+
+
+}
 
 
 
@@ -1072,7 +1237,7 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 template __global__ void fillRight<float>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, float* a);
 template __global__ void fillRight<double>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
 
-template <class T> void fillRightFlux(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+template <class T> void fillRightFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
 	int read, write;
@@ -1190,8 +1355,8 @@ template <class T> void fillRightFlux(Param XParam, int ib, BlockP<T> XBlock, T*
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
 
 			ii = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
-
-			//z[write] = z[ii];
+			if (doProlongation)
+				z[write] = z[ii];
 		}
 	}
 
@@ -1199,12 +1364,12 @@ template <class T> void fillRightFlux(Param XParam, int ib, BlockP<T> XBlock, T*
 
 }
 
-template void fillRightFlux<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
-template void fillRightFlux<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+template void fillRightFlux<float>(Param XParam, bool doProlongation, int ib, BlockP<float> XBlock, float*& z);
+template void fillRightFlux<double>(Param XParam, bool doProlongation, int ib, BlockP<double> XBlock, double*& z);
 
 
 
-template <class T> __global__ void fillRightFlux(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
+template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
@@ -1308,14 +1473,16 @@ template <class T> __global__ void fillRightFlux(int halowidth, int* active, int
 		
 		ir = memloc(halowidth, blkmemwidth, 0, jj, RB);
 		
+		if (doProlongation)
+			a_read = a[ir];
 		
-
-		a_read = a[write];
+		else
+			a_read = a[write];
 	}
 	a[write] = a_read;
 }
-template __global__ void fillRightFlux<float>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, float* a);
-template __global__ void fillRightFlux<double>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
+template __global__ void fillRightFlux<float>(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, float* a);
+template __global__ void fillRightFlux<double>(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
 
 
 
@@ -1686,6 +1853,136 @@ template <class T> __global__ void fillBot(int halowidth, int* active, int* leve
 template __global__ void fillBot<float>(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, float* a);
 template __global__ void fillBot<double>(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, double* a);
 
+template <class T> void fillBotFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
+{
+	int jj, bb;
+	int read, write;
+	int ii, ir, it, itr;
+
+
+	if (XBlock.BotLeft[ib] == ib)//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+
+			read = memloc(XParam, j, 0, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			write = memloc(XParam, j, -1, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+			z[write] = z[read];
+		}
+
+		if (XBlock.BotRight[ib] == ib) // boundary on the top half too
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, j, 0, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, -1, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+		{
+
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				write = memloc(XParam, j, -1, ib);
+				jj = (j - 8) * 2;
+				ii = memloc(XParam, jj, (XParam.blkwidth - 1), XBlock.BotRight[ib]);
+				//ir = memloc(XParam, jj, (XParam.blkwidth - 2), XBlock.BotRight[ib]);
+				it = memloc(XParam, jj + 1, (XParam.blkwidth - 1), XBlock.BotRight[ib]);
+				//itr = memloc(XParam, jj + 1, (XParam.blkwidth - 2), XBlock.BotRight[ib]);
+
+				z[write] = T(0.5) * (z[ii] + z[it] );
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.BotLeft[ib]]) // LeftTop block does not exist
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			//
+
+			write = memloc(XParam, j, -1, ib);
+			read = memloc(XParam, j, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
+			z[write] = z[read];
+		}
+	}
+	else if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+	{
+
+		for (int j = 0; j < XParam.blkwidth / 2; j++)
+		{
+
+			write = memloc(XParam, j, -1, ib);
+
+			jj = j * 2;
+			bb = XBlock.BotLeft[ib];
+
+			ii = memloc(XParam, jj, (XParam.blkwidth - 1), bb);
+			//ir = memloc(XParam, jj, (XParam.blkwidth - 2), bb);
+			it = memloc(XParam, jj + 1, (XParam.blkwidth - 1), bb);
+			//itr = memloc(XParam, jj + 1, (XParam.blkwidth - 2), bb);
+
+			z[write] = T(0.5) * (z[ii] + z[it]);
+		}
+		//now find out aboy botright block
+		if (XBlock.BotRight[ib] == ib)
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+
+				read = memloc(XParam, j, 0, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, -1, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				z[write] = z[read];
+			}
+		}
+		else
+		{
+			for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+			{
+				//
+				jj = (j - 8) * 2;
+				bb = XBlock.BotRight[ib];
+
+				//read = memloc(XParam, 0, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				write = memloc(XParam, j, -1, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				//z[write] = z[read];
+				ii = memloc(XParam, jj, (XParam.blkwidth - 1), bb);
+				//ir = memloc(XParam, jj, (XParam.blkwidth - 2), bb);
+				it = memloc(XParam, jj + 1, (XParam.blkwidth - 1), bb);
+				//itr = memloc(XParam, jj + 1, (XParam.blkwidth - 2), bb);
+
+				z[write] = T(0.5) * (z[ii]  + z[it] );
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			write = memloc(XParam, j, -1, ib);
+
+			T w1, w2, w3;
+
+
+			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			
+
+			//ii = memloc(XParam, j, 0, ib);
+			ir = memloc(XParam, jj, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
+			if(doProlongation)
+				z[write] = z[ir];
+		}
+	}
+
+
+
+}
+
 template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -2055,7 +2352,7 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 template __global__ void fillTop<float>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, float* a);
 template __global__ void fillTop<double>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
 
-template <class T> void fillTopFlux(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
 	int read, write;
@@ -2171,20 +2468,19 @@ template <class T> void fillTopFlux(Param XParam, int ib, BlockP<T> XBlock, T*& 
 						
 			ir = memloc(XParam, jj, 0, XBlock.TopLeft[ib]);
 			
-			
+			if (doProlongation)
+				z[write] = z[ir];
 
-
-			//z[write] = z[ir];
 		}
 	}
 
 
 
 }
-template void fillTopFlux<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
-template void fillTopFlux<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+template void fillTopFlux<float>(Param XParam, bool doProlongation, int ib, BlockP<float> XBlock, float*& z);
+template void fillTopFlux<double>(Param XParam, bool doProlongation, int ib, BlockP<double> XBlock, double*& z);
 
-template <class T> __global__ void fillTopFlux(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
+template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
 {
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
@@ -2279,14 +2575,16 @@ template <class T> __global__ void fillTopFlux(int halowidth, int* active, int* 
 		jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
 		
 		ir = memloc(halowidth, blkmemwidth, jj, 0, TL);
-				
-		a_read =  a[write];
+		if (doProlongation)
+			a_read = a[ir];
+		else
+			a_read =  a[write];
 	}
 	a[write] = a_read;
 }
 
-template __global__ void fillTopFlux<float>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, float* a);
-template __global__ void fillTopFlux<double>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
+template __global__ void fillTopFlux<float>(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, float* a);
+template __global__ void fillTopFlux<double>(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
 
 
 
@@ -2459,3 +2757,4 @@ template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& 
 }
 template void fillCorners<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
 template void fillCorners<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
+

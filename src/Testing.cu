@@ -16,49 +16,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 	log("\nRunning internal test(s):");
 
-	if (XParam.test == 2)
-	{
-		if (XParam.GPUDEVICE >= 0)
-		{
-			bool GPUvsCPUtest;
-			log("\t Gaussian wave on Cartesian grid: CPU vs GPU");
-			GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE,true);
-			std::string result = GPUvsCPUtest ? "successful" : "failed";
-			log("\t\tCPU vs GPU test: " + result);
-		}
-		else
-		{
-			log("Specify GPU device to run test 2 (CPU vs GPU comparison)");
-		}
-	}
-	if (XParam.test == 3)
-	{
-		
-			bool testresults;
-			bool testreduction=true;
-
-			// Iterate this test niter times:
-			int niter = 1000;
-			srand(time(0));
-			log("\t Reduction Test");
-			for (int iter = 0; iter < niter; iter++)
-			{
-				testresults = reductiontest(XParam, XModel, XModel_g);
-				testreduction = testreduction && testresults;
-			}
-			
-			std::string result = testreduction ? "successful" : "failed";
-			log("\t\tReduction test: " + result);
-		
-	}
-
-	if (XParam.test == 4)
-	{
-		//
-		bool testresults;
-		testresults= CPUGPUtest(XParam, XModel, XModel_g);
-		exit(1);
-	}
+	
 
 	if (XParam.test == 0)
 	{
@@ -88,7 +46,54 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		std::string result = rivertest ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
 	}
+	if (XParam.test == 2)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			bool GPUvsCPUtest;
+			log("\t Gaussian wave on Cartesian grid: CPU vs GPU");
+			GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+			std::string result = GPUvsCPUtest ? "successful" : "failed";
+			log("\t\tCPU vs GPU test: " + result);
+		}
+		else
+		{
+			log("Specify GPU device to run test 2 (CPU vs GPU comparison)");
+		}
+	}
+	if (XParam.test == 3)
+	{
 
+		bool testresults;
+		bool testreduction = true;
+
+		// Iterate this test niter times:
+		int niter = 1000;
+		srand(time(0));
+		log("\t Reduction Test");
+		for (int iter = 0; iter < niter; iter++)
+		{
+			testresults = reductiontest(XParam, XModel, XModel_g);
+			testreduction = testreduction && testresults;
+		}
+
+		std::string result = testreduction ? "successful" : "failed";
+		log("\t\tReduction test: " + result);
+
+	}
+
+	if (XParam.test == 4)
+	{
+		//
+		bool testresults;
+		testresults = CPUGPUtest(XParam, XModel, XModel_g);
+		exit(1);
+	}
+	if (XParam.test == 5)
+	{
+		log("\t Lake-at-rest Test");
+		LakeAtRest(XParam, XModel);
+	}
 
 	
 
@@ -731,8 +736,8 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//============================================
 	//perform gradient reconstruction
-	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad);
-	gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad);
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel.zb);
 
 	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
 
@@ -892,6 +897,194 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 }
 
 
+
+/*! \fn 
+*	Simulate the first predictive step and check wether the lake at rest is preserved
+*	
+*/
+template <class T> void LakeAtRest(Param XParam, Model<T> XModel)
+{
+	T epsi = 0.000001;
+	int ib;
+
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	//============================================
+	// Predictor step in reimann solver
+	//============================================
+
+	//============================================
+	//  Fill the halo for gradient reconstruction
+	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+
+	//============================================
+	// Reset DTmax
+	InitArrayBUQ(XParam, XModel.blocks, XLoop.hugeposval, XModel.time.dtmax);
+
+	//============================================
+	// Calculate gradient for evolving parameters
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+
+	//============================================
+	// Flux and Source term reconstruction
+	// X- direction
+	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+
+	// Y- direction
+	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+	
+	//============================================
+	// Fill Halo for flux from fine to coarse
+	//fillHalo(XParam, XModel.blocks, XModel.flux);
+
+
+	// Check Fhu and Fhv (they should be zero)
+	int i, ibot, itop, iright, ileft;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				i = memloc(XParam, ix, iy, ib);
+				iright = memloc(XParam, ix+1, iy, ib);
+				ileft = memloc(XParam, ix-1, iy, ib);
+				itop = memloc(XParam, ix, iy+1, ib);
+				ibot = memloc(XParam, ix, iy-1, ib);
+
+				if (abs(XModel.flux.Fhu[i]) > epsi)
+				{
+					log("Fhu is not zero. Lake at rest not preserved!!!");
+				}
+				
+				if (abs(XModel.flux.Fhv[i]) > epsi)
+				{
+					log("Fhv is not zero. Lake at rest not preserved!!!");
+				}
+
+				T dhus = (XModel.flux.Fqux[i] - XModel.flux.Su[iright]);
+				if (abs(dhus) > epsi)
+				{
+					log("dhu is not zero. Lake at rest not preserved!!!");
+
+					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n",XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
+
+					printf(" At i:\n");
+					testkurganovX(XParam, ib, ix, iy, XModel);
+
+					printf(" At iright:\n");
+					testkurganovX(XParam, ib, ix+1, iy, XModel);
+				}
+
+			}
+		}
+	}
+
+	
+}
+
+
+template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+{
+	int RB, levRB, LBRB, LB, levLB, RBLB;
+	int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+	int ileft = memloc(XParam.halowidth, XParam.blkmemwidth, ix - 1, iy, ib);
+
+	int lev = XModel.blocks.level[ib];
+	T delta = calcres(T(XParam.dx), lev);
+
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+
+	// neighbours for source term
+
+	RB = XModel.blocks.RightBot[ib];
+	levRB = XModel.blocks.level[RB];
+	LBRB = XModel.blocks.LeftBot[RB];
+
+	LB = XModel.blocks.LeftBot[ib];
+	levLB = XModel.blocks.level[LB];
+	RBLB = XModel.blocks.RightBot[LB];
+
+	T dhdxi = XModel.grad.dhdx[i];
+	T dhdxmin = XModel.grad.dhdx[ileft];
+	T cm = T(1.0);
+	T fmu = T(1.0);
+
+	T hi = XModel.evolv.h[i];
+
+	T hn = XModel.evolv.h[ileft];
+	T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, ga;
+
+	// along X
+	dx = delta * T(0.5);
+	zi = XModel.evolv.zs[i] - hi;
+
+	//printf("%f\n", zi);
+
+
+	//zl = zi - dx*(dzsdx[i] - dhdx[i]);
+	zl = zi - dx * (XModel.grad.dzsdx[i] - dhdxi);
+	//printf("%f\n", zl);
+
+	zn = XModel.evolv.zs[ileft] - hn;
+
+	//printf("%f\n", zn);
+	zr = zn + dx * (XModel.grad.dzsdx[ileft] - dhdxmin);
+
+
+	zlr = max(zl, zr);
+
+	//hl = hi - dx*dhdx[i];
+	hl = hi - dx * dhdxi;
+	up = XModel.evolv.u[i] - dx * XModel.grad.dudx[i];
+	hp = max(T(0.0), hl + zl - zlr);
+
+	hr = hn + dx * dhdxmin;
+	um = XModel.evolv.u[ileft] + dx * XModel.grad.dudx[ileft];
+	hm = max(T(0.0), hr + zr - zlr);
+
+	ga = g * T(0.5);
+	///// Reimann solver
+	T fh, fu, fv, sl, sr, dt;
+
+	//solver below also modifies fh and fu
+	dt = KurgSolver(g, delta, epsi, CFL, cm, fmu, hp, hm, up, um, fh, fu);
+
+	if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
+	{
+		int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+		int iright = memloc(XParam.halowidth, XParam.blkmemwidth, 0, jj, RB);;
+		hi = XModel.evolv.h[iright];
+		zi = XModel.zb[iright];
+	}
+	if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
+	{
+		int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+		int ilc = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth - 1, jj, LB);
+		hn = XModel.evolv.h[ilc];
+		zn = XModel.zb[ilc];
+	}
+
+	sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
+	sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
+
+	////Flux update
+	//Fhu[i] = fmu * fh;
+	//Fqux[i] = fmu * (fu - sl);
+	//Su[i] = fmu * (fu - sr);
+	//Fqvx[i] = fmu * fv;
+
+	printf("fh=%f; fu=%f; sl=%f; sr=%f; hp=%f; hm=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", fh, fu, sl, sr, hp, hm, hr, hl, zr, zl);
+
+
+
+}
 
 
 template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T * z)

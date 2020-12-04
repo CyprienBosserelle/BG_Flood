@@ -17,7 +17,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	
 	//============================================
 	// Calculate gradient for evolving parameters
-	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad);
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
 
 	//============================================
 	// Flux and Source term reconstruction
@@ -31,7 +31,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHalo(XParam, XModel.blocks, XModel.flux);
+	//fillHalo(XParam, XModel.blocks, XModel.flux);
 	
 	//============================================
 	// Reduce minimum timestep
@@ -62,6 +62,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Update evolving variable by 1/2 time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	
+	
 	//============================================
 	// Corrector step in reimann solver
 	//============================================
@@ -72,7 +73,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Calculate gradient for evolving parameters
-	gradientCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad);
+	gradientCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.zb);
 
 	//============================================
 	// Flux and Source term reconstruction
@@ -86,7 +87,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHalo(XParam, XModel.blocks, XModel.flux);
+	//fillHalo(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 
