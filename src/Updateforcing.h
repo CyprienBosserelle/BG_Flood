@@ -24,4 +24,6 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 
 template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, std::vector<River> XRivers, Model<T> XModel);
 
+template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel, Model<T> XModel_g);
+
 #endif

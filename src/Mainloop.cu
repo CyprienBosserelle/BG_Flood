@@ -45,10 +45,12 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
-		
-		
+				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+
+		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
+		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
 
 		// Do Sum & Max variables Here
 		Calcmeanmax(XParam, XLoop, XModel, XModel_g);

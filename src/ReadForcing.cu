@@ -121,8 +121,37 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			// read the roughness map header
 			readstaticforcing(XForcing.deform[nd]);
 			//XForcing.deform[nd].grid = readcfmaphead(XForcing.deform[nd].grid);
+
+			//Clamp edges to 0.0
+			int ii;
+			for (int ix = 0; ix < XForcing.deform[nd].nx; ix++)
+			{
+				ii = ix + 0 * XForcing.deform[nd].nx;
+				XForcing.deform[nd].val[ii] = 0.0f;
+				ii = ix + (XForcing.deform[nd].ny-1) * XForcing.deform[nd].nx;
+				XForcing.deform[nd].val[ii] = 0.0f;
+			}
+
+			for (int iy = 0; iy < XForcing.deform[nd].ny; iy++)
+			{
+				ii = 0 + iy * XForcing.deform[nd].nx;
+				XForcing.deform[nd].val[ii] = 0.0f;
+				ii = (XForcing.deform[nd].nx - 1) + (iy) * XForcing.deform[nd].nx;
+				XForcing.deform[nd].val[ii] = 0.0f;
+			}
+
 			
 			XParam.deformmaxtime = utils::max(XParam.deformmaxtime, XForcing.deform[nd].startime + XForcing.deform[nd].duration);
+
+			AllocateTEX(XForcing.deform[nd].nx, XForcing.deform[nd].ny, XForcing.deform[nd].GPU, XForcing.deform[nd].val);
+
+			// below might seem redundant but it simplifies the 
+			// template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing)
+			// function
+			XForcing.deform[nd].GPU.xo = float(XForcing.deform[nd].xo);
+			XForcing.deform[nd].GPU.yo = float(XForcing.deform[nd].yo);
+			XForcing.deform[nd].GPU.uniform = false;
+			XForcing.deform[nd].GPU.dx = float(XForcing.deform[nd].dx);
 		}
 		//log("...done");
 

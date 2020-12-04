@@ -49,7 +49,7 @@ public:
 	double startime = 0.0;
 	double duration = 0.0;
 	T* val;
-	T* val_g;
+	
 
 	TexSetP GPU;
 };

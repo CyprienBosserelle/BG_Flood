@@ -421,6 +421,8 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 		deformstep(XParam, XLoop, deform, XModel_g);
 	}
 }
+template void deformstep<float>(Param XParam, Loop<float> XLoop, std::vector<deformmap<float>> deform, Model<float> XModel, Model<float> XModel_g);
+template void deformstep<double>(Param XParam, Loop<double> XLoop, std::vector<deformmap<float>> deform, Model<double> XModel, Model<double> XModel_g);
 
 template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel)
 {
@@ -473,7 +475,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 }
 
 
-template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<T> defmap, T scale, T* zs, T* zb)
+template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb)
 {
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
@@ -496,7 +498,7 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 
 }
 
-template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<T> defmap, T scale, T* zs, T* zb)
+template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb)
 {
 	int ib;
 	int halowidth = XParam.halowidth;
