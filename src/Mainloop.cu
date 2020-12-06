@@ -64,7 +64,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Reset mean/Max if needed
 		resetmeanmax(XParam, XLoop, XModel, XModel_g);
 
-		modelstatus(XLoop.totaltime, XLoop.dt);
+		printstatus(XLoop.totaltime, XLoop.dt);
 	}
 	
 
@@ -356,7 +356,7 @@ template <class T> __global__ void CalcInitdtGPU(Param XParam, BlockP<T> XBlock,
 }
 
 
-template <class T> void modelstatus(T totaltime, T dt)
+template <class T> void printstatus(T totaltime, T dt)
 {
 	std::cout << "\r\e[K" << std::flush;
 	std::cout << "\rtotaltime = "<< std::to_string(totaltime) << "   dt = " << std::to_string(dt) << std::flush;
