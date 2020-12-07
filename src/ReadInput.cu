@@ -1032,6 +1032,26 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}
 
+	parameterstr = "Adaptation";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> adaptpar = split(parametervalue, ',');
+		// special case for 'Targetlevel' adaptation
+		if (!adaptpar.empty())
+		{
+			if (adaptpar[0].compare("Targetlevel") == 0)
+			{
+				for (int ng = 1; ng < adaptpar.size(); ng++)
+				{
+					StaticForcingP<int> infogrid;
+					forcing.targetadapt.push_back(readfileinfo(parametervalue, infogrid));
+				}
+			}
+		}
+
+	}
+
 	return forcing;
 }
 
