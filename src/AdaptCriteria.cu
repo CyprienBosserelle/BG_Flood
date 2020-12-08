@@ -132,8 +132,8 @@ template int inrangecriteria<double>(Param XParam, double zmin, double zmax, dou
 template<class T>
 int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
-	float targetlevel;
-	bool uplevel = false;
+	int targetlevel;
+	bool uplevel, downlevel;
 	T delta, x, y;
 	int success = 0;
 
@@ -142,6 +142,9 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 		int ib = XBlock.active[ibl];
 
 		delta = calcres(XParam.dx, XBlock.level[ib]);
+
+		uplevel = false;
+		
 
 		refine[ib] = false; // only refine if all are wet
 		coarsen[ib] = true; // always try to coarsen
@@ -155,12 +158,15 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 				x = XParam.xo + XBlock.xo[ib] + ix * delta;
 				y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
-				targetlevel = float(interp2BUQ(x, y, targetlevelmap));
+				targetlevel = int(round(interp2BUQ(x, y, targetlevelmap)));
 
 				if (targetlevel >= XBlock.level[ib])
 				{
+					//printf("x=%f; y=%f; target=%d; level=%d", x, y, targetlevel, XBlock.level[ib]);
 					uplevel = true;
+					
 				}
+
 
 			}
 		}

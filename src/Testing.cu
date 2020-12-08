@@ -902,10 +902,13 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 *	Simulate the first predictive step and check wether the lake at rest is preserved
 *	
 */
-template <class T> void LakeAtRest(Param XParam, Model<T> XModel)
+template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 {
 	T epsi = 0.000001;
 	int ib;
+
+	bool test = true;
+
 
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
@@ -947,7 +950,7 @@ template <class T> void LakeAtRest(Param XParam, Model<T> XModel)
 		ib = XModel.blocks.active[ibl];
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
-			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
 			{
 				i = memloc(XParam, ix, iy, ib);
 				iright = memloc(XParam, ix+1, iy, ib);
@@ -958,29 +961,62 @@ template <class T> void LakeAtRest(Param XParam, Model<T> XModel)
 				if (abs(XModel.flux.Fhu[i]) > epsi)
 				{
 					log("Fhu is not zero. Lake at rest not preserved!!!");
+					test = false;
 				}
 				
 				if (abs(XModel.flux.Fhv[i]) > epsi)
 				{
 					log("Fhv is not zero. Lake at rest not preserved!!!");
+					test = false;
 				}
 
 				T dhus = (XModel.flux.Fqux[i] - XModel.flux.Su[iright]);
 				if (abs(dhus) > epsi)
 				{
+					test = false;
+
 					log("dhu is not zero. Lake at rest not preserved!!!");
 
 					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n",XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
 
-					printf(" At i:\n");
+					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib,ix,iy);
 					testkurganovX(XParam, ib, ix, iy, XModel);
 
-					printf(" At iright:\n");
+					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix+1, iy);
 					testkurganovX(XParam, ib, ix+1, iy, XModel);
 				}
 
 			}
 		}
+	}
+
+
+	if (!test)
+	{
+		copyID2var(XParam, XModel.blocks, XModel.flux.Fhu);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.LeftBot, XModel.grad.dhdx);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.LeftTop, XModel.grad.dhdy);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.TopLeft, XModel.grad.dzsdx);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.TopRight, XModel.grad.dzsdy);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.RightTop, XModel.grad.dudx);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.RightBot, XModel.grad.dudy);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotRight, XModel.grad.dvdx);
+		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotLeft, XModel.grad.dvdy);
+
+		creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "blockID", 3, XModel.flux.Fhu);
+
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftBot", 3, XModel.grad.dhdx);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftTop", 3, XModel.grad.dhdy);
+
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopLeft", 3, XModel.grad.dzsdx);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopRight", 3, XModel.grad.dzsdy);
+
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightTop", 3, XModel.grad.dudx);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightBot", 3, XModel.grad.dudy);
+
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotLeft", 3, XModel.grad.dvdx);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotRight", 3, XModel.grad.dvdy);
 	}
 
 	
@@ -1071,6 +1107,7 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 		zn = XModel.zb[ilc];
 	}
 
+	
 	sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
 	sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
 
@@ -1080,7 +1117,7 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 	//Su[i] = fmu * (fu - sr);
 	//Fqvx[i] = fmu * fv;
 
-	printf("fh=%f; fu=%f; sl=%f; sr=%f; hp=%f; hm=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", fh, fu, sl, sr, hp, hm, hr, hl, zr, zl);
+	printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hp=%f; hm=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", hi, hn, fh, fu, sl, sr, hp, hm, hr, hl, zr, zl);
 
 
 

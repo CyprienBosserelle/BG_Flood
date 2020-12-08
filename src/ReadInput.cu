@@ -1045,7 +1045,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 				for (int ng = 1; ng < adaptpar.size(); ng++)
 				{
 					StaticForcingP<int> infogrid;
-					forcing.targetadapt.push_back(readfileinfo(parametervalue, infogrid));
+					forcing.targetadapt.push_back(readfileinfo(adaptpar[ng], infogrid));
 				}
 			}
 		}
