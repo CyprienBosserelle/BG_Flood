@@ -1117,7 +1117,7 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 	//Su[i] = fmu * (fu - sr);
 	//Fqvx[i] = fmu * fv;
 
-	printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hp=%f; hm=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", hi, hn, fh, fu, sl, sr, hp, hm, hr, hl, zr, zl);
+	printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hp=%f; hm=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", XModel.evolv.h[i], XModel.evolv.h[ileft], fh, fu, sl, sr, hp, hm, hr, hl, zr, zl);
 
 
 
