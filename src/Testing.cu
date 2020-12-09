@@ -1019,7 +1019,7 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotRight", 3, XModel.grad.dvdy);
 	}
 
-	
+	return test;
 }
 
 

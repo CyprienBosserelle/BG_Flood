@@ -239,13 +239,173 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 
 	fillHalo(XParam, XBlock, XGrad);
 
+	gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
 	conserveElevationGradHalo(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
 	//conserveElevationGradHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 	//conserveElevationGradHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-	//conserveElevationGradHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	//conserveElevationGradHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdyythhhhhhhhhg);
 
 
 }
 template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb);
 template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb);
+
+
+template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
+{
+	int i, ib;
+	int xplus, xminus, yplus, yminus;
+
+	T delta;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			gradientHaloLeft(XParam, XBlock, ib, iy, a, dadx, dady);
+		}
+	}
+}
+
+
+template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
+{
+	int i, j, ix, jj, ii, ir, it, itr;
+	int xplus, xminus, yplus, yminus, read;
+	
+	T delta, aright, aleft, abot, atop;
+
+	ix = -1;
+
+	i = memloc(XParam, ix, iy, ib);
+	xplus = memloc(XParam, ix + 1, iy, ib);
+	yplus = memloc(XParam, ix, iy - 1, ib);
+	yminus = memloc(XParam, ix, iy - 1, ib);
+
+
+
+	aright = a[xplus];
+
+
+
+	delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+
+	if (XBlock.LeftBot[ib] == ib)//The lower half is a boundary 
+	{
+		if ( iy < (XParam.blkwidth / 2))
+		{
+
+			read = memloc(XParam, 0, iy, ib);// or memloc(XParam, -1, j, ib) but they should be the same
+			
+			aleft = a[read];
+		}
+
+		if (XBlock.LeftTop[ib] == ib) // boundary on the top half too
+		{
+			if ( iy >= (XParam.blkwidth / 2))
+			{
+				//
+
+				read = memloc(XParam, 0, iy, ib);
+				
+				aleft = a[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+		{
+
+			if (iy >= (XParam.blkwidth / 2))
+			{
+				
+				jj = (iy - XParam.blkwidth / 2) * 2;
+				ii = memloc(XParam, (XParam.blkwidth - 3), jj, XBlock.LeftTop[ib]);
+				ir = memloc(XParam, (XParam.blkwidth - 4), jj, XBlock.LeftTop[ib]);
+				it = memloc(XParam, (XParam.blkwidth - 3), jj + 1, XBlock.LeftTop[ib]);
+				itr = memloc(XParam, (XParam.blkwidth - 4), jj + 1, XBlock.LeftTop[ib]);
+
+				aleft = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.LeftBot[ib]]) // LeftTop block does not exist
+	{
+		
+			read = memloc(XParam, (XParam.blkwidth - 2), iy, XBlock.LeftBot[ib]);
+			aleft = a[read];
+		
+	}
+	else if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])
+	{
+
+		if (iy < (XParam.blkwidth / 2))
+		{	
+
+			jj = iy * 2;
+			int bb = XBlock.LeftBot[ib];
+
+			ii = memloc(XParam, (XParam.blkwidth - 3), jj, bb);
+			ir = memloc(XParam, (XParam.blkwidth - 4), jj, bb);
+			it = memloc(XParam, (XParam.blkwidth - 3), jj + 1, bb);
+			itr = memloc(XParam, (XParam.blkwidth - 4), jj + 1, bb);
+
+			aleft = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+		}
+		//now find out aboy lefttop block
+		if (XBlock.LeftTop[ib] == ib)
+		{
+			if (j >= (XParam.blkwidth / 2))
+			{
+				//
+
+				read = memloc(XParam, 0, iy, ib);
+				
+				aleft = a[read];
+			}
+		}
+		else
+		{
+			if (iy >= (XParam.blkwidth / 2))
+			{
+				//
+				jj = (iy - XParam.blkwidth / 2) * 2;
+				ii = memloc(XParam, (XParam.blkwidth - 3), jj, XBlock.LeftTop[ib]);
+				ir = memloc(XParam, (XParam.blkwidth - 4), jj, XBlock.LeftTop[ib]);
+				it = memloc(XParam, (XParam.blkwidth - 3), jj + 1, XBlock.LeftTop[ib]);
+				itr = memloc(XParam, (XParam.blkwidth - 4), jj + 1, XBlock.LeftTop[ib]);
+
+				aleft = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.75) : T(0.25);
+
+		ii = memloc(XParam, (XParam.blkwidth - 1), jj, XBlock.LeftBot[ib]);
+		ir = memloc(XParam, (XParam.blkwidth - 2), jj, XBlock.LeftBot[ib]);
+		it = memloc(XParam, (XParam.blkwidth - 1), jj - 1, XBlock.LeftBot[ib]);
+		itr = memloc(XParam, (XParam.blkwidth - 2), jj - 1, XBlock.LeftBot[ib]);
+
+		aleft = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+	}
+	
+
+
+
+
+	dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
+	dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
+
+}
+
+
 
