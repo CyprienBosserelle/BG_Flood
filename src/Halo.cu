@@ -115,8 +115,7 @@ template void fillHaloTopRightGPU<float>(Param XParam, BlockP<float> XBlock, cud
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
 {
 	
-		int ii = memloc(XParam, XParam.blkwidth, 15, 223);
-		printf("prehalo: zs[ii]=%f, h[ii]=%f, zb[ii]=%f\n", Xev.zs[ii], Xev.h[ii], zb[ii]);
+		
 		std::thread t0(fillHaloC<T>,XParam, XBlock, Xev.h);
 		std::thread t1(fillHaloC<T>,XParam, XBlock, Xev.zs);
 		std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
@@ -126,17 +125,10 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		t1.join();
 		t2.join();
 		t3.join();
-
-		printf("posthalo: zs[ii]=%f, h[ii]=%f, zb[ii]=%f\n", Xev.zs[ii], Xev.h[ii], zb[ii]);
 		
 		conserveElevation(XParam, XBlock, Xev, zb);
-
-		printf("Post conservElev: zs[ii]=%f, h[ii]=%f, zb[ii]=%f\n", Xev.zs[ii], Xev.h[ii], zb[ii]);
+		
 		maskbnd(XParam, XBlock, Xev, zb);
-
-		printf("Postmask: zs[ii]=%f, h[ii]=%f, zb[ii]=%f\n", Xev.zs[ii], Xev.h[ii], zb[ii]);
-		//printf("prehalo: h[ii]=%f, zb[ii]=%f\n", Xev.h[ii], zb[ii]);
-
 	
 }
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float *zb);

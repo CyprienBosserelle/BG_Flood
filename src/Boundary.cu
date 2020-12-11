@@ -437,14 +437,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				hnew = Xev.zs[i];
 				zbnew = zb[i];
 
-				if (ib == 223 && iy == 15)
-					printf("zsinside=%f\n", zsinside);
-
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
-
-
-				if (ib == 223 && iy == 15)
-					printf("zsnew=%f\n", zsnew);
 
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
@@ -455,8 +448,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 			}
 
 		}
-		if (ib == 223)
-			printf("zs[i]=%f\n", Xev.zs[memloc(halowidth, blkmemwidth, 16, 15, 223)]);
+		
 		//botside
 		if (isbotright | isbotleft)//?
 		{
@@ -491,8 +483,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 			}
 
 		}
-		if (ib == 223 )
-			printf("zs[i]=%f\n", Xev.zs[memloc(halowidth, blkmemwidth, 16, 15, 223) ]);
+		
 
 
 	}
