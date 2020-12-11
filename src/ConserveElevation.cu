@@ -7,10 +7,20 @@ template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, Evolvi
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
+
+		int ii = memloc(XParam, -1, 6, 46);
+
+		if(ib==46)
+			printf("preleft: hii=%f, \n", XEv.h[ii]);
 		conserveElevationLeft(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock, XEv, zb);
+		if (ib == 46)
+			printf("preright: hii=%f, \n", XEv.h[ii]);
 		conserveElevationRight(XParam, ib, XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock, XEv, zb);
+		
 		conserveElevationTop(XParam, ib, XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock, XEv, zb);
+		
 		conserveElevationBot(XParam, ib, XBlock.BotLeft[ib], XBlock.BotRight[ib], XBlock, XEv, zb);
+		
 	}
 }
 template void conserveElevation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
@@ -46,11 +56,17 @@ template <class T> __host__ __device__ void ProlongationElevation(int halowidth,
 	halo = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
 	//Check if parent is dry or any of close neighbour
 
+
+
 	if (!(h[ll] > eps && h[halo]>eps && h[pp] > eps))
 	{
 		
-		h[halo] = utils::max(T(0.0), zs[pp] - zb[halo]);
-		zs[halo] = h[halo] + zb[halo];
+		//h[halo] = utils::max(T(0.0), zs[pp] - zb[halo]);
+		//zs[halo] = h[halo] + zb[halo];
+		h[halo] = h[pp];
+		zb[halo] = zb[pp];
+		zs[halo] = zs[pp];
+
 	}
 	
 
@@ -852,6 +868,8 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	// Restriction
 	ihalo = -1;
 	ip = XParam.blkwidth - 2;
+
+	int ii = memloc(XParam, -1, 6, 46);
 	if (XBlock.level[ib] < XBlock.level[ibLB])
 	{
 		for (int j = 0; j < XParam.blkwidth / 2; j++)
@@ -863,6 +881,8 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 		}
 
 	}
+	if (ib == 46)
+		printf("Restriction1: hii=%f, \n", XEv.h[ii]);
 	if (XBlock.level[ib] < XBlock.level[ibLT])
 	{
 		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
@@ -874,7 +894,8 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 		}
 
 	}
-
+	if (ib == 46)
+		printf("Restriction2: hii=%f, \n", XEv.h[ii]);
 	// Prolongation
 	int il, jl;
 	ihalo = -1;
@@ -892,12 +913,14 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 			jl = j;
 
 			ip = XParam.blkwidth - 1;
-			jp = XBlock.RightBot[ibLB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
+			jp = XBlock.RightBot[ibLB] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
 
 			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
 		}
 
 	}
+	if (ib == 46)
+		printf("Prolongation: hii=%f, \n", XEv.h[ii]);
 }
 
 template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)

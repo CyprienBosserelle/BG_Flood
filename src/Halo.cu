@@ -115,6 +115,8 @@ template void fillHaloTopRightGPU<float>(Param XParam, BlockP<float> XBlock, cud
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
 {
 	
+		int ii = memloc(XParam, -1, 6, 46);
+		printf("prehalo: h[ii]=%f, zb[ii]=%f\n", Xev.h[ii], zb[ii]);
 		std::thread t0(fillHaloC<T>,XParam, XBlock, Xev.h);
 		std::thread t1(fillHaloC<T>,XParam, XBlock, Xev.zs);
 		std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
@@ -125,10 +127,14 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		t2.join();
 		t3.join();
 
+		printf("prehalo: h[ii]=%f, zb[ii]=%f\n", Xev.h[ii], zb[ii]);
+		
 		conserveElevation(XParam, XBlock, Xev, zb);
 
-
+		printf("prehalo: h[ii]=%f, zb[ii]=%f\n", Xev.h[ii], zb[ii]);
 		maskbnd(XParam, XBlock, Xev, zb);
+		printf("prehalo: h[ii]=%f, zb[ii]=%f\n", Xev.h[ii], zb[ii]);
+
 	
 }
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float *zb);
@@ -543,6 +549,9 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 
 
 			z[write] = w1 * z[ii] + w2 * z[ir] + w3 * z[it];
+
+			
+
 		}
 	}
 	
