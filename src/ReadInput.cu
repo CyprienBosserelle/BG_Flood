@@ -126,7 +126,7 @@ Param readparamstr(std::string line, Param param)
 
 
 	std::string parameterstr, parametervalue;
-
+	//std::vector<std::string> paramvec;
 	///////////////////////////////////////////////////////
 	// General parameters
 	//
@@ -139,20 +139,20 @@ Param readparamstr(std::string line, Param param)
 		param.test = std::stoi(parametervalue);
 	}
 
-	parameterstr = "gpudevice";
-	parametervalue = findparameter(parameterstr, line);
+	std::vector<std::string> paramvec = { "gpudevice","GPUDEVICE" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		param.GPUDEVICE = std::stoi(parametervalue);
 	}
-
+	/*
 	parameterstr = "GPUDEVICE";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.GPUDEVICE = std::stoi(parametervalue);
 	}
-
+	*/
 	parameterstr = "doubleprecision";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -1314,7 +1314,7 @@ double setendtime(Param XParam,Forcing<float> XForcing)
 * separate parameter from value
 *
 */
-std::string findparameter(std::string parameterstr, std::string line)
+std::string findparameter(std::vector<std::string> parameterstr, std::string line)
 {
 	std::size_t found;
 	std::string parameternumber,left,right;
@@ -1327,7 +1327,12 @@ std::string findparameter(std::string parameterstr, std::string line)
 	{
 		left = trim(splittedstr[0]," ");
 		right = splittedstr[1]; // if there are more than one equal sign in the line the second one is ignored
-		found = left.compare(parameterstr);// it needs to strictly compare
+		for (int ii = 0; ii < parameterstr.size(); ii++)
+		{
+			found = left.compare(parameterstr[ii]);// it needs to strictly compare
+			if (found == 0)
+				break;
+		}
 		if (found == 0) // found the parameter
 		{
 			//std::cout <<"found LonMin at : "<< found << std::endl;
@@ -1343,6 +1348,16 @@ std::string findparameter(std::string parameterstr, std::string line)
 	}
 	return trim(parameternumber, " ");
 }
+
+
+std::string findparameter(std::string parameterstr, std::string line)
+{
+	std::vector<std::string> parametervec;
+
+	parametervec.push_back(parameterstr);
+	return findparameter(parametervec, line);
+}
+
 
 /*! \fn void split(const std::string &s, char delim, std::vector<std::string> &elems)
 * split string based in character

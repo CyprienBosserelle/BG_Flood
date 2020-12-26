@@ -155,8 +155,8 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 			{
 				//
 				int n = memloc(XParam, ix, iy, ib);
-				x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				x = XParam.xo + XBlock.xo[ib] + T(ix) * delta;
+				y = XParam.yo + XBlock.yo[ib] + T(iy) * delta;
 
 				targetlevel = int(round(interp2BUQ(x, y, targetlevelmap)));
 
