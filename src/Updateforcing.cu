@@ -230,9 +230,14 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 
 	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
-
-	Rainhh = T(interpDyn2BUQ(x, y, Rain.GPU));
-
+	if (Rain.uniform)
+	{
+		Rainhh = Rain.nowvalue;
+	}
+	else
+	{
+		Rainhh = T(interpDyn2BUQ(x, y, Rain.GPU));
+	}
 
 
 	Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
