@@ -183,6 +183,24 @@ Param readparamstr(std::string line, Param param)
 		param.initlevel = std::stoi(parametervalue);
 	}
 
+	parameterstr = "conserveelevation";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
+		{
+			param.conserveElevation = true;
+		}
+		else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
+		{
+			param.conserveElevation = false;
+		}
+
+
+	}
+
+
 	parameterstr = "membuffer";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())

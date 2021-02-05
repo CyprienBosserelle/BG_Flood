@@ -22,6 +22,8 @@ public:
 	bool atmpforcing = false;
 	bool rainforcing = false;
 
+	bool conserveElevation = false;
+
 	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)

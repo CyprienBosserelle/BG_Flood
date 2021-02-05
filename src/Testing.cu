@@ -8,7 +8,14 @@
 
 /*! \fn bool testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 * Wrapping function for all the inbuilt test
-* This function is the entry point to the software
+* This function is the entry point to other function below.
+* 
+* Test 0 is a gausian hump propagating on a flat uniorm cartesian mesh (both GPU and CPU version tested)
+* Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU or CPU version)
+* Test 2 Gaussian wave on Cartesian grid (same as test 0): CPU vs GPU (GPU required)
+* Test 3 Test Reduction algorithm
+* Test 4 Compare resuts between the CPU and GPU Flow functions (GPU required)
+* Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
@@ -40,7 +47,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	if (XParam.test == 1)
 	{
 		bool rivertest;
-		// Test 0 is pure bump test
+		// Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU and CU version)
 		log("\t River Mass conservation grid");
 		rivertest = Rivertest(0.1, -1);
 		std::string result = rivertest ? "successful" : "failed";
@@ -94,6 +101,12 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t Lake-at-rest Test");
 		LakeAtRest(XParam, XModel);
 	}
+	if (XParam.test == 6)
+	{
+		log("\t Mass conservation Test");
+		MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
+	}
+	
 
 	
 
@@ -574,6 +587,225 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 template bool Rivertest<float>(float zsnit, int gpu);
 template bool Rivertest<double>(double zsnit, int gpu);
 
+
+/*! \fn bool MassConserveSteepSlope(T zsnit, int gpu)
+*
+* This function tests the mass conservation of the vertical injection (used for rivers)
+*	The function creates it own model setup and mesh independantly to what the user might want to do
+*	This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results
+*	with zsnit=0.1 that is approx 20 steps
+*/
+template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
+{
+	log("#####");
+	Param XParam;
+	T delta, initVol, finalVol, TheoryInput;
+	// initialise domain and required resolution
+	XParam.dx = 1.0 / ((1 << 8));
+	XParam.xo = -0.5;
+	XParam.yo = -0.5;
+
+	XParam.xmax = 0.5;
+	XParam.ymax = 0.5;
+	//level 8 is 
+
+
+	XParam.initlevel = 0;
+	XParam.minlevel = -1;
+	XParam.maxlevel = 1;
+
+	XParam.AdatpCrit = "Threshold";
+	XParam.Adapt_arg1 = "1.0";
+	XParam.Adapt_arg2 = "zb";
+
+	XParam.zsinit = zsnit;
+	XParam.zsoffset = 0.0;
+
+	//Output times for comparisons
+	XParam.endtime = 1.0;
+	XParam.outputtimestep = 0.1;
+
+	XParam.smallnc = 0;
+
+	XParam.cf = 0.0;
+	XParam.frictionmodel = 0;
+
+	XParam.conserveElevation = false;
+
+	// Enforece GPU/CPU
+	XParam.GPUDEVICE = gpu;
+
+	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+
+	std::vector<std::string> outv;
+
+	for (int nv = 0; nv < 15; nv++)
+	{
+		outv.push_back(outvi[nv]);
+	}
+
+	XParam.outvars = outv;
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy[0].xo = -1.0;
+	XForcing.Bathy[0].yo = -1.0;
+
+	XForcing.Bathy[0].xmax = 1.0;
+	XForcing.Bathy[0].ymax = 1.0;
+	XForcing.Bathy[0].nx = 3;
+	XForcing.Bathy[0].ny = 3;
+
+	XForcing.Bathy[0].dx = 1.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = i*1.0f;
+		}
+	}
+	//
+	//
+	// 
+	T Q = 0.001;
+	TheoryInput = Q * XParam.outputtimestep;
+
+
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = -1.0 * XParam.dx * 3.0;
+	thisriver.xend = XParam.dx * 3.0;
+	thisriver.ystart = -1.0 * XParam.dx * 3.0;
+	thisriver.yend = XParam.dx * 3.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	Loop<T> XLoop;
+
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+
+	InitSave2Netcdf(XParam, XModel);
+	XLoop.nextoutputtime = XParam.outputtimestep;
+	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	initVol = T(0.0);
+	// Calculate initial water volume
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XModel.blocks.active[ibl];
+		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				initVol = initVol + XModel.evolv.h[n] * delta * delta;
+			}
+		}
+	}
+
+
+	//InitSave2Netcdf(XParam, XModel);
+	bool modelgood = true;
+
+	while (XLoop.totaltime < XLoop.nextoutputtime)
+	{
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+		}
+		else
+		{
+			FlowCPU(XParam, XLoop, XForcing, XModel);
+		}
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+		//Save2Netcdf(XParam, XLoop, XModel);
+
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		{
+			if (XParam.GPUDEVICE >= 0)
+			{
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+				}
+			}
+
+			Save2Netcdf(XParam, XLoop, XModel);
+			// Verify the Validity of results
+			finalVol = T(0.0);
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
+			{
+				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+				int ib = XModel.blocks.active[ibl];
+				delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+				for (int iy = 0; iy < XParam.blkwidth; iy++)
+				{
+					for (int ix = 0; ix < XParam.blkwidth; ix++)
+					{
+						//
+						int n = memloc(XParam, ix, iy, ib);
+						finalVol = finalVol + XModel.evolv.h[n] * delta * delta;
+					}
+				}
+			}
+			T error = (finalVol - initVol) - TheoryInput;
+
+			modelgood = error / TheoryInput < 0.05;
+		}
+
+
+	}
+	log("#####");
+	return modelgood;
+}
+template bool MassConserveSteepSlope<float>(float zsnit, int gpu);
+template bool MassConserveSteepSlope<double>(double zsnit, int gpu);
 
 
 /*! \fn reductiontest()

@@ -164,6 +164,7 @@ template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T q
 
 	if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
 	{
+
 		XAdv.dh[i] += qnow  / XRiver.disarea;
 		
 	}

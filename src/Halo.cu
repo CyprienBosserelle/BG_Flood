@@ -125,9 +125,12 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		t1.join();
 		t2.join();
 		t3.join();
-		
-		conserveElevation(XParam, XBlock, Xev, zb);
-		
+
+		if (XParam.conserveElevation)
+		{
+			conserveElevation(XParam, XBlock, Xev, zb);
+		}
+
 		maskbnd(XParam, XBlock, Xev, zb);
 	
 }
@@ -199,9 +202,10 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	fillHaloGPU(XParam, XBlock, streams[3], Xev.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-
-	conserveElevationGPU(XParam, XBlock, Xev, zb);
-
+	if (XParam.conserveElevation)
+	{
+		conserveElevationGPU(XParam, XBlock, Xev, zb);
+	}
 
 	maskbndGPUleft << <gridDim, blockDimHalo, 0 , streams[0] >> > (XParam, XBlock,  Xev, zb);
 	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Xev, zb);

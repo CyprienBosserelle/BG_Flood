@@ -18,7 +18,7 @@
 #include "FlowCPU.h"
 #include "FlowGPU.h"
 
-
+#include "Adaptation.h"
 
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
 
