@@ -1,5 +1,7 @@
 ﻿#include "Halo.h"
 
+
+
 template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
 	
@@ -27,6 +29,45 @@ template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 }
 template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+	int ib,n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int j = -1; j <= (XParam.blkwidth); j++)
+		{
+			for (int i = -1; i <= (XParam.blkwidth); i++)
+			{
+				n = memloc(XParam, i, j, ib);
+				Xev.zs[n] = zb[n] + Xev.h[n];
+			}
+		}
+
+	}
+}
+
+
+template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	int ix = threadIdx.x -1;
+	int iy = threadIdx.y -1;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+	
+	int  n;
+	
+	ib = XBlock.active[ibl];
+		
+	n = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+	Xev.zs[n] = zb[n] + Xev.h[n];
+	
+
+	
+}
 
 template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
 {
@@ -131,6 +172,8 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 			conserveElevation(XParam, XBlock, Xev, zb);
 		}
 
+		RecalculateZs(XParam, XBlock, Xev, zb);
+
 		maskbnd(XParam, XBlock, Xev, zb);
 	
 }
@@ -186,8 +229,13 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev,T * zb)
 {
 	const int num_streams = 4;
-	dim3 blockDimHalo(16, 1, 1);
+	dim3 blockDimHalo(XParam.blkwidth, 1, 1);
+
 	dim3 gridDim(XBlock.mask.nblk, 1, 1);
+	
+	dim3 blockDimfull(XParam.blkmemwidth, XParam.blkmemwidth, 1);
+	dim3 gridDimfull(XParam.nblk, 1, 1);
+	
 	cudaStream_t streams[num_streams];
 
 	for (int i = 0; i < num_streams; i++)
@@ -206,6 +254,10 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	{
 		conserveElevationGPU(XParam, XBlock, Xev, zb);
 	}
+
+	RecalculateZsGPU << < gridDimfull, blockDimfull, 0 >> > (XParam, XBlock, Xev, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
 
 	maskbndGPUleft << <gridDim, blockDimHalo, 0 , streams[0] >> > (XParam, XBlock,  Xev, zb);
 	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Xev, zb);
