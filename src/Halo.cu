@@ -32,27 +32,44 @@ template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
-	int ib,n;
+	int ib,n,left, right, top,bot;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		for (int j = -1; j <= (XParam.blkwidth); j++)
+
+		
+		for (int n = -1; n <= (XParam.blkwidth); n++)
 		{
-			for (int i = -1; i <= (XParam.blkwidth); i++)
+			left = memloc(XParam.halowidth, XParam.blkmemwidth, -1, n, ib);
+			right = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth, n, ib);
+			top = memloc(XParam.halowidth, XParam.blkmemwidth, n, XParam.blkwidth, ib);
+			bot = memloc(XParam.halowidth, XParam.blkmemwidth, n, -1, ib);
+
+			Xev.zs[left] = zb[left] + Xev.h[left];
+			Xev.zs[right] = zb[right] + Xev.h[right];
+			Xev.zs[top] = zb[top] + Xev.h[top];
+			Xev.zs[bot] = zb[bot] + Xev.h[bot];
+
+			//printf("n=%d; zsold=%f; zsnew=%f (zb=%f + h=%f)\n",n, Xev.zs[n], zb[n] + Xev.h[n], zb[n] , Xev.h[n]);
+		}
+		/*
+		for (int j = 0; j < (XParam.blkwidth); j++)
+		{
+			for (int i = 0; i < (XParam.blkwidth); i++)
 			{
-				n = memloc(XParam, i, j, ib);
-				Xev.zs[n] = zb[n] + Xev.h[n];
+				n = memloc(XParam.halowidth,XParam.blkmemwidth, i, j, ib);
+				//Xev.zs[n] = zb[n] + Xev.h[n];
 			}
 		}
-
+		*/
 	}
 }
 
 
 template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	unsigned int blkmemwidth = XParam.blkmemwidth;
+	
 	int ix = threadIdx.x -1;
 	int iy = threadIdx.y -1;
 	unsigned int ibl = blockIdx.x;
@@ -60,12 +77,16 @@ template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlo
 	
 	int  n;
 	
-	ib = XBlock.active[ibl];
+	//ib = XBlock.active[ibl];
 		
 	n = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
 	Xev.zs[n] = zb[n] + Xev.h[n];
-	
-
+	/*
+	if(zb[n] < XParam.eps)
+	{
+		printf("ix=%d, iy=%d, ib=%d, n=%d; zsold=%f; zsnew=%f (zb=%f + h=%f)\n",ix,iy,ib, n, Xev.zs[n], zb[n] + Xev.h[n], zb[n], Xev.h[n]);
+	}
+	*/
 	
 }
 
@@ -159,8 +180,11 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		
 		std::thread t0(fillHaloC<T>,XParam, XBlock, Xev.h);
 		std::thread t1(fillHaloC<T>,XParam, XBlock, Xev.zs);
-		std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
-		std::thread t3(fillHaloF<T>,XParam,true, XBlock, Xev.v);
+		//std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
+		//std::thread t3(fillHaloF<T>,XParam,true, XBlock, Xev.v);
+
+		std::thread t2(fillHaloC<T>, XParam, XBlock, Xev.u);
+		std::thread t3(fillHaloC<T>, XParam, XBlock, Xev.v);
 
 		t0.join();
 		t1.join();

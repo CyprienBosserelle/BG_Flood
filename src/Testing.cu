@@ -615,7 +615,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XParam.maxlevel = 1;
 
 	XParam.AdatpCrit = "Threshold";
-	XParam.Adapt_arg1 = "1.0";
+	XParam.Adapt_arg1 = "3.5";
 	XParam.Adapt_arg2 = "zb";
 
 	XParam.zsinit = zsnit;
@@ -623,7 +623,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	//Output times for comparisons
 	XParam.endtime = 1.0;
-	XParam.outputtimestep = 0.1;
+	XParam.outputtimestep = 0.035;
 
 	XParam.smallnc = 0;
 
@@ -674,13 +674,13 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = i*1.0f;
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = i*4;
 		}
 	}
 	//
 	//
 	// 
-	T Q = 0.001;
+	T Q = 0.10;
 	TheoryInput = Q * XParam.outputtimestep;
 
 
@@ -726,6 +726,45 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
 	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+
+
+
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XModel.blocks.active[ibl];
+		//delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				if (XModel.zb[n] < XParam.eps)
+				{
+					printf("ix=%d, iy=%d, ib=%d, n=%d; zb=%f \n", ix, iy, ib, n, XModel.zb[n] );
+				}
+			}
+		}
+	}
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		cudaStream_t stream;
+		CUDA_CHECK(cudaStreamCreate(&stream));
+
+		fillHaloGPU(XParam, XModel_g.blocks, stream, XModel_g.zb);
+
+		cudaStreamDestroy(stream);
+	}
+	else
+	{
+		fillHaloC(XParam, XModel.blocks, XModel.zb);
+	}
+
 	initVol = T(0.0);
 	// Calculate initial water volume
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -747,7 +786,10 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	}
 
 
-	//InitSave2Netcdf(XParam, XModel);
+	//InitSave2Netcdf(XParam, XModel);+
+
+
+
 	bool modelgood = true;
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
@@ -962,14 +1004,39 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
-	fillHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel.zb);
+	fillHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.zb);
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evolvVar, true);
 
 	//============================================
 	//perform gradient reconstruction
-	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
-	gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel.zb);
+	//gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	//gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel.zb);
+
+
+	// CPU gradients
+	std::thread t0(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
+	std::thread t1(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.zs, XModel.grad.dzsdx, XModel.grad.dzsdy);
+	std::thread t2(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	std::thread t3(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+
+	t0.join();
+	t1.join();
+	t2.join();
+	t3.join();
+
+	//GPU gradients
+	
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T) XParam.theta, (T) XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T) XParam.theta, (T) XParam.dx, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T) XParam.theta, (T) XParam.dx, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T) XParam.theta, (T) XParam.dx, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
 
@@ -981,6 +1048,22 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	}
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, false);
+
+	// Gradient in Halo
+
+	// CPU
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.zs, XModel.grad.dzsdx, XModel.grad.dzsdy);
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+
+	// GPU
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
 
 	//============================================
 	// Kurganov scheme
@@ -1176,7 +1259,7 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	//fillHalo(XParam, XModel.blocks, XModel.flux);
+	fillHalo(XParam, XModel.blocks, XModel.flux);
 
 
 	// Check Fhu and Fhv (they should be zero)
@@ -1664,11 +1747,16 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 {
 	T diff, maxdiff, rmsdiff;
 	unsigned int nit = 0;
+	int ixmd, iymd, ibmd;
 	//copy GPU back to the CPU (store in dummy)
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, dummy, gpu);
 
 	rmsdiff = T(0.0);
 	maxdiff = XLoop.hugenegval;
+	ixmd = 0;
+	iymd = 0;
+	ibmd = 0;
+
 	// calculate difference
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -1687,7 +1775,15 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 			{
 				int n = memloc(XParam, ix, iy, ib);
 				diff = dummy[n] - cpu[n];
-				maxdiff = utils::max(abs(diff), maxdiff);
+
+				if (abs(diff) >= maxdiff)
+				{
+					maxdiff = utils::max(abs(diff), maxdiff);
+					ixmd = ix;
+					iymd = iy;
+					ibmd = ib;
+				}
+				
 				rmsdiff = rmsdiff + utils::sq(diff);
 				nit++;
 				out[n] = diff;
@@ -1707,7 +1803,7 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 	}
 	else
 	{
-		log(varname + " FAIL: " + " Max difference: " + std::to_string(maxdiff) + " RMS difference: " + std::to_string(rmsdiff) + " Eps: " + std::to_string(XLoop.epsilon));
+		log(varname + " FAIL: " + " Max difference: " + std::to_string(maxdiff) + " (at: ix = " + std::to_string(ixmd) + " iy = " + std::to_string(iymd) + " ib = " + std::to_string(ibmd) + ") RMS difference: " + std::to_string(rmsdiff) + " Eps: " + std::to_string(XLoop.epsilon));
 		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_CPU", 3, cpu);
 		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_GPU", 3, dummy);
 		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_diff", 3, out);

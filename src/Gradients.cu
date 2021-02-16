@@ -302,8 +302,8 @@ template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dad
 
 template <class T> void gradientHaloGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
-	dim3 blockDimL(1, 16, 1);
-	dim3 blockDimB(16, 1, 1);
+	dim3 blockDimL(1, XParam.blkwidth, 1);
+	dim3 blockDimB(XParam.blkwidth, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	
@@ -480,6 +480,7 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 			read = memloc(XParam, ix, 0, ib);// or memloc(XParam, -1, j, ib) but they should be the same
 
 			abot = a[read];
+			
 		}
 
 		if (XBlock.BotRight[ib] == ib) // boundary on the top half too
@@ -587,7 +588,7 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 
 template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
 	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = -1;
 	int iy = threadIdx.y;
@@ -725,7 +726,7 @@ template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XB
 
 template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
 	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = -1;
 	int ix = threadIdx.x;
@@ -760,6 +761,7 @@ template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBl
 			read = memloc(XParam.halowidth, blkmemwidth, ix, 0, ib);// or memloc(XParam, -1, j, ib) but they should be the same
 
 			abot = a[read];
+
 		}
 
 		if (XBlock.BotRight[ib] == ib) // boundary on the top half too
@@ -795,6 +797,8 @@ template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBl
 
 		read = memloc(XParam.halowidth, blkmemwidth, ix, (XParam.blkwidth - 2), XBlock.BotLeft[ib]);
 		abot = a[read];
+
+		
 
 	}
 	else if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
