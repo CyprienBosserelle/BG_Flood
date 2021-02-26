@@ -3,7 +3,7 @@ Numerical model for simulating shallow water hydrodynamics on the GPU using an A
 
 The core SWE engine and adaptivity has been inspired and taken from St Venant solver from [Basilisk](http://basilisk.fr/) and the CUDA GPU memory model has been inspired by the work from [Vacondio _et al._2017](https://dl.acm.org/citation.cfm?id=3031292))
 
-The adaptive version of the model is currently under heavy developement. Makefile in the master branch is not operational and general process may be broken in othe rbranch as well. 
+The adaptive version of the model is currently under heavy developement. Makefile in the master branch is not operational and general process may be broken in other branches as well. 
 
 
 
