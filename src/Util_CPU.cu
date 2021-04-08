@@ -101,7 +101,7 @@ double interptime(double next, double prev, double timenext, double time)
 
 
 
-template <class T> T BilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y)
+template <class T> __host__ __device__ T BilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y)
 {
 	T x2x1, y2y1, x2x, y2y, yy1, xx1;
 	x2x1 = x2 - x1;
@@ -118,8 +118,8 @@ template <class T> T BilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x
 		);
 }
 
-template float BilinearInterpolation<float>(float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2, float x, float y);
-template double BilinearInterpolation<double>(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y);
+template __host__ __device__ float BilinearInterpolation<float>(float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2, float x, float y);
+template __host__ __device__ double BilinearInterpolation<double>(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y);
 
 
 template <class T> T BarycentricInterpolation(T q1, T x1, T y1, T q2, T x2, T y2, T q3, T x3, T y3, T x, T y)

@@ -7,10 +7,18 @@ template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, Evolvi
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
+
+		//int ii = memloc(XParam, -1, 5, 46);
+
+		
 		conserveElevationLeft(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock, XEv, zb);
+		
 		conserveElevationRight(XParam, ib, XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock, XEv, zb);
+		
 		conserveElevationTop(XParam, ib, XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock, XEv, zb);
+		
 		conserveElevationBot(XParam, ib, XBlock.BotLeft[ib], XBlock.BotRight[ib], XBlock, XEv, zb);
+		
 	}
 }
 template void conserveElevation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
@@ -37,38 +45,46 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
-template <class T> __host__ __device__ void ProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int il, int jl, int ip, int jp, T* h, T* zs, T* zb)
+template <class T> __host__ __device__ void ProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int il, int jl, int ip, int jp, int im, int jm, T* h, T* zs, T* zb)
 {
-	int ll, pp, halo;
+	int ll, pp, halo,mm;
 	pp = memloc(halowidth, blkmemwidth, ip, jp, ibn);
 	ll = memloc(halowidth, blkmemwidth, il, jl, ib);
+	mm = memloc(halowidth, blkmemwidth, im, jm, ibn);
 
 	halo = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
 	//Check if parent is dry or any of close neighbour
 
-	if (!(h[ll] > eps && h[halo]>eps && h[pp] > eps))
+
+
+	if (!(h[ll] > eps && h[halo]>eps && h[pp] > eps && h[mm] > eps))
 	{
 		
-		h[halo] = utils::max(T(0.0), zs[pp] - zb[halo]);
-		zs[halo] = h[halo] + zb[halo];
+		//h[halo] = utils::max(T(0.0), zs[pp] - zb[halo]);
+		//zs[halo] = h[halo] + zb[halo];
+		h[halo] = h[pp];
+		zb[halo] = zb[pp];
+		zs[halo] = zs[pp];
+
 	}
 	
 
 
 }
 
-template <class T> __host__ __device__ void ProlongationElevationGH(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int il, int jl, int ip, int jp, T* h, T* dhdx, T* dzsdx)
+template <class T> __host__ __device__ void ProlongationElevationGH(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int il, int jl, int ip, int jp,int im, int jm, T* h, T* dhdx, T* dzsdx)
 {
-	int ll, pp, halo;
+	int ll, pp, halo, mm;
 	pp = memloc(halowidth, blkmemwidth, ip, jp, ibn);
 	ll = memloc(halowidth, blkmemwidth, il, jl, ib);
+	mm = memloc(halowidth, blkmemwidth, im, jm, ibn);
 
 	halo = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
 	//Check if parent is dry or any of close neighbour
 
 
 	
-	if (!(h[ll] > eps && h[halo] > eps && h[pp] > eps))
+	if (!(h[ll] > eps && h[halo] > eps && h[pp] > eps && h[mm] > eps))
 	{
 
 		dhdx[halo] = T(0.0);
@@ -369,7 +385,7 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 	}
 
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 	ihalo = -1;
 
 	if (XBlock.level[ib] > XBlock.level[ibLB])
@@ -387,7 +403,10 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 			ip = XParam.blkwidth - 1;
 			jp = XBlock.RightBot[ibLB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
 
-			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+			im = ip;
+			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
+
+			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		}
 
 	}
@@ -439,7 +458,7 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 	}
 
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 	
 
 	if (XBlock.level[ib] > XBlock.level[LB])
@@ -454,8 +473,10 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 
 		ip = blockDim.y - 1;
 		jp = XBlock.RightBot[LB] == ib ? int(floor(iy *T(0.5))) : int((floor(iy * T(0.5)) + blockDim.y / 2));
+		im = ip;
+		jm = ceil(iy * T(0.5)) * 2 > iy ? jp + 1 : jp - 1;
 
-		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		
 
 	}
@@ -500,7 +521,7 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 	}
 
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 	
 
 	if (XBlock.level[ib] > XBlock.level[ibRB])
@@ -517,8 +538,10 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 
 			ip = 0;
 			jp = XBlock.LeftBot[ibRB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
+			im = ip;
+			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
 
-			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		}
 
 	}
@@ -568,7 +591,7 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 	}
 
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 
 
 	if (XBlock.level[ib] > XBlock.level[RB])
@@ -584,8 +607,11 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 
 		ip = 0;
 		jp = XBlock.LeftBot[RB] == ib ? int(floor(iy * T(0.5))) : int((floor(iy *T (0.5)) + blockDim.y / 2));
+		
+		im = ip;
+		jm = ceil(iy * T(0.5)) * 2 > iy ? jp + 1 : jp - 1;
 
-		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		
 
 	}
@@ -629,7 +655,7 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 	}
 
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 
 
 	if (XBlock.level[ib] > XBlock.level[ibTL])
@@ -646,8 +672,10 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 
 			jp = 0;
 			ip = XBlock.BotLeft[ibTL] == ib ? floor(i / 2) : (floor(i / 2) + XParam.blkwidth / 2);
+			jm = jp;
+			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
 
-			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		}
 
 	}
@@ -696,7 +724,7 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 	}
 
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 
 
 	if (XBlock.level[ib] > XBlock.level[TL])
@@ -711,8 +739,10 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 
 		jp = 0;
 		ip = XBlock.BotLeft[TL] == ib ? int(floor(ix *T(0.0))) : int((floor(ix * T(0.0)) + blockDim.x / 2));
+		jm = jp;
+		im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
 
-		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		
 
 	}
@@ -757,7 +787,7 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 		}
 	}
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 
 
 	if (XBlock.level[ib] > XBlock.level[ibBL])
@@ -774,8 +804,10 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 
 			jp = XParam.blkwidth - 1;
 			ip = XBlock.TopLeft[ibBL] == ib ? floor(i / 2) : (floor(i / 2) + XParam.blkwidth / 2);
+			jm = jp;
+			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
 
-			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+			ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		}
 
 	}
@@ -823,7 +855,7 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 	}
 
 	// Prolongation part
-	int il, jl;
+	int il, jl, im, jm;
 
 
 	if (XBlock.level[ib] > XBlock.level[BL])
@@ -839,7 +871,10 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 		jp = blockDim.x - 1;
 		ip = XBlock.TopLeft[BL] == ib ? int(floor(ix * T(0.0))) : int((floor(ix * T(0.0)) + blockDim.x / 2));
 
-		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, h, dhdx, dzsdx);
+		jm = jp;
+		im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
+
+		ProlongationElevationGH(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, h, dhdx, dzsdx);
 		
 
 	}
@@ -852,6 +887,8 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	// Restriction
 	ihalo = -1;
 	ip = XParam.blkwidth - 2;
+
+	//int ii = memloc(XParam, -1, 5, 46);
 	if (XBlock.level[ib] < XBlock.level[ibLB])
 	{
 		for (int j = 0; j < XParam.blkwidth / 2; j++)
@@ -863,6 +900,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 		}
 
 	}
+	
 	if (XBlock.level[ib] < XBlock.level[ibLT])
 	{
 		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
@@ -874,9 +912,9 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 		}
 
 	}
-
+	
 	// Prolongation
-	int il, jl;
+	int il, jl, im,jm;
 	ihalo = -1;
 
 	if (XBlock.level[ib] > XBlock.level[ibLB])
@@ -892,12 +930,16 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 			jl = j;
 
 			ip = XParam.blkwidth - 1;
-			jp = XBlock.RightBot[ibLB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
+			jp = XBlock.RightBot[ibLB] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
 
-			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+			im = ip;
+			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
+
+			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 		}
 
 	}
+	
 }
 
 template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
@@ -939,7 +981,7 @@ template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T>
 	}
 
 	// Prolongation
-	int ip, jp, il, jl;
+	int ip, jp, il, jl, im, jm;
 	ihalo = -1;
 
 	if (XBlock.level[ib] > XBlock.level[LB])
@@ -955,7 +997,11 @@ template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T>
 		ip = XParam.blkwidth - 1;
 		jp = XBlock.RightBot[ibn] == ib ? floor(iy * T(0.5)) : (floor(iy * T(0.5)) + blockDim.y / 2);
 
-		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+
+		im = ip;
+		jm = ceil(iy * T(0.5)) * 2 > iy ? jp + 1 : jp - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 		
 
 	}
@@ -985,7 +1031,7 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 	}
 
 	// Prolongation
-	int il, jl;
+	int il, jl, im, jm;
 	ihalo = XParam.blkwidth;
 
 	if (XBlock.level[ib] > XBlock.level[ibRB])
@@ -1002,8 +1048,10 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 
 			ip = 0;
 			jp = XBlock.LeftBot[ibn] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
+			im = ip;
+			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
 
-			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -1049,7 +1097,7 @@ template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T
 	}
 	
 	// Prolongation
-	int ip, jp, il, jl;
+	int ip, jp, il, jl, im, jm;
 	//ihalo = -1;
 
 	if (lev > XBlock.level[RB])
@@ -1065,7 +1113,10 @@ template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T
 		ip = 0;
 		jp = XBlock.LeftBot[ibn] == ib ? floor(iy * T(0.5)) : (floor(iy * T(0.5)) + blockDim.y / 2);
 
-		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+		im = ip;
+		jm = ceil(iy * T(0.5)) * 2 > iy ? jp + 1 : jp - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 
 
 	}
@@ -1096,7 +1147,7 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 	}
 
 	// Prolongation
-	int il, jl;
+	int il, jl, im, jm;
 	jhalo = XParam.blkwidth;
 
 	if (XBlock.level[ib] > XBlock.level[ibTL])
@@ -1114,7 +1165,10 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 			jp = 0;
 			ip = XBlock.BotLeft[ibn] == ib ? floor(i * T(0.5)) : (floor(i * T(0.5)) + XParam.blkwidth / 2);
 
-			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+			jm = jp;
+			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
+
+			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -1160,7 +1214,7 @@ template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> 
 	}
 
 	// Prolongation
-	int ip, jp, il, jl;
+	int ip, jp, il, jl, im, jm;
 	
 
 	if (lev > XBlock.level[TL])
@@ -1176,7 +1230,10 @@ template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> 
 		jp = 0;
 		ip = XBlock.BotLeft[ibn] == ib ? floor(ix * T(0.5)) : (floor(ix * T(0.5)) + blockDim.x / 2);
 
-		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+		jm = jp;
+		im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 
 
 	}
@@ -1207,7 +1264,7 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 
 
 	// Prolongation
-	int  il, jl;
+	int  il, jl, im, jm;
 	jhalo = -1;
 
 	if (XBlock.level[ib] > XBlock.level[ibBL])
@@ -1225,7 +1282,10 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 			jp = XParam.blkwidth - 1;
 			ip = XBlock.TopLeft[ibn] == ib ? floor(i * T(0.5)) : (floor(i * T(0.5)) + XParam.blkwidth / 2);
 
-			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+			jm = jp;
+			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
+
+			ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 		}
 
 	}
@@ -1273,7 +1333,8 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 	}
 
 	// Prolongation
-	int ip, jp, il, jl;
+	int ip, jp, il, jl, im, jm;
+	//int ip, jp, il, jl, im, jm;
 	//jhalo = -1;
 
 	if (lev > XBlock.level[BL])
@@ -1289,8 +1350,10 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 		jp = blockDim.x - 1;
 		ip = XBlock.TopLeft[ibn] == ib ? floor(ix *T(0.5)) : (floor(ix*T(0.5)) + blockDim.x / 2);
 
+		jm = jp;
+		im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
 
-		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, XEv.h, XEv.zs, zb);
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, il, jl, ip, jp, im, jm, XEv.h, XEv.zs, zb);
 
 
 	}

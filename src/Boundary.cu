@@ -374,7 +374,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				Xev.u[i]=unew;
 				Xev.v[i]=vnew;
 				Xev.zs[i]=zsnew;
-				Xev.zs[i]=hnew;
+				Xev.h[i]=hnew;
 				zb[i]=zbnew;
 
 			}
@@ -408,7 +408,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
 				Xev.zs[i] = zsnew;
-				Xev.zs[i] = hnew;
+				Xev.h[i] = hnew;
 				zb[i] = zbnew;
 
 			}
@@ -442,12 +442,13 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
 				Xev.zs[i] = zsnew;
-				Xev.zs[i] = hnew;
+				Xev.h[i] = hnew;
 				zb[i] = zbnew;
 
 			}
 
 		}
+		
 		//botside
 		if (isbotright | isbotleft)//?
 		{
@@ -476,13 +477,13 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
 				Xev.zs[i] = zsnew;
-				Xev.zs[i] = hnew;
+				Xev.h[i] = hnew;
 				zb[i] = zbnew;
 
 			}
 
 		}
-
+		
 
 
 	}

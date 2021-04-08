@@ -133,7 +133,7 @@ template<class T>
 int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
 	int targetlevel;
-	bool uplevel, downlevel;
+	bool uplevel, samelevel;
 	T delta, x, y;
 	int success = 0;
 
@@ -144,7 +144,7 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 		delta = calcres(XParam.dx, XBlock.level[ib]);
 
 		uplevel = false;
-		
+		samelevel = false;
 
 		refine[ib] = false; // only refine if all are wet
 		coarsen[ib] = true; // always try to coarsen
@@ -155,16 +155,21 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 			{
 				//
 				int n = memloc(XParam, ix, iy, ib);
-				x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				x = XParam.xo + XBlock.xo[ib] + T(ix) * delta;
+				y = XParam.yo + XBlock.yo[ib] + T(iy) * delta;
 
 				targetlevel = int(round(interp2BUQ(x, y, targetlevelmap)));
 
-				if (targetlevel >= XBlock.level[ib])
+				if (targetlevel > XBlock.level[ib])
 				{
 					//printf("x=%f; y=%f; target=%d; level=%d", x, y, targetlevel, XBlock.level[ib]);
 					uplevel = true;
 					
+				}
+				if (targetlevel == XBlock.level[ib])
+				{
+					samelevel = true;
+
 				}
 
 
@@ -176,6 +181,11 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 			refine[ib] = true; // only refine if all are wet
 			coarsen[ib] = false;
 		}
+		else if (samelevel)
+		{
+			coarsen[ib] = false;
+		}
+
 	}
 	return success;
 }

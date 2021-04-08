@@ -1,5 +1,7 @@
 ﻿#include "Halo.h"
 
+
+
 template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
 	
@@ -27,6 +29,68 @@ template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 }
 template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+	int ib,n,left, right, top,bot;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		/*
+		//We only need to recalculate zs on the halo side 
+		for (int n = -1; n <= (XParam.blkwidth); n++)
+		{
+			left = memloc(XParam.halowidth, XParam.blkmemwidth, -1, n, ib);
+			right = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth, n, ib);
+			top = memloc(XParam.halowidth, XParam.blkmemwidth, n, XParam.blkwidth, ib);
+			bot = memloc(XParam.halowidth, XParam.blkmemwidth, n, -1, ib);
+
+			Xev.zs[left] = zb[left] + Xev.h[left];
+			Xev.zs[right] = zb[right] + Xev.h[right];
+			Xev.zs[top] = zb[top] + Xev.h[top];
+			Xev.zs[bot] = zb[bot] + Xev.h[bot];
+
+			//printf("n=%d; zsold=%f; zsnew=%f (zb=%f + h=%f)\n",n, Xev.zs[n], zb[n] + Xev.h[n], zb[n] , Xev.h[n]);
+		}
+		*/
+		
+		// Recalculate zs everywhere maybe we only need to do that on the halo ?
+		for (int j = -1; j < (XParam.blkwidth+1); j++)
+		{
+			for (int i = -1; i < (XParam.blkwidth+1); i++)
+			{
+				n = memloc(XParam.halowidth,XParam.blkmemwidth, i, j, ib);
+				Xev.zs[n] = zb[n] + Xev.h[n];
+			}
+		}
+		
+	}
+}
+
+
+template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+	unsigned int blkmemwidth = XParam.blkmemwidth;
+	
+	int ix = threadIdx.x -1;
+	int iy = threadIdx.y -1;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+	
+	int  n;
+	
+	//ib = XBlock.active[ibl];
+		
+	n = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+	Xev.zs[n] = zb[n] + Xev.h[n];
+	/*
+	if(zb[n] < XParam.eps)
+	{
+		printf("ix=%d, iy=%d, ib=%d, n=%d; zsold=%f; zsnew=%f (zb=%f + h=%f)\n",ix,iy,ib, n, Xev.zs[n], zb[n] + Xev.h[n], zb[n], Xev.h[n]);
+	}
+	*/
+	
+}
 
 template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
 {
@@ -115,18 +179,26 @@ template void fillHaloTopRightGPU<float>(Param XParam, BlockP<float> XBlock, cud
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
 {
 	
+		
 		std::thread t0(fillHaloC<T>,XParam, XBlock, Xev.h);
 		std::thread t1(fillHaloC<T>,XParam, XBlock, Xev.zs);
-		std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
-		std::thread t3(fillHaloF<T>,XParam,true, XBlock, Xev.v);
+		//std::thread t2(fillHaloF<T>,XParam,true, XBlock, Xev.u);
+		//std::thread t3(fillHaloF<T>,XParam,true, XBlock, Xev.v);
+
+		std::thread t2(fillHaloC<T>, XParam, XBlock, Xev.u);
+		std::thread t3(fillHaloC<T>, XParam, XBlock, Xev.v);
 
 		t0.join();
 		t1.join();
 		t2.join();
 		t3.join();
 
-		conserveElevation(XParam, XBlock, Xev, zb);
+		if (XParam.conserveElevation)
+		{
+			conserveElevation(XParam, XBlock, Xev, zb);
+		}
 
+		RecalculateZs(XParam, XBlock, Xev, zb);
 
 		maskbnd(XParam, XBlock, Xev, zb);
 	
@@ -183,8 +255,13 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev,T * zb)
 {
 	const int num_streams = 4;
-	dim3 blockDimHalo(16, 1, 1);
+	dim3 blockDimHalo(XParam.blkwidth, 1, 1);
+
 	dim3 gridDim(XBlock.mask.nblk, 1, 1);
+	
+	dim3 blockDimfull(XParam.blkmemwidth, XParam.blkmemwidth, 1);
+	dim3 gridDimfull(XParam.nblk, 1, 1);
+	
 	cudaStream_t streams[num_streams];
 
 	for (int i = 0; i < num_streams; i++)
@@ -199,8 +276,13 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	fillHaloGPU(XParam, XBlock, streams[3], Xev.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	if (XParam.conserveElevation)
+	{
+		conserveElevationGPU(XParam, XBlock, Xev, zb);
+	}
 
-	conserveElevationGPU(XParam, XBlock, Xev, zb);
+	RecalculateZsGPU << < gridDimfull, blockDimfull, 0 >> > (XParam, XBlock, Xev, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 
 	maskbndGPUleft << <gridDim, blockDimHalo, 0 , streams[0] >> > (XParam, XBlock,  Xev, zb);
@@ -543,6 +625,9 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 
 
 			z[write] = w1 * z[ii] + w2 * z[ir] + w3 * z[it];
+
+			
+
 		}
 	}
 	
@@ -884,6 +969,8 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				read = memloc(XParam, XParam.blkwidth - 1, j, ib);// 1 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				write = memloc(XParam, XParam.blkwidth, j, ib); //0 + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				z[write] = z[read];
+
+				
 			}
 		}
 		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
