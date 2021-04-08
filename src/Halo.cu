@@ -36,8 +36,8 @@ template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-
-		
+		/*
+		//We only need to recalculate zs on the halo side 
 		for (int n = -1; n <= (XParam.blkwidth); n++)
 		{
 			left = memloc(XParam.halowidth, XParam.blkmemwidth, -1, n, ib);
@@ -52,16 +52,18 @@ template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<
 
 			//printf("n=%d; zsold=%f; zsnew=%f (zb=%f + h=%f)\n",n, Xev.zs[n], zb[n] + Xev.h[n], zb[n] , Xev.h[n]);
 		}
-		/*
-		for (int j = 0; j < (XParam.blkwidth); j++)
+		*/
+		
+		// Recalculate zs everywhere maybe we only need to do that on the halo ?
+		for (int j = -1; j < (XParam.blkwidth+1); j++)
 		{
-			for (int i = 0; i < (XParam.blkwidth); i++)
+			for (int i = -1; i < (XParam.blkwidth+1); i++)
 			{
 				n = memloc(XParam.halowidth,XParam.blkmemwidth, i, j, ib);
-				//Xev.zs[n] = zb[n] + Xev.h[n];
+				Xev.zs[n] = zb[n] + Xev.h[n];
 			}
 		}
-		*/
+		
 	}
 }
 

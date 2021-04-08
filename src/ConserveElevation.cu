@@ -8,7 +8,7 @@ template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, Evolvi
 	{
 		ib = XBlock.active[ibl];
 
-		int ii = memloc(XParam, -1, 5, 46);
+		//int ii = memloc(XParam, -1, 5, 46);
 
 		
 		conserveElevationLeft(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock, XEv, zb);
@@ -888,7 +888,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 	ihalo = -1;
 	ip = XParam.blkwidth - 2;
 
-	int ii = memloc(XParam, -1, 5, 46);
+	//int ii = memloc(XParam, -1, 5, 46);
 	if (XBlock.level[ib] < XBlock.level[ibLB])
 	{
 		for (int j = 0; j < XParam.blkwidth / 2; j++)
