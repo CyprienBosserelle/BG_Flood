@@ -485,7 +485,7 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 
 		if (XBlock.BotRight[ib] == ib) // boundary on the top half too
 		{
-			if (iy >= (XParam.blkwidth / 2))
+			if (ix >= (XParam.blkwidth / 2))
 			{
 				//
 
