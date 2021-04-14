@@ -126,7 +126,7 @@ Param readparamstr(std::string line, Param param)
 
 
 	std::string parameterstr, parametervalue;
-	//std::vector<std::string> paramvec;
+	std::vector<std::string> paramvec;
 	///////////////////////////////////////////////////////
 	// General parameters
 	//
@@ -139,20 +139,13 @@ Param readparamstr(std::string line, Param param)
 		param.test = std::stoi(parametervalue);
 	}
 
-	std::vector<std::string> paramvec = { "gpudevice","GPUDEVICE" };
+	paramvec = { "gpudevice","GPUDEVICE" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		param.GPUDEVICE = std::stoi(parametervalue);
 	}
-	/*
-	parameterstr = "GPUDEVICE";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.GPUDEVICE = std::stoi(parametervalue);
-	}
-	*/
+
 	parameterstr = "doubleprecision";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -281,21 +274,22 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	
-	parameterstr = "outputtimestep";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "outputtimestep","outtimestep" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "outputtimestep";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.outputtimestep = std::stod(parametervalue);
 
 	}
-	parameterstr = "outtimestep";
+	/*parameterstr = "outtimestep";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.outputtimestep = std::stod(parametervalue);
 
-	}
+	}*/
 
 	parameterstr = "endtime";
 	parametervalue = findparameter(parameterstr, line);
@@ -434,31 +428,35 @@ Param readparamstr(std::string line, Param param)
 		param.grdalpha = std::stod(parametervalue);
 	}
 
-	parameterstr = "xo";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "xo","xmin" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "xo";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.xo = std::stod(parametervalue);
 	}
-	parameterstr = "xmin";
+	/*parameterstr = "xmin";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.xo = std::stod(parametervalue);
-	}
+	}*/
 
-	parameterstr = "yo";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "yo","ymin" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "yo";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.yo = std::stod(parametervalue);
 	}
-	parameterstr = "ymin";
+	/*parameterstr = "ymin";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.yo = std::stod(parametervalue);
-	}
+	}*/
 
 	parameterstr = "xmax";
 	parametervalue = findparameter(parameterstr, line);
@@ -553,19 +551,21 @@ Param readparamstr(std::string line, Param param)
 	}
 #endif
 
-	parameterstr = "initzs";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "initzs","zsinit" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "initzs";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.zsinit = std::stod(parametervalue);
 	}
-
+	/*
 	parameterstr = "zsinit";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.zsinit = std::stod(parametervalue);
-	}
+	}*/
 
 	parameterstr = "zsoffset";
 	parametervalue = findparameter(parameterstr, line);
@@ -647,8 +647,10 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 {
 	std::string parameterstr, parametervalue;
 
-	parameterstr = "bathy";
-	parametervalue = findparameter(parameterstr, line);
+	std::vector<std::string> paramvec = { "bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo"};
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "bathy";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		StaticForcingP<float> infobathy;
@@ -656,7 +658,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
-	parameterstr = "bathyfile";
+	/*parameterstr = "bathyfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
@@ -684,12 +686,15 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		StaticForcingP<float> infobathy;
 		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
 		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
-	}
+	}*/
 
 
 	// Boundaries
-	parameterstr = "leftbndfile";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
+	
+	paramvec = { "leftbndfile","leftbnd","left"};
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "leftbndfile";// or left or leftbnd
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> items = split(parametervalue, ',');
@@ -706,7 +711,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 				
 	}
-
+	/*
 	parameterstr = "leftbnd";// or left or leftbnd
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -743,10 +748,12 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 
 	}
-
+	*/
 	
-	parameterstr = "rightbndfile";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "rightbndfile","rightbnd","right"};
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "rightbndfile";// or left or leftbnd
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> items = split(parametervalue, ',');
@@ -763,7 +770,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 
 	}
-	parameterstr = "rightbnd";// or left or leftbnd
+	/*parameterstr = "rightbnd";// or left or leftbnd
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
@@ -798,10 +805,12 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			forcing.right.on = true;
 		}
 
-	}
+	}*/
 
-	parameterstr = "topbndfile";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "topbndfile","topbnd","top" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "topbndfile";// or left or leftbnd
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> items = split(parametervalue, ',');
@@ -818,7 +827,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 
 	}
-	parameterstr = "top";// or left or leftbnd
+	/*parameterstr = "top";// or left or leftbnd
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
@@ -853,10 +862,12 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			forcing.top.on = true;
 		}
 
-	}
+	}*/
 
-	parameterstr = "botbndfile";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "botbndfile","botbnd","bot","bottom"};
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "botbndfile";// or left or leftbnd
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> items = split(parametervalue, ',');
@@ -873,7 +884,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 
 	}
-	parameterstr = "botbnd";// or left or leftbnd
+	/*parameterstr = "botbnd";// or left or leftbnd
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
@@ -908,7 +919,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			forcing.bot.on = true;
 		}
 
-	}
+	}*/
 
 
 	//Tsunami deformation input files
@@ -965,22 +976,24 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// Mapped friction
-	parameterstr = "cfmap";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "cfmap","roughnessmap"};
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "cfmap";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 
 		forcing.cf = readfileinfo(parametervalue, forcing.cf);
 
 	}
-	parameterstr = "roughnessmap";
+	/*parameterstr = "roughnessmap";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 
 		forcing.cf = readfileinfo(parametervalue, forcing.cf);
 
-	}
+	}*/
 
 	// wind forcing
 	parameterstr = "windfiles";
@@ -1017,7 +1030,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}
 
-	// atmpress forcing
+	// atmospheric pressure forcing
 	parameterstr = "atmpfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -1026,7 +1039,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		forcing.Atmp = readfileinfo(parametervalue, forcing.Atmp);
 	}
 
-	// atmpress forcing
+	// rain forcing
 	parameterstr = "rainfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -1251,11 +1264,10 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	}
 
 
-	// CHeck whether a cuda compatible GPU is present
+	// Check whether a cuda compatible GPU is present
 	if (XParam.GPUDEVICE >= 0)
 	{
 		// Init GPU
-		// This should be in the sanity check
 		int nDevices;
 		cudaGetDeviceCount(&nDevices);
 		cudaDeviceProp prop;
