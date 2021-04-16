@@ -326,7 +326,7 @@ Param readparamstr(std::string line, Param param)
 	{
 		TSoutnode node;
 		std::vector<std::string> nodeitems = split(parametervalue, ',');
-		if (nodeitems.size() > 3)
+		if (nodeitems.size() >= 3)
 		{
 			node.outname = nodeitems[0];
 			node.x = std::stod(nodeitems[1]);
