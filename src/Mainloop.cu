@@ -178,7 +178,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 			//
 			Pointout stepread;
 		
-			stepread.time = XParam.totaltime;
+			stepread.time = XLoop.totaltime;
 			stepread.zs = 0.0;// That is a bit useless
 			stepread.h = 0.0;
 			stepread.u = 0.0;
@@ -186,7 +186,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 			XLoop.TSAllout[o].push_back(stepread);
 					
 			
-			storeTSout << <gridDim, blockDim, 0 >> > (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
+			storeTSout << <gridDim, blockDim, 0 >> > (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
 		}
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
@@ -199,7 +199,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 
 			int i = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block);
 
-			stepread.time = XParam.totaltime;
+			stepread.time = XLoop.totaltime;
 			stepread.zs = XModel.evolv.zs[i];
 			stepread.h = XModel.evolv.h[i];;
 			stepread.u = XModel.evolv.u[i];;
