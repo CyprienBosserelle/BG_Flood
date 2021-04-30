@@ -291,10 +291,12 @@ template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dad
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			gradientHaloLeft(XParam, XBlock, ib, iy, a, dadx, dady);
+			gradientHaloRight(XParam, XBlock, ib, iy, a, dadx, dady);
 		}
 		for (int ix = 0; ix < XParam.blkwidth; ix++)
 		{
 			gradientHaloBot(XParam, XBlock, ib, ix, a, dadx, dady);
+			gradientHaloTop(XParam, XBlock, ib, ix, a, dadx, dady);
 		}
 	}
 }
@@ -449,6 +451,137 @@ template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, 
 }
 
 
+template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
+{
+	int i, j, ix, jj, ii, ir, it, itr;
+	int xminus, read;
+
+	T delta, aright, aleft, abot, atop;
+
+	ix = 16;
+
+	i = memloc(XParam, ix, iy, ib);
+	xminus = memloc(XParam, ix - 1, iy, ib);
+
+
+	aleft = a[xminus];
+
+
+
+	delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+
+	if (XBlock.RightBot[ib] == ib)//The lower half is a boundary 
+	{
+		if (iy < (XParam.blkwidth / 2))
+		{
+
+			read = memloc(XParam, XParam.blkwidth -1, iy, ib);// or memloc(XParam, -1, j, ib) but they should be the same
+
+			aright = a[read];
+		}
+
+		if (XBlock.RightTop[ib] == ib) // boundary on the top half too
+		{
+			if (iy >= (XParam.blkwidth / 2))
+			{
+				//
+
+				read = memloc(XParam, XParam.blkwidth - 1, iy, ib);
+
+				aright = a[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of righttopib is levelib+1
+		{
+
+			if (iy >= (XParam.blkwidth / 2))
+			{
+
+				jj = (iy - XParam.blkwidth / 2) * 2;
+				ii = memloc(XParam, 3, jj, XBlock.RightTop[ib]);
+				ir = memloc(XParam, 2, jj, XBlock.RightTop[ib]);
+				it = memloc(XParam, 3, jj + 1, XBlock.RightTop[ib]);
+				itr = memloc(XParam, 2, jj + 1, XBlock.RightTop[ib]);
+
+				aright = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.RightBot[ib]]) // LeftTop block does not exist
+	{
+
+		read = memloc(XParam, 1, iy, XBlock.RightBot[ib]);
+		aright = a[read];
+
+	}
+	else if (XBlock.level[XBlock.RightBot[ib]] > XBlock.level[ib])
+	{
+
+		if (iy < (XParam.blkwidth / 2))
+		{
+
+			jj = iy * 2;
+			int bb = XBlock.RightBot[ib];
+
+			ii = memloc(XParam, 3, jj, bb);
+			ir = memloc(XParam, 2, jj, bb);
+			it = memloc(XParam, 3, jj + 1, bb);
+			itr = memloc(XParam, 2, jj + 1, bb);
+
+			aright = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+		}
+		//now find out aboy lefttop block
+		if (XBlock.RightTop[ib] == ib)
+		{
+			if (iy >= (XParam.blkwidth / 2))
+			{
+				//
+
+				read = memloc(XParam, XParam.blkwidth - 1, iy, ib);
+
+				aright = a[read];
+			}
+		}
+		else
+		{
+			if (iy >= (XParam.blkwidth / 2))
+			{
+				//
+				jj = (iy - XParam.blkwidth / 2) * 2;
+				ii = memloc(XParam, 3, jj, XBlock.RightTop[ib]);
+				ir = memloc(XParam, 2, jj, XBlock.RightTop[ib]);
+				it = memloc(XParam, 3, jj + 1, XBlock.RightTop[ib]);
+				itr = memloc(XParam, 2, jj + 1, XBlock.RightTop[ib]);
+
+				aright = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.75) : T(0.25);
+
+		ii = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
+		ir = memloc(XParam, 1, jj, XBlock.RightBot[ib]);
+		it = memloc(XParam, 0, jj - 1, XBlock.RightBot[ib]);
+		itr = memloc(XParam, 1, jj - 1, XBlock.RightBot[ib]);
+
+		aright = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+	}
+
+
+
+
+
+	dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
+	//dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
+
+}
+
 
 template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
@@ -573,6 +706,140 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 		itr = memloc(XParam, jj - 1, (XParam.blkwidth - 2), XBlock.BotLeft[ib]);
 
 		abot = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.75));
+	}
+
+
+
+
+
+	//dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
+	dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
+
+}
+
+template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
+{
+	int i, j, iy, jj, ii, ir, it, itr;
+	int xplus, xminus, yplus, yminus, read;
+
+	T delta, atop, abot;
+
+	iy = XParam.blkwidth;
+
+	i = memloc(XParam, ix, iy, ib);
+	yminus = memloc(XParam, ix, XParam.blkwidth-1, ib);
+
+
+
+
+	abot = a[yminus];
+
+
+
+	delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+
+	if (XBlock.TopLeft[ib] == ib)//The lower half is a boundary 
+	{
+		if (ix < (XParam.blkwidth / 2))
+		{
+
+			read = memloc(XParam, ix, XParam.blkwidth - 1, ib);// or memloc(XParam, -1, j, ib) but they should be the same
+
+			atop = a[read];
+
+		}
+
+		if (XBlock.TopRight[ib] == ib) // boundary on the top half too
+		{
+			if (ix >= (XParam.blkwidth / 2))
+			{
+				//
+
+				read = memloc(XParam, ix, XParam.blkwidth - 1, ib);
+
+				atop = a[read];
+			}
+		}
+		else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+		{
+
+			if (ix >= (XParam.blkwidth / 2))
+			{
+
+				jj = (ix - XParam.blkwidth / 2) * 2;
+				ii = memloc(XParam, jj, 3, XBlock.TopRight[ib]);
+				ir = memloc(XParam, jj, 2, XBlock.TopRight[ib]);
+				it = memloc(XParam, jj + 1, 3, XBlock.TopRight[ib]);
+				itr = memloc(XParam, jj + 1, 2, XBlock.TopRight[ib]);
+
+				atop = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+
+			}
+		}
+	}
+	else if (XBlock.level[ib] == XBlock.level[XBlock.TopLeft[ib]]) // LeftTop block does not exist
+	{
+
+		read = memloc(XParam, ix, 1, XBlock.TopLeft[ib]);
+		atop = a[read];
+
+	}
+	else if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+	{
+
+		if (ix < (XParam.blkwidth / 2))
+		{
+
+			jj = ix * 2;
+			int bb = XBlock.TopLeft[ib];
+
+			ii = memloc(XParam, jj, 3, bb);
+			ir = memloc(XParam, jj, 2, bb);
+			it = memloc(XParam, jj + 1, 3, bb);
+			itr = memloc(XParam, jj + 1, 2, bb);
+
+			atop = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+		}
+		//now find out aboy lefttop block
+		if (XBlock.TopRight[ib] == ib)
+		{
+			if (ix >= (XParam.blkwidth / 2))
+			{
+				//
+
+				read = memloc(XParam, ix, XParam.blkwidth - 1, ib);
+
+				atop = a[read];
+			}
+		}
+		else
+		{
+			if (ix >= (XParam.blkwidth / 2))
+			{
+				//
+				jj = (ix - XParam.blkwidth / 2) * 2;
+				ii = memloc(XParam, jj, 3, XBlock.TopRight[ib]);
+				ir = memloc(XParam, jj, 2, XBlock.TopRight[ib]);
+				it = memloc(XParam, jj + 1, 3, XBlock.TopRight[ib]);
+				itr = memloc(XParam, jj + 1, 2, XBlock.TopRight[ib]);
+
+				atop = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+		}
+
+	}
+	else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+	{
+		jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
+		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.75) : T(0.25);
+
+		ii = memloc(XParam, jj, 0, XBlock.TopLeft[ib]);
+		ir = memloc(XParam, jj, 1, XBlock.TopLeft[ib]);
+		it = memloc(XParam, jj - 1, 0, XBlock.TopLeft[ib]);
+		itr = memloc(XParam, jj - 1, 1, XBlock.TopLeft[ib]);
+
+		atop = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.75));
 	}
 
 
