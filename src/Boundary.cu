@@ -83,7 +83,7 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	
 	unsigned int ibl = blockIdx.x;
 	unsigned int ix, iy;
@@ -196,7 +196,7 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 	//
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
 	for (int ibl = 0; ibl < side.nblk; ibl++)
 	{
@@ -498,7 +498,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ibl = blockIdx.x;
-	unsigned int ix, iy;
+	int ix, iy;
 
 	int isright, istop;
 
@@ -668,7 +668,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ibl = blockIdx.x;
-	unsigned int ix, iy;
+	int ix, iy;
 
 	int isright, istop;
 
