@@ -500,6 +500,9 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XLoop.nextoutputtime = XParam.outputtimestep;
 	XLoop.dtmax = initdt(XParam, XLoop, XModel);
 	initVol = T(0.0);
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+
 	// Calculate initial water volume
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -520,36 +523,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 		}
 	}
 
-	fillHaloC(XParam, XModel.blocks, XModel.zb);
-
-	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
-	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
-	/*
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
-		int ib = XModel.blocks.active[ibl];
-		//delta = calcres(XParam.dx, XModel.blocks.level[ib]);
-
 		
-		for (int iy = -1; iy <= XParam.blkwidth; iy++)
-		{
-			for (int ix = -1; ix <= XParam.blkwidth; ix++)
-			{
-				int n = memloc(XParam, ix, iy, ib);
-				if (abs(XModel.grad.dudx[n]) > T(0.0))
-				{
-					printf("dudx[%d] = %f\n", n, XModel.grad.dudx[n]);
-				}
-			}
-		}
-		
-	}
-	*/
-
-	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-
-	InitSave2Netcdf(XParam, XModel);
 	//InitSave2Netcdf(XParam, XModel);
 	bool modelgood = true;
 
@@ -565,7 +539,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
-		Save2Netcdf(XParam, XLoop, XModel);
+		//Save2Netcdf(XParam, XLoop, XModel);
 
 		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
 		{
@@ -599,22 +573,17 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 				}
 			}
 			T error = ((finalVol - initVol) - TheoryInput) / TheoryInput;
-			std::cout << "finalVol =" << finalVol << std::endl;
-			std::cout << "initVol =" << initVol << std::endl;
-			std::cout << "TheoryInput =" << TheoryInput << std::endl;
-
-			std::cout << "error =" << error << std::endl;
-			error = abs(error);
-			std::cout << "error abs =" << error << std::endl;
-
-			modelgood = (error / TheoryInput) < 0.05;
+			printf("error = %g\%, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f\n", error, finalVol, initVol, abs(finalVol - initVol), TheoryInput);
+			
+			
+			modelgood = abs(error) < 0.05;
 		}
 
 
 
 	}
 
-	if (true)
+	if (!modelgood)
 	{
 		InitSave2Netcdf(XParam, XModel);
 

@@ -291,12 +291,12 @@ template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dad
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			gradientHaloLeft(XParam, XBlock, ib, iy, a, dadx, dady);
-			gradientHaloRight(XParam, XBlock, ib, iy, a, dadx, dady);
+			//gradientHaloRight(XParam, XBlock, ib, iy, a, dadx, dady);
 		}
 		for (int ix = 0; ix < XParam.blkwidth; ix++)
 		{
 			gradientHaloBot(XParam, XBlock, ib, ix, a, dadx, dady);
-			gradientHaloTop(XParam, XBlock, ib, ix, a, dadx, dady);
+			//gradientHaloTop(XParam, XBlock, ib, ix, a, dadx, dady);
 		}
 	}
 }
