@@ -38,7 +38,7 @@ public:
 
 	//grid parameters
 	double dx= nan(""); // grid resolution in the coordinate system unit. 
-	double delta; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
+	double delta = 1.0; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
 	int nblk=0; // number of compute blocks

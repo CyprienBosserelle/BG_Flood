@@ -16,6 +16,8 @@
 * Test 3 Test Reduction algorithm
 * Test 4 Compare resuts between the CPU and GPU Flow functions (GPU required)
 * Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
+* Test 6 Mass conservation on a slope
+* Test 7 is mass conservation with rain fall on grid 
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
@@ -106,10 +108,20 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t Mass conservation Test");
 		MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
 	}
-	
-
-	
-
+	if (XParam.test == 7)
+	{
+		bool raintest;
+		/* Test 7 is homogeneous rain on a uniform slope for cartesian mesh (GPU and CU version)
+		 The input parameters are :
+				- the initial water level (zs)
+				- GPU option
+				- the slope angle
+		*/
+		log("\t Rain on grid Mass conservation test");
+		raintest = Raintest(1.0, -1, 0.0);
+		std::string result = raintest ? "successful" : "failed";
+		log("\t\tCPU test: " + result);
+	}
 }
 template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
@@ -118,7 +130,7 @@ template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<doubl
 *
 * This function tests the full hydrodynamics model and compares the results with pre-conmputed (Hard wired) values
 *	The function creates it own model setup and mesh independantly to what the user might want to do
-*	The setup consist of and centrally located gaussian hump radiating away
+*	The setup consist of a centrally located gaussian hump radiating away
 *	The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk
 *	This function also compares the result of the GPU and CPU code (until they diverge) 
 */
@@ -387,9 +399,13 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 {
 	log("#####");
 	Param XParam;
-	T delta, initVol, finalVol, TheoryInput;
+	T delta = 0;
+	T initVol = 0;
+	T finalVol = 0; 
+	T TheoryInput = 0;
+
 	// initialise domain and required resolution
-	XParam.dx = 1.0 / ((1 << 8));
+	XParam.dx = 1.0 / ((1 << 4));
 	XParam.xo = -0.5;
 	XParam.yo = -0.5;
 
@@ -574,13 +590,22 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 					}
 				}
 			}
-			T error = (finalVol - initVol) - TheoryInput;
+			T error = ((finalVol - initVol) - TheoryInput)/TheoryInput;
+			std::cout << "finalVol =" << finalVol << std::endl;
+			std::cout << "initVol =" << initVol << std::endl;
+			std::cout << "TheoryInput =" << TheoryInput << std::endl;
 
-			modelgood = error / TheoryInput < 0.05;
+			std::cout << "error =" << error << std::endl;
+			error = abs(error);
+			std::cout << "error abs =" << error << std::endl;
+
+			modelgood = error < 0.05;
 		}
 
-		
+
+
 	}
+
 	log("#####");
 	return modelgood;
 }
@@ -1441,6 +1466,259 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 	printf("h[i]=%f; h[ileft]=%f dhdx[i]=%f, dhdx[ileft]=%f, zs[i]=%f, zs[ileft]=%f, dzsdx[i]=%f, dzsdx[ileft]=%f\n", XModel.evolv.h[i], XModel.evolv.h[ileft], XModel.grad.dhdx[i], XModel.grad.dhdx[ileft], XModel.evolv.zs[i], XModel.evolv.zs[ileft], XModel.grad.dzsdx[i], XModel.grad.dzsdx[ileft]);
 
 }
+
+/*! \fn bool Raintest(T zsnit, int gpu, float alpha)
+*
+* This function tests the mass conservation of the spacial injection (used to model rain on grid)
+*	The function creates it own model setup and mesh independantly to what the user might want to do
+*	This starts with a initial water level (zsnit=0.0 is dry) and runs for 0.1s before comparing results
+*	with zsnit=0.1 that is approx 20 steps
+*/
+template <class T> bool Raintest(T zsnit, int gpu, float alpha)
+{
+	log("#####");
+	Param XParam;
+	T delta, initVol, finalVol, TheoryInput;
+	// initialise domain and required resolution
+	XParam.dx = 1.0 / ((1 << 4)); //1<<8  = 2^8
+	XParam.xo = -0.5;
+	XParam.yo = -0.5;
+	XParam.xmax = 0.5;
+	XParam.ymax = 0.5;
+
+	if (alpha == 100.0)//paper Aureli2020
+	{
+		XParam.xo = 0;
+		XParam.yo = 0;
+		XParam.xmax = 24.0;
+		XParam.ymax = 0.196;
+	}
+
+	XParam.initlevel = 0;
+	XParam.minlevel = 0;
+	XParam.maxlevel = 0;
+
+	XParam.zsinit = zsnit;
+	XParam.zsoffset = 0.0;
+
+	//Output times for comparisons
+	XParam.endtime = 1.0;
+	XParam.outputtimestep = 0.1;
+
+	XParam.smallnc = 0;
+
+	XParam.cf = 0.01;
+	XParam.frictionmodel = 0;
+
+	//Specification of the test
+	XParam.test = 7;
+	XParam.rainforcing = true;
+
+	// Enforce GPU/CPU
+	XParam.GPUDEVICE = gpu;
+
+	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+
+	std::vector<std::string> outv;
+
+	for (int nv = 0; nv < 15; nv++)
+	{
+		outv.push_back(outvi[nv]);
+	}
+
+	XParam.outvars = outv;
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy[0].xo = -1.0;
+	XForcing.Bathy[0].yo = -1.0;
+	XForcing.Bathy[0].xmax = 1.0;
+	XForcing.Bathy[0].ymax = 1.0;
+	XForcing.Bathy[0].nx = 3;
+	XForcing.Bathy[0].ny = 3;
+
+	XForcing.Bathy[0].dx = 1.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0f;
+		}
+	}
+	//
+	//
+	// 
+
+	// Add wall boundary conditions
+	XForcing.right.type = 0;
+	XForcing.left.type = 0;
+	XForcing.top.type = 0;
+	XForcing.bot.type = 0;
+
+
+
+	//Value definition for surface rain fall
+	T Q = 10000000; // mm/hr
+	TheoryInput = Q * XParam.outputtimestep / T(1000.0) / T(3600.0); //m3/s
+	std::cout << "# Theoretical volume of water input during the simulation in m3: "<< TheoryInput <<", from a rain input of: " << Q << "mm/hr."<< std::endl;
+	//Create a temporary file with rain fluxes
+	std::ofstream rain_file(
+		"testrain.tmp", std::ios_base::out | std::ios_base::trunc);
+	rain_file << "0.0 " + std::to_string(Q) << std::endl;
+	rain_file << "3600.0 " + std::to_string(Q) << std::endl;
+	rain_file.close(); //destructor implicitly does it
+
+	XForcing.Rain.inputfile = "testrain.tmp";
+	//////TEMP
+	////Error here!!!!
+	XForcing.Rain.uniform = true;
+
+	// Reading rain forcing from file
+	//if (XForcing.Rain.uniform == 1)
+	//{
+		// grid uniform time varying rain input
+		XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+	//}
+	//else
+	//{
+	//	readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+	//}
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	Loop<T> XLoop;
+
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+
+	//InitSave2Netcdf(XParam, XModel);
+	XLoop.nextoutputtime = XParam.outputtimestep;
+	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	initVol = T(0.0);
+	// Calculate initial water volume
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+		int ib = XModel.blocks.active[ibl];
+		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				//
+				int n = memloc(XParam, ix, iy, ib);
+				initVol = initVol + XModel.evolv.h[n] * delta * delta;
+			}
+		}
+	}
+
+	std::cout << std::endl; 
+	std::cout << "# Initial volume of water in m3: " << initVol << std::endl;
+
+	//log("\t Full volume =" + ftos(initVol));
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+
+
+	InitSave2Netcdf(XParam, XModel);
+
+
+	
+	InitSave2Netcdf(XParam, XModel);
+	bool modelgood = true;
+
+	while (XLoop.totaltime < XLoop.nextoutputtime)
+	{
+
+		if (XParam.GPUDEVICE >= 0)
+		{
+			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+		}
+		else
+		{
+			FlowCPU(XParam, XLoop, XForcing, XModel);
+		}
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+		std::cout << "Time steps: " << XLoop.dt << std::endl;
+
+		//Save2Netcdf(XParam, XModel);
+		
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		{
+			if (XParam.GPUDEVICE >= 0)
+			{
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+				}
+			}
+			
+			InitSave2Netcdf(XParam, XModel);
+			// Verify the Validity of results
+			finalVol = T(0.0);
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
+			{
+				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+				int ib = XModel.blocks.active[ibl];
+				delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+				for (int iy = 0; iy < XParam.blkwidth; iy++)
+				{
+					for (int ix = 0; ix < XParam.blkwidth; ix++)
+					{
+						//
+						int n = memloc(XParam, ix, iy, ib);
+						finalVol = finalVol + XModel.evolv.h[n] * delta * delta;
+						std::cout << "# Final volume of water in m3: " << finalVol << " and h" << XModel.evolv.h[n] << std::endl;
+					}
+				}
+			}
+
+			T error = abs((finalVol - initVol) - TheoryInput)/TheoryInput;
+			std::cout << "# Final volume of water in m3: " << finalVol << std::endl;
+			std::cout << "# Initial volume of water in m3: " << initVol << std::endl;
+			std::cout << "# Theoretical input volume of water in m3: " << TheoryInput << std::endl;
+
+			modelgood = (error < 0.05);
+
+			std::cout << std::endl;
+			std::cout << "# Final volume of water in m3: " << finalVol << std::endl;
+			std::cout << "# Error (% water loss in m3): " << error << std::endl;
+		}	
+	}
+
+	log("#####");
+	return modelgood;
+}
+
+//template bool Raintest<float>(float zsnit, int gpu, float alpha);
+//template bool Raintest<double>(double zsnit, int gpu, float alpha);
 
 
 template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T * z)
