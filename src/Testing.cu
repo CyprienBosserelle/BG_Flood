@@ -433,14 +433,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
-
-	std::vector<std::string> outv;
-
-	for (int nv = 0; nv < 15; nv++)
-	{
-		outv.push_back(outvi[nv]);
-	}
+	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx"  };
 
 	XParam.outvars = outv;
 	// create Model setup
@@ -478,9 +471,9 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	//
 	//
 	// 
-	T Q = 0.001;
+	T Q = T(0.001);
 	TheoryInput = Q * XParam.outputtimestep;
-	
+
 
 	//Create a temporary file with river fluxes
 	std::ofstream river_file(
@@ -491,7 +484,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 
 	River thisriver;
 	thisriver.Riverflowfile = "testriver.tmp";
-	thisriver.xstart = -1.0*XParam.dx*3.0;
+	thisriver.xstart = -1.0 * XParam.dx * 3.0;
 	thisriver.xend = XParam.dx * 3.0;
 	thisriver.ystart = -1.0 * XParam.dx * 3.0;
 	thisriver.yend = XParam.dx * 3.0;
@@ -518,11 +511,14 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
 	XLoop.totaltime = 0.0;
-	
+
 	//InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
 	XLoop.dtmax = initdt(XParam, XLoop, XModel);
 	initVol = T(0.0);
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+
 	// Calculate initial water volume
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -537,12 +533,13 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 			{
 				//
 				int n = memloc(XParam, ix, iy, ib);
-				initVol = initVol+XModel.evolv.h[n] * delta * delta;
+				//printf("h[%d] = %f\n", n, XModel.evolv.h[n]);
+				initVol = initVol + XModel.evolv.h[n] * delta * delta;
 			}
 		}
 	}
 
-
+		
 	//InitSave2Netcdf(XParam, XModel);
 	bool modelgood = true;
 
@@ -558,7 +555,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
-		//Save2Netcdf(XParam, XModel);
+		//Save2Netcdf(XParam, XLoop, XModel);
 
 		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
 		{
@@ -586,31 +583,35 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 					{
 						//
 						int n = memloc(XParam, ix, iy, ib);
+						//printf("h[%d] = %f\n", n, XModel.evolv.h[n]);
 						finalVol = finalVol + XModel.evolv.h[n] * delta * delta;
 					}
 				}
 			}
-			T error = ((finalVol - initVol) - TheoryInput)/TheoryInput;
-			std::cout << "finalVol =" << finalVol << std::endl;
-			std::cout << "initVol =" << initVol << std::endl;
-			std::cout << "TheoryInput =" << TheoryInput << std::endl;
-
-			std::cout << "error =" << error << std::endl;
-			error = abs(error);
-			std::cout << "error abs =" << error << std::endl;
-
-			modelgood = error < 0.05;
+			T error = ((finalVol - initVol) - TheoryInput) / TheoryInput;
+			printf("error = %g\%, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f\n", error, finalVol, initVol, abs(finalVol - initVol), TheoryInput);
+			
+			
+			modelgood = abs(error) < 0.05;
 		}
 
 
 
 	}
 
+	if (!modelgood)
+	{
+		InitSave2Netcdf(XParam, XModel);
+
+	}
+
+
 	log("#####");
 	return modelgood;
 }
 template bool Rivertest<float>(float zsnit, int gpu);
 template bool Rivertest<double>(double zsnit, int gpu);
+
 
 
 /*! \fn bool MassConserveSteepSlope(T zsnit, int gpu)
@@ -659,15 +660,8 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
-
-	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
-
-	std::vector<std::string> outv;
-
-	for (int nv = 0; nv < 15; nv++)
-	{
-		outv.push_back(outvi[nv]);
-	}
+	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy" };
+	
 
 	XParam.outvars = outv;
 	// create Model setup
@@ -705,7 +699,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	//
 	//
 	// 
-	T Q = 0.10;
+	T Q = T(0.10);
 	TheoryInput = Q * XParam.outputtimestep;
 
 
@@ -747,6 +741,8 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XLoop.epsilon = std::numeric_limits<T>::epsilon();
 
 	XLoop.totaltime = 0.0;
+
+
 
 	InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
@@ -1244,7 +1240,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 */
 template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 {
-	T epsi = 0.000001;
+	T epsi = T(0.000001);
 	int ib;
 
 	bool test = true;

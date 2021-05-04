@@ -40,13 +40,13 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 	
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
 
-	T eps = T(XParam.eps);
+	//T eps = T(XParam.eps);
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 	T g = T(XParam.g);
 	
@@ -100,7 +100,7 @@ template __global__ void updateEVGPU<double>(Param XParam, BlockP<double> XBlock
 template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv)
 {
 
-	T eps = T(XParam.eps);
+	//T eps = T(XParam.eps);
 	T delta;
 	T g = T(XParam.g);
 	
@@ -171,7 +171,7 @@ template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, 
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -217,8 +217,8 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 
 
 	int ib;
-	int halowidth = XParam.halowidth;
-	int blkmemwidth = XParam.blkmemwidth;
+	//int halowidth = XParam.halowidth;
+	//int blkmemwidth = XParam.blkmemwidth;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
