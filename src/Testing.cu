@@ -108,6 +108,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t Mass conservation Test");
 		MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
 	}
+	
 	if (XParam.test == 7)
 	{
 		bool raintest;
@@ -125,6 +126,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 }
 template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
+
 
 /*! \fn bool GaussianHumptest(T zsnit, int gpu, bool compare)
 *
@@ -539,7 +541,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 		}
 	}
 
-		
+
 	//InitSave2Netcdf(XParam, XModel);
 	bool modelgood = true;
 
@@ -552,6 +554,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 		}
 		else
 		{
+			printf("h[1] = %f\n", XModel.evolv.h[1]);
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
@@ -1523,6 +1526,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	}
 
 	XParam.outvars = outv;
+	
 	// create Model setup
 	Model<T> XModel;
 	Model<T> XModel_g;
@@ -1594,12 +1598,13 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	//}
 
 	checkparamsanity(XParam, XForcing);
+	
 
 	InitMesh(XParam, XForcing, XModel);
 
 	InitialConditions(XParam, XForcing, XModel);
 
-	SetupGPU(XParam, XModel, XForcing, XModel_g);
+	//SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	Loop<T> XLoop;
 
@@ -1612,7 +1617,10 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	//InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
-	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	XLoop.dtmax = initdt(XParam, XLoop, XModel); // TODO error on this variable
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+
 	initVol = T(0.0);
 	// Calculate initial water volume
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1639,13 +1647,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	//log("\t Full volume =" + ftos(initVol));
 
 	fillHaloC(XParam, XModel.blocks, XModel.zb);
-
-
-	InitSave2Netcdf(XParam, XModel);
-
-
 	
-	InitSave2Netcdf(XParam, XModel);
 	bool modelgood = true;
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
@@ -1657,6 +1659,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 		}
 		else
 		{
+			printf("h[1] = %f\n", XModel.evolv.h[1]);
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
@@ -1674,7 +1677,6 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 				}
 			}
 			
-			InitSave2Netcdf(XParam, XModel);
 			// Verify the Validity of results
 			finalVol = T(0.0);
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1690,8 +1692,9 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 					{
 						//
 						int n = memloc(XParam, ix, iy, ib);
+						printf("h[%d] = %f\n", n, XModel.evolv.h[n]);
 						finalVol = finalVol + XModel.evolv.h[n] * delta * delta;
-						std::cout << "# Final volume of water in m3: " << finalVol << " and h" << XModel.evolv.h[n] << std::endl;
+						//std::cout << "# Final volume of water in m3: " << finalVol << " and h" << XModel.evolv.h[n] << std::endl;
 					}
 				}
 			}
@@ -1708,6 +1711,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 			std::cout << "# Error (% water loss in m3): " << error << std::endl;
 		}	
 	}
+	InitSave2Netcdf(XParam, XModel);
 
 	log("#####");
 	return modelgood;
