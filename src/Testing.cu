@@ -1652,6 +1652,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
 	{
+		updateforcing(XParam, XLoop, XForcing);
 
 		if (XParam.GPUDEVICE >= 0)
 		{
@@ -1659,7 +1660,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 		}
 		else
 		{
-			printf("h[1] = %f\n", XModel.evolv.h[1]);
+			printf("h[50] = %f\n", XModel.evolv.h[1]);
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
