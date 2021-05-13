@@ -30,5 +30,10 @@ template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z);
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo);
 //template <class T> void Gaussianhump(Param XParam, Model<T> XModel, Model<T> XModel_g);
+
+template <class T> bool Rivertest(T zsnit, int gpu);
+template <class T> bool MassConserveSteepSlope(T zsnit, int gpu);
+
+
 // End of global definition
 #endif

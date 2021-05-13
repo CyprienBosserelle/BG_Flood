@@ -6,7 +6,7 @@
 #include "Input.h"
 #include "Param.h"
 #include "Write_txtlog.h"
-#include "read_netcdf.h"
+#include "Read_netcdf.h"
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "Setup_GPU.h"

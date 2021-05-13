@@ -12,7 +12,7 @@
 //the Free Software Foundation.                                                 //
 //                                                                              //
 //This program is distributed in the hope that it will be useful,               //
-//but WITHOUT ANY WARRANTY; without even the implied warranty of                //    
+//but WITHOUT ANY WARRANTY; without even the implied warranty of                //
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 //
 //GNU General Public License for more details.                                  //
 //                                                                              //
@@ -64,9 +64,9 @@ template <class T, class F> void InitBlkBUQ(Param XParam, BlockP<F> XBlock, T in
 	{
 		ib = XBlock.active[ibl];
 
-		
+
 				Arr[ib] = initval;
-			
+
 	}
 }
 
@@ -87,14 +87,14 @@ template <class T,class F> void CopyArrayBUQ(Param XParam,BlockP<F> XBlock, T* s
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		
+
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-			
-				
+
+
 				dest[n] = source[n];
 			}
 		}
@@ -132,7 +132,7 @@ template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 	{
 		int ib = XBlock.active[bl];
 		// Now check each corner of each block
-		
+
 
 		// Left
 		setedgessideLR(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], 1, 0, zb);
@@ -145,8 +145,8 @@ template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 
 		// Bot
 		setedgessideBT(XParam, ib, XBlock.BotLeft[ib], XBlock.BotRight[ib], 1, 0, zb);
-		
-		
+
+
 	}
 }
 template void setedges<float>(Param XParam, BlockP<float> XBlock, float*& zb);
@@ -204,7 +204,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XBlock.active[ibl];
-		
+
 		double blkdx = calcres(XParam.dx, XBlock.level[ib]);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
@@ -223,7 +223,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 template void interp2BUQ<float, StaticForcingP<float>>(Param XParam, BlockP<float> XBlock, StaticForcingP<float> forcing, float*& z);
 template void interp2BUQ<double, StaticForcingP<float>>(Param XParam, BlockP<double> XBlock, StaticForcingP<float> forcing, double*& z);
 //template void interp2BUQ<float, StaticForcingP<float>>(Param XParam, BlockP<float> XBlock, std::vector<StaticForcingP<float>> forcing, float*& z);
-template void interp2BUQ<double, StaticForcingP<float>>(Param XParam, BlockP<double> XBlock, StaticForcingP<float> forcing, double*& z);
+//template void interp2BUQ<double, StaticForcingP<float>>(Param XParam, BlockP<double> XBlock, StaticForcingP<float> forcing, double*& z);
 template void interp2BUQ<float, deformmap<float>>(Param XParam, BlockP<float> XBlock, deformmap<float> forcing, float*& z);
 template void interp2BUQ<double, deformmap<float>>(Param XParam, BlockP<double> XBlock, deformmap<float> forcing, double*& z);
 template void interp2BUQ<float, DynForcingP<float>>(Param XParam, BlockP<float> XBlock, DynForcingP<float> forcing, float*& z);
@@ -249,7 +249,7 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
 				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
-				
+
 				// Interpolate to fill in values from the whole domain (even if the domain outspan the domain fo the bathy)
 				z[n] = interp2BUQ(x, y, forcing[0]);
 
@@ -261,7 +261,7 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 						z[n] = interp2BUQ(x, y, forcing[nf]);
 					}
 				}
-				
+
 
 			}
 		}
@@ -281,7 +281,7 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 
 	xi = utils::max(utils::min(double(x), forcing.xmax), forcing.xo);
 	yi = utils::max(utils::min(double(y), forcing.ymax), forcing.yo);
-	// cells that falls off this domain are assigned 
+	// cells that falls off this domain are assigned
 	double x1, x2, y1, y2;
 	double q11, q12, q21, q22;
 	int cfi, cfip, cfj, cfjp;
@@ -386,5 +386,3 @@ template void Copy2CartCPU<int>(int nx, int ny, int* dest, int* src);
 template void Copy2CartCPU<bool>(int nx, int ny, bool* dest, bool* src);
 template void Copy2CartCPU<float>(int nx, int ny, float* dest, float* src);
 template void Copy2CartCPU<double>(int nx, int ny, double* dest, double* src);
-
-

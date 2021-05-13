@@ -21,5 +21,8 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 
 template <class T> Loop<T> InitLoop(Param& XParam, Model<T>& XModel);
 
+template <class T> void printstatus(T totaltime, T dt);
+
+
 // End of global definition
 #endif

@@ -3,7 +3,7 @@
 #define PARAM_H
 
 #include "General.h"
-#include "input.h"
+#include "Input.h"
 
 class Param {
 public:
@@ -15,8 +15,8 @@ public:
 	double dt=0.0; // Model time step in s.
 	double CFL=0.5; // Current Freidrich Limiter
 	double theta=1.3; // minmod limiter can be used to tune the momentum dissipation (theta=1 gives minmod, the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
-	int frictionmodel=0; // 
-	double cf=0.0001; // bottom friction for flow model cf 
+	int frictionmodel=0; //
+	double cf=0.0001; // bottom friction for flow model cf
 	double Cd=0.002; // Wind drag coeff
 	bool windforcing = false;
 	bool atmpforcing = false;
@@ -30,14 +30,14 @@ public:
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
 
 	double Pa2m = 0.00009916; // if unit is hPa then user should use 0.009916;
-	double Paref = 101300.0; // if unit is hPa then user should use 1013.0 
+	double Paref = 101300.0; // if unit is hPa then user should use 1013.0
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
 
 	int doubleprecision = 0;
 
 	//grid parameters
-	double dx= nan(""); // grid resolution in the coordinate system unit. 
+	double dx= nan(""); // grid resolution in the coordinate system unit.
 	double delta; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
@@ -69,7 +69,7 @@ public:
 	//std::string Bathymetryfile;// bathymetry file name
 	//inputmap Bathymetry;
 	std::string outfile="Output.nc"; // netcdf output file name
-	
+
 	//Timekeeping
 	double outputtimestep=0.0; //number of seconds between output 0.0 for none
 	double endtime=0.0; // Total runtime in s will be calculated based on bnd input as min(length of the shortest time series, user defined)
@@ -92,7 +92,7 @@ public:
 	int nbndblkright = 0;
 	int nbndblktop = 0;
 	int nbndblkbot = 0;
-	
+
 	int nmaskblk = 0;
 
 	//hot start
@@ -107,7 +107,7 @@ public:
 	int hotstep = 0; //step to read if hotstart file has multiple steps
 	//other
 	clock_t startcputime, endcputime, setupcputime;
-	
+
 	//Netcdf parameters
 	int smallnc = 1;//default save as short integer if smallnc=0 then save all variables as float
 	float scalefactor = 0.01f;
@@ -126,10 +126,10 @@ public:
 	// Output switch controls
 	bool resetmax = false;
 	bool outmax = false;
-	
+
 
 	bool outmean = false;
-	
+
 
 	bool outvort = false;
 
