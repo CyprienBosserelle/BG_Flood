@@ -167,8 +167,8 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	//
-	dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
-	dim3 gridDim = (XModel.bndblk.nblkTs, 1, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XModel.bndblk.nblkTs, 1, 1);
 	FILE* fsSLTS;
 	if (XParam.GPUDEVICE>=0)
 	{
@@ -187,8 +187,9 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 					
 			
 			storeTSout << <gridDim, blockDim, 0 >> > (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
+			CUDA_CHECK(cudaDeviceSynchronize());
 		}
-		CUDA_CHECK(cudaDeviceSynchronize());
+		//CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
@@ -274,6 +275,7 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
+	//printf("ib=%d; ix=%d; iy=%d; blknode=%d; inode=%d; jnode=%d\n", ib, ix,iy,blknode,inode,jnode);
 
 	if (ib == blknode && ix == inode && iy == jnode)
 	{
@@ -281,6 +283,10 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 		store[1 + outnode * 4 + istep * noutnodes * 4] = XEv.zs[i];
 		store[2 + outnode * 4 + istep * noutnodes * 4] = XEv.u[i];
 		store[3 + outnode * 4 + istep * noutnodes * 4] = XEv.v[i];
+
+
+
+		//printf("XEv.h[i]=%f; store[h]=%f\n", XEv.h[i], store[0 + outnode * 4 + istep * noutnodes * 4]);
 	}
 }
 
