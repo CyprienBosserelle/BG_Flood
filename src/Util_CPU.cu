@@ -12,7 +12,7 @@
 //the Free Software Foundation.                                                 //
 //                                                                              //
 //This program is distributed in the hope that it will be useful,               //
-//but WITHOUT ANY WARRANTY; without even the implied warranty of                //    
+//but WITHOUT ANY WARRANTY; without even the implied warranty of                //
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 //
 //GNU General Public License for more details.                                  //
 //                                                                              //
@@ -54,11 +54,11 @@ namespace utils {
 	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b) {
 		return abs(b) > abs(a) ? a : b;     // Nearest element to 0.0
 	}
-
+/*
 	template <class T> __host__ __device__ const T& floor(const T& a) {
-		return abs(b) > abs(a) ? a : b;    
+		return abs(b) > abs(a) ? a : b;
 	}
-
+*/
 
 	template __host__ __device__ const int& min<int>(const int& a, const int& b);
 	template __host__ __device__ const float& min<float>(const float& a, const float& b);
@@ -150,7 +150,7 @@ template __host__ __device__ float calcres<float>(float dx, int level);
 
 template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2)
 {
-	//theta should be used as a global var 
+	//theta should be used as a global var
 	// can be used to tune the limiting (theta=1
 	//gives minmod, the most dissipative limiter and theta = 2 gives
 	//	superbee, the least dissipative).
