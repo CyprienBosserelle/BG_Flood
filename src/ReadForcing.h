@@ -24,6 +24,7 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 
 void readDynforcing(bool gpgpu,double totaltime, DynForcingP<float>& Dforcing);
 
+DynForcingP<float> readforcinghead(DynForcingP<float> Fmap);
 template<class T> T readforcinghead(T Fmap);
 //template<class T> T readBathyhead(T BathyParam);
 template<class T> void readstaticforcing(T& Sforcing);

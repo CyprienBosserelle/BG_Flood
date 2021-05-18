@@ -106,7 +106,7 @@ template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBloc
 					}
 					else if (XParam.frictionmodel == -1)// Manning friction formulation
 					{
-						T n = cfi;
+						T n = cf[i];
 						cfi = manningfriction(g, hi, n);
 
 
@@ -126,7 +126,7 @@ template __host__ void bottomfrictionCPU<float>(Param XParam, BlockP<float> XBlo
 template __host__ void bottomfrictionCPU<double>(Param XParam, BlockP<double> XBlock,double dt, double* cf, EvolvingP<double> XEvolv);
 
 /*!\fn void XiafrictionCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv)
-* apply bottom friction follwing the procedure from Xia and Lang 2018
+* apply bottom friction following the procedure from Xia and Lang 2018
 * https://doi.org/10.1016/j.advwatres.2018.05.004
 * 
 *
@@ -171,7 +171,7 @@ template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, 
 					}
 					else if (XParam.frictionmodel == -1)// Manning friction formulation
 					{
-						T n = cfi;
+						T n = cf[i];
 						cfi = manningfriction(g, hi, n);
 
 
@@ -237,7 +237,7 @@ template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock
 		}
 		else if (XParam.frictionmodel == -1)// Manning friction formulation
 		{
-			T n = cfi;
+			T n = cf[i];
 			cfi = manningfriction(g, hi, n);
 
 

@@ -647,7 +647,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 {
 	std::string parameterstr, parametervalue;
 
-	std::vector<std::string> paramvec = { "bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEM"};
+	std::vector<std::string> paramvec = { "bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEMv"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "bathy";
 	//parametervalue = findparameter(parameterstr, line);
