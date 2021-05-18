@@ -62,7 +62,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 
 		//case 0 (i.e. zsinint not specified by user and no boundaries were specified)
 		
-		if (std::isnan(XParam.zsinit) && (!XParam.leftbnd && !XParam.rightbnd && !XParam.topbnd && !XParam.botbnd)) //zsinit is default
+		if (std::isnan(XParam.zsinit) && (!XForcing.left.on && !XForcing.right.on && !XForcing.top.on && !XForcing.bot.on)) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value than nan
 		}
