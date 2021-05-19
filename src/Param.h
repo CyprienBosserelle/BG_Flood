@@ -11,9 +11,9 @@ public:
 	*  Param holds model parameters
 	*/
 	
-	int test = -1;/**< -1:no test; 0:some test; 1:test 0 and XX test */
-	double g=9.81; /**< Gravity */
-	double rho=1025.0; /**< fluid density */
+	int test = -1;//!< -1:no test; 0:some test; 1:test 0 and XX test 
+	double g=9.81; //!< Gravity 
+	double rho=1025.0; //!< fluid density
 	double eps= 0.0001; // //drying height in m
 	double dt=0.0; // Model time step in s.
 	double CFL=0.5; // Current Freidrich Limiter
