@@ -11,13 +11,14 @@
 
 class Param {
 public:
-	/** 
-	* General parameters
-	*  Param holds model parameters
-	*/
 	
-
+	
+	//! int Variable.
+	/*! More detailed enum description. */
 	int test = -1;//! -1:no test; 0:some test; 1:test 0 and XX test 
+
+	//! double Variable.
+	/*! Gravity.... */
 	double g=9.81; /**< variable. Gravity. */
 	double rho=1025.0; //!< fluid density
 	double eps= 0.0001; // //drying height in m
