@@ -5,14 +5,20 @@
 #include "General.h"
 #include "input.h"
 
+/**
+ *  A class. A class for holding model parameters.
+ */
+
 class Param {
 public:
-	/** General parameters
+	/** 
+	* General parameters
 	*  Param holds model parameters
 	*/
 	
-	int test = -1;//!< -1:no test; 0:some test; 1:test 0 and XX test 
-	double g=9.81; //!< Gravity 
+
+	int test = -1;//! -1:no test; 0:some test; 1:test 0 and XX test 
+	double g=9.81; /**< variable. Gravity. */
 	double rho=1025.0; //!< fluid density
 	double eps= 0.0001; // //drying height in m
 	double dt=0.0; // Model time step in s.
