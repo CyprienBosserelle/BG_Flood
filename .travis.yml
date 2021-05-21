@@ -7,12 +7,6 @@ compiler:
 
 matrix:
   include:
-    - name: CUDA 8
-      env:
-      - CUDA=8.0.61-1
-      - CUDA_SHORT=8.0
-      - UBUNTU_VERSION=ubuntu1604
-      dist: xenial
     - name: CUDA 9
       env:
       - CUDA=9.2.148-1
