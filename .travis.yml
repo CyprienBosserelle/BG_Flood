@@ -32,11 +32,23 @@ before_install:
   - CUDA_HOME=/usr/local/cuda-${CUDA_SHORT}
   - LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
   - PATH=${CUDA_HOME}/bin:${PATH}
-  - wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
-  - unzip ninja-linux.zip
-  - PATH=${PATH}:${PWD}
+
   - sudo apt-get update
   - sudo apt-get -y install libnetcdf-dev
 
+before_script:
+  - echo "ncols 3" > bathy.asc
+  - echo "nrows 3" >> bathy.asc
+  - echo "xllcenter -1" >> bathy.asc
+  - echo "yllcenter -1" >> bathy.asc
+  - echo "cellsize 1" >> bathy.asc
+  - echo "nodata_value -9999" >> bathy.asc
+  - printf "0.0 0.0 0.0" >> bathy.asc
+  - printf "0.0 0.0 0.0" >> bathy.asc
+  - printf "0.0 0.0 0.0" >> bathy.asc
+  - echo "test=0">BG_param.txt
+  - echo "gpudevice=-1">>BG_param.txt
+  - echo "bathy=bathy.asc">>BG_param.txt
 script:
-  make
+  - make
+  - ./BG_Flood
