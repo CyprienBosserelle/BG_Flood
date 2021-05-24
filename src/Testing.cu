@@ -1871,11 +1871,11 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 		//rain_file.close(); //destructor implicitly does it
 
 		XForcing.Rain.inputfile = "testrain7.tmp";
-		XForcing.Rain.uniform = true;
+	//	XForcing.Rain.uniform = true;
 
 		// Reading rain forcing from file for CPU and uniform rain
-		XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
-		printf("ok to read 1D rain forcing\n");
+	//	XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+	//	printf("ok to read 1D rain forcing\n");
 	//}
 	//else //non-uniform forcing
 	//{
