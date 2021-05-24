@@ -8,12 +8,12 @@
 /**
  *  A class. A class for holding model parameters.
  */
-
 class Param {
 public:
 	
 	
-	///! int Variable.
+	/// @brief int Variable.
+	/// @details -1:no test; 0:some test; 1:test 0 and XX test 
 	int test = -1;//! -1:no test; 0:some test; 1:test 0 and XX test 
 
 	//! double Variable.
