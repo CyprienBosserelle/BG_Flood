@@ -1717,40 +1717,30 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 {
 	log("#####");
-	//int i, j, k;
-	////T zinit = 0.0;
-	////int gpu = -1;
-	////int dimf = 3;
-	//T rainDuration = 10.0;
-	//int NX = 2502;
-	//int NY = 22;
-	//int NT;
-	//double* xRain;
-	//double* yRain;
-	//double* tRain;
-	//double* rainForcing;
-	////float** rainForcing2D;
-	////alloc_init2Darray(rainForcing2D, NX, NY);
-
-	///*rainForcing2D = (float**)malloc(sizeof(float*) * NX);
-	//for (i = 0; i < NX; i++) {
-	//	rainForcing2D[i] = (float*)malloc(sizeof(float) * NY);
-	//}*/
-
-
-	////alloc_init2Darray(rainForcing2D, NX, NY);
+	int i, j, k;
+	T rainDuration = 10.0;
+	int NX = 2502;
+	int NY = 22;
+	int NT;
+	double* xRain;
+	double* yRain;
+	double* tRain;
+	double* rainForcing;
+	FILE* fp;
 
 	Param XParam;
 	T delta, initVol, finalVol, TheoryInput, Surf;
+
 	// initialise domain and required resolution
 	XParam.xo = 0;
 	XParam.yo = 0;
 	XParam.ymax = 0.196;
 	XParam.dx = (XParam.ymax - XParam.yo) / ((1 << 4));
 	double Xmax_exp = 24.0; //minimum Xmax position (adjust to have a "full blocks" config)
-	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx));
+	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
+	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
 	printf("Xmax=%f\n", XParam.xmax);
-	//Surf = (XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo);
+	Surf = (XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo);
 	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
 
 	XParam.initlevel = 0;
@@ -1761,8 +1751,8 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 	XParam.zsoffset = 0.0;
 
 	//Output times for comparisons
-	XParam.endtime = 10.0;
-	XParam.outputtimestep = 0.5;
+	XParam.endtime = 12.0;
+	XParam.outputtimestep = 0.1;
 
 	XParam.smallnc = 0;
 
@@ -1773,9 +1763,9 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	////Bottom friction
-	//XParam.frictionmodel = -1; //Manning model
-	//XParam.cf = 0.009; //n in m^(-1/3)s
+	//Bottom friction
+	XParam.frictionmodel = -1; //Manning model
+	XParam.cf = 0.009; //n in m^(-1/3)s
 
 	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
 
@@ -1799,16 +1789,17 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 	XForcing.Bathy.push_back(bathy);
 
 	// initialise forcing bathymetry to 0
-	XForcing.Bathy[0].xo = -1, 0;
+	XForcing.Bathy[0].xo = -1.0;
 	XForcing.Bathy[0].yo = -1.0;
 	XForcing.Bathy[0].xmax = 25.0;
 	XForcing.Bathy[0].ymax = 1.0;
-	XForcing.Bathy[0].nx = 27;
-	XForcing.Bathy[0].ny = 3;
+	XForcing.Bathy[0].dx = 0.1;
+	XForcing.Bathy[0].nx = (XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1;
+	XForcing.Bathy[0].ny = (XForcing.Bathy[0].ymax - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx + 1;
 
-	XForcing.Bathy[0].dx = 1.0;
 
-	AllocateCPU(XParam.nblk, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 
@@ -1817,225 +1808,165 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
 			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = -10.0;
-			if (i < 10)
+			if (i < (9 / XForcing.Bathy[0].dx + 1))
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.2 + (9 - i) * 2.0 / 100.0;
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.2 + (9.0 - i * XForcing.Bathy[0].dx) * 2.0 / 100.0;
 			}
-			else if (i < 18)
+			else if (i < (17 / XForcing.Bathy[0].dx + 1))
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.08 + (17 - i) * 1.5 / 100.0;
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.08 + (17.0 - i * XForcing.Bathy[0].dx) * 1.5 / 100.0;
 			}
-			else
+			else if (i < (25 / XForcing.Bathy[0].dx + 1))
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0 + (25 - i) * 1.0 / 100.0;
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0 + (25.0 - i * XForcing.Bathy[0].dx) * 1.0 / 100.0;
 			}
 		}
 	}
 
-	//double* xx; double* yy;
-	//xx = (double*)malloc(sizeof(double) * XForcing.Bathy[0].nx);
-	//yy = (double*)malloc(sizeof(double) * XForcing.Bathy[0].ny);
-
-	//	for (int i = 0; i < XForcing.Bathy[0].nx; i++) { xx[i] = -1 + 1 * i; }
-	//	for (int i = 0; i < XForcing.Bathy[0].ny; i++) { yy[i] = -1 + 1 * i; }
-
-	////create2dnc(char* "Mybathy.nc", int XForcing.Bathy[0].nx, int XForcing.Bathy[0].ny, double* xx, double* yy, double* XForcing.Bathy[0].val, char* "Bathym");
+	// Add wall boundary conditions but at the bottom of the slope
+	XForcing.right.type = 0;
+	XForcing.left.type = 0;
+	XForcing.top.type = 0;
+	XForcing.bot.type = 0;
 
 
-	//// Add wall boundary conditions but at the bottom of the slope
-	//XForcing.right.type = 1;
-	//XForcing.left.type = 0;
-	//XForcing.top.type = 0;
-	//XForcing.bot.type = 0;
+	//Value definition for surface rain fall
+	T r1 = 3888; // mm/hr
+	T r2 = 2296.8; //mm/hr
+	T r3 = 2880; //mm/hr
+	T Q = (r1 + r2 + r3) / 3;
+	TheoryInput = Q * XParam.outputtimestep / T(1000.0) / T(3600.0) * Surf; //m3/s
+	printf("# Theoretical volume of water input during the simulation in m3: %f , from a mean rain input of: %f mm/hr.\n", TheoryInput, Q);
+	double eps = 0.0001;
 
+	// Create the rain forcing file
+	if (dimf == 1)
+	{
+		//Create a temporary file with rain fluxes for uniform rain
+		std::ofstream rain_file(
+			"testrain.tmp", std::ios_base::out | std::ios_base::trunc);
+		rain_file << "0.0 " + std::to_string(Q) << std::endl;
+		rain_file << std::to_string(rainDuration) + " " + std::to_string(Q) << std::endl;
+		rain_file << std::to_string(rainDuration + eps) + " 0.0" << std::endl;
+		rain_file << std::to_string(rainDuration + 360000) + " 0.0" << std::endl;
+		rain_file.close(); //destructor implicitly does it
 
-	////Value definition for surface rain fall
-	//T r1 = 3888; // mm/hr
-	//T r2 = 2296.8; //mm/hr
-	//T r3 = 2880; //mm/hr
-	//T Q = (r1 + r2 + r3) / 3;
-	//TheoryInput = Q * XParam.outputtimestep / T(1000.0) / T(3600.0) * Surf; //m3/s
-	//printf("# Theoretical volume of water input during the simulation in m3: %f , from a mean rain input of: %f mm/hr.\n", TheoryInput, Q);
-	//double eps = 0.0001;
-
-	//// Create the rain forcing file
-	//if (dimf == 1)
-	//{
-		////Create a temporary file with rain fluxes for uniform rain
-		//std::ofstream rain_file(
-		//	"testrain.tmp", std::ios_base::out | std::ios_base::trunc);
-		//rain_file << "0.0 " + std::to_string(Q) << std::endl;
-		//rain_file << std::to_string(rainDuration) + " " + std::to_string(Q) << std::endl;
-		//rain_file << std::to_string(rainDuration + eps) + " 0.0" << std::endl;
-		//rain_file << std::to_string(rainDuration + 360000) + " 0.0" << std::endl;
-		//rain_file.close(); //destructor implicitly does it
-
-		XForcing.Rain.inputfile = "testrain7.tmp";
-	//	XForcing.Rain.uniform = true;
+		XForcing.Rain.inputfile = "testrain.tmp";
+		XForcing.Rain.uniform = true;
 
 		// Reading rain forcing from file for CPU and uniform rain
-	//	XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
-	//	printf("ok to read 1D rain forcing\n");
-	//}
-	//else //non-uniform forcing
-	//{
+		XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+		printf("ok to read 1D rain forcing\n");
+	}
+	else //non-uniform forcing
+	{
+		XForcing.Rain.uniform = false;
 
-	//	//X Y variables
+		//X Y variables
 
-	//	xRain = (double*)malloc(sizeof(double) * NX);
-	//	yRain = (double*)malloc(sizeof(double) * NY);
+		xRain = (double*)malloc(sizeof(double) * NX);
+		yRain = (double*)malloc(sizeof(double) * NY);
 
-	//	for (int i = 0; i < NX; i++) { xRain[i] = -0.005 + 0.01 * i; }
-	//	for (int j = 0; j < NY; j++) { yRain[j] = -0.01 + 0.01 * j; }
+		for (int i = 0; i < NX; i++) { xRain[i] = -0.005 + 0.01 * i; }
+		for (int j = 0; j < NY; j++) { yRain[j] = -0.01 + 0.01 * j; }
 
-	//	//rainForcing = (double***)malloc(sizeof(double**) * NT);
-	//	//for (k = 0; k < NT; k++) {
-	//	//	rainForcing[k] = (double**)malloc(sizeof(double*) * NY);
-	//	//	for (j = 0; j < NY; j++) {
-	//	//		rainForcing[k][j] = (double*)malloc(sizeof(double) * NX);
-	//	//	}
-	//	//}
+		//Create a non-uniform time-variable rain forcing
+		if (dimf == 3)
+		{
+			NT = 4;
+			tRain = (double*)malloc(sizeof(double) * NT);
+			tRain[0] = 0.0; tRain[1] = rainDuration; tRain[2] = rainDuration + eps; tRain[3] = XParam.endtime + rainDuration;
+			/*NT = 100;
+			tRain = (double*)malloc(sizeof(double) * NT);
+			for (int k = 0; k < NT; k++) { yRain[k] = 0.0 + (2 * rainDuration / NT) * k; }*/
 
+			rainForcing = (double*)malloc(sizeof(double) * NT * NY * NX);
 
-	//			//Create a non-uniform time-variable rain forcing
-	//	if (dimf == 3)
-	//	{
-	//		NT = 4;
-	//		tRain = (double*)malloc(sizeof(double) * NT);
-	//		tRain[0] = 0.0; tRain[1] = rainDuration; tRain[2] = rainDuration + eps; tRain[3] = XParam.endtime + rainDuration;
+			//Create the rain forcing:
+			for (k = 0; k < NT; k++)
+			{
+				for (j = 0; j < NY; j++)
+				{
+					for (i = 0; i < NX; i++)
+					{
+						if (tRain[k] < rainDuration+eps)
+						{
+							if (xRain[i] < 8.0)
+							{
+								rainForcing[k * (NX * NY) + j * NX + i] = r1;
+							}
+							else if (xRain[i] < 16.0)
+							{
+								rainForcing[k * (NX * NY) + j * NX + i] = r2;
+							}
+							else
+							{
+								rainForcing[k * (NX * NY) + j * NX + i] = r3;
+							}
+						}
+						else
+						{
+							rainForcing[k * (NX * NY) + i * NY + j] = 0.0;
+						}
+					}
+				}
+			}
 
-	//		rainForcing = (double*)malloc(sizeof(double) * NT * NY * NX);
+			//Write the netcdf file
+			create3dnc("rainTempt.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
 
-	//		//Create the rain forcing:
-	//		for (k = 0; k < NT; k++)
-	//		{
-	//			for (j = 0; j < NY; j++)
-	//			{
-	//				for (i = 0; i < NX; i++)
-	//				{
-	//					if (k < 2)
-	//					{
-	//						if (xRain[i] < 8.0)
-	//						{
-	//							//*(Rainforcing +)
-	//							rainForcing[k * (NX * NY) + j * NX + i] = r1;
-	//						}
-	//						else if (xRain[i] < 16.0)
-	//						{
-	//							rainForcing[k * (NX * NY) + j * NX + i] = r2;
-	//						}
-	//						else
-	//						{
-	//							rainForcing[k * (NX * NY) + j * NX + i] = r3;
-	//						}
-	//					}
-	//					else
-	//					{
-	//						rainForcing[k * (NX * NY) + i * NY + j] = 0.0;
-	//					}
-	//				}
-	//			}
-	//		}
+			//End creation of the nc file for rain forcing
+		}
+		else if (dimf == 2)//dimf==2 for rain forcing 
+		{
 
-	//		//Write the netcdf file
-	//		create3dnc("rainTemp2.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
+			//Create a non-uniform time-constant rain forcing 
+			rainForcing = (double*)malloc(sizeof(double) * NY * NX);
 
-	//		////Variables to write the netcdf file
-	//		//int status, ncid, xRain_dimId, yRain_dimId, tRain_dimId, xRain_varId, yRain_varId, tRain_varId, rainForcingId;
-	//		////create file
-	//		//status = nc_create("rainTemp.nc", NC_CLOBBER, &ncid);
-	//		//if (status != NC_NOERR) handle_ncerror(status);
-	//		////Define the dimensions in the netcdf file
-	//		//if ((status = nc_def_dim(ncid, "Time", NT, &tRain_dimId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_dim(ncid, "Xr", NX, &xRain_dimId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_dim(ncid, "Yr", NY, &yRain_dimId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		////Gather the dimids into an array
-	//		//int RainIds[3];
-	//		//RainIds[0] = tRain_dimId;
-	//		//RainIds[1] = yRain_dimId;
-	//		//RainIds[2] = xRain_dimId;
-	//		////Define variables
-	//		//if ((status = nc_def_var(ncid, "Time", NC_FLOAT, 1, &tRain_dimId, &tRain_varId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_var(ncid, "Xr", NC_FLOAT, 1, &xRain_dimId, &xRain_varId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_var(ncid, "Yr", NC_FLOAT, 1, &yRain_dimId, &yRain_varId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_var(ncid, "rainForcing", NC_FLOAT, 3, RainIds, &rainForcingId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_put_att_text(ncid, rainForcingId, "units", 5, "mm/hr"))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//// End "Metadata" mode
-	//		//if ((status = nc_enddef(ncid))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//// Write data to the file
-	//		//if ((status = nc_put_var(ncid, tRain_varId, &tRain[0]))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_put_var(ncid, xRain_varId, &xRain[0]))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_put_var(ncid, yRain_varId, &yRain[0]))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_put_var(ncid, rainForcingId, &rainForcing[0][0][0]))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		////Close the netcdf file
-	//		//if ((status = nc_close(ncid))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
+			//Create the rain forcing:
 
-	//		//End creation of the nc file for rain forcing
-	//	}
-	//	else if (dimf == 2)//dimf==2 for rain forcing 
-	//	{
+			for (j = 0; j < NY; j++)
+			{
+				for (i = 0; i < NX; i++)
+				{
 
-	//		//Create a non-uniform time-constant rain forcing 
-	//		//float rainForcing2D[NY][NX];
-	//		//printf("tototo");
-	//		//for (int i = 0; i < NX; i++)
-	//		//{
-	//		//	for (int j = 0; j < NY; j++)
-	//		//	{
-	//		//		if (xRain[i] < 8.0)
-	//		//		{
-	//		//			rainForcing2D[j][i] = r1;
-	//		//		}
-	//		//		else if (xRain[i] < 16.0)
-	//		//		{
-	//		//			rainForcing2D[j][i] = r2;
-	//		//		}
-	//		//		else
-	//		//		{
-	//		//			rainForcing2D[j][i] = r3;
-	//		//		}
-	//		//	}
-	//		//}
+					if (xRain[i] < 8.0)
+					{
+						rainForcing[j * NX + i] = r1;
+					}
+					else if (xRain[i] < 16.0)
+					{
+						rainForcing[j * NX + i] = r2;
+					}
+					else
+					{
+						rainForcing[j * NX + i] = r3;
+					}
 
-	//		////Variables to write the netcdf file
-	//		//int status, ncid, xRain_dimId, yRain_dimId, xRain_varId, yRain_varId, rainForcingId;
-	//		////create file
-	//		//status = nc_create("rainTemp.nc", NC_CLOBBER, &ncid);
-	//		//if (status != NC_NOERR) handle_ncerror(status);
-	//		////Define the dimensions in the netcdf file
-	//		//if ((status = nc_def_dim(ncid, "Xr", NX, &xRain_dimId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_dim(ncid, "Yr", NY, &yRain_dimId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		////Gather the dimids into an array
-	//		//int RainIds[2];
-	//		//RainIds[0] = yRain_dimId;
-	//		//RainIds[1] = xRain_dimId;
-	//		////Define variables
-	//		//if ((status = nc_def_var(ncid, "Xr", NC_FLOAT, 1, &xRain_dimId, &xRain_varId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_var(ncid, "Yr", NC_FLOAT, 1, &yRain_dimId, &yRain_varId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_def_var(ncid, "rainForcing", NC_FLOAT, 2, RainIds, &rainForcingId))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_put_att_text(ncid, rainForcingId, "units", 5, "mm/hr"))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//// End "Metadata" mode
-	//		//if ((status = nc_enddef(ncid))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//// Write data to the file
-	//		//if ((status = nc_put_var(ncid, xRain_varId, &xRain[0]))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_put_var(ncid, yRain_varId, &yRain[0]))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		//if ((status = nc_put_var(ncid, rainForcingId, &rainForcing2D[0][0]))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
-	//		////Close the netcdf file
-	//		//if ((status = nc_close(ncid))) { printf("Error: %s \n", nc_strerror(status)); exit(2); }
+				}
+			}
 
-	//		//End creation of the nc file for rain forcing
-	//	}
-	//	else { printf("Error in rain forcing dimension (should be in [1,2,3])\n"); }
+			create2dnc("rainTempt.nc", NX, NY, xRain, yRain, rainForcing, "myrainforcing");
 
-	//	//Reading non-unform forcing
-	//	XForcing.Rain = readfileinfo("rainTemp2.nc", XForcing.Rain);
-	//	XForcing.Rain.uniform = 0;
-	//	XForcing.Rain.varname = "myrainforcing";
+			//End creation of the nc file for rain forcing
+		}
+		else { printf("Error in rain forcing dimension (should be in [1,2,3])\n"); }
 
-	//	bool gpgpu = XParam.GPUDEVICE >= 0;
-	//	readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
-	//}
+		//Reading non-unform forcing
+		XForcing.Rain = readfileinfo("rainTempt.nc", XForcing.Rain);
+		XForcing.Rain.uniform = 0;
+		XForcing.Rain.varname = "myrainforcing";
 
+		bool gpgpu = XParam.GPUDEVICE >= 0;
+		readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+
+		free(rainForcing);
+		free(xRain);
+		free(yRain);
+		free(tRain);
+	}
+
+	printf("Rain forcing read = %f", XForcing.Rain.val[400]);
 
 	checkparamsanity(XParam, XForcing);
 
@@ -2066,32 +1997,6 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 
 	//InitSave2Netcdf(XParam, XModel);
 
-	///Still needed here?
-	initVol = T(0.0);
-	// Calculate initial water volume
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
-		int ib = XModel.blocks.active[ibl];
-		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
-
-
-		for (int iy = 0; iy < XParam.blkwidth; iy++)
-		{
-			for (int ix = 0; ix < XParam.blkwidth; ix++)
-			{
-				//
-				int n = memloc(XParam, ix, iy, ib);
-				initVol = initVol + XModel.evolv.h[n] * delta * delta;
-			}
-		}
-	}
-
-	std::cout << std::endl;
-	std::cout << "# Initial volume of water in m3: " << initVol << std::endl;
-
-	//log("\t Full volume =" + ftos(initVol));
-
 	fillHaloC(XParam, XModel.blocks, XModel.zb);
 	if (XParam.GPUDEVICE >= 0)
 	{
@@ -2103,92 +2008,94 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 
 	bool modelgood = true;
 
-	//////while (XLoop.totaltime < XLoop.nextoutputtime)
-	//////{
-	//////	//	//Bnd update
-	//////	//	if (XParam.GPUDEVICE >= 0)
-	//////	//	{
-	//////	//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XModel_g.evolv);
-	//////	//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XModel_g.evolv);
-	//////	//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XModel_g.evolv);
-	//////	//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XModel_g.evolv);
-	//////	//	}
-	//////	//	else
-	//////	//	{
-	//////	//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XModel.evolv);
-	//////	//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XModel.evolv);
-	//////	//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XModel.evolv);
-	//////	//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XModel.evolv);
-	//////	//	}
-	//////		//updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
-	//////		//updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+	fp = fopen("Rain_outflowt.txt", "w+");
 
-		updateforcing(XParam, XLoop, XForcing);
-
-		if (XParam.GPUDEVICE >= 0)
+	while (XLoop.totaltime < XParam.endtime)
+	{
+		//while (XLoop.totaltime < XLoop.nextoutputtime)
 		{
-			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+				//	//Bnd update
+				//	if (XParam.GPUDEVICE >= 0)
+				//	{
+				//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XModel_g.evolv);
+				//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XModel_g.evolv);
+				//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XModel_g.evolv);
+				//		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XModel_g.evolv);
+				//	}
+				//	else
+				//	{
+				//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XModel.evolv);
+				//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XModel.evolv);
+				//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XModel.evolv);
+				//		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XModel.evolv);
+				//	}
+					//updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+					//updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+
+			updateforcing(XParam, XLoop, XForcing);
+
+			if (XParam.GPUDEVICE >= 0)
+			{
+				FlowGPU(XParam, XLoop, XForcing, XModel_g);
+			}
+			else
+			{
+				FlowCPU(XParam, XLoop, XForcing, XModel);
+			}
+			XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+			printf("Time = %f \n", XLoop.totaltime);
+			//Save2Netcdf(XParam, XLoop, XModel);
+
+
+			if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+			{
+				if (XParam.GPUDEVICE >= 0)
+				{
+					for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+					{
+						CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+					}
+				}
+
+				// Verify the Validity of results
+				T finalFlux = T(0.0);
+				for (int ibl = 0; ibl < XParam.nblk; ibl++)
+				{
+					//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+					int ib = XModel.blocks.active[ibl];
+					delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+
+					for (int iy = 0; iy < XParam.blkwidth; iy++)
+					{
+						for (int ix = 0; ix < XParam.blkwidth; ix++)
+						{
+							//
+							int n = memloc(XParam, ix, iy, ib);
+							//Computing x-flux at x=24m
+							//printf("Diff: %f \n", abs(XModel.blocks.xo[ibl] + ix * delta - 24.0));
+							if (abs(XModel.blocks.xo[ibl] + ix * delta - 24.0) < delta / 2.0)
+							{
+								//printf("this is n: %i \n", n);
+								//printf("this is x: %f \n", XModel.blocks.xo[ibl] + ix * delta);
+								//printf("at indice %i, the elevation is %g\n", n, XModel.evolv.h[n]);
+								finalFlux = finalFlux + XModel.evolv.h[n] * XModel.evolv.u[n] * delta;
+								//std::cout << "# Final volume of water in m3: " << finalVol << " and h" << XModel.evolv.h[n] << std::endl;
+							}
+						}
+					}
+				}
+				printf("Final Flux: %e \n", finalFlux);
+				fprintf(fp, "%f %e \n", XLoop.totaltime, finalFlux);
+				Save2Netcdf(XParam, XLoop, XModel);
+
+				XLoop.nextoutputtime = XLoop.nextoutputtime + XParam.outputtimestep;
+			}
 		}
-		else
-		{
-			FlowCPU(XParam, XLoop, XForcing, XModel);
-		}
-		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
-		InitSave2Netcdf(XParam, XModel);
+	}
 
-	////	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
-	////	{
-	////		if (XParam.GPUDEVICE >= 0)
-	////		{
-	////			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
-	////			{
-	////				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
-	////			}
-	////		}
-
-	////		// Verify the Validity of results
-	////		finalVol = T(0.0);
-	////		for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	////		{
-	////			//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
-	////			int ib = XModel.blocks.active[ibl];
-	////			delta = calcres(XParam.dx, XModel.blocks.level[ib]);
-
-
-	////			for (int iy = 0; iy < XParam.blkwidth; iy++)
-	////			{
-	////				for (int ix = 0; ix < XParam.blkwidth; ix++)
-	////				{
-	////					//
-	////					int n = memloc(XParam, ix, iy, ib);
-	////					//printf("at indice %i, the elevation is %g\n", n, XModel.evolv.h[n]);
-	////					finalVol = finalVol + XModel.evolv.h[n] * delta * delta;
-	////					//std::cout << "# Final volume of water in m3: " << finalVol << " and h" << XModel.evolv.h[n] << std::endl;
-	////				}
-	////			}
-	////		}
-
-	////		T error = abs((finalVol - initVol) - TheoryInput) / TheoryInput;
-	////		modelgood = (error < 0.05);
-
-	////		printf("error = %g\%, initial volume=%4.4g; final Volume=%4.4g; abs. difference=%g, Theoretical  input=%g\n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
-	////	}
-
-	////	InitSave2Netcdf(XParam, XModel);
-	//bool modelgood = 1;
+	fclose(fp);
 	log("#####");
-
-	//Desallocate rainForcing Matrix
-	/*for (int k = 0; k < NT; k++){
-		for (int j = 0; j < NY; j++){
-			free(rainForcing[k][j]);
-		}
-		free(rainForcing[k]);
-	//}*/
-	//free(rainForcing);
-	//free(xRain);
-	//free(yRain);
-	//free(tRain);
 
 	return modelgood;
 }

@@ -36,5 +36,11 @@ template <class T> int readvardata(std::string filename, std::string Varname, in
 
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo);
 void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po);
+
+extern "C" void read3Dnc(int nx, int ny, int ntheta, char ncfile[], float*& ee);
+extern "C" void read2Dnc(int nx, int ny, char ncfile[], float*& hh);
+extern "C" void readnczb(int nx, int ny, std::string ncfile, float*& zb);
+
+
 // End of global definition
 #endif
