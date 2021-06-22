@@ -151,13 +151,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
 		yymin = XParam.yo + calcres(XParam.dx, lev + 1);
 
-<<<<<<< Updated upstream
 		nx = round((xxmax - xxmin) / ddx + 1.0);
 		ny = round((yymax - yymin) / ddx + 1.0);
-=======
-		nx = round((xxmax - xxmin) / ddx) + 1;
-		ny = round((yymax - yymin) / ddx) + 1;
->>>>>>> Stashed changes
 
 		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
 		//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
@@ -262,13 +257,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
 		yymin = XParam.yo  + calcres(XParam.dx, lev + 1);
 
-<<<<<<< Updated upstream
 		nx = round((xxmax - xxmin) / ddx + 1.0);
 		ny = round((yymax - yymin) / ddx + 1.0);
-=======
-		nx = round((xxmax - xxmin) / ddx) + 1;
-		ny = round((yymax - yymin) / ddx) + 1;
->>>>>>> Stashed changes
 
 
 		
