@@ -1743,6 +1743,10 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 	Surf = (XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo);
 	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
 
+
+
+
+
 	XParam.initlevel = 0;
 	XParam.minlevel = 0;
 	XParam.maxlevel = 0;
@@ -1758,7 +1762,7 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 
 	//Specification of the test
 	XParam.test = 8;
-	XParam.rainforcing = true;
+	//XParam.rainforcing = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
