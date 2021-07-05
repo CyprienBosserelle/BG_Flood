@@ -1,0 +1,50 @@
+#################################
+# Bathymetry file
+bathy = Bathy_D.nc?z;
+posdown=1;
+xo=0;
+xmax=5.6;
+yo=-0.18;
+ymax=3.4040;
+
+# Model controls
+gpudevice = 0;
+
+# Flow parameters
+eps = 0.00010000;
+cf=0.001;
+
+# Timekeeping parameters
+CFL = 0.500000;
+outputtimestep = 1.000000;
+outvars = zs,hh,uu,vv,zb;
+endtime = 30.000000;
+
+smallnc=0
+
+# Files
+outfile = newbathy3.nc;
+leftbndfile = MonaiValley_InputWave.txt;
+left = 2
+right = 0;
+top = 0;
+bot = 0;
+
+# ParaView Catalyst
+use_catalyst = 1;
+catalyst_python_pipeline = 0;
+vtk_output_frequency = 0;
+vtk_output_time_interval = 1;
+vtk_outputfile_root = myoutput;
+python_pipeline = coproc.py;
+
+# Time series output
+TSOfile = gauge1-newbathy3.txt
+TSnode = 4.521, 1.196; #Note these are x, y values converted to the nearest i,j
+
+TSOfile = gauge2-newbathy3.txt
+TSnode = 4.521, 1.696;
+
+TSOfile = gauge3-newbathy3.txt
+TSnode = 4.521, 2.196;
+
