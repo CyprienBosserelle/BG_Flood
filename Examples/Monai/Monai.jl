@@ -1,14 +1,11 @@
 ### A Pluto.jl notebook ###
-# v0.14.8
+# v0.12.12
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 9f6a4682-dd4b-11eb-29b9-0311850f7de6
-using GMT, DelimitedFiles, Printf
-
-# ╔═╡ 8fd3f310-dd4b-11eb-13f2-634f6f98c198
-
+using GMT, DelimitedFiles, Printf, StatsBase
 
 # ╔═╡ 949761a0-dd16-11eb-32de-4b235b067893
 md"""
@@ -17,18 +14,29 @@ This example replicates the "Tsunami runup onto a complex three-dimensional beac
 
 This notebook is presented to show how I use the model and also how the model performs against standart benchmarks.
 
+_Cyprien Bosserelle 07/07/2021_
+
 ## Some background
 This lab benchmark is an experimental setup to replicate the extreme runup observed during the Hokkaido-Nansei-Oki tsunami of 1993 that struck Okushiri Island, Japan. The extreme runup was located on a small cove (Monai Cove) surrounded by a complex bathymetry.
 
 Details of the experiements and the benchmark data are available at the  [NOAA webpage](https://nctr.pmel.noaa.gov/benchmark/Laboratory/Laboratory_MonaiValley/index.html) and are referenced in [Synolakis et al. 2007](https://nctr.pmel.noaa.gov/benchmark/SP_3053.pdf) 
 
 ## To run this notebook
-This notebook requires **GMT 6.2** installed and the GMT package. Downloads is part of base in Julia version 1.6 but may need to be added. also please add Printf for writing neat looking txt files.
+This notebook requires **GMT 6.2** installed as well as the GMT.jl package. Downloads is part of base in Julia version 1.6 but may need to be added. also please add Printf for writing neat looking txt files and StatsBase.
 
-We need the ability to read excel files (95-97 workbook style) to read the gauge data. Here I'm using 
+While I tried to make this notebook as portatble as I could I couldn't resolve the issue that the gauge data is provided online in a _defunct_ excel format. I have left a copy of in txt in the repository.
 
 """
 
+
+# ╔═╡ 3c725fe0-dea9-11eb-25e3-03d2f01c07f8
+md"""
+## Where is BG\_flood
+list below the folder where BG_flood (and associated dlls) resides:
+"""
+
+# ╔═╡ 25d689d0-dea1-11eb-3446-cfa9d339a899
+bgfloodbin=`C:\\Users\\bosserellec\\source\\repos\\BG_Flood_Cleanup\\x64\\Release\\BG_Flood_Cleanup.exe`
 
 # ╔═╡ a81a6580-dd4b-11eb-2c2c-1f7e0e684d59
 md"""
@@ -56,12 +64,13 @@ This bathy is _positive down_. This is not an issue for BG_Flood but we need to 
 gaugelocs=[4.521 1.196; 4.521 1.696; 4.521 2.196]
 
 # ╔═╡ 79fc30ee-1de4-455b-ab4e-f99fe8899f25
-cpt=makecpt(cmap=:geo, inverse=true, range=(-0.13,0.13));
+cpt=makecpt(cmap=:geo, inverse=true, range=(-0.2,0.13));
 
 # ╔═╡ f99d1880-dd4b-11eb-3def-57d4ec93c373
 begin
 	grdimage(Bathy, cmap=cpt);
-	scatter!(gaugelocs,mc=:black,show=true)
+	scatter!(gaugelocs,G=:black)
+	text!(text_record(gaugelocs, ["Gauge 1", "Gauge 2", "Gauge 3"]),justify=:MR, offset=(shift=(-0.2,0.0)), show=true)
 	
 end
 
@@ -177,7 +186,7 @@ on my Laptop I do not have a suitable GPU so I run the CPU mode:
 
 # ╔═╡ 1ae54e3f-1c0b-4681-962b-f0d5b7930e4b
 open("BG_param.txt","a") do io
-	Printf.@printf(io,"gpudevice = %d;\n\n",-1);
+	Printf.@printf(io,"gpudevice = %d;\n\n",1);
 	
 end
 
@@ -205,11 +214,16 @@ md"""
 In this experiment the forcing wave comes from the left hand side of the grid.so the keyword is `left`. When forcing a boundary you will need the type of boundary and if necessary the forcing file. In this case we will be forcing with a Dirichlet type boundary(type 2) so we need to write":
 
 `left = myfile.txt,2;`
+
+Also the right boundary is a wall?
+
+`right = 0;`
 """
 
 # ╔═╡ fb6e55b9-b6af-4fa4-a0f3-cb20dc196253
 open("BG_param.txt","a") do io
 	Printf.@printf(io,"left = %s,%d;\n\n",inputfile,2);
+	Printf.@printf(io,"right = %d;\n\n",0);
 end
 
 # ╔═╡ 4b39e332-59c2-435f-a0b8-6b2b2118efe0
@@ -266,6 +280,10 @@ Finally we need to specify how often we want output maps (in seconds). We will r
 
 `outputtimestep = 1.0`
 
+By default, BG\_flood save the output as ascaled up short integer that most other NetCDF software are capable of rescaling on the fly (COARDS compliance). This make much smaller output files and while this is pratical for real life models it doesn't work well for lab experiment where scales are quite small. so let's switch this option off.
+
+`smallnc=0`
+
 """
 
 # ╔═╡ afbb832f-cc6f-4b24-af38-952ca22afd9e
@@ -276,6 +294,7 @@ open("BG_param.txt","a") do io
 	Printf.@printf(io,"outfile = %s;\n",outfile);
 	Printf.@printf(io,"outvars = zs,zsmax,hmax;\n");
 	Printf.@printf(io,"outputtimestep = %f;\n",1.0);
+	Printf.@printf(io,"smallnc = %d;\n",0.0);
 end
 
 # ╔═╡ 576c4515-2066-420f-9bc9-2fe93ecfec02
@@ -284,26 +303,26 @@ md"""
 To run the model you will need the executable (and dlls) to be present in the folder. 
 """
 
-# ╔═╡ b2e38da0-19c6-4ce0-b80b-c97a5af17c67
-bgflood=`BG_flood.exe`
-
 # ╔═╡ f2e52db8-a76c-49b2-b643-53017824eaf1
-run(bgflood)
+begin
+	rm(outfile,force=true)
+	run(bgfloodbin)
+end 
 
 # ╔═╡ 0e653452-42b0-4dae-bc5c-ad46ba8e5372
 md"""
 ## Results
 Let's check the results.
 
-### Snapshots
+### Runup map
 
 """
 
 # ╔═╡ b6a96982-888a-4ee2-a7f3-1e8e2939e4ab
-step=6;
+step=50;
 
 # ╔═╡ 65ea5121-5cb9-4d7e-9dc4-ac0d8d231123
-zsmaxvar = "zs_P0";
+zsmaxvar = "zsmax_P0";
 
 # ╔═╡ 1aaef1db-59f3-4991-b658-0657f9801d66
 hmaxvar = "hmax_P0";
@@ -321,24 +340,187 @@ zsmax=gmtread(zsmaxstgmt);
 hmax=gmtread(hmaxstgmt);
 
 # ╔═╡ 7d2b30c0-afe4-4f63-a572-ece53e40ceb7
-Runup=grdmath("? 0.001 GT 0 NAN ? MUL =",hmax,hmax)
-
-# ╔═╡ 8e0f8c11-07da-410b-a720-c3eb85dab135
-junk = grdmath("? 1 MUL =",zsmax)
+Runup=grdmath("? 0.001 GT 0 NAN ? MUL =",hmax,zsmax);
 
 # ╔═╡ 1a784c29-e2bf-4a23-a243-2f668b35ce51
-cwave=makecpt(cmap=:panoply, range=(-0.1,0.1));
+cwave=makecpt(cmap=:panoply, range=(0.0,0.05));
 
 # ╔═╡ ed88675d-5362-42d8-b281-1c2c88ea26cc
 begin
-	grdimage(Bathy, cmap=cpt);
-	grdimage!(junk, cmap=cwave, show=true);
+	grdimage(Bathy, cmap=cpt, region=(2.5,5.4,0.8,3.0));
+	grdimage!(Runup, cmap=cwave, nan_alpha=true)
+	scatter!(gaugelocs,G=:black, show=true)
 end
 
+# ╔═╡ 2f11c250-de13-11eb-33cf-3580fab90aa2
+md"""
+### Gauges output
+Read the simulated gauge output.
+"""
+
+# ╔═╡ c0f8d550-de13-11eb-0fe8-69be1dcd7792
+begin
+	BGG1=readdlm("Monai_BG_Gauge_"*string(1)*".txt", '\t',  skipstart=1);
+	BGG2=readdlm("Monai_BG_Gauge_"*string(2)*".txt", '\t',  skipstart=1);
+	BGG3=readdlm("Monai_BG_Gauge_"*string(3)*".txt", '\t',  skipstart=1);
+end
+
+# ╔═╡ fd1c0930-de13-11eb-2eaf-4f04b2bf6604
+begin
+	plot(GaugeData[:,1],GaugeData[:,2],pen=(1.0,:black), region=(0,25,-1,5), xlabel="time [s]", ylabel="water level [cm]",title="Gauge 1")
+	plot!(BGG1[:,1],BGG1[:,2].*100.0,pen=(1.0,:red),show=true)
+	
+end
+
+# ╔═╡ 045167b0-de17-11eb-000a-fd7463f0598c
+begin
+	plot(GaugeData[:,1],GaugeData[:,3],pen=(1.0,:black), region=(0,25,-1,5), xlabel="time [s]", ylabel="water level [cm]",title="Gauge 2")
+	plot!(BGG2[:,1],BGG2[:,2].*100.0,pen=(1.0,:red),show=true)
+	
+end
+
+# ╔═╡ 07d9a410-de17-11eb-2aed-d7ced49e5460
+begin
+	plot(GaugeData[:,1],GaugeData[:,4],pen=(1.0,:black), region=(0,25,-1,5), xlabel="time [s]", ylabel="water level [cm]",title="Gauge 3")
+	plot!(BGG3[:,1],BGG3[:,2].*100.0,pen=(1.0,:red),show=true)
+	
+end
+
+# ╔═╡ ab1227fe-de17-11eb-11b6-0d9773718991
+md"""
+#### Measuring the skill of the model
+Plots are great to have a visual comparison and really show how well the model works it is also nice to have a measure too.
+
+##### Define some useful functions and a skill function
+`interp1()` is a 1d linear interpolation function to interpolate the time axis so we can have the data and simulation at exactly the same time for comparison.
+
+`skills()` is a function that calculate a handfull of model validation stats: RMS, bias, Index of agreement (Willmott 2002) and skill score.
+"""
+
+
+# ╔═╡ c5aeca00-de18-11eb-0a58-39fc9c5d7c10
+function interp1(xA, yA, newx)
+        # Interpolate to time nx even if xA is not monotonic (although it has to be increasing)
+        # This is a naive implementation and could do with improvements.
+        # This function deals with extrapolation by padding the first/last known value
+        #
+
+        #selcasttimedep[indnonan], error[indnonan], ttt
+
+        #xA=selcasttimedep[indnonan]
+        #yA=error[indnonan]
+        #newx=copy(ttt)
+
+		xA=vec(xA);
+	    yA=vec(yA);
+
+
+        y = zeros(length(newx))
+        for n = 1:length(newx)
+            index = findfirst(xA .> newx[n]);
+            if index==nothing
+                if newx[n] <= xA[1]
+                    index = 1;
+                elseif newx[n] >= xA[end]
+                    index = length(xA)+1;
+                end
+            end
+            prev = yA[max(index[1] - 1, 1)];
+            next = yA[min(index[1],length(xA))];
+
+            time = newx[n] - xA[max(index[1] - 1, 1)];
+            timenext = xA[max(min(index[1],length(xA)), 1)] - xA[max(index[1] - 1, 1)];
+
+            if max(min(index[1],length(xA)), 1) == max(index[1] - 1, 1)
+
+                y[n] = yA[max(min(index[1],length(xA)), 1)];
+            else
+                y[n] = prev + (time) / (timenext) * (next - prev);
+
+            end
+        end
+        return y;
+    end
+
+# ╔═╡ c668e7b0-de17-11eb-2a96-2b4eedc665a3
+function skills(tmeas,xmeas,tmodel,xmodel)
+        # Calculate RMS. Bias, Index of agreement, and skill score
+        #
+
+        #crop non overlapping
+        index=(tmodel.>=tmeas[1]) .& (tmodel.<=tmeas[end]);
+
+        tmod=tmodel[index];
+        xmod=xmodel[index];
+
+        indxmea=(tmeas.>=tmod[1]) .& (tmeas.<=tmod[end]);
+        tmea=tmeas[indxmea];
+        xmea=xmeas[indxmea];
+
+
+        xint=interp1(tmod,xmod,tmea);
+
+		PmO=sum(abs.(xint.-xmea));
+		OmOb=sum(abs.(xmea.-StatsBase.mean(xmea)))
+		Cwcorr=2.0;
+		Wcorr=0.0;
+
+		if(PmO<=(Cwcorr*OmOb))
+			Wcorr=1.0-(PmO/(Cwcorr*OmOb));
+		else
+			Wcorr=((Cwcorr*OmOb)/PmO)-1.0;
+		end
+
+        RMS=sqrt(StatsBase.mean((xint.-xmea).^2));
+        Bias=StatsBase.mean(xint)-StatsBase.mean(xmea);
+        #Wcorr=1-(sum((xmea-xint).^2)/(sum((abs.(xmea.-StatsBase.mean(xint)).+abs.(xint.-StatsBase.mean(xint))).^2)));
+
+		Bss=1-(StatsBase.var((xmea-xint))/(StatsBase.var((xint.-StatsBase.mean(xint)))));
+
+        return RMS,Bias,Wcorr,Bss
+    end
+
+# ╔═╡ f2c51590-dea3-11eb-17e3-21fd60e6f304
+md"""
+##### Skills
+Now we calculate the skills for each gauge separately. We are only calculating the skill of the model for the first 25 s of the model.
+"""
+
+# ╔═╡ 452c9370-de19-11eb-1deb-157e713d4964
+indxt=GaugeData[:,1] .<25.0;
+
+# ╔═╡ 0511e6a0-de19-11eb-08d9-fdc5480f4254
+skillG1=skills(GaugeData[indxt,1],GaugeData[indxt,2],BGG1[:,1],BGG1[:,2].*100.0)
+
+# ╔═╡ ad111a5e-de19-11eb-0925-03015ce5836a
+skillG2=skills(GaugeData[indxt,1],GaugeData[indxt,3],BGG2[:,1],BGG2[:,2].*100.0)
+
+# ╔═╡ af034d70-de19-11eb-3800-7ff4270631bc
+skillG3=skills(GaugeData[indxt,1],GaugeData[indxt,4],BGG3[:,1],BGG3[:,2].*100.0)
+
+# ╔═╡ f9d87f12-dea4-11eb-0095-e598384dbc95
+md"""
+Overall the model is doing pretty good with index of agreement above $(minimum([skillG1[3] skillG2[3] skillG3[3]])).
+
+## What's next ?
+
+there are a bunch of things that we could try to further improve the model.
+
+### Single vs double precision
+By default, BG\_flood runs with single precision math which makes things much faster. But, is the results much better in double precision?
+
+### Default friction
+By default BG_flood runs with a sinple low quadratic friction. For most applications this is not good enough but you can try a Manning friction or a Smart friction. any difference?
+
+### Adaptive mesh
+Can we run in adaptive mode to better resolve the wave at/near the gauges? See `monai_adapt.jl` notebook. 
+"""
+
 # ╔═╡ Cell order:
-# ╠═8fd3f310-dd4b-11eb-13f2-634f6f98c198
 # ╟─949761a0-dd16-11eb-32de-4b235b067893
 # ╠═9f6a4682-dd4b-11eb-29b9-0311850f7de6
+# ╟─3c725fe0-dea9-11eb-25e3-03d2f01c07f8
+# ╠═25d689d0-dea1-11eb-3446-cfa9d339a899
 # ╟─a81a6580-dd4b-11eb-2c2c-1f7e0e684d59
 # ╟─92e31b39-e80c-4dbb-8daa-b624abcf18bb
 # ╠═dda506d2-f026-44c5-aed1-47f7b174d533
@@ -381,7 +563,6 @@ end
 # ╠═afbb832f-cc6f-4b24-af38-952ca22afd9e
 # ╠═0a83e5bc-f3d8-4e8b-a51f-24d19d9d9b54
 # ╟─576c4515-2066-420f-9bc9-2fe93ecfec02
-# ╠═b2e38da0-19c6-4ce0-b80b-c97a5af17c67
 # ╠═f2e52db8-a76c-49b2-b643-53017824eaf1
 # ╟─0e653452-42b0-4dae-bc5c-ad46ba8e5372
 # ╠═b6a96982-888a-4ee2-a7f3-1e8e2939e4ab
@@ -392,6 +573,19 @@ end
 # ╠═3e58715e-a360-452b-908b-1a4abf1b332b
 # ╠═53625fa5-92d4-481c-8f9d-ea72f79ee611
 # ╠═7d2b30c0-afe4-4f63-a572-ece53e40ceb7
-# ╠═8e0f8c11-07da-410b-a720-c3eb85dab135
 # ╠═1a784c29-e2bf-4a23-a243-2f668b35ce51
 # ╠═ed88675d-5362-42d8-b281-1c2c88ea26cc
+# ╟─2f11c250-de13-11eb-33cf-3580fab90aa2
+# ╠═c0f8d550-de13-11eb-0fe8-69be1dcd7792
+# ╠═fd1c0930-de13-11eb-2eaf-4f04b2bf6604
+# ╠═045167b0-de17-11eb-000a-fd7463f0598c
+# ╠═07d9a410-de17-11eb-2aed-d7ced49e5460
+# ╟─ab1227fe-de17-11eb-11b6-0d9773718991
+# ╟─c5aeca00-de18-11eb-0a58-39fc9c5d7c10
+# ╟─c668e7b0-de17-11eb-2a96-2b4eedc665a3
+# ╟─f2c51590-dea3-11eb-17e3-21fd60e6f304
+# ╠═452c9370-de19-11eb-1deb-157e713d4964
+# ╠═0511e6a0-de19-11eb-08d9-fdc5480f4254
+# ╠═ad111a5e-de19-11eb-0925-03015ce5836a
+# ╠═af034d70-de19-11eb-3800-7ff4270631bc
+# ╟─f9d87f12-dea4-11eb-0095-e598384dbc95
