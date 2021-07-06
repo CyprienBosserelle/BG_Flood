@@ -47,8 +47,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	{
 		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
 		{
-			//printf("Warning! Outut file name already exist  ");
-			log("Warning! Outut file name already exist   ");
+			//printf("Warning! Output file name already exist  ");
+			log("Warning! Output file name already exist   ");
 			int fileinc = 1;
 			std::vector<std::string> extvec = split(XParam.outfile, '.');
 			std::string bathyext = extvec.back();
@@ -126,7 +126,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_ncerror(status);
 
-	// Define dimensions and variables to store block id,, status, level xo, yo
+	// Define dimensions and variables to store block id, status, level xo, yo
 
 	status = nc_def_dim(ncid, "blockid", XParam.nblk, &blockid_dim);
 	if (status != NC_NOERR) handle_ncerror(status);

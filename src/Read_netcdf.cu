@@ -637,10 +637,10 @@ template int readvardata<double>(std::string filename, std::string Varname, int 
 
 
 
-std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD)
+std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE)
 {
 	int varid;
-	int errorA, errorB,errorC,errorD;
+	int errorA, errorB,errorC,errorD,errorE;
 	std::string outstring;
 
 	//std::vector<std::string> teststr;
@@ -652,6 +652,8 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	errorB = nc_inq_varid(ncid, stringB.c_str(), &varid);
 	errorC = nc_inq_varid(ncid, stringC.c_str(), &varid);
 	errorD = nc_inq_varid(ncid, stringD.c_str(), &varid);
+	errorE = nc_inq_varid(ncid, stringE.c_str(), &varid);
+
 
 	if (errorA == NC_NOERR)
 	{
@@ -669,7 +671,10 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	{
 		outstring = stringD;
 	}
-
+	else if (errorE == NC_NOERR)
+	{
+		outstring = stringE;
+	}
 
 	return outstring;
 
