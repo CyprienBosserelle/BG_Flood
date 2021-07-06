@@ -15,6 +15,22 @@ void handle_ncerror(int status) {
 	}
 }
 
+void Calcnxny(Param XParam, int level, int& nx, int& ny)
+{
+	double ddx = calcres(XParam.dx, level);
+	double dxp = calcres(XParam.dx, level + 1);
+	double xxmax, xxmin, yymax, yymin;
+
+	xxmax = XParam.xmax - dxp;
+	yymax = XParam.ymax - dxp;
+
+	xxmin = XParam.xo + dxp;
+	yymin = XParam.yo + dxp;
+
+	nx = round((xxmax - xxmin) / ddx + 1.0);
+	ny = round((yymax - yymin) / ddx + 1.0);
+}
+
 template<class T>
 void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo)
 {
@@ -141,18 +157,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
 
-		double ddx = calcres(XParam.dx, lev);
-		double initdx= calcres(XParam.dx, XParam.initlevel);
-		double xxmax, xxmin, yymax, yymin;
-
-		xxmax = XParam.xmax - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax - calcres(XParam.dx, lev + 1);
-
-		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo + calcres(XParam.dx, lev + 1);
-
-		nx = (xxmax - xxmin) / ddx + 1;
-		ny = (yymax - yymin) / ddx + 1;
+		Calcnxny(XParam, lev, nx, ny);
 
 		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
 		//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
@@ -247,18 +252,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
-		double ddx = calcres(XParam.dx, lev);
-		double initdx = calcres(XParam.dx, XParam.initlevel);
-		double xxmax, xxmin, yymax, yymin;
-
-		xxmax = XParam.xmax - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax - calcres(XParam.dx, lev + 1);
-
-		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo  + calcres(XParam.dx, lev + 1);
-
-		nx = (xxmax - xxmin) / ddx + 1;
-		ny = (yymax - yymin) / ddx + 1;
+		Calcnxny(XParam, lev, nx, ny);
 
 
 		
@@ -273,6 +267,15 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		xval = (double *)malloc(nx*sizeof(double));
 		yval = (double*)malloc(ny*sizeof(double));
 
+		double ddx = calcres(XParam.dx, lev );
+		double dxp = calcres(XParam.dx, lev + 1);
+		double xxmax, xxmin, yymax, yymin;
+
+		xxmax = XParam.xmax - dxp;
+		yymax = XParam.ymax - dxp;
+
+		xxmin = XParam.xo + dxp;
+		yymin = XParam.yo + dxp;
 
 		for (int i = 0; i < nx; i++)
 		{
@@ -804,3 +807,4 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
 }
 template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
 template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double> XModel);
+

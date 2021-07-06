@@ -1,5 +1,5 @@
 #include "Reimann.h"
-
+/*
 template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -195,3 +195,5 @@ template <class T> __host__ __device__ T hllc(T g, T delta, T epsi, T CFL, T cm,
 	}
 	return dt;
 }
+
+*/
