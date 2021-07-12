@@ -111,7 +111,7 @@ void InitTSOutput(Param XParam)
 
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSnodesout[o].outname.c_str(), "w");
-		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%dt%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
 		fclose(fsSLTS);
 		
 
