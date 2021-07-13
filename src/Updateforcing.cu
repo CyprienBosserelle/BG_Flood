@@ -243,7 +243,7 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 
 	Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
 
-	XAdv.dh[i] += Rainhh;
+	XAdv.dh[i] += Rainhh * XBlock.activeCell[i];
 }
 template __global__ void AddrainforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
 template __global__ void AddrainforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
@@ -287,7 +287,7 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 
 				Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
 
-				XAdv.dh[i] += Rainhh;
+				XAdv.dh[i] += Rainhh * XBlock.activeCell[i];
 			}
 		}
 	}
