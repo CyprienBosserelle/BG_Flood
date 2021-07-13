@@ -168,7 +168,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 	if (XForcing.rivers.size() > 0)
 	{
 		//
-		double xx, yy;
+		double xl, yb, xr, yt ;
 		int n,ib;
 		double levdx;
 		double dischargeArea = 0.0;
@@ -189,11 +189,15 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						
 						
-						xx = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
-						yy = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
+						xl = XParam.xo + XModel.blocks.xo[ib] + i * levdx - 0.5 * levdx;
+						yb = XParam.yo + XModel.blocks.yo[ib] + j * levdx - 0.5 * levdx;
+
+						xr = XParam.xo + XModel.blocks.xo[ib] + i * levdx + 0.5 * levdx;
+						yt = XParam.yo + XModel.blocks.yo[ib] + j * levdx + 0.5 * levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-						if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+						//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+						if (OBBdetect(xl, xr, yb, yt, XForcing.rivers[Rin].xstart, XForcing.rivers[Rin].xend, XForcing.rivers[Rin].ystart, XForcing.rivers[Rin].yend))
 						{
 
 							// This cell belongs to the river discharge area
