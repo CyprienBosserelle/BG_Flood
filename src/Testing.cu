@@ -633,12 +633,12 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	//Output times for comparisons
 	XParam.endtime = 1.0;
-	XParam.outputtimestep = 0.035;
+	XParam.outputtimestep = 0.04;//0.035;
 
 	XParam.smallnc = 0;
 
-	XParam.cf = 0.0;
-	XParam.frictionmodel = 0;
+	XParam.cf = 0.001;
+	XParam.frictionmodel = 1;
 
 	XParam.conserveElevation = false;
 
@@ -730,7 +730,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
-	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	XLoop.dtmax = 0.025;// initdt(XParam, XLoop, XModel);
 
 
 
