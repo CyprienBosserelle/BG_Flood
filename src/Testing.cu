@@ -16,6 +16,7 @@
 * Test 3 Test Reduction algorithm
 * Test 4 Compare resuts between the CPU and GPU Flow functions (GPU required)
 * Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
+* Test 999 RUne the main loop and engine in debug mode
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
@@ -106,7 +107,11 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t Mass conservation Test");
 		MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
 	}
-	
+	if (XParam.test == 999)
+	{
+		//
+		DebugLoop(XParam, XForcing, XModel, XModel_g); 
+	}
 
 	
 

@@ -76,6 +76,87 @@ template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<dou
 
 
 
+/*! \fn  void  DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
+* Debugging loop 
+* This function was crated to debug to properly wrap the debug flow engine of the model
+*/
+template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
+{
+
+	log("Initialising model main loop");
+
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	//Define some useful variables 
+	Initmeanmax(XParam, XLoop, XModel, XModel_g);
+
+	// fill halo for zb
+	// only need to do that once 
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	if (XParam.GPUDEVICE >= 0)
+	{
+		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
+		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
+
+		cudaStreamDestroy(XLoop.streams[0]);
+	}
+
+
+
+	log("\t\tCompleted");
+	log("Model Running...");
+	while (XLoop.nstep < 100)
+	{
+		// Bnd stuff here
+		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+
+
+		// Calculate Forcing at this step
+		updateforcing(XParam, XLoop, XForcing);
+
+		// Core engine
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//HalfStepGPU(XParam, XLoop, XForcing, XModel_g);
+		}
+		else
+		{
+			HalfStepCPU(XParam, XLoop, XForcing, XModel);
+		}
+
+		// Time keeping
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+
+		// Force output at every step
+		XLoop.nextoutputtime = XLoop.totaltime;
+
+		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
+		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
+
+		// Do Sum & Max variables Here
+		Calcmeanmax(XParam, XLoop, XModel, XModel_g);
+
+		// Check & collect TSoutput
+		pointoutputstep(XParam, XLoop, XModel, XModel_g);
+
+		// Check for map output
+		mapoutput(XParam, XLoop, XModel, XModel_g);
+
+		// Reset mean/Max if needed
+		resetmeanmax(XParam, XLoop, XModel, XModel_g);
+
+		printstatus(XLoop.totaltime, XLoop.dt);
+		XLoop.nstep++;
+	}
+
+
+
+
+}
+template void DebugLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
+template void DebugLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
+
+
 
  
 template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)

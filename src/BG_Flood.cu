@@ -25,30 +25,31 @@
 #include "BG_Flood.h"
 
 
-
-
 /*! \fn int main(int argc, char **argv)
 * Main function 
 * This function is the entry point to the software
+* The main function setups all the init of the model and then calls the mainloop to actually run the model
+*
+*	There are 3 main class storing information about the model: XParam (class Param), XModel (class Model) and XForcing (class Forcing)
+*	Leading X stands for eXecution and is to avoid confusion between the class variable and the class declaration
+*	When running with the GPU there is also XModel_g
+*	which is the same as XModel but with GPU specific pointers
+*
+*
+* This function does:
+* * Reads the inputs to the model
+* * Allocate memory on GPU and CPU
+* * Prepare and initialise memory and arrays on CPU and GPU
+* * Setup initial condition
+* * Adapt grid if require
+* * Prepare output file
+* * Run main loop
+* * Clean up and close
 */
 int main(int argc, char **argv)
 {
 
-	//The main function setups all the init of the model and then calls the mainloop to actually run the model
-
-	// There are 3 main class storing information about the model: XParam (class Param), XModel (class Model) and XForcing (class Forcing)
-	// Leading X stands for eXecution and is to avoid confusion between the class variable and the class declaration
-	// When running with the GPU there is also XModel_g
-	// which is the same as XModel but with GPU specific pointers
-
-	//First part reads the inputs to the model
-	//then allocate memory on GPU and CPU
-	//Then prepare and initialise memory and arrays on CPU and GPU
-	// Setup initial condition
-	// Adapt grid if require
-	// Prepare output file
-	// Run main loop
-	// Clean up and close
+	
 
 	//===========================================
 	//  Define the main parameter controling the model (XModels class at produced later) 
