@@ -133,6 +133,12 @@ public:
 
 	bool outvort = false;
 
+	// WARNING FOR DEBUGGING PURPOSE ONLY
+	// For debugging one can shift the output by 1 or -1 in the i and j direction.
+	// this will save the value in the halo to the output file allowing debugging of values there.
+	int outishift = 0;
+	int outjshift = 0;
+
 	// info of the mapped cf
 	//inputmap roughnessmap;
 

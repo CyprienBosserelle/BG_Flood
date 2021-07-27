@@ -630,6 +630,8 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 	float scalefactor = XParam.scalefactor;
 	float addoffset = XParam.addoffset;
 
+
+
 	status = nc_open(XParam.outfile.c_str(), NC_WRITE, &ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
 	//read id from time dimension
@@ -680,7 +682,8 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + bl * XParam.blksize;
+				//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + bl * XParam.blksize;
+				int n = memloc(XParam, i + XParam.outishift, j + XParam.outjshift, bl);
 				int r = i + j * XParam.blkwidth;
 				if (smallnc > 0)
 				{

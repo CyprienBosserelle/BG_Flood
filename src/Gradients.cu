@@ -101,9 +101,9 @@ template <class T> __global__ void gradient(int halowidth, int* active, int* lev
 
 
 	a_l = a[memloc(halowidth, blkmemwidth, ix - 1, iy, ib)];
-	a_t = a[memloc(halowidth, blkmemwidth, ix , iy+1, ib)];
+	a_t = a[memloc(halowidth, blkmemwidth, ix , iy + 1, ib)];
 	a_r = a[memloc(halowidth, blkmemwidth, ix + 1, iy, ib)];
-	a_b = a[memloc(halowidth, blkmemwidth, ix, iy-1, ib)];
+	a_b = a[memloc(halowidth, blkmemwidth, ix, iy - 1, ib)];
 	//__shared__ T a_s[18][18];
 
 
@@ -431,14 +431,15 @@ template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, 
 	else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
 		jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
-		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.75) : T(0.25);
+		//T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.75) : T(0.25);// This is the wrong way around
+		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75); // This is right (e.g. at iy==0 use 0.75 at iy==1 use 0.25)
 
 		ii = memloc(XParam, (XParam.blkwidth - 1), jj, XBlock.LeftBot[ib]);
 		ir = memloc(XParam, (XParam.blkwidth - 2), jj, XBlock.LeftBot[ib]);
 		it = memloc(XParam, (XParam.blkwidth - 1), jj - 1, XBlock.LeftBot[ib]);
 		itr = memloc(XParam, (XParam.blkwidth - 2), jj - 1, XBlock.LeftBot[ib]);
 
-		aleft = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+		aleft = BilinearInterpolation(a[itr], a[ir], a[it], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
 	}
 	
 
@@ -563,14 +564,14 @@ template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib,
 	else if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
 		jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
-		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.75) : T(0.25);
+		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
 		ir = memloc(XParam, 1, jj, XBlock.RightBot[ib]);
 		it = memloc(XParam, 0, jj - 1, XBlock.RightBot[ib]);
 		itr = memloc(XParam, 1, jj - 1, XBlock.RightBot[ib]);
 
-		aright = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+		aright = BilinearInterpolation(a[it], a[ii], a[itr], a[ir], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), jr);
 	}
 
 
@@ -698,7 +699,7 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 	else if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
 		jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
-		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.75) : T(0.25);
+		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam, jj, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
 		ir = memloc(XParam, jj, (XParam.blkwidth - 2), XBlock.BotLeft[ib]);
@@ -832,14 +833,14 @@ template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, i
 	else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
 		jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
-		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.75) : T(0.25);
+		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam, jj, 0, XBlock.TopLeft[ib]);
 		ir = memloc(XParam, jj, 1, XBlock.TopLeft[ib]);
 		it = memloc(XParam, jj - 1, 0, XBlock.TopLeft[ib]);
 		itr = memloc(XParam, jj - 1, 1, XBlock.TopLeft[ib]);
 
-		atop = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.75));
+		atop = BilinearInterpolation(a[it], a[itr], a[ii], a[ir], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.25));
 	}
 
 
@@ -971,14 +972,14 @@ template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XB
 	else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
 		jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
-		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.75) : T(0.25);
+		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 1), jj, XBlock.LeftBot[ib]);
 		ir = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 2), jj, XBlock.LeftBot[ib]);
 		it = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 1), jj - 1, XBlock.LeftBot[ib]);
 		itr = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 2), jj - 1, XBlock.LeftBot[ib]);
 
-		aleft = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+		aleft = BilinearInterpolation(a[itr], a[ir], a[it], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
 	}
 
 
@@ -1115,7 +1116,7 @@ template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBl
 	else if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
 		jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
-		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.75) : T(0.25);
+		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
 		ir = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 2), XBlock.BotLeft[ib]);

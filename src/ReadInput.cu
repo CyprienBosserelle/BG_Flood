@@ -397,8 +397,24 @@ Param readparamstr(std::string line, Param param)
 		param.resetmax = std::stoi(parametervalue);
 	}
 
+	// WARNING FOR DEBUGGING PURPOSE ONLY
+	// For debugging one can shift the output by 1 or -1 in the i and j direction.
+	// this will save the value in the halo to the output file allowing debugging of values there.
+	parameterstr = "outishift";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.outishift = std::stoi(parametervalue);
+	}
+	parameterstr = "outjshift";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.outjshift = std::stoi(parametervalue);
+	}
 
-	
+	////////////////////////////////////////////////////////////////
+	// 
 
 	parameterstr = "nx";
 	parametervalue = findparameter(parameterstr, line);
