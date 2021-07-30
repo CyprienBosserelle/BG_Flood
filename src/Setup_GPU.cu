@@ -157,6 +157,7 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	//Block info
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.active, XModel_gpu.blocks.active);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.activeCell, XModel_gpu.blocks.activeCell);
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.level, XModel_gpu.blocks.level);
 
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.xo, XModel_gpu.blocks.xo);
