@@ -139,7 +139,7 @@ Param readparamstr(std::string line, Param param)
 		param.test = std::stoi(parametervalue);
 	}
 
-	paramvec = { "gpudevice","GPUDEVICE" };
+	paramvec = { "gpudevice","gpu" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -181,11 +181,13 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 
-		if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
+		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
+		if (case_insensitive_compare(parametervalue, "true") == 0)
 		{
 			param.conserveElevation = true;
 		}
-		else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
+		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
+		else if (case_insensitive_compare(parametervalue, "false") == 0)
 		{
 			param.conserveElevation = false;
 		}
@@ -1071,7 +1073,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		// special case for 'Targetlevel' adaptation
 		if (!adaptpar.empty())
 		{
-			if (adaptpar[0].compare("Targetlevel") == 0)
+			//if (adaptpar[0].compare("Targetlevel") == 0)
+			if (case_insensitive_compare(adaptpar[0], "Targetlevel") == 0)
 			{
 				for (int ng = 1; ng < adaptpar.size(); ng++)
 				{
@@ -1350,7 +1353,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 	std::string parameternumber,left,right;
 	std::vector<std::string> splittedstr;
 	
-	// first look fo an equal sign
+	// first look for an equal sign
 	// No equal sign mean not a valid line so skip
 	splittedstr=split(line, '=' );
 	if (splittedstr.size()>1)
@@ -1359,7 +1362,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		right = splittedstr[1]; // if there are more than one equal sign in the line the second one is ignored
 		for (int ii = 0; ii < parameterstr.size(); ii++)
 		{
-			found = left.compare(parameterstr[ii]);// it needs to strictly compare
+			found = case_insensitive_compare(left,parameterstr[ii]);// it needs to strictly compare
 			if (found == 0)
 				break;
 		}
@@ -1433,6 +1436,18 @@ std::string trim(const std::string& str, const std::string& whitespace)
 	return str.substr(strBegin, strRange);
 }
 
+/*! \fn std::size_t case_insensitive_compare(const std::string& str, const std::string& str)
+* case non-sensitive string comparison (return 0 if the same, as for the "compare" function)
+*
+*/
+std::size_t case_insensitive_compare(std::string& s1, std::string& s2)
+{
+	//Convert s1 and s2 to lower case strings
+	std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
+	std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
+	if (s1.compare(s2) == 0)
+	return s1.compare(s2);
+}
 
 
 

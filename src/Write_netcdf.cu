@@ -45,7 +45,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER|NC_NETCDF4, &ncid);
 	if (status != NC_NOERR)
 	{
-		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
+		if (status == NC_EEXIST) // File already exist so automatically rename the output file 
 		{
 			//printf("Warning! Output file name already exist  ");
 			log("Warning! Output file name already exist   ");
