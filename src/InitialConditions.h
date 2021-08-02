@@ -25,5 +25,8 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock);
 template <class T> void Findbndblks(Param XParam, Model<T> XModel, Forcing<float>& XForcing);
 
+
+template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb);
+
 // End of global definition;
 #endif

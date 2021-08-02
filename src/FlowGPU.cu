@@ -57,7 +57,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Reduce minimum timestep
@@ -119,7 +119,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 

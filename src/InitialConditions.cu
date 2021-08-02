@@ -28,6 +28,9 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Set edges
 	setedges(XParam, XModel.blocks, XModel.zb);
 
+	// Calculate Active cells
+	calcactiveCellCPU(XParam, XModel.blocks, XModel.zb);
+
 	//=====================================
 	// Initialise Friction map
 
@@ -489,3 +492,53 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 }
 
+
+
+template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb)
+{
+	int ib;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				if (zb[n] < XParam.mask)
+				{
+					XBlock.activeCell[n] = 1;
+				}
+				else
+				{
+					XBlock.activeCell[n] = 0;
+				}
+			}
+		}
+	}
+
+}
+
+
+template <class T> void calcactiveCellGPU(Param XParam, BlockP<T> XBlock, T *zb)
+{
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int n = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+
+	if (zb[n] < XParam.mask)
+	{
+		XBlock.activeCell[n] = 1;
+	}
+	else
+	{
+		XBlock.activeCell[n] = 0;
+	}
+}

@@ -96,6 +96,8 @@ template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcin
 		log("Adapting mesh");
 		Adaptation(XParam, XForcing, XModel);
 
+		calcactiveCellCPU(XParam, XModel.blocks, XModel.zb);
+
 		//recalculate river positions (They may belong to a different block)
 		InitRivers(XParam, XForcing, XModel);
 

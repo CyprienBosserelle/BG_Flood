@@ -258,10 +258,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 						if (q >= XParam.mask)
 						{
 							nmask++;
-							XBlock.activeCell[n] = 0;
+
 						}
-						else
-							XBlock.activeCell[n] = 1;
 					}
 					
 
