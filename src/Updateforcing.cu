@@ -249,6 +249,43 @@ template __global__ void AddrainforcingGPU<float>(Param XParam, BlockP<float> XB
 template __global__ void AddrainforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
 
 
+template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T Rainhh;
+
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+	if (Rain.uniform)
+	{
+		Rainhh = Rain.nowvalue;
+	}
+	else
+	{
+		Rainhh = T(interpDyn2BUQ(x, y, Rain.GPU));
+	}
+
+
+	Rainhh = Rainhh / T(1000.0) / T(3600.0) * XLoop.dt; // convert from mm/hrs to m/s
+
+	XEv.h[i] += Rainhh * XBlock.activeCell[i];
+	XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+}
+template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
+template __global__ void AddrainforcingImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
+
+
 template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
 {
 	int ib;
@@ -295,6 +332,52 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 template __host__ void AddrainforcingCPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
 template __host__ void AddrainforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
 
+template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv)
+{
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+				T Rainhh;
+
+				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				if (Rain.uniform)
+				{
+					Rainhh = Rain.nowvalue;
+				}
+				else
+				{
+					Rainhh = interp2BUQ(x, y, Rain);
+				}
+
+
+
+
+				Rainhh = Rainhh / T(1000.0) / T(3600.0) * XLoop.dt; // convert from mm/hrs to m/s
+
+				XEv.h[i] += Rainhh * XBlock.activeCell[i];
+				XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+			}
+		}
+	}
+}
+template __host__ void AddrainforcingImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
+template __host__ void AddrainforcingImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
 template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
 {

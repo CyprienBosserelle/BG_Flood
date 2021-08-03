@@ -45,10 +45,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Add forcing (Rain, Wind)
-	if (!XForcing.Rain.inputfile.empty())
-	{
-		AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
-	}
+	//if (!XForcing.Rain.inputfile.empty())
+	//{
+	//	AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
+	//}
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingCPU(XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
@@ -95,10 +95,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	
 	//============================================
 	// Add forcing (Rain, Wind)
-	if (!XForcing.Rain.inputfile.empty())
-	{
-		AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
-	}
+	//if (!XForcing.Rain.inputfile.empty())
+	//{
+	//	AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
+	//}
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingCPU(XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
@@ -122,7 +122,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Copy updated evolving variable back
 	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 
-	
+	if (!XForcing.Rain.inputfile.empty())
+	{
+		AddrainforcingImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+	}
 
 
 
@@ -183,10 +186,10 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	//============================================
 	// Add forcing (Rain, Wind)
-	if (!XForcing.Rain.inputfile.empty())
-	{
-		AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
-	}
+	//if (!XForcing.Rain.inputfile.empty())
+	//{
+	//	AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
+	//}
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingCPU(XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
@@ -208,6 +211,11 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	//============================================
 	//Copy updated evolving variable back
 	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
+
+	if (!XForcing.Rain.inputfile.empty())
+	{
+		AddrainforcingImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+	}
 }
 template void HalfStepCPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void HalfStepCPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);

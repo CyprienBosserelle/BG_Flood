@@ -20,7 +20,9 @@ template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBloc
 template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv);
 
 template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv);
+template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv);
 template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv);
+template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv);
 
 template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, std::vector<River> XRivers, Model<T> XModel);
 

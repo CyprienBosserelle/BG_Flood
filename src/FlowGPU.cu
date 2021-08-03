@@ -74,10 +74,10 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	
 	//============================================
 	// Add forcing (Rain, Wind)
-	if (!XForcing.Rain.inputfile.empty())
-	{
-		AddrainforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Rain, XModel.adv);
-	}
+	//if (!XForcing.Rain.inputfile.empty())
+	//{
+	//	AddrainforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Rain, XModel.adv);
+	//}
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
@@ -129,10 +129,10 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Add forcing (Rain, Wind)
-	if (!XForcing.Rain.inputfile.empty())
-	{
-		AddrainforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Rain, XModel.adv);
-	}
+	//if (!XForcing.Rain.inputfile.empty())
+	//{
+	//	AddrainforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Rain, XModel.adv);
+	//}
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
@@ -158,6 +158,11 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	//Copy updated evolving variable back
 	cleanupGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	if (!XForcing.Rain.inputfile.empty())
+	{
+		AddrainforcingImplicitGPU << < gridDim, blockDim, 0 >> > (XParam,XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+	}
 	
 	
 	for (int i = 0; i < XLoop.num_streams; i++)
