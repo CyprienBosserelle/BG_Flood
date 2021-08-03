@@ -12,6 +12,7 @@
 #include "Advection.h"
 #include "Friction.h"
 #include "Updateforcing.h"
+#include "Reimann.h"
 
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel);
 
