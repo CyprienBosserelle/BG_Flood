@@ -9,6 +9,7 @@
 #include "Util_CPU.h"
 
 template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb);
+template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb);
 template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb);
-
+template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb);
 #endif

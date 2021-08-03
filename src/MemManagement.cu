@@ -67,6 +67,9 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateCPU(nblk, blksize, XModel.grad.dhdy, XModel.grad.dzsdy, XModel.grad.dudy, XModel.grad.dvdy);
 	AllocateCPU(nblk, blksize, XModel.grad.dhdx, XModel.grad.dzsdx, XModel.grad.dudx, XModel.grad.dvdx);
 
+	AllocateCPU(nblk, blksize, XModel.grad.dzbdx);
+	AllocateCPU(nblk, blksize, XModel.grad.dzbdy);
+
 	AllocateCPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
 	AllocateCPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);

@@ -1,5 +1,7 @@
 #include "Reimann.h"
 
+
+
 template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -168,6 +170,186 @@ template __global__ void UpdateButtingerXGPU(Param XParam, BlockP<float> XBlock,
 template __global__ void UpdateButtingerXGPU(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb);
 
 
+template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
+{
+
+
+	T delta;
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	int RB, LBRB, LB, RBLB, levRB, levLB;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		int lev = XBlock.level[ib];
+		delta = calcres(T(XParam.dx), lev);
+
+		// neighbours for source term
+
+		RB = XBlock.RightBot[ib];
+		levRB = XBlock.level[RB];
+		LBRB = XBlock.LeftBot[RB];
+
+		LB = XBlock.LeftBot[ib];
+		levLB = XBlock.level[LB];
+		RBLB = XBlock.RightBot[LB];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth + XParam.halowidth); ix++)
+			{
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+
+
+
+
+				T dhdxi = XGrad.dhdx[i];
+				T dhdxmin = XGrad.dhdx[ileft];
+				T cm = T(1.0);
+				T fmu = T(1.0);
+
+				T hi = XEv.h[i];
+
+				T hn = XEv.h[ileft];
+
+
+				if (hi > eps || hn > eps)
+				{
+					T dx, zi, zn, hr, hl, etar, etal, zr, zl, zA, zCN, hCNr, hCNl;
+					T ui, vi, uli, vli, dhdxi, dhdxil, dudxi, dudxil, dvdxi, dvdxil;
+
+					T ga = g * T(0.5);
+					// along X
+					dx = delta * T(0.5);
+					zi = zb[i];
+					zn = zb[ileft];
+
+					ui = XEv.u[i];
+					vi = XEv.v[i];
+					uli = XEv.u[ileft];
+					vli = XEv.v[ileft];
+
+					dhdxi = XGrad.dhdx[i];
+					dhdxil = XGrad.dhdx[ileft];
+					dudxi = XGrad.dudx[i];
+					dudxil = XGrad.dudx[ileft];
+					dvdxi = XGrad.dvdx[i];
+					dvdxil = XGrad.dvdx[ileft];
+
+
+					hr = hi - dx * dhdxi;
+					hl = hn + dx * dhdxil;
+					etar = XEv.zs[i] - dx * XGrad.dzsdx[i];
+					etal = XEv.zs[ileft] + dx * XGrad.dzsdx[ileft];
+
+					//define the topography term at the interfaces
+					zr = zi - dx * XGrad.dzbdx[i];
+					zl = zn + dx * XGrad.dzbdx[ileft];
+
+					//define the Audusse terms
+					zA = max(zr, zl);
+
+					// Now the CN terms
+					zCN = min(zA, min(etal, etar));
+					hCNr = max(T(0.0), min(etar - zCN, hr));
+					hCNl = max(T(0.0), min(etal - zCN, hl));
+
+					//Velocity reconstruction
+					//To avoid high velocities near dry cells, we reconstruct velocities according to Bouchut.
+					T ul, ur, vl, vr, sl, sr;
+					if (hi > eps) {
+						ur = ui - (1. + dx * dhdxi / hi) * dx * dudxi;
+						vr = vi - (1. + dx * dhdxi / hi) * dx * dvdxi;
+					}
+					else {
+						ur = ui - dx * dudxi;
+						vr = vi - dx * dvdxi;
+					}
+					if (hn > eps) {
+						ul = uli + (1. - dx * dhdxil / hn) * dx * dudxil;
+						vl = vli + (1. - dx * dhdxil / hn) * dx * dvdxil;
+					}
+					else {
+						ul = uli + dx * dudxil;
+						vl = vli + dx * dvdxil;
+					}
+
+
+
+
+					T fh, fu, fv, dt;
+
+
+					//solver below also modifies fh and fu
+					dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, ul, ur, fh, fu);
+					//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
+
+					if (dt < dtmax[i])
+					{
+						dtmax[i] = dt;
+					}
+					else
+					{
+						dtmax[i] = T(1.0) / epsi;
+					}
+
+					fv = (fh > 0. ? vl : vr) * fh;
+
+
+					// Topographic source term
+
+					// In the case of adaptive refinement, care must be taken to ensure
+					// well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
+					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
+					{
+						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
+						hi = XEv.h[iright];
+						zi = zb[iright];
+					}
+					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
+					{
+						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
+						hn = XEv.h[ilc];
+						zn = zb[ilc];
+					}
+
+					sl = ga * (hi + hCNr) * (zi - zCN);
+					sr = ga * (hCNl + hn) * (zn - zCN);
+
+					////Flux update
+
+					XFlux.Fhu[i] = fmu * fh;
+					XFlux.Fqux[i] = fmu * (fu - sl);
+					XFlux.Su[i] = fmu * (fu - sr);
+					XFlux.Fqvx[i] = fmu * fv;
+				}
+				else
+				{
+					dtmax[i] = T(1.0) / epsi;
+					XFlux.Fhu[i] = T(0.0);
+					XFlux.Fqux[i] = T(0.0);
+					XFlux.Su[i] = T(0.0);
+					XFlux.Fqvx[i] = T(0.0);
+				}
+			}
+		}
+	}
+}
+template __host__ void UpdateButtingerXCPU(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb);
+template __host__ void UpdateButtingerXCPU(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb);
+
 template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -334,6 +516,192 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 }
 template __global__ void UpdateButtingerYGPU(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb);
 template __global__ void UpdateButtingerYGPU(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb);
+
+
+template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
+{
+
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+	T delta;
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+
+
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	int TL, BLTL, BL, TLBL, levTL, levBL, lev;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+
+
+
+		TL = XBlock.TopLeft[ib];
+		levTL = XBlock.level[TL];
+		BLTL = XBlock.BotLeft[TL];
+
+		BL = XBlock.BotLeft[ib];
+		levBL = XBlock.level[BL];
+		TLBL = XBlock.TopLeft[BL];
+
+		lev = XBlock.level[ib];
+
+		delta = calcres(XParam.dx, lev);
+
+		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+
+
+
+
+				T dhdyi = XGrad.dhdy[i];
+				T dhdymin = XGrad.dhdy[ibot];
+				T cm = T(1.0);
+				T fmu = T(1.0);
+
+				T hi = XEv.h[i];
+
+				T hn = XEv.h[ibot];
+
+
+				if (hi > eps || hn > eps)
+				{
+					T dx, zi, zn, hr, hl, etar, etal, zr, zl, zA, zCN, hCNr, hCNl;
+					T ui, vi, uli, vli, dhdyi, dhdyil, dudyi, dudyil, dvdyi, dvdyil;
+
+					T ga = g * T(0.5);
+					// along X
+					dx = delta * T(0.5);
+					zi = zb[i];
+					zn = zb[ibot];
+
+					ui = XEv.u[i];
+					vi = XEv.v[i];
+					uli = XEv.u[ibot];
+					vli = XEv.v[ibot];
+
+					dhdyi = XGrad.dhdy[i];
+					dhdyil = XGrad.dhdy[ibot];
+					dudyi = XGrad.dudy[i];
+					dudyil = XGrad.dudy[ibot];
+					dvdyi = XGrad.dvdy[i];
+					dvdyil = XGrad.dvdy[ibot];
+
+
+					hr = hi - dx * dhdyi;
+					hl = hn + dx * dhdyil;
+					etar = XEv.zs[i] - dx * XGrad.dzsdy[i];
+					etal = XEv.zs[ibot] + dx * XGrad.dzsdy[ibot];
+
+					//define the topography term at the interfaces
+					zr = zi - dx * XGrad.dzbdy[i];
+					zl = zn + dx * XGrad.dzbdy[ibot];
+
+					//define the Audusse terms
+					zA = max(zr, zl);
+
+					// Now the CN terms
+					zCN = min(zA, min(etal, etar));
+					hCNr = max(T(0.0), min(etar - zCN, hr));
+					hCNl = max(T(0.0), min(etal - zCN, hl));
+
+					//Velocity reconstruction
+					//To avoid high velocities near dry cells, we reconstruct velocities according to Bouchut.
+					T ul, ur, vl, vr, sl, sr;
+					if (hi > eps) {
+						ur = ui - (1. + dx * dhdyi / hi) * dx * dudyi;
+						vr = vi - (1. + dx * dhdyi / hi) * dx * dvdyi;
+					}
+					else {
+						ur = ui - dx * dudyi;
+						vr = vi - dx * dvdyi;
+					}
+					if (hn > eps) {
+						ul = uli + (1. - dx * dhdyil / hn) * dx * dudyil;
+						vl = vli + (1. - dx * dhdyil / hn) * dx * dvdyil;
+					}
+					else {
+						ul = uli + dx * dudyil;
+						vl = vli + dx * dvdyil;
+					}
+
+
+
+
+					T fh, fu, fv, dt;
+
+
+					//solver below also modifies fh and fu
+					dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, vl, vr, fh, fu);
+					//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
+
+					if (dt < dtmax[i])
+					{
+						dtmax[i] = dt;
+					}
+					else
+					{
+						dtmax[i] = T(1.0) / epsi;
+					}
+
+					fv = (fh > 0. ? ul : ur) * fh;
+
+
+					// Topographic source term
+
+					// In the case of adaptive refinement, care must be taken to ensure
+					// well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
+					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the top halo
+					{
+						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
+						hi = XEv.h[itop];
+						zi = zb[itop];
+					}
+					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
+					{
+						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
+						hn = XEv.h[ibc];
+						zn = zb[ibc];
+					}
+
+					sl = ga * (hi + hCNr) * (zi - zCN);
+					sr = ga * (hCNl + hn) * (zn - zCN);
+
+					////Flux update
+
+					XFlux.Fhv[i] = fmu * fh;
+					XFlux.Fqvy[i] = fmu * (fu - sl);
+					XFlux.Sv[i] = fmu * (fu - sr);
+					XFlux.Fquy[i] = fmu * fv;
+				}
+				else
+				{
+					dtmax[i] = T(1.0) / epsi;
+					XFlux.Fhv[i] = T(0.0);
+					XFlux.Fqvy[i] = T(0.0);
+					XFlux.Sv[i] = T(0.0);
+					XFlux.Fquy[i] = T(0.0);
+				}
+			}
+		}
+	}
+}
+template __host__ void UpdateButtingerYCPU(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb);
+template __host__ void UpdateButtingerYCPU(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb);
+
+
+
 
 
 template <class T> __host__ __device__ T hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T &fh, T &fq)
