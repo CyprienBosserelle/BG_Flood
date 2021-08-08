@@ -47,7 +47,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 		while (difft < 0.0)
 		{
 			Rstepinbnd++;
-			difft = XDynForcing.unidata[Rstepinbnd].time - XParam.totaltime;
+			difft = XDynForcing.unidata[Rstepinbnd].time - XLoop.totaltime;
 		}
 
 		XDynForcing.nowvalue = T(interptime(XDynForcing.unidata[Rstepinbnd].wspeed, XDynForcing.unidata[Rstepinbnd - 1].wspeed, XDynForcing.unidata[Rstepinbnd].time - XDynForcing.unidata[Rstepinbnd - 1].time, XLoop.totaltime - XDynForcing.unidata[Rstepinbnd - 1].time));
