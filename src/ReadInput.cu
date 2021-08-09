@@ -1449,12 +1449,12 @@ std::string trim(const std::string& str, const std::string& whitespace)
 * case non-sensitive string comparison (return 0 if the same, as for the "compare" function)
 *
 */
-std::size_t case_insensitive_compare(std::string& s1, std::string& s2)
+std::size_t case_insensitive_compare(std::string s1, std::string s2)
 {
 	//Convert s1 and s2 to lower case strings
 	std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
 	std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
-	if (s1.compare(s2) == 0)
+//if (s1.compare(s2) == 0)
 	return s1.compare(s2);
 }
 
