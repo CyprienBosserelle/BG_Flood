@@ -47,7 +47,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 		while (difft < 0.0)
 		{
 			Rstepinbnd++;
-			difft = XDynForcing.unidata[Rstepinbnd].time - XParam.totaltime;
+			difft = XDynForcing.unidata[Rstepinbnd].time - XLoop.totaltime;
 		}
 
 		XDynForcing.nowvalue = T(interptime(XDynForcing.unidata[Rstepinbnd].wspeed, XDynForcing.unidata[Rstepinbnd - 1].wspeed, XDynForcing.unidata[Rstepinbnd].time - XDynForcing.unidata[Rstepinbnd - 1].time, XLoop.totaltime - XDynForcing.unidata[Rstepinbnd - 1].time));
@@ -243,7 +243,7 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 
 	Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
 
-	XAdv.dh[i] += Rainhh;
+	XAdv.dh[i] += Rainhh * XBlock.activeCell[i];
 }
 template __global__ void AddrainforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
 template __global__ void AddrainforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
@@ -287,7 +287,7 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 
 				Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
 
-				XAdv.dh[i] += Rainhh;
+				XAdv.dh[i] += Rainhh * XBlock.activeCell[i];
 			}
 		}
 	}

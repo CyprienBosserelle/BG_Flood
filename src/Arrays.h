@@ -68,7 +68,8 @@ struct BlockP
 	int* RightBot, *RightTop;
 
 	int* level;
-	int* active;
+	int* active; // active blocks
+	int* activeCell; //To apply forcings (rain) only on these
 
 	maskinfo mask;
 	

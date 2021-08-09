@@ -12,7 +12,7 @@
 //the Free Software Foundation.                                                 //
 //                                                                              //
 //This program is distributed in the hope that it will be useful,               //
-//but WITHOUT ANY WARRANTY; without even the implied warranty of                //    
+//but WITHOUT ANY WARRANTY; without even the implied warranty of                //
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 //
 //GNU General Public License for more details.                                  //
 //                                                                              //
@@ -46,19 +46,21 @@ namespace utils {
 		return !(b<a) ? a : b;     // or: return comp(a,b)?b:a; for version (2)
 	}
 
-
-	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b, const T& c) {
+	/*! \fn template <class T> const T& nearest(const T& a, const T& b, const T& c)
+	* Generic nearest value function with 3 parameter
+	*/
+		template <class T> __host__ __device__ const T& nearest(const T& a, const T& b, const T& c) {
 		return abs(b - c) > abs(a - c) ? a : b;     // Nearest element to c
 	}
 
 	template <class T> __host__ __device__ const T& nearest(const T& a, const T& b) {
 		return abs(b) > abs(a) ? a : b;     // Nearest element to 0.0
 	}
-
+/*
 	template <class T> __host__ __device__ const T& floor(const T& a) {
-		return abs(b) > abs(a) ? a : b;    
+		return abs(b) > abs(a) ? a : b;
 	}
-
+*/
 
 	template __host__ __device__ const int& min<int>(const int& a, const int& b);
 	template __host__ __device__ const float& min<float>(const float& a, const float& b);
@@ -150,7 +152,7 @@ template __host__ __device__ float calcres<float>(float dx, int level);
 
 template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2)
 {
-	//theta should be used as a global var 
+	//theta should be used as a global var
 	// can be used to tune the limiting (theta=1
 	//gives minmod, the most dissipative limiter and theta = 2 gives
 	//	superbee, the least dissipative).
@@ -172,3 +174,21 @@ template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2)
 
 template __host__ __device__ float minmod2(float theta, float s0, float s1, float s2);
 template __host__ __device__ double minmod2(double theta, double s0, double s1, double s2);
+
+/*! \fn OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)
+	* Overlaping Bounding Box to detect which cell river falls into. It is the simplest version of the algorythm where the bounding box are paralle;l to the axis
+	*/
+template <class T> __host__ bool OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)
+{
+	bool overlap = false;
+
+	bool testX = Bxmin <= Axmax && Bxmax >= Axmin;
+	bool testY = Bymin <= Aymax && Bymax >= Aymin;
+
+	overlap = testX && testY;
+
+	return overlap;
+}
+
+template __host__ bool OBBdetect(float Axmin, float Axmax, float Aymin, float Aymax, float Bxmin, float Bxmax, float Bymin, float Bymax);
+template __host__ bool OBBdetect(double Axmin, double Axmax, double Aymin, double Aymax, double Bxmin, double Bxmax, double Bymin, double Bymax);

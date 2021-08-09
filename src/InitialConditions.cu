@@ -111,7 +111,10 @@ void InitTSOutput(Param XParam)
 
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSnodesout[o].outname.c_str(), "w");
-		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%dt%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
+
+		fprintf(fsSLTS, "# time[s]\tzs[m]\th[m]\tu[m/s]\tv[m/s]\n");
+
 		fclose(fsSLTS);
 		
 
@@ -139,7 +142,7 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 
 			ib = XBlock.active[blk];
 			levdx = calcres(XParam.dx,XBlock.level[ib]);
-			if (XParam.TSnodesout[o].x >= (XParam.xo + XBlock.xo[ib]) && XParam.TSnodesout[o].x <= (XParam.xo + XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= (XParam.yo + XBlock.yo[o]) && XParam.TSnodesout[o].y <= (XParam.yo + XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
+			if (XParam.TSnodesout[o].x >= (XParam.xo + XBlock.xo[ib]) && XParam.TSnodesout[o].x <= (XParam.xo + XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= (XParam.yo + XBlock.yo[ib]) && XParam.TSnodesout[o].y <= (XParam.yo + XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
 			{
 				XParam.TSnodesout[o].block = ib;
 				XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - (XParam.xo + XBlock.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
@@ -165,7 +168,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 	if (XForcing.rivers.size() > 0)
 	{
 		//
-		double xx, yy;
+		double xl, yb, xr, yt ;
 		int n,ib;
 		double levdx;
 		double dischargeArea = 0.0;
@@ -186,11 +189,15 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						
 						
-						xx = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
-						yy = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
+						xl = XParam.xo + XModel.blocks.xo[ib] + i * levdx - 0.5 * levdx;
+						yb = XParam.yo + XModel.blocks.yo[ib] + j * levdx - 0.5 * levdx;
+
+						xr = XParam.xo + XModel.blocks.xo[ib] + i * levdx + 0.5 * levdx;
+						yt = XParam.yo + XModel.blocks.yo[ib] + j * levdx + 0.5 * levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-						if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+						//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+						if (OBBdetect(xl, xr, yb, yt, XForcing.rivers[Rin].xstart, XForcing.rivers[Rin].xend, XForcing.rivers[Rin].ystart, XForcing.rivers[Rin].yend))
 						{
 
 							// This cell belongs to the river discharge area

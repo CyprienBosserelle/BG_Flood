@@ -32,5 +32,9 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 //template <class T> void Gaussianhump(Param XParam, Model<T> XModel, Model<T> XModel_g);
 //template <class T> bool Raintestmap(int gpu, int dimf, T zinit);
 
+template <class T> bool Rivertest(T zsnit, int gpu);
+template <class T> bool MassConserveSteepSlope(T zsnit, int gpu);
+
+
 // End of global definition
 #endif

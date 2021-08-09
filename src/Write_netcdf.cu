@@ -15,6 +15,22 @@ void handle_ncerror(int status) {
 	}
 }
 
+void Calcnxny(Param XParam, int level, int& nx, int& ny)
+{
+	double ddx = calcres(XParam.dx, level);
+	double dxp = calcres(XParam.dx, level + 1);
+	double xxmax, xxmin, yymax, yymin;
+
+	xxmax = XParam.xmax - dxp;
+	yymax = XParam.ymax - dxp;
+
+	xxmin = XParam.xo + dxp;
+	yymin = XParam.yo + dxp;
+
+	nx = round((xxmax - xxmin) / ddx + 1.0);
+	ny = round((yymax - yymin) / ddx + 1.0);
+}
+
 template<class T>
 void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo)
 {
@@ -31,8 +47,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	{
 		if (status == NC_EEXIST) // File already exist so automatically rename the output file 
 		{
-			//printf("Warning! Outut file name already exist  ");
-			log("Warning! Outut file name already exist   ");
+			//printf("Warning! Output file name already exist  ");
+			log("Warning! Output file name already exist   ");
 			int fileinc = 1;
 			std::vector<std::string> extvec = split(XParam.outfile, '.');
 			std::string bathyext = extvec.back();
@@ -110,7 +126,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_ncerror(status);
 
-	// Define dimensions and variables to store block id,, status, level xo, yo
+	// Define dimensions and variables to store block id, status, level xo, yo
 
 	status = nc_def_dim(ncid, "blockid", XParam.nblk, &blockid_dim);
 	if (status != NC_NOERR) handle_ncerror(status);
@@ -141,18 +157,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
 
-		double ddx = calcres(XParam.dx, lev);
-		double initdx= calcres(XParam.dx, XParam.initlevel);
-		double xxmax, xxmin, yymax, yymin;
-
-		xxmax = XParam.xmax - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax - calcres(XParam.dx, lev + 1);
-
-		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo + calcres(XParam.dx, lev + 1);
-
-		nx = round((xxmax - xxmin) / ddx + 1.0);
-		ny = round((yymax - yymin) / ddx + 1.0);
+		Calcnxny(XParam, lev, nx, ny);
 
 		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
 		//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
@@ -247,20 +252,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
-		double ddx = calcres(XParam.dx, lev);
-		double initdx = calcres(XParam.dx, XParam.initlevel);
-		double xxmax, xxmin, yymax, yymin;
-
-		xxmax = XParam.xmax - calcres(XParam.dx, lev + 1);
-		yymax = XParam.ymax - calcres(XParam.dx, lev + 1);
-
-		xxmin = XParam.xo + calcres(XParam.dx, lev + 1);
-		yymin = XParam.yo  + calcres(XParam.dx, lev + 1);
-
-		nx = round((xxmax - xxmin) / ddx + 1.0);
-		ny = round((yymax - yymin) / ddx + 1.0);
-
-
+		Calcnxny(XParam, lev, nx, ny);
 		
 
 		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin, nx);
@@ -273,6 +265,15 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		xval = (double *)malloc(nx*sizeof(double));
 		yval = (double*)malloc(ny*sizeof(double));
 
+		double ddx = calcres(XParam.dx, lev );
+		double dxp = calcres(XParam.dx, lev + 1);
+		double xxmax, xxmin, yymax, yymin;
+
+		xxmax = XParam.xmax - dxp;
+		yymax = XParam.ymax - dxp;
+
+		xxmin = XParam.xo + dxp;
+		yymin = XParam.yo + dxp;
 
 		for (int i = 0; i < nx; i++)
 		{

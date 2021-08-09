@@ -104,11 +104,15 @@ template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcin
 		Calcbndblks(XParam, XForcing, XModel.blocks);
 		Findbndblks(XParam, XModel, XForcing);
 
+		initoutput(XParam, XModel);
+
 		//Recalculate the masks
 		FindMaskblk(XParam, XModel.blocks);
 
 		// Re run initial contions to avoid dry/wet issues
 		initevolv(XParam, XModel.blocks, XForcing, XModel.evolv, XModel.zb);
+
+		
 	}
 }
 template void InitialAdaptation<float>(Param& XParam, Forcing<float> &XForcing, Model<float>& XModel);

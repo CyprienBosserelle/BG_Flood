@@ -29,5 +29,8 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T> XEvo, EvolvingP<T>& XEv);
 template <class T> void Adaptationcleanup(Param& XParam, BlockP<T>& XBlock, AdaptP& XAdapt);
 
+
+template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T blocko, int neighbourib, int levelneighbour, T neighbourblocko, bool rightortop );
+
 // End of global definition
 #endif

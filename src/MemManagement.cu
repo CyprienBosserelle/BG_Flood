@@ -75,6 +75,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	//Allocate block info
 	AllocateCPU(nblk, 1, XModel.blocks.active);
+	AllocateCPU(nblk, blksize, XModel.blocks.activeCell);
 	AllocateCPU(nblk, 1, XModel.blocks.level);
 
 	AllocateCPU(nblk, 1, XModel.blocks.BotLeft, XModel.blocks.BotRight, XModel.blocks.LeftBot, XModel.blocks.LeftTop);
@@ -205,6 +206,7 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	//Allocate block info
 	ReallocArray(nblk, 1, XModel.blocks.active);
+	ReallocArray(nblk, blksize, XModel.blocks.activeCell);
 	ReallocArray(nblk, 1, XModel.blocks.level);
 
 	ReallocArray(nblk, 1, XModel.blocks.BotLeft, XModel.blocks.BotRight, XModel.blocks.LeftBot, XModel.blocks.LeftTop);
@@ -300,6 +302,7 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	//Allocate block info
 	AllocateGPU(nblk, 1, XModel.blocks.active);
+	AllocateGPU(nblk, blksize, XModel.blocks.activeCell);
 	AllocateGPU(nblk, 1, XModel.blocks.level);
 
 	AllocateGPU(nblk, 1, XModel.blocks.BotLeft, XModel.blocks.BotRight, XModel.blocks.LeftBot, XModel.blocks.LeftTop);

@@ -220,6 +220,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx)*levdx + 0.5 * levdx;
 					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky)*levdx + 0.5 * levdx;
 
+					int n = memloc(XParam, i, j, blkid);
+
 					//x = max(min(x, XParam.Bathymetry.xmax), XParam.Bathymetry.xo);
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
 					
@@ -254,7 +256,12 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 						//printf("q = %f\t q11=%f\t, q12=%f\t, q21=%f\t, q22=%f\t, x1=%f\t, x2=%f\t, y1=%f\t, y2=%f\t, x=%f\t, y=%f\t\n", q, q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 						//printf("mloc: %i\n", mloc);
 						if (q >= XParam.mask)
+						{
 							nmask++;
+							XBlock.activeCell[n] = 0;
+						}
+						else
+							XBlock.activeCell[n] = 1;
 					}
 					
 
