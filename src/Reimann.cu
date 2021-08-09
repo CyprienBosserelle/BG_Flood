@@ -664,15 +664,15 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 					{
 						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
-						//hi = XEv.h[itop];
-						//zi = zb[itop];
+						hi = XEv.h[itop];
+						zi = zb[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
 					{
 						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
-						//hn = XEv.h[ibc];
-						//zn = zb[ibc];
+						hn = XEv.h[ibc];
+						zn = zb[ibc];
 					}
 
 					sl = ga * (hi + hCNr) * (zi - zCN);

@@ -182,13 +182,17 @@ template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, 
 	T eps = T(XParam.eps);
 	T hold = XEv.h[i];
 	T ho, uo, vo;
-	ho = hold + dt * XAdv.dh[i];
+	T dhi = XAdv.dh[i];
+
+	T edt = dt;// dhi > T(0.0) ? dt : min(dt, hold / (-1.0 * dhi));
+
+	ho = hold + edt * dhi;
 
 
 	if (ho > eps) {
 		//
-		uo = (hold * XEv.u[i] + dt * XAdv.dhu[i]) / ho;
-		vo = (hold * XEv.v[i] + dt * XAdv.dhv[i]) / ho;
+		uo = (hold * XEv.u[i] + edt * XAdv.dhu[i]) / ho;
+		vo = (hold * XEv.v[i] + edt * XAdv.dhv[i]) / ho;
 		
 	}
 	else
