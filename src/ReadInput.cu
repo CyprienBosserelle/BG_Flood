@@ -118,7 +118,7 @@ void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 
 
 /*! \fn Param readparamstr(std::string line, Param param)
-* Read BG_param.txt line and convert parameter to the righ parameter in teh class
+* Read BG_param.txt line and convert parameter to the righ parameter in the class
 * retrun an updated Param class 
 */
 Param readparamstr(std::string line, Param param)
@@ -276,7 +276,7 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	paramvec = { "outputtimestep","outtimestep" };
+	paramvec = { "outputtimestep","outtimestep","outputstep"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "outputtimestep";
 	//parametervalue = findparameter(parameterstr, line);
@@ -651,8 +651,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 {
 	std::string parameterstr, parametervalue;
 	std::vector<std::string> paramvec;
-		
-	paramvec= { "Bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo"};
+       	
+	paramvec = { "bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEM"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "bathy";
 	//parametervalue = findparameter(parameterstr, line);

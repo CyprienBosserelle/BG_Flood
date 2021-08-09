@@ -1063,6 +1063,7 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	readvardata(forcing.inputfile, forcing.varname, step, forcing.before);
 	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after);
 	InterpstepCPU(forcing.nx, forcing.ny, step, totaltime, forcing.dt, forcing.now, forcing.before, forcing.after);
+	forcing.val = forcing.now;
 }
 
 /*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)

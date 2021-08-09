@@ -17,8 +17,8 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop,BlockP<T> XBlock, b
 	if (side.isright == 0)
 	{
 		//top or bottom
-		un = XEv.v;
-		ut = XEv.u;
+		un = XEv.v; //u normal to boundary
+		ut = XEv.u; //u tangent to boundary
 	}
 	else
 	{
@@ -772,7 +772,8 @@ template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un
 
 template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd,T unbnd, T& un, T& ut, T& zs, T& h)
 {
-	// When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
+	//Absorbing 1D boundary
+	//When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
 	// For utbnd use utinside if no utbnd are known 
 	un= sign * sqrt(g / h) * (zsinside - zsbnd) + T(unbnd);
 	zs = zsinside;
@@ -783,7 +784,7 @@ template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinsi
 template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h)
 {
 	// Is this even the right formulation?.
-	// I don't really like this formulation. while a bit less difssipative then abs1D with 0 unbnd (but worse if forcing uniside with 0) it is very reflective an not stable  
+	// I don't really like this formulation. while a bit less dissipative then abs1D with 0 unbnd (but worse if forcing uniside with 0) it is very reflective an not stable  
 	T zbinside = zsinside - hinside;
 	un = sign * T(2.0) * (sqrt(g * max(hinside, T(0.0))) - sqrt(g * max(zsbnd - zbinside, T(0.0)))) + uninside;
 	ut = T(0.0);

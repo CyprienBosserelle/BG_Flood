@@ -835,5 +835,41 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 
 }
 
+// The following functions are simple tools to create 2D or 3D netcdf files (for testing for example)
 
+extern "C" void read3Dnc(int nx, int ny, int ntheta, char ncfile[], float * &ee)
+{
+	int status;
+	int ncid, ee_id;
+	static size_t count[] = { nx, ny,ntheta };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "z", &ee_id);
+	status = nc_get_var_float(ncid, ee_id, ee);
+	status = nc_close(ncid);
 
+}
+
+extern "C" void read2Dnc(int nx, int ny, char ncfile[], float * &hh)
+{
+	int status;
+	int ncid, hh_id;
+	static size_t count[] = { nx, ny };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "hh", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, hh);
+	status = nc_close(ncid);
+
+}
+
+extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
+{
+	int status;
+	int ncid, hh_id;
+	static size_t count[] = { nx, ny };
+
+	status = nc_open(ncfile.c_str(), NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "zb", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, zb);
+	status = nc_close(ncid);
+
+}
