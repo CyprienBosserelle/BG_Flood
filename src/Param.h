@@ -9,8 +9,8 @@ class Param {
 public:
 	//general parameters
 	int test = -1;//-1:no test; 0:some test; 1:test 0 and XX test
-	double g=9.81; // Gravity
-	double rho=1025.0; // fluid density
+	double g=9.81; // Gravity in m.s-2
+	double rho=1025.0; // fluid density in kg/m-3
 	double eps= 0.0001; // //drying height in m
 	double dt=0.0; // Model time step in s.
 	double CFL=0.5; // Current Freidrich Limiter
@@ -37,12 +37,12 @@ public:
 	int doubleprecision = 0;
 
 	//grid parameters
-	double dx= nan(""); // grid resolution in the coordinate system unit.
+	double dx= nan(""); // grid resolution in the coordinate system unit in m.
 	double delta; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
 	int nblk=0; // number of compute blocks
-	int blkwidth = 16;
+	int blkwidth = 16; //block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
 	int halowidth = 1; // use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16

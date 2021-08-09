@@ -116,8 +116,9 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Add bottom friction
-	bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
-	
+	//bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	XiafrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
+
 	//============================================
 	//Copy updated evolving variable back
 	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
