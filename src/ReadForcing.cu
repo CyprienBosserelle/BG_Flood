@@ -785,7 +785,7 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 	}
 
 	std::string line;
-	std::vector<std::string> lineelementsharang;
+	std::vector<std::string> lineelements;
 	//std::vector<double> WLS;
 	Flowin slbndline;
 	while (std::getline(fs, line))
