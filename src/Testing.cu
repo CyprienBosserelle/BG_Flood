@@ -124,7 +124,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		std::string result = raintest ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
 	}
-	if (XParam.test == 8)
+	/*if (XParam.test == 8)
 	{
 		bool raintest2;
 		/* Test 8 is non-homogeneous rain on a n0n-uniform slope for cartesian mesh (GPU and CU version)
@@ -132,14 +132,14 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		 The input parameters are :
 				- GPU option
 		*/
-		log("\t non-uniform rain on slope based on Aureli2020");
+		/*log("\t non-uniform rain on slope based on Aureli2020");
 		int GPU_option = -1;
 		int dim_rain_forcing = 3;
 		T Zinit = T(0.0);
 		raintest2 = Raintestmap(GPU_option, dim_rain_forcing, Zinit);
 		std::string result = raintest2 ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
-	}
+	}*/
 }
 template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
