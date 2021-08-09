@@ -34,7 +34,7 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 
 template <class T> bool Rivertest(T zsnit, int gpu);
 template <class T> bool MassConserveSteepSlope(T zsnit, int gpu);
-
+template <class T> bool Raintest(T zsnit, int gpu, float alpha);
 
 // End of global definition
 #endif
