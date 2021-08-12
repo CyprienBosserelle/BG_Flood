@@ -104,12 +104,21 @@ template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<
 	// fill halo for zb
 	// only need to do that once 
 	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	if (XParam.GPUDEVICE >= 0)
 	{
+		dim3 blockDim(16, 16, 1);
+		dim3 gridDim(XParam.nblk, 1, 1);
 		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
 		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
-
 		cudaStreamDestroy(XLoop.streams[0]);
+
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+
 	}
 
 

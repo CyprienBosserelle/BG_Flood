@@ -120,8 +120,8 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Add bottom friction
-	//bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
-	XiafrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
+	bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	//XiafrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
 
 	//============================================
 	//Copy updated evolving variable back
@@ -183,7 +183,8 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	//============================================
 	// Reduce minimum timestep
 	// Make only a half max step
-	XLoop.dt = double(CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time)) * T(0.5);
+	//XLoop.dt = double(CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time)) * T(0.5);
+	XLoop.dt = double(timestepreductionCPU(XParam, XLoop, XModel.blocks, XModel.time)) * T(0.5);
 	XLoop.dtmax = XLoop.dt;
 	XModel.time.dt = T(XLoop.dt);
 
@@ -207,13 +208,14 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	}
 
 	//============================================
-	//Update evolving variable by 1/2 time step
+	//Update evolving variable by 1 time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt , XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 
 
 	//============================================
 	// Add bottom friction
 	bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	//XiafrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
 
 	//============================================
 	//Copy updated evolving variable back

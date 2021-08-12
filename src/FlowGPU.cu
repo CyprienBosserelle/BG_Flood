@@ -59,7 +59,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Reduce minimum timestep
@@ -123,7 +123,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 
@@ -155,8 +155,8 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	
 	//============================================
 	// Add bottom friction
-	//bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
-	XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
+	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	//XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
 
 	CUDA_CHECK(cudaDeviceSynchronize());
 	

@@ -184,7 +184,7 @@ template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, 
 	T ho, uo, vo;
 	T dhi = XAdv.dh[i];
 
-	T edt = dt;// dhi > T(0.0) ? dt : min(dt, hold / (-1.0 * dhi));
+	T edt = dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
 
 	ho = hold + edt * dhi;
 
@@ -321,7 +321,8 @@ template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, Evol
 template __host__ void cleanupCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, EvolvingP<float> XEv_o);
 template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, EvolvingP<double> XEv_o);
 
-template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
+
+template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -329,7 +330,7 @@ template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, Block
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 
-	T dt=T(1.0)/epsi;
+	T dt = T(1.0) / epsi;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -347,6 +348,19 @@ template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, Block
 			}
 		}
 	}
+
+	return dt;
+}
+template __host__ float timestepreductionCPU(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
+template __host__ double timestepreductionCPU(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
+
+template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
+{
+	
+
+	T dt= timestepreductionCPU(XParam,XLoop,XBlock,XTime);
+
+	
 
 	// also don't allow dt to be larger than 1.5*dtmax (usually the last time step or smallest delta/sqrt(gh) if the first step)
 	if (dt > (1.5 * XLoop.dtmax))
