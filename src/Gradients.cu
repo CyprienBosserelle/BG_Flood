@@ -16,7 +16,9 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 		CUDA_CHECK(cudaStreamCreate(&streams[i]));
 	}
 	*/
-	dim3 blockDim(16, 16, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 blockDimfull(XParam.blkmemwidth, XParam.blkmemwidth, 1);
+	
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	//gradient << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
@@ -55,6 +57,21 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	if (XParam.conserveElevation)
 	{
 		conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
+	}
+	else
+	{
+		refine_linearGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		//refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		refine_linearGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+		refine_linearGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+		RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XBlock, XEv, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientHaloGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+		gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 	}
 	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);

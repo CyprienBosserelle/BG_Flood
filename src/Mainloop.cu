@@ -18,6 +18,9 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
+	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
 	if (XParam.GPUDEVICE >= 0)
 	{
 		dim3 blockDim(16, 16, 1);
@@ -30,8 +33,8 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
-
-		
+		refine_linearGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 	}
 
 
