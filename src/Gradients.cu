@@ -268,6 +268,22 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 		conserveElevationGradHalo(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
 
 	}
+	else
+	{
+		refine_linear(XParam,XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		refine_linear(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+		refine_linear(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+		RecalculateZs(XParam, XBlock, XEv, zb);
+				
+
+		gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+		gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	}
+
+
 	//conserveElevationGradHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 	//conserveElevationGradHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 	//conserveElevationGradHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdyythhhhhhhhhg);

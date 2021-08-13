@@ -66,6 +66,9 @@ template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<
 		
 	}
 }
+template void RecalculateZs<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template void RecalculateZs<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
 
 
 template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
@@ -91,6 +94,8 @@ template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlo
 	*/
 	
 }
+template __global__ void RecalculateZsGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template __global__ void RecalculateZsGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
 template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
 {
@@ -437,7 +442,7 @@ template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBloc
 			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
 			int il = memloc(XParam, XParam.blkwidth - 1, jj - 1, XBlock.LeftBot[ib]);
 			int write = memloc(XParam, -1, j, ib);
-			T slope = dzdx[il];
+			
 			T newz = z[il] - dzdx[il] * ilevdx;
 
 			z[write] = newz;
@@ -446,6 +451,9 @@ template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBloc
 		}
 	}
 }
+template void refine_linear_Left<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdx);
+template void refine_linear_Left<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdx);
+
 
 template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx)
 {
@@ -457,7 +465,7 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
 			int il = memloc(XParam, 0, jj - 1, XBlock.RightBot[ib]);
 			int write = memloc(XParam, XParam.blkwidth, j, ib);
-			T slope = dzdx[il];
+			
 			T newz = z[il] + dzdx[il] * ilevdx;
 
 			z[write] = newz;
@@ -466,7 +474,8 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 		}
 	}
 }
-
+template void refine_linear_Right<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdx);
+template void refine_linear_Right<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdx);
 
 template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdy)
 {
@@ -478,7 +487,7 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 			int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(i * (T)0.5) : ceil(i * (T)0.5) + XParam.blkwidth / 2;
 			int jl = memloc(XParam,  ii - 1, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 			int write = memloc(XParam, i, -1, ib);
-			T slope = dzdx[jl];
+			
 			T newz = z[jl] - dzdy[jl] * ilevdx;
 
 			z[write] = newz;
@@ -487,6 +496,8 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 		}
 	}
 }
+template void refine_linear_Bot<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdy);
+template void refine_linear_Bot<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdy);
 
 template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdy)
 {
@@ -498,7 +509,7 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 			int ii = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(i * (T)0.5) : ceil(i * (T)0.5) + XParam.blkwidth / 2;
 			int jl = memloc(XParam, ii - 1, 0, XBlock.TopLeft[ib]);
 			int write = memloc(XParam, i, XParam.blkwidth, ib);
-			T slope = dzdx[jl];
+			
 			T newz = z[jl] + dzdy[jl] * ilevdx;
 
 			z[write] = newz;
@@ -507,6 +518,23 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 		}
 	}
 }
+template void refine_linear_Top<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdy);
+template void refine_linear_Top<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdy);
+
+template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
+{
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		refine_linear_Left(XParam, ib, XBlock, z, dzdx);
+		refine_linear_Right(XParam, ib, XBlock, z, dzdx);
+		refine_linear_Top(XParam, ib, XBlock, z, dzdy);
+		refine_linear_Bot(XParam, ib, XBlock, z, dzdy);
+	}
+}
+template void refine_linear<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
+template void refine_linear<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
+
 
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 {
