@@ -300,7 +300,10 @@ template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForci
 	{
 
 		int bl = XBlock.active[ibl];
-		T espdist = std::numeric_limits<T>::epsilon() * (T)100.0; // i.e. distances are calculated within 100x theoretical machine precision
+		//T espdist = std::numeric_limits<T>::epsilon() * (T)100.0; // i.e. distances are calculated within 100x theoretical machine precision
+		// This too theoretical error definition has been modified to allow more flexibility
+		T espdist = levdx/3;
+		
 
 		leftxo = XBlock.xo[bl] - ((T)XParam.blkwidth) * levdx;
 
