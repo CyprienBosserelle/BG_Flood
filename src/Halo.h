@@ -49,7 +49,7 @@ template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlo
 template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
 template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
 
-template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx);
+template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
 template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdy);
 template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdy);
 template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx);

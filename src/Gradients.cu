@@ -68,6 +68,23 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 		RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XBlock, XEv, zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
+		//gradient << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//gradient << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//gradient << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//gradient << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
 		gradientHaloGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
 		gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 		gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
@@ -309,6 +326,149 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 }
 template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb);
 template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb);
+
+template <class T> void WetsloperesetCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+{
+	int i, ib;
+	int xplus, xminus, yplus, yminus;
+
+	T delta;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				i = memloc(XParam, ix, iy, ib);
+
+				//
+				xplus = memloc(XParam, ix + 1, iy, ib);
+				xminus = memloc(XParam, ix - 1, iy, ib);
+				yplus = memloc(XParam, ix, iy + 1, ib);
+				yminus = memloc(XParam, ix, iy - 1, ib);
+
+				T dzsdxi = XGrad.dzsdx[i];
+				T dzsdyi = XGrad.dzsdy[i];
+
+
+
+
+				//Do X axis
+				if (utils::sq(dzsdxi) > utils::sq(XGrad.dzbdx[i]))
+				{
+					T leftzs, rightzs;
+					leftzs = XEv.zs[i] - XEv.h[i] - delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
+					rightzs = XEv.zs[i] - XEv.h[i] + delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
+
+					if (leftzs > XEv.zs[xminus] || rightzs > XEv.zs[xplus])
+					{
+						XGrad.dzsdx[i] = XGrad.dhdx[i] + XGrad.dzbdx[i];
+					}
+
+				}
+
+				//Do Y axis
+				if (utils::sq(dzsdyi) > utils::sq(XGrad.dzbdy[i]))
+				{
+					T botzs, topzs;
+					botzs = XEv.zs[i] - XEv.h[i] - delta * T(0.5) * (dzsdyi - XGrad.dhdy[i]);
+					topzs = XEv.zs[i] - XEv.h[i] + delta * T(0.5) * (dzsdyi - XGrad.dhdy[i]);
+
+					if (botzs > XEv.zs[yminus] || topzs > XEv.zs[yminus])
+					{
+						XGrad.dzsdy[i] = XGrad.dhdy[i] + XGrad.dzbdy[i];
+					}
+
+				}
+
+
+			}
+		}
+	}
+}
+
+template <class T> __global__ void WetsloperesetXGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+	T delta = calcres(XParam.dx, lev);
+
+
+	int i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+
+	int iright, ileft;
+	iright = memloc(XParam.halowidth, blkmemwidth, ix + 1, iy, ib);
+	ileft = memloc(XParam.halowidth, blkmemwidth, ix - 1, iy, ib);
+
+	T dzsdxi = XGrad.dzsdx[i];
+
+
+	if (utils::sq(dzsdxi) > utils::sq(XGrad.dzbdx[i]))
+	{
+		T leftzs, rightzs;
+		leftzs = XEv.zs[i] - XEv.h[i] - delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
+		rightzs = XEv.zs[i] - XEv.h[i] + delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
+
+		if (leftzs > XEv.zs[ileft] || rightzs > XEv.zs[iright])
+		{
+			XGrad.dzsdx[i] = XGrad.dhdx[i] + XGrad.dzbdx[i];
+		}
+
+	}
+	
+
+}
+
+template <class T> __global__ void WetsloperesetYGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+	T delta = calcres(XParam.dx, lev);
+
+
+	int i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+
+	int itop, ibot;
+	itop = memloc(XParam.halowidth, blkmemwidth, ix, iy + 1, ib);
+	ibot = memloc(XParam.halowidth, blkmemwidth, ix, iy - 1, ib);
+
+	T dzsdyi = XGrad.dzsdy[i];
+
+
+	if (utils::sq(dzsdyi) > utils::sq(XGrad.dzbdy[i]))
+	{
+		T botzs, topzs;
+		botzs = XEv.zs[i] - XEv.h[i] - delta * T(0.5) * (dzsdyi - XGrad.dhdy[i]);
+		topzs = XEv.zs[i] - XEv.h[i] + delta * T(0.5) * (dzsdyi - XGrad.dhdy[i]);
+
+		if (botzs > XEv.zs[ibot] || topzs > XEv.zs[itop])
+		{
+			XGrad.dzsdy[i] = XGrad.dhdy[i] + XGrad.dzbdy[i];
+		}
+
+	}
+
+
+}
+
+
 
 
 template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
