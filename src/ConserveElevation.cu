@@ -1127,7 +1127,7 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 {
 	int ihalo, jhalo, ibn, ip, jp;
 
-	int write;
+	
 
 	if (XBlock.level[ib] < XBlock.level[ibTL])
 	{

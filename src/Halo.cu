@@ -151,10 +151,9 @@ template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 		ib = XBlock.active[ibl];
 		fillRightFlux(XParam,false, ib, XBlock, z);
 		fillTopFlux(XParam,false, ib, XBlock, z);
+
 	}
-	//fillBot(XParam, ib, XBlock, z);
-	//fill bot
-	//fill top
+	
 
 
 }

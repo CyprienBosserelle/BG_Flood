@@ -236,14 +236,19 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 
 				
 				T hold = XEv.h[i];
-				T ho, uo, vo;
-				ho = hold + dt * XAdv.dh[i];
+				T ho, uo, vo, dhi;
+
+				dhi = XAdv.dh[i];
+
+				T edt = dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
+
+				ho = hold + edt * dhi;
 
 
 				if (ho > eps) {
 					//
-					uo = (hold * XEv.u[i] + dt * XAdv.dhu[i]) / ho;
-					vo = (hold * XEv.v[i] + dt * XAdv.dhv[i]) / ho;
+					uo = (hold * XEv.u[i] + edt * XAdv.dhu[i]) / ho;
+					vo = (hold * XEv.v[i] + edt * XAdv.dhv[i]) / ho;
 
 				}
 				else
@@ -412,8 +417,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 	dim3 blockDimLine(threads, 1, 1);
 	dim3 gridDimLine(blocks, 1, 1);
 
-	float mindtmaxB;
-
+	
 	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -500,7 +504,7 @@ template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
