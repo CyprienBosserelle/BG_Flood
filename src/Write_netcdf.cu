@@ -779,6 +779,7 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> XModel)
 		log("Create netCDF output file...");
 		creatncfileBUQ(XParam, XModel.blocks);
 		//creatncfileBUQ(XParam);
+		writenctimestep(XParam.outfile, XParam.totaltime);
 		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 		{
 
