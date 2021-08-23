@@ -117,8 +117,8 @@ template void fillHaloF<double>(Param XParam, bool doProlongation, BlockP<double
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
-	dim3 blockDimHaloLR(1, 16, 1);
-	dim3 blockDimHaloBT(16, 1, 1);
+	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	fillLeft << <gridDim, blockDimHaloLR, 0 , stream >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, z);
@@ -163,6 +163,53 @@ template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 template void fillHaloTopRightC<double>(Param XParam, BlockP<double> XBlock, double* z);
 template void fillHaloTopRightC<float>(Param XParam, BlockP<float> XBlock, float* z);
 
+template <class T> void fillHaloLRFluxC(Param XParam, BlockP<T> XBlock, T* z)
+{
+	// for flux term and actually most terms, only top and right neighbours are needed!
+
+	//fillLeft(XParam, ib, XBlock, z);
+	int ib;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		HaloFluxCPULR(XParam, ib, XBlock, z);
+		//HaloFluxCPUBT(XParam, ib, XBlock, z);
+
+		//fillRightFlux(XParam,true, ib, XBlock, z);
+		//fillTopFlux(XParam,true, ib, XBlock, z);
+
+	}
+
+
+
+}
+template void fillHaloLRFluxC<double>(Param XParam, BlockP<double> XBlock, double* z);
+template void fillHaloLRFluxC<float>(Param XParam, BlockP<float> XBlock, float* z);
+
+template <class T> void fillHaloBTFluxC(Param XParam, BlockP<T> XBlock, T* z)
+{
+	// for flux term and actually most terms, only top and right neighbours are needed!
+
+	//fillLeft(XParam, ib, XBlock, z);
+	int ib;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		//HaloFluxCPULR(XParam, ib, XBlock, z);
+		HaloFluxCPUBT(XParam, ib, XBlock, z);
+
+		//fillRightFlux(XParam,true, ib, XBlock, z);
+		//fillTopFlux(XParam,true, ib, XBlock, z);
+
+	}
+
+
+
+}
+template void fillHaloBTFluxC<double>(Param XParam, BlockP<double> XBlock, double* z);
+template void fillHaloBTFluxC<float>(Param XParam, BlockP<float> XBlock, float* z);
+
+
 
 template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
@@ -171,11 +218,14 @@ template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cuda
 	dim3 blockDimHaloBT(16, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
-	//fillLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, a);
-	fillRightFlux << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
-	//fillBot << <gridDim, blockDimHaloBT, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, a);
-	fillTopFlux << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
 
+	//fillLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, a);
+	//fillRightFlux << <gridDim, blockDimHaloLR, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
+	HaloFluxGPULR << <gridDim, blockDimHaloLR, 0, stream >> > (XParam, XBlock, z);
+	
+	//fillBot << <gridDim, blockDimHaloBT, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, a);
+	//fillTopFlux << <gridDim, blockDimHaloBT, 0, stream >> > (XParam.halowidth,false, XBlock.active, XBlock.level, XBlock.TopLeft, XBlock.TopRight, XBlock.BotLeft, XBlock.LeftBot, XBlock.RightBot, z);
+	HaloFluxGPUBT << <gridDim, blockDimHaloBT, 0, stream >> > (XParam, XBlock, z);
 	CUDA_CHECK(cudaStreamSynchronize(stream));
 
 }
@@ -381,15 +431,27 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 {
 	
 		
-	std::thread t0(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fhu);
-	std::thread t1(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fhv);
-	std::thread t2(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fqux);
-	std::thread t3(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fquy);
+	//std::thread t0(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fhu);
+	//std::thread t1(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fhv);
+	//std::thread t2(fillHaloTopRightC<T>,XParam, XBlock, Flux.Fqux);
+	//std::thread t3(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fquy);
 
-	std::thread t4(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fqvx);
-	std::thread t5(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fqvy);
-	std::thread t6(fillHaloTopRightC<T>, XParam, XBlock, Flux.Su);
-	std::thread t7(fillHaloTopRightC<T>, XParam, XBlock, Flux.Sv);
+	//std::thread t4(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fqvx);
+	//std::thread t5(fillHaloTopRightC<T>, XParam, XBlock, Flux.Fqvy);
+	//std::thread t6(fillHaloTopRightC<T>, XParam, XBlock, Flux.Su);
+	//std::thread t7(fillHaloTopRightC<T>, XParam, XBlock, Flux.Sv);
+
+	std::thread t0(fillHaloLRFluxC<T>, XParam, XBlock, Flux.Fhu);
+	std::thread t1(fillHaloLRFluxC<T>, XParam, XBlock, Flux.Fqux);
+	std::thread t2(fillHaloLRFluxC<T>, XParam, XBlock, Flux.Su);
+
+	std::thread t6(fillHaloLRFluxC<T>, XParam, XBlock, Flux.Fqvx);
+
+	std::thread t3(fillHaloBTFluxC<T>, XParam, XBlock, Flux.Fhv);
+	std::thread t4(fillHaloBTFluxC<T>, XParam, XBlock, Flux.Fqvy);
+	std::thread t5(fillHaloBTFluxC<T>, XParam, XBlock, Flux.Sv);
+
+	std::thread t7(fillHaloBTFluxC<T>, XParam, XBlock, Flux.Fquy);
 
 	t0.join();
 	t1.join();
@@ -415,10 +477,13 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 		CUDA_CHECK(cudaStreamCreate(&streams[i]));
 	}
 
+
 	fillHaloTopRightGPU(XParam, XBlock, streams[0], Flux.Fhu);
 	fillHaloTopRightGPU(XParam, XBlock, streams[1], Flux.Fhv);
 	fillHaloTopRightGPU(XParam, XBlock, streams[2], Flux.Fqux);
 	fillHaloTopRightGPU(XParam, XBlock, streams[3], Flux.Fquy);
+
+	
 
 	fillHaloTopRightGPU(XParam, XBlock, streams[4], Flux.Fqvx);
 	fillHaloTopRightGPU(XParam, XBlock, streams[5], Flux.Fqvy);
@@ -831,7 +896,7 @@ template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock
 	unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	unsigned int ib = XBlock.active[ibl];
 
 
 	int j = iy;
@@ -1017,7 +1082,104 @@ template <class T> void HaloFluxCPUBT(Param XParam, int ib, BlockP<T> XBlock, T*
 	}
 }
 
+template <class T> __global__ void HaloFluxGPUBT(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, il, itl;
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	//unsigned int iy = threadIdx.x;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
 
+	int j = ix;
+
+	if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		if (j < (XParam.blkwidth / 2))
+		{
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, j, 0, ib);
+
+
+			jj = j * 2;
+			il = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth, XBlock.BotLeft[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, jj + 1, XParam.blkwidth, XBlock.BotLeft[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.BotRight[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		if (j >= (XParam.blkwidth / 2))
+		{
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, j, 0, ib);
+
+
+			jj = (j - XParam.blkwidth / 2) * 2;
+			il = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth, XBlock.BotRight[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, jj + 1, XParam.blkwidth, XBlock.BotRight[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		if (j < (XParam.blkwidth / 2))
+		{
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, j, XParam.blkwidth, ib);
+
+
+			jj = j * 2;
+			il = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopLeft[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, jj + 1, 0, XBlock.TopLeft[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.TopRight[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		if (j >= (XParam.blkwidth / 2))
+		{
+
+			jj = (j - XParam.blkwidth / 2) * 2;
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, j, XParam.blkwidth, ib);
+
+
+			il = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopRight[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, jj + 1, 0, XBlock.TopRight[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+}
 
 
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
