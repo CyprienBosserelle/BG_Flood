@@ -149,8 +149,11 @@ template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		fillRightFlux(XParam,true, ib, XBlock, z);
-		fillTopFlux(XParam,true, ib, XBlock, z);
+		HaloFluxCPULR(XParam, ib, XBlock, z);
+		HaloFluxCPUBT(XParam, ib, XBlock, z);
+
+		//fillRightFlux(XParam,true, ib, XBlock, z);
+		//fillTopFlux(XParam,true, ib, XBlock, z);
 
 	}
 	
@@ -730,6 +733,293 @@ template void refine_linearGPU<float>(Param XParam, BlockP<float> XBlock, float*
 template void refine_linearGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
 
+template <class T> void HaloFluxCPULR(Param XParam, int ib, BlockP<T> XBlock, T *z)
+{
+	int jj, i,il,itl;
+	if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+			//
+			i = memloc(XParam, 0, j, ib);
+
+
+			jj = j*2;
+			il = memloc(XParam, XParam.blkwidth, jj, XBlock.LeftBot[ib]);
+			itl = memloc(XParam, XParam.blkwidth, jj+1, XBlock.LeftBot[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+			
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.LeftTop[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+		{
+			//
+			i = memloc(XParam, 0, j, ib);
+
+
+			jj = (j - XParam.blkwidth / 2) * 2;
+			il = memloc(XParam, XParam.blkwidth, jj, XBlock.LeftTop[ib]);
+			itl = memloc(XParam, XParam.blkwidth, jj + 1, XBlock.LeftTop[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.RightBot[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+			//
+			i = memloc(XParam, XParam.blkwidth, j, ib);
+
+
+			jj = j * 2;
+			il = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
+			itl = memloc(XParam, 0, jj + 1, XBlock.RightBot[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.RightTop[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+		{
+			
+			jj = (j - XParam.blkwidth / 2) * 2;
+			//
+			i = memloc(XParam, XParam.blkwidth, j, ib);
+			
+			
+			il = memloc(XParam, 0, jj, XBlock.RightTop[ib]);
+			itl = memloc(XParam, 0, jj + 1, XBlock.RightTop[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+}
+
+template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, il, itl;
+	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = 0;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = active[ibl];
+
+
+	int j = iy;
+
+
+	if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		
+		if (j< (XParam.blkwidth / 2))
+		{
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, 0, j, ib);
+
+
+			jj = j * 2;
+			il = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj, XBlock.LeftBot[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj + 1, XBlock.LeftBot[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.LeftTop[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		
+		if (j >= (XParam.blkwidth / 2))
+		{
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, 0, j, ib);
+
+
+			jj = (j - XParam.blkwidth / 2) * 2;
+			il = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj, XBlock.LeftTop[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj + 1, XBlock.LeftTop[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.RightBot[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		
+		if (j < (XParam.blkwidth / 2))
+		{
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+
+
+			jj = j * 2;
+			il = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, XBlock.RightBot[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.RightTop[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		if (j >= (XParam.blkwidth / 2))
+		{
+
+			jj = (j - XParam.blkwidth / 2) * 2;
+			//
+			i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+
+
+			il = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightTop[ib]);
+			itl = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, XBlock.RightTop[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+}
+
+template <class T> void HaloFluxCPUBT(Param XParam, int ib, BlockP<T> XBlock, T* z)
+{
+	int jj, i, il, itl;
+	if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+			//
+			i = memloc(XParam, j, 0, ib);
+
+
+			jj = j * 2;
+			il = memloc(XParam, jj, XParam.blkwidth,  XBlock.BotLeft[ib]);
+			itl = memloc(XParam, jj+1, XParam.blkwidth,  XBlock.BotLeft[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.BotRight[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+		{
+			//
+			i = memloc(XParam, j, 0, ib);
+
+
+			jj = (j - XParam.blkwidth / 2) * 2;
+			il = memloc(XParam,  jj, XParam.blkwidth, XBlock.BotRight[ib]);
+			itl = memloc(XParam,  jj + 1, XParam.blkwidth, XBlock.BotRight[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = 0; j < (XParam.blkwidth / 2); j++)
+		{
+			//
+			i = memloc(XParam, j, XParam.blkwidth, ib);
+
+
+			jj = j * 2;
+			il = memloc(XParam, jj, 0,  XBlock.TopLeft[ib]);
+			itl = memloc(XParam, jj + 1, 0, XBlock.TopLeft[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+	if (XBlock.level[XBlock.TopRight[ib]] > XBlock.level[ib])//The lower half is a boundary 
+	{
+		for (int j = (XParam.blkwidth / 2); j < (XParam.blkwidth); j++)
+		{
+
+			jj = (j - XParam.blkwidth / 2) * 2;
+			//
+			i = memloc(XParam, j, XParam.blkwidth, ib);
+
+
+			il = memloc(XParam, jj, 0, XBlock.TopRight[ib]);
+			itl = memloc(XParam, jj + 1, 0, XBlock.TopRight[ib]);
+
+			z[i] = T(0.5) * (z[il] + z[itl]);
+
+
+
+
+
+		}
+		//
+	}
+}
+
+
+
+
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 {
 	int jj,bb;
@@ -934,6 +1224,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 
 
 }
+
 
 
 template <class T> __global__ void fillLeft(int halowidth, int* active, int * level, int* leftbot, int * lefttop, int * rightbot, int* botright,int * topright, T * a)

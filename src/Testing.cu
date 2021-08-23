@@ -16,7 +16,7 @@
 * Test 3 Test Reduction algorithm
 * Test 4 Compare resuts between the CPU and GPU Flow functions (GPU required)
 * Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
-* Test 999 RUne the main loop and engine in debug mode
+* Test 999 Run the main loop and engine in debug mode
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
@@ -287,6 +287,13 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
 	}
 	bool modelgood = true;
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
 	{
