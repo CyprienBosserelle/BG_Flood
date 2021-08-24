@@ -341,6 +341,48 @@ template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
 
+template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
+{
+	int ib;
+	T levdx;
+
+	// Initialise all storage involving parameter the outzone objects (only blocks needed)
+
+	for (int o = 0; o < XParam.outzone.size(); o++)
+	{
+
+		// find the blocks to output for each zone 
+		//(at least a part of the block must be inside the user defined rectangular)
+		
+		std::vector<int> blkzone;
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		{
+			ib = XModel.blocks.active[ibl];
+			levdx = calcres(XParam.dx, Xblocks.level[ib]);
+
+			// get the corners' locations of the block
+			xl = XParam.xo + Xblocks.xo[ib] - 0.5 * levdx;
+			yb = XParam.yo + Xblocks.yo[ib] - 0.5 * levdx;
+
+			xr = XParam.xo + Xblocks.xo[ib] + 0.5 * levdx;
+			yt = XParam.yo + Xblocks.yo[ib] + 0.5 * levdx;
+
+			// Checking if at least one paret of the a cell of the block is 
+			// inside the area defined by the user (here concidering left block edge o right block edge)
+			if (OBBdetect(xl, xr, yb, yt, XParam.outzone[o].xstart, XParam.outzone[o].xend, XParam.outzone[o].ystart, XParam.outzone[o].yend))
+			{
+				// This block belongs to the output zone defined by the user
+				blkzone.push_back(ib);
+
+			}
+		}
+		XParam.outzone[o].blocks = blkzone;
+	}
+
+}
+template void Findoutzoneblks<float>(Param& XParam, BlockP<float> XBlock, BndblockP& bnd);
+template void Findoutzoneblks<double>(Param& XParam, BlockP<double> XBlock, BndblockP& bnd);
+
 
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {

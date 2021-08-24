@@ -12,6 +12,13 @@ public:
 	std::string outname;
 };
 
+class outzone {
+public:
+	std::vector<int> blocks; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
+	double xstart, xend, ystart, yend; // definition of the zone needed for special nc output (rectangular zone)
+	std::string outname; // output name, by default "Output_*sim. number*_zone_*zone number*.nc"
+};
+
 class Flowin {
 public:
 	double time, q;

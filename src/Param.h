@@ -68,7 +68,6 @@ public:
 	//files
 	//std::string Bathymetryfile;// bathymetry file name
 	//inputmap Bathymetry;
-	std::string outfile="Output.nc"; // netcdf output file name
 
 	//Timekeeping
 	double outputtimestep=0.0; //number of seconds between output 0.0 for none
@@ -79,7 +78,10 @@ public:
 	std::vector<TSoutnode> TSnodesout; // vector containing i and j of each variables
 	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
 
-	std::vector<std::string> outvars; //list of names of teh variables to output
+	//NC outputs
+	std::string outfile = "Output.nc"; // netcdf output file name
+	std::vector<std::string> outvars; //list of names of the variables to output
+	std::vector<outzone> outzone; // vector containing information for the zoned nc output
 
 
 	//Rivers

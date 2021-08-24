@@ -138,7 +138,13 @@ void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 		write_text_to_log_file("scalefactor = " + std::to_string(XParam.scalefactor) + ";");
 		write_text_to_log_file("addoffset = " + std::to_string(XParam.addoffset) + ";");
 	}
-
+	if (!XParam.outzone.empty())
+	{
+		for (int o = 0; o < XParam.outzone.size(); o++)
+		{
+			write_text_to_log_file("outzonefile = " + XParam.outzone[o].outname + "," + std::to_string(XParam.outzone[o].xstart) + "," + std::to_string(XParam.outzone[o].xend) + "," + std::to_string(XParam.outzone[o].ystart) + "," + std::to_string(XParam.outzone[o].yend) + ";");
+		}
+	}
 	if (!XParam.TSnodesout.empty())
 	{
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)

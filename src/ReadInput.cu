@@ -391,7 +391,31 @@ Param readparamstr(std::string line, Param param)
 		
 	}
 
-	
+	// Same as for TSnodesout, the same key word can be used for different zones Output
+	parameterstr = "outzone";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		outzone zone;
+		std::vector<std::string> zoneitems = split(parametervalue, ',');
+		if (zoneitems.size() >= 5)
+		{
+			zone.outname = zoneitems[0];
+			zone.xstart = std::stod(zoneitems[1]);
+			zone.xend = std::stod(zoneitems[2]);
+			zone.ystart = std::stod(zoneitems[3]);
+			zone.yend = std::stod(zoneitems[4]);
+			param.outzone.push_back(zone);
+		}
+		else
+		{
+			std::cerr << "Zone input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details" << std::endl;
+
+			log("Node input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details. Input was: " + parametervalue);
+
+		}
+
+	}
 
 
 	parameterstr = "resetmax";

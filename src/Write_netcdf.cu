@@ -31,6 +31,22 @@ void Calcnxny(Param XParam, int level, int& nx, int& ny)
 	ny = round((yymax - yymin) / ddx + 1.0);
 }
 
+void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzone zone)
+{
+	double ddx = calcres(XParam.dx, level);
+	double dxp = calcres(XParam.dx, level + 1);
+	double xxmax, xxmin, yymax, yymin;
+
+	xxmax = zone.xend - dxp;
+	yymax = zone.yend - dxp;
+
+	xxmin = zone.xstart + dxp;
+	yymin = zone.ystart + dxp;
+
+	nx = round((xxmax - xxmin) / ddx + 1.0);
+	ny = round((yymax - yymin) / ddx + 1.0);
+}
+
 template<class T>
 void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo)
 {
