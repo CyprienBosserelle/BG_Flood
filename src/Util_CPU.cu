@@ -178,7 +178,7 @@ template __host__ __device__ double minmod2(double theta, double s0, double s1, 
 /*! \fn OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)
 	* Overlaping Bounding Box to detect which cell river falls into. It is the simplest version of the algorythm where the bounding box are paralle;l to the axis
 	*/
-template <class T> __host__ bool OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)
+template <class T> __host__  __device__  bool OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)
 {
 	bool overlap = false;
 
@@ -190,5 +190,5 @@ template <class T> __host__ bool OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T
 	return overlap;
 }
 
-template __host__ bool OBBdetect(float Axmin, float Axmax, float Aymin, float Aymax, float Bxmin, float Bxmax, float Bymin, float Bymax);
-template __host__ bool OBBdetect(double Axmin, double Axmax, double Aymin, double Aymax, double Bxmin, double Bxmax, double Bymin, double Bymax);
+template __host__  __device__  bool OBBdetect(float Axmin, float Axmax, float Aymin, float Aymax, float Bxmin, float Bxmax, float Bymin, float Bymax);
+template __host__  __device__  bool OBBdetect(double Axmin, double Axmax, double Aymin, double Aymax, double Bxmin, double Bxmax, double Bymin, double Bymax);

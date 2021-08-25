@@ -181,9 +181,18 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
+	T xllo, yllo, xl, yb, xr, yt, levdx;
+
 	for (int ibl = 0; ibl < nblkriver; ibl++)
 	{
 		ib = Riverblks[ibl];
+
+		levdx = calcres(XParam.dx, XBlock.level[ib]);
+
+		xllo = XParam.xo + XBlock.xo[ib];
+		yllo = XParam.yo + XBlock.yo[ib];
+
+
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -196,10 +205,19 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 
 				T Rainhh;
 
-				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				//T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				//T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
-				if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+				//if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+				xl = xllo + ix * levdx - 0.5 * levdx;
+				yb = yllo + iy * levdx - 0.5 * levdx;
+
+				xr = xllo + ix * levdx + 0.5 * levdx;
+				yt = yllo + iy * levdx + 0.5 * levdx;
+				// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+				// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+				//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+				if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart),T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
 				{
 					XAdv.dh[i] += qnow / XRiver.disarea;
 

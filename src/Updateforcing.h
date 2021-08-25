@@ -10,6 +10,7 @@
 #include "MemManagement.h"
 #include "ReadForcing.h"
 #include "GridManip.h"
+#include "Util_CPU.h"
 
 template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float>& XForcing);
 
