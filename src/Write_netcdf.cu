@@ -48,7 +48,7 @@ void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzone zone)
 }
 
 template<class T>
-void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo)
+void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo, outzone * zone)
 {
 
 	int status;
@@ -58,6 +58,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	int ncid, xx_dim, yy_dim, time_dim, blockid_dim;
 	double * xval, *yval;
 	// create the netcdf datasetXParam.outfile.c_str()
+	//##
 	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER|NC_NETCDF4, &ncid);
 	if (status != NC_NOERR)
 	{
@@ -100,6 +101,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	double initdx = calcres(XParam.dx, XParam.initlevel);
 	double xmin, xmax, ymin, ymax;
 
+	//##
 	xmin = XParam.xo ;
 	xmax = XParam.xmax ;
 	ymin = XParam.yo ;
@@ -172,7 +174,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	// For each level Define xx yy 
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
-
+		//##
 		Calcnxny(XParam, lev, nx, ny);
 
 		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
@@ -244,7 +246,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		blkid[ib] = level[ibl];
 		
 	}
-
+	//##
 	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blkwidth);
 	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, blkid);
 	for (int ib = 0; ib < XParam.nblk; ib++)
@@ -269,7 +271,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
 		Calcnxny(XParam, lev, nx, ny);
-		
+		//##
 
 		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin, nx);
 		//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
@@ -285,6 +287,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		double dxp = calcres(XParam.dx, lev + 1);
 		double xxmax, xxmin, yymax, yymin;
 
+		//##
 		xxmax = XParam.xmax - dxp;
 		yymax = XParam.ymax - dxp;
 
@@ -346,7 +349,26 @@ template void creatncfileBUQ<double>(Param &XParam, int* activeblk, int* level, 
 template<class T>
 void creatncfileBUQ(Param &XParam, BlockP<T> XBlock)
 {
-	creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo);
+	outzone Xzone;
+	if (!XParam.outzone.empty()) :
+	{
+		for (int o = 0; o < XParam.outzone.size(); o++)
+		{
+			Xzone = XParam.outzone[o]
+			creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, Xzone);
+		}
+	}
+	else:
+	{
+		//Define the full domain as a zone
+		Xzone.outname = XParam.outfile;
+		Xzone.blocks = XParam.outfile;
+		Xzone.xo = XParam.xo;
+		Xzone.yo = XParam.yo;
+		Xzone.xf = XParam.xf;
+		Xzone.yf = XParam.yf;
+		creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, Xzone);
+	}
 }
 template void creatncfileBUQ<float>(Param &XParam, BlockP<float> XBlock);
 template void creatncfileBUQ<double>(Param &XParam, BlockP<double> XBlock);

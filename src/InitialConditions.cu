@@ -340,14 +340,13 @@ template<class T> void Initmaparray(Model<T>& XModel)
 template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
-
+// Initialise all storage involving parameter the outzone objects
 template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 {
 	int ib;
 	T levdx;
 
-	// Initialise all storage involving parameter the outzone objects (only blocks needed)
-
+	// Find the blocks to output and the corners of this area
 	for (int o = 0; o < XParam.outzone.size(); o++)
 	{
 
@@ -363,9 +362,8 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 			// get the corners' locations of the block
 			xl = XParam.xo + Xblocks.xo[ib] - 0.5 * levdx;
 			yb = XParam.yo + Xblocks.yo[ib] - 0.5 * levdx;
-
-			xr = XParam.xo + Xblocks.xo[ib] + 0.5 * levdx;
-			yt = XParam.yo + Xblocks.yo[ib] + 0.5 * levdx;
+			xr = XParam.xo + Xblocks.xo[ib] + (XParam.blkwidth - 0.5) * levdx;
+			yt = XParam.yo + Xblocks.yo[ib] + (XParam.blkwidth - 0.5) * levdx;
 
 			// Checking if at least one paret of the a cell of the block is 
 			// inside the area defined by the user (here concidering left block edge o right block edge)
@@ -375,13 +373,26 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 				blkzone.push_back(ib);
 
 			}
+
+			// Getting the bottom left corner coordibate of the output area
+			if (XParam.outzone[o].xstart >= xl && XParam.outzone[o].xstart <= xr && XParam.outzone[o].ystart >= yb && XParam.outzone[o].ystart <= yt)
+			{
+				XParam.outzone[o].xo = Xblocks.xo[ib];
+				XParam.outzone[o].yo = Xblocks.yo[ib];
+			}
+			// Getting the top right corner coordibate of the output area
+			if (XParam.outzone[o].xend >= xl && XParam.outzone[o].xend <= xr && XParam.outzone[o].yend >= yb && XParam.outzone[o].yend <= yt)
+			{
+				XParam.outzone[o].xf = Xblocks.xo[ib];
+				XParam.outzone[o].yf = Xblocks.yo[ib];
+			}
 		}
 		XParam.outzone[o].blocks = blkzone;
 	}
 
 }
-template void Findoutzoneblks<float>(Param& XParam, BlockP<float> XBlock, BndblockP& bnd);
-template void Findoutzoneblks<double>(Param& XParam, BlockP<double> XBlock, BndblockP& bnd);
+template void Findoutzoneblks<float>(Param& XParam, BlockP<float> XBlock);
+template void Findoutzoneblks<double>(Param& XParam, BlockP<double> XBlock);
 
 
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
