@@ -74,8 +74,8 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 		etal = XEv.zs[ileft] + dx * XGrad.dzsdx[ileft];
 
 		//define the topography term at the interfaces
-		zr = zi - dx * XGrad.dzbdx[i];
-		zl = zn + dx * XGrad.dzbdx[ileft];
+		zr = etar - hr;// zi - dx * XGrad.dzbdx[i];
+		zl = etal - hl;// zn + dx * XGrad.dzbdx[ileft];
 
 		//define the Audusse terms
 		zA = max(zr, zl);
@@ -252,8 +252,8 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 					etal = XEv.zs[ileft] + dx * XGrad.dzsdx[ileft];
 
 					//define the topography term at the interfaces
-					zr = zi - dx * XGrad.dzbdx[i];
-					zl = zn + dx * XGrad.dzbdx[ileft];
+					zr = etar - hr;// zi - dx * XGrad.dzbdx[i];
+					zl = etal - hl;// zn + dx * XGrad.dzbdx[ileft];
 
 					//define the Audusse terms
 					zA = max(zr, zl);
@@ -422,8 +422,8 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 		etal = XEv.zs[ibot] + dx * XGrad.dzsdy[ibot];
 
 		//define the topography term at the interfaces
-		zr = zi - dx * XGrad.dzbdy[i];
-		zl = zn + dx * XGrad.dzbdy[ibot];
+		zr = etar - hr;// zi - dx * XGrad.dzbdy[i];
+		zl = etal - hl;// zn + dx * XGrad.dzbdy[ibot];
 
 		//define the Audusse terms
 		zA = max(zr, zl);
@@ -603,8 +603,8 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 					etal = XEv.zs[ibot] + dx * XGrad.dzsdy[ibot];
 
 					//define the topography term at the interfaces
-					zr = zi - dx * XGrad.dzbdy[i];
-					zl = zn + dx * XGrad.dzbdy[ibot];
+					zr = etar - hr;// zi - dx * XGrad.dzbdy[i];
+					zl = etal - hl;// zn + dx * XGrad.dzbdy[ibot];
 
 					//define the Audusse terms
 					zA = max(zr, zl);

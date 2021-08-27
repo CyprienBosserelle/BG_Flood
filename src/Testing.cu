@@ -1236,7 +1236,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 */
 template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 {
-	T epsi = T(0.000001);
+	T epsi = T(0.000000001);
 	int ib;
 
 	bool test = true;
@@ -1245,6 +1245,11 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
 	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	
 
 
@@ -1267,11 +1272,13 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	//============================================
 	// Flux and Source term reconstruction
 	// X- direction
-	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 	//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 
 	// Y- direction
-	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 	//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 	
 	//============================================
@@ -1313,13 +1320,15 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 
 					log("dhu is not zero. Lake at rest not preserved!!!");
 
+					printf("Fhu[i]=%f\n", XModel.flux.Fhu[i]);
+
 					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n",XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
 
 					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib,ix,iy);
-					testkurganovX(XParam, ib, ix, iy, XModel);
+					testButtingerX(XParam, ib, ix, iy, XModel);
 
 					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix+1, iy);
-					testkurganovX(XParam, ib, ix+1, iy, XModel);
+					testButtingerX(XParam, ib, ix+1, iy, XModel);
 				}
 
 			}
@@ -1358,6 +1367,150 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	return test;
 }
 
+
+
+template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+{
+	int RB, levRB, LBRB, LB, levLB, RBLB;
+	int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+	int ileft = memloc(XParam.halowidth, XParam.blkmemwidth, ix - 1, iy, ib);
+
+	int lev = XModel.blocks.level[ib];
+	T delta = calcres(T(XParam.dx), lev);
+
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+
+	// neighbours for source term
+
+	RB = XModel.blocks.RightBot[ib];
+	levRB = XModel.blocks.level[RB];
+	LBRB = XModel.blocks.LeftBot[RB];
+
+	LB = XModel.blocks.LeftBot[ib];
+	levLB = XModel.blocks.level[LB];
+	RBLB = XModel.blocks.RightBot[LB];
+
+	T dhdxi = XModel.grad.dhdx[i];
+	T dhdxmin = XModel.grad.dhdx[ileft];
+	T cm = T(1.0);
+	T fmu = T(1.0);
+
+	T hi = XModel.evolv.h[i];
+
+	T hn = XModel.evolv.h[ileft];
+
+
+	//if (hi > eps || hn > eps)
+	{
+		T dx, zi, zn, hr, hl, etar, etal, zr, zl, zA, zCN, hCNr, hCNl;
+		T ui, vi, uli, vli, dhdxi, dhdxil, dudxi, dudxil, dvdxi, dvdxil;
+
+		T ga = g * T(0.5);
+		// along X
+		dx = delta * T(0.5);
+		zi = XModel.zb[i];
+		zn = XModel.zb[ileft];
+
+		ui = XModel.evolv.u[i];
+		vi = XModel.evolv.v[i];
+		uli = XModel.evolv.u[ileft];
+		vli = XModel.evolv.v[ileft];
+
+		dhdxi = XModel.grad.dhdx[i];
+		dhdxil = XModel.grad.dhdx[ileft];
+		dudxi = XModel.grad.dudx[i];
+		dudxil = XModel.grad.dudx[ileft];
+		dvdxi = XModel.grad.dvdx[i];
+		dvdxil = XModel.grad.dvdx[ileft];
+
+
+		hr = hi - dx * dhdxi;
+		hl = hn + dx * dhdxil;
+		etar = XModel.evolv.zs[i] - dx * XModel.grad.dzsdx[i];
+		etal = XModel.evolv.zs[ileft] + dx * XModel.grad.dzsdx[ileft];
+
+		//define the topography term at the interfaces
+		zr = zi - dx * XModel.grad.dzbdx[i];
+		zl = zn + dx * XModel.grad.dzbdx[ileft];
+
+		//define the Audusse terms
+		zA = max(zr, zl);
+
+		// Now the CN terms
+		zCN = min(zA, min(etal, etar));
+		hCNr = max(T(0.0), min(etar - zCN, hr));
+		hCNl = max(T(0.0), min(etal - zCN, hl));
+
+		//Velocity reconstruction
+		//To avoid high velocities near dry cells, we reconstruct velocities according to Bouchut.
+		T ul, ur, vl, vr, sl, sr;
+		if (hi > eps) {
+			ur = ui - (1. + dx * dhdxi / hi) * dx * dudxi;
+			vr = vi - (1. + dx * dhdxi / hi) * dx * dvdxi;
+		}
+		else {
+			ur = ui - dx * dudxi;
+			vr = vi - dx * dvdxi;
+		}
+		if (hn > eps) {
+			ul = uli + (1. - dx * dhdxil / hn) * dx * dudxil;
+			vl = vli + (1. - dx * dhdxil / hn) * dx * dvdxil;
+		}
+		else {
+			ul = uli + dx * dudxil;
+			vl = vli + dx * dvdxil;
+		}
+
+
+
+
+		T fh, fu, fv, dt;
+
+
+		//solver below also modifies fh and fu
+		dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, ul, ur, fh, fu);
+		//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
+
+		
+
+		fv = (fh > 0. ? vl : vr) * fh;
+
+
+		// Topographic source term
+
+		// In the case of adaptive refinement, care must be taken to ensure
+		// well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
+		if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+			int iright = memloc(XParam.halowidth, XParam.blkmemwidth, 0, jj, RB);;
+			hi = XModel.evolv.h[iright];
+			zi = XModel.zb[iright];
+		}
+		if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
+		{
+			int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+			int ilc = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth - 1, jj, LB);
+			//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
+			hn = XModel.evolv.h[ilc];
+			zn = XModel.zb[ilc];
+		}
+
+		sl = ga * (hi + hCNr) * (zi - zCN);
+		sr = ga * (hCNl + hn) * (zn - zCN);
+
+
+		printf("etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n", etar,etal,zCN,zi,zn,zA, zr,zl);
+
+
+		printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hCNl=%f; hCNr=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", hi, hn, fh, fu, sl, sr, hCNl, hCNr, hr, hl, zr, zl);
+
+		printf("h[i]=%f; h[ileft]=%f dhdx[i]=%f, dhdx[ileft]=%f, zs[i]=%f, zs[ileft]=%f, dzsdx[i]=%f, dzsdx[ileft]=%f, dzbdx[i]=%f, dzbdx[ileft]=%f\n\n", XModel.evolv.h[i], XModel.evolv.h[ileft], XModel.grad.dhdx[i], XModel.grad.dhdx[ileft], XModel.evolv.zs[i], XModel.evolv.zs[ileft], XModel.grad.dzsdx[i], XModel.grad.dzsdx[ileft], XModel.grad.dzbdx[i], XModel.grad.dzbdx[ileft]);
+	}
+}
 
 template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
 {
