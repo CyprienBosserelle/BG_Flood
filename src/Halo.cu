@@ -521,7 +521,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 
 
 	fillHaloLeftRightGPU(XParam, XBlock, streams[0], Flux.Fhu);
-	fillHaloLeftRightGPU(XParam, XBlock, streams[1], Flux.Fhv);
+	fillHaloLeftRightGPU(XParam, XBlock, streams[1], Flux.Su);
 	fillHaloLeftRightGPU(XParam, XBlock, streams[2], Flux.Fqux);
 	fillHaloLeftRightGPU(XParam, XBlock, streams[3], Flux.Fqvx);
 
@@ -529,7 +529,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 
 	fillHaloBotTopGPU(XParam, XBlock, streams[4], Flux.Fquy);
 	fillHaloBotTopGPU(XParam, XBlock, streams[5], Flux.Fqvy);
-	fillHaloBotTopGPU(XParam, XBlock, streams[6], Flux.Su);
+	fillHaloBotTopGPU(XParam, XBlock, streams[6], Flux.Fhv);
 	fillHaloBotTopGPU(XParam, XBlock, streams[7], Flux.Sv);
 
 	for (int i = 0; i < num_streams; i++)
