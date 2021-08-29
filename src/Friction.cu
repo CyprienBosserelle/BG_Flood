@@ -283,3 +283,26 @@ template <class T> __host__ __device__ T manningfriction(T g, T hi, T n)
 	T cfi= g * n * n / cbrt(hi);
 	return cfi;
 }
+
+/*! \fn bool ThresholdVelocity(T Threshold, T& u, T& v)
+* 
+* \brief Function Used to prevent crazy velocity
+* 
+* The function scale velocities so it doesn't exceeds a given threshold. 
+* Default threshold is/should be 16.0m/s
+*/
+template <class T> __host__ __device__ bool ThresholdVelocity(T Threshold, T& u, T& v)
+{
+	T normvel = sqrt(u * u + v * v);
+
+	bool alert = normvel > Threshold
+
+	if (alert)
+	{
+		u /= normvel / Threshold;
+		v /= normvel / Threshold;
+	}
+	return alert;
+}
+
+
