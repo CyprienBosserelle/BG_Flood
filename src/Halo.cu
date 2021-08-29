@@ -1,7 +1,14 @@
 ﻿#include "Halo.h"
 
 
-
+/*! \fn void void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
+* \brief Wrapping function for calculating halos on CPU on every side of a block of a single variable
+* 
+* ## Description
+* This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean.
+* In a sense this is the third (and last) layer of wrapping
+* 
+*/
 template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
 	
@@ -18,6 +25,14 @@ template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 template void fillHaloD<double>(Param XParam, int ib, BlockP<double> XBlock, double* z);
 template void fillHaloD<float>(Param XParam, int ib, BlockP<float> XBlock, float* z);
 
+/*! \fn void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
+* \brief Wrapping function for calculating halos for each block of a single variable on CPU.
+*
+* ## Description
+* This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo CPU function.
+* This is layer 2 of 3 wrap so the candy doesn't stick too much.
+*
+*/
 template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 {
 	int ib;
@@ -30,6 +45,17 @@ template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 
+/*! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+* \brief Recalculate water surface after recalculating the values on the halo on the CPU
+*
+* ## Description
+* Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated
+* at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps.  
+* zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)
+* 
+* ## Warning
+* This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction
+*/
 template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	int ib,n,left, right, top,bot;
@@ -70,7 +96,17 @@ template void RecalculateZs<float>(Param XParam, BlockP<float> XBlock, EvolvingP
 template void RecalculateZs<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
 
-
+/*! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+* \brief Recalculate water surface after recalculating the values on the halo on the GPU
+*
+* ## Description
+* Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated
+* at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps.
+* zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)
+*
+* ## Warning
+* This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction
+*/
 template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkmemwidth;
@@ -97,6 +133,16 @@ template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlo
 template __global__ void RecalculateZsGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void RecalculateZsGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+/*! \fn void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
+* \brief Wrapping function for calculating flux in the halos for a block and a single variable on CPU.
+* ## Depreciated
+* This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn't preserve the balance of fluxes on the restiction interface
+* It should be deleted soon
+* ## Description
+* 
+* 
+*
+*/
 template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
 {
 	int ib;
@@ -113,7 +159,14 @@ template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> X
 template void fillHaloF<float>(Param XParam, bool doProlongation, BlockP<float> XBlock, float* z);
 template void fillHaloF<double>(Param XParam, bool doProlongation, BlockP<double> XBlock, double* z);
 
-
+/*! \fn void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
+* \brief Wrapping function for calculating halos for each block of a single variable on GPU.
+*
+* ## Description
+* This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function.
+* The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
+* 
+*/
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
@@ -140,6 +193,14 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, cudaStrea
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
 
+/*! \fn void  fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
+* \brief Wrapping function for calculating flux for halos for each block of a single variable on GPU.
+*
+* ## Description
+* This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function.
+* The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
+*
+*/
 template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 {
 	// for flux term and actually most terms, only top and right neighbours are needed!
