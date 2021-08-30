@@ -17,6 +17,8 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	}
 	*/
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 blockDimLR(1, XParam.blkwidth, 1);
+	dim3 blockDimBT(XParam.blkwidth, 1, 1);
 	dim3 blockDimfull(XParam.blkmemwidth, XParam.blkmemwidth, 1);
 	
 	dim3 gridDim(XParam.nblk, 1, 1);
@@ -89,6 +91,25 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 		gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 		gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 		gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+		//  wet slope limiter
+		WetsloperesetXGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+
+		WetsloperesetYGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		// ALso do the slope limiter on the halo
+		WetsloperesetHaloLeftGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+		
+		WetsloperesetHaloRightGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+
+		WetsloperesetHaloBotGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+
+		WetsloperesetHaloTopGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
+
 	}
 	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
@@ -588,7 +609,7 @@ template <class T> __global__ void WetsloperesetHaloLeftGPU(Param XParam, BlockP
 				it = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 3), jj + 1, XBlock.LeftTop[ib]);
 				itr = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 4), jj + 1, XBlock.LeftTop[ib]);
 
-				zsleft = T(0.25) * (XEv.zs[ii] + XEv.zs[ir] + XEv.zsa[it] + XEv.zs[itr]);
+				zsleft = T(0.25) * (XEv.zs[ii] + XEv.zs[ir] + XEv.zs[it] + XEv.zs[itr]);
 			}
 		}
 

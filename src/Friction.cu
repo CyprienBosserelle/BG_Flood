@@ -311,14 +311,12 @@ template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlo
 
 	T ui, vi;
 
-	bustedThreshold = ThresholdVelocity(XParam.VelThreshold, ui, T vi);
-
 	
-
 	XEvolv.u[i] = ui;
 
 	XEvolv.v[i] = vi;
 
+	bustedThreshold = ThresholdVelocity(XParam.VelThreshold, ui, vi);
 
 	
 	ui = XEvolv.u[i];
@@ -360,11 +358,12 @@ template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock
 
 				vi = XEvolv.v[i];
 
-				bustedThreshold = ThresholdVelocity(XParam.VelThreshold, ui, T vi);
+				bustedThreshold = ThresholdVelocity(XParam.VelThreshold, ui, vi);
 
-				if bustedThreshold
+				if (bustedThreshold)
+				{
 					log("Memory Threshold exceeded!");
-
+				}
 				XEvolv.u[i] = ui;
 
 				XEvolv.v[i] = vi;
@@ -385,7 +384,7 @@ template <class T> __host__ __device__ bool ThresholdVelocity(T Threshold, T& u,
 {
 	T normvel = sqrt(u * u + v * v);
 
-	bool alert = normvel > Threshold
+	bool alert = normvel > Threshold;
 
 	if (alert)
 	{
