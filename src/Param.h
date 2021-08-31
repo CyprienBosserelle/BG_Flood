@@ -98,7 +98,7 @@ public:
 	int nmaskblk = 0;
 
 	//hot start
-	double zsinit = nan(""); //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
+	double zsinit = nan(""); //init zs for cold start. if not specified by user and no bnd so =1 then sanity check will set to 0.0
 
 	//Add a water level offset to initial conditions and bnds
 	double zsoffset = nan("");

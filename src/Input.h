@@ -14,9 +14,9 @@ public:
 
 class outzone {
 public:
-	std::vector<int> blocks; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
+	//std::vector<int> blocks; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
 	double xstart, xend, ystart, yend; // definition of the zone needed for special nc output (rectangular zone) by the user
-	double xo, xf, yo, yf; // Real zone for output (because we output full blocks)
+	//double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)
 	std::string outname; // name for the output file (one for each zone)
 };
 

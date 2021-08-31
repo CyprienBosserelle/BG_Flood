@@ -58,6 +58,14 @@ struct maskinfo
 	int* side; // e.g. 11000000 for the entire left side being a mask
 };
 
+class outzoneB {
+	int nbl;
+	std::vector<int> blocks; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
+	double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)
+	std::string outname; // name for the output file (one for each zone)
+};
+
+
 template <class T>
 struct BlockP
 {
@@ -73,6 +81,7 @@ struct BlockP
 
 	maskinfo mask;
 	
+	std::vector<outzoneB> outZone;
 };
 
 
