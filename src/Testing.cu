@@ -100,6 +100,9 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	if (XParam.test == 5)
 	{
 		log("\t Lake-at-rest Test");
+		bool testTLAR=ThackerLakeAtRest(XParam,T(0.0));
+		std::string result = testTLAR ? "successful" : "failed";
+		log("\t\tThaker lake-at-rest test: " + result);
 		LakeAtRest(XParam, XModel);
 	}
 	if (XParam.test == 6)
@@ -1228,6 +1231,129 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	return test;
 }
 
+
+/*! \fn
+* \brief	Simulate the Lake-at-rest in a parabolic bassin
+* 
+* This function creates a parabolic bassin filled to a given level and run the modle for a while and checks that the velocities in the lake remain very small
+* thus verifying the well-balancedness of teh engine and the Lake-at-rest condition.
+*
+* Borrowed from Buttinger et al. 2019.
+*
+* ### Reference
+* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+*/
+template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
+{
+	bool test = true;
+	// Make a Parabolic bathy
+	
+	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
+	Model<decltype(modeltype)> XModel; // For CPU pointers
+	Model<decltype(modeltype)> XModel_g; // For GPU pointers
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+
+	T Lo = T(2500.0);
+	T Do = T(1.0);
+
+	T x, y;
+
+
+
+	XForcing.Bathy[0].xo = -4000.0;
+	XForcing.Bathy[0].yo = -4000.0;
+
+	XForcing.Bathy[0].xmax = 4000.0;
+	XForcing.Bathy[0].ymax = 4000.0;
+	XForcing.Bathy[0].nx = 64;
+	XForcing.Bathy[0].ny = 64;
+
+	XForcing.Bathy[0].dx = 126.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
+			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = ThackerBathy(x, y, Lo, Do);
+		}
+	}
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = zsinit;
+	XParam.endtime = 1390.0;
+
+	XParam.outputtimestep = XParam.endtime; 
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+
+	// Check Lake at rest state?
+	// all velocities should be very small
+	T smallvel = T(1e-6);
+	int i, ibot, itop, iright, ileft;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				i = memloc(XParam, ix, iy, ib);
+				if (abs(XModel.evolv.u[i]) > smallvel || abs(XModel.evolv.v[i]) > smallvel)
+				{
+					log("Lake at rest state not acheived!");
+					test = false;
+				}
+			}
+		}
+	}
+
+	return test;
+}
+template bool ThackerLakeAtRest<float>(Param XParam,float zsinit);
+template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
+
+template <class T> T ThackerBathy(T x, T y, T L, T D)
+{
+
+
+	T bathy = D * ((x * x + y * y) / (L * L) - 1.0);
+
+
+	return bathy;
+}
 
 
 /*! \fn 

@@ -11,6 +11,7 @@
 #include "Write_txtlog.h"
 #include "GridManip.h"
 #include "InitEvolv.h"
+#include "Gradients.h"
 
 
 template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel);
@@ -25,6 +26,8 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock);
 template <class T> void Findbndblks(Param XParam, Model<T> XModel, Forcing<float>& XForcing);
 
+template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel);
+template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel);
 
 template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb);
 

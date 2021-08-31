@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 	InitMesh(XParam, XForcing, XModel);
 
 	//============================================
-	// Prepare initial conditions
+	// Prepare initial conditions on CPU
 	InitialConditions(XParam, XForcing, XModel);
 
 	//============================================
@@ -101,6 +101,8 @@ int main(int argc, char **argv)
 	//============================================
 	// Setup GPU (bypassed within the function if no suitable GPU is available)
 	SetupGPU(XParam, XModel,XForcing, XModel_g);
+
+
 
 	//
 	log("\nModel setup complete");
