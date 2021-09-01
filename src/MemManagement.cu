@@ -97,6 +97,20 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(nblk, 1, XModel.adapt.refine);
 	}
 	
+	// do allocate 1 outzone block (block with at least 1 empty neighbourhood) 
+	// this will be reallocated eventually
+	for (int o = 0; o < XModel.blocks.outZone.size(); o++)
+	{
+		AllocateCPU(1, 1, XModel.blocks.outZone[o].blk);
+	}
+	//std::string outname;
+
+	if (XParam.TSnodesout.size() > 0)
+	{
+		// Timeseries output temporary storage
+		int storage = XParam.maxTSstorage;
+		AllocateCPU(storage, 1, XModel.TSstore);
+	}
 
 	if (XParam.atmpforcing)
 	{
@@ -125,6 +139,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		int storage = XParam.maxTSstorage;
 		AllocateCPU(storage, 1, XModel.TSstore);
 	}
+
 	if (XParam.nrivers > 0)
 	{
 		//this will be eventually reallocated later

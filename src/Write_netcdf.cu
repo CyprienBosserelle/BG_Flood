@@ -58,7 +58,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	int ncid, xx_dim, yy_dim, time_dim, blockid_dim, nblk;
 	double * xval, *yval;
 
-	nblk = Xzone.blocks.size();
+	nblk = Xzone.nblk;
 
 
 	// create the netcdf dataset Xzone.outname.c_str()

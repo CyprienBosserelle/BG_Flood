@@ -368,6 +368,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 		double xl, xr, yb, yt;
 		int ibl, itl, ibr, itr;
 
+		int nblk = 0;
 
 		//Getting the new area's corners
 		for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -472,10 +473,16 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 			{
 				// This block belongs to the output zone defined by the user
 				blkzone.push_back(ib);
+				nblk++;
 			}
 		}
-		XBlock.outZone[o].blocks = blkzone;
-		XBlock.outZone[o].outname = XParam.outzone[0].outname;
+		XBlock.outZone[o].nblk = nblk;
+		ReallocArray(blkzone.size(), 1, XBlock.outZone[o].blk);
+		for (int b = 0; b < blkzone.size(); b++)
+		{
+			XBlock.outZone[o].blk[b] = blkzone[b];
+		}
+		XBlock.outZone[o].outname = XParam.outzone[o].outname;
 	}
 
 }
@@ -501,11 +508,12 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T> XBlock)
 		XBlock.outZone[0].yo = XParam.yo;
 		XBlock.outZone[0].xmax = XParam.xmax;
 		XBlock.outZone[0].ymax = XParam.ymax;
+		XBlock.outZone[0].ymax = XParam.nblk;
+		ReallocArray(XParam.nblk, 1, XBlock.outZone[0].blk);
 		for (int ib = 0; ib < XParam.nblk; ib++)
 		{
-			blksall.push_back(ib);
+			XBlock.outZone[0].blk[ib]=ib;
 		}
-		XBlock.outZone[0].blocks = blksall;
 	}
 }
 template void Initoutzone<float>(Param& XParam, BlockP<float> XBlock);
