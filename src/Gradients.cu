@@ -317,36 +317,40 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 	gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 	
+	if (XParam.conserveElevation)
+	{
+		conserveElevationGradHalo(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
+
+	}
+	
+	
+	refine_linear(XParam,XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	refine_linear(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	refine_linear(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+	RecalculateZs(XParam, XBlock, XEv, zb);
+				
+
+	gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
 	if (XParam.conserveElevation)
 	{
 		conserveElevationGradHalo(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
 
 	}
-	else
-	{
-		refine_linear(XParam,XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-		refine_linear(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-		refine_linear(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb);
 
-		RecalculateZs(XParam, XBlock, XEv, zb);
-				
-
-		gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-		gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-		gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-		gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
-
-		WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb);
-
-		WetsloperesetHaloLeftCPU(XParam, XBlock, XEv, XGrad, zb);
-		WetsloperesetHaloRightCPU(XParam, XBlock, XEv, XGrad, zb);
-		WetsloperesetHaloBotCPU(XParam, XBlock, XEv, XGrad, zb);
-		WetsloperesetHaloTopCPU(XParam, XBlock, XEv, XGrad, zb);
+	WetsloperesetHaloLeftCPU(XParam, XBlock, XEv, XGrad, zb);
+	WetsloperesetHaloRightCPU(XParam, XBlock, XEv, XGrad, zb);
+	WetsloperesetHaloBotCPU(XParam, XBlock, XEv, XGrad, zb);
+	WetsloperesetHaloTopCPU(XParam, XBlock, XEv, XGrad, zb);
 		
 
 
-	}
+	
 
 
 	//conserveElevationGradHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);

@@ -1356,13 +1356,27 @@ template <class T> T ThackerBathy(T x, T y, T L, T D)
 }
 
 
+
+template <class T> T ValleyBathy(T x, T y, bool flowleft, T slope, T xcenter)
+{
+
+
+	T bathy;
+	
+	bathy = (abs(x - xcenter)+y) * slope;
+
+
+	return bathy;
+}
+
+
 /*! \fn 
 *	Simulate the first predictive step and check wether the lake at rest is preserved
 *	
 */
 template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 {
-	T epsi = T(0.000000001);
+	T epsi = T(1e-5);
 	int ib;
 
 	bool test = true;

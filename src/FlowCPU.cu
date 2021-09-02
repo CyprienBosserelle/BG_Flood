@@ -178,7 +178,7 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
-	//fillHalo(XParam, XModel.blocks, XModel.flux);
+	fillHalo(XParam, XModel.blocks, XModel.flux);
 
 	//============================================
 	// Reduce minimum timestep

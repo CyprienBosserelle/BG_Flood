@@ -354,8 +354,8 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
 						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
-						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
-						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
+						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth- 1, jj, LB);
+						
 						hn = XEv.h[ilc];
 						zn = zb[ilc];
 					}
@@ -742,6 +742,8 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 					{
 						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
+						// Warning I think the above is wrong and should be as below to be consistent with halo flux scheme:
+						//int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth, BL);
 						hn = XEv.h[ibc];
 						zn = zb[ibc];
 					}
