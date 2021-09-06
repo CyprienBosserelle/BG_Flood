@@ -145,6 +145,7 @@ template <class T>
 __host__ __device__ T calcres(T dx, int level)
 {
 	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
+	//should be 1<< -level
 }
 
 template __host__ __device__ double calcres<double>(double dx, int level);

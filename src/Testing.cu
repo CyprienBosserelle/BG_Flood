@@ -53,6 +53,8 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		rivertest = Rivertest(0.1, -1);
 		std::string result = rivertest ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
+
+		RiverVolumeAdapt(XParam, T(0.4));
 	}
 	if (XParam.test == 2)
 	{
@@ -1345,6 +1347,17 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 template bool ThackerLakeAtRest<float>(Param XParam,float zsinit);
 template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
 
+/*! \fn T ThackerBathy(T x, T y, T L, T D)
+* \brief	create a parabolic bassin
+*
+* This function creates a parabolic bassin. The function returns a single value of the bassin
+*
+* Borrowed from Buttinger et al. 2019.
+*
+* ### Reference
+* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+*/
 template <class T> T ThackerBathy(T x, T y, T L, T D)
 {
 
@@ -1355,15 +1368,360 @@ template <class T> T ThackerBathy(T x, T y, T L, T D)
 	return bathy;
 }
 
+/*! \fn bool RiverVolumeAdapt(Param XParam)
+* \brief	Wraping function for RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+*
+* The function calls it's child function with different adaptation set in XParam so needs to be rerun to account for the different scenarios:
+* * uniform level
+* * flow from coasrse to fine
+* * flow from fine to coarse
+*
+* and account for different flow direction
+* 
+*/
+template <class T> void RiverVolumeAdapt(Param XParam, T maxslope)
+{
+	//T maxslope = 0.45; // tthe mass conservation is better with smaller slopes 
+
+	bool UnitestA, UnitestB, UnitestC, UnitestD;
+	bool ctofA, ctofB, ctofC, ctofD;
+	bool ftocA, ftocB, ftocC, ftocD;
+
+	std::string details;
+
+	XParam.minlevel = 1;
+	XParam.maxlevel = 1;
+	XParam.initlevel = 1;
+	
 
 
-template <class T> T ValleyBathy(T x, T y, bool flowleft, T slope, T xcenter)
+	UnitestA=RiverVolumeAdapt(XParam, maxslope, false, false);
+	UnitestB=RiverVolumeAdapt(XParam, maxslope, true, false);
+	UnitestC=RiverVolumeAdapt(XParam, maxslope, false, true);
+	UnitestD=RiverVolumeAdapt(XParam, maxslope, true, true);
+
+	if (UnitestA && UnitestB && UnitestC && UnitestD)
+	{
+		log("River Volume Conservation Test: Uniform mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Uniform mesh: Failed");
+		details = UnitestA ? "successful" : "failed";
+		log("\t Uniform mesh A :"+ details);
+		details = UnitestB ? "successful" : "failed";
+		log("\t Uniform mesh B :" + details);
+		details = UnitestC ? "successful" : "failed";
+		log("\t Uniform mesh C :" + details);
+		details = UnitestD ? "successful" : "failed";
+		log("\t Uniform mesh D :" + details);
+	}
+
+	XParam.minlevel = 0;
+	XParam.maxlevel = 1;
+	XParam.initlevel = 0;
+
+	//Fine to coarse
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdatpCrit = "Inrange";
+	XParam.Adapt_arg1 = "28.0";
+	XParam.Adapt_arg2 = "40.0";
+	XParam.Adapt_arg3 = "zb";
+
+	ftocA = RiverVolumeAdapt(XParam, maxslope, false, false);
+	ftocB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	ftocC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	ftocD = RiverVolumeAdapt(XParam, maxslope, true, true);
+	if (UnitestA && UnitestB && UnitestC && UnitestD)
+	{
+		log("River Volume Conservation Test: Flow from fine to coarse adapted mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Flow from fine to coarse adapted mesh: Failed");
+		details = ftocA ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh A :" + details);
+		details = ftocB ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh B :" + details);
+		details = ftocC ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh C :" + details);
+		details = ftocD ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh D :" + details);
+	}
+
+	//coarse to fine
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdatpCrit = "Inrange";
+	XParam.Adapt_arg1 = "0.0";
+	XParam.Adapt_arg2 = "2.0";
+	XParam.Adapt_arg3 = "zb";
+
+	ctofA = RiverVolumeAdapt(XParam, maxslope, false, false);
+	ctofB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	ctofC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	ctofD = RiverVolumeAdapt(XParam, maxslope, true, true);
+	if (ctofA && ctofB && ctofC && ctofD)
+	{
+		log("River Volume Conservation Test: Flow from coarse to fine adapted mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Flow from coarse to fine adapted: Failed");
+		details = ctofA ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh A :" + details);
+		details = ctofB ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh B :" + details);
+		details = ctofC ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh C :" + details);
+		details = ctofD ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh D :" + details);
+	}
+
+
+}
+
+
+/*! \fn bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+* \brief	Simulate a river flowing in a steep valley
+* and heck the Volume conservation
+*
+* This function creates a dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
+*
+* The function can test the water volume for 4 scenario each time:
+* * left to right: bottop=false & flip=true;
+* * right to left: bottop=false & flip=false;
+* * bottom to top: bottop=true & flip=true;
+* * top to bottom: bottop=true & flip=false;
+*
+* The function inherits the adaptation set in XParam so needs to be rerun to accnout for the different scenarios:
+* * uniform level
+* * flow from coasrse to fine
+* * flow from fine to coarse
+* This is done in the higher level wrapping function
+*/
+template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+{
+	//bool test = true;
+	// Make a Parabolic bathy
+
+	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
+	Model<decltype(modeltype)> XModel; // For CPU pointers
+	Model<decltype(modeltype)> XModel_g; // For GPU pointers
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	float* dummybathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	XForcing.Bathy[0].xo = 0.0;
+	XForcing.Bathy[0].yo = 0.0;
+
+	XForcing.Bathy[0].xmax = 31.0;
+	XForcing.Bathy[0].ymax = 31.0;
+	XForcing.Bathy[0].nx = 32;
+	XForcing.Bathy[0].ny = 32;
+
+	XForcing.Bathy[0].dx = 1.0;
+
+	T x, y;
+	T center = T(10.5);
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, dummybathy);
+
+
+	float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = std::numeric_limits<float>::max();
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
+			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+
+			
+			dummybathy[i + j * XForcing.Bathy[0].nx] = ValleyBathy(y, x, slope, center);
+
+			maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
+
+			
+		}
+	}
+
+	// Make surrounding wall
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+
+		dummybathy[0 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[1 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[j + 0 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[j + 1 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[(XForcing.Bathy[0].nx - 1) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[(XForcing.Bathy[0].nx - 2) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[j + (XForcing.Bathy[0].ny - 1) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[j + (XForcing.Bathy[0].ny - 2) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+
+	}
+
+	// make a specially elevated spot 
+
+	dummybathy[(XForcing.Bathy[0].nx - 1) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+	dummybathy[(XForcing.Bathy[0].nx - 2) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+
+	dummybathy[(XForcing.Bathy[0].nx - 1) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+	dummybathy[(XForcing.Bathy[0].nx - 2) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			mintopo = min(dummybathy[i + j * XForcing.Bathy[0].nx], mintopo);
+		}
+	}
+
+	// Flip or rotate the bathy according to what is requested
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			if (!flip && !bottop)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (flip && !bottop)
+			{
+				XForcing.Bathy[0].val[(XForcing.Bathy[0].nx - 1 - i) + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (!flip && bottop)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+			else if (flip && bottop)
+			{
+				XForcing.Bathy[0].val[i + (XForcing.Bathy[0].ny - 1 - j) * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+		}
+	}
+
+	free(dummybathy);
+
+	// Overrule whatever is set in the river forcing
+	T Q = T(1.0);
+	
+	double upstream = !flip ? 24.0 : 8;
+	double riverx = !bottop ? upstream : center;
+	double rivery = !bottop ? center : upstream;
+
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = riverx - 1.0;
+	thisriver.xend = riverx + 1.0;
+	thisriver.ystart = rivery - 1.0;
+	thisriver.yend = rivery + 1.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = mintopo+0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	XParam.endtime = 20.0;
+
+	XParam.outputtimestep = XParam.endtime;
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+	T initVol = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				initVol = initVol + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+	
+	T TheoryInput = Q * XParam.endtime;
+
+
+	T SimulatedVolume = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+
+	SimulatedVolume = SimulatedVolume - initVol;
+
+	T error = abs(SimulatedVolume - TheoryInput);
+
+	return error / TheoryInput < 0.05;
+
+}
+
+/*! \fn T ValleyBathy(T x, T y, T slope, T center)
+* \brief	create V shape Valley basin
+*
+* This function creates a simple V shape Valley basin
+*
+*
+*/
+template <class T> T ValleyBathy(T x, T y, T slope, T center)
 {
 
 
 	T bathy;
 	
-	bathy = (abs(x - xcenter)+y) * slope;
+	bathy = (abs(x - center)+y) * slope;
 
 
 	return bathy;
@@ -1418,13 +1776,14 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 
 	// Y- direction
 	//updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	UpdateButtingerYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 	//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 	
 	//============================================
 	// Fill Halo for flux from fine to coarse
 	fillHalo(XParam, XModel.blocks, XModel.flux);
 
+	// Do we need to check also before fill halo part?
 
 	// Check Fhu and Fhv (they should be zero)
 	int i, ibot, itop, iright, ileft;
