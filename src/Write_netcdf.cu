@@ -1,4 +1,3 @@
-
 #include "Write_netcdf.h"
 
 void handle_ncerror(int status) {
@@ -45,7 +44,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_create(XParam.outfile.c_str(), NC_NOCLOBBER|NC_NETCDF4, &ncid);
 	if (status != NC_NOERR)
 	{
-		if (status == NC_EEXIST) // File already axist so automatically rename the output file 
+		if (status == NC_EEXIST) // File already exist so automatically rename the output file 
 		{
 			//printf("Warning! Output file name already exist  ");
 			log("Warning! Output file name already exist   ");
@@ -253,8 +252,6 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
 	{
 		Calcnxny(XParam, lev, nx, ny);
-
-
 		
 
 		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin, nx);
@@ -630,8 +627,6 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 	float scalefactor = XParam.scalefactor;
 	float addoffset = XParam.addoffset;
 
-
-
 	status = nc_open(XParam.outfile.c_str(), NC_WRITE, &ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
 	//read id from time dimension
@@ -784,6 +779,7 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> XModel)
 		log("Create netCDF output file...");
 		creatncfileBUQ(XParam, XModel.blocks);
 		//creatncfileBUQ(XParam);
+		writenctimestep(XParam.outfile, XParam.totaltime);
 		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 		{
 
@@ -810,4 +806,184 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
 }
 template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
 template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double> XModel);
+
+
+//The following functions are tools to create 2D or 3D netcdf files (for testing for example)
+
+//
+extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* yy, double* var, char* varname)
+{
+	int status;
+	int ncid, xx_dim, yy_dim, time_dim, p_dim, tvar_id;
+
+	size_t nxx, nyy, ntt;
+	static size_t start[] = { 0, 0 }; // start at first value
+	static size_t count[] = { ny, nx };
+	int time_id, xx_id, yy_id; //
+	nxx = nx;
+	nyy = ny;
+
+	//create the netcdf dataset
+	status = nc_create(filename, NC_NOCLOBBER, &ncid);
+
+	//Define dimensions: Name and length
+
+	status = nc_def_dim(ncid, "xx", nxx, &xx_dim);
+	status = nc_def_dim(ncid, "yy", nyy, &yy_dim);
+	int xdim[] = { xx_dim };
+	int ydim[] = { yy_dim };
+
+	//define variables: Name, Type,...
+	int var_dimids[3];
+	var_dimids[0] = yy_dim;
+	var_dimids[1] = xx_dim;
+
+	status = nc_def_var(ncid, "xx", NC_DOUBLE, 1, xdim, &xx_id);
+	status = nc_def_var(ncid, "yy", NC_DOUBLE, 1, ydim, &yy_id);
+
+
+	status = nc_def_var(ncid, varname, NC_DOUBLE, 2, var_dimids, &tvar_id);
+
+	status = nc_enddef(ncid);
+
+	static size_t xstart[] = { 0 }; // start at first value
+	static size_t xcount[] = { nx };
+	
+	static size_t ystart[] = { 0 }; // start at first value
+	static size_t ycount[] = { ny };
+
+
+
+	//Provide values for variables
+	status = nc_put_vara_double(ncid, xx_id, xstart, xcount, xx);
+	status = nc_put_vara_double(ncid, yy_id, ystart, ycount, yy);
+
+	status = nc_put_vara_double(ncid, tvar_id, start, count, var);
+	status = nc_close(ncid);
+
+}
+
+//Create a ncdf file containing a 3D variable (the file is overwritten if it was existing before)
+extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, double* yy, double* theta, double* var, char* varname)
+{
+	int status;
+	int ncid, xx_dim, yy_dim, tt_dim, tvar_id;
+	size_t nxx, nyy, ntt;
+	static size_t start[] = { 0, 0, 0 }; // start at first value
+	static size_t count[] = { nt, ny, nx };
+	int xx_id, yy_id, tt_id; //
+	nxx = nx;
+	nyy = ny;
+	ntt = nt;
+
+	//create the netcdf dataset
+	status = nc_create(name, NC_CLOBBER, &ncid);
+	//Define dimensions: Name and length
+	status = nc_def_dim(ncid, "xx", nxx, &xx_dim);
+	status = nc_def_dim(ncid, "yy", nyy, &yy_dim);
+	status = nc_def_dim(ncid, "time", ntt, &tt_dim);
+	int xdim[] = { xx_dim };
+	int ydim[] = { yy_dim };
+	int tdim[] = { tt_dim };
+
+	//define variables: Name, Type,...
+	int var_dimids[3];
+	var_dimids[0] = tt_dim;
+	var_dimids[1] = yy_dim;
+	var_dimids[2] = xx_dim;
+
+	status = nc_def_var(ncid, "time", NC_DOUBLE, 1, tdim, &tt_id);
+	status = nc_def_var(ncid, "xx", NC_DOUBLE, 1, xdim, &xx_id);
+	status = nc_def_var(ncid, "yy", NC_DOUBLE, 1, ydim, &yy_id);
+
+	status = nc_def_var(ncid, varname, NC_DOUBLE, 3, var_dimids, &tvar_id);
+
+	status = nc_enddef(ncid);
+
+	static size_t tst[] = { 0 };
+	static size_t xstart[] = { 0 }; // start at first value
+	static size_t xcount[] = { nx };
+	static size_t ystart[] = { 0 }; // start at first value
+	static size_t ycount[] = { ny };
+
+	static size_t tstart[] = { 0 }; // start at first value
+	static size_t tcount[] = { nt };
+
+	//Provide values for variables
+	status = nc_put_vara_double(ncid, xx_id, xstart, xcount, xx);
+	status = nc_put_vara_double(ncid, yy_id, ystart, ycount, yy);
+	status = nc_put_vara_double(ncid, tt_id, tstart, tcount, theta);
+
+	status = nc_put_vara_double(ncid, tvar_id, start, count, var);
+	status = nc_close(ncid);
+
+}
+
+extern "C" void write3dvarnc(int nx, int ny, int nt, double totaltime, double* var)
+{
+	int status;
+	int ncid, time_dim, recid;
+	size_t nxx, nyy;
+	static size_t start[] = { 0, 0, 0, 0 }; // start at first value
+	static size_t count[] = { 1, nt, ny, nx };
+	static size_t tst[] = { 0 };
+	int time_id, var_id;
+
+	nxx = nx;
+	nyy = ny;
+
+	static size_t nrec;
+	status = nc_open("3Dvar.nc", NC_WRITE, &ncid);
+	//read id from time dimension
+	status = nc_inq_unlimdim(ncid, &recid);
+	status = nc_inq_dimlen(ncid, recid, &nrec);
+	//printf("nrec=%d\n",nrec);
+
+	 //read file for variable ids
+	status = nc_inq_varid(ncid, "time", &time_id);
+	status = nc_inq_varid(ncid, "3Dvar", &var_id);
+	start[0] = nrec;//
+	tst[0] = nrec;
+
+	//Provide values for variables
+	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
+	status = nc_put_vara_double(ncid, var_id, start, count, var);
+	status = nc_close(ncid);
+
+}
+
+extern "C" void write2dvarnc(int nx, int ny, double totaltime, double* var)
+{
+	int status;
+	int ncid, time_dim, recid;
+	size_t nxx, nyy;
+	static size_t start[] = { 0, 0, 0 }; // start at first value
+	static size_t count[] = { 1, ny, nx };
+	static size_t tst[] = { 0 };
+	int time_id, var_id;
+
+	nxx = nx;
+	nyy = ny;
+
+	static size_t nrec;
+	status = nc_open("3Dvar.nc", NC_WRITE, &ncid);
+
+	//read id from time dimension
+	status = nc_inq_unlimdim(ncid, &recid);
+	status = nc_inq_dimlen(ncid, recid, &nrec);
+	//printf("nrec=%d\n",nrec);
+
+	 //read file for variable ids
+	status = nc_inq_varid(ncid, "time", &time_id);
+	status = nc_inq_varid(ncid, "3Dvar", &var_id);
+
+	start[0] = nrec;//
+	tst[0] = nrec;
+
+	//Provide values for variables
+	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
+	status = nc_put_vara_double(ncid, var_id, start, count, var);
+	status = nc_close(ncid);
+
+}
 

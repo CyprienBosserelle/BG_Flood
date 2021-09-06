@@ -1,3 +1,4 @@
+
 //////////////////////////////////////////////////////////////////////////////////
 //                                                                              //
 //Copyright (C) 2018 Bosserelle                                                 //
@@ -118,7 +119,7 @@ void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 
 
 /*! \fn Param readparamstr(std::string line, Param param)
-* Read BG_param.txt line and convert parameter to the righ parameter in teh class
+* Read BG_param.txt line and convert parameter to the righ parameter in the class
 * retrun an updated Param class 
 */
 Param readparamstr(std::string line, Param param)
@@ -139,7 +140,7 @@ Param readparamstr(std::string line, Param param)
 		param.test = std::stoi(parametervalue);
 	}
 
-	paramvec = { "gpudevice","GPUDEVICE" };
+	paramvec = { "GPUDEVICE","gpu" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -176,16 +177,18 @@ Param readparamstr(std::string line, Param param)
 		param.initlevel = std::stoi(parametervalue);
 	}
 
-	parameterstr = "conserveelevation";
+	parameterstr = "conserveElevation";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 
-		if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
+		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
+		if (case_insensitive_compare(parametervalue, std::string("True")) == 0)
 		{
 			param.conserveElevation = true;
 		}
-		else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
+		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
+		else if (case_insensitive_compare(parametervalue, std::string("false")) == 0)
 		{
 			param.conserveElevation = false;
 		}
@@ -274,7 +277,7 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	paramvec = { "outputtimestep","outtimestep" };
+	paramvec = { "outputtimestep","outtimestep","outputstep"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "outputtimestep";
 	//parametervalue = findparameter(parameterstr, line);
@@ -298,8 +301,10 @@ Param readparamstr(std::string line, Param param)
 		param.endtime = std::stod(parametervalue);
 
 	}
-	parameterstr = "totaltime";
-	parametervalue = findparameter(parameterstr, line);
+	//parameterstr = "totaltime";
+	//parametervalue = findparameter(parameterstr, line);
+	paramvec = { "totaltime","inittime" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		param.totaltime = std::stod(parametervalue);
@@ -320,7 +325,7 @@ Param readparamstr(std::string line, Param param)
 
 	
 	// Below is a bit more complex than usual because more than 1 node can be outputed as a timeseries
-	parameterstr = "TSOutput";
+	parameterstr = "TSOutput";  //##TSnodesout
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
@@ -414,7 +419,7 @@ Param readparamstr(std::string line, Param param)
 	}
 
 	////////////////////////////////////////////////////////////////
-	// 
+	
 
 	parameterstr = "nx";
 	parametervalue = findparameter(parameterstr, line);
@@ -567,7 +572,7 @@ Param readparamstr(std::string line, Param param)
 	}
 #endif
 
-	paramvec = { "initzs","zsinit" };
+	paramvec = { "zsinit", "initzs"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "initzs";
 	//parametervalue = findparameter(parameterstr, line);
@@ -662,8 +667,9 @@ template <class T>
 Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 {
 	std::string parameterstr, parametervalue;
-
-	std::vector<std::string> paramvec = { "bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo"};
+	std::vector<std::string> paramvec;
+       	
+	paramvec = { "bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEM"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "bathy";
 	//parametervalue = findparameter(parameterstr, line);
@@ -707,7 +713,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	// Boundaries
 	
-	paramvec = { "leftbndfile","leftbnd","left"};
+	paramvec = { "left","leftbndfile","leftbnd"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "leftbndfile";// or left or leftbnd
 	//parametervalue = findparameter(parameterstr, line);
@@ -766,7 +772,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 	*/
 	
-	paramvec = { "rightbndfile","rightbnd","right"};
+	paramvec = { "right","rightbndfile","rightbnd"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "rightbndfile";// or left or leftbnd
 	//parametervalue = findparameter(parameterstr, line);
@@ -823,7 +829,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}*/
 
-	paramvec = { "topbndfile","topbnd","top" };
+	paramvec = { "top","topbndfile","topbnd"};
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "topbndfile";// or left or leftbnd
 	//parametervalue = findparameter(parameterstr, line);
@@ -880,7 +886,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}*/
 
-	paramvec = { "botbndfile","botbnd","bot","bottom"};
+	paramvec = { "bot","botbndfile","botbnd","bottom" };
 	parametervalue = findparameter(paramvec, line);
 	//parameterstr = "botbndfile";// or left or leftbnd
 	//parametervalue = findparameter(parameterstr, line);
@@ -965,8 +971,10 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	//River
-	parameterstr = "river";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "rivers","river" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "river";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> vars = split(parametervalue, ',');
@@ -1012,8 +1020,10 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}*/
 
 	// wind forcing
-	parameterstr = "windfiles";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "wind","windfiles" }; //## UWind,VWind
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "windfiles";  
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 
@@ -1047,8 +1057,10 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// atmospheric pressure forcing
-	parameterstr = "atmpfile";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = {"Atmp","atmpfile"};
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "atmpfile";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		// needs to be a netcdf file 
@@ -1056,8 +1068,10 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// rain forcing
-	parameterstr = "rainfile";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "Rain","rainfile" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "rainfile";
+	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		// netcdf file == Variable spatially
@@ -1075,8 +1089,6 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			forcing.Rain.uniform = 1;
 		}
 
-
-
 	}
 
 	parameterstr = "Adaptation";
@@ -1087,7 +1099,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		// special case for 'Targetlevel' adaptation
 		if (!adaptpar.empty())
 		{
-			if (adaptpar[0].compare("Targetlevel") == 0)
+			//if (adaptpar[0].compare("Targetlevel") == 0)
+			if (case_insensitive_compare(adaptpar[0], std::string("Targetlevel")) == 0)
 			{
 				for (int ng = 1; ng < adaptpar.size(); ng++)
 				{
@@ -1366,7 +1379,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 	std::string parameternumber,left,right;
 	std::vector<std::string> splittedstr;
 	
-	// first look fo an equal sign
+	// first look for an equal sign
 	// No equal sign mean not a valid line so skip
 	splittedstr=split(line, '=' );
 	if (splittedstr.size()>1)
@@ -1375,7 +1388,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		right = splittedstr[1]; // if there are more than one equal sign in the line the second one is ignored
 		for (int ii = 0; ii < parameterstr.size(); ii++)
 		{
-			found = left.compare(parameterstr[ii]);// it needs to strictly compare
+			found = case_insensitive_compare(left,parameterstr[ii]);// it needs to strictly compare
 			if (found == 0)
 				break;
 		}
@@ -1449,6 +1462,18 @@ std::string trim(const std::string& str, const std::string& whitespace)
 	return str.substr(strBegin, strRange);
 }
 
+/*! \fn std::size_t case_insensitive_compare(const std::string& str, const std::string& str)
+* case non-sensitive string comparison (return 0 if the same, as for the "compare" function)
+*
+*/
+std::size_t case_insensitive_compare(std::string s1, std::string s2)
+{
+	//Convert s1 and s2 to lower case strings
+	std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
+	std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
+//if (s1.compare(s2) == 0)
+	return s1.compare(s2);
+}
 
 
 
