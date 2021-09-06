@@ -1432,7 +1432,7 @@ template <class T> void RiverVolumeAdapt(Param XParam, T maxslope)
 	ftocB = RiverVolumeAdapt(XParam, maxslope, true, false);
 	ftocC = RiverVolumeAdapt(XParam, maxslope, false, true);
 	ftocD = RiverVolumeAdapt(XParam, maxslope, true, true);
-	if (UnitestA && UnitestB && UnitestC && UnitestD)
+	if (ftocA && ftocB && ftocC && ftocD)
 	{
 		log("River Volume Conservation Test: Flow from fine to coarse adapted mesh: Success");
 	}
