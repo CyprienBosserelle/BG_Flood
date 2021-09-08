@@ -1270,6 +1270,46 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	return test;
 }
 
+/*! \fn T ValleyBathy(T x, T y, T slope, T center)
+* \brief	create V shape Valley basin
+*
+* This function creates a simple V shape Valley basin
+*
+*
+*/
+template <class T> T ValleyBathy(T x, T y, T slope, T center)
+{
+
+
+	T bathy;
+
+	bathy = (abs(x - center) + y) * slope;
+
+
+	return bathy;
+}
+
+
+/*! \fn T ThackerBathy(T x, T y, T L, T D)
+* \brief	create a parabolic bassin
+*
+* This function creates a parabolic bassin. The function returns a single value of the bassin
+*
+* Borrowed from Buttinger et al. 2019.
+*
+* ### Reference
+* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+*/
+template <class T> T ThackerBathy(T x, T y, T L, T D)
+{
+
+
+	T bathy = D * ((x * x + y * y) / (L * L) - 1.0);
+
+
+	return bathy;
+}
 
 /*! \fn
 * \brief	Simulate the Lake-at-rest in a parabolic bassin
@@ -1384,26 +1424,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 template bool ThackerLakeAtRest<float>(Param XParam,float zsinit);
 template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
 
-/*! \fn T ThackerBathy(T x, T y, T L, T D)
-* \brief	create a parabolic bassin
-*
-* This function creates a parabolic bassin. The function returns a single value of the bassin
-*
-* Borrowed from Buttinger et al. 2019.
-*
-* ### Reference
-* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
-* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
-*/
-template <class T> T ThackerBathy(T x, T y, T L, T D)
-{
 
-
-	T bathy = D * ((x * x + y * y) / (L * L) - 1.0);
-
-
-	return bathy;
-}
 
 /*! \fn bool RiverVolumeAdapt(Param XParam)
 * \brief	Wraping function for RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
@@ -1745,24 +1766,6 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 }
 
-/*! \fn T ValleyBathy(T x, T y, T slope, T center)
-* \brief	create V shape Valley basin
-*
-* This function creates a simple V shape Valley basin
-*
-*
-*/
-template <class T> T ValleyBathy(T x, T y, T slope, T center)
-{
-
-
-	T bathy;
-	
-	bathy = (abs(x - center)+y) * slope;
-
-
-	return bathy;
-}
 
 
 /*! \fn
