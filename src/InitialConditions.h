@@ -24,6 +24,7 @@ void InitTSOutput(Param XParam);
 template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP& bnd);
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock);
 template <class T> void Findbndblks(Param XParam, Model<T> XModel, Forcing<float>& XForcing);
+template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock);
 
 // End of global definition;
 #endif

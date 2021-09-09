@@ -47,6 +47,18 @@ void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzoneB Xzone)
 	ny = round((yymax - yymin) / ddx + 1.0);
 }
 
+std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzone)
+{
+	int nblkzone = Xzone.nblk;
+	std::vector<int> actblkzone(XParam.nblk, -1);
+
+	for (int ibz = 0; ibz < nblkzone; ibz++)
+	{
+		actblkzone[Xzone.blk[ibz]] = activeblk[Xzone.blk[ibz]];
+	}
+	return(actblkzone);
+}
+
 template<class T>
 void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo, outzoneB Xzone)
 {
@@ -222,15 +234,16 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	float* blkwidth;
 	int* blkid;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
 
-//################
+
 	AllocateCPU(1, nblk, blkwidth);
 	AllocateCPU(1, nblk, blkid);
 
 
-	for (int ib = 0; ib < nblk; ib++)
+	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
-		int ibl = activeblk[ib];
+		int ibl = activeblkzone[ib];
 		blkwidth[ib] = (float)calcres(XParam.dx, level[ibl]);
 		blkid[ib] = ibl;
 	}
@@ -242,9 +255,9 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	// Reusing blkwidth for other array
 	// This is needed because the blockxo array may be shuffled to memory block beyond nblk
-	for (int ib = 0; ib < nblk; ib++)
+	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
-		int ibl = activeblk[ib];
+		int ibl = activeblkzone[ib];
 		blkwidth[ib] = XParam.xo + blockxo[ibl];
 		blkid[ib] = level[ibl];
 		
@@ -252,9 +265,9 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	
 	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blkwidth);
 	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, blkid);
-	for (int ib = 0; ib < nblk; ib++)
+	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
-		int ibl = activeblk[ib];
+		int ibl = activeblkzone[ib];
 		blkwidth[ib] = XParam.yo + blockyo[ibl];
 	}
 
@@ -349,29 +362,10 @@ template void creatncfileBUQ<double>(Param& XParam, int* activeblk, int* level, 
 template<class T>
 void creatncfileBUQ(Param& XParam, BlockP<T> XBlock)
 {
-	outzoneB Xzone;
-	std::vector<int> blksall;
-
 	for (int o = 0; o < XBlock.outZone.size(); o++)
 	{
-		Xzone = XBlock.outZone[o];
-		creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, Xzone);
+		creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, XBlock.outZone[o]);
 	}
-	/*else
-	{
-		//Define the full domain as a zone
-		Xzone.outname = XParam.outfile;
-		Xzone.xo = XParam.xo;
-		Xzone.yo = XParam.yo;
-		Xzone.xmax = XParam.xmax;
-		Xzone.ymax = XParam.ymax;
-		for (int ib = 0; ib < XParam.nblk; ib++)
-		{
-			blksall.push_back(ib);
-        }
-		Xzone.blocks = blksall;
-		creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, Xzone);
-	}*/
 }
 template void creatncfileBUQ<float>(Param &XParam, BlockP<float> XBlock);
 template void creatncfileBUQ<double>(Param &XParam, BlockP<double> XBlock);
@@ -519,10 +513,12 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 	// Now write the initial value of the Variable out
 	int lev, bl;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+
 	//####################
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		bl = activeblk[ibl];
+		bl = activeblkzone[ibl];
 		lev = level[bl];
 
 
@@ -690,11 +686,12 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 
 	std::string xxname, yyname, varname, sign;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
 
 	int lev, bl;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		bl = activeblk[ibl];
+		bl = activeblkzone[ibl];
 		lev = level[bl];
 		lev < 0 ? sign = "N" : sign = "P";
 		double xxmax, xxmin, yymax, yymin;
@@ -820,7 +817,7 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> XModel)
 		log("Create netCDF output file...");
 		creatncfileBUQ(XParam, XModel.blocks);
 		//creatncfileBUQ(XParam);
-		for (int o = 0; o < XParam.outzone.size(); o++)
+		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
 			writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)

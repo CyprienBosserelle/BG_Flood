@@ -131,13 +131,6 @@ void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 
 	write_text_to_log_file("\n");
 	write_text_to_log_file("# Files");
-	write_text_to_log_file("outfile = " + XParam.outfile + ";");
-	write_text_to_log_file("smallnc = " + std::to_string(XParam.smallnc) + "; #if smallnc==1 all Output are scaled and saved as a short int");
-	if (XParam.smallnc == 1)
-	{
-		write_text_to_log_file("scalefactor = " + std::to_string(XParam.scalefactor) + ";");
-		write_text_to_log_file("addoffset = " + std::to_string(XParam.addoffset) + ";");
-	}
 	if (!XParam.outzone.empty())
 	{
 		for (int o = 0; o < XParam.outzone.size(); o++)
@@ -145,6 +138,18 @@ void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 			write_text_to_log_file("outzonefile = " + XParam.outzone[o].outname + "," + std::to_string(XParam.outzone[o].xstart) + "," + std::to_string(XParam.outzone[o].xend) + "," + std::to_string(XParam.outzone[o].ystart) + "," + std::to_string(XParam.outzone[o].yend) + ";");
 		}
 	}
+	else
+	{
+		write_text_to_log_file("outfile = " + XParam.outfile + ";");
+	}
+	
+	write_text_to_log_file("smallnc = " + std::to_string(XParam.smallnc) + "; #if smallnc==1 all Output are scaled and saved as a short int");
+	if (XParam.smallnc == 1)
+	{
+		write_text_to_log_file("scalefactor = " + std::to_string(XParam.scalefactor) + ";");
+		write_text_to_log_file("addoffset = " + std::to_string(XParam.addoffset) + ";");
+	}
+
 	if (!XParam.TSnodesout.empty())
 	{
 		for (int o = 0; o < XParam.TSnodesout.size(); o++)

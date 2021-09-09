@@ -12,6 +12,7 @@ public:
 	std::string outname;
 };
 
+// Special output zones for nc files, informatin given by the user
 class outzone {
 public:
 	//std::vector<int> blocks; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)

@@ -97,13 +97,18 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(nblk, 1, XModel.adapt.refine);
 	}
 	
-	// do allocate 1 outzone block (block with at least 1 empty neighbourhood) 
-	// this will be reallocated eventually
-	for (int o = 0; o < XModel.blocks.outZone.size(); o++)
-	{
-		AllocateCPU(1, 1, XModel.blocks.outZone[o].blk);
-	}
-	//std::string outname;
+	// do allocate 1 outzone block, this will be reallocated eventually
+	//AllocateCPU(1, 1, XModel.blocks.outZone[0].blk);
+	//if (XParam.outzone.size() > 0)
+	//{
+	//	//XModel.blocks.outZone.resize(XParam.outzone.size())
+	//	for (int o = 1; o < XParam.outzone.size(); o++)
+	//	{
+	//		AllocateCPU(1, 1, XModel.blocks.outZone[o].blk);
+	//	}
+	//}
+
+	
 
 	if (XParam.TSnodesout.size() > 0)
 	{

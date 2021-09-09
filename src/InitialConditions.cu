@@ -86,7 +86,7 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	
 	if (XParam.TSnodesout.size() > 0)
 	{
-		FindTSoutNodes(XParam, XModel.blocks,XModel.bndblk);
+		FindTSoutNodes(XParam, XModel.blocks, XModel.bndblk);
 	}
 	
 
@@ -342,11 +342,12 @@ template void Initmaparray<double>(Model<double>& XModel);
 
 
 // Initialise all storage involving parameter the outzone objects
-template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
+template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 {
 	int ib;
 	T levdx;
-	outzone Xzone;
+	outzone Xzone; //info on outzone given by the user
+	outzoneB XzoneB; //infor on outzone computed and used actually for writing nc files
 
 	// Find the blocks to output and the corners of this area for each zone
 	for (int o = 0; o < XParam.outzone.size(); o++)
@@ -364,16 +365,16 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 		// identify the blocks inside this new defined zone.
 		
 		std::vector<int> blkzone;
-		double xbl, ybl, xtl, ytl, xtr, ytr, xbr, ybr, xo, yo, xmax, ymax;
+		double xo, yo, xmax, ymax;
 		double xl, xr, yb, yt;
-		int ibl, itl, ibr, itr;
+		int ibl, itl, ibr, itr, i;
 
 		int nblk = 0;
 
 		//Getting the new area's corners
-		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		for (i = 0; i < XParam.nblk; i++)
 		{
-			ib = XBlock.active[ibl];
+			ib = XBlock.active[i];
 			levdx = calcres(XParam.dx, XBlock.level[ib]);
 
 			// get the corners' locations of the block (center of the corner cell)
@@ -385,80 +386,86 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 			// Getting the bottom left corner coordinate of the output area
 			if (XParam.outzone[o].xstart >= xl && XParam.outzone[o].xstart <= xr && XParam.outzone[o].ystart >= yb && XParam.outzone[o].ystart <= yt)
 			{
-				xbl = XBlock.xo[ib];
-				ybl = XBlock.yo[ib];
+				ibl = ib;
+
 			}
 			// Getting the top left corner coordinate of the output area
 			if (XParam.outzone[o].xstart >= xl && XParam.outzone[o].xstart <= xr && XParam.outzone[o].yend >= yb && XParam.outzone[o].yend <= yt)
 			{
-				xtl = XBlock.xo[ib];
-				ytl = XBlock.yo[ib];
+				itl = ib;
+
 			}
 			// Getting the top right corner coordinate of the output area
 			if (XParam.outzone[o].xend >= xl && XParam.outzone[o].xend <= xr && XParam.outzone[o].ystart >= yb && XParam.outzone[o].ystart <= yt)
 			{
-				xtr = XBlock.xo[ib];
-				ytr = XBlock.yo[ib];
+				itr = ib;
+
 			}
 			// Getting the bottom right corner coordinate of the output area
 			if (XParam.outzone[o].xend >= xl && XParam.outzone[o].xend <= xr && XParam.outzone[o].ystart >= yb && XParam.outzone[o].ystart <= yt)
 			{
-				xbr = XBlock.xo[ib];
-				ybr = XBlock.yo[ib];
+				ibr = ib;
+
 			}
 		}
 		// get the minimal rectangle
-		xo = min(xbl, xtl);
-		yo = min(ybl, ybr);
-		xmax = max(xtr, xbr);
-		ymax = max(ytr, ytl);
-		
-		//This minimal rectangular can include only part of blocks depending of resolution
-		//the blocks containing the corners are found and the lager block impose its border on each side
-		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		xo = XParam.xo + min(XBlock.xo[ibl], XBlock.xo[itl]);
+		yo = XParam.yo + min(XBlock.yo[ibl], XBlock.yo[ibr]);
+		xmax = XParam.xo + max(XBlock.xo[itr], XBlock.xo[ibr]) + (XParam.blkwidth - 1) * levdx;
+		ymax = XParam.yo + max(XBlock.yo[itr], XBlock.yo[itl]) + (XParam.blkwidth - 1) * levdx;
+
+		if (XParam.maxlevel != XParam.minlevel) //if adapatation
 		{
-			ib = XBlock.active[ibl];
-			levdx = calcres(XParam.dx, XBlock.level[ib]);
 
-			// get the corners' locations of the block (center of the corner cell)
-			xl = XParam.xo + XBlock.xo[ib];
-			yb = XParam.yo + XBlock.yo[ib];
-			xr = XParam.xo + XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-			yt = XParam.yo + XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
+			//This minimal rectangular can include only part of blocks depending of resolution.
+			//the blocks containing the corners are found and the lager block impose its border on each side
+			for (i = 0; i < XParam.nblk; i++)
+			{
+				ib = XBlock.active[i];
+				levdx = calcres(XParam.dx, XBlock.level[ib]);
+				double eps = levdx / 3; //margin to search for block boundaries, to avoid machine error
 
-			// Getting the bottom left corner coordinate of the output area
-			if (xo >= xl && xo <= xr && yo >= yb && yo <= yt)
-			{
-				ibl = ib;
-			}
-			// Getting the top left corner coordinate of the output area
-			if (xo >= xl && xo <= xr && ymax >= yb && ymax <= yt)
-			{
-				itl = ib;
-			}
-			// Getting the top right corner coordinate of the output area
-			if (xmax >= xl && xmax <= xr && yo >= yb && yo <= yt)
-			{
-				itr = ib;
-			}
-			// Getting the bottom right corner coordinate of the output area
-			if (xmax >= xl && xmax <= xr && ymax >= yb && ymax <= yt)
-			{
-				ibr = ib;
+				// get the corners' locations of the block (center of the corner cell)
+				xl = XParam.xo + XBlock.xo[ib];
+				yb = XParam.yo + XBlock.yo[ib];
+				xr = XParam.xo + XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
+				yt = XParam.yo + XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
+
+				// Getting the bottom left corner coordinate of the output area
+				if (xo + eps >= xl && xo - eps <= xr && yo + eps >= yb && yo - eps <= yt)
+				{
+					ibl = ib;
+				}
+				// Getting the top left corner coordinate of the output area
+				if (xo + eps >= xl && xo - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
+				{
+					itl = ib;
+				}
+				// Getting the bottom right corner coordinate of the output area
+				if (xmax + eps >= xl && xmax - eps <= xr && yo + eps >= yb && yo - eps <= yt)
+				{
+					ibr = ib;
+				}
+				// Getting the top right corner coordinate of the output area
+				if (xmax + eps >= xl && xmax - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
+				{
+					itr = ib;
+				}
 			}
 		}
+		// for each side, the border is imposed by the larger block (the "further out" one).
+		levdx = calcres(XParam.dx, XBlock.level[ib]);
 
-		// for each side, the border is imposed by the larger block, of the "further out" one.
-		XBlock.outZone[o].xo = min(XBlock.xo[ibl], XBlock.xo[itl]);
-		XBlock.outZone[o].yo = min(XBlock.yo[ibl], XBlock.yo[ibr]);
-		XBlock.outZone[o].xmax = max(XBlock.xo[itr], XBlock.xo[ibr]);
-		XBlock.outZone[o].ymax = max(XBlock.yo[itr], XBlock.yo[itl]);
+		XzoneB.xo = XParam.xo + min(XBlock.xo[ibl], XBlock.xo[itl]);
+		XzoneB.yo = XParam.yo + min(XBlock.yo[ibl], XBlock.yo[ibr]);
+		XzoneB.xmax = XParam.xo + max(XBlock.xo[itr], XBlock.xo[ibr]) + (XParam.blkwidth - 1) * levdx;
+		XzoneB.ymax = XParam.yo + max(XBlock.yo[itr], XBlock.yo[itl]) + (XParam.blkwidth - 1) * levdx;
 		
 		// Get the list of all blocks in the zone
-		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		for (i = 0; i < XParam.nblk; i++)
 		{
 			double xbl, ybl, xtl, ytl, xtr, ytr, xbr, ybr;
-			ib = XBlock.active[ibl];
+			ib = XBlock.active[i];
 			levdx = calcres(XParam.dx, XBlock.level[ib]);
 
 			// get the corners' locations of the block (center of the corner cell)
@@ -469,55 +476,63 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T> XBlock)
 
 			// Checking if at least one part of the a cell of the block is 
 			// inside the area defined by the user.
-			if (OBBdetect(xl, xr, yb, yt, XBlock.outZone[o].xo, XBlock.outZone[o].xmax, XBlock.outZone[o].yo, XBlock.outZone[o].ymax))
+			if (OBBdetect(xl, xr, yb, yt, XzoneB.xo, XzoneB.xmax, XzoneB.yo, XzoneB.ymax))
 			{
 				// This block belongs to the output zone defined by the user
 				blkzone.push_back(ib);
 				nblk++;
 			}
 		}
-		XBlock.outZone[o].nblk = nblk;
-		ReallocArray(blkzone.size(), 1, XBlock.outZone[o].blk);
+		XzoneB.nblk = nblk;
+		AllocateCPU(blkzone.size(), 1, XzoneB.blk);
 		for (int b = 0; b < blkzone.size(); b++)
 		{
-			XBlock.outZone[o].blk[b] = blkzone[b];
+			XzoneB.blk[b] = blkzone[b];
 		}
-		XBlock.outZone[o].outname = XParam.outzone[o].outname;
+		XzoneB.outname = XParam.outzone[o].outname;
+		//All the zone informatin has been integrated in a outzoneB structure,
+		// and pushed back to the initial variable.
+		XBlock.outZone.emplace_back(XzoneB);
 	}
 
 }
-template void Findoutzoneblks<float>(Param& XParam, BlockP<float> XBlock);
-template void Findoutzoneblks<double>(Param& XParam, BlockP<double> XBlock);
+template void Findoutzoneblks<float>(Param& XParam, BlockP<float>& XBlock);
+template void Findoutzoneblks<double>(Param& XParam, BlockP<double>& XBlock);
 
-template <class T> void Initoutzone(Param& XParam, BlockP<T> XBlock)
+template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 {
 	//The domain full domain is defined as the output zone by default 
 	//(and the blocks have been initialised by default)
 	// If a zone for the output has been requested by the user, the blocks in the 
 	// zone and the corners are computed here:
+
 	if (XParam.outzone.size() > 0)
 	{
+		XBlock.outZone.reserve(XParam.outzone.size()); //to avoid a change of location of memory if not enought space
 		Findoutzoneblks(XParam, XBlock);
 	}
 	else
 	{
+		outzoneB XzoneB;
 		std::vector<int> blksall;
 		//Define the full domain as a zone
-		XBlock.outZone[0].outname = XParam.outfile;
-		XBlock.outZone[0].xo = XParam.xo;
-		XBlock.outZone[0].yo = XParam.yo;
-		XBlock.outZone[0].xmax = XParam.xmax;
-		XBlock.outZone[0].ymax = XParam.ymax;
-		XBlock.outZone[0].ymax = XParam.nblk;
-		ReallocArray(XParam.nblk, 1, XBlock.outZone[0].blk);
+		XzoneB.outname = XParam.outfile; //.assign(XParam.outfile);
+		XzoneB.xo = XParam.xo;
+		XzoneB.yo = XParam.yo;
+		XzoneB.xmax = XParam.xmax;
+		XzoneB.ymax = XParam.ymax;
+		XzoneB.nblk = XParam.nblk;
+		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
 		for (int ib = 0; ib < XParam.nblk; ib++)
 		{
-			XBlock.outZone[0].blk[ib]=ib;
+			XzoneB.blk[ib]=ib;
 		}
+		//XBlock.outZone.reserve(1);
+		XBlock.outZone.push_back(XzoneB);
 	}
 }
-template void Initoutzone<float>(Param& XParam, BlockP<float> XBlock);
-template void Initoutzone<double>(Param& XParam, BlockP<double> XBlock);
+template void Initoutzone<float>(Param& XParam, BlockP<float>& XBlock);
+template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
 
 
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
