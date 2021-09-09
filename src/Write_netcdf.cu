@@ -60,7 +60,7 @@ std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzon
 }
 
 template<class T>
-void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo, outzoneB Xzone)
+void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo, outzoneB &Xzone)
 {
 
 	int status;
@@ -148,10 +148,10 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	int time_id, xx_id, yy_id;
 	int tdim[] = { time_dim };
 	
-
+	//########################
 	//static size_t tst[] = { 0 };
-	size_t blkstart[] = { 0 };
-	size_t blkcount[] = { (size_t) nblk };
+	size_t blkstart[] = { Xzone.blk[0] };
+	size_t blkcount[] = { (size_t) Xzone.nblk };
 	size_t xcount[] = { 0 };
 	size_t ycount[] = { 0 };
 	static size_t xstart[] = { 0 }; // start at first value
@@ -234,30 +234,30 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	float* blkwidth;
 	int* blkid;
-	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
 
 
 	AllocateCPU(1, nblk, blkwidth);
 	AllocateCPU(1, nblk, blkid);
 
 
-	for (int ib = 0; ib < XParam.nblk; ib++)
+	for (int ib = 0; ib < nblk; ib++)
 	{
-		int ibl = activeblkzone[ib];
+		int ibl = activeblk[Xzone.blk[ib]];
 		blkwidth[ib] = (float)calcres(XParam.dx, level[ibl]);
 		blkid[ib] = ibl;
 	}
-
+	
 	status = nc_put_vara_int(ncid, blkid_id, blkstart, blkcount, blkid);
 	//status = nc_put_vara_int(ncid, blkstatus_id, blkstart, blkcount, activeblk);
 	status = nc_put_vara_float(ncid, blkwidth_id, blkstart, blkcount, blkwidth);
 
 
-	// Reusing blkwidth for other array
+	// Reusing blkwidth/blkid for other array (for blkxo/blklevel and blkyo) to save memory space
+
 	// This is needed because the blockxo array may be shuffled to memory block beyond nblk
-	for (int ib = 0; ib < XParam.nblk; ib++)
+	for (int ib = 0; ib < nblk; ib++)
 	{
-		int ibl = activeblkzone[ib];
+		int ibl = activeblk[Xzone.blk[ib]];
 		blkwidth[ib] = XParam.xo + blockxo[ibl];
 		blkid[ib] = level[ibl];
 		
@@ -265,16 +265,15 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	
 	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blkwidth);
 	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, blkid);
-	for (int ib = 0; ib < XParam.nblk; ib++)
+
+	for (int ib = 0; ib < nblk; ib++)
 	{
-		int ibl = activeblkzone[ib];
+		int ibl = activeblk[Xzone.blk[ib]];
 		blkwidth[ib] = XParam.yo + blockyo[ibl];
 	}
 
 	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blkwidth);
 	
-	
-
 
 	free(blkid);
 	free(blkwidth);
@@ -355,20 +354,20 @@ if (status != NC_NOERR) handle_ncerror(status);
 //return XParam;void
 }
 
-template void creatncfileBUQ<float>(Param& XParam, int* activeblk, int* level, float* blockxo, float* blockyo, outzoneB Xzone);
-template void creatncfileBUQ<double>(Param& XParam, int* activeblk, int* level, double* blockxo, double* blockyo, outzoneB Xzone);
+template void creatncfileBUQ<float>(Param& XParam, int* activeblk, int* level, float* blockxo, float* blockyo, outzoneB& Xzone);
+template void creatncfileBUQ<double>(Param& XParam, int* activeblk, int* level, double* blockxo, double* blockyo, outzoneB& Xzone);
 
 
 template<class T>
-void creatncfileBUQ(Param& XParam, BlockP<T> XBlock)
+void creatncfileBUQ(Param& XParam, BlockP<T> &XBlock)
 {
 	for (int o = 0; o < XBlock.outZone.size(); o++)
 	{
 		creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, XBlock.outZone[o]);
 	}
 }
-template void creatncfileBUQ<float>(Param &XParam, BlockP<float> XBlock);
-template void creatncfileBUQ<double>(Param &XParam, BlockP<double> XBlock);
+template void creatncfileBUQ<float>(Param &XParam, BlockP<float> &XBlock);
+template void creatncfileBUQ<double>(Param &XParam, BlockP<double> &XBlock);
 
 template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, T * blockxo, T *blockyo, std::string varst, int vdim, T * var, outzoneB Xzone)
 {
@@ -513,12 +512,14 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 	// Now write the initial value of the Variable out
 	int lev, bl;
-	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+	//std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
 
 	//####################
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl = 0; ibl < Xzone.nblk; ibl++)
 	{
-		bl = activeblkzone[ibl];
+		
+		bl = activeblk[Xzone.blk[ibl]];
+		//bl = activeblkzone[ibl];
 		lev = level[bl];
 
 
@@ -578,8 +579,8 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		{
 
 			//###############
-			start2D[0] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start2D[1] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start2D[0] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start2D[1] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 
 			if (smallnc > 0)
 			{
@@ -598,8 +599,8 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		{
 			//
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n",bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
-			start3D[1] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start3D[2] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start3D[1] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start3D[2] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 

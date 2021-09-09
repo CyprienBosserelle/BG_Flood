@@ -10,8 +10,8 @@
 #include "Util_CPU.h"
 
 void handle_ncerror(int status);
-template<class T> void creatncfileBUQ(Param &XParam, int* activeblk, int* level, T* blockxo, T* blockyo, outzoneB Xzone);
-template<class T> void creatncfileBUQ(Param &XParam, BlockP<T> XBlock);
+template<class T> void creatncfileBUQ(Param &XParam, int* activeblk, int* level, T* blockxo, T* blockyo, outzoneB &Xzone);
+template<class T> void creatncfileBUQ(Param &XParam, BlockP<T> &XBlock);
 template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, T * blockxo, T *blockyo, std::string varst, int vdim, T * var, outzoneB Xzone);
 template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activeblk, int* level, T * blockxo, T *blockyo, std::string varst, T * var, outzoneB Xzone);
 template <class T> void InitSave2Netcdf(Param &XParam, Model<T> XModel);
