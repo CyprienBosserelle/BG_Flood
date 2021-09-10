@@ -19,6 +19,7 @@
 * Test 6 Mass conservation on a slope
 * Test 7 is mass conservation with rain fall on grid
 * Test 8 is a comparison with litterature case with slope and non-uniform rain
+* Test 999 Run the main loop and engine in debug mode
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
@@ -55,6 +56,8 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		rivertest = Rivertest(0.1, -1);
 		std::string result = rivertest ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
+
+		RiverVolumeAdapt(XParam, T(0.4));
 	}
 	if (XParam.test == 2)
 	{
@@ -102,6 +105,9 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	if (XParam.test == 5)
 	{
 		log("\t Lake-at-rest Test");
+		bool testTLAR=ThackerLakeAtRest(XParam,T(0.0));
+		std::string result = testTLAR ? "successful" : "failed";
+		log("\t\tThaker lake-at-rest test: " + result);
 		LakeAtRest(XParam, XModel);
 	}
 	if (XParam.test == 6)
@@ -140,6 +146,11 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		std::string result = raintest2 ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
 	}*/
+	if (XParam.test == 999)
+	{
+		//
+		DebugLoop(XParam, XForcing, XModel, XModel_g);
+	}
 }
 template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
@@ -313,6 +324,13 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		CompareCPUvsGPU(XParam, XModel, XModel_g, outv, false);
 	}
 	bool modelgood = true;
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
 	{
@@ -669,12 +687,12 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	//Output times for comparisons
 	XParam.endtime = 1.0;
-	XParam.outputtimestep = 0.035;
+	XParam.outputtimestep = 0.04;//0.035;
 
 	XParam.smallnc = 0;
 
-	XParam.cf = 0.0;
-	XParam.frictionmodel = 0;
+	XParam.cf = 0.001;
+	XParam.frictionmodel = 1;
 
 	XParam.conserveElevation = false;
 
@@ -766,7 +784,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = XParam.outputtimestep;
-	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	XLoop.dtmax = 0.025;// initdt(XParam, XLoop, XModel);
 
 
 
@@ -1252,6 +1270,502 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	return test;
 }
 
+/*! \fn T ValleyBathy(T x, T y, T slope, T center)
+* \brief	create V shape Valley basin
+*
+* This function creates a simple V shape Valley basin
+*
+*
+*/
+template <class T> T ValleyBathy(T x, T y, T slope, T center)
+{
+
+
+	T bathy;
+
+	bathy = (abs(x - center) + y) * slope;
+
+
+	return bathy;
+}
+
+
+/*! \fn T ThackerBathy(T x, T y, T L, T D)
+* \brief	create a parabolic bassin
+*
+* This function creates a parabolic bassin. The function returns a single value of the bassin
+*
+* Borrowed from Buttinger et al. 2019.
+*
+* ### Reference
+* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+*/
+template <class T> T ThackerBathy(T x, T y, T L, T D)
+{
+
+
+	T bathy = D * ((x * x + y * y) / (L * L) - 1.0);
+
+
+	return bathy;
+}
+
+/*! \fn
+* \brief	Simulate the Lake-at-rest in a parabolic bassin
+* 
+* This function creates a parabolic bassin filled to a given level and run the modle for a while and checks that the velocities in the lake remain very small
+* thus verifying the well-balancedness of teh engine and the Lake-at-rest condition.
+*
+* Borrowed from Buttinger et al. 2019.
+*
+* ### Reference
+* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+*/
+template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
+{
+	bool test = true;
+	// Make a Parabolic bathy
+	
+	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
+	Model<decltype(modeltype)> XModel; // For CPU pointers
+	Model<decltype(modeltype)> XModel_g; // For GPU pointers
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+
+	T Lo = T(2500.0);
+	T Do = T(1.0);
+
+	T x, y;
+
+
+
+	XForcing.Bathy[0].xo = -4000.0;
+	XForcing.Bathy[0].yo = -4000.0;
+
+	XForcing.Bathy[0].xmax = 4000.0;
+	XForcing.Bathy[0].ymax = 4000.0;
+	XForcing.Bathy[0].nx = 64;
+	XForcing.Bathy[0].ny = 64;
+
+	XForcing.Bathy[0].dx = 126.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
+			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = ThackerBathy(x, y, Lo, Do);
+		}
+	}
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = zsinit;
+	XParam.endtime = 1390.0;
+
+	XParam.outputtimestep = XParam.endtime; 
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+
+	// Check Lake at rest state?
+	// all velocities should be very small
+	T smallvel = T(1e-6);
+	int i, ibot, itop, iright, ileft;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				i = memloc(XParam, ix, iy, ib);
+				if (abs(XModel.evolv.u[i]) > smallvel || abs(XModel.evolv.v[i]) > smallvel)
+				{
+					log("Lake at rest state not acheived!");
+					test = false;
+				}
+			}
+		}
+	}
+
+	return test;
+}
+template bool ThackerLakeAtRest<float>(Param XParam,float zsinit);
+template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
+
+
+
+/*! \fn bool RiverVolumeAdapt(Param XParam)
+* \brief	Wraping function for RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+*
+* The function calls it's child function with different adaptation set in XParam so needs to be rerun to account for the different scenarios:
+* * uniform level
+* * flow from coasrse to fine
+* * flow from fine to coarse
+*
+* and account for different flow direction
+* 
+*/
+template <class T> void RiverVolumeAdapt(Param XParam, T maxslope)
+{
+	//T maxslope = 0.45; // tthe mass conservation is better with smaller slopes 
+
+	bool UnitestA, UnitestB, UnitestC, UnitestD;
+	bool ctofA, ctofB, ctofC, ctofD;
+	bool ftocA, ftocB, ftocC, ftocD;
+
+	std::string details;
+
+	XParam.minlevel = 1;
+	XParam.maxlevel = 1;
+	XParam.initlevel = 1;
+	
+
+
+	UnitestA=RiverVolumeAdapt(XParam, maxslope, false, false);
+	UnitestB=RiverVolumeAdapt(XParam, maxslope, true, false);
+	UnitestC=RiverVolumeAdapt(XParam, maxslope, false, true);
+	UnitestD=RiverVolumeAdapt(XParam, maxslope, true, true);
+
+	if (UnitestA && UnitestB && UnitestC && UnitestD)
+	{
+		log("River Volume Conservation Test: Uniform mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Uniform mesh: Failed");
+		details = UnitestA ? "successful" : "failed";
+		log("\t Uniform mesh A :"+ details);
+		details = UnitestB ? "successful" : "failed";
+		log("\t Uniform mesh B :" + details);
+		details = UnitestC ? "successful" : "failed";
+		log("\t Uniform mesh C :" + details);
+		details = UnitestD ? "successful" : "failed";
+		log("\t Uniform mesh D :" + details);
+	}
+
+	XParam.minlevel = 0;
+	XParam.maxlevel = 1;
+	XParam.initlevel = 0;
+
+	//Fine to coarse
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdatpCrit = "Inrange";
+	XParam.Adapt_arg1 = "28.0";
+	XParam.Adapt_arg2 = "40.0";
+	XParam.Adapt_arg3 = "zb";
+
+	ftocA = RiverVolumeAdapt(XParam, maxslope, false, false);
+	ftocB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	ftocC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	ftocD = RiverVolumeAdapt(XParam, maxslope, true, true);
+	if (ftocA && ftocB && ftocC && ftocD)
+	{
+		log("River Volume Conservation Test: Flow from fine to coarse adapted mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Flow from fine to coarse adapted mesh: Failed");
+		details = ftocA ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh A :" + details);
+		details = ftocB ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh B :" + details);
+		details = ftocC ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh C :" + details);
+		details = ftocD ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh D :" + details);
+	}
+
+	//coarse to fine
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdatpCrit = "Inrange";
+	XParam.Adapt_arg1 = "0.0";
+	XParam.Adapt_arg2 = "2.0";
+	XParam.Adapt_arg3 = "zb";
+
+	ctofA = RiverVolumeAdapt(XParam, maxslope, false, false);
+	ctofB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	ctofC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	ctofD = RiverVolumeAdapt(XParam, maxslope, true, true);
+	if (ctofA && ctofB && ctofC && ctofD)
+	{
+		log("River Volume Conservation Test: Flow from coarse to fine adapted mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Flow from coarse to fine adapted: Failed");
+		details = ctofA ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh A :" + details);
+		details = ctofB ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh B :" + details);
+		details = ctofC ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh C :" + details);
+		details = ctofD ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh D :" + details);
+	}
+
+
+}
+
+
+/*! \fn bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+* \brief	Simulate a river flowing in a steep valley
+* and heck the Volume conservation
+*
+* This function creates a dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
+*
+* The function can test the water volume for 4 scenario each time:
+* * left to right: bottop=false & flip=true;
+* * right to left: bottop=false & flip=false;
+* * bottom to top: bottop=true & flip=true;
+* * top to bottom: bottop=true & flip=false;
+*
+* The function inherits the adaptation set in XParam so needs to be rerun to accnout for the different scenarios:
+* * uniform level
+* * flow from coasrse to fine
+* * flow from fine to coarse
+* This is done in the higher level wrapping function
+*/
+template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+{
+	//bool test = true;
+	// Make a Parabolic bathy
+
+	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
+	Model<decltype(modeltype)> XModel; // For CPU pointers
+	Model<decltype(modeltype)> XModel_g; // For GPU pointers
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	float* dummybathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	XForcing.Bathy[0].xo = 0.0;
+	XForcing.Bathy[0].yo = 0.0;
+
+	XForcing.Bathy[0].xmax = 31.0;
+	XForcing.Bathy[0].ymax = 31.0;
+	XForcing.Bathy[0].nx = 32;
+	XForcing.Bathy[0].ny = 32;
+
+	XForcing.Bathy[0].dx = 1.0;
+
+	T x, y;
+	T center = T(10.5);
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, dummybathy);
+
+
+	float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = std::numeric_limits<float>::max();
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
+			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+
+			
+			dummybathy[i + j * XForcing.Bathy[0].nx] = ValleyBathy(y, x, slope, center);
+
+			maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
+
+			
+		}
+	}
+
+	// Make surrounding wall
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+
+		dummybathy[0 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[1 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[j + 0 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[j + 1 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[(XForcing.Bathy[0].nx - 1) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[(XForcing.Bathy[0].nx - 2) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[j + (XForcing.Bathy[0].ny - 1) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[j + (XForcing.Bathy[0].ny - 2) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+
+	}
+
+	// make a specially elevated spot 
+
+	dummybathy[(XForcing.Bathy[0].nx - 1) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+	dummybathy[(XForcing.Bathy[0].nx - 2) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+
+	dummybathy[(XForcing.Bathy[0].nx - 1) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+	dummybathy[(XForcing.Bathy[0].nx - 2) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			mintopo = min(dummybathy[i + j * XForcing.Bathy[0].nx], mintopo);
+		}
+	}
+
+	// Flip or rotate the bathy according to what is requested
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			if (!flip && !bottop)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (flip && !bottop)
+			{
+				XForcing.Bathy[0].val[(XForcing.Bathy[0].nx - 1 - i) + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (!flip && bottop)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+			else if (flip && bottop)
+			{
+				XForcing.Bathy[0].val[i + (XForcing.Bathy[0].ny - 1 - j) * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+		}
+	}
+
+	free(dummybathy);
+
+	// Overrule whatever is set in the river forcing
+	T Q = T(1.0);
+	
+	double upstream = !flip ? 24.0 : 8;
+	double riverx = !bottop ? upstream : center;
+	double rivery = !bottop ? center : upstream;
+
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = riverx - 1.0;
+	thisriver.xend = riverx + 1.0;
+	thisriver.ystart = rivery - 1.0;
+	thisriver.yend = rivery + 1.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = mintopo+0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	XParam.endtime = 20.0;
+
+	XParam.outputtimestep = XParam.endtime;
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+	T initVol = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				initVol = initVol + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+	
+	T TheoryInput = Q * XParam.endtime;
+
+
+	T SimulatedVolume = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+
+	SimulatedVolume = SimulatedVolume - initVol;
+
+	T error = abs(SimulatedVolume - TheoryInput);
+
+	return error / TheoryInput < 0.05;
+
+}
+
 
 
 /*! \fn
@@ -1260,7 +1774,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 */
 template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 {
-	T epsi = T(0.000001);
+	T epsi = T(1e-5);
 	int ib;
 
 	bool test = true;
@@ -1269,6 +1783,13 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
 	fillHaloC(XParam, XModel.blocks, XModel.zb);
+
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	
 
 
 
@@ -1291,17 +1812,20 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	//============================================
 	// Flux and Source term reconstruction
 	// X- direction
-	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 	//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 
 	// Y- direction
-	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	//updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	UpdateButtingerYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 	//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
 	fillHalo(XParam, XModel.blocks, XModel.flux);
 
+	// Do we need to check also before fill halo part?
 
 	// Check Fhu and Fhv (they should be zero)
 	int i, ibot, itop, iright, ileft;
@@ -1337,13 +1861,17 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 
 					log("dhu is not zero. Lake at rest not preserved!!!");
 
-					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n", XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
 
-					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib, ix, iy);
-					testkurganovX(XParam, ib, ix, iy, XModel);
+					printf("Fhu[i]=%f\n", XModel.flux.Fhu[i]);
 
-					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix + 1, iy);
-					testkurganovX(XParam, ib, ix + 1, iy, XModel);
+					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n",XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
+
+					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib,ix,iy);
+					testButtingerX(XParam, ib, ix, iy, XModel);
+
+					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix+1, iy);
+					testButtingerX(XParam, ib, ix+1, iy, XModel);
+
 				}
 
 			}
@@ -1382,6 +1910,150 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	return test;
 }
 
+
+
+template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+{
+	int RB, levRB, LBRB, LB, levLB, RBLB;
+	int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+	int ileft = memloc(XParam.halowidth, XParam.blkmemwidth, ix - 1, iy, ib);
+
+	int lev = XModel.blocks.level[ib];
+	T delta = calcres(T(XParam.dx), lev);
+
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+
+	// neighbours for source term
+
+	RB = XModel.blocks.RightBot[ib];
+	levRB = XModel.blocks.level[RB];
+	LBRB = XModel.blocks.LeftBot[RB];
+
+	LB = XModel.blocks.LeftBot[ib];
+	levLB = XModel.blocks.level[LB];
+	RBLB = XModel.blocks.RightBot[LB];
+
+	T dhdxi = XModel.grad.dhdx[i];
+	T dhdxmin = XModel.grad.dhdx[ileft];
+	T cm = T(1.0);
+	T fmu = T(1.0);
+
+	T hi = XModel.evolv.h[i];
+
+	T hn = XModel.evolv.h[ileft];
+
+
+	//if (hi > eps || hn > eps)
+	{
+		T dx, zi, zn, hr, hl, etar, etal, zr, zl, zA, zCN, hCNr, hCNl;
+		T ui, vi, uli, vli, dhdxi, dhdxil, dudxi, dudxil, dvdxi, dvdxil;
+
+		T ga = g * T(0.5);
+		// along X
+		dx = delta * T(0.5);
+		zi = XModel.zb[i];
+		zn = XModel.zb[ileft];
+
+		ui = XModel.evolv.u[i];
+		vi = XModel.evolv.v[i];
+		uli = XModel.evolv.u[ileft];
+		vli = XModel.evolv.v[ileft];
+
+		dhdxi = XModel.grad.dhdx[i];
+		dhdxil = XModel.grad.dhdx[ileft];
+		dudxi = XModel.grad.dudx[i];
+		dudxil = XModel.grad.dudx[ileft];
+		dvdxi = XModel.grad.dvdx[i];
+		dvdxil = XModel.grad.dvdx[ileft];
+
+
+		hr = hi - dx * dhdxi;
+		hl = hn + dx * dhdxil;
+		etar = XModel.evolv.zs[i] - dx * XModel.grad.dzsdx[i];
+		etal = XModel.evolv.zs[ileft] + dx * XModel.grad.dzsdx[ileft];
+
+		//define the topography term at the interfaces
+		zr = zi - dx * XModel.grad.dzbdx[i];
+		zl = zn + dx * XModel.grad.dzbdx[ileft];
+
+		//define the Audusse terms
+		zA = max(zr, zl);
+
+		// Now the CN terms
+		zCN = min(zA, min(etal, etar));
+		hCNr = max(T(0.0), min(etar - zCN, hr));
+		hCNl = max(T(0.0), min(etal - zCN, hl));
+
+		//Velocity reconstruction
+		//To avoid high velocities near dry cells, we reconstruct velocities according to Bouchut.
+		T ul, ur, vl, vr, sl, sr;
+		if (hi > eps) {
+			ur = ui - (1. + dx * dhdxi / hi) * dx * dudxi;
+			vr = vi - (1. + dx * dhdxi / hi) * dx * dvdxi;
+		}
+		else {
+			ur = ui - dx * dudxi;
+			vr = vi - dx * dvdxi;
+		}
+		if (hn > eps) {
+			ul = uli + (1. - dx * dhdxil / hn) * dx * dudxil;
+			vl = vli + (1. - dx * dhdxil / hn) * dx * dvdxil;
+		}
+		else {
+			ul = uli + dx * dudxil;
+			vl = vli + dx * dvdxil;
+		}
+
+
+
+
+		T fh, fu, fv, dt;
+
+
+		//solver below also modifies fh and fu
+		dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, ul, ur, fh, fu);
+		//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
+
+		
+
+		fv = (fh > 0. ? vl : vr) * fh;
+
+
+		// Topographic source term
+
+		// In the case of adaptive refinement, care must be taken to ensure
+		// well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
+		if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+			int iright = memloc(XParam.halowidth, XParam.blkmemwidth, 0, jj, RB);;
+			hi = XModel.evolv.h[iright];
+			zi = XModel.zb[iright];
+		}
+		if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
+		{
+			int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+			int ilc = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth - 1, jj, LB);
+			//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
+			hn = XModel.evolv.h[ilc];
+			zn = XModel.zb[ilc];
+		}
+
+		sl = ga * (hi + hCNr) * (zi - zCN);
+		sr = ga * (hCNl + hn) * (zn - zCN);
+
+
+		printf("etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n", etar,etal,zCN,zi,zn,zA, zr,zl);
+
+
+		printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hCNl=%f; hCNr=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", hi, hn, fh, fu, sl, sr, hCNl, hCNr, hr, hl, zr, zl);
+
+		printf("h[i]=%f; h[ileft]=%f dhdx[i]=%f, dhdx[ileft]=%f, zs[i]=%f, zs[ileft]=%f, dzsdx[i]=%f, dzsdx[ileft]=%f, dzbdx[i]=%f, dzbdx[ileft]=%f\n\n", XModel.evolv.h[i], XModel.evolv.h[ileft], XModel.grad.dhdx[i], XModel.grad.dhdx[ileft], XModel.evolv.zs[i], XModel.evolv.zs[ileft], XModel.grad.dzsdx[i], XModel.grad.dzsdx[ileft], XModel.grad.dzbdx[i], XModel.grad.dzbdx[ileft]);
+	}
+}
 
 template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
 {

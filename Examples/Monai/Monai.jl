@@ -360,15 +360,15 @@ Read the simulated gauge output.
 
 # ╔═╡ c0f8d550-de13-11eb-0fe8-69be1dcd7792
 begin
-	BGG1=readdlm("Monai_BG_Gauge_"*string(1)*".txt", '\t',  skipstart=1);
-	BGG2=readdlm("Monai_BG_Gauge_"*string(2)*".txt", '\t',  skipstart=1);
-	BGG3=readdlm("Monai_BG_Gauge_"*string(3)*".txt", '\t',  skipstart=1);
+	BGG1=readdlm("Monai_BG_Gauge_"*string(1)*".txt", '\t',  skipstart=2);
+	BGG2=readdlm("Monai_BG_Gauge_"*string(2)*".txt", '\t',  skipstart=2);
+	BGG3=readdlm("Monai_BG_Gauge_"*string(3)*".txt", '\t',  skipstart=2);
 end
 
 # ╔═╡ fd1c0930-de13-11eb-2eaf-4f04b2bf6604
 begin
 	plot(GaugeData[:,1],GaugeData[:,2],pen=(1.0,:black), region=(0,25,-1,5), xlabel="time [s]", ylabel="water level [cm]",title="Gauge 1")
-	plot!(BGG1[:,1],BGG1[:,2].*100.0,pen=(1.0,:red),show=true)
+	plot!(BGG1[:,1],BGG1[:,2] .* 100.0,pen=(1.0,:red),show=true)
 	
 end
 

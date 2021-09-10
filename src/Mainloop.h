@@ -17,6 +17,8 @@
 
 template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);
 
+template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);
+
 template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> XModel);
 
 template <class T> Loop<T> InitLoop(Param& XParam, Model<T>& XModel);

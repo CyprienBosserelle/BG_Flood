@@ -1,4 +1,3 @@
-
 #include "Write_netcdf.h"
 
 void handle_ncerror(int status) {
@@ -678,7 +677,8 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + bl * XParam.blksize;
+				//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + bl * XParam.blksize;
+				int n = memloc(XParam, i + XParam.outishift, j + XParam.outjshift, bl);
 				int r = i + j * XParam.blkwidth;
 				if (smallnc > 0)
 				{
@@ -986,3 +986,4 @@ extern "C" void write2dvarnc(int nx, int ny, double totaltime, double* var)
 	status = nc_close(ncid);
 
 }
+

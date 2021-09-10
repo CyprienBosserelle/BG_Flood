@@ -75,6 +75,8 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		}
 
 		Initmaparray(XModel_g);
+
+		InitzbgradientGPU(XParam, XModel_g);
 	}
 }
 template void SetupGPU<float>(Param XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);

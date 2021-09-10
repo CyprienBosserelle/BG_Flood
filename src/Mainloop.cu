@@ -12,19 +12,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
-	// fill halo for zb
-	// only need to do that once 
-	fillHaloC(XParam, XModel.blocks, XModel.zb);
-	if (XParam.GPUDEVICE >= 0)
-	{
-		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
-		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
-
-		cudaStreamDestroy(XLoop.streams[0]);
-	}
-
-
-
+	
 	log("\t\tCompleted");
 	log("Model Running...");
 	while (XLoop.totaltime < XParam.endtime)
@@ -74,6 +62,96 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 template void MainLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
 template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
 
+
+
+/*! \fn  void  DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
+* Debugging loop 
+* This function was crated to debug to properly wrap the debug flow engine of the model
+*/
+template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
+{
+
+	log("Initialising model main loop");
+
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	//Define some useful variables 
+	Initmeanmax(XParam, XLoop, XModel, XModel_g);
+
+	// fill halo for zb
+	// only need to do that once 
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	if (XParam.GPUDEVICE >= 0)
+	{
+		dim3 blockDim(16, 16, 1);
+		dim3 gridDim(XParam.nblk, 1, 1);
+		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
+		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
+		cudaStreamDestroy(XLoop.streams[0]);
+
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+
+	}
+
+
+
+	log("\t\tCompleted");
+	log("Model Running...");
+	while (XLoop.nstep < 100)
+	{
+		// Bnd stuff here
+		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+
+
+		// Calculate Forcing at this step
+		updateforcing(XParam, XLoop, XForcing);
+
+		// Core engine
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//HalfStepGPU(XParam, XLoop, XForcing, XModel_g);
+		}
+		else
+		{
+			HalfStepCPU(XParam, XLoop, XForcing, XModel);
+		}
+
+		// Time keeping
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+
+		// Force output at every step
+		XLoop.nextoutputtime = XLoop.totaltime;
+
+		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
+		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
+
+		// Do Sum & Max variables Here
+		Calcmeanmax(XParam, XLoop, XModel, XModel_g);
+
+		// Check & collect TSoutput
+		pointoutputstep(XParam, XLoop, XModel, XModel_g);
+
+		// Check for map output
+		mapoutput(XParam, XLoop, XModel, XModel_g);
+
+		// Reset mean/Max if needed
+		resetmeanmax(XParam, XLoop, XModel, XModel_g);
+
+		printstatus(XLoop.totaltime, XLoop.dt);
+		XLoop.nstep++;
+	}
+
+
+
+
+}
+template void DebugLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
+template void DebugLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
 
 
 

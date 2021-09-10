@@ -28,6 +28,9 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Set edges
 	setedges(XParam, XModel.blocks, XModel.zb);
 
+	// Calculate Active cells
+	calcactiveCellCPU(XParam, XModel.blocks, XModel.zb);
+
 	//=====================================
 	// Initialise Friction map
 
@@ -49,6 +52,10 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// First calculate the initial values for Evolving parameters (i.e. zs, h, u and v)
 	initevolv(XParam, XModel.blocks,XForcing, XModel.evolv, XModel.zb);
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
+
+	// Initialise the topography slope and halo
+	InitzbgradientCPU(XParam, XModel);
+
 	//=====================================
 	// Initial forcing
 	InitRivers(XParam, XForcing, XModel);
@@ -66,6 +73,53 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
+
+template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel)
+{
+	
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	
+}
+template void InitzbgradientCPU<double>(Param XParam, Model<double> XModel);
+template void InitzbgradientCPU<float>(Param XParam, Model<float> XModel);
+
+template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
+{
+	const int num_streams = 4;
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+
+	cudaStream_t streams[num_streams];
+
+
+	CUDA_CHECK(cudaStreamCreate(&streams[0]));
+
+	fillHaloGPU(XParam, XModel.blocks, streams[0], XModel.zb);
+
+	cudaStreamDestroy(streams[0]);
+
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+}
+template void InitzbgradientGPU<double>(Param XParam, Model<double> XModel);
+template void InitzbgradientGPU<float>(Param XParam, Model<float> XModel);
 
 template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
@@ -489,3 +543,53 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 }
 
+
+
+template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb)
+{
+	int ib;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				if (zb[n] < XParam.mask)
+				{
+					XBlock.activeCell[n] = 1;
+				}
+				else
+				{
+					XBlock.activeCell[n] = 0;
+				}
+			}
+		}
+	}
+
+}
+
+
+template <class T> void calcactiveCellGPU(Param XParam, BlockP<T> XBlock, T *zb)
+{
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int n = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+
+	if (zb[n] < XParam.mask)
+	{
+		XBlock.activeCell[n] = 1;
+	}
+	else
+	{
+		XBlock.activeCell[n] = 0;
+	}
+}
