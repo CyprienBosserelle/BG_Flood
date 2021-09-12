@@ -100,7 +100,14 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		//
 		bool testresults;
 		testresults = CPUGPUtest(XParam, XModel, XModel_g);
-		exit(1);
+		if (testresults)
+		{
+			exit(0);
+		}
+		else
+		{
+			exit(1);
+		}
 	}
 	if (XParam.test == 5)
 	{
@@ -275,7 +282,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
-		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		delta = T(calcres(XParam.dx, XModel.blocks.level[ib]));
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -284,9 +291,9 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 			{
 				//
 				int n = memloc(XParam, ix, iy, ib);
-				x = XParam.xo + XModel.blocks.xo[ib] + ix * delta;
-				y = XParam.yo + XModel.blocks.yo[ib] + iy * delta;
-				XModel.evolv.zs[n] = XModel.evolv.zs[n] + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
+				x = T(XParam.xo) + XModel.blocks.xo[ib] + ix * delta;
+				y = T(XParam.yo) + XModel.blocks.yo[ib] + iy * delta;
+				XModel.evolv.zs[n] = XModel.evolv.zs[n] + a * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (T(2.0) * cc * cc));
 				XModel.evolv.h[n] = utils::max(XModel.evolv.zs[n] - XModel.zb[n], T(0.0));
 
 			}
@@ -348,7 +355,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 
-			T diffdt = XLoop_g.dt - XLoop.dt;
+			T diffdt = T(XLoop_g.dt - XLoop.dt);
 			if (abs(diffdt) > T(100.0) * (XLoop.epsilon))
 			{
 				printf("Timestep Difference=%f\n", diffdt);
@@ -380,13 +387,13 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 			for (int iv = 0; iv < 8; iv++)
 			{
 
-				int ix, iy, ib, ii, jj, ibx, iby, nbx, nby;
+				int ix, iy, ib, ii, jj, ibx, iby, nbx;
 				jj = 127;
 				ii = (iv + 1) * 16 - 1;
 
 				// Theoretical size is 255x255
 				nbx = 256 / 16;
-				nby = 256 / 16;
+				
 
 				ibx = floor(ii / 16);
 				iby = floor(jj / 16);
@@ -627,7 +634,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 				}
 			}
 			T error = ((finalVol - initVol) - TheoryInput) / TheoryInput;
-			printf("error = %g\%, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f\n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
+			printf("error = %g %, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f \n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
 
 
 			modelgood = abs(error) < 0.05;
@@ -909,7 +916,7 @@ template bool MassConserveSteepSlope<float>(float zsnit, int gpu);
 template bool MassConserveSteepSlope<double>(double zsnit, int gpu);
 
 
-/*! \fn reductiontest()
+/*! \fn T reductiontest(Param XParam, Model<T> XModel, Model<T> XModel_g)
 *
 *	Test the algorithm for reducing the global time step on the user grid layout
 */
@@ -1401,7 +1408,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 	// Check Lake at rest state?
 	// all velocities should be very small
 	T smallvel = T(1e-6);
-	int i, ibot, itop, iright, ileft;
+	int i;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
@@ -1768,9 +1775,9 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 
 
-/*! \fn
-*	Simulate the first predictive step and check wether the lake at rest is preserved
-*
+/*! \fn bool LakeAtRest(Param XParam, Model<T> XModel)
+*	This function simulates the first predictive step and check whether the lake at rest is preserved
+*	otherwise it prints out to screen the cells (and neighbour) where the test fails
 */
 template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 {
@@ -1828,7 +1835,7 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 	// Do we need to check also before fill halo part?
 
 	// Check Fhu and Fhv (they should be zero)
-	int i, ibot, itop, iright, ileft;
+	int i, iright;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XModel.blocks.active[ibl];
@@ -1838,9 +1845,9 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 			{
 				i = memloc(XParam, ix, iy, ib);
 				iright = memloc(XParam, ix + 1, iy, ib);
-				ileft = memloc(XParam, ix - 1, iy, ib);
-				itop = memloc(XParam, ix, iy + 1, ib);
-				ibot = memloc(XParam, ix, iy - 1, ib);
+				//ileft = memloc(XParam, ix - 1, iy, ib);
+				//itop = memloc(XParam, ix, iy + 1, ib);
+				//ibot = memloc(XParam, ix, iy - 1, ib);
 
 				if (abs(XModel.flux.Fhu[i]) > epsi)
 				{
@@ -1911,7 +1918,13 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 }
 
 
-
+/*! \fn  void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+*
+* This function goes through the Buttinger scheme but instead of the normal output just prints all teh usefull values
+* This function is/was used in the lake-at-rest verification
+*
+* See also: void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+*/
 template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
 {
 	int RB, levRB, LBRB, LB, levLB, RBLB;
@@ -1936,8 +1949,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 	levLB = XModel.blocks.level[LB];
 	RBLB = XModel.blocks.RightBot[LB];
 
-	T dhdxi = XModel.grad.dhdx[i];
-	T dhdxmin = XModel.grad.dhdx[ileft];
+	
 	T cm = T(1.0);
 	T fmu = T(1.0);
 
@@ -2055,6 +2067,12 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 	}
 }
 
+
+/*! \fn  void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+*
+* This function goes through the Kurganov scheme but instead of the normal output just prints all teh usefull values
+* This function is/was used in the lake-at-rest verification
+*/
 template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
 {
 	int RB, levRB, LBRB, LB, levLB, RBLB;
@@ -2368,7 +2386,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 			T error = abs((finalVol - initVol) - TheoryInput) / TheoryInput;
 			modelgood = (error < 0.05);
 
-			printf("error = %g\%, initial volume=%4.4g; final Volume=%4.4g; abs. difference=%g, Theoretical  input=%g\n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
+			printf("error = %g %, initial volume=%4.4g; final Volume=%4.4g; abs. difference=%g, Theoretical  input=%g\n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
 		}
 	}
 	InitSave2Netcdf(XParam, XModel);
@@ -2389,7 +2407,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 {
 	log("#####");
-	int i, j, k;
+	int k;
 	T rainDuration = 10.0;
 	int NX = 2502;
 	int NY = 22;
@@ -2401,7 +2419,7 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 	FILE* fp;
 
 	Param XParam;
-	T delta, initVol, finalVol, TheoryInput, Surf;
+	T delta, TheoryInput, Surf;
 
 	// initialise domain and required resolution
 	XParam.xo = 0;
@@ -2561,9 +2579,9 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 			//Create the rain forcing:
 			for (k = 0; k < NT; k++)
 			{
-				for (j = 0; j < NY; j++)
+				for (int j = 0; j < NY; j++)
 				{
-					for (i = 0; i < NX; i++)
+					for (int i = 0; i < NX; i++)
 					{
 						if (tRain[k] < rainDuration+eps)
 						{
@@ -2601,9 +2619,9 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 
 			//Create the rain forcing:
 
-			for (j = 0; j < NY; j++)
+			for (int j = 0; j < NY; j++)
 			{
-				for (i = 0; i < NX; i++)
+				for (int i = 0; i < NX; i++)
 				{
 
 					if (xRain[i] < 8.0)
@@ -2778,6 +2796,11 @@ template <class T> bool Raintestmap(int gpu, int dimf, T zinit)
 template bool Raintestmap<float>(int gpu, int dimf, float Zsinit);
 template bool Raintestmap<double>(int gpu, int dimf, double Zsinit);
 
+/*! \fn void alloc_init2Darray(float** arr, int NX, int NY)
+* This function allocates and fills a 2D array with zero values
+*
+*
+*/
 void alloc_init2Darray(float** arr, int NX, int NY)
 {
 	int i, j;
@@ -2799,6 +2822,11 @@ void alloc_init2Darray(float** arr, int NX, int NY)
 	}
 }
 
+/*! \fn void init3Darray(float*** arr, int rows, int cols, int depths)
+* This function fill a 3D array with zero values 
+*
+*
+*/
 void init3Darray(float*** arr, int rows, int cols, int depths)
 {
 	int i, j, k;
@@ -2812,6 +2840,11 @@ void init3Darray(float*** arr, int rows, int cols, int depths)
 	}
 }
 
+/*! \fn void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
+* This function fill an array with random values (0 - 1)
+*
+* 
+*/
 template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -2832,6 +2865,11 @@ template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
 template void fillrandom<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillrandom<double>(Param XParam, BlockP<double> XBlock, double* z);
 
+/*! \fn void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
+* This function fill an array with a gaussian bump
+* 
+* borrowed/adapted from Basilisk test (?)
+*/
 template <class T> void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
 {
 	T delta, x, y;
@@ -2951,7 +2989,13 @@ void TestingOutput(Param XParam, Model<T> XModel)
 template void TestingOutput<float>(Param XParam, Model<float> XModel);
 template void TestingOutput<double>(Param XParam, Model<double> XModel);
 
-
+/*! \fn void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
+* This function copies block info to an output variable
+* This function is somewhat useful when checking bugs in the mesh refinement or coarsening
+* one needs to provide a pointer(z) allocated on the CPU to store the clockinfo
+* This fonction only works on CPU
+*
+*/
 template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -2972,6 +3016,14 @@ template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
 template void copyID2var<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z);
 
+
+/*! \fn void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z)
+* This function copies blick info to an output variable
+* This function is somewhat useful when checking bugs in the mesh refinement or coarsening
+* one needs to provide a pointer(z) allocated on the CPU to store the clockinfo
+* This fonction only works on CPU
+*
+*/
 template <class T> void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -2993,7 +3045,12 @@ template void copyBlockinfo2var<float>(Param XParam, BlockP<float> XBlock, int* 
 template void copyBlockinfo2var<double>(Param XParam, BlockP<double> XBlock, int* blkinfo, double* z);
 
 
-
+/*! \fn void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo)
+* This function compares the Valiables in a CPU model and a GPU models
+* This function is quite useful when checking both are identical enough
+* one needs to provide a list (vector<string>) of variable to check
+* 
+*/
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo)
 {
 	Loop<T> XLoop;
@@ -3060,6 +3117,11 @@ template void CompareCPUvsGPU<float>(Param XParam, Model<float> XModel, Model<fl
 template void CompareCPUvsGPU<double>(Param XParam, Model<double> XModel, Model<double> XModel_g, std::vector<std::string> varlist, bool checkhalo);
 
 
+/*! \fn void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* output, T* shuffle)
+* This function Calculates The difference in left and right flux terms.
+* This function is quite useful when checking for Lake-at-Rest states
+* This function requires a preallocated output and a shuffle (right side term) CPU pointers to save the result of teh calculation
+*/
 template <class T> void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* output, T* shuffle)
 {
 	int iright, itop;
@@ -3085,6 +3147,11 @@ template <class T> void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* outp
 	}
 }
 
+/*! \fn void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* Su, T* output)
+* This function Calculate The source term of the equation. 
+* This function is quite useful when checking for Lake-at-Rest states
+* This function requires an outputCPU pointers to save the result of teh calculation
+*/
 template <class T> void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* Su, T* output)
 {
 	int iright, itop;
@@ -3110,7 +3177,11 @@ template <class T> void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* S
 	}
 }
 
-
+/*! \fn void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
+* Calculate and output the difference between a CPU and a GPU array
+* This function is quite usefull to spot inconsistencies between the GPU and CPU algorithmes.
+* This function requires two (dummy and an output) CPU pointers to transition the GPU data on the CU RAM for comparison and saving to the disk
+*/
 template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
 {
 	T diff, maxdiff, rmsdiff;
