@@ -34,17 +34,16 @@ void Calcnxny(Param XParam, int level, int& nx, int& ny)
 void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzoneB Xzone)
 {
 	double ddx = calcres(XParam.dx, level);
-	double dxp = calcres(XParam.dx, level + 1);
 	double xxmax, xxmin, yymax, yymin;
 
-	xxmax = Xzone.xo - dxp;
-	yymax = Xzone.ymax - dxp;
+	xxmax = Xzone.xmax;
+	yymax = Xzone.ymax;
 
-	xxmin = Xzone.xo + dxp;
-	yymin = Xzone.ymax + dxp;
+	xxmin = Xzone.xo;
+	yymin = Xzone.yo;
 
-	nx = round((xxmax - xxmin) / ddx + 1.0);
-	ny = round((yymax - yymin) / ddx + 1.0);
+	nx = round((xxmax - xxmin) / ddx ) + 1.0;
+	ny = round((yymax - yymin) / ddx ) + 1.0;
 }
 
 std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzone)
@@ -192,9 +191,10 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		
 		Calcnxnyzone(XParam, lev, nx, ny, Xzone);
 
-		//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin,nx);
-		//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
+		printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xmax, xmin,nx);
+		printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, ymax, ymin, ny);
 
+		//to change type from int to size_t
 		nxx = nx;
 		nyy = ny;
 
@@ -577,15 +577,11 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 		if (vdim == 2)
 		{
-
-			//###############
 			start2D[0] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 			start2D[1] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 
 			if (smallnc > 0)
 			{
-
-
 				status = nc_put_vara_short(ncid, var_id, start2D, count2D, varblk_s);
 				if (status != NC_NOERR) handle_ncerror(status);
 			}
@@ -667,8 +663,7 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 	float scalefactor = XParam.scalefactor;
 	float addoffset = XParam.addoffset;
 
-	//####################
-	status = nc_open(XParam.outfile.c_str(), NC_WRITE, &ncid);
+	status = nc_open(Xzone.outname.c_str(), NC_WRITE, &ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
 	//read id from time dimension
 	status = nc_inq_unlimdim(ncid, &recid);
@@ -690,9 +685,12 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
 
 	int lev, bl;
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl = 0; ibl < Xzone.nblk; ibl++)
 	{
-		bl = activeblkzone[ibl];
+		bl = activeblk[Xzone.blk[ibl]];
+	//for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	//{
+		//bl = activeblkzone[ibl];
 		lev = level[bl];
 		lev < 0 ? sign = "N" : sign = "P";
 		double xxmax, xxmin, yymax, yymin;
@@ -732,11 +730,10 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 				}
 			}
 		}
-		//#########################
 		if (vdim == 2)
 		{
-			start2D[0] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start2D[1] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start2D[0] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start2D[1] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 
 			if (smallnc > 0)
 			{
@@ -753,9 +750,8 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		}
 		else if (vdim == 3)
 		{
-			//###################################
-			start3D[1] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start3D[2] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start3D[1] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start3D[2] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 			if (smallnc > 0)
 			{
 				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);
@@ -811,7 +807,7 @@ extern "C" void writenctimestep(std::string outfile, double totaltime)
 	if (status != NC_NOERR) handle_ncerror(status);
 }
 
-template <class T> void InitSave2Netcdf(Param &XParam, Model<T> XModel)
+template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 {
 	if (!XParam.outvars.empty())
 	{
@@ -830,8 +826,8 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> XModel)
 		}
 	}
 }
-template void InitSave2Netcdf<float>(Param &XParam, Model<float> XModel);
-template void InitSave2Netcdf<double>(Param &XParam, Model<double> XModel);
+template void InitSave2Netcdf<float>(Param &XParam, Model<float> &XModel);
+template void InitSave2Netcdf<double>(Param &XParam, Model<double> &XModel);
 
 
 template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
@@ -839,9 +835,9 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
 	if (!XParam.outvars.empty())
 	{
 		//creatncfileBUQ(XParam);
-		for (int o = 0; o < XParam.outzone.size(); o++)
+		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
-			writenctimestep(XParam.outzone[o].outname, XLoop.totaltime);
+			writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
 				writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
