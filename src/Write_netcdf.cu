@@ -843,7 +843,6 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
 				writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
 			}
 		}
-
 	}
 }
 template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
