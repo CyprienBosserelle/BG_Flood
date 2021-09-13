@@ -70,8 +70,8 @@ template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing,
 template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
 	
-	int ib;
-	T levdx;
+	//int ib;
+	//T levdx;
 	//FILE* fsSLTS;
 	// Initialise all storage involving parameters
 	//CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
@@ -186,7 +186,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				{
 					for (int i = 0; i < XParam.blkwidth; i++)
 					{
-						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+						//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						
 						
 						xl = XParam.xo + XModel.blocks.xo[ib] + i * levdx - 0.5 * levdx;
@@ -344,7 +344,7 @@ template void Initmaparray<double>(Model<double>& XModel);
 // Initialise all storage involving parameter the outzone objects
 template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 {
-	int ib;
+	int ib, i;
 	T levdx;
 	std::vector<int> cornerblk; //index of the blocks at the corner of the zone 
 	outzone Xzone; //info on outzone given by the user
@@ -367,9 +367,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		// identify the blocks inside this new defined zone.
 		
 		std::vector<int> blkzone;
-		double xo, yo, xmax, ymax;
 		double xl, xr, yb, yt;
-		int ibl, itl, ibr, itr, i;
 
 		int nblk = 0;
 
@@ -498,7 +496,6 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		// Get the list of all blocks in the zone
 		for (i = 0; i < XParam.nblk; i++)
 		{
-			double xbl, ybl, xtl, ytl, xtr, ytr, xbr, ybr;
 			ib = XBlock.active[i];
 			levdx = calcres(XParam.dx, XBlock.level[ib]);
 
@@ -574,13 +571,13 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	//=====================================
 	// Find how many blocks are on each bnds
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+	T leftxo, rightxo, topyo, botyo;
 
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		double espdist = 0.00000001;///WARMING
+		//double espdist = 0.00000001;///WARMING
 
 		int ib = XBlock.active[ibl];
 
@@ -588,12 +585,12 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-		leftyo =XBlock.yo[ib];
+		//leftyo =XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
+		//rightyo = XBlock.yo[ib];
+		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
+		//botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
 		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * levdx))
@@ -653,7 +650,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
 	BlockP<T> XBlock = XModel.blocks;
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+	T leftxo, rightxo, topyo, botyo;
 
 
 	// Reallocate array if necessary
@@ -664,7 +661,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		double espdist = 0.00000001;///WARMING
+		//double espdist = 0.00000001;///WARMING
 
 		int ib = XBlock.active[ibl];
 		T levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
@@ -672,12 +669,12 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-		leftyo = XBlock.yo[ib];
+		//leftyo = XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
+		//rightyo = XBlock.yo[ib];
+		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
+		//botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
 		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * levdx))
