@@ -138,11 +138,12 @@ int main(int argc, char **argv)
 	//===========================================
 	//   Log the timer
 	//===========================================
-	
+	log("#################################");
 	log("End Computation");
 	log("#################################");
 	log("Total runtime= " + std::to_string((XParam.endcputime - XParam.startcputime) / CLOCKS_PER_SEC) + " seconds");
-
+	log("Model Setup time= " + std::to_string((XParam.setupcputime - XParam.startcputime) / CLOCKS_PER_SEC) + " seconds");
+	log("Model runtime= " + std::to_string((XParam.endcputime - XParam.setupcputime) / CLOCKS_PER_SEC) + " seconds");
 	//============================================
 	// Cleanup and free memory
 
