@@ -58,7 +58,8 @@ int main(int argc, char **argv)
 	// Start timer to keep track of time
 	XParam.startcputime = clock();
 
-	// Create/overight existing 
+
+	// Create/overwrite existing 
 	create_logfile();
 
 	//============================================
@@ -127,16 +128,21 @@ int main(int argc, char **argv)
 
 	}
 
-	//log(std::to_string(XForcing.Bathy.val[50]));
-	//TestingOutput(XParam, XModel);
-	//CompareCPUvsGPU(XParam, XForcing, XModel, XModel_g);
-	//Gaussianhump(XParam, XModel, XModel_g);
-	
+		
 
 	//===========================================
 	//   End of Model
 	//===========================================
 	XParam.endcputime = clock();
+
+	//===========================================
+	//   Log the timer
+	//===========================================
+	
+	log("End Computation");
+	log("#################################");
+	log("Total runtime= " + std::to_string((XParam.endcputime - XParam.startcputime) / CLOCKS_PER_SEC) + " seconds");
+
 	//============================================
 	// Cleanup and free memory
 

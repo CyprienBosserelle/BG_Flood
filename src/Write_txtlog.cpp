@@ -61,12 +61,26 @@ void create_logfile()
 */
 	//strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
 	//std::string strtimenow(buffer);
+
+	time_t rawtime, dstart;
+	struct tm* timeinfo;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
+	std::string strtimenow(buffer);
+
+
 	log("#################################");
 	log("BG_Flood v0.5");
 	log("#################################");
 	//log("model started at " + ss.str());
 	log("#################################");
 	log("#");
+
+	write_text_to_log_file("model started at " + strtimenow);
 }
 
 void write_text_to_log_file(std::string text)
