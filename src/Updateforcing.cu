@@ -158,11 +158,19 @@ template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T q
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T xl, yb, xr, yt, xllo, yllo;
+	xllo = XParam.xo + XBlock.xo[ib];
+	yllo = XParam.yo + XBlock.yo[ib];
 
-	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+	xl = xllo + ix * delta - 0.5 * delta;
+	yb = yllo + iy * delta - 0.5 * delta;
 
-	if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+	xr = xllo + ix * delta + 0.5 * delta;
+	yt = yllo + iy * delta + 0.5 * delta;
+	// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+	// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+	//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+	if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart), T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
 	{
 
 		XAdv.dh[i] += qnow  / XRiver.disarea;

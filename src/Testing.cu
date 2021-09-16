@@ -57,6 +57,13 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		std::string result = rivertest ? "successful" : "failed";
 		log("\t\tCPU test: " + result);
 
+		if (XParam.GPUDEVICE >= 0)
+		{
+			rivertest = Rivertest(0.1, XParam.GPUDEVICE);
+			std::string result = rivertest ? "successful" : "failed";
+			log("\t\tGPU test: " + result);
+		}
+
 		RiverVolumeAdapt(XParam, T(0.4));
 	}
 	if (XParam.test == 2)
