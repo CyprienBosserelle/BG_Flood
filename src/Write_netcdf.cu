@@ -247,6 +247,23 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		blkid[ib] = ibl;
 	}
 	
+	int iib;
+	printf("activeblk:\n");
+	for (iib = 0; iib < XParam.nblk; iib++)
+	{
+		printf("%i\n", activeblk[iib]);
+	}
+	printf("Xzone blocks:\n");
+	for (iib = 0; iib < nblk; iib++)
+	{
+		printf("%i\n", Xzone.blk[iib]);
+	}
+	printf("Xzone blocks active:\n");
+	for (iib = 0; iib < nblk; iib++)
+	{
+		printf("%i\n", activeblk[Xzone.blk[iib]]);
+	}
+
 	status = nc_put_vara_int(ncid, blkid_id, blkstart, blkcount, blkid);
 	//status = nc_put_vara_int(ncid, blkstatus_id, blkstart, blkcount, activeblk);
 	status = nc_put_vara_float(ncid, blkwidth_id, blkstart, blkcount, blkwidth);
@@ -262,7 +279,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		blkid[ib] = level[ibl];
 		
 	}
-	
+
 	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blkwidth);
 	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, blkid);
 

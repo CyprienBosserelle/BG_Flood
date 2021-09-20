@@ -169,7 +169,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 	{
 		//
 		double xl, yb, xr, yt ;
-		int n,ib;
+		int ib;//n
 		double levdx;
 		double dischargeArea = 0.0;
 		log("\tInitializing rivers");
@@ -521,9 +521,20 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			XzoneB.blk[b] = blkzone[b];
 		}
 		XzoneB.outname = XParam.outzone[o].outname;
+		
 		//All the zone informatin has been integrated in a outzoneB structure,
 		// and pushed back to the initial variable.
-		XBlock.outZone.push_back(XzoneB);
+		// If this variable has already be constructed and adjusted here (after adaptation for example),
+		// just modify the variable
+
+		if (XBlock.outZone.size() < XParam.outzone.size())
+		{
+			XBlock.outZone.push_back(XzoneB);
+		}
+		else
+		{
+			XBlock.outZone[o] = XzoneB;
+		}
 	}
 
 }
