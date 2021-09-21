@@ -302,8 +302,12 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 		Rainhh = T(interpDyn2BUQ(x, y, Rain.GPU));
 	}
 
+	
+
 
 	Rainhh = Rainhh / T(1000.0) / T(3600.0) * XLoop.dt; // convert from mm/hrs to m/s
+
+	
 
 	XEv.h[i] += Rainhh * XBlock.activeCell[i];
 	XEv.zs[i] += Rainhh * XBlock.activeCell[i];
@@ -349,6 +353,8 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 
 
 				Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
+
+				
 
 				XAdv.dh[i] += Rainhh * XBlock.activeCell[i];
 			}

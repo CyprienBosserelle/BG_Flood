@@ -28,9 +28,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Set edges
 	setedges(XParam, XModel.blocks, XModel.zb);
 
-	// Calculate Active cells
-	calcactiveCellCPU(XParam, XModel.blocks, XModel.zb);
-
+	
 	//=====================================
 	// Initialise Friction map
 
@@ -64,6 +62,11 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Initial bndinfo
 	Calcbndblks(XParam, XForcing, XModel.blocks);
 	Findbndblks(XParam, XModel, XForcing);
+
+	//=====================================
+	// Calculate Active cells
+	calcactiveCellCPU(XParam, XModel.blocks, XForcing, XModel.zb);
+
 
 	//=====================================
 	// Initialize output variables
@@ -545,10 +548,11 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 
 
-template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb)
+template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float> XForcing, T* zb)
 {
-	int ib;
+	int ib,n;
 
+	// Remove rain from area above mask elevatio
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
@@ -557,7 +561,7 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb)
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
-				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				n = memloc(XParam, i, j, ib);
 				if (zb[n] < XParam.mask)
 				{
 					XBlock.activeCell[n] = 1;
@@ -569,11 +573,60 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb)
 			}
 		}
 	}
+	// Remove rain from boundary cells
+	for (int ibl = 0; ibl < XParam.nbndblkleft; ibl++)
+	{
+		ib = XForcing.left.blks[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			n = memloc(XParam, 0, j, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam, 1, j, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
+	for (int ibl = 0; ibl < XParam.nbndblkright; ibl++)
+	{
+		ib = XForcing.right.blks[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			n = memloc(XParam, XParam.blkwidth-1, j, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam, XParam.blkwidth-2, j, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
+	for (int ibl = 0; ibl < XParam.nbndblkbot; ibl++)
+	{
+		ib = XForcing.bot.blks[ibl];
+		for (int i = 0; i < XParam.blkwidth; i++)
+		{
+			n = memloc(XParam, i, 0, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam, i, 1, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
+	for (int ibl = 0; ibl < XParam.nbndblktop; ibl++)
+	{
+		ib = XForcing.top.blks[ibl];
+		for (int i = 0; i < XParam.blkwidth; i++)
+		{
+			n = memloc(XParam,i , XParam.blkwidth - 1, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam,i , XParam.blkwidth - 2, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
 
 }
 
 
-template <class T> void calcactiveCellGPU(Param XParam, BlockP<T> XBlock, T *zb)
+template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBlock, T *zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;

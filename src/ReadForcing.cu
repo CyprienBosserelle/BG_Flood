@@ -254,7 +254,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		}
 	}
 
@@ -359,6 +360,7 @@ void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
 	if (Dforcing.nx > 0 && Dforcing.ny > 0)
 	{
 		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
+		//
 		readforcingdata(totaltime, Dforcing);
 		if (gpgpu)
 		{
@@ -1083,7 +1085,14 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 		log("Reading Forcing file as netcdf file");
 		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
 		
-
+		if (Fmap.nt > 1)
+		{
+			Fmap.dt = (Fmap.tmax - Fmap.to) / (Fmap.nt - 1);
+		}
+		else
+		{
+			Fmap.dt = Fmap.tmax; // Or a very large number!
+		}
 	}
 	else
 	{

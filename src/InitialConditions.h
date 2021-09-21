@@ -29,7 +29,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel, Forcing<float
 template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel);
 template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel);
 
-template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, T* zb);
+template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float> XForcing, T* zb);
 
 // End of global definition;
 #endif
