@@ -13,3 +13,5 @@ The adaptive version of the model is currently under heavy developement. Makefil
 
 ## Build status
 development: [![Build Status](https://travis-ci.com/CyprienBosserelle/BG_Flood.svg?branch=development)](https://travis-ci.com/CyprienBosserelle/BG_Flood)
+
+## Testing
