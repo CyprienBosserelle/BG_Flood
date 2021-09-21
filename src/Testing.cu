@@ -1,6 +1,4 @@
 ﻿
-
-
 #include "Testing.h"
 
 
@@ -15,7 +13,7 @@
 * Test 2 Gaussian wave on Cartesian grid (same as test 0): CPU vs GPU (GPU required)
 * Test 3 Test Reduction algorithm
 * Test 4 Compare resuts between the CPU and GPU Flow functions (GPU required)
-* Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
+* Test 5 Lake at rest test for Ardusse/kurganov reconstruction/schemes
 */
 template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
