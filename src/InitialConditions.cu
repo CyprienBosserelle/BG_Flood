@@ -228,11 +228,12 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		double xl, yb, xr, yt ;
 		int n,ib;
 		double levdx;
-		double dischargeArea = 0.0;
+		double dischargeArea;
 		log("\tInitializing rivers");
 		//For each rivers
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
+			dischargeArea = 0.0;
 			// find the cells where the river discharge will be applied
 			std::vector<int> idis, jdis, blockdis;
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
