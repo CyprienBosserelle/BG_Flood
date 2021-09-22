@@ -26,11 +26,25 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      #- name: Launch of BG_Flood tests
+      #  run: echo Hello, world!
 
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: creation of the bathy and Params files
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+            echo "ncols 3" > bathy.asc
+            echo "nrows 3" >> bathy.asc
+            echo "xllcenter -1" >> bathy.asc
+            echo "yllcenter -1" >> bathy.asc
+            echo "cellsize 1" >> bathy.asc
+            echo "nodata_value -9999" >> bathy.asc
+            printf "0.0 0.0 0.0" >> bathy.asc
+            printf "0.0 0.0 0.0" >> bathy.asc
+            printf "0.0 0.0 0.0" >> bathy.asc
+            echo "test=0">BG_param.txt
+            echo "gpudevice=1">>BG_param.txt
+            echo "bathy=bathy.asc">>BG_param.txt
+      - name: compilation of the code
+        run: make
+      - name: running the tests
+        run: ./BG_Flood
