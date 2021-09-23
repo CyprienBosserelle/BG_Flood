@@ -7,7 +7,7 @@
 //the Free Software Foundation.                                                 //
 //                                                                              //
 //This program is distributed in the hope that it will be useful,               //
-//but WITHOUT ANY WARRANTY; without even the implied warranty of                //    
+//but WITHOUT ANY WARRANTY; without even the implied warranty of                //
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 //
 //GNU General Public License for more details.                                  //
 //                                                                              //
@@ -32,7 +32,7 @@ void create_logfile()
 	// Reset the log file
 	std::ofstream log_file(
 		"BG_log.txt", std::ios_base::out | std::ios_base::trunc);
-	
+
 	log_file.close();
 
 	//Logfile header
@@ -41,22 +41,46 @@ void create_logfile()
 	//std::tm buf;
 	//localtime_s(&buf, &in_time_t);
 	//std::cout << std::put_time(&buf, "%Y-%m-%d %X") << std::endl;
+/*
+	auto now = std::chrono::system_clock::now();
+	auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
+	 std::stringstream ss;
+	 ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+	 */
+/*
 	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	std::string s(30, '\0');
 	std::tm buf;
-	localtime_s(&buf, &now);
-	std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", &buf);
-
+	struct tm * timeinfo;
+	std::localtime_s(&buf, &now);
+	//std::time_t rawtime;
+	//timeinfo = localtime(&rawtime);
+	std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", &timeinfo);
+*/
 	//strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
 	//std::string strtimenow(buffer);
+
+	time_t rawtime, dstart;
+	struct tm* timeinfo;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
+	std::string strtimenow(buffer);
+
+
 	log("#################################");
 	log("BG_Flood v0.5");
 	log("#################################");
-	log("model started at " + s);
+	//log("model started at " + ss.str());
 	log("#################################");
 	log("#");
+
+	write_text_to_log_file("model started at " + strtimenow);
 }
 
 void write_text_to_log_file(std::string text)

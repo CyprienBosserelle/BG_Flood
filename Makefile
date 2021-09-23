@@ -151,7 +151,7 @@ HOST_COMPILER ?= g++
 NVCC          := nvcc -ccbin $(HOST_COMPILER)
 
 # internal flags
-NVCCFLAGS   := -m${TARGET_SIZE} -std=c++11
+NVCCFLAGS   := -m${TARGET_SIZE} -std=c++11 -rdc=true
 CCFLAGS     :=
 LDFLAGS     :=
 
@@ -198,7 +198,7 @@ ALL_CCFLAGS += $(addprefix -Xcompiler ,$(EXTRA_CCFLAGS))
 
 SAMPLE_ENABLED := 1
 
-ALL_LDFLAGS := -lnetcdf -I./
+ALL_LDFLAGS := -lnetcdf -I
 ALL_LDFLAGS += $(ALL_CCFLAGS)
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
@@ -210,7 +210,7 @@ LIBRARIES :=
 ################################################################################
 
 # Gencode arguments
-SMS ?= 30 35 37 50 52 60
+SMS ?= 50 52 60
 #SMS ?= 20 30 35
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
@@ -232,7 +232,7 @@ ifeq ($(SAMPLE_ENABLED),0)
 EXEC ?= @echo "[@]"
 endif
 
-OBJ = Bas_Cart_CPU.o BasCart_gpu.o Flow_kernel.o read_input.o  writenetcdf.o
+OBJ = BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o  Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o
 
 
 ################################################################################
@@ -240,7 +240,7 @@ OBJ = Bas_Cart_CPU.o BasCart_gpu.o Flow_kernel.o read_input.o  writenetcdf.o
 # Target rules
 all: build
 
-build: BasCGPU
+build: BG_Flood
 
 check.deps:
 ifeq ($(SAMPLE_ENABLED),0)
@@ -249,29 +249,107 @@ else
 	@echo "Sample is ready - all dependencies have been met"
 endif
 
-BasCart_gpu.o:BasCart_gpu.cu
+
+BG_Flood.o:./src/BG_Flood.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-Bas_Cart_CPU.o:Bas_Cart_CPU.cpp
+AdaptCriteria.o:./src/AdaptCriteria.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-read_input.o:read_input.cpp
+Adaptation.o:./src/Adaptation.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-writenetcdf.o:writenetcdf.cpp
+Advection.o:./src/Advection.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
+Boundary.o:./src/Boundary.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-BasCGPU: BasCart_gpu.o Bas_Cart_CPU.o read_input.o writenetcdf.o
+ConserveElevation.o:./src/ConserveElevation.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+FlowCPU.o:./src/FlowCPU.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+FlowGPU.o:./src/FlowGPU.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Friction.o:./src/Friction.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Gradients.o:./src/Gradients.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+GridManip.o:./src/GridManip.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Halo.o:./src/Halo.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+InitEvolv.o:./src/InitEvolv.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+InitialConditions.o:./src/InitialConditions.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Kurganov.o:./src/Kurganov.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Mainloop.o:./src/Mainloop.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Meanmax.o:./src/Meanmax.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+MemManagement.o:./src/MemManagement.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Mesh.o:./src/Mesh.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+ReadForcing.o:./src/ReadForcing.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+ReadForcing.o:./src/ReadForcing.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+ReadInput.o:./src/ReadInput.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Read_netcdf.o:./src/Read_netcdf.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+	
+Reimann.o:./src/Reimann.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Setup_GPU.o:./src/Setup_GPU.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Testing.o:./src/Testing.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Updateforcing.o:./src/Updateforcing.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Util_CPU.o:./src/Util_CPU.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Write_netcdf.o:./src/Write_netcdf.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+Write_txtlog.o:./src/Write_txtlog.cpp
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+BG_Flood: BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 	$(EXEC) cp $@ ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 
 run: build
-	$(EXEC) ./XBGPU
+	$(EXEC) ./BG_Flood
 
 clean:
-	rm -f BasCGPU BasCart_gpu.o Bas_Cart_CPU.o read_input.o writenetcdf.o
+	rm -f BG_Flood AdaptCriteria.o Adaptation.o Advection.o BG_Flood.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o
 	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/template
 
 clobber: clean

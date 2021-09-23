@@ -43,6 +43,16 @@ template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& 
 template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, T*& z);
 template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, EvolvingP<T>& Xev);
 
+template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
+template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
+
+template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
+template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
+
+template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
+template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdy);
+template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdy);
+template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx);
 
 // GPU versions
 template <class T> __global__ void fillLeft(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, T* a);

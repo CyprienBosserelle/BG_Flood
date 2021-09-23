@@ -43,6 +43,9 @@ void AllocateCPU(int nx, int ny, GradientsP<T>& Grad)
 {
 	AllocateCPU(nx, ny, Grad.dhdx, Grad.dzsdx, Grad.dudx, Grad.dvdx);
 	AllocateCPU(nx, ny, Grad.dhdy, Grad.dzsdy, Grad.dudy, Grad.dvdy);
+	
+	AllocateCPU(nx, ny, Grad.dzbdx);
+	AllocateCPU(nx, ny, Grad.dzbdy);
 }
 template void AllocateCPU<float>(int nx, int ny, GradientsP<float>& Grad);
 template void AllocateCPU<double>(int nx, int ny, GradientsP<double>& Grad);
@@ -64,6 +67,9 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateCPU(nblk, blksize, XModel.grad.dhdy, XModel.grad.dzsdy, XModel.grad.dudy, XModel.grad.dvdy);
 	AllocateCPU(nblk, blksize, XModel.grad.dhdx, XModel.grad.dzsdx, XModel.grad.dudx, XModel.grad.dvdx);
 
+	AllocateCPU(nblk, blksize, XModel.grad.dzbdx);
+	AllocateCPU(nblk, blksize, XModel.grad.dzbdy);
+
 	AllocateCPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
 	AllocateCPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
@@ -75,6 +81,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	//Allocate block info
 	AllocateCPU(nblk, 1, XModel.blocks.active);
+	AllocateCPU(nblk, blksize, XModel.blocks.activeCell);
 	AllocateCPU(nblk, 1, XModel.blocks.level);
 
 	AllocateCPU(nblk, 1, XModel.blocks.BotLeft, XModel.blocks.BotRight, XModel.blocks.LeftBot, XModel.blocks.LeftTop);
@@ -194,6 +201,9 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	ReallocArray(nblk, blksize, XModel.grad.dhdy, XModel.grad.dzsdy, XModel.grad.dudy, XModel.grad.dvdy);
 	ReallocArray(nblk, blksize, XModel.grad.dhdx, XModel.grad.dzsdx, XModel.grad.dudx, XModel.grad.dvdx);
 
+	ReallocArray(nblk, blksize, XModel.grad.dzbdx);
+	ReallocArray(nblk, blksize, XModel.grad.dzbdy);
+
 	ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
 	ReallocArray(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
@@ -205,6 +215,7 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	//Allocate block info
 	ReallocArray(nblk, 1, XModel.blocks.active);
+	ReallocArray(nblk, blksize, XModel.blocks.activeCell);
 	ReallocArray(nblk, 1, XModel.blocks.level);
 
 	ReallocArray(nblk, 1, XModel.blocks.BotLeft, XModel.blocks.BotRight, XModel.blocks.LeftBot, XModel.blocks.LeftTop);
@@ -272,6 +283,8 @@ void AllocateGPU(int nx, int ny, GradientsP<T>& Grad)
 {
 	AllocateGPU(nx, ny, Grad.dhdx, Grad.dzsdx, Grad.dudx, Grad.dvdx);
 	AllocateGPU(nx, ny, Grad.dhdy, Grad.dzsdy, Grad.dudy, Grad.dvdy);
+	AllocateGPU(nx, ny, Grad.dzbdy);
+	AllocateGPU(nx, ny, Grad.dzbdx);
 }
 template void AllocateGPU<float>(int nx, int ny, GradientsP<float>& Grad);
 template void AllocateGPU<double>(int nx, int ny, GradientsP<double>& Grad);
@@ -300,6 +313,7 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	//Allocate block info
 	AllocateGPU(nblk, 1, XModel.blocks.active);
+	AllocateGPU(nblk, blksize, XModel.blocks.activeCell);
 	AllocateGPU(nblk, 1, XModel.blocks.level);
 
 	AllocateGPU(nblk, 1, XModel.blocks.BotLeft, XModel.blocks.BotRight, XModel.blocks.LeftBot, XModel.blocks.LeftTop);

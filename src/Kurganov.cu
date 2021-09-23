@@ -7,8 +7,8 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
 	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
 
@@ -402,6 +402,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 					{
 						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 						hn = XEv.h[ilc];
 						zn = zb[ilc];
 					}

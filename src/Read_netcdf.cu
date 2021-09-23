@@ -637,10 +637,10 @@ template int readvardata<double>(std::string filename, std::string Varname, int 
 
 
 
-std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD)
+std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE)
 {
 	int varid;
-	int errorA, errorB,errorC,errorD;
+	int errorA, errorB,errorC,errorD,errorE;
 	std::string outstring;
 
 	//std::vector<std::string> teststr;
@@ -652,6 +652,8 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	errorB = nc_inq_varid(ncid, stringB.c_str(), &varid);
 	errorC = nc_inq_varid(ncid, stringC.c_str(), &varid);
 	errorD = nc_inq_varid(ncid, stringD.c_str(), &varid);
+	errorE = nc_inq_varid(ncid, stringE.c_str(), &varid);
+
 
 	if (errorA == NC_NOERR)
 	{
@@ -669,7 +671,10 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	{
 		outstring = stringD;
 	}
-
+	else if (errorE == NC_NOERR)
+	{
+		outstring = stringE;
+	}
 
 	return outstring;
 
@@ -830,5 +835,41 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 
 }
 
+// The following functions are simple tools to create 2D or 3D netcdf files (for testing for example)
 
+extern "C" void read3Dnc(int nx, int ny, int ntheta, char ncfile[], float * &ee)
+{
+	int status;
+	int ncid, ee_id;
+	static size_t count[] = { nx, ny,ntheta };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "z", &ee_id);
+	status = nc_get_var_float(ncid, ee_id, ee);
+	status = nc_close(ncid);
 
+}
+
+extern "C" void read2Dnc(int nx, int ny, char ncfile[], float * &hh)
+{
+	int status;
+	int ncid, hh_id;
+	static size_t count[] = { nx, ny };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "hh", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, hh);
+	status = nc_close(ncid);
+
+}
+
+extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
+{
+	int status;
+	int ncid, hh_id;
+	static size_t count[] = { nx, ny };
+
+	status = nc_open(ncfile.c_str(), NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "zb", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, zb);
+	status = nc_close(ncid);
+
+}

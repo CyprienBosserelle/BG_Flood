@@ -28,6 +28,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Set edges
 	setedges(XParam, XModel.blocks, XModel.zb);
 
+	
 	//=====================================
 	// Initialise Friction map
 
@@ -49,6 +50,10 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// First calculate the initial values for Evolving parameters (i.e. zs, h, u and v)
 	initevolv(XParam, XModel.blocks,XForcing, XModel.evolv, XModel.zb);
 	CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
+
+	// Initialise the topography slope and halo
+	InitzbgradientCPU(XParam, XModel);
+
 	//=====================================
 	// Initial forcing
 	InitRivers(XParam, XForcing, XModel);
@@ -59,6 +64,11 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	Findbndblks(XParam, XModel, XForcing);
 
 	//=====================================
+	// Calculate Active cells
+	calcactiveCellCPU(XParam, XModel.blocks, XForcing, XModel.zb);
+
+
+	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
 
@@ -66,6 +76,53 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
+
+template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel)
+{
+	
+
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	
+}
+template void InitzbgradientCPU<double>(Param XParam, Model<double> XModel);
+template void InitzbgradientCPU<float>(Param XParam, Model<float> XModel);
+
+template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
+{
+	const int num_streams = 4;
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+
+	cudaStream_t streams[num_streams];
+
+
+	CUDA_CHECK(cudaStreamCreate(&streams[0]));
+
+	fillHaloGPU(XParam, XModel.blocks, streams[0], XModel.zb);
+
+	cudaStreamDestroy(streams[0]);
+
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+}
+template void InitzbgradientGPU<double>(Param XParam, Model<double> XModel);
+template void InitzbgradientGPU<float>(Param XParam, Model<float> XModel);
 
 template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
@@ -111,7 +168,10 @@ void InitTSOutput(Param XParam)
 
 		//Overwrite existing files
 		fsSLTS = fopen(XParam.TSnodesout[o].outname.c_str(), "w");
-		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%dt%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
+		fprintf(fsSLTS, "# x=%f\ty=%f\ti=%d\tj=%d\tblock=%d\t%s\n", XParam.TSnodesout[o].x, XParam.TSnodesout[o].y, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XParam.TSnodesout[o].block, XParam.TSnodesout[o].outname.c_str());
+
+		fprintf(fsSLTS, "# time[s]\tzs[m]\th[m]\tu[m/s]\tv[m/s]\n");
+
 		fclose(fsSLTS);
 		
 
@@ -139,7 +199,7 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 
 			ib = XBlock.active[blk];
 			levdx = calcres(XParam.dx,XBlock.level[ib]);
-			if (XParam.TSnodesout[o].x >= (XParam.xo + XBlock.xo[ib]) && XParam.TSnodesout[o].x <= (XParam.xo + XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= (XParam.yo + XBlock.yo[o]) && XParam.TSnodesout[o].y <= (XParam.yo + XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
+			if (XParam.TSnodesout[o].x >= (XParam.xo + XBlock.xo[ib]) && XParam.TSnodesout[o].x <= (XParam.xo + XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= (XParam.yo + XBlock.yo[ib]) && XParam.TSnodesout[o].y <= (XParam.yo + XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
 			{
 				XParam.TSnodesout[o].block = ib;
 				XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - (XParam.xo + XBlock.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
@@ -165,14 +225,15 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 	if (XForcing.rivers.size() > 0)
 	{
 		//
-		double xx, yy;
+		double xl, yb, xr, yt ;
 		int n,ib;
 		double levdx;
-		double dischargeArea = 0.0;
+		double dischargeArea;
 		log("\tInitializing rivers");
 		//For each rivers
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
+			dischargeArea = 0.0;
 			// find the cells where the river discharge will be applied
 			std::vector<int> idis, jdis, blockdis;
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -186,11 +247,15 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						
 						
-						xx = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
-						yy = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
+						xl = XParam.xo + XModel.blocks.xo[ib] + i * levdx - 0.5 * levdx;
+						yb = XParam.yo + XModel.blocks.yo[ib] + j * levdx - 0.5 * levdx;
+
+						xr = XParam.xo + XModel.blocks.xo[ib] + i * levdx + 0.5 * levdx;
+						yt = XParam.yo + XModel.blocks.yo[ib] + j * levdx + 0.5 * levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-						if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+						//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+						if (OBBdetect(xl, xr, yb, yt, XForcing.rivers[Rin].xstart, XForcing.rivers[Rin].xend, XForcing.rivers[Rin].ystart, XForcing.rivers[Rin].yend))
 						{
 
 							// This cell belongs to the river discharge area
@@ -482,3 +547,103 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 }
 
+
+
+template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float> XForcing, T* zb)
+{
+	int ib,n;
+
+	// Remove rain from area above mask elevatio
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				n = memloc(XParam, i, j, ib);
+				if (zb[n] < XParam.mask)
+				{
+					XBlock.activeCell[n] = 1;
+				}
+				else
+				{
+					XBlock.activeCell[n] = 0;
+				}
+			}
+		}
+	}
+	// Remove rain from boundary cells
+	for (int ibl = 0; ibl < XParam.nbndblkleft; ibl++)
+	{
+		ib = XForcing.left.blks[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			n = memloc(XParam, 0, j, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam, 1, j, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
+	for (int ibl = 0; ibl < XParam.nbndblkright; ibl++)
+	{
+		ib = XForcing.right.blks[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			n = memloc(XParam, XParam.blkwidth-1, j, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam, XParam.blkwidth-2, j, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
+	for (int ibl = 0; ibl < XParam.nbndblkbot; ibl++)
+	{
+		ib = XForcing.bot.blks[ibl];
+		for (int i = 0; i < XParam.blkwidth; i++)
+		{
+			n = memloc(XParam, i, 0, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam, i, 1, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
+	for (int ibl = 0; ibl < XParam.nbndblktop; ibl++)
+	{
+		ib = XForcing.top.blks[ibl];
+		for (int i = 0; i < XParam.blkwidth; i++)
+		{
+			n = memloc(XParam,i , XParam.blkwidth - 1, ib);
+			XBlock.activeCell[n] = 0;
+
+			n = memloc(XParam,i , XParam.blkwidth - 2, ib);
+			XBlock.activeCell[n] = 0;
+		}
+	}
+
+}
+
+
+template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBlock, T *zb)
+{
+	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int n = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+
+	if (zb[n] < XParam.mask)
+	{
+		XBlock.activeCell[n] = 1;
+	}
+	else
+	{
+		XBlock.activeCell[n] = 0;
+	}
+}

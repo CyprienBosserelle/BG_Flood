@@ -1,31 +1,28 @@
 
+
 #ifndef PARAM_H
 #define PARAM_H
 
 #include "General.h"
-#include "input.h"
+#include "Input.h"
 
 /**
  *  A class. A class for holding model parameters.
  */
 class Param {
 public:
-	
-	
-	/// @brief int Variable.
-	/// @details -1:no test; 0:some test; 1:test 0 and XX test 
-	int test = -1;//! -1:no test; 0:some test; 1:test 0 and XX test 
 
-	//! double Variable.
-	/*! Gravity.... */
-	double g=9.81; /**< variable. Gravity. */
-	double rho=1025.0; ///!< fluid density
+	//general parameters
+	int test = -1;//-1:no test; 0:some test; 1:test 0 and XX test
+	double g=9.81; // Gravity in m.s-2
+	double rho=1025.0; // fluid density in kg/m-3
 	double eps= 0.0001; // //drying height in m
 	double dt=0.0; // Model time step in s.
 	double CFL=0.5; // Current Freidrich Limiter
 	double theta=1.3; // minmod limiter can be used to tune the momentum dissipation (theta=1 gives minmod, the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
-	int frictionmodel=0; // 
-	double cf=0.0001; // bottom friction for flow model cf 
+	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. use 16.0 to use or negative value (-1) to turn off
+	int frictionmodel=0; //
+	double cf=0.0001; // bottom friction for flow model cf
 	double Cd=0.002; // Wind drag coeff
 	bool windforcing = false;
 	bool atmpforcing = false;
@@ -39,19 +36,19 @@ public:
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
 
 	double Pa2m = 0.00009916; // if unit is hPa then user should use 0.009916;
-	double Paref = 101300.0; // if unit is hPa then user should use 1013.0 
+	double Paref = 101300.0; // if unit is hPa then user should use 1013.0
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
 
 	int doubleprecision = 0;
 
 	//grid parameters
-	double dx= nan(""); // grid resolution in the coordinate system unit. 
+	double dx= nan(""); // grid resolution in the coordinate system unit in m.
 	double delta; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
 	int nblk=0; // number of compute blocks
-	int blkwidth = 16;
+	int blkwidth = 16; //block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
 	int halowidth = 1; // use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
@@ -78,7 +75,7 @@ public:
 	//std::string Bathymetryfile;// bathymetry file name
 	//inputmap Bathymetry;
 	std::string outfile="Output.nc"; // netcdf output file name
-	
+
 	//Timekeeping
 	double outputtimestep=0.0; //number of seconds between output 0.0 for none
 	double endtime=0.0; // Total runtime in s will be calculated based on bnd input as min(length of the shortest time series, user defined)
@@ -101,7 +98,7 @@ public:
 	int nbndblkright = 0;
 	int nbndblktop = 0;
 	int nbndblkbot = 0;
-	
+
 	int nmaskblk = 0;
 
 	//hot start
@@ -116,7 +113,7 @@ public:
 	int hotstep = 0; //step to read if hotstart file has multiple steps
 	//other
 	clock_t startcputime, endcputime, setupcputime;
-	
+
 	//Netcdf parameters
 	int smallnc = 1;//default save as short integer if smallnc=0 then save all variables as float
 	float scalefactor = 0.01f;
@@ -135,12 +132,18 @@ public:
 	// Output switch controls
 	bool resetmax = false;
 	bool outmax = false;
-	
+
 
 	bool outmean = false;
-	
+
 
 	bool outvort = false;
+
+	// WARNING FOR DEBUGGING PURPOSE ONLY
+	// For debugging one can shift the output by 1 or -1 in the i and j direction.
+	// this will save the value in the halo to the output file allowing debugging of values there.
+	int outishift = 0;
+	int outjshift = 0;
 
 	// info of the mapped cf
 	//inputmap roughnessmap;
