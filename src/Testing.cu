@@ -24,7 +24,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 {
 
 	bool isfailed = false;
-
+	std::string result;
 
 	log("\nRunning internal test(s):");
 
@@ -42,18 +42,18 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			bool bumptest;
 			bool bumptestGPU = true;
 			// Test 0 is pure bump test
-			log("\t Gaussian wave on Cartesian grid");
+			log("\t ### Gaussian wave on Cartesian grid ###");
 			//set gpu is -1 for cpu test
 
 			bumptest = GaussianHumptest(0.1, -1, false);
-			std::string result = bumptest ? "successful" : "failed";
+			result = bumptest ? "successful" : "failed";
 			log("\t\tCPU test: " + result);
 
-			// If origiinal XParam tried to use GPU we try also
+			// If original XParam tried to use GPU we try also
 			if (XParam.GPUDEVICE >= 0)
 			{
 				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
-				std::string result = bumptestGPU ? "successful" : "failed";
+				result = bumptestGPU ? "successful" : "failed";
 				log("\t\tGPU test: " + result);
 			}
 			isfailed = ((bumptest == true) && (bumptestGPU == true)) ? false : true;
@@ -62,21 +62,25 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		{
 			bool rivertest;
 			// Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU and CU version)
-			log("\t River Mass conservation grid");
+			log("\t ### River Mass conservation grid ###");
 			rivertest = Rivertest(0.1, -1);
-			std::string result = rivertest ? "successful" : "failed";
+			result = rivertest ? "successful" : "failed";
 			log("\t\tCPU test: " + result);
 			isfailed = (!rivertest || isfailed) ? true : false;
+
+			log(" \t\t\t GPU device= " + XParam.GPUDEVICE);
 
 			if (XParam.GPUDEVICE >= 0)
 			{
 				rivertest = Rivertest(0.1, XParam.GPUDEVICE);
-				std::string result = rivertest ? "successful" : "failed";
+				result = rivertest ? "successful" : "failed";
 				log("\t\tGPU test: " + result);
 				isfailed = (!rivertest || isfailed) ? true : false;
 			}
 
 			rivertest=RiverVolumeAdapt(XParam, T(0.4));
+			result = rivertest ? "successful" : "failed";
+			log("\t\tRiver Volume Adapt: " + result);
 			isfailed = (!rivertest || isfailed) ? true : false;
 
 		}
@@ -85,9 +89,9 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			if (XParam.GPUDEVICE >= 0)
 			{
 				bool GPUvsCPUtest;
-				log("\t Gaussian wave on Cartesian grid: CPU vs GPU");
+				log("\t### Gaussian wave on Cartesian grid: CPU vs GPU ###");
 				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
-				std::string result = GPUvsCPUtest ? "successful" : "failed";
+				result = GPUvsCPUtest ? "successful" : "failed";
 				log("\t\tCPU vs GPU test: " + result);
 				isfailed = (!GPUvsCPUtest || isfailed) ? true : false;
 			}
@@ -105,14 +109,14 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			// Iterate this test niter times:
 			int niter = 1000;
 			srand(time(0));
-			log("\t Reduction Test");
+			log("\t### Reduction Test ###");
 			for (int iter = 0; iter < niter; iter++)
 			{
 				testresults = reductiontest(XParam, XModel, XModel_g);
 				testreduction = testreduction && testresults;
 			}
 
-			std::string result = testreduction ? "successful" : "failed";
+			result = testreduction ? "successful" : "failed";
 			log("\t\tReduction test: " + result);
 			isfailed = (!testreduction || isfailed) ? true : false;
 
@@ -122,6 +126,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		{
 			//
 			bool testresults;
+			log("\t### CPU vs GPU Test ###");
 			testresults = CPUGPUtest(XParam, XModel, XModel_g);
 			isfailed = (!testresults || isfailed) ? true : false;
 
@@ -136,9 +141,9 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		}
 		if (mytest == 5)
 		{
-			log("\t Lake-at-rest Test");
+			log("\t### Lake-at-rest Test ###");
 			bool testTLAR = ThackerLakeAtRest(XParam, T(0.0));
-			std::string result = testTLAR ? "successful" : "failed";
+			result = testTLAR ? "successful" : "failed";
 			isfailed = (!testTLAR || isfailed) ? true : false;
 			log("\t\tThaker lake-at-rest test: " + result);
 			testTLAR = LakeAtRest(XParam, XModel);
@@ -146,7 +151,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		}
 		if (mytest == 6)
 		{
-			log("\t Mass conservation Test");
+			log("\t### Mass conservation Test ###");
 			bool testSteepSlope = MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
 			isfailed = (!testSteepSlope || isfailed) ? true : false;
 
@@ -161,9 +166,9 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 					- GPU option
 					- the slope (%)
 			*/
-			log("\t Rain on grid Mass conservation test");
+			log("\t### Rain on grid Mass conservation test ###");
 			testrain = Raintest(0.0, -1, 10);
-			std::string result = testrain ? "successful" : "failed";
+			result = testrain ? "successful" : "failed";
 			log("\t\tCPU test: " + result);
 			isfailed = (!testrain || isfailed) ? true : false;
 		}
