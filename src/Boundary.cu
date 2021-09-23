@@ -65,6 +65,7 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop,BlockP<T> XBlock, b
 	if (XParam.GPUDEVICE >= 0)
 	{
 		bndGPU <<< gridDimBBND, blockDim, 0 >>> (XParam, side, XBlock, T(itime), XEv.zs, XEv.h, un, ut);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
