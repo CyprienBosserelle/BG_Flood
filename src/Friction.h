@@ -16,5 +16,8 @@ template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock
 template <class T> __host__ __device__ T smartfriction(T hi,T zo);
 template <class T> __host__ __device__ T manningfriction(T g, T hi, T n);
 
+template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv);
+template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv);
+
 // End of global definition
 #endif

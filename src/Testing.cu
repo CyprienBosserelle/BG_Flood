@@ -165,6 +165,7 @@ template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		//
 		DebugLoop(XParam, XForcing, XModel, XModel_g);
 	}
+
 }
 template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
 template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);

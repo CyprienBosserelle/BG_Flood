@@ -312,18 +312,19 @@ template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlo
 	T ui, vi;
 
 	
-	XEvolv.u[i] = ui;
-
-	XEvolv.v[i] = vi;
-
-	bustedThreshold = ThresholdVelocity(XParam.VelThreshold, ui, vi);
-
-	
 	ui = XEvolv.u[i];
 	vi = XEvolv.v[i];
 
-}
+	bustedThreshold = ThresholdVelocity(T(XParam.VelThreshold), ui, vi);
 
+	XEvolv.u[i] = ui;
+
+	XEvolv.v[i] = vi;
+	
+
+}
+template __global__ void TheresholdVelGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEvolv);
+template __global__ void TheresholdVelGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEvolv);
 
 /*! \fn void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
 *
@@ -358,11 +359,11 @@ template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock
 
 				vi = XEvolv.v[i];
 
-				bustedThreshold = ThresholdVelocity(XParam.VelThreshold, ui, vi);
+				bustedThreshold = ThresholdVelocity(T(XParam.VelThreshold), ui, vi);
 
 				if (bustedThreshold)
 				{
-					log("Memory Threshold exceeded!");
+					log("Velocity Threshold exceeded!");
 				}
 				XEvolv.u[i] = ui;
 
@@ -371,7 +372,8 @@ template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock
 		}
 	}
 }
-				
+template __host__ void TheresholdVelCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEvolv);
+template __host__ void TheresholdVelCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEvolv);
 
 /*! \fn bool ThresholdVelocity(T Threshold, T& u, T& v)
 * 

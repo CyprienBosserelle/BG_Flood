@@ -221,7 +221,12 @@ Param readparamstr(std::string line, Param param)
 		param.cf = std::stod(parametervalue);
 	}
 
-	
+	paramvec = { "velthreshold","vthresh","vmax","velmax" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.VelThreshold = std::stod(parametervalue);
+	}
 	
 	parameterstr = "Cd";
 	parametervalue = findparameter(parameterstr, line);

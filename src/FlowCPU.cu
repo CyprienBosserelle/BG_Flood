@@ -134,7 +134,11 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 		AddrainforcingImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
 	}
 
-
+	if (XParam.VelThreshold > 0.0)
+	{
+		TheresholdVelCPU(XParam, XModel.blocks, XModel.evolv);
+		
+	}
 
 
 }
