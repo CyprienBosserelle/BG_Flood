@@ -64,6 +64,8 @@ template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongatio
 template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a);
 
 
+template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock, T* z);
+template <class T> __global__ void HaloFluxGPUBT(Param XParam, BlockP<T> XBlock, T* z);
 
 // End of global definition
 #endif
