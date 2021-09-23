@@ -17,156 +17,325 @@
 * Test 6 Mass conservation on a slope
 * Test 7 is mass conservation with rain fall on grid
 * Test 8 is a comparison with litterature case with slope and non-uniform rain
+* Test 99: run all the test with test number < 99.
 * Test 999 Run the main loop and engine in debug mode
 */
-template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
+
+	bool isfailed = false;
 
 
 	log("\nRunning internal test(s):");
 
-
-
-	if (XParam.test == 0)
+	int mytest;
+	mytest = XParam.test;
+	if (XParam.test == 99)
 	{
-		bool bumptest;
-		// Test 0 is pure bump test
-		log("\t Gaussian wave on Cartesian grid");
-		//set gpu is -1 for cpu test
+		mytest = 0;
+	}
 
-		bumptest = GaussianHumptest(0.1, -1, false);
-		std::string result = bumptest ? "successful" : "failed";
-		log("\t\tCPU test: " + result);
-
-		// If origiinal XParam tried to use GPU we try also
-		if (XParam.GPUDEVICE >= 0)
+	while (mytest <= XParam.test)
+	{
+		if (mytest == 0)
 		{
-			bumptest = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+			bool bumptest;
+			bool bumptestGPU = true;
+			// Test 0 is pure bump test
+			log("\t Gaussian wave on Cartesian grid");
+			//set gpu is -1 for cpu test
+
+			bumptest = GaussianHumptest(0.1, -1, false);
 			std::string result = bumptest ? "successful" : "failed";
-			log("\t\tGPU test: " + result);
-		}
-	}
-	if (XParam.test == 1)
-	{
-		bool rivertest;
-		// Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU and CU version)
-		log("\t River Mass conservation grid");
-		rivertest = Rivertest(0.1, -1);
-		std::string result = rivertest ? "successful" : "failed";
-		log("\t\tCPU test: " + result);
+			log("\t\tCPU test: " + result);
 
-		if (XParam.GPUDEVICE >= 0)
+			// If origiinal XParam tried to use GPU we try also
+			if (XParam.GPUDEVICE >= 0)
+			{
+				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+				std::string result = bumptestGPU ? "successful" : "failed";
+				log("\t\tGPU test: " + result);
+			}
+			isfailed = ((bumptest == true) && (bumptestGPU == true)) ? false : true;
+		}
+		if (mytest == 1)
 		{
-			rivertest = Rivertest(0.1, XParam.GPUDEVICE);
+			bool rivertest;
+			// Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU and CU version)
+			log("\t River Mass conservation grid");
+			rivertest = Rivertest(0.1, -1);
 			std::string result = rivertest ? "successful" : "failed";
-			log("\t\tGPU test: " + result);
-		}
+			log("\t\tCPU test: " + result);
+			isfailed = (!rivertest || isfailed) ? true : false;
 
-		RiverVolumeAdapt(XParam, T(0.4));
-	}
-	if (XParam.test == 2)
-	{
-		if (XParam.GPUDEVICE >= 0)
+			if (XParam.GPUDEVICE >= 0)
+			{
+				rivertest = Rivertest(0.1, XParam.GPUDEVICE);
+				std::string result = rivertest ? "successful" : "failed";
+				log("\t\tGPU test: " + result);
+				isfailed = (!rivertest || isfailed) ? true : false;
+			}
+
+			rivertest=RiverVolumeAdapt(XParam, T(0.4));
+			isfailed = (!rivertest || isfailed) ? true : false;
+
+		}
+		if (mytest == 2)
 		{
-			bool GPUvsCPUtest;
-			log("\t Gaussian wave on Cartesian grid: CPU vs GPU");
-			GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
-			std::string result = GPUvsCPUtest ? "successful" : "failed";
-			log("\t\tCPU vs GPU test: " + result);
+			if (XParam.GPUDEVICE >= 0)
+			{
+				bool GPUvsCPUtest;
+				log("\t Gaussian wave on Cartesian grid: CPU vs GPU");
+				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+				std::string result = GPUvsCPUtest ? "successful" : "failed";
+				log("\t\tCPU vs GPU test: " + result);
+				isfailed = (!GPUvsCPUtest || isfailed) ? true : false;
+			}
+			else
+			{
+				log("Specify GPU device to run test 2 (CPU vs GPU comparison)");
+			}
 		}
-		else
+		if (mytest == 3)
 		{
-			log("Specify GPU device to run test 2 (CPU vs GPU comparison)");
+
+			bool testresults;
+			bool testreduction = true;
+
+			// Iterate this test niter times:
+			int niter = 1000;
+			srand(time(0));
+			log("\t Reduction Test");
+			for (int iter = 0; iter < niter; iter++)
+			{
+				testresults = reductiontest(XParam, XModel, XModel_g);
+				testreduction = testreduction && testresults;
+			}
+
+			std::string result = testreduction ? "successful" : "failed";
+			log("\t\tReduction test: " + result);
+			isfailed = (!testreduction || isfailed) ? true : false;
+
 		}
-	}
-	if (XParam.test == 3)
-	{
 
-		bool testresults;
-		bool testreduction = true;
-
-		// Iterate this test niter times:
-		int niter = 1000;
-		srand(time(0));
-		log("\t Reduction Test");
-		for (int iter = 0; iter < niter; iter++)
+		if (mytest == 4)
 		{
-			testresults = reductiontest(XParam, XModel, XModel_g);
-			testreduction = testreduction && testresults;
+			//
+			bool testresults;
+			testresults = CPUGPUtest(XParam, XModel, XModel_g);
+			isfailed = (!testresults || isfailed) ? true : false;
+
+			//if (testresults)
+			//{
+			//	exit(0);
+			//}
+			//else
+			//{
+			//	exit(1);
+			//}
 		}
-
-		std::string result = testreduction ? "successful" : "failed";
-		log("\t\tReduction test: " + result);
-
-	}
-
-	if (XParam.test == 4)
-	{
-		//
-		bool testresults;
-		testresults = CPUGPUtest(XParam, XModel, XModel_g);
-		if (testresults)
+		if (mytest == 5)
 		{
-			exit(0);
+			log("\t Lake-at-rest Test");
+			bool testTLAR = ThackerLakeAtRest(XParam, T(0.0));
+			std::string result = testTLAR ? "successful" : "failed";
+			isfailed = (!testTLAR || isfailed) ? true : false;
+			log("\t\tThaker lake-at-rest test: " + result);
+			testTLAR = LakeAtRest(XParam, XModel);
+			isfailed = (!testTLAR || isfailed) ? true : false;
 		}
-		else
+		if (mytest == 6)
 		{
-			exit(1);
+			log("\t Mass conservation Test");
+			bool testSteepSlope = MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
+			isfailed = (!testSteepSlope || isfailed) ? true : false;
+
 		}
-	}
-	if (XParam.test == 5)
-	{
-		log("\t Lake-at-rest Test");
-		bool testTLAR=ThackerLakeAtRest(XParam,T(0.0));
-		std::string result = testTLAR ? "successful" : "failed";
-		log("\t\tThaker lake-at-rest test: " + result);
-		LakeAtRest(XParam, XModel);
-	}
-	if (XParam.test == 6)
-	{
-		log("\t Mass conservation Test");
-		MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
-	}
 
-	if (XParam.test == 7)
-	{
-		bool raintest;
-		/* Test 7 is homogeneous rain on a uniform slope for cartesian mesh (GPU and CU version)
-		 The input parameters are :
-				- the initial water level (zs)
-				- GPU option
-				- the slope (%)
-		*/
-		log("\t Rain on grid Mass conservation test");
-		raintest = Raintest(0.0, -1, 10);
-		std::string result = raintest ? "successful" : "failed";
-		log("\t\tCPU test: " + result);
+		if (mytest == 7)
+		{
+			bool testrain;
+			/* Test 7 is homogeneous rain on a uniform slope for cartesian mesh (GPU and CU version)
+			 The input parameters are :
+					- the initial water level (zs)
+					- GPU option
+					- the slope (%)
+			*/
+			log("\t Rain on grid Mass conservation test");
+			testrain = Raintest(0.0, -1, 10);
+			std::string result = testrain ? "successful" : "failed";
+			log("\t\tCPU test: " + result);
+			isfailed = (!testrain || isfailed) ? true : false;
+		}
+		///*if (XParam.test == 8)
+		//{
+		//	bool raintest2;
+		//	/* Test 8 is non-homogeneous rain on a n0n-uniform slope for cartesian mesh (GPU and CU version)
+		//	 It is based on a teste case from litterature
+		//	 The input parameters are :
+		//			- GPU option
+		//	*/
+		//	/*log("\t non-uniform rain on slope based on Aureli2020");
+		//	int GPU_option = -1;
+		//	int dim_rain_forcing = 3;
+		//	T Zinit = T(0.0);
+		//	raintest2 = Raintestmap(GPU_option, dim_rain_forcing, Zinit);
+		//	std::string result = raintest2 ? "successful" : "failed";
+		//	log("\t\tCPU test: " + result);
+		//}*/
+		//if (XParam.test == 999)
+		//{
+		//	//
+		//	DebugLoop(XParam, XForcing, XModel, XModel_g);
+		//}
+		mytest++;
 	}
-	/*if (XParam.test == 8)
-	{
-		bool raintest2;
-		/* Test 8 is non-homogeneous rain on a n0n-uniform slope for cartesian mesh (GPU and CU version)
-		 It is based on a teste case from litterature
-		 The input parameters are :
-				- GPU option
-		*/
-		/*log("\t non-uniform rain on slope based on Aureli2020");
-		int GPU_option = -1;
-		int dim_rain_forcing = 3;
-		T Zinit = T(0.0);
-		raintest2 = Raintestmap(GPU_option, dim_rain_forcing, Zinit);
-		std::string result = raintest2 ? "successful" : "failed";
-		log("\t\tCPU test: " + result);
-	}*/
-	if (XParam.test == 999)
-	{
-		//
-		DebugLoop(XParam, XForcing, XModel, XModel_g);
-	}
+	//if (XParam.test == 0)
+	//{
+	//	bool bumptest;
+	//	// Test 0 is pure bump test
+	//	log("\t Gaussian wave on Cartesian grid");
+	//	//set gpu is -1 for cpu test
 
+	//	bumptest = GaussianHumptest(0.1, -1, false);
+	//	std::string result = bumptest ? "successful" : "failed";
+	//	log("\t\tCPU test: " + result);
+
+	//	// If origiinal XParam tried to use GPU we try also
+	//	if (XParam.GPUDEVICE >= 0)
+	//	{
+	//		bool bumptestGPU;
+	//		bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+	//		std::string result = bumptestGPU ? "successful" : "failed";
+	//		log("\t\tGPU test: " + result);
+	//	}
+	//	if (bumptest == true and bumptestGPU == true)
+	//	{
+	//		isfailed = false;
+	//	}
+	//}
+	//if (XParam.test == 1)
+	//{
+	//	bool rivertest;
+	//	// Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU and CU version)
+	//	log("\t River Mass conservation grid");
+	//	rivertest = Rivertest(0.1, -1);
+	//	std::string result = rivertest ? "successful" : "failed";
+	//	log("\t\tCPU test: " + result);
+
+	//	if (XParam.GPUDEVICE >= 0)
+	//	{
+	//		rivertest = Rivertest(0.1, XParam.GPUDEVICE);
+	//		std::string result = rivertest ? "successful" : "failed";
+	//		log("\t\tGPU test: " + result);
+	//	}
+
+	//	RiverVolumeAdapt(XParam, T(0.4));
+	//}
+	//if (XParam.test == 2)
+	//{
+	//	if (XParam.GPUDEVICE >= 0)
+	//	{
+	//		bool GPUvsCPUtest;
+	//		log("\t Gaussian wave on Cartesian grid: CPU vs GPU");
+	//		GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+	//		std::string result = GPUvsCPUtest ? "successful" : "failed";
+	//		log("\t\tCPU vs GPU test: " + result);
+	//		isfailed = !GPUvsCPUtest;
+	//	}
+	//	else
+	//	{
+	//		log("Specify GPU device to run test 2 (CPU vs GPU comparison)");
+	//	}
+	//}
+	//if (XParam.test == 3)
+	//{
+
+	//	bool testresults;
+	//	bool testreduction = true;
+
+	//	// Iterate this test niter times:
+	//	int niter = 1000;
+	//	srand(time(0));
+	//	log("\t Reduction Test");
+	//	for (int iter = 0; iter < niter; iter++)
+	//	{
+	//		testresults = reductiontest(XParam, XModel, XModel_g);
+	//		testreduction = testreduction && testresults;
+	//	}
+
+	//	std::string result = testreduction ? "successful" : "failed";
+	//	log("\t\tReduction test: " + result);
+
+	//}
+
+	//if (XParam.test == 4)
+	//{
+	//	//
+	//	bool testresults;
+	//	testresults = CPUGPUtest(XParam, XModel, XModel_g);
+	//	if (testresults)
+	//	{
+	//		exit(0);
+	//	}
+	//	else
+	//	{
+	//		exit(1);
+	//	}
+	//}
+	//if (XParam.test == 5)
+	//{
+	//	log("\t Lake-at-rest Test");
+	//	bool testTLAR=ThackerLakeAtRest(XParam,T(0.0));
+	//	std::string result = testTLAR ? "successful" : "failed";
+	//	log("\t\tThaker lake-at-rest test: " + result);
+	//	LakeAtRest(XParam, XModel);
+	//}
+	//if (XParam.test == 6)
+	//{
+	//	log("\t Mass conservation Test");
+	//	MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
+	//}
+
+	//if (XParam.test == 7)
+	//{
+	//	bool raintest;
+	//	/* Test 7 is homogeneous rain on a uniform slope for cartesian mesh (GPU and CU version)
+	//	 The input parameters are :
+	//			- the initial water level (zs)
+	//			- GPU option
+	//			- the slope (%)
+	//	*/
+	//	log("\t Rain on grid Mass conservation test");
+	//	raintest = Raintest(0.0, -1, 10);
+	//	std::string result = raintest ? "successful" : "failed";
+	//	log("\t\tCPU test: " + result);
+	//}
+	///*if (XParam.test == 8)
+	//{
+	//	bool raintest2;
+	//	/* Test 8 is non-homogeneous rain on a n0n-uniform slope for cartesian mesh (GPU and CU version)
+	//	 It is based on a teste case from litterature
+	//	 The input parameters are :
+	//			- GPU option
+	//	*/
+	//	/*log("\t non-uniform rain on slope based on Aureli2020");
+	//	int GPU_option = -1;
+	//	int dim_rain_forcing = 3;
+	//	T Zinit = T(0.0);
+	//	raintest2 = Raintestmap(GPU_option, dim_rain_forcing, Zinit);
+	//	std::string result = raintest2 ? "successful" : "failed";
+	//	log("\t\tCPU test: " + result);
+	//}*/
+	//if (XParam.test == 999)
+	//{
+	//	//
+	//	DebugLoop(XParam, XForcing, XModel, XModel_g);
+	//}
+	return(isfailed);
 }
-template void Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
-template void Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
+template bool Testing<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel, Model<float> XModel_g);
+template bool Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
 
 /*! \fn bool GaussianHumptest(T zsnit, int gpu, bool compare)
@@ -1450,7 +1619,7 @@ template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
 * and account for different flow direction
 * 
 */
-template <class T> void RiverVolumeAdapt(Param XParam, T maxslope)
+template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 {
 	//T maxslope = 0.45; // tthe mass conservation is better with smaller slopes 
 
@@ -1548,7 +1717,7 @@ template <class T> void RiverVolumeAdapt(Param XParam, T maxslope)
 		log("\t Flow from coarse to fine adapted mesh D :" + details);
 	}
 
-
+	return (UnitestA * UnitestB * UnitestC * UnitestD * ctofA * ctofB * ctofC * ctofD * ftocA * ftocB * ftocC * ftocD);
 }
 
 

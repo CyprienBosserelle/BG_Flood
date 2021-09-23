@@ -32,19 +32,26 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: creation of the bathy and Params files
         run: |
-            echo "ncols 3" > bathy.asc
-            echo "nrows 3" >> bathy.asc
-            echo "xllcenter -1" >> bathy.asc
-            echo "yllcenter -1" >> bathy.asc
-            echo "cellsize 1" >> bathy.asc
-            echo "nodata_value -9999" >> bathy.asc
-            printf "0.0 0.0 0.0" >> bathy.asc
-            printf "0.0 0.0 0.0" >> bathy.asc
-            printf "0.0 0.0 0.0" >> bathy.asc
-            echo "test=0">BG_param.txt
-            echo "gpudevice=1">>BG_param.txt
-            echo "bathy=bathy.asc">>BG_param.txt
+          echo "ncols 3" > bathy.asc
+          echo "nrows 3" >> bathy.asc
+          echo "xllcenter -1" >> bathy.asc
+          echo "yllcenter -1" >> bathy.asc
+          echo "cellsize 1" >> bathy.asc
+          echo "nodata_value -9999" >> bathy.asc
+          printf "0.0 0.0 0.0" >> bathy.asc
+          printf "0.0 0.0 0.0" >> bathy.asc
+          printf "0.0 0.0 0.0" >> bathy.asc
+          echo "test=0">BG_param.txt
+          echo "gpudevice=1">>BG_param.txt
+          echo "bathy=bathy.asc">>BG_param.txt
+      # Compilation of the code
       - name: compilation of the code
         run: make
-      - name: running the tests
+      # Running the tests
+      - name: running test 0
         run: ./BG_Flood
+      - name: running test 2
+        run: |
+          sed -i 's/test=0/test=2/' BG_param.txt
+          ./BG_Flood
+                - name: running test 2
