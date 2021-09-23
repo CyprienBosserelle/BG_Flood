@@ -23,5 +23,7 @@ template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, 
 
 template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned int n);
 
+template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_idata, T* g_odata);
+
 // End of global definition
 #endif

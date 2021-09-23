@@ -26,5 +26,8 @@ template <class T> Loop<T> InitLoop(Param& XParam, Model<T>& XModel);
 template <class T> void printstatus(T totaltime, T dt);
 
 
+template <class T> __global__ void storeTSout(Param XParam, int noutnodes, int outnode, int istep, int blknode, int inode, int jnode, int* blkTS, EvolvingP<T> XEv, T* store);
+
+
 // End of global definition
 #endif

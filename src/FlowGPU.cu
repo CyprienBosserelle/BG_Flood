@@ -83,6 +83,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	if (XForcing.rivers.size() > 0)
 	{
@@ -140,6 +141,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	if (XForcing.rivers.size() > 0)
 	{
@@ -170,8 +172,14 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (!XForcing.Rain.inputfile.empty())
 	{
 		AddrainforcingImplicitGPU << < gridDim, blockDim, 0 >> > (XParam,XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
-	
+
+	if (XParam.VelThreshold > 0.0)
+	{
+		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 	
 	for (int i = 0; i < XLoop.num_streams; i++)
 	{
