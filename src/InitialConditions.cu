@@ -549,7 +549,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 
 
-template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float> XForcing, T* zb)
+template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float>& XForcing, T* zb)
 {
 	int ib,n;
 
