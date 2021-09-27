@@ -677,6 +677,7 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 			int i, iright, ileft;
 			i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
 			iright = memloc(XParam.halowidth, blkmemwidth, ix + 1, iy, ib);
+			ileft = memloc(XParam.halowidth, blkmemwidth, ix - 1, iy, ib);
 
 			zsi = XEv.zs[i];
 			zsright = XEv.zs[iright];
