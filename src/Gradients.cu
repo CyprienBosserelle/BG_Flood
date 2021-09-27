@@ -94,17 +94,20 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 
 		//  wet slope limiter
 		WetsloperesetXGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		WetsloperesetYGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		// ALso do the slope limiter on the halo
 		WetsloperesetHaloLeftGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-		
+		CUDA_CHECK(cudaDeviceSynchronize());
+
 		WetsloperesetHaloRightGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		WetsloperesetHaloBotGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		WetsloperesetHaloTopGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
 
