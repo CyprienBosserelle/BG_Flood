@@ -544,15 +544,18 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 	// The role of this function is to offload and simplify the rest of the code
 
 
-	int nx, ny, nt, status, ncid, varid, sferr, oferr,ndims;
+	int nx, ny, nt, status, ncid, varid, sferr, oferr, merr,ndims;
 	size_t * start, * count, *ddim;
-	double scalefac, offset;
+	double scalefac, offset, missing;
+
+
 
 	ndims = readvarinfo(filename, Varname, ddim);
 
 	start = (size_t *)malloc(ndims*sizeof(size_t));
 	count = (size_t *)malloc(ndims*sizeof(size_t));
 
+	
 
 	//
 	status = nc_open(filename.c_str(), 0, &ncid);
@@ -603,17 +606,48 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 
 	if (ndims > 1)
 	{
+
 		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
 		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
 
+		merr = nc_get_att_double(ncid, varid, "missingvalue", &missing);
+		if (merr != NC_NOERR)
+		{
+			merr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
+		}
+
+
+		// remove fill value
+		if (merr == NC_NOERR)
+		{
+			T maxval = T(-99999.0);
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					if ((vardata[i + j * nx] != vardata[i + j * nx]) || (vardata[i + j * nx] > T(0.9 * missing))) // i.e. if vardata is anywhere near missing
+					{
+						
+						//vardata[i + j * nx] = T(0.0);
+					}
+					maxval = utils::max(maxval, vardata[i + j * nx]);
+				}
+			}
+			printf("maxval = %f\n", maxval);
+		}
+
+
+
+		// apply scale and offset
 		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 		{
 			for (int j = 0; j < ny; j++)
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					vardata[i + j*nx] = vardata[i + j*nx] * (T)scalefac + (T)offset;
+					vardata[i + j * nx] = vardata[i + j * nx] * (T)scalefac + (T)offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
+					
 				}
 			}
 		}

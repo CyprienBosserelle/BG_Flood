@@ -644,7 +644,7 @@ template <class T> __global__ void WetsloperesetHaloLeftGPU(Param XParam, BlockP
 		leftzs = zsi - XEv.h[i] - delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
 		rightzs = zsi - XEv.h[i] + delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
 
-		if (leftzs > XEv.zs[ileft] || rightzs > zsright)
+		if (leftzs > zsleft || rightzs > zsright)
 		{
 			XGrad.dzsdx[i] = XGrad.dhdx[i] + XGrad.dzbdx[i];
 		}
