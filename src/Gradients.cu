@@ -94,17 +94,20 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 
 		//  wet slope limiter
 		WetsloperesetXGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		WetsloperesetYGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		// ALso do the slope limiter on the halo
 		WetsloperesetHaloLeftGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-		
+		CUDA_CHECK(cudaDeviceSynchronize());
+
 		WetsloperesetHaloRightGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		WetsloperesetHaloBotGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		WetsloperesetHaloTopGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
 
@@ -674,7 +677,7 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 		for (int iy = 0; iy <= XParam.blkwidth; iy++)
 		{
 
-			int i, iright, ileft;
+			int i, iright;
 			i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
 			iright = memloc(XParam.halowidth, blkmemwidth, ix + 1, iy, ib);
 
@@ -795,7 +798,7 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 				leftzs = zsi - XEv.h[i] - delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
 				rightzs = zsi - XEv.h[i] + delta * T(0.5) * (dzsdxi - XGrad.dhdx[i]);
 
-				if (leftzs > XEv.zs[ileft] || rightzs > zsright)
+				if (leftzs > zsleft || rightzs > zsright)
 				{
 					XGrad.dzsdx[i] = XGrad.dhdx[i] + XGrad.dzbdx[i];
 				}
