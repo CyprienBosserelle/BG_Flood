@@ -33,7 +33,12 @@ inline int nc_get_var_T(int ncid, int varid, double * &zb)
 	status = nc_get_var_double(ncid, varid, zb);
 	return status;
 }
-
+inline int nc_get_var_T(int ncid, int varid, int*& zb)
+{
+	int status;
+	status = nc_get_var_int(ncid, varid, zb);
+	return status;
+}
 
 inline int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, int*& zb)
 {
@@ -590,13 +595,13 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		nt = (int)ddim[0];
 		ny = (int)ddim[1];
 		nx = (int)ddim[2];
-		start[0] = utils::min(step, nt - 1);
-		start[1] = 0;
-		start[2] = 0;
+		start[0] = size_t(utils::min(step, nt - 1));
+		start[1] = size_t(0);
+		start[2] = size_t(0);
 
-		count[0] = 1;
-		count[1] = ny;
-		count[2] = nx;
+		count[0] = size_t(1);
+		count[1] = size_t(ny);
+		count[2] = size_t(nx);
 
 
 
@@ -633,7 +638,7 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 					maxval = utils::max(maxval, vardata[i + j * nx]);
 				}
 			}
-			printf("maxval = %f\n", maxval);
+			printf("maxval = %f\n", float(maxval));
 		}
 
 
