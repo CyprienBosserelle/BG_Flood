@@ -630,10 +630,11 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					if ((vardata[i + j * nx] != vardata[i + j * nx]) || (vardata[i + j * nx] > T(0.9 * missing))) // i.e. if vardata is anywhere near missing
+					bool test = missing != missing ? vardata[i + j * nx] != vardata[i + j * nx] : (vardata[i + j * nx] > T(0.9 * missing));
+					if (test) // i.e. if vardata is anywhere near missing
 					{
 						
-						//vardata[i + j * nx] = T(0.0);
+						vardata[i + j * nx] = T(0.0);
 					}
 					maxval = utils::max(maxval, vardata[i + j * nx]);
 				}
