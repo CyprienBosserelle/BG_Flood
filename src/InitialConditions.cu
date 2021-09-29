@@ -574,56 +574,60 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 			}
 		}
 	}
-	// Remove rain from boundary cells
-	for (int ibl = 0; ibl < XParam.nbndblkleft; ibl++)
-	{
-		ib = XForcing.left.blks[ibl];
-		for (int j = 0; j < XParam.blkwidth; j++)
-		{
-			n = memloc(XParam, 0, j, ib);
-			XBlock.activeCell[n] = 0;
 
-			n = memloc(XParam, 1, j, ib);
-			XBlock.activeCell[n] = 0;
+	bool Modif = false;
+	if (Modif == true) {
+		// Remove rain from boundary cells
+		for (int ibl = 0; ibl < XParam.nbndblkleft; ibl++)
+		{
+			ib = XForcing.left.blks[ibl];
+			for (int j = 0; j < XParam.blkwidth; j++)
+			{
+				n = memloc(XParam, 0, j, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, 1, j, ib);
+				XBlock.activeCell[n] = 0;
+			}
+		}
+		for (int ibl = 0; ibl < XParam.nbndblkright; ibl++)
+		{
+			ib = XForcing.right.blks[ibl];
+			for (int j = 0; j < XParam.blkwidth; j++)
+			{
+				n = memloc(XParam, XParam.blkwidth - 1, j, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, XParam.blkwidth - 2, j, ib);
+				XBlock.activeCell[n] = 0;
+			}
+		}
+		for (int ibl = 0; ibl < XParam.nbndblkbot; ibl++)
+		{
+			ib = XForcing.bot.blks[ibl];
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				n = memloc(XParam, i, 0, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, i, 1, ib);
+				XBlock.activeCell[n] = 0;
+			}
+		}
+		for (int ibl = 0; ibl < XParam.nbndblktop; ibl++)
+		{
+			ib = XForcing.top.blks[ibl];
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				n = memloc(XParam, i, XParam.blkwidth - 1, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, i, XParam.blkwidth - 2, ib);
+				XBlock.activeCell[n] = 0;
+			}
 		}
 	}
-	for (int ibl = 0; ibl < XParam.nbndblkright; ibl++)
-	{
-		ib = XForcing.right.blks[ibl];
-		for (int j = 0; j < XParam.blkwidth; j++)
-		{
-			n = memloc(XParam, XParam.blkwidth-1, j, ib);
-			XBlock.activeCell[n] = 0;
-
-			n = memloc(XParam, XParam.blkwidth-2, j, ib);
-			XBlock.activeCell[n] = 0;
-		}
-	}
-	for (int ibl = 0; ibl < XParam.nbndblkbot; ibl++)
-	{
-		ib = XForcing.bot.blks[ibl];
-		for (int i = 0; i < XParam.blkwidth; i++)
-		{
-			n = memloc(XParam, i, 0, ib);
-			XBlock.activeCell[n] = 0;
-
-			n = memloc(XParam, i, 1, ib);
-			XBlock.activeCell[n] = 0;
-		}
-	}
-	for (int ibl = 0; ibl < XParam.nbndblktop; ibl++)
-	{
-		ib = XForcing.top.blks[ibl];
-		for (int i = 0; i < XParam.blkwidth; i++)
-		{
-			n = memloc(XParam,i , XParam.blkwidth - 1, ib);
-			XBlock.activeCell[n] = 0;
-
-			n = memloc(XParam,i , XParam.blkwidth - 2, ib);
-			XBlock.activeCell[n] = 0;
-		}
-	}
-
+	
 }
 
 
