@@ -625,7 +625,7 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		// remove fill value
 		if (merr == NC_NOERR)
 		{
-			T maxval = T(-99999.0);
+			//T maxval = T(-99999.0);
 			for (int j = 0; j < ny; j++)
 			{
 				for (int i = 0; i < nx; i++)
@@ -636,10 +636,10 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 						
 						vardata[i + j * nx] = T(0.0);
 					}
-					maxval = utils::max(maxval, vardata[i + j * nx]);
+					//maxval = utils::max(maxval, vardata[i + j * nx]);
 				}
 			}
-			printf("maxval = %f\n", float(maxval));
+			//printf("maxval = %f\n", float(maxval));
 		}
 
 
