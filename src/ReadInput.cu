@@ -1197,6 +1197,9 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	// First estimate nx and ny
 	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
 	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+	//if desire size in one direction is under the bathy resolution or dx requested
+	if (XParam.nx == 0) { XParam.nx = 1; }
+	if (XParam.ny == 0) { XParam.ny = 1; }
 
 
 	// Adjust xmax and ymax so that nx and ny are a factor of XParam.blkwidth [16]
