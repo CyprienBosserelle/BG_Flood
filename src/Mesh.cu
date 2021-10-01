@@ -328,30 +328,22 @@ template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForci
 		{
 			//
 			int blb = XBlock.active[iblb];
-
-			//printf("For left ::\t Blockx=%f\t xo=%f\tBlocky=%f\tyo=%f\n", XBlock.xo[blb], leftxo, XBlock.yo[blb], leftyo);
 			if (abs(XBlock.xo[blb] - leftxo) < espdist && abs(XBlock.yo[blb] - leftyo) < espdist)
 			{
 				XBlock.LeftBot[bl] = blb;
 				XBlock.LeftTop[bl] = blb;
 			}
-
-			//printf("For right ::\t Blockx=%f\t xo=%f\tBlocky=%f\tyo=%f\n", XBlock.xo[blb], rightxo, XBlock.yo[blb], rightyo);
 			if (abs(XBlock.xo[blb] - rightxo) < espdist && abs(XBlock.yo[blb] - rightyo) < espdist)
 			{
 				XBlock.RightBot[bl] = blb;
 				XBlock.RightTop[bl] = blb;
 			}
-
-			//printf("For top ::\t Blockx=%f\t xo=%f\tBlocky=%f\tyo=%f\n", XBlock.xo[blb], topxo, XBlock.yo[blb], topyo);
 			if (abs(XBlock.xo[blb] - topxo) < espdist && abs(XBlock.yo[blb] - topyo) < espdist)
 			{
 				XBlock.TopLeft[bl] = blb;
 				XBlock.TopRight[bl] = blb;
 
 			}
-
-			//printf("For bottom ::\t Blockx=%f\t xo=%f\tBlocky=%f\tyo=%f\n", XBlock.xo[blb], botxo, XBlock.yo[blb], botyo);
 			if (abs(XBlock.xo[blb] - botxo) < espdist && abs(XBlock.yo[blb] - botyo) < espdist)
 			{
 				XBlock.BotLeft[bl] = blb;

@@ -305,11 +305,6 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 	q21 = forcing.val[cfip + cfj * forcing.nx];
 	q22 = forcing.val[cfip + cfjp * forcing.nx];
 
-	//T z = T(BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, xi, yi));
-	//double z1D = q11 + (q22 - q11) * (xi - x1) / (x2 - x1);
-	//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
-	//printf("x=%f\ty=%f\tq11=%d\tq22=%d\tx1=%d\tx2=%d\tz=%f\tz1D=%d\n", x, y, q11, q22, x1, x2, z, z1D);
-
 	return T(BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, xi, yi));
 
 
