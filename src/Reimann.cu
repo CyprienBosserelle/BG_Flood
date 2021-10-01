@@ -136,10 +136,7 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 		{
 			dtmax[i] = dt;
 		}
-		else
-		{
-			dtmax[i] = T(1.0) / epsi;
-		}
+		
 
 		fv = (fh > 0. ? vl : vr) * fh;
 
@@ -332,10 +329,7 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 					{
 						dtmax[i] = dt;
 					}
-					else
-					{
-						dtmax[i] = T(1.0) / epsi;
-					}
+					
 
 					fv = (fh > 0. ? vl : vr) * fh;
 
@@ -521,10 +515,7 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 		{
 			dtmax[i] = dt;
 		}
-		else
-		{
-			dtmax[i] = T(1.0) / epsi;
-		}
+		
 
 		fv = (fh > 0. ? ul : ur) * fh;
 
@@ -719,10 +710,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 					{
 						dtmax[i] = dt;
 					}
-					else
-					{
-						dtmax[i] = T(1.0) / epsi;
-					}
+					
 
 					fv = (fh > 0. ? ul : ur) * fh;
 

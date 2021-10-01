@@ -344,6 +344,7 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 		conserveElevationGradHalo(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
 
 	}
+	
 	WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb);
 
 	WetsloperesetHaloLeftCPU(XParam, XBlock, XEv, XGrad, zb);

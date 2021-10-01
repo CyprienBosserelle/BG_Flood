@@ -444,12 +444,14 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	RecalculateZsGPU << < gridDimfull, blockDimfull, 0 >> > (XParam, XBlock, Xev, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-
-	maskbndGPUleft << <gridDim, blockDimHalo, 0 , streams[0] >> > (XParam, XBlock,  Xev, zb);
-	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Xev, zb);
-	maskbndGPUright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Xev, zb);
-	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Xev, zb);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	if (XBlock.mask.nblk > 0)
+	{
+		maskbndGPUleft << <gridDim, blockDimHalo, 0, streams[0] >> > (XParam, XBlock, Xev, zb);
+		maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Xev, zb);
+		maskbndGPUright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Xev, zb);
+		maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Xev, zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 	for (int i = 0; i < num_streams; i++)
 	{
 		cudaStreamDestroy(streams[i]);
