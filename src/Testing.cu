@@ -3249,7 +3249,7 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 
 
 
-	if (maxdiff <= T(100.0) * (XLoop.epsilon))
+	if (maxdiff <= T(10000.0) * (XLoop.epsilon))
 	{
 		log(varname + " PASS");
 	}
