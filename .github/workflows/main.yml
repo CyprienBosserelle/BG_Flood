@@ -41,14 +41,14 @@ jobs:
           printf "0.0 0.0 0.0" >> bathy.asc
           printf "0.0 0.0 0.0" >> bathy.asc
           printf "0.0 0.0 0.0" >> bathy.asc
-          echo "test = 0;">BG_param.txt
+          echo "test = 7;">BG_param.txt
           echo "gpudevice = 0;"
           echo "bathy = bathy.asc;">>BG_param.txt
       # Compilation of the code
       - name: compilation of the code
         run: make
       # Running the tests
-      - name: running test 0
+      - name: running test 7
         run: ./BG_Flood
 #      - name: running test 2
 #        run: |

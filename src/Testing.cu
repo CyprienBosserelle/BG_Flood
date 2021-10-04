@@ -12,12 +12,16 @@
 * Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU or CPU version)
 * Test 2 Gaussian wave on Cartesian grid (same as test 0): CPU vs GPU (GPU required)
 * Test 3 Test Reduction algorithm
-* Test 4 Compare resuts between the CPU and GPU Flow functions (GPU required)
+
 * Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
 * Test 6 Mass conservation on a slope
 * Test 7 is mass conservation with rain fall on grid
 * Test 8 is a comparison with litterature case with slope and non-uniform rain
-* Test 99: run all the test with test number < 99.
+
+* Test 99 Run all the test with test number < 99.
+
+The following test are not independant, they are tools to check or debug a personnal case
+* Test 998 Compare resuts between the CPU and GPU Flow functions (GPU required)
 * Test 999 Run the main loop and engine in debug mode
 */
 template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
@@ -127,23 +131,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 		}
 
-		if (mytest == 4)
-		{
-			//
-			bool testresults;
-			log("\t### CPU vs GPU Test ###");
-			testresults = CPUGPUtest(XParam, XModel, XModel_g);
-			isfailed = (!testresults || isfailed) ? true : false;
 
-			//if (testresults)
-			//{
-			//	exit(0);
-			//}
-			//else
-			//{
-			//	exit(1);
-			//}
-		}
 		if (mytest == 5)
 		{
 			log("\t### Lake-at-rest Test ###");
@@ -158,6 +146,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		{
 			log("\t### Mass conservation Test ###");
 			bool testSteepSlope = MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
+			result = testSteepSlope ? "successful" : "failed";
 			isfailed = (!testSteepSlope || isfailed) ? true : false;
 
 		}
@@ -171,10 +160,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 					- GPU option
 					- the slope (%)
 			*/
-			log("\t### Rain on grid Mass conservation test ###");
-			testrain = Raintest(0.0, -1, 10);
+			log("\t### Homogeneous rain on grid Mass conservation test ###");
+			testrain = Raintest(0.0, 0, 10);
 			result = testrain ? "successful" : "failed";
-			log("\t\tCPU test: " + result);
+			log("\t\tHomogeneous rain on grid test: " + result);
 			isfailed = (!testrain || isfailed) ? true : false;
 		}
 		///*if (XParam.test == 8)
@@ -337,6 +326,25 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	//	std::string result = raintest2 ? "successful" : "failed";
 	//	log("\t\tCPU test: " + result);
 	//}*/
+
+
+	//if (mytest == 998)
+	//{
+	//	//
+	//	bool testresults;
+	//	log("\t### CPU vs GPU Test ###");
+	//	testresults = CPUGPUtest(XParam, XModel, XModel_g);
+	//	isfailed = (!testresults || isfailed) ? true : false;
+
+	//	if (testresults)
+	//	{
+	//		exit(0);
+	//	}
+	//	else
+	//	{
+	//		exit(1);
+	//	}
+	//}
 	//if (XParam.test == 999)
 	//{
 	//	//
