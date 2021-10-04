@@ -199,9 +199,9 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Verification data
 	// This is a transect across iy=15:16:127 at ix=127 (or vice versa because the solution is symetrical)
 	// These values are based on single precision output from Netcdf file so are only accurate to 10-7 
-	double ZsVerification[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
+	double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
 	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
-
+	double ZsVerifButtinger[8] = { 0.100000000023, 0.100000063119, 0.100093580546, 0.195088199869, 0.136767978925, 0.0850706353898, 0.0663028448129, 0.063727949607 };
 
 
 
@@ -418,14 +418,14 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 				int n = memloc(XParam, ix, iy, ib);
 
-				diff = abs(T(XModel.evolv.zs[n]) - ZsVerification[iv]);
+				diff = abs(T(XModel.evolv.zs[n]) - ZsVerifButtinger[iv]);
 
 
 
 				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
 				{
 
-					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerification[iv], diff);
+					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerifButtinger[iv], diff);
 					modelgood = false;
 				}
 
