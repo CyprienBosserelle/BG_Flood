@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  Build and Inside tests:
     # The type of runner that the job will run on
     runs-on: [self-hosted, linux, x64, gpu]
 
@@ -41,15 +41,19 @@ jobs:
           printf "0.0 0.0 0.0" >> bathy.asc
           printf "0.0 0.0 0.0" >> bathy.asc
           printf "0.0 0.0 0.0" >> bathy.asc
-          echo "test = 7;">BG_param.txt
+          echo "test = 0;">BG_param.txt
           echo "gpudevice = 0;"
           echo "bathy = bathy.asc;">>BG_param.txt
       # Compilation of the code
       - name: compilation of the code
         run: make
       # Running the tests
-      - name: running test 7
+      - name: running test 0
         run: ./BG_Flood
+      - name: running test 7
+         run: |
+          sed -i 's/test = 0/test = 7/' BG_param.txt
+          ./BG_Flood
 #      - name: running test 2
 #        run: |
 #          sed -i 's/test=0/test=2/' BG_param.txt
