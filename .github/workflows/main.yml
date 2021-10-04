@@ -50,9 +50,29 @@ jobs:
       # Running the tests
       - name: running test 0
         run: ./BG_Flood
+      - name: running test 1
+        run: |
+          sed -i 's/test = 0/test = 1/' BG_param.txt
+          ./BG_Flood
+      - name: running test 2
+        run: |
+          sed -i 's/test = 1/test = 2/' BG_param.txt
+          ./BG_Flood
+      - name: running test 3
+        run: |
+          sed -i 's/test = 2/test = 3/' BG_param.txt
+          ./BG_Flood
+      - name: running test 5
+        run: |
+          sed -i 's/test = 3/test = 5/' BG_param.txt
+          ./BG_Flood
+      - name: running test 6
+        run: |
+          sed -i 's/test = 5/test = 6/' BG_param.txt
+          ./BG_Flood
       - name: running test 7
         run: |
-          sed -i 's/test = 0/test = 7/' BG_param.txt
+          sed -i 's/test = 6/test = 7/' BG_param.txt
           ./BG_Flood
 #      - name: running test 2
 #        run: |
