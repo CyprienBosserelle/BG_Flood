@@ -51,7 +51,7 @@ jobs:
       - name: running test 0
         run: ./BG_Flood
       - name: running test 7
-         run: |
+        run: |
           sed -i 's/test = 0/test = 7/' BG_param.txt
           ./BG_Flood
 #      - name: running test 2
