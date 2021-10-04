@@ -2369,7 +2369,7 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 /*! \fn bool Raintest(T zsnit, int gpu, float alpha)
 *
 * This function tests the mass conservation of the spacial injection (used to model rain on grid)
-*	The function creates it own model setup and mesh independantly to what the user might want to do
+*	The function creates its own model setup and mesh independantly to what the user inputs.
 *	This starts with a initial water level (zsnit=0.0 is dry) and runs for 0.1s before comparing results
 *	with zsnit=0.1 that is approx 20 steps
 */
@@ -2527,7 +2527,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	fillHaloC(XParam, XModel.blocks, XModel.zb);
 
 	bool modelgood = true;
-
+	
 	while (XLoop.totaltime < XLoop.nextoutputtime)
 	{
 
@@ -2579,7 +2579,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 			T error = abs((finalVol - initVol) - TheoryInput) / TheoryInput;
 			modelgood = (error < 0.05);
 
-			printf("error = %g %, initial volume=%4.4g; final Volume=%4.4g; abs. difference=%g, Theoretical  input=%g\n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
+			printf("error = %g, initial volume=%4.4g; final Volume=%4.4g; abs. difference=%g, Theoretical  input=%g\n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
 		}
 	}
 	InitSave2Netcdf(XParam, XModel);
