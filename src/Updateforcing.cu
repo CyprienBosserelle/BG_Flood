@@ -399,7 +399,7 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 				}
 
 
-				Rainhh = Rainhh / T(1000.0) / T(3600.0) * XLoop.dt; // convert from mm/hrs to m/s
+				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt, T(0.0)); // convert from mm/hrs to m/s
 
 				XEv.h[i] += Rainhh * XBlock.activeCell[i];
 				XEv.zs[i] += Rainhh * XBlock.activeCell[i];

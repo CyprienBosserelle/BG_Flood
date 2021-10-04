@@ -47,7 +47,7 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 
 
 		// things are quite different for Time Series output. Why is that?.
-		if (XModel.bndblk.nblkTs > 0)
+		if (XParam.TSnodesout.size() > 0)
 		{
 
 			AllocateGPU(XModel.bndblk.nblkTs, 1, XModel_g.bndblk.Tsout);

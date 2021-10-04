@@ -39,7 +39,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	{
 		if (mytest == 0)
 		{
-			bool bumptest;
+			bool bumptest, bumptestComp;
 			bool bumptestGPU = true;
 			// Test 0 is pure bump test
 			log("\t ### Gaussian wave on Cartesian grid ###");
@@ -55,6 +55,11 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
 				result = bumptestGPU ? "successful" : "failed";
 				log("\t\tGPU test: " + result);
+
+				if (!bumptestGPU)
+				{
+					bumptestComp = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+				}
 			}
 			isfailed = ((bumptest == true) && (bumptestGPU == true)) ? false : true;
 		}
@@ -1119,7 +1124,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 
 	//InitSave2Netcdf(XParam, XModel);
 	XLoop.nextoutputtime = mininput * T(2.0);
-	XLoop.dtmax = mininput * T(10.0);
+	XLoop.dtmax = mininput * T(2.01);
 
 	// Fill in dtmax with random values that are larger than  mininput
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1156,7 +1161,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	{
 		char buffer[256]; sprintf(buffer, "%e", abs(reducedt - mininput));
 		std::string str(buffer);
-		//log("\t\t CPU testfailed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt)+ ";  error=" +str);
+		log("\t\t CPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt)+ ";  error=" +str);
 	}
 
 	if (XParam.GPUDEVICE >= 0)
@@ -1173,7 +1178,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 		{
 			char buffer[256]; sprintf(buffer, "%e", abs(reducedtgpu - mininput));
 			std::string str(buffer);
-			//log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
+			log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
 		}
 
 		if (abs(reducedtgpu - reducedt) > T(100.0) * (XLoop.epsilon))
@@ -3416,7 +3421,7 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 
 
 
-	if (maxdiff <= T(100.0) * (XLoop.epsilon))
+	if (maxdiff <= T(10000.0) * (XLoop.epsilon))
 	{
 		log(varname + " PASS");
 	}

@@ -40,6 +40,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	XLoop.dt = double(CalctimestepCPU(XParam,XLoop, XModel.blocks, XModel.time));
 	XLoop.dtmax = XLoop.dt;
 	XModel.time.dt = T(XLoop.dt);
+	
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 
