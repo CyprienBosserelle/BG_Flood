@@ -148,12 +148,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			bool testSteepSlope = MassConserveSteepSlope(XParam.zsinit, XParam.GPUDEVICE);
 			result = testSteepSlope ? "successful" : "failed";
 			isfailed = (!testSteepSlope || isfailed) ? true : false;
-
+			log("\t\tMass conservation test: " + result);
 		}
 
 		if (mytest == 7)
 		{
-			bool testrain;
+			bool testrainGPU, testrainCPU;
 			/* Test 7 is homogeneous rain on a uniform slope for cartesian mesh (GPU and CU version)
 			 The input parameters are :
 					- the initial water level (zs)
@@ -161,10 +161,13 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 					- the slope (%)
 			*/
 			log("\t### Homogeneous rain on grid Mass conservation test ###");
-			testrain = Raintest(0.0, 0, 10);
-			result = testrain ? "successful" : "failed";
-			log("\t\tHomogeneous rain on grid test: " + result);
-			isfailed = (!testrain || isfailed) ? true : false;
+			testrainGPU = Raintest(0.0, 0, 10);
+			result = testrainGPU ? "successful" : "failed";
+			log("\t\tHomogeneous rain on grid test GPU: " + result);
+			testrainCPU = Raintest(0.0, -1, 10);
+			result = testrainCPU ? "successful" : "failed";
+			log("\t\tHomogeneous rain on grid test CPU: " + result);
+			isfailed = (!testrainCPU || !testrainGPU || isfailed) ? true : false;
 		}
 		///*if (XParam.test == 8)
 		//{
