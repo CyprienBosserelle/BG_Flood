@@ -20,7 +20,7 @@ public:
 	int frictionmodel=0; //
 	double cf=0.0001; // bottom friction for flow model cf
 	double Cd=0.002; // Wind drag coeff
-	bool windforcing = false;
+	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
 
