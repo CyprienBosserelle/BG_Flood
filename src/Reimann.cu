@@ -2,7 +2,7 @@
 
 
 /*! \fn void UpdateButtingerXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. GPU version for t X-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. GPU version for t X-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
@@ -185,7 +185,7 @@ template __global__ void UpdateButtingerXGPU(Param XParam, BlockP<double> XBlock
 
 
 /*! \fn void UpdateButtingerXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. CPU version for the X-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. CPU version for the X-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
@@ -381,7 +381,7 @@ template __host__ void UpdateButtingerXCPU(Param XParam, BlockP<double> XBlock, 
 
 
 /*! \fn void UpdateButtingerYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. GPU version for the Y-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. GPU version for the Y-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
@@ -563,7 +563,7 @@ template __global__ void UpdateButtingerYGPU(Param XParam, BlockP<float> XBlock,
 template __global__ void UpdateButtingerYGPU(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb);
 
 /*! \fn void UpdateButtingerYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. CPU version for the Y-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. CPU version for the Y-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
