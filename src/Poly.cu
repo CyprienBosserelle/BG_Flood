@@ -105,14 +105,14 @@ template <class T> int wn_PnPoly(T Px, T Py, Polygon Poly)
 
 	// loop through all edges of the polygon
 	for (int i = 0; i < (Poly.vertex.size() - 1); i++) {   // edge from V[i] to  V[i+1]
-		if (Poly.vertex.y[i] <= Py) {          // start y <= P.y
-			if (Poly.vertex.y[i + 1] > Py)      // an upward crossing
-				if (isLeft(Poly.vertex.x[i], Poly.vertex.y[i], Poly.vertex.x[i + 1], Poly.vertex.y[i + 1], Px, Py) > 0)  // P left of  edge
+		if (Poly.vertex[i].y <= Py) {          // start y <= P.y
+			if (Poly.vertex[i + 1].y > Py)      // an upward crossing
+				if (isLeft(Poly.vertex[i].x, Poly.vertex[i].y, Poly.vertex[i + 1].x, Poly.vertex[i + 1].y, Px, Py) > 0)  // P left of  edge
 					++wn;            // have  a valid up intersect
 		}
 		else {                        // start y > P.y (no test needed)
-			if (Poly.vertex.y[i + 1] <= Py)     // a downward crossing
-				if (isLeft(Poly.vertex.x[i], Poly.vertex.y[i], Poly.vertex.x[i + 1], Poly.vertex.y[i + 1], Px, Py) < 0)  // P right of  edge
+			if (Poly.vertex[i + 1].y <= Py)     // a downward crossing
+				if (isLeft(Poly.vertex[i].x, Poly.vertex[i].y, Poly.vertex[i + 1].x, Poly.vertex[i + 1].y, Px, Py) < 0)  // P right of  edge
 					--wn;            // have  a valid down intersect
 		}
 	}
