@@ -120,6 +120,110 @@ template <class T> int wn_PnPoly(T Px, T Py, Polygon Poly)
 }
 //===================================================================
 
+Vertex VertAdd(Vertex A, Vertex B)
+{
+	Vertex v;
+	v.x = A.x + B.x; 
+	v.y = A.y + B.y;
+
+	return v;
+}
+
+Vertex VertSub(Vertex A, Vertex B)
+{
+	Vertex v;
+	v.x = A.x - B.x;
+	v.y = A.y - B.y;
+
+	return v;
+}
+
+double dotprod(Vertex A, Vertex B)
+{
+	double a = 0.0;
+	a = A.x * B.x + A.x + B.y + A.y * B.x + A.y * B.y;
+	return a;
+}
+
+double xprod(Vertex A, Vertex B)
+{
+	double a = 0.0;
+	a = A.x*B.y-A.y*B.x;
+	return a;
+}
+
+//===================================================================
+// Intersection between segments
+bool SegmentIntersect(Polygon P, Polygon Q)
+{
+	//
+	Vertex r, s, p, q, qmp;
+	double rxs, qmpxr, eps, t, u;
+	bool intersect = false;
+
+	eps = 1e-9;
+
+	p = P.vertex[0];
+	q = Q.vertex[0];
+	r = VertSub(P.vertex[1], P.vertex[0]);
+	s = VertSub(Q.vertex[1], Q.vertex[0]);
+	
+	qmp= VertSub(q, p);
+
+	rxs = xprod(r, s);
+
+	qmpxr = xprod(qmp, r);
+
+	
+
+
+	if (abs(rxs) <= eps && abs(qmpxr) <= eps)
+	{
+		// colinear
+		double t0, t1, rdr, sdr;
+		sdr= dotprod(s, r);
+		rdr = dotprod(r, r);
+
+		t0 = dotprod(qmp, r) / rdr;
+		t1 = t0 + dotprod(s, r) / rdr;
+
+		if (sdr < 0.0)
+		{
+			intersect = (t0 >= 0.0 && t1 <= 1);
+		}
+		else
+		{
+			intersect = (t1 >= 0.0 && t0 <= 1);
+		}
+
+
+	}
+	else if (abs(rxs) <= eps && abs(qmpxr) > eps)
+	{
+		// parallele lines and non intersecting
+		intersect = false;
+	}
+	else if (abs(rxs) > eps)
+	{
+		t = xprod(qmp, s) / rxs;
+		u = qmpxr / rxs;
+
+		if (t >= 0.0 && t <= 1.0 && u <= 1.0 && u >= 0.0)
+		{
+			intersect = true;
+		}
+
+	}
+	else
+	{
+		intersect = false;
+	}
+
+		
+	return intersect;
+}
+
+
 template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly)
 {
 	bool insidepoly = false;
