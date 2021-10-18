@@ -94,8 +94,11 @@ public:
 };
 
 
-
-
+class AOIinfo {
+public:
+	std::string inputfile;
+	Polygon poly;
+};
 
 
 template <class T>
@@ -120,7 +123,7 @@ struct Forcing
 	bndparam top;
 	bndparam bot;
 
-	
+	AOIinfo AOI;
 	
 };
 
