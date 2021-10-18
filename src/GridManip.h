@@ -19,6 +19,7 @@ template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T*& zb);
 template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<StaticForcingP<float>> forcing, T* z);
 template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F forcing, T*& z);
 template <class T, class F> T interp2BUQ(T x, T y, F forcing);
+template <class T, class F> T interp2BUQ(T x, T y, T dx, F forcing);
 
 template <class T, class F> void InterpstepCPU(int nx, int ny, int hdstep, F totaltime, F hddt, T*& Ux, T* Uo, T* Un);
 template <class T> __global__ void InterpstepGPU(int nx, int ny, int hdstp, T totaltime, T hddt, T* Ux, T* Uo, T* Un);

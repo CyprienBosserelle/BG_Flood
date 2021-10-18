@@ -2,7 +2,7 @@
 
 
 /*! \fn void UpdateButtingerXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. GPU version for t X-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. GPU version for t X-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
@@ -15,9 +15,9 @@
 * http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h
 *
 * Reference:
-* Kirstetter, G., Delestre, O., Lagrée, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
-* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
-* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+* Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
+* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019.
 */
 template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
@@ -185,7 +185,7 @@ template __global__ void UpdateButtingerXGPU(Param XParam, BlockP<double> XBlock
 
 
 /*! \fn void UpdateButtingerXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. CPU version for the X-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. CPU version for the X-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
@@ -198,9 +198,9 @@ template __global__ void UpdateButtingerXGPU(Param XParam, BlockP<double> XBlock
 * http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h
 *
 * Reference:
-* Kirstetter, G., Delestre, O., Lagrée, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
-* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
-* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+* Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
+* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019.
 */
 template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
@@ -381,7 +381,7 @@ template __host__ void UpdateButtingerXCPU(Param XParam, BlockP<double> XBlock, 
 
 
 /*! \fn void UpdateButtingerYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. GPU version for the Y-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. GPU version for the Y-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
@@ -394,9 +394,9 @@ template __host__ void UpdateButtingerXCPU(Param XParam, BlockP<double> XBlock, 
 * http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h
 *
 * Reference:
-* Kirstetter, G., Delestre, O., Lagrée, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
-* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
-* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+* Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
+* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019.
 */
 template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
@@ -563,7 +563,7 @@ template __global__ void UpdateButtingerYGPU(Param XParam, BlockP<float> XBlock,
 template __global__ void UpdateButtingerYGPU(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb);
 
 /*! \fn void UpdateButtingerYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
-* \brief "Adaptive” second-order hydrostatic reconstruction. CPU version for the Y-axis
+* \brief "Adaptive" second-order hydrostatic reconstruction. CPU version for the Y-axis
 *
 * ## Description
 * This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019).
@@ -576,9 +576,9 @@ template __global__ void UpdateButtingerYGPU(Param XParam, BlockP<double> XBlock
 * http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h
 *
 * Reference:
-* Kirstetter, G., Delestre, O., Lagrée, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
-* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
-* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+* Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. Model Dev. Discuss. [preprint], https://doi.org/10.5194/gmd-2021-15, in review, 2021.*
+* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+* structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019.
 */
 template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
