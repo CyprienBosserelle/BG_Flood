@@ -223,6 +223,35 @@ bool SegmentIntersect(Polygon P, Polygon Q)
 	return intersect;
 }
 
+bool PolygonIntersect(Polygon P, Polygon Q)
+{
+	bool intersect=false;
+	for (int i = 0; i < (P.vertex.size() - 1); i++)
+	{
+		for (int j = 0; j < (Q.vertex.size() - 1); j++)
+		{
+			// build segments
+			Polygon Pseg, Qseg;
+			Pseg.vertex = { P.vertex[i], P.vertex[i + 1] };
+			Qseg.vertex = { Q.vertex[i], Q.vertex[i + 1] };
+
+			intersect = SegmentIntersect(Pseg, Qseg);
+
+			if (intersect)
+			{
+				i = P.vertex.size();
+				j = Q.vertex.size();
+				break;
+			}
+
+		}
+		
+	}
+
+	return intersect;
+
+}
+
 
 template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly)
 {
@@ -232,17 +261,36 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 
 	if (insidepoly)
 	{
-		int wn;
+		// being in the bounding box doesn't say much
+
+		// Is there any corner of the block inside the polygon?
+		int wnBL,wnBR,wnTL,wnTR;
 		insidepoly = false;
-		for (int i = 0; i < blkwidth; i++)
+		
+		wnBL = wn_PnPoly(xo, yo, Poly);
+		wnBR = wn_PnPoly(xo + blkwidth*dx, yo, Poly);
+		wnTL = wn_PnPoly(xo, yo + blkwidth * dx, Poly);
+		wnTR = wn_PnPoly(xo + blkwidth * dx, yo + blkwidth * dx, Poly);
+
+		insidepoly = (wnBL > 0 || wnBR > 0 || wnTL > 0 || wnTR > 0);
+
+		if (!insidepoly)
 		{
-			for (int j = 0; j < blkwidth; j++)
-			{
-				T Px = xo + i * dx;
-				T Py = yo + j * dx;
-				wn = wn_PnPoly(Px, Py, Poly);
-				insidepoly = wn > 0;
-			}
+			// maybe a thin arn of the polygon intersect the block
+			Polygon Polyblock;
+			Vertex vxBL, vxBR, vxTL, vxTR;
+			vxBL.x = xo; vxBL.y = yo;
+			vxBR.x = xo + blkwidth * dx; vxBR.y = yo;
+			vxTL.x = xo; vxTL.y = yo + blkwidth * dx;
+			vxTR.x = xo + blkwidth * dx; vxTR.y = yo + blkwidth * dx;
+
+			Polyblock.vertex.push_back(vxBL);
+			Polyblock.vertex.push_back(vxBR);
+			Polyblock.vertex.push_back(vxTR);
+			Polyblock.vertex.push_back(vxTL);
+			Polyblock.vertex.push_back(vxBL);
+
+			insidepoly = PolygonIntersect(PolyBlock, Poly);
 		}
 
 	}
