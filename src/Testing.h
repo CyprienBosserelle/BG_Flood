@@ -31,8 +31,7 @@ template <class T> void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* b
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo);
 //template <class T> void Gaussianhump(Param XParam, Model<T> XModel, Model<T> XModel_g);
 template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit);
-template <class T> bool Raintestinput(int gpu, T zinit);
-
+bool Raintestinput(int gpu);
 template <class T> bool Rivertest(T zsnit, int gpu);
 template <class T> bool MassConserveSteepSlope(T zsnit, int gpu);
 template <class T> bool Raintest(T zsnit, int gpu, float alpha);

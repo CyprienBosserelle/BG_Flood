@@ -172,23 +172,16 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		if (XParam.test == 8)
 		{
 			bool raintest2;
-			/* Test 8 is non-homogeneous rain on a n0n-uniform slope for cartesian mesh (GPU and CU version)
-			 It is based on a teste case from litterature
-			 The input parameters are :
-					- GPU option
+			/* Test 8 is non-homogeneous rain on a non-uniform slope for cartesian mesh (GPU and CPU version)
+			 It is based on a teste case from litterature (Iwagaki1955) and tests the different
+			 rain inputs (time serie for 1D input or netCDF file).
 			*/
-			int gpu = 0;
-			T zinit = 0.0;
-			bool raintestinput = Raintestinput(gpu, zinit);
-			
-			/*log("\t non-uniform rain on slope based on Aureli2020");
-			int GPU_option = -1;
-			int dim_rain_forcing = 3;
-			T Zinit = T(0.0);
-			raintest2 = Raintestmap(GPU_option, dim_rain_forcing, Zinit);
-			std::string result = raintest2 ? "successful" : "failed";
-			log("\t\tCPU test: " + result);
-			*/
+
+			log("\t non-uniform rain forcing on slope based on Aureli2020");
+			int gpu = -1;
+			raintest2 = Raintestinput(gpu);
+			result = raintest2 ? "successful" : "failed";
+			log("\t\tNon-uniform rain forcing : " + result);
 		}
 		if (mytest == 998)
 		{
@@ -2401,19 +2394,19 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 * forcing and a time varying 2D field (with same value).
 * The second test check the 3D rain forcing (comparing it to expected values).
 */
-template <class T> bool Raintestinput(int gpu, T zinit)
+bool Raintestinput(int gpu)
 {
 	//Results of the experiment of Aureli, interpolated to output values
-	T modelgood1, modelgood2;
+	bool modelgood1, modelgood2;
 	std::string result;
 	int dim_flux;
 	std::vector<float> Flux1D, Flux3DUni, Flux3D, Flux_obs;
 	float diff = 0.0;
 	float ref = 0.0;
 	
-	/*//Comparison between the 1D forcing and the 3D hommgeneous forcing
-	Flux1D = Raintestmap(gpu, 1, zinit);
-	Flux3DUni = Raintestmap(gpu, 31, zinit);
+	//Comparison between the 1D forcing and the 3D hommgeneous forcing
+	Flux1D = Raintestmap(gpu, 1, -0.03);
+	Flux3DUni = Raintestmap(gpu, 31, -0.03);
 	for (int i = 0; i < Flux1D.size(); i++)
 	{
 		diff = diff + Flux1D[i] - Flux3DUni[i];
@@ -2425,15 +2418,17 @@ template <class T> bool Raintestinput(int gpu, T zinit)
 	modelgood1 = abs(diff / ref) < 0.005;
 	result = modelgood1 ? "successful" : "failed";
 	log("\t\tRain test input 1D vs 3D homogeneous: " + result);
-	*/
 
 	//Comparison between the 3D forcing and the observations from Iwagaki1955.
+
 	//From Observations
 	//Flux_obs = { 1.75136262,  4.31856716, 24.36350225, 32.02235696, 32.41207121,
 	//   31.68632601, 29.8140878 , 47.9632521 , 68.78608061, 57.03656989 };
+
 	//From BG_run of the testcase
 	Flux_obs = { 4.003079, 12.664897, 25.376514, 33.214722, 34.987427, 34.054474,
 		32.696472, 30.718161, 89.497993, 58.156021 };
+
 	Flux3D = Raintestmap(gpu, 3, -0.03);
 
 	for (int i = 0; i < Flux3D.size(); i++)
@@ -2448,15 +2443,13 @@ template <class T> bool Raintestinput(int gpu, T zinit)
 	result = modelgood2 ? "successful" : "failed";
 	log("\t\tRain test input 3D map vs Iwagaki1955: " + result);
 
-	return (modelgood1 && modelgood2);
+	return (modelgood1 * modelgood2);
 }
-template bool Raintestinput<float>(int gpu, float Zsinit);
-template bool Raintestinput<double>(int gpu, double Zsinit);
 
-/*! \fn bool Raintestmap(int gpu)
+/*! \fnstd::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 *
-* This function tests the mass conservation of a non-uniform rain forcing
-* using the test case presented in the paper Aureli2020
+* This function return the flux at the bottom of the 3 part slope
+* for different types of rain forcings using the test case based on Iwagaki1955
 */
 template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 {
@@ -2721,16 +2714,16 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		
 		bool gpgpu = 0;
-		/*if (XParam.GPUDEVICE >= 0)
+		if (XParam.GPUDEVICE >= 0)
 		{
 			gpgpu = 1;
-		}*/
+		}
 		readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
-		/*if (gpgpu == 1 )
+		if (gpgpu == 1 )
 		{
 			// Allocate and bind textures
 			AllocateTEX(NX, NY, XForcing.Rain.GPU, XForcing.Rain.now);
-		}*/
+		}
 
 		free(rainForcing);
 		free(xRain);
