@@ -269,10 +269,19 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 			}
 
-			XForcing.rivers[Rin].i = idis;
-			XForcing.rivers[Rin].j = jdis;
-			XForcing.rivers[Rin].block = blockdis;
-			XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+
+			if (dischargeArea > 0.0)
+			{
+				XForcing.rivers[Rin].i = idis;
+				XForcing.rivers[Rin].j = jdis;
+				XForcing.rivers[Rin].block = blockdis;
+				XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+			}
+			else
+			{
+				log("Warning river outside active model domain!\n");
+				//XForcing.rivers.erase(0);
+			}
 
 			
 		}

@@ -289,7 +289,7 @@ template <class T, class F> T interp2BUQ(T x, T y, T dx, F forcing)
 template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 {
 	double xmin, xmax, ymin, ymax,z;
-	unsigned int imin,imax,jmin,jmax,ni, nj,cfi,cfj;
+	int imin,imax,jmin,jmax,ni, nj,cfi,cfj;
 
 
 	xmin = x - dx * 0.5;
@@ -303,17 +303,20 @@ template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 	jmin = max(ftoi(floor((ymin - forcing.yo) / forcing.dx)), 0);
 	jmax = min(ftoi(floor((ymax - forcing.yo) / forcing.dx)), forcing.ny - 1);
 
+	//printf("imin=%d; imax=%d, jmin=%d, jmax=%d\t",imin, imax, jmin, jmax);
 
-	ni = max(imax - imin + 1,1);
+	ni = max(imax - imin + 1, 1);
 	nj = max(jmax - jmin + 1, 1);
 
+
+	//printf("ni=%d; nj=%d\n", ni, nj);
 	z = 0.0;
 	for (int i = 0; i < ni; i++)
 	{
 		for (int j = 0; j < nj; j++)
 		{
-			cfi = imin + i;
-			cfj = jmin + j;
+			cfi = min(imin + i, forcing.nx - 1);
+			cfj = min(jmin + j, forcing.ny - 1);
 			z = z + forcing.val[cfi + cfj * forcing.nx];
 		}
 
