@@ -2322,7 +2322,6 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	//Value definition for surface rain fall
 	T Q = 300; // mm/hr
-	//TheoryInput = Q / T(1000.0) / T(3600.0); //m/s
 	std::cout << "# Theoretical volume of water input during the simulation in m3: " << TheoryInput << ", from a rain input of: " << Q << "mm/hr." << std::endl;
 	//Create a temporary file with rain fluxes
 	std::ofstream rain_file(
@@ -2388,8 +2387,6 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	T modelgood= error / TheoryInput < 0.05;
 
-	//printf("error = %g, initial volume=%4.4g; final Volume=%4.4g; abs. difference=%g, Theoretical  input=%g\n", error, initVol, SimulatedVolume, abs(finalVol - initVol), TheoryInput);
-
 	//log("#####");
 	return modelgood;
 }
@@ -2401,8 +2398,8 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 * This test is based on the paper Aureli2020, the 3 slopes test
 * with regional rain. The experiment has been presented in Iwagaki1955.
 * The first test compares a time varying rain input using a uniform time serie 
-* forcing and a time varying 2D field (with same value)
-* The second test compares the output flux of a 3D varying forcing to an experiment.
+* forcing and a time varying 2D field (with same value).
+* The second test check the 3D rain forcing (comparing it to expected values).
 */
 template <class T> bool Raintestinput(int gpu, T zinit)
 {
@@ -2435,8 +2432,8 @@ template <class T> bool Raintestinput(int gpu, T zinit)
 	//Flux_obs = { 1.75136262,  4.31856716, 24.36350225, 32.02235696, 32.41207121,
 	//   31.68632601, 29.8140878 , 47.9632521 , 68.78608061, 57.03656989 };
 	//From BG_run of the testcase
-	Flux_obs = { 3.91529345, 13.25190688, 26.80124094, 35.66923489, 37.53384948,
-	   36.48744275, 35.05542626, 33.29121321, 95.42833765, 62.4640137 };
+	Flux_obs = { 4.003079, 12.664897, 25.376514, 33.214722, 34.987427, 34.054474,
+		32.696472, 30.718161, 89.497993, 58.156021 };
 	Flux3D = Raintestmap(gpu, 3, -0.03);
 
 	for (int i = 0; i < Flux3D.size(); i++)
@@ -2448,7 +2445,7 @@ template <class T> bool Raintestinput(int gpu, T zinit)
 	printf("Error %f \n", diff / ref);
 
 	modelgood2 = abs(diff / ref) < 0.00005;
-	result = modelgood1 ? "successful" : "failed";
+	result = modelgood2 ? "successful" : "failed";
 	log("\t\tRain test input 3D map vs Iwagaki1955: " + result);
 
 	return (modelgood1 && modelgood2);
@@ -2482,11 +2479,10 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XParam.xo = 0;
 	XParam.yo = 0;
 	XParam.ymax = 0.196;
-	XParam.dx = (XParam.ymax - XParam.yo) / (1 << 1);
-	double Xmax_exp = 24.0; //minimum Xmax position (adjust to have a "full blocks" config)
+	XParam.dx=(XParam.ymax - XParam.yo) / (1 << 1);
+	double Xmax_exp = 28.0; //minimum Xmax position (adjust to have a "full blocks" config)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
-	//printf("Xmax=%f\n", XParam.xmax);
 	Surf = (XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo);
 	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
 
@@ -2500,7 +2496,6 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 	//Specification of the test
 	XParam.test = 8;
-	//XParam.rainforcing = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
@@ -2533,7 +2528,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	// initialise forcing bathymetry to 0
 	XForcing.Bathy[0].xo = -1.0;
 	XForcing.Bathy[0].yo = -1.0;
-	XForcing.Bathy[0].xmax = 25.0;
+	XForcing.Bathy[0].xmax = 28.0;
 	XForcing.Bathy[0].ymax = 1.0;
 	XForcing.Bathy[0].dx = 0.1;
 	XForcing.Bathy[0].nx = (XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1;
@@ -2682,6 +2677,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			//End creation of the nc file for rain forcing
 		}
 		/*
+		//2D forcing (map without time variation is not working)
 		else if (dimf == 2)//dimf==2 for rain forcing 
 		{
 
@@ -2723,8 +2719,18 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		XForcing.Rain.uniform = 0;
 		XForcing.Rain.varname = "myrainforcing";
 
-		bool gpgpu = XParam.GPUDEVICE >= 0;
+		
+		bool gpgpu = 0;
+		/*if (XParam.GPUDEVICE >= 0)
+		{
+			gpgpu = 1;
+		}*/
 		readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+		/*if (gpgpu == 1 )
+		{
+			// Allocate and bind textures
+			AllocateTEX(NX, NY, XForcing.Rain.GPU, XForcing.Rain.now);
+		}*/
 
 		free(rainForcing);
 		free(xRain);
@@ -2732,7 +2738,6 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		free(tRain);
 	}
 
-	//printf("Rain forcing read = %f", XForcing.Rain.now[400]);
 
 	checkparamsanity(XParam, XForcing);
 
@@ -2778,6 +2783,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		//if Toutput, calculate the flux at x=24m;
 
+
 		// Getting the coordinate for the flux calculation
 		int bl, ixx, ibl, ix, ib, n;
 		float dist = 1000000000;
@@ -2808,25 +2814,6 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				}
 			}
 
-			/*// Verify the Validity of results
-			int bl, ixx, ibl, ix, ib, n;
-			float dist = 10^9;
-			for (ibl = 0; ibl < XParam.nblk; ibl++)
-			{
-				ib = XModel.blocks.active[ibl];
-				delta = calcres(XParam.dx, XModel.blocks.level[ib]);
-				for (ix = 0; ix < XParam.blkwidth; ix++)
-				{
-					n = memloc(XParam, ix, 1, ib);
-					if (abs(XModel.blocks.xo[ibl] + ix * delta - 24.0) < dist)
-					{
-						ixx = ix;
-						bl = ibl;
-						dist = abs(XModel.blocks.xo[ibl] + ix * delta - 24.0);
-					}
-				}
-			}*/
-
 			//Calculation of the flux at the bottom of the slope (x=24m)
 			ib = XModel.blocks.active[bl];
 			delta = calcres(XParam.dx, XModel.blocks.level[ib]);
@@ -2836,7 +2823,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				int n = memloc(XParam, ixx, iy, ib);
 				finalFlux = finalFlux + XModel.evolv.h[n] * XModel.evolv.u[n] * delta;
 			}
-			finalFlux = finalFlux * 100 * 100 / (XParam.ymax - XParam.yo);
+			finalFlux = finalFlux / (XParam.ymax - XParam.yo)*100*100;
 			Flux.push_back(finalFlux);
 			XLoop.nextoutputtime = XLoop.nextoutputtime + XParam.outputtimestep;
 			printf("\tTime = %f, Flux at bottom end of slope : %f \n", XLoop.totaltime, finalFlux);

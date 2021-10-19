@@ -48,34 +48,34 @@ jobs:
       - name: compilation of the code
         run: make
       # Running the tests
-      - name: running test 0
+      - name: running test 0,  Gaussian hump propagation
         run: ./BG_Flood
-      - name: running test 1
+      - name: running test 1, Vertical discharge in all directions, different grid adaptation
         run: |
           sed -i 's/test = 0/test = 1/' BG_param.txt
           ./BG_Flood
-      - name: running test 2
+      - name: running test 2, Gaussian wave - CPU vs GPU
         run: |
           sed -i 's/test = 1/test = 2/' BG_param.txt
           ./BG_Flood
-      - name: running test 3
+      - name: running test 3, Reduction algorithm
         run: |
           sed -i 's/test = 2/test = 3/' BG_param.txt
           ./BG_Flood
-      - name: running test 5
+      - name: running test 5, Lake at rest
         run: |
           sed -i 's/test = 3/test = 5/' BG_param.txt
           ./BG_Flood
-      - name: running test 6
+      - name: running test 6, Mass conservation on slope
         run: |
           sed -i 's/test = 5/test = 6/' BG_param.txt
           ./BG_Flood
-      - name: running test 7
+      - name: running test 7, rain mass conservation
         run: |
           sed -i 's/test = 6/test = 7/' BG_param.txt
           ./BG_Flood
-#      - name: running test 2
-#        run: |
-#          sed -i 's/test=0/test=2/' BG_param.txt
-#          ./BG_Flood
-#                - name: running test 2
+      - name: running test 8, rain input validation
+        run: |
+          sed -i 's/test = 7/test = 8/' BG_param.txt
+          ./BG_Flood
+
