@@ -130,8 +130,15 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			isfailed = (!testreduction || isfailed) ? true : false;
 
 		}
-
-
+		if (mytest == 4)
+		{
+			log("\t### Boundary Test ###");
+			bool testBound = testboundaries(T(0.0));
+			result = testboundaries ? "successful" : "failed";
+			isfailed = (!testboundaries || isfailed) ? true : false;
+			log("\t\tboundaries test: " + result);
+		}
+		
 		if (mytest == 5)
 		{
 			log("\t### Lake-at-rest Test ###");
@@ -141,6 +148,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t\tThaker lake-at-rest test: " + result);
 			testTLAR = LakeAtRest(XParam, XModel);
 			isfailed = (!testTLAR || isfailed) ? true : false;
+			log("\t\tLake-at-rest test: " + result);
 		}
 		if (mytest == 6)
 		{
@@ -2584,7 +2592,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		// Reading rain forcing from file for CPU and uniform rain
 		XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
-		printf("ok to read 1D rain forcing\n");
+		printf("1D rain forcing read\n");
 	}
 	else //non-uniform forcing
 	{
