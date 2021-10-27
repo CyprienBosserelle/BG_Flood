@@ -3044,7 +3044,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		//Reading non-unform forcing
 		bool gpgpu = 0;
-		if (XParam.GPUDEVICE != 0)
+		if (XParam.GPUDEVICE != -1)
 		{
 			gpgpu = 1;
 		}
@@ -3055,14 +3055,8 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		XForcing.Rain.uniform = 0;
 		XForcing.Rain.varname = "myrainforcing";
 
-		
-
 		readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
-		if (gpgpu == 1 )
-		{
-			// Allocate and bind textures
-			//AllocateTEX(NX, NY, XForcing.Rain.GPU, XForcing.Rain.now);
-		}
+
 
 		free(rainForcing);
 		free(xRain);
