@@ -133,12 +133,11 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		if (mytest == 4)
 		{
 			log("\t### Boundary Test ###");
-			bool testBound = testboundaries(T(0.0));
-			result = testboundaries ? "successful" : "failed";
-			isfailed = (!testboundaries || isfailed) ? true : false;
+			bool testBound = testboundaries(T(0.1));
+			result = testBound ? "successful" : "failed";
+			isfailed = (!testBound || isfailed) ? true : false;
 			log("\t\tboundaries test: " + result);
 		}
-		
 		if (mytest == 5)
 		{
 			log("\t### Lake-at-rest Test ###");
@@ -186,7 +185,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			*/
 
 			log("\t non-uniform rain forcing on slope based on Aureli2020");
-			int gpu = -1;
+			int gpu = 0;
 			raintest2 = Raintestinput(gpu);
 			result = raintest2 ? "successful" : "failed";
 			log("\t\tNon-uniform rain forcing : " + result);
@@ -1833,6 +1832,330 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 
 
+/*! \fn bool testboundaries(T maxslope)
+* \brief	Wraping function for Boundary(Param XParam, T slope, bool bottop, bool flip)
+*
+* This function test the 3 types of boundaries (0: Wall/1: Neumann/3: non-reflexive)
+* and on all orientations
+*
+*/
+template <class T> bool testboundaries(T maxslope)
+{
+	//T maxslope = 0.45; // tthe mass conservation is better with smaller slopes 
+
+	bool UnitestA, UnitestB, UnitestC, UnitestD;
+	bool ctofA, ctofB, ctofC, ctofD;
+	bool ftocA, ftocB, ftocC, ftocD;
+
+
+	std::string details;
+	int Dir, Bound_type;
+	
+	Dir = 3;
+	UnitestA = RiverOnBoundary(maxslope, Dir, Bound_type);
+
+	/*UnitestB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	UnitestC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	UnitestD = RiverVolumeAdapt(XParam, maxslope, true, true);
+
+	if (UnitestA && UnitestB && UnitestC && UnitestD)
+	{
+		log("River Volume Conservation Test: Uniform mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Uniform mesh: Failed");
+		details = UnitestA ? "successful" : "failed";
+		log("\t Uniform mesh A :" + details);
+		details = UnitestB ? "successful" : "failed";
+		log("\t Uniform mesh B :" + details);
+		details = UnitestC ? "successful" : "failed";
+		log("\t Uniform mesh C :" + details);
+		details = UnitestD ? "successful" : "failed";
+		log("\t Uniform mesh D :" + details);
+	}
+
+	XParam.minlevel = 0;
+	XParam.maxlevel = 1;
+	XParam.initlevel = 0;
+
+	//Fine to coarse
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdatpCrit = "Inrange";
+	XParam.Adapt_arg1 = "28.0";
+	XParam.Adapt_arg2 = "40.0";
+	XParam.Adapt_arg3 = "zb";
+
+	ftocA = RiverVolumeAdapt(XParam, maxslope, false, false);
+	ftocB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	ftocC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	ftocD = RiverVolumeAdapt(XParam, maxslope, true, true);
+	if (ftocA && ftocB && ftocC && ftocD)
+	{
+		log("River Volume Conservation Test: Flow from fine to coarse adapted mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Flow from fine to coarse adapted mesh: Failed");
+		details = ftocA ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh A :" + details);
+		details = ftocB ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh B :" + details);
+		details = ftocC ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh C :" + details);
+		details = ftocD ? "successful" : "failed";
+		log("\t Flow from fine to coarse adapted mesh D :" + details);
+	}
+
+	//coarse to fine
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdatpCrit = "Inrange";
+	XParam.Adapt_arg1 = "0.0";
+	XParam.Adapt_arg2 = "2.0";
+	XParam.Adapt_arg3 = "zb";
+
+	ctofA = RiverVolumeAdapt(XParam, maxslope, false, false);
+	ctofB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	ctofC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	ctofD = RiverVolumeAdapt(XParam, maxslope, true, true);
+	if (ctofA && ctofB && ctofC && ctofD)
+	{
+		log("River Volume Conservation Test: Flow from coarse to fine adapted mesh: Success");
+	}
+	else
+	{
+		log("River Volume Conservation Test: Flow from coarse to fine adapted: Failed");
+		details = ctofA ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh A :" + details);
+		details = ctofB ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh B :" + details);
+		details = ctofC ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh C :" + details);
+		details = ctofD ? "successful" : "failed";
+		log("\t Flow from coarse to fine adapted mesh D :" + details);
+	}*/
+
+	//return (UnitestA * UnitestB * UnitestC * UnitestD * ctofA * ctofB * ctofC * ctofD * ftocA * ftocB * ftocC * ftocD);
+	return(true);
+}
+
+
+/*! \fn bool RiverOnBoundary(T slope, bool bottop, bool flip)
+* \brief	Simulate a river flowing in a (steep) valley
+* and heck the Volume conservation
+*
+* This function creates a half dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
+* A wall is located in the center of the valley.
+*
+* The function can test the water volume for 4 scenario each time:
+* * flowing to the right: Dir=0;
+* * flowing to the left: Dir=1;
+* * flowing to the top: Dir=2;
+* * flowing to the bottom: Dir=3;
+*
+*/
+template <class T> bool RiverOnBoundary(T slope, int Dir, int Bound_type)
+{
+	//bool test = true;
+	// Make a Parabolic bathy
+
+	Param XParam;
+
+	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
+	Model<decltype(modeltype)> XModel; // For CPU pointers
+	Model<decltype(modeltype)> XModel_g; // For GPU pointers
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	float* dummybathy;
+
+	//Boundary conditions
+	if (Dir == 0) 
+	{
+		XForcing.right.type = Bound_type;
+		XForcing.top.type = 0;
+	}
+	else if (Dir == 1)
+	{
+		XForcing.left.type = Bound_type;
+		XForcing.bot.type = 0;
+	}
+	else if (Dir == 2)
+	{
+		XForcing.top.type = Bound_type;
+		XForcing.left.type = 0;
+	}
+	else if (Dir == 3)
+	{
+		XForcing.bot.type = Bound_type;
+		XForcing.right.type = 0;
+	}
+
+	XForcing.Bathy.push_back(bathy);
+
+	XForcing.Bathy[0].xo = 0.0;
+	XForcing.Bathy[0].yo = 0.0;
+
+	XForcing.Bathy[0].xmax = 31.0;
+	XForcing.Bathy[0].ymax = 31.0;
+	XForcing.Bathy[0].nx = 32;
+	XForcing.Bathy[0].ny = 32;
+
+	XForcing.Bathy[0].dx = 1.0;
+
+	T x, y;
+	T center = T(31.0);
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, dummybathy);
+
+
+	float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = std::numeric_limits<float>::max();
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
+			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+
+
+			dummybathy[i + j * XForcing.Bathy[0].nx] = ValleyBathy(y, x, slope, center);
+
+			maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
+
+
+		}
+	}
+
+	// Flip or rotate the bathy according to what is requested
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			if (Dir == 1) //left wise
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (Dir == 0) //right wise
+			{
+				XForcing.Bathy[0].val[(XForcing.Bathy[0].nx - 1 - i) + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (Dir == 3) //bottom wise
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+			else if (Dir == 2) //top wise
+			{
+				XForcing.Bathy[0].val[i + (XForcing.Bathy[0].ny - 1 - j) * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+		}
+	}
+
+	free(dummybathy);
+
+	// Overrule whatever is set in the river forcing
+	T Q = T(1.0);
+
+	double rivery = (Dir == 2)? 6.0 : 25.0; //Dir=2 =>topward
+	double riverx = (Dir == 1)? 6.0 : 25.0; //Dir=1 =>leftward
+	
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = riverx - 1.0;
+	thisriver.xend = riverx + 1.0;
+	thisriver.ystart = rivery - 1.0;
+	thisriver.yend = rivery + 1.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	XParam.zsoffset = 0.2;
+	XParam.endtime = 20.0;
+
+	XParam.outputtimestep = XParam.endtime;
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	InitSave2Netcdf(XParam, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+	T initVol = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				initVol = initVol + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	T TheoryInput = Q * XParam.endtime;
+
+
+	T SimulatedVolume = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+	InitSave2Netcdf(XParam, XModel);
+
+	SimulatedVolume = SimulatedVolume - initVol;
+
+	T error = abs(SimulatedVolume - TheoryInput);
+
+	return error / TheoryInput < 0.05;
+
+}
+
+
+
 /*! \fn bool LakeAtRest(Param XParam, Model<T> XModel)
 *	This function simulates the first predictive step and check whether the lake at rest is preserved
 *	otherwise it prints out to screen the cells (and neighbour) where the test fails
@@ -2409,23 +2732,25 @@ bool Raintestinput(int gpu)
 	std::string result;
 	int dim_flux;
 	std::vector<float> Flux1D, Flux3DUni, Flux3D, Flux_obs;
-	float diff = 0.0;
-	float ref = 0.0;
+	float diff, ref, error;
 	
-	//Comparison between the 1D forcing and the 3D hommgeneous forcing
+	/*//Comparison between the 1D forcing and the 3D hommgeneous forcing
 	Flux1D = Raintestmap(gpu, 1, -0.03);
 	Flux3DUni = Raintestmap(gpu, 31, -0.03);
+	ref = 0.0;
+	diff = 0.0;
 	for (int i = 0; i < Flux1D.size(); i++)
 	{
 		diff = diff + Flux1D[i] - Flux3DUni[i];
 		ref = ref + Flux1D[i];
 	}
 
-	printf("Error %f \n", diff/ref);
+	error = abs(diff / ref);
+	printf("Error %f \n", error);
 
-	modelgood1 = abs(diff / ref) < 0.005;
+	modelgood1 = error < 0.005;
 	result = modelgood1 ? "successful" : "failed";
-	log("\t\tRain test input 1D vs 3D homogeneous: " + result);
+	log("\t\tRain test input 1D vs 3D homogeneous: " + result);*/
 
 	//Comparison between the 3D forcing and the observations from Iwagaki1955.
 
@@ -2438,16 +2763,18 @@ bool Raintestinput(int gpu)
 		32.696472, 30.718161, 89.497993, 58.156021 };
 
 	Flux3D = Raintestmap(gpu, 3, -0.03);
-
+	ref = 0.0;
+	diff = 0.0;
 	for (int i = 0; i < Flux3D.size(); i++)
 	{
 		diff = diff + Flux_obs[i] - Flux3D[i];
 		ref = ref + Flux3D[i];
 	}
 
-	printf("Error %f \n", diff / ref);
+	error = abs(diff / ref);
+	printf("Error %f \n", error);
 
-	modelgood2 = abs(diff / ref) < 0.00005;
+	modelgood2 = error < 0.00005;
 	result = modelgood2 ? "successful" : "failed";
 	log("\t\tRain test input 3D map vs Iwagaki1955: " + result);
 
@@ -2716,21 +3043,25 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		else { printf("Error in rain forcing dimension (should be in [1,3,31])\n"); }
 
 		//Reading non-unform forcing
+		bool gpgpu = 0;
+		if (XParam.GPUDEVICE != 0)
+		{
+			gpgpu = 1;
+		}
+
+		InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+
 		XForcing.Rain = readfileinfo("rainTemp.nc", XForcing.Rain);
 		XForcing.Rain.uniform = 0;
 		XForcing.Rain.varname = "myrainforcing";
 
 		
-		bool gpgpu = 0;
-		if (XParam.GPUDEVICE >= 0)
-		{
-			gpgpu = 1;
-		}
+
 		readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		if (gpgpu == 1 )
 		{
 			// Allocate and bind textures
-			AllocateTEX(NX, NY, XForcing.Rain.GPU, XForcing.Rain.now);
+			//AllocateTEX(NX, NY, XForcing.Rain.GPU, XForcing.Rain.now);
 		}
 
 		free(rainForcing);
