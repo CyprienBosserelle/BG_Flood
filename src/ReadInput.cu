@@ -685,6 +685,17 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
+
+	paramvec = { "AOI","aoipoly" };
+	parametervalue = findparameter(paramvec, line);
+	//parameterstr = "bathy";
+	//parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		forcing.AOI.file= parametervalue;
+		forcing.AOI.active = true;
+	}
+
 	/*parameterstr = "bathyfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())

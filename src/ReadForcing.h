@@ -42,5 +42,9 @@ template <class T> void readbathyASCzb(std::string filename, int nx, int ny, T*&
 
 template <class T> void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, T*& Ux, T* Uo, T* Un);
 
+std::vector<std::string> DelimLine(std::string line, int n, char delim);
+std::vector<std::string> DelimLine(std::string line, int n);
+Polygon readPolygon(std::string filename);
+
 // End of global definition
 #endif

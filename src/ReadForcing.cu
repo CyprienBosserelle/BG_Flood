@@ -260,6 +260,16 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	}
 
 	//======================
+	// Polygon data
+	if (!XForcing.AOI.file.empty())
+	{
+		log("\nRead AOI polygon");
+		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
+		//
+		
+	}
+
+	//======================
 	// Done
 	//======================
 }
@@ -1017,6 +1027,93 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 }
 
 
+
+/*! \fn void read
+* Read polygon
+*
+*/
+Polygon readPolygon(std::string filename)
+{
+	Polygon poly;
+	Vertex v;
+
+	std::string line;
+	std::vector<std::string> lineelements;
+
+	std::ifstream fs(filename);
+
+	if (fs.fail()) {
+		//std::cerr << filename << "ERROR: Wind file could not be opened" << std::endl;
+		log("ERROR: Polygon file could not be opened : " + filename);
+		return poly;
+	}
+	
+	while (std::getline(fs, line))
+	{
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//
+			//line.substr(0, 1).compare(">") != 0
+			//by default we expect tab delimitation
+			lineelements = DelimLine(line, 2);
+			v.x = std::stod(lineelements[0]);
+			v.y = std::stod(lineelements[1]);
+
+			poly.vertices.push_back(v);
+
+		}
+	}
+
+
+	return poly;
+}
+
+
+std::vector<std::string> DelimLine(std::string line, int n, char delim)
+{
+	std::vector<std::string> lineelements;
+	lineelements = split(line, delim);
+	if (lineelements.size() != n)
+	{
+		lineelements.clear();
+
+
+	}
+	return lineelements;
+}
+
+std::vector<std::string> DelimLine(std::string line, int n)
+{
+	std::vector<std::string> LeTab;
+	std::vector<std::string> LeSpace;
+	std::vector<std::string> LeComma;
+	
+	//std::vector<std::string> lineelements;
+
+	LeTab = DelimLine(line, n, '\t');
+	LeSpace = DelimLine(line, n, ' ');
+	LeComma = DelimLine(line, n, ',');
+	
+	if (LeTab.size() == n)
+	{
+		return LeTab;
+	}
+	if (LeSpace.size() == n)
+	{
+		return LeSpace;
+	}
+	if (LeComma.size() == n)
+	{
+		return LeComma;
+	}
+
+	LeTab.clear();
+
+	return LeTab;
+		
+}
+
 /*! \fn void readforcingdata(int step,T forcing)
 * Read static forcing data 
 *
@@ -1131,8 +1228,8 @@ template<class T> T readforcinghead(T ForcingParam)
 			readbathyHeadMD(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.grdalpha);
 			ForcingParam.xo = 0.0;
 			ForcingParam.yo = 0.0;
-			ForcingParam.xmax = ForcingParam.xo + (ForcingParam.nx - 1)* ForcingParam.dx;
-			ForcingParam.ymax = ForcingParam.yo + (ForcingParam.ny - 1)* ForcingParam.dx;
+			ForcingParam.xmax = ForcingParam.xo + (double(ForcingParam.nx) - 1.0) * ForcingParam.dx;
+			ForcingParam.ymax = ForcingParam.yo + (double(ForcingParam.ny) - 1.0) * ForcingParam.dx;
 
 		}
 		if (ForcingParam.extension.compare("nc") == 0)

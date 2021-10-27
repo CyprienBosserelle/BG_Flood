@@ -96,8 +96,9 @@ public:
 
 class AOIinfo {
 public:
-	std::string inputfile;
+	std::string file;
 	Polygon poly;
+	bool active=false;
 };
 
 

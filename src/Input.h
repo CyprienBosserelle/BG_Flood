@@ -82,7 +82,7 @@ public:
 class Polygon {
 public:
 	double xmin, xmax, ymin, ymax;
-	std::vector<Vertex> vertex;
+	std::vector<Vertex> vertices;
 };
 
 // End of global definition
