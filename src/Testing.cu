@@ -3057,7 +3057,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 
-		readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+		//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 
 
 		free(rainForcing);
@@ -3141,6 +3141,9 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 					CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 				}
 			}
+
+			Save2Netcdf(XParam, XLoop, XModel);
+			
 
 			//Calculation of the flux at the bottom of the slope (x=24m)
 			ib = XModel.blocks.active[bl];
