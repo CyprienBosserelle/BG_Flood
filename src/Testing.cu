@@ -2734,7 +2734,8 @@ bool Raintestinput(int gpu)
 	std::vector<float> Flux1D, Flux3DUni, Flux3D, Flux_obs;
 	float diff, ref, error;
 	
-	/*//Comparison between the 1D forcing and the 3D hommgeneous forcing
+	/*
+	//Comparison between the 1D forcing and the 3D hommgeneous forcing
 	Flux1D = Raintestmap(gpu, 1, -0.03);
 	Flux3DUni = Raintestmap(gpu, 31, -0.03);
 	ref = 0.0;
@@ -3049,11 +3050,12 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			gpgpu = 1;
 		}
 
-		InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
-
 		XForcing.Rain = readfileinfo("rainTemp.nc", XForcing.Rain);
 		XForcing.Rain.uniform = 0;
 		XForcing.Rain.varname = "myrainforcing";
+		
+
+		InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 
 		readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 
@@ -3105,7 +3107,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
-		//printf("\tTime = %f \n", XLoop.totaltime);
+		printf("\tTime = %f \n", XLoop.totaltime);
 
 		//if Toutput, calculate the flux at x=24m;
 
