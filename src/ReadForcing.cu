@@ -265,6 +265,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		log("\nRead AOI polygon");
 		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
+		
+
 		//
 		
 	}
@@ -1063,6 +1065,35 @@ Polygon readPolygon(std::string filename)
 			poly.vertices.push_back(v);
 
 		}
+	}
+
+
+	size_t nv = poly.vertices.size();
+
+	// Make sure ploygon is closed
+	double epsilon = std::numeric_limits<double>::epsilon() * 1000.0;
+
+	if ( !(abs(poly.vertices[0].x - poly.vertices[nv - 1].x) < epsilon && abs(poly.vertices[0].y - poly.vertices[nv - 1].y) < epsilon) )
+	{
+		v.x = poly.vertices[0].x;
+		v.y = poly.vertices[0].y;
+
+		poly.vertices.push_back(v);
+	}
+
+
+	poly.xmin = poly.vertices[0].x;
+	poly.xmax = poly.vertices[0].x;
+
+	poly.ymin = poly.vertices[0].y;
+	poly.ymax = poly.vertices[0].y;
+
+	for (int i = 0; i < poly.vertices.size(); i++)
+	{
+		poly.xmin = utils::min(poly.vertices[i].x, poly.xmin);
+		poly.xmax = utils::max(poly.vertices[i].x, poly.xmax);
+		poly.ymin = utils::min(poly.vertices[i].y, poly.ymin);
+		poly.ymax = utils::max(poly.vertices[i].y, poly.ymax);
 	}
 
 
