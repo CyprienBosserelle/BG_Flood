@@ -104,15 +104,15 @@ template <class T> int wn_PnPoly(T Px, T Py, Polygon Poly)
 	int    wn = 0;    // the  winding number counter
 
 	// loop through all edges of the polygon
-	for (int i = 0; i < (Poly.vertex.size() - 1); i++) {   // edge from V[i] to  V[i+1]
-		if (Poly.vertex[i].y <= Py) {          // start y <= P.y
-			if (Poly.vertex[i + 1].y > Py)      // an upward crossing
-				if (isLeft(Poly.vertex[i].x, Poly.vertex[i].y, Poly.vertex[i + 1].x, Poly.vertex[i + 1].y, Px, Py) > 0)  // P left of  edge
+	for (int i = 0; i < (Poly.vertices.size() - 1); i++) {   // edge from V[i] to  V[i+1]
+		if (Poly.vertices[i].y <= Py) {          // start y <= P.y
+			if (Poly.vertices[i + 1].y > Py)      // an upward crossing
+				if (isLeft(Poly.vertices[i].x, Poly.vertices[i].y, Poly.vertices[i + 1].x, Poly.vertices[i + 1].y, Px, Py) > 0)  // P left of  edge
 					++wn;            // have  a valid up intersect
 		}
 		else {                        // start y > P.y (no test needed)
-			if (Poly.vertex[i + 1].y <= Py)     // a downward crossing
-				if (isLeft(Poly.vertex[i].x, Poly.vertex[i].y, Poly.vertex[i + 1].x, Poly.vertex[i + 1].y, Px, Py) < 0)  // P right of  edge
+			if (Poly.vertices[i + 1].y <= Py)     // a downward crossing
+				if (isLeft(Poly.vertices[i].x, Poly.vertices[i].y, Poly.vertices[i + 1].x, Poly.vertices[i + 1].y, Px, Py) < 0)  // P right of  edge
 					--wn;            // have  a valid down intersect
 		}
 	}
@@ -163,10 +163,10 @@ bool SegmentIntersect(Polygon P, Polygon Q)
 
 	eps = 1e-9;
 
-	p = P.vertex[0];
-	q = Q.vertex[0];
-	r = VertSub(P.vertex[1], P.vertex[0]);
-	s = VertSub(Q.vertex[1], Q.vertex[0]);
+	p = P.vertices[0];
+	q = Q.vertices[0];
+	r = VertSub(P.vertices[1], P.vertices[0]);
+	s = VertSub(Q.vertices[1], Q.vertices[0]);
 	
 	qmp= VertSub(q, p);
 
@@ -226,21 +226,21 @@ bool SegmentIntersect(Polygon P, Polygon Q)
 bool PolygonIntersect(Polygon P, Polygon Q)
 {
 	bool intersect=false;
-	for (int i = 0; i < (P.vertex.size() - 1); i++)
+	for (int i = 0; i < (P.vertices.size() - 1); i++)
 	{
-		for (int j = 0; j < (Q.vertex.size() - 1); j++)
+		for (int j = 0; j < (Q.vertices.size() - 1); j++)
 		{
 			// build segments
 			Polygon Pseg, Qseg;
-			Pseg.vertex = { P.vertex[i], P.vertex[i + 1] };
-			Qseg.vertex = { Q.vertex[i], Q.vertex[i + 1] };
+			Pseg.vertices = { P.vertices[i], P.vertices[i + 1] };
+			Qseg.vertices = { Q.vertices[i], Q.vertices[i + 1] };
 
 			intersect = SegmentIntersect(Pseg, Qseg);
 
 			if (intersect)
 			{
-				i = P.vertex.size();
-				j = Q.vertex.size();
+				i = P.vertices.size();
+				j = Q.vertices.size();
 				break;
 			}
 
@@ -284,11 +284,11 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 			vxTL.x = xo; vxTL.y = yo + blkwidth * dx;
 			vxTR.x = xo + blkwidth * dx; vxTR.y = yo + blkwidth * dx;
 
-			Polyblock.vertex.push_back(vxBL);
-			Polyblock.vertex.push_back(vxBR);
-			Polyblock.vertex.push_back(vxTR);
-			Polyblock.vertex.push_back(vxTL);
-			Polyblock.vertex.push_back(vxBL);
+			Polyblock.vertices.push_back(vxBL);
+			Polyblock.vertices.push_back(vxBR);
+			Polyblock.vertices.push_back(vxTR);
+			Polyblock.vertices.push_back(vxTL);
+			Polyblock.vertices.push_back(vxBL);
 
 			insidepoly = PolygonIntersect(PolyBlock, Poly);
 		}

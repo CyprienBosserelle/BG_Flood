@@ -31,6 +31,8 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	int nmask = 0;
 	//int mloc = 0;
 
+	bool insidepoly = false;
+
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
 	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
@@ -40,6 +42,9 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	{
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
+
+			insidepoly = blockinpoly(XParam.xo + nblkx * levdx, XParam.xo + nblkx * levdx, levdx, XParam.blksize, XForcing.AOI.poly);
+
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
@@ -89,7 +94,7 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 				}
 			}
-			if (nmask < (XParam.blkwidth* XParam.blkwidth))
+			if ((nmask < (XParam.blkwidth* XParam.blkwidth)) || insidepoly)
 				nblk++;
 		}
 	}
@@ -106,7 +111,7 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 	log("\nInitializing mesh");
 	int nblk;
 
-	nblk= CalcInitnblk(XParam, XForcing);
+	nblk = CalcInitnblk(XParam, XForcing);
 		
 	XParam.nblk = nblk;
 	// allocate a few extra blocks for adaptation
