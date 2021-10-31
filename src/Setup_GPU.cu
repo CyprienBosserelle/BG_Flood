@@ -2,7 +2,6 @@
 #include "Setup_GPU.h"
 
 
-
 template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &XForcing, Model<T>& XModel_g)
 {
 	if (XParam.GPUDEVICE >= 0)
@@ -83,11 +82,29 @@ template void SetupGPU<float>(Param XParam, Model<float> XModel, Forcing<float>&
 template void SetupGPU<double>(Param XParam, Model<double> XModel, Forcing<float>& XForcing, Model<double>& XModel_g);
 
 
+//from helper_cuda.h
+#define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
+
+template <typename T>
+void check(T result, char const* const func, const char* const file,
+	int const line)
+{
+	if (result) {
+		fprintf(stderr, "CUDA error at %s:%d code=%d(%s) \"%s\" \n", file, line,
+			static_cast<unsigned int>(result), cudaGetErrorEnum(result), func);
+		exit(EXIT_FAILURE);
+	}
+}
+
 void CUDA_CHECK(cudaError CUDerr)
 {
 
+	// This will output the proper CUDA error strings in the event
+// that a CUDA host call returns an error
 
-	if (cudaSuccess != CUDerr) {
+	checkCudaErrors(CUDerr);
+
+	/*if (cudaSuccess != CUDerr) {
 
 		fprintf(stderr, "Cuda error in file '%s' in line %i : %s.\n", \
 
@@ -95,7 +112,7 @@ void CUDA_CHECK(cudaError CUDerr)
 
 		exit(EXIT_FAILURE);
 
-	}
+	}*/
 }
 
 
