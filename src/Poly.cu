@@ -99,6 +99,10 @@ template <class T> int wn_PnPoly(T Px, T Py, T* Vx, T* Vy, unsigned int n)
 	return wn;
 }
 
+// wn_PnPoly(): winding number test for a point in a polygon
+//      Input:   P = a point,
+//               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
+//      Return:  wn = the winding number (=0 only when P is outside)
 template <class T> int wn_PnPoly(T Px, T Py, Polygon Poly)
 {
 	int    wn = 0;    // the  winding number counter
@@ -107,17 +111,19 @@ template <class T> int wn_PnPoly(T Px, T Py, Polygon Poly)
 	for (int i = 0; i < (Poly.vertices.size() - 1); i++) {   // edge from V[i] to  V[i+1]
 		if (Poly.vertices[i].y <= Py) {          // start y <= P.y
 			if (Poly.vertices[i + 1].y > Py)      // an upward crossing
-				if (isLeft(Poly.vertices[i].x, Poly.vertices[i].y, Poly.vertices[i + 1].x, Poly.vertices[i + 1].y, Px, Py) > 0)  // P left of  edge
+				if (isLeft(T(Poly.vertices[i].x), T(Poly.vertices[i].y), T(Poly.vertices[i + 1].x), T(Poly.vertices[i + 1].y), Px, Py) > 0)  // P left of  edge
 					++wn;            // have  a valid up intersect
 		}
 		else {                        // start y > P.y (no test needed)
 			if (Poly.vertices[i + 1].y <= Py)     // a downward crossing
-				if (isLeft(Poly.vertices[i].x, Poly.vertices[i].y, Poly.vertices[i + 1].x, Poly.vertices[i + 1].y, Px, Py) < 0)  // P right of  edge
+				if (isLeft(T(Poly.vertices[i].x), T(Poly.vertices[i].y), T(Poly.vertices[i + 1].x), T(Poly.vertices[i + 1].y), Px, Py) < 0)  // P right of  edge
 					--wn;            // have  a valid down intersect
 		}
 	}
 	return wn;
 }
+template int wn_PnPoly<float>(float Px, float Py, Polygon Poly);
+template int wn_PnPoly<double>(double Px, double Py, Polygon Poly);
 //===================================================================
 
 Vertex VertAdd(Vertex A, Vertex B)
@@ -257,7 +263,7 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 {
 	bool insidepoly = false;
 	// First check if it isinmside the bounding box
-	insidepoly = OBBdetect(xo, xo + dx * blkwidth, yo, yo + dx * blkwidth, Poly.xmin, Poly.xmax, Poly.ymin, Poly.ymax);
+	insidepoly = OBBdetect(xo, xo + dx * blkwidth, yo, yo + dx * blkwidth, T(Poly.xmin), T(Poly.xmax), T(Poly.ymin), T(Poly.ymax));
 
 	if (insidepoly)
 	{
@@ -290,14 +296,15 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 			Polyblock.vertices.push_back(vxTL);
 			Polyblock.vertices.push_back(vxBL);
 
-			insidepoly = PolygonIntersect(PolyBlock, Poly);
+			insidepoly = PolygonIntersect(Polyblock, Poly);
 		}
 
 	}
 
 	return insidepoly;
 }
-
+template bool blockinpoly<float>(float xo, float yo, float dx, int blkwidth, Polygon Poly);
+template bool blockinpoly<double>(double xo, double yo, double dx, int blkwidth, Polygon Poly);
 //template <class T> Poly<T> ReadPoly();
 
 
