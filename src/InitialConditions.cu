@@ -565,8 +565,11 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 				double levdx = calcres(XParam.dx, XBlock.level[ib]);
 				double x = XParam.xo + XBlock.xo[ib] + i * levdx;
 				double y = XParam.yo + XBlock.yo[ib] + j * levdx;
-
-				wn = wn_PnPoly(x, y, XForcing.AOI.poly);
+				wn = 1;
+				if (XForcing.AOI.active)
+				{
+					wn = wn_PnPoly(x, y, XForcing.AOI.poly);
+				}
 				n = memloc(XParam, i, j, ib);
 				if (zb[n] < XParam.mask && wn != 0)
 				{

@@ -278,7 +278,7 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 		wnTL = wn_PnPoly(xo, yo + blkwidth * dx, Poly);
 		wnTR = wn_PnPoly(xo + blkwidth * dx, yo + blkwidth * dx, Poly);
 
-		insidepoly = (wnBL > 0 || wnBR > 0 || wnTL > 0 || wnTR > 0);
+		insidepoly = (wnBL != 0 || wnBR != 0 || wnTL != 0 || wnTR != 0);
 
 		if (!insidepoly)
 		{

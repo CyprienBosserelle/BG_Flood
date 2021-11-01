@@ -42,9 +42,11 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	{
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
-
-			insidepoly = blockinpoly(XParam.xo + nblkx * levdx, XParam.xo + nblkx * levdx, levdx, XParam.blksize, XForcing.AOI.poly);
-
+			insidepoly = true;
+			if (XForcing.AOI.active)
+			{
+				insidepoly = blockinpoly(XParam.xo + nblkx * XParam.blkwidth * levdx, XParam.yo + nblky * XParam.blkwidth * levdx, levdx, XParam.blksize, XForcing.AOI.poly);
+			}
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
@@ -209,7 +211,7 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 	int blkid = 0;
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
-	bool insidepoly = false;
+	bool insidepoly = true;
 	
 	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
 	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
@@ -218,7 +220,11 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 	{
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
-			insidepoly = blockinpoly(XParam.xo + nblkx * levdx, XParam.xo + nblkx * levdx, levdx, XParam.blksize, XForcing.AOI.poly);
+			insidepoly = true;
+			if (XForcing.AOI.active)
+			{
+				insidepoly = blockinpoly(XParam.xo + nblkx * XParam.blkwidth * levdx, XParam.yo + nblky * XParam.blkwidth * levdx, levdx, XParam.blksize, XForcing.AOI.poly);
+			}
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
