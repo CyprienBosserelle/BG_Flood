@@ -133,7 +133,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		if (mytest == 4)
 		{
 			log("\t### Boundary Test ###");
-			bool testBound = testboundaries(T(0.1));
+			bool testBound = testboundaries(XParam, T(0.1));
 			result = testBound ? "successful" : "failed";
 			isfailed = (!testBound || isfailed) ? true : false;
 			log("\t\tboundaries test: " + result);
@@ -1839,7 +1839,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 * and on all orientations
 *
 */
-template <class T> bool testboundaries(T maxslope)
+template <class T> bool testboundaries(Param XParam,T maxslope)
 {
 	//T maxslope = 0.45; // tthe mass conservation is better with smaller slopes 
 
@@ -1851,8 +1851,10 @@ template <class T> bool testboundaries(T maxslope)
 	std::string details;
 	int Dir, Bound_type;
 	
+	XParam.GPUDEVICE = 0;
 	Dir = 3;
-	UnitestA = RiverOnBoundary(maxslope, Dir, Bound_type);
+	Bound_type = 0;
+	UnitestA = RiverOnBoundary(XParam, maxslope, Dir, Bound_type);
 
 	/*UnitestB = RiverVolumeAdapt(XParam, maxslope, true, false);
 	UnitestC = RiverVolumeAdapt(XParam, maxslope, false, true);
@@ -1936,7 +1938,7 @@ template <class T> bool testboundaries(T maxslope)
 	}*/
 
 	//return (UnitestA * UnitestB * UnitestC * UnitestD * ctofA * ctofB * ctofC * ctofD * ftocA * ftocB * ftocC * ftocD);
-	return(true);
+	return(UnitestA);
 }
 
 
@@ -1954,12 +1956,14 @@ template <class T> bool testboundaries(T maxslope)
 * * flowing to the bottom: Dir=3;
 *
 */
-template <class T> bool RiverOnBoundary(T slope, int Dir, int Bound_type)
+template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound_type)
 {
 	//bool test = true;
 	// Make a Parabolic bathy
 
-	Param XParam;
+	//Param XParam;
+
+	//XParam.GPUDEVICE = -1;
 
 	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
 	Model<decltype(modeltype)> XModel; // For CPU pointers
@@ -1972,22 +1976,22 @@ template <class T> bool RiverOnBoundary(T slope, int Dir, int Bound_type)
 	float* dummybathy;
 
 	//Boundary conditions
-	if (Dir == 0) 
+	if (Dir == 0) //To right
 	{
 		XForcing.right.type = Bound_type;
 		XForcing.top.type = 0;
 	}
-	else if (Dir == 1)
+	else if (Dir == 1) //To left
 	{
 		XForcing.left.type = Bound_type;
 		XForcing.bot.type = 0;
 	}
-	else if (Dir == 2)
+	else if (Dir == 2) //To top
 	{
 		XForcing.top.type = Bound_type;
 		XForcing.left.type = 0;
 	}
-	else if (Dir == 3)
+	else if (Dir == 3) //To bottom
 	{
 		XForcing.bot.type = Bound_type;
 		XForcing.right.type = 0;
@@ -2014,8 +2018,8 @@ template <class T> bool RiverOnBoundary(T slope, int Dir, int Bound_type)
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, dummybathy);
 
 
-	float maxtopo = std::numeric_limits<float>::min();
-	float mintopo = std::numeric_limits<float>::max();
+	//float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = 1000000000000;
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
@@ -2025,9 +2029,8 @@ template <class T> bool RiverOnBoundary(T slope, int Dir, int Bound_type)
 
 
 			dummybathy[i + j * XForcing.Bathy[0].nx] = ValleyBathy(y, x, slope, center);
-
-			maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
-
+			mintopo = utils::min(dummybathy[i + j * XForcing.Bathy[0].nx], mintopo);
+			//maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
 
 		}
 	}
@@ -2092,9 +2095,9 @@ template <class T> bool RiverOnBoundary(T slope, int Dir, int Bound_type)
 
 	XParam.dx = XForcing.Bathy[0].dx;
 
-	XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
-	XParam.zsoffset = 0.2;
-	XParam.endtime = 20.0;
+	//XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	//XParam.zsoffset = 0.2;
+	XParam.endtime = 100.0;
 
 	XParam.outputtimestep = XParam.endtime;
 
@@ -2144,11 +2147,15 @@ template <class T> bool RiverOnBoundary(T slope, int Dir, int Bound_type)
 			}
 		}
 	}
-	InitSave2Netcdf(XParam, XModel);
 
 	SimulatedVolume = SimulatedVolume - initVol;
 
 	T error = abs(SimulatedVolume - TheoryInput);
+
+	printf("error : %f \n", error);
+	printf("Theory input : %f \n", TheoryInput);
+	printf("return : %f \n", (error/TheoryInput));
+
 
 	return error / TheoryInput < 0.05;
 
@@ -2734,7 +2741,7 @@ bool Raintestinput(int gpu)
 	std::vector<float> Flux1D, Flux3DUni, Flux3D, Flux_obs;
 	float diff, ref, error;
 	
-	/*
+	
 	//Comparison between the 1D forcing and the 3D hommgeneous forcing
 	Flux1D = Raintestmap(gpu, 1, -0.03);
 	Flux3DUni = Raintestmap(gpu, 31, -0.03);
@@ -2751,7 +2758,7 @@ bool Raintestinput(int gpu)
 
 	modelgood1 = error < 0.005;
 	result = modelgood1 ? "successful" : "failed";
-	log("\t\tRain test input 1D vs 3D homogeneous: " + result);*/
+	log("\t\tRain test input 1D vs 3D homogeneous: " + result);
 
 	//Comparison between the 3D forcing and the observations from Iwagaki1955.
 
@@ -3107,7 +3114,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
-		printf("\tTime = %f \n", XLoop.totaltime);
+		//printf("\tTime = %f \n", XLoop.totaltime);
 
 		//if Toutput, calculate the flux at x=24m;
 

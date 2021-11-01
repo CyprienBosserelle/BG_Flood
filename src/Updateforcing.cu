@@ -300,37 +300,16 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 	else
 	{
 		Rainhh = T(interpDyn2BUQ(x, y, Rain.GPU));
-		if (ix == 5 && iy == 5 && ib == 1)
-		{
-			printf("Rain in GPU function: %f  mm/h \n", Rainhh);
-		}
-
 	}
 
 	
-
 
 	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt,T(0.0)); // convert from mm/hrs to m/s
 
 	
-	
-	if (ix == 5 && iy == 5 && ib == 1)
-	{
-		printf("Rain in GPU function: %f m/s \n", Rainhh);
-	}
-
-	if (ix == 5 && iy == 5 && ib == 1)
-	{
-		printf("XEv.h in GPU function: %f before rain \n", XEv.h[i]);
-		printf("XEv.u in GPU function: %f before rain \n", XEv.u[i]);
-	}
 	XEv.h[i] += Rainhh * XBlock.activeCell[i];
 	XEv.zs[i] += Rainhh * XBlock.activeCell[i];
-	if (ix == 5 && iy == 5 && ib == 1)
-	{
-		printf("XEv.h in GPU function: %f after rain \n", XEv.h[i]);
-		printf("XEv.u in GPU function: %f before rain \n", XEv.u[i]);
-	}
+
 }
 template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __global__ void AddrainforcingImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
