@@ -62,27 +62,28 @@ BG_flood user interface consists in a text file, associating key words to user c
 &nbsp;
  
 ## List of the Forcings
-|_Reference_|_Keys_|_default_|_Explanation_|
-|----|---|---|---|
-|left|"left","leftbndfile","leftbnd"|Def|FFF|
-|right|"right","rightbndfile","rightbnd"|Def|FFF|
-|top|"top","topbndfile","topbnd"|Def|FFF|
-|bot|"bot","botbndfile","botbnd","bottom"|Def|FFF|
-|deform|"deform"|Def|FFF|
-|Atmp|"Atmp","atmpfile"|Def|FFF|
-|Rain|"Rain","rainfile"|Def|FFF|
+|_Reference_|_Keys_|_default_|_example_|_Explanation_|
+|----|---|---|---|---|
+|Bathy|"Bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEM"|None|EEE|FFF|
+|left|"left","leftbndfile","leftbnd"|None|EEE|FFF|
+|right|"right","rightbndfile","rightbnd"|None|EEE|FFF|
+|top|"top","topbndfile","topbnd"|None|EEE|FFF|
+|bot|"bot","botbndfile","botbnd","bottom"|None|EEE|FFF|
+|deform|"deform"|None|EEE|FFF|
+|Atmp|"Atmp","atmpfile"|None|EEE|FFF|
+|Rain|"Rain","rainfile"|None|EEE|FFF|
 ---
 &nbsp;
  
 ## List of the Unidentificated entries
-|_Reference_|_Keys_|_default_|_Explanation_|
-|----|---|---|---|
-|velthreshold|"velthreshold","vthresh","vmax","velmax"|NNdef|NNNN|
-|Adaptation|"Adaptation"|NNdef|NNNN|
-|bathy|"bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEM"|NNdef|NNNN|
-|bathymetry|"bathymetry"|NNdef|NNNN|
-|depfile|"depfile"|NNdef|NNNN|
-|cfmap|"cfmap","roughnessmap"|NNdef|NNNN|
-|Adaptation|"Adaptation"|NNdef|NNNN|
+|_Reference_|_Keys_|
+|----|---|
+|velthreshold|"velthreshold","vthresh","vmax","velmax"|
+|Adaptation|"Adaptation"|
+|bathymetry|"bathymetry"|
+|depfile|"depfile"|
+|cfmap|"cfmap","roughnessmap"|
+|Adaptation|"Adaptation"|
+---
  
 *Note* : The keys are not case sensitive.
