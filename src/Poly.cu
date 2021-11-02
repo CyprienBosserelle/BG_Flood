@@ -239,7 +239,7 @@ bool PolygonIntersect(Polygon P, Polygon Q)
 			// build segments
 			Polygon Pseg, Qseg;
 			Pseg.vertices = { P.vertices[i], P.vertices[i + 1] };
-			Qseg.vertices = { Q.vertices[i], Q.vertices[i + 1] };
+			Qseg.vertices = { Q.vertices[j], Q.vertices[j + 1] };
 
 			intersect = SegmentIntersect(Pseg, Qseg);
 
@@ -251,6 +251,7 @@ bool PolygonIntersect(Polygon P, Polygon Q)
 			}
 
 		}
+		
 		
 	}
 
@@ -264,21 +265,27 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 	bool insidepoly = false;
 
 
-	bool test = test_wninpoly();
 	
-	printf("wn_inpolytest=%s\n", test ? "true" : "false");
 
-	test = test_intersectpoly();
-	printf("test_intersectpoly=%s\n", test ? "true" : "false");
 
-	test = test_SegmentIntersect();
-	printf("test_SegmentIntersect=%s\n", test ? "true" : "false");
+	//bool test = test_wninpoly();
+
+
+	
+	//printf("wn_inpolytest=%s\n", test ? "true" : "false");
+
+	//test = test_intersectpoly();
+	//printf("test_intersectpoly=%s\n", test ? "true" : "false");
+
+	//test = test_SegmentIntersect();
+	//printf("test_SegmentIntersect=%s\n", test ? "true" : "false");
 
 	// First check if it isinmside the bounding box
 	insidepoly = OBBdetect(xo, xo + dx * blkwidth, yo, yo + dx * blkwidth, T(Poly.xmin), T(Poly.xmax), T(Poly.ymin), T(Poly.ymax));
 
 	if (insidepoly)
 	{
+		//printf("xo=%f, yo=%f, dx=%f, blkwidth=%d\n", xo, yo, dx, blkwidth);
 		// being in the bounding box doesn't say much
 
 		// Is there any corner of the block inside the polygon?
@@ -357,8 +364,8 @@ bool test_SegmentIntersect()
 
 	double eps = 0.0001;
 
-	e.x = a.x + eps; e.y = a.y + eps;
-	f.x = b.x + eps; f.y = b.y + eps;
+	e.x = a.x + eps; e.y = a.y ;
+	f.x = b.x + eps; f.y = b.y;
 
 	P.vertices.push_back(a);
 	P.vertices.push_back(b);
@@ -382,7 +389,7 @@ bool test_intersectpoly()
 	bool out = false;
 	Polygon Polyblock;
 
-	Polygon PolyTri;
+	Polygon PolyTriA, PolyTriB;
 	Vertex vxBL, vxBR, vxTL, vxTR, TriA, TriB, TriC;
 	vxBL.x = 0.0; vxBL.y = 0.0;
 	vxBR.x = 1.0; vxBR.y = 0.0;
@@ -399,14 +406,14 @@ bool test_intersectpoly()
 
 	TriB.x = -1.0; TriB.y = -1.0;
 
-	TriB.x = 0.8; TriB.y = -0.8;
+	TriC.x = 0.8; TriC.y = -0.8;
 
-	PolyTri.vertices.push_back(TriA);
-	PolyTri.vertices.push_back(TriB);
-	PolyTri.vertices.push_back(TriC);
-	PolyTri.vertices.push_back(TriA);
+	PolyTriA.vertices.push_back(TriA);
+	PolyTriA.vertices.push_back(TriB);
+	PolyTriA.vertices.push_back(TriC);
+	PolyTriA.vertices.push_back(TriA);
 
-	in = PolygonIntersect(Polyblock, PolyTri);
+	in = PolygonIntersect(Polyblock, PolyTriA);
 
 	TriA.x = -2.0; TriA.y = 1.0;
 
@@ -414,12 +421,12 @@ bool test_intersectpoly()
 
 	TriC.x = -1.8; TriC.y = -0.8;
 
-	PolyTri.vertices.push_back(TriA);
-	PolyTri.vertices.push_back(TriB);
-	PolyTri.vertices.push_back(TriC);
-	PolyTri.vertices.push_back(TriA);
+	PolyTriB.vertices.push_back(TriA);
+	PolyTriB.vertices.push_back(TriB);
+	PolyTriB.vertices.push_back(TriC);
+	PolyTriB.vertices.push_back(TriA);
 
-	out = PolygonIntersect(Polyblock, PolyTri);
+	out = PolygonIntersect(Polyblock, PolyTriB);
 
 	success = (in && !out);
 	return success;
