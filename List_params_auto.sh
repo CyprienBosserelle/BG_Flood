@@ -8,9 +8,9 @@ echo Creating the list of keys words for the BG_flood interface
 
 ## Localisation of the input and output files
 
-BG_ReadInput="github/src/ReadInput.cu"
-BG_Params_h="github/src/Param.h"
-BG_Forcing_h="github/src/Forcing.h"
+BG_ReadInput="src/ReadInput.cu"
+BG_Params_h="src/Param.h"
+BG_Forcing_h="src/Forcing.h"
 ParamListFile="ParametersList.md"
 
 
@@ -89,8 +89,8 @@ done <<< "$params"
 index=0
 while read -r line
 do
-        myforcings[$index]=$line
-       index=$(($index+1))
+    myforcings[$index]=$line
+    index=$(($index+1))
 done <<< "$forcings"
 
 
@@ -160,11 +160,69 @@ done
 #########################################################################################
 ## Create the output Markdown file ########
 
-echo "__Paramter and Forcing list for BG_Flood__"  >> $ParamListFile
+echo "# Paramter and Forcing list for BG_Flood"  >> $ParamListFile
+echo " " >> $ParamListFile
 echo "BG_flood user interface consists in a text file, associating key words to user chosen parameters and forcings."  >> $ParamListFile
 echo " " >> $ParamListFile
-echo "|_Reference_|_Keys_| _Variable name_|_default_|_Explanation_|" >> $ParamListFile
-echo "|----|---|---|---|---|" >> $ParamListFile
+
+echo "## List of the Parameters">> $ParamListFile
+echo "|_Reference_|_Keys_|_default_|_Explanation_|" >> $ParamListFile
+echo "|----|---|---|---|" >> $ParamListFile
+#echo "|${mykeys[0]}|toto|" >> $filename
+#echo "|${mykeys[1]}|tata|" >> $filename
+
+for ind in "${!myrefs[@]}"
+do
+	refword=${myrefs[$ind]}
+	default=0
+	comment=0
+	echo "domain for $refword :"
+	if [[ "${Ps[*]}" =~ "${refword}" ]]; then
+		echo "In Params"
+	#	domain[$index] ="Param."
+		domain=( "Param." )
+		echo "$refword"
+	#	com="$(grep -F "^\s*${refword}\.*=\s*$" $BG_Params_h)"	
+		com="$(grep "\ ${refword}\s*=" $BG_Params_h)"
+		echo "com : $com"
+		comment="$(cut -d'/' -f3 <<< "${com}")"
+		echo "comment : $comment"
+		def="$(cut -d '=' -f2 <<< "${com}")" 
+		default="$(cut -d ';' -f1 <<< "${def}")"
+	        #toto= -e "$BG_Params_h" | grep "\s${refword}\s*="	
+		#echo "toto : $toto"
+		#forcings="$(grep -oP  '(^\s*forcing\.\K(\w+)(?=.*))|(^\s*XForcing\.\K(\w+)(?=.*))' $BG_ReadInput)"
+		#def="$(cut -d '=' -f2 <<< "${com}")" 
+	#	default="$(grep -oP  '(^\s*$refword\s*=\K(.*)(?=//))' $BG_Param_h)"
+		#comment="$(grep -oP  '(^\s*\w*\s*${refword}\s*=.*\s*\/\/\K(.*)(?=.*)$)' $BG_Param_h)"
+		#comments+=( $com2 )
+		#comments+=( "$(grep $refword $BG_Params_h)" )
+		#comments+=( "$(grep -oP  "^\s*$refword\s*=\s*;\s*//\K\w+\s*$" $BG_Params_h)" )
+	elif [[ "${Fs[*]}" =~ "${refword}" ]]; then
+		echo "In Forcing"
+	#	domain[$index] = "Forcing."
+		domain=( "Forcing." )
+		comment=( "FFF" )
+		default=( "None" )
+		Example= ("EEE")
+	else
+		echo "Not found"
+	#	domain[$index] = "Nan"
+		domain=( "Nan." )
+		comment=( "NNNN" )
+		default=( "NNdef" )
+	fi
+	if [[ "${domain}" == "Param." ]]; then
+		echo "|${myrefs[$ind]}|${mykeys[$ind]}|${default[0]}|${comment}|" >> $ParamListFile
+	fi
+done
+echo "---" >> $ParamListFile
+
+echo "&nbsp;">> $ParamListFile
+echo " ">> $ParamListFile
+echo "## List of the Forcings">> $ParamListFile
+echo "|_Reference_|_Keys_|_default_|_Explanation_|" >> $ParamListFile
+echo "|----|---|---|---|" >> $ParamListFile
 #echo "|${mykeys[0]}|toto|" >> $filename
 #echo "|${mykeys[1]}|tata|" >> $filename
 
@@ -208,10 +266,64 @@ do
 		comment=( "NNNN" )
 		default=( "NNdef" )
 	fi
-	echo "|${myrefs[$ind]}|${mykeys[$ind]}|${domain}${myrefs[$ind]}|${default[0]}|${comment}" >> $ParamListFile
+	if [[ "${domain}" == "Forcing." ]]; then
+		echo "|${myrefs[$ind]}|${mykeys[$ind]}|${default[0]}|${comment}|" >> $ParamListFile
+	fi
 done
+echo "---" >> $ParamListFile
 
+echo "&nbsp;">> $ParamListFile
+echo " ">> $ParamListFile
+echo "## List of the Unidentificated entries">> $ParamListFile
+echo "|_Reference_|_Keys_|_default_|_Explanation_|" >> $ParamListFile
+echo "|----|---|---|---|" >> $ParamListFile
+#echo "|${mykeys[0]}|toto|" >> $filename
+#echo "|${mykeys[1]}|tata|" >> $filename
 
+for ind in "${!myrefs[@]}"
+do
+	refword=${myrefs[$ind]}
+	default=0
+	comment=0
+	echo "domain for $refword :"
+	if [[ "${Ps[*]}" =~ "${refword}" ]]; then
+		echo "In Params"
+	#	domain[$index] ="Param."
+		domain=( "Param." )
+		echo "$refword"
+	#	com="$(grep -F "^\s*${refword}\.*=\s*$" $BG_Params_h)"	
+		com="$(grep "\ ${refword}\s*=" $BG_Params_h)"
+		echo "com : $com"
+		comment="$(cut -d'/' -f3 <<< "${com}")"
+		echo "comment : $comment"
+		def="$(cut -d '=' -f2 <<< "${com}")" 
+		default="$(cut -d ';' -f1 <<< "${def}")"
+	        #toto= -e "$BG_Params_h" | grep "\s${refword}\s*="	
+		#echo "toto : $toto"
+		#forcings="$(grep -oP  '(^\s*forcing\.\K(\w+)(?=.*))|(^\s*XForcing\.\K(\w+)(?=.*))' $BG_ReadInput)"
+		#def="$(cut -d '=' -f2 <<< "${com}")" 
+	#	default="$(grep -oP  '(^\s*$refword\s*=\K(.*)(?=//))' $BG_Param_h)"
+		#comment="$(grep -oP  '(^\s*\w*\s*${refword}\s*=.*\s*\/\/\K(.*)(?=.*)$)' $BG_Param_h)"
+		#comments+=( $com2 )
+		#comments+=( "$(grep $refword $BG_Params_h)" )
+		#comments+=( "$(grep -oP  "^\s*$refword\s*=\s*;\s*//\K\w+\s*$" $BG_Params_h)" )
+	elif [[ "${Fs[*]}" =~ "${refword}" ]]; then
+		echo "In Forcing"
+	#	domain[$index] = "Forcing."
+		domain=( "Forcing." )
+		comment=( "FFF" )
+		default=( "Def" )
+	else
+		echo "Not found"
+	#	domain[$index] = "Nan"
+		domain=( "Nan." )
+		comment=( "NNNN" )
+		default=( "NNdef" )
+	fi
+	if [[ "${domain}" == "Nan." ]]; then
+		echo "|${myrefs[$ind]}|${mykeys[$ind]}|${default[0]}|${comment}|" >> $ParamListFile
+	fi
+done
 
 #echo " ">> $ParamListFile
 		#comments+=( $com2 )
