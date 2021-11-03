@@ -87,3 +87,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 ---
  
 *Note* : The keys are not case sensitive.
+# Paramter and Forcing list for BG_Flood
+ 
+BG_flood user interface consists in a text file, associating key words to user chosen parameters and forcings.
+ 

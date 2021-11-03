@@ -198,7 +198,8 @@ do
 		echo "In Forcing"
 		domain=( "Forcing." )
 		echo "$refword"
-		com="$(awk -F"$BG_Forcing_h" 'BEGIN{}"\ ${refword}\s*=" $BG_Params_h)"
+		com="$(awk '/ deform;/,/\*\//' $BG_Forcing_h)"
+		#com="$(awk -F"$BG_Forcing_h" 'BEGIN{}"\ ${refword}\s*=" $BG_Params_h)"
 		echo "com : $com"
 		comment=( "FFF" )
 		default=( "None" )
