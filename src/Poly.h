@@ -5,6 +5,7 @@
 #include "General.h"
 #include "Param.h"
 #include "Input.h"
+#include "Write_txtlog.h"
 #include "Util_CPU.h"
 #include "Forcing.h"
 #include "Arrays.h"
@@ -12,7 +13,7 @@
 
 template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly);
 template <class T> int wn_PnPoly(T Px, T Py, Polygon Poly);
-
+Polygon CounterCWPoly(Polygon Poly);
 
 
 // End of global definition

@@ -126,6 +126,42 @@ template int wn_PnPoly<float>(float Px, float Py, Polygon Poly);
 template int wn_PnPoly<double>(double Px, double Py, Polygon Poly);
 //===================================================================
 
+Polygon CounterCWPoly(Polygon Poly)
+{
+	double sum = 0.0;
+	Polygon Rev;
+	
+
+	for (int i = 0; i < (Poly.vertices.size() - 1); i++)
+	{
+		//
+		sum = sum + (Poly.vertices[i + 1].x - Poly.vertices[i].x) * (Poly.vertices[i + 1].y - Poly.vertices[i].y);
+	}
+
+	std::string res = sum > 0.0 ? "ClockWise" : "CCW";
+
+	log(" Polygon is " + res );
+
+
+	// sum<0.0 -> counterclockwise Polygon; sum>0.0 -> clockwise
+	if (sum > 0.0)
+	{
+		log(" Reversing Polygon handedness");
+		for (int i = Poly.vertices.size(); i > 0; i--)
+		{
+			//
+			
+			
+			Rev.vertices.push_back(Poly.vertices[i]);
+		}
+		Rev.vertices.push_back(Rev.vertices[0]);
+		
+	}
+	return sum > 0.0 ? Rev : Poly;
+
+}
+
+
 Vertex VertAdd(Vertex A, Vertex B)
 {
 	Vertex v;
@@ -266,7 +302,7 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 
 
 	
-
+	
 
 	//bool test = test_wninpoly();
 
@@ -432,3 +468,6 @@ bool test_intersectpoly()
 	return success;
 
 }
+
+
+

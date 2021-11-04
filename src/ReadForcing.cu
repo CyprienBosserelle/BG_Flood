@@ -264,9 +264,11 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	if (!XForcing.AOI.file.empty())
 	{
 		log("\nRead AOI polygon");
+
+		//Polygon Poly;
 		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
 		
-
+		// = CounterCWPoly(Poly);
 		//
 		
 	}
@@ -1036,7 +1038,7 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 */
 Polygon readPolygon(std::string filename)
 {
-	Polygon poly;
+	Polygon poly, polyB;
 	Vertex v;
 
 	std::string line;
@@ -1081,23 +1083,24 @@ Polygon readPolygon(std::string filename)
 		poly.vertices.push_back(v);
 	}
 
+	polyB = CounterCWPoly(poly);
 
-	poly.xmin = poly.vertices[0].x;
-	poly.xmax = poly.vertices[0].x;
+	polyB.xmin = polyB.vertices[0].x;
+	polyB.xmax = polyB.vertices[0].x;
 
-	poly.ymin = poly.vertices[0].y;
-	poly.ymax = poly.vertices[0].y;
+	polyB.ymin = polyB.vertices[0].y;
+	polyB.ymax = polyB.vertices[0].y;
 
-	for (int i = 0; i < poly.vertices.size(); i++)
+	for (int i = 0; i < polyB.vertices.size(); i++)
 	{
-		poly.xmin = utils::min(poly.vertices[i].x, poly.xmin);
-		poly.xmax = utils::max(poly.vertices[i].x, poly.xmax);
-		poly.ymin = utils::min(poly.vertices[i].y, poly.ymin);
-		poly.ymax = utils::max(poly.vertices[i].y, poly.ymax);
+		polyB.xmin = utils::min(polyB.vertices[i].x, polyB.xmin);
+		polyB.xmax = utils::max(polyB.vertices[i].x, polyB.xmax);
+		polyB.ymin = utils::min(polyB.vertices[i].y, polyB.ymin);
+		polyB.ymax = utils::max(polyB.vertices[i].y, polyB.ymax);
 	}
 
 
-	return poly;
+	return polyB;
 }
 
 

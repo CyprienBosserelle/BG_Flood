@@ -10,6 +10,7 @@
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "Setup_GPU.h"
+#include "Poly.h"
 
 template<class T> void readforcing(Param& XParam, Forcing<T> & XForcing);
 
