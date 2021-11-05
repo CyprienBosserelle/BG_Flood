@@ -221,7 +221,7 @@ Param readparamstr(std::string line, Param param)
 		param.cf = std::stod(parametervalue);
 	}
 
-	paramvec = { "velthreshold","vthresh","vmax","velmax" };
+	paramvec = { "VelThreshold","vthresh","vmax","velmax" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -320,8 +320,8 @@ Param readparamstr(std::string line, Param param)
 
 	
 	// Below is a bit more complex than usual because more than 1 node can be outputed as a timeseries
-	parameterstr = "TSOutput";  //##TSnodesout
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "TSnodesout","TSOutput" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		TSoutnode node;
@@ -792,7 +792,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// wind forcing
-	paramvec = { "wind","windfiles" }; //## UWind,VWind
+	paramvec = { "Wind","windfiles" }; //## Forcing.Wind
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{

@@ -104,9 +104,27 @@ struct Forcing
 	DynForcingP<T> UWind;
 	DynForcingP<T> VWind;
 	DynForcingP<T> Rain;
+	/* Rain dynamic forcing: This allow to force a time varying, space varying rain on the model, in mm/h.
+	The rain can also be forced using a time serie (rain will be considered uniform on the domain)
+	Ex: For a uniform rain: "rain=rain_forcing.txt" (2 column values, time (not necessary unformly distributed) and rain intensity)
+	Ex: For a non-uniform rain: "rain=rain_forcing.nc?rain" (to define the entry netcdf file and the variable associated to the rain "rain", after the "?")
+	Default: None
+	*/
 	DynForcingP<T> Atmp;
 
 	std::vector<StaticForcingP<T>> Bathy; //Should be a vector at some point
+	/* Bathymetry/Topography input, ONLY NECESSARY INPUT
+	Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.
+	This grid will define the extend of the model domain and model resolution (if not inform by the user).
+	The coordinate can be cartesian or spheric (To be check).
+	A list of file can also be use to provide a thiner resolution localy for example.
+	The first file will be use to define the domain area and base resolution but the following file
+	will be used during the refinement process.
+	Ex: "bathy=topo=Westport_DEM_2020.nc?z" or "topo=Westport_DEM_2020.asc"
+	Ex: "bathy=South_Island_200.nc?z, West_Coast_100.nc?z, Westport_10.nc?z"
+	Default: None but input NECESSARY
+	*/
+
 	StaticForcingP<T> cf;
 
 	std::vector<StaticForcingP<int>> targetadapt;
@@ -114,8 +132,8 @@ struct Forcing
 	std::vector<deformmap<T>> deform;
 	/*Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave
 	Here you can spread the deformation across a certain amount of time and apply it at any point in the model
-	Ex: toto
-	Default: tata
+	Ex: XXXXXXXXXXXXXXXX
+	Default: None
 	*/
 	
 

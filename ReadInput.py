@@ -5,6 +5,8 @@ Spyder Editor
 This is a temporary script file.
 """
 #%% Configuration
+
+
 import re;
 
 BG_ReadInput="src/ReadInput.cu"
@@ -22,37 +24,25 @@ F=open(BG_ReadInput,'r')
 lines = F.readlines()
 F.close()
 
-#line='nodvWOONN parameterstr = TATAT  ;'
-#toto=re.search('(^\s*parameterstr\s*=\s*(\"\s*\w+\s*\")(?=\s*;\s*$))', line)
-
-
-#p = re.compile(r'\.*parameterstr = (?:\w+)\.*')
-
-#with open(BG_ReadInput, 'r') as f:
-#    while (line := f.readline().rstrip()):
-#        print(line)
-
-
-#m = re.findall("\.*parameterstr = (\w+)\.*", line, re.IGNORECASE)
-#if m:
-#    key=m[0];
 
 for line in lines:
-    if (('param.' in line) or ('XParam.' in line)):
-        Params.append(re.findall("\.*(param.|XParam.)(\w+)\.*", line, re.IGNORECASE)[0][1])
-    if (('forcing.' in line) or ('XForcing.' in line)):
-        Forcings.append(re.findall("\.*(forcing.|XForcing.)(\w+)\.*", line, re.IGNORECASE)[0][1])
-    line=re.sub(r"[\t\s]*","",line)
-    if ('parameterstr=' in line):
-        key_loc=re.findall("parameterstr=\"(\w+)\"\.*", line, re.IGNORECASE)[0]
-        if not (key_loc in keys):
-            keys.append(key_loc)
-            ref_name.append(key_loc)
-    elif ('paramvec=' in line):
-        key_loc=re.findall(".*paramvec={(.*)}.*", line, re.IGNORECASE)[0]
-        if not (key_loc in keys):
-            keys.append(key_loc)
-            ref_name.append(re.findall('\"(\w+)\".*',key_loc,re.IGNORECASE)[0])
+    if not(re.findall('^\s*(//).*',line)):
+        if (('param.' in line) or ('XParam.' in line)):
+            Params.append(re.findall("\.*(param.|XParam.)(\w+)\.*", line, re.IGNORECASE)[0][1])
+        if (('forcing.' in line) or ('XForcing.' in line)):
+            Forcings.append(re.findall("\.*(forcing.|XForcing.)(\w+)\.*", line, re.IGNORECASE)[0][1])
+        line=re.sub(r"[\t\s]*","",line)
+        if ('parameterstr=' in line):
+            key_loc=re.findall("parameterstr=\"(\w+)\"\.*", line, re.IGNORECASE)[0]
+            if not (key_loc in keys):
+                keys.append(key_loc)
+                ref_name.append(key_loc)
+        elif ('paramvec=' in line):
+            key_loc=re.findall(".*paramvec={(.*)}.*", line, re.IGNORECASE)[0]
+            key_loc=re.sub(r"\""," ",key_loc)
+            if not (key_loc in keys):
+                keys.append(key_loc)
+                ref_name.append(re.findall('(\w+) ,.*',key_loc,re.IGNORECASE)[0])
 
 myParams=list(set(Params))
 myForcings=list(set(Forcings))
@@ -79,7 +69,7 @@ for ind in range(len(ref_name)):
         Domain[ind]='Param'
         com=[]
         for line in P_lines:
-            found=re.findall(rf"\.*{re.escape(refword)}\s*=(.*);\s*(\/\/)*\s*(.*)" , line)
+            found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
             if len(found) > 0:
                 com=found[0]
         if com:
@@ -116,7 +106,6 @@ for ind in range(len(ref_name)):
         
 
 
-
 #%% Creation of the output file
 
 #Creating the mark-down file/table for the list of the user input parameters
@@ -136,7 +125,7 @@ for ind in range(len(ref_name)):
         Out.write(mystr)
 Out.write('---\n\n')
 
-#Creation of the Parameter table in MD
+#Creation of the Forcing table in MD
 #####Paramters
 Out.write('## List of the Forcings\' inputs\n\n')
 Out.write('|_Reference_|_Keys_|_default_|_Example_|_Explanation_|\n')
@@ -147,6 +136,22 @@ for ind in range(len(ref_name)):
         mystr= "|" + str(ref_name[ind]) + "|" + str(keys[ind]) + "|" + str(Default[ind][4:]) + "|" + str(Example[ind][4:]) + "|"+ str(Comment[ind][4:]) + "|\n"
         Out.write(mystr)
 Out.write('---\n\n')
+
+
+#Creation of the non-identified entries table in MD
+#####Paramters
+Out.write('## List of the non-identified inputs\n\n')
+Out.write('|_Reference_|_Keys_|\n')
+Out.write('|----|---|\n')
+
+for ind in range(len(ref_name)):
+    if (Domain[ind] == 'NN'):
+        mystr= "|" + str(ref_name[ind]) + "|" + str(keys[ind]) + "|\n"
+        Out.write(mystr)
+Out.write('---\n\n')
+
+Out.write('*Note* : The keys are not case sensitive.\n')
+
 
 Out.close()
 

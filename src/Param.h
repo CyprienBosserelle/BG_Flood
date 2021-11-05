@@ -13,17 +13,17 @@ class Param {
 public:
 
 	//general parameters
-	int test = -1;//-1:no test; 0:some test; 1:test 0 and XX test
+	int test = -1;//-1: no test; 99: run all independent tests; X: run test X
 	double g=9.81; // Gravity in m.s-2
-	double rho=1025.0; // fluid density in kg/m-3
-	double eps= 0.0001; // //drying height in m
+	double rho=1025.0; // Fluid density in kg/m-3
+	double eps= 0.0001; // Drying height in m (under eps, the surface is concidered dry)
 	double dt=0.0; // Model time step in s.
 	double CFL=0.5; // Current Freidrich Limiter
-	double theta=1.3; // minmod limiter can be used to tune the momentum dissipation (theta=1 gives minmod, the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
-	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. use 16.0 to use or negative value (-1) to turn off
-	int frictionmodel=0; //
-	double cf=0.0001; // bottom friction for flow model cf
-	double Cd=0.002; // Wind drag coeff
+	double theta=1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
+	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
+	int frictionmodel=0; // Bottom friction model (-1: Manning model, 0: default, 1: Smart model [REF])
+	double cf=0.0001; // Bottom friction coefficient for flow model cf (if constant)
+	double Cd=0.002; // Wind drag coefficient
 	bool windforcing = false;
 	bool atmpforcing = false;
 	bool rainforcing = false;
@@ -35,37 +35,37 @@ public:
 	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
 
-	double Pa2m = 0.00009916; // if unit is hPa then user should use 0.009916;
-	double Paref = 101300.0; // if unit is hPa then user should use 1013.0
+	double Pa2m = 0.00009916; // XXXX in Pa (if unit is hPa then user should use 0.009916)
+	double Paref = 101300.0; // Reference pressure in Pa (if unit is hPa then user should use 1013.0)
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
 
-	int doubleprecision = 0;
+	int doubleprecision = 0; // 0: float precision, 1: double precision
 
 	//grid parameters
-	double dx= nan(""); // grid resolution in the coordinate system unit in m.
-	double delta; // grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
+	double dx= nan(""); // Grid resolution in the coordinate system unit in m.
+	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx=0; // Initial grid size
 	int ny=0; //Initial grid size
-	int nblk=0; // number of compute blocks
-	int blkwidth = 16; //block width in number of cells
+	int nblk=0; // Number of compute blocks
+	int blkwidth = 16; //Block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
-	int halowidth = 1; // use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
+	int halowidth = 1; // Use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
 
-	double xo = nan(""); // originally defined has nan to check whether the user alter these values when runing the model
-	double yo = nan(""); // grid origin
-	double ymax = nan("");
-	double xmax = nan("");
-	double grdalpha= nan(""); // grid rotation Y axis from the North input in degrees but later converted to rad
-	int posdown = 0; // flag for bathy input. model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
-	int spherical = 0; // flag for geographical coordinate. can be activated by using teh keyword geographic
+	double xo = nan(""); // Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
+	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
+	double ymax = nan(""); // Grid ymax (if not alter by the user, will be defined based on the topography/bathymetry input map)
+	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
+	double grdalpha= nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
+	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
+	int spherical = 0; // Flag for geographical coordinate. Can be activated by using the keyword geographic
 	double Radius = 6371220.; //Earth radius [m]
 
 	//Adaptation
-	int initlevel = 0;
-	int maxlevel = 0;
-	int minlevel = 0;
+	int initlevel = 0; //Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)
+	int maxlevel = 0; //Maximum level for grid adaptation (overwrite the adaptation map if use) 
+	int minlevel = 0; //Minumim level for grid adaptation (overwrite the adaptation map if use) 
 	int nblkmem = 0;
 	int navailblk = 0;
 	double membuffer = 1.05; //needs to allocate more memory than initially needed so adaptation can happen without memory reallocation
@@ -77,15 +77,16 @@ public:
 	std::string outfile="Output.nc"; // netcdf output file name
 
 	//Timekeeping
-	double outputtimestep=0.0; //number of seconds between output 0.0 for none
-	double endtime=0.0; // Total runtime in s will be calculated based on bnd input as min(length of the shortest time series, user defined)
-	double totaltime = 0.0; //
+	double outputtimestep=0.0; //Number of seconds between netCDF outputs, 0.0 for none
+	double endtime=0.0; // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
+	double totaltime = 0.0; // Total simulation time in s
 
 	//Timeseries output
 	std::vector<TSoutnode> TSnodesout; // vector containing i and j of each variables
 	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
 
-	std::vector<std::string> outvars; //list of names of teh variables to output
+	std::vector<std::string> outvars; //list of names of the variables to output (for 2D maps), default: "zb", "zs", "u", "v", "h",<br> supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
+
 
 
 	//Rivers
@@ -102,48 +103,43 @@ public:
 	int nmaskblk = 0;
 
 	//hot start
-	double zsinit = nan(""); //init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0
+	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
 
-	//Add a water level offset to initial conditions and bnds
-	double zsoffset = nan("");
+	double zsoffset = nan(""); //Add a water level offset in m to initial conditions and boundaries (0.0 by default)
 
 
-	std::string hotstartfile;
+	std::string hotstartfile; //Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb; h or zs; u and v
 	//std::string deformfile;
-	int hotstep = 0; //step to read if hotstart file has multiple steps
+	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
 	//other
 	clock_t startcputime, endcputime, setupcputime;
 
 	//Netcdf parameters
-	int smallnc = 1;//default save as short integer if smallnc=0 then save all variables as float
-	float scalefactor = 0.01f;
-	float addoffset = 0.0f;
+	int smallnc = 1; //Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float
+	float scalefactor = 0.01f; //Scale factor used for the short integer conversion for netcdf outputs
+	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs
 
 #ifdef USE_CATALYST
         // ParaView Catalyst parameters
-        int use_catalyst = 0;
-        int catalyst_python_pipeline = 0;
-        int vtk_output_frequency = 0;
-        double vtk_output_time_interval = 1.0;
-        std::string vtk_outputfile_root = "bg_out";
-        std::string python_pipeline = "coproc.py";
+        int use_catalyst = 0; // Switch to use ParaView Catalyst
+        int catalyst_python_pipeline = 0; //Pipeline to use ParaView Catalyst
+        int vtk_output_frequency = 0; // Output frequency for ParaView Catalyst
+        double vtk_output_time_interval = 1.0; // XXX  for ParaView Catalyst
+        std::string vtk_outputfile_root = "bg_out"; //output file name for ParaView Catalyst
+        std::string python_pipeline = "coproc.py"; //python pipeline for ParaView Catalyst
 #endif
 
 	// Output switch controls
 	bool resetmax = false;
 	bool outmax = false;
-
-
 	bool outmean = false;
-
-
 	bool outvort = false;
 
 	// WARNING FOR DEBUGGING PURPOSE ONLY
 	// For debugging one can shift the output by 1 or -1 in the i and j direction.
 	// this will save the value in the halo to the output file allowing debugging of values there.
-	int outishift = 0;
-	int outjshift = 0;
+	int outishift = 0; //DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output 
+	int outjshift = 0; //DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output 
 
 	// info of the mapped cf
 	//inputmap roughnessmap;
@@ -155,7 +151,7 @@ public:
 
 	// deformation forcing for tsunami generation
 	//std::vector<deformmap> deform;
-	double deformmaxtime = 0.0; // time after which no deformation occurs (internal parameter to cut some of the loops)
+	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
 
 
 	// This here should be stored in a structure at a later stage
