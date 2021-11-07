@@ -138,6 +138,12 @@ struct Forcing
 	
 
 	std::vector<River> rivers;
+	/*The river is added as a vertical discharge on a chosen area (the user input consisting in a Time serie and a rectangular area definition: river = Fluxfile,xstart,xend,ystart,yend).
+	The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.
+	To add multiple rivers, just add different lines in the input file (one by river).
+	Ex: river = Votualevu_R.txt,1867430,1867455,3914065,3914090;
+	Default: None
+	*/
 
 	bndparam right;
 	bndparam left;

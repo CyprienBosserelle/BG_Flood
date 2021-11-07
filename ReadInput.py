@@ -15,39 +15,44 @@ BG_Forcing_h="src/Forcing.h"
 ParamListFile="ParametersList-py.md"
 
 #%% Getting the list of the available entry keys
-# Get the parameter keys
+# Get the parameter keys, as well as the list of variables associated to the
+# Param and Forcing objects, and the reference names
 keys=[]
 ref_name=[]
 Params=[]
 Forcings=[]
-F=open(BG_ReadInput,'r')
-lines = F.readlines()
-F.close()
+R=open(BG_ReadInput,'r')
+lines = R.readlines()
+R.close()
 
 
 for line in lines:
-    if not(re.findall('^\s*(//).*',line)):
-        if (('param.' in line) or ('XParam.' in line)):
-            Params.append(re.findall("\.*(param.|XParam.)(\w+)\.*", line, re.IGNORECASE)[0][1])
-        if (('forcing.' in line) or ('XForcing.' in line)):
-            Forcings.append(re.findall("\.*(forcing.|XForcing.)(\w+)\.*", line, re.IGNORECASE)[0][1])
-        line=re.sub(r"[\t\s]*","",line)
-        if ('parameterstr=' in line):
-            key_loc=re.findall("parameterstr=\"(\w+)\"\.*", line, re.IGNORECASE)[0]
-            if not (key_loc in keys):
-                keys.append(key_loc)
-                ref_name.append(key_loc)
-        elif ('paramvec=' in line):
-            key_loc=re.findall(".*paramvec={(.*)}.*", line, re.IGNORECASE)[0]
-            key_loc=re.sub(r"\""," ",key_loc)
-            if not (key_loc in keys):
-                keys.append(key_loc)
-                ref_name.append(re.findall('(\w+) ,.*',key_loc,re.IGNORECASE)[0])
+#    if not(re.findall('^\s*(//).*',line)):
+    if (('param.' in line) or ('XParam.' in line)):
+        Params.append(re.findall("\.*(param.|XParam.)(\w+)\.*", line, re.IGNORECASE)[0][1])
+    if (('forcing.' in line) or ('XForcing.' in line)):
+        Forcings.append(re.findall("\.*(forcing.|XForcing.)(\w+)\.*", line, re.IGNORECASE)[0][1])
+    line=re.sub(r"[\t\s]*","",line)
+    if ('parameterstr=' in line):
+        key_loc=re.findall("parameterstr=\"(\w+)\"\.*", line, re.IGNORECASE)[0]
+        if not (key_loc in keys):
+            keys.append(key_loc)
+            ref_name.append(key_loc)
+    elif ('paramvec=' in line):
+        key_loc=re.findall(".*paramvec={(.*)}.*", line, re.IGNORECASE)[0]
+        key_loc=re.sub(r"\""," ",key_loc)
+        if not (key_loc in keys):
+            keys.append(key_loc)
+            ref_name.append(re.findall('(\w+) ,.*',key_loc,re.IGNORECASE)[0])
 
 myParams=list(set(Params))
 myForcings=list(set(Forcings))
 
 #%% Getting the information from the others files
+
+#Getting the information from the others files (Param.h / Forcing.h) and link
+#keys with comment/Example and Default value 
+
 
 # Get the parameters variables
 Default=['DD']*len(keys)
@@ -65,11 +70,13 @@ P.close()
 ##Creation of the variables for the tables
 for ind in range(len(ref_name)):
     refword=ref_name[ind]
+    print(refword)
     if (refword in myParams):
         Domain[ind]='Param'
         com=[]
         for line in P_lines:
-            found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
+            found=re.findall(rf"\.*{re.escape(refword)}\s*=(.*);\s*(\/\/)*\s*(.*)" , line)
+            #found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
             if len(found) > 0:
                 com=found[0]
         if com:
@@ -80,12 +87,14 @@ for ind in range(len(ref_name)):
         com=[]
         for i in range(len(F_lines)):
             found=re.findall(rf"\.*{re.escape(refword)}\s*;", F_lines[i])
+            print(i)
             if (len(found) > 0) and (re.search(r'\s*\/\*', F_lines[i+1])):
                 j=1
                 Default[ind]=''
                 Example[ind]=''
                 Comment[ind]=''
                 while j > 0:
+                    print(j)
                     line=F_lines[i+j]
                     j=j+1
                     EXX=re.search(r'\.*Ex:\s*(.*)',line);

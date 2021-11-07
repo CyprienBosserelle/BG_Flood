@@ -5,63 +5,84 @@ BG_flood user interface consists in a text file, associating key words to user c
 
 |_Reference_|_Keys_|_default_|_Explanation_|
 |----|---|---|---|
-|test|test|-1|-1:no test; 0:some test; 1:test 0 and XX test|
-|doubleprecision|doubleprecision|0||
-|maxlevel|maxlevel|0||
-|minlevel|minlevel|0||
-|initlevel|initlevel|0||
-|conserveElevation|conserveElevation|false||
-|membuffer|membuffer|1.05|needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
-|eps|eps|0.0001|//drying height in m|
-|Cd|Cd|0.002|Wind drag coeff|
-|Pa2m|Pa2m|0.00009916|if unit is hPa then user should use 0.009916;|
-|Paref|Paref|101300.0|if unit is hPa then user should use 1013.0|
-|mask|mask|9999.0|mask any zb above this value. if the entire Block is masked then it is not allocated in the memory|
+|test|test| -1;//-1: no test; 99: run all independent tests|X: run test X|
+|GPUDEVICE| GPUDEVICE , gpu |0; // 0: first available GPU; -1: CPU single core|2+: other GPU|
+|doubleprecision|doubleprecision| 0|0: float precision, 1: double precision|
+|maxlevel|maxlevel| 0|Maximum level for grid adaptation (overwrite the adaptation map if use) |
+|minlevel|minlevel| 0|Minumim level for grid adaptation (overwrite the adaptation map if use) |
+|initlevel|initlevel| 0|Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)|
+|conserveElevation|conserveElevation| false||
+|membuffer|membuffer| 1.05|needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
+|eps|eps| 0.0001|Drying height in m (under eps, the surface is concidered dry)|
+|VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
+|Cd|Cd|0.002|Wind drag coefficient|
+|Pa2m|Pa2m| 0.00009916|XXXX in Pa (if unit is hPa then user should use 0.009916)|
+|Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
+|mask|mask| 9999.0|mask any zb above this value. if the entire Block is masked then it is not allocated in the memory|
 |dt|dt|0.0|Model time step in s.|
 |CFL|CFL|0.5|Current Freidrich Limiter|
-|theta|theta|1.3|minmod limiter can be used to tune the momentum dissipation (theta=1 gives minmod, the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
-|endtime|endtime|0.0|Total runtime in s will be calculated based on bnd input as min(length of the shortest time series, user defined)|
+|theta|theta|1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
+|outputtimestep| outputtimestep , outtimestep , outputstep |0.0|Number of seconds between netCDF outputs, 0.0 for none|
+|endtime|endtime|0.0|Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing|
+|totaltime| totaltime , inittime | 0.0|Total simulation time in s|
 |outfile|outfile|"Output.nc"|netcdf output file name|
+|TSnodesout| TSnodesout , TSOutput |DD|CC|
 |outvars|outvars|DD|CC|
-|resetmax|resetmax|false||
-|outishift|outishift|0||
-|outjshift|outjshift|0||
+|resetmax|resetmax| false||
+|outishift|outishift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output |
+|outjshift|outjshift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output |
 |nx|nx|0|Initial grid size|
 |ny|ny|0|Initial grid size|
-|dx|dx|nan("")|grid resolution in the coordinate system unit in m.|
-|grdalpha|grdalpha|nan("")|grid rotation Y axis from the North input in degrees but later converted to rad|
-|xmax|xmax|nan("")||
-|ymax|ymax|nan("")||
-|g|g|false||
-|rho|rho|1025.0|fluid density in kg/m-3|
-|smallnc|smallnc|1|default save as short integer if smallnc=0 then save all variables as float|
-|scalefactor|scalefactor|0.01f||
-|addoffset|addoffset|0.0f||
-|posdown|posdown|0|flag for bathy input. model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f|
-|use_catalyst|use_catalyst|0||
-|catalyst_python_pipeline|catalyst_python_pipeline|0||
-|vtk_output_frequency|vtk_output_frequency|0||
-|vtk_output_time_interval|vtk_output_time_interval|1.0||
-|vtk_outputfile_root|vtk_outputfile_root|"bg_out"||
-|python_pipeline|python_pipeline|"coproc.py"||
-|zsinit|zsinit|nan("")|init zs for cold start. if not specified by user and no bnd file =1 then sanity check will set to 0.0|
-|zsoffset|zsoffset|nan("")||
+|dx|dx| nan("")|Grid resolution in the coordinate system unit in m.|
+|grdalpha|grdalpha| nan("")|Grid rotation Y axis from the North input in degrees but later converted to rad|
+|xo| xo , xmin | nan("")|Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)|
+|yo| yo , ymin | nan("")|Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)|
+|xmax|xmax| nan("")|Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)|
+|ymax|ymax| nan("")|Grid ymax (if not alter by the user, will be defined based on the topography/bathymetry input map)|
+|g|g| false||
+|rho|rho|1025.0|Fluid density in kg/m-3|
+|smallnc|smallnc| 1|Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float|
+|scalefactor|scalefactor| 0.01f|Scale factor used for the short integer conversion for netcdf outputs|
+|addoffset|addoffset| 0.0f|Offset add during the short integer conversion for netcdf outputs|
+|posdown|posdown| 0|Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f|
+|use_catalyst|use_catalyst| 0|Switch to use ParaView Catalyst|
+|catalyst_python_pipeline|catalyst_python_pipeline| 0|Pipeline to use ParaView Catalyst|
+|vtk_output_frequency|vtk_output_frequency| 0|Output frequency for ParaView Catalyst|
+|vtk_output_time_interval|vtk_output_time_interval| 1.0|XXX  for ParaView Catalyst|
+|vtk_outputfile_root|vtk_outputfile_root| "bg_out"|output file name for ParaView Catalyst|
+|python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
+|zsinit| zsinit , initzs | nan("")|Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0|
+|zsoffset|zsoffset| nan("")|Add a water level offset in m to initial conditions and boundaries (0.0 by default)|
 |hotstartfile|hotstartfile|DD|CC|
-|hotstep|hotstep|0|step to read if hotstart file has multiple steps|
-|spherical|spherical|0|flag for geographical coordinate. can be activated by using teh keyword geographic|
-|Radius|Radius|6371220.|Earth radius [m]|
-|frictionmodel|frictionmodel|0||
+|hotstep|hotstep| 0|Step to read if hotstart file has multiple steps (step and not (computation) time)|
+|spherical|spherical| 0|Flag for geographical coordinate. Can be activated by using the keyword geographic|
+|Radius|Radius| 6371220.|Earth radius [m]|
+|frictionmodel|frictionmodel|0|Bottom friction model (-1: Manning model, 0: default, 1: Smart model [REF])|
 ---
 
 ## List of the Forcings' inputs
 
 |_Reference_|_Keys_|_default_|_Example_|_Explanation_|
 |----|---|---|---|---|
-|cf|cf|01||om friction for flow model cf|
-|left|left||||
-|right|right||||
-|top|top||||
-|bot|bot||||
-|deform|deform|tata|toto|Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave<br>Here you can spread the deformation across a certain amount of time and apply it at any point in the model|
+|cf|cf|01||om friction coefficient for flow model cf (if constant)|
+|Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|"bathy=topo=Westport_DEM_2020.nc?z" or "topo=Westport_DEM_2020.asc"<br>"bathy=South_Island_200.nc?z, West_Coast_100.nc?z, Westport_10.nc?z"| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spheric (To be check).<br>A list of file can also be use to provide a thiner resolution localy for example.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
+|left| left , leftbndfile , leftbnd ||||
+|right| right , rightbndfile , rightbnd ||||
+|top| top , topbndfile , topbnd ||||
+|bot| bot , botbndfile , botbnd , bottom ||||
+|deform|deform|None|XXXXXXXXXXXXXXXX|Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave<br>Here you can spread the deformation across a certain amount of time and apply it at any point in the model|
+|rivers| rivers , river ||||
+|Atmp| Atmp , atmpfile ||||
+|Rain| Rain , rainfile |None|For a uniform rain: "rain=rain_forcing.txt" (2 column values, time (not necessary unformly distributed) and rain intensity)<br>For a non-uniform rain: "rain=rain_forcing.nc?rain" (to define the entry netcdf file and the variable associated to the rain "rain", after the "?")| Rain dynamic forcing: This allow to force a time varying, space varying rain on the model, in mm/h.<br>The rain can also be forced using a time serie (rain will be considered uniform on the domain)|
 ---
 
+## List of the non-identified inputs
+
+|_Reference_|_Keys_|
+|----|---|
+|Adaptation|Adaptation|
+|cfmap| cfmap , roughnessmap |
+|Wind| Wind , windfiles |
+---
+
+*Note* : The keys are not case sensitive.
