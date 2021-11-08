@@ -120,7 +120,7 @@ struct Forcing
 	A list of file can also be use to provide a thiner resolution localy for example.
 	The first file will be use to define the domain area and base resolution but the following file
 	will be used during the refinement process.
-	Ex: "bathy=topo=Westport_DEM_2020.nc?z" or "topo=Westport_DEM_2020.asc"
+	Ex: "bathy=Westport_DEM_2020.nc?z" or "topo=Westport_DEM_2020.asc"
 	Ex: "bathy=South_Island_200.nc?z, West_Coast_100.nc?z, Westport_10.nc?z"
 	Default: None but input NECESSARY
 	*/
@@ -146,6 +146,12 @@ struct Forcing
 	*/
 
 	bndparam right;
+	/*The river is added as a vertical discharge on a chosen area (the user input consisting in a Time serie and a rectangular area definition: river = Fluxfile,xstart,xend,ystart,yend).
+The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.
+To add multiple rivers, just add different lines in the input file (one by river).
+Ex: river = Votualevu_R.txt,1867430,1867455,3914065,3914090;
+Default: None
+*/
 	bndparam left;
 	bndparam top;
 	bndparam bot;
