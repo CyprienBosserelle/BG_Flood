@@ -70,7 +70,7 @@ P.close()
 ##Creation of the variables for the tables
 for ind in range(len(ref_name)):
     refword=ref_name[ind]
-    print(refword)
+    #print(refword)
     if (refword in myParams):
         Domain[ind]='Param'
         com=[]
@@ -87,14 +87,14 @@ for ind in range(len(ref_name)):
         com=[]
         for i in range(len(F_lines)):
             found=re.findall(rf"\.*{re.escape(refword)}\s*;", F_lines[i])
-            print(i)
+            #print(i)
             if (len(found) > 0) and (re.search(r'\s*\/\*', F_lines[i+1])):
                 j=1
                 Default[ind]=''
                 Example[ind]=''
                 Comment[ind]=''
                 while j > 0:
-                    print(j)
+                    #print(j)
                     line=F_lines[i+j]
                     j=j+1
                     EXX=re.search(r'\.*Ex:\s*(.*)',line);
