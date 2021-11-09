@@ -36,6 +36,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+		log("timestep = " + std::to_string(XLoop.totaltime));
 
 		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
 		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
@@ -378,6 +379,11 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 
 	XLoop.dtmax = XLoop.hugeposval;
 
+	//to limit the initial time steps (by user input)
+	if (XParam.dtinit > 0)
+	{
+		XLoop.dtmax = XParam.dtinit / 1.5;
+	}
 
 	BlockP<T> XBlock = XModel.blocks;
 
