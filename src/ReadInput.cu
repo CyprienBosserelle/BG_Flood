@@ -316,6 +316,14 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	parameterstr = "dtinit";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.dtinit = std::stod(parametervalue);
+
+	}
+
 	///////////////////////////////////////////////////////
 	// Input and output files
 	//
