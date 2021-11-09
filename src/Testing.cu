@@ -12,11 +12,11 @@
 * Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU or CPU version)
 * Test 2 Gaussian wave on Cartesian grid (same as test 0): CPU vs GPU (GPU required)
 * Test 3 Test Reduction algorithm
-
+* Test 4 Boundary condition test
 * Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
 * Test 6 Mass conservation on a slope
-* Test 7 is mass conservation with rain fall on grid
-* Test 8 is a comparison with litterature case with slope and non-uniform rain
+* Test 7 Mass conservation with rain fall on grid
+* Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
 
 * Test 99 Run all the test with test number < 99.
 
@@ -1944,7 +1944,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 
 /*! \fn bool RiverOnBoundary(T slope, bool bottop, bool flip)
 * \brief	Simulate a river flowing in a (steep) valley
-* and heck the Volume conservation
+* and check the Volume conservation
 *
 * This function creates a half dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
 * A wall is located in the center of the valley.
@@ -1963,7 +1963,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 	//Param XParam;
 
-	//XParam.GPUDEVICE = -1;
+	XParam.GPUDEVICE = -1;
 
 	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
 	Model<decltype(modeltype)> XModel; // For CPU pointers
@@ -2001,7 +2001,6 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 	XForcing.Bathy[0].xo = 0.0;
 	XForcing.Bathy[0].yo = 0.0;
-
 	XForcing.Bathy[0].xmax = 31.0;
 	XForcing.Bathy[0].ymax = 31.0;
 	XForcing.Bathy[0].nx = 32;
@@ -2097,9 +2096,10 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 	//XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
 	//XParam.zsoffset = 0.2;
-	XParam.endtime = 100.0;
+	XParam.endtime = 20.0;
+	XParam.dtinit = 0.1;
 
-	XParam.outputtimestep = XParam.endtime;
+	XParam.outputtimestep = 10.0;// XParam.endtime;
 
 	checkparamsanity(XParam, XForcing);
 
@@ -2148,7 +2148,13 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 		}
 	}
 
+
+	printf("End Volume : %f \n", SimulatedVolume);
+	printf("Init Volume : %f \n", initVol);
+
 	SimulatedVolume = SimulatedVolume - initVol;
+
+	printf("End Volume - Init volume : %f \n", SimulatedVolume);
 
 	T error = abs(SimulatedVolume - TheoryInput);
 
