@@ -125,7 +125,13 @@ struct Forcing
 	Default: None but input NECESSARY
 	*/
 
-	StaticForcingP<T> cf;
+	StaticForcingP<T> cf; //cfmap;
+	/*Bottom friction coefficient map (associated to the chosen bottom friction model)
+	NEED TO BE MODIFIED TO HAVE THE GOOD KEYS
+	Ex: cf=0.001;
+	Ex: cfmap=bottom_friction.nc?bfc;
+	Default: 0.0001 (constant)
+	*/
 
 	std::vector<StaticForcingP<int>> targetadapt;
 
@@ -145,17 +151,23 @@ struct Forcing
 	Default: None
 	*/
 
-	bndparam right;
-	/*The river is added as a vertical discharge on a chosen area (the user input consisting in a Time serie and a rectangular area definition: river = Fluxfile,xstart,xend,ystart,yend).
-The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.
-To add multiple rivers, just add different lines in the input file (one by river).
-Ex: river = Votualevu_R.txt,1867430,1867455,3914065,3914090;
-Default: None
-*/
 	bndparam left;
-	bndparam top;
-	bndparam bot;
+	/* 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
+	For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first time
+	column (with possibly variable time steps) and levels in the following columns (1 column correspond to a constant value along the boundary,
+	2 column will correspond to values at boundary edges with linear evolution in between, n colums will correspond to n regularly space
+	applied values along the boundary)
+	Ex: left = 0;
+	Ex: left = 2,leftBnd.txt;
+	Default: 1 *****TO DISCUSS******
+	*/
 
+	bndparam right;
+	/*Same as left boundary*/
+	bndparam top;
+	/*Same as left boundary*/
+	bndparam bot;
+	/*Same as left boundary*/
 	
 	
 };

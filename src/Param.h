@@ -13,8 +13,8 @@ class Param {
 public:
 
 	//general parameters
-	int test = -1;//-1: no test; 99: run all independent tests; X: run test X
-	double g=9.81; // Gravity in m.s-2
+	int test = -1; //-1: no test, 99: run all independent tests, X: run test X
+	double g = 9.81; // Gravity in m.s-2
 	double rho=1025.0; // Fluid density in kg/m-3
 	double eps= 0.0001; // Drying height in m (under eps, the surface is concidered dry)
 	double dt=0.0; // Model time step in s.
@@ -38,7 +38,7 @@ public:
 	double Pa2m = 0.00009916; // XXXX in Pa (if unit is hPa then user should use 0.009916)
 	double Paref = 101300.0; // Reference pressure in Pa (if unit is hPa then user should use 1013.0)
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
-	int GPUDEVICE=0; // 0: first available GPU; -1: CPU single core; 2+: other GPU
+	int GPUDEVICE = 0; // 0: first available GPU, -1: CPU single core, 2+: other GPU
 
 	int doubleprecision = 0; // 0: float precision, 1: double precision
 
@@ -83,11 +83,19 @@ public:
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 
 	//Timeseries output
-	std::vector<TSoutnode> TSnodesout; // vector containing i and j of each variables
+	std::vector<TSoutnode> TSnodesout; 
+	/*vector containing i and j of each variables
+	Example: "TSnodesout: TOOOTOTOTOOOOT"
+	Default: None
+	*/
+
 	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
 
-	std::vector<std::string> outvars; //list of names of the variables to output (for 2D maps), default: "zb", "zs", "u", "v", "h",<br> supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
-
+	std::vector<std::string> outvars; 
+	/*list of names of the variables to output (for 2D maps),
+	<br> supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
+	Default: "zb", "zs", "u", "v", "h"
+	*/
 
 
 	//Rivers
@@ -109,7 +117,10 @@ public:
 	double zsoffset = nan(""); //Add a water level offset in m to initial conditions and boundaries (0.0 by default)
 
 
-	std::string hotstartfile; //Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb; h or zs; u and v
+	std::string hotstartfile; 
+	/*Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb, h or zs, u and v
+	Default= None
+	*/
 	//std::string deformfile;
 	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
 	//other

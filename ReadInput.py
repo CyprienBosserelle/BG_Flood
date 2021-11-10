@@ -55,9 +55,9 @@ myForcings=list(set(Forcings))
 
 
 # Get the parameters variables
-Default=['DD']*len(keys)
-Example=['EE']*len(keys)
-Comment=['CC']*len(keys)
+Default=['']*len(keys)
+Example=['']*len(keys)
+Comment=['']*len(keys)
 Domain=['NN']*len(keys)
 P=open(BG_Params_h,'r')
 P_lines = P.readlines()
@@ -74,14 +74,39 @@ for ind in range(len(ref_name)):
     if (refword in myParams):
         Domain[ind]='Param'
         com=[]
-        for line in P_lines:
-            found=re.findall(rf"\.*{re.escape(refword)}\s*=(.*);\s*(\/\/)*\s*(.*)" , line)
+        for i in range(len(P_lines)):
+            line=P_lines[i]
+            found=re.findall(rf"\s*(\w|std.*)\s* {re.escape(refword)}\s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
             #found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
             if len(found) > 0:
                 com=found[0]
+                Default[ind]=''
+                Example[ind]=''
+                Comment[ind]=''
+                if (re.search(r'\s*\/\*', P_lines[i+1])):
+                    j=1
+                    while j > 0:
+                        #print(j)
+                        line=P_lines[i+j]
+                        j=j+1
+                        #EXX=re.search(r'\.*Ex:\s*(.*)',line);
+                        DEF=re.search(r'\.*Default:\s*(.*)',line);
+                        ENDCOM=re.search(r'\.*\*\/\s*',line);
+                        line=re.sub(r"[\t\n]*","",line)
+                        line=line.replace("*/","")
+                        line=line.replace("/*","")
+                        #if (EXX):
+                        #    Example[ind] = Example[ind] + '<br>' + EXX[1]
+                        if (DEF):
+                            Default[ind]=Default[ind] + '<br>' + DEF[1]
+                        else:
+                            if (re.search(r'\w',line)):
+                                Comment[ind] = Comment[ind] + '<br>' + line
+                        if (ENDCOM):
+                            j=-1
         if com:
-            Comment[ind]=com[2]
-            Default[ind]=com[0]
+            Comment[ind]=Comment[ind] + '<br>' + com[3]
+            Default[ind]=Default[ind] + '<br>' + com[1]
     if (refword in myForcings):
         Domain[ind]='Forcing'
         com=[]
@@ -130,7 +155,7 @@ Out.write('|----|---|---|---|\n')
 
 for ind in range(len(ref_name)):
     if (Domain[ind] == 'Param'):
-        mystr= "|" + str(ref_name[ind]) + "|" + str(keys[ind]) + "|" + str(Default[ind]) + "|" + str(Comment[ind]) + "|\n"
+        mystr= "|" + str(ref_name[ind]) + "|" + str(keys[ind]) + "|" + str(Default[ind][4:]) + "|" + str(Comment[ind][4:]) + "|\n"
         Out.write(mystr)
 Out.write('---\n\n')
 
