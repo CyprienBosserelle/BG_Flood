@@ -76,7 +76,10 @@ for ind in range(len(ref_name)):
         com=[]
         for i in range(len(P_lines)):
             line=P_lines[i]
-            found=re.findall(rf"\s*(\w|std.*)\s* {re.escape(refword)}\s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
+            if 'std' in line:
+                found=re.findall(rf"\s*std.*\s* {re.escape(refword)}(\.*);\s*(\/\/)*\s*(.*)" , line)
+            else:
+                found=re.findall(rf"\s*\w\s* {re.escape(refword)} \s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
             #found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
             if len(found) > 0:
                 com=found[0]
@@ -105,8 +108,8 @@ for ind in range(len(ref_name)):
                         if (ENDCOM):
                             j=-1
         if com:
-            Comment[ind]=Comment[ind] + '<br>' + com[3]
-            Default[ind]=Default[ind] + '<br>' + com[1]
+            Comment[ind]=Comment[ind] + '<br>' + com[2]
+            Default[ind]=Default[ind] + '<br>' + com[0]
     if (refword in myForcings):
         Domain[ind]='Forcing'
         com=[]
@@ -151,7 +154,7 @@ Out.write('BG_flood user interface consists in a text file, associating key word
 #####Paramters
 Out.write('## List of the Parameters\' input\n\n')
 Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
-Out.write('|----|---|---|---|\n')
+Out.write('|---|---|---|---|\n')
 
 for ind in range(len(ref_name)):
     if (Domain[ind] == 'Param'):
@@ -163,7 +166,7 @@ Out.write('---\n\n')
 #####Paramters
 Out.write('## List of the Forcings\' inputs\n\n')
 Out.write('|_Reference_|_Keys_|_default_|_Example_|_Explanation_|\n')
-Out.write('|----|---|---|---|---|\n')
+Out.write('|---|---|---|---|---|\n')
 
 for ind in range(len(ref_name)):
     if (Domain[ind] == 'Forcing'):
@@ -176,7 +179,7 @@ Out.write('---\n\n')
 #####Paramters
 Out.write('## List of the non-identified inputs\n\n')
 Out.write('|_Reference_|_Keys_|\n')
-Out.write('|----|---|\n')
+Out.write('|---|---|\n')
 
 for ind in range(len(ref_name)):
     if (Domain[ind] == 'NN'):

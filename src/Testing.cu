@@ -1841,24 +1841,26 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 */
 template <class T> bool testboundaries(Param XParam,T maxslope)
 {
-	//T maxslope = 0.45; // tthe mass conservation is better with smaller slopes 
+	//T maxslope = 0.45; // the mass conservation is better with smaller slopes 
 
-	bool UnitestA, UnitestB, UnitestC, UnitestD;
-	bool ctofA, ctofB, ctofC, ctofD;
-	bool ftocA, ftocB, ftocC, ftocD;
+	bool Wall_B, Wall_R, Wall_L, Wall_T;
+	//bool ctofA, ctofB, ctofC, ctofD;
+	//bool ftocA, ftocB, ftocC, ftocD;
 
 
 	std::string details;
 	int Dir, Bound_type;
+
 	
 	XParam.GPUDEVICE = 0;
+	maxslope = 0.0;
 	Dir = 3;
-	Bound_type = 0;
-	UnitestA = RiverOnBoundary(XParam, maxslope, Dir, Bound_type);
-
-	/*UnitestB = RiverVolumeAdapt(XParam, maxslope, true, false);
-	UnitestC = RiverVolumeAdapt(XParam, maxslope, false, true);
-	UnitestD = RiverVolumeAdapt(XParam, maxslope, true, true);
+	Bound_type = -1;
+	Wall_B = RiverOnBoundary(XParam, maxslope, 3, Bound_type);
+	//Wall_R = RiverOnBoundary(XParam, maxslope, 0, 0);
+	//Wall_L = RiverOnBoundary(XParam, maxslope, 1, 0);
+	//Wall_T = RiverOnBoundary(XParam, maxslope, 2, 0);
+	/*
 
 	if (UnitestA && UnitestB && UnitestC && UnitestD)
 	{
@@ -1938,7 +1940,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 	}*/
 
 	//return (UnitestA * UnitestB * UnitestC * UnitestD * ctofA * ctofB * ctofC * ctofD * ftocA * ftocB * ftocC * ftocD);
-	return(UnitestA);
+	return(Wall_B);
 }
 
 
@@ -1962,7 +1964,6 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	// Make a Parabolic bathy
 
 	//Param XParam;
-
 	XParam.GPUDEVICE = -1;
 
 	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
@@ -1976,6 +1977,19 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	float* dummybathy;
 
 	//Boundary conditions
+	XForcing.top.type = 0;
+	XForcing.bot.type = 0;
+	XForcing.right.type = 0;
+	XForcing.left.type = 0;
+
+	//Physical wall boundary condition
+	bool PhysWall = 0;
+	if (Bound_type == -1)
+	{
+		PhysWall = 1;
+		Bound_type = 0;
+	}
+
 	if (Dir == 0) //To right
 	{
 		XForcing.right.type = Bound_type;
@@ -2028,6 +2042,28 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 
 			dummybathy[i + j * XForcing.Bathy[0].nx] = ValleyBathy(y, x, slope, center);
+
+			//Add physical walls
+			if (PhysWall == 1)
+			{
+				//if (j < 3)
+				//{
+				//	dummybathy[i + j * XForcing.Bathy[0].nx] = 100.0;
+				//}
+				if (j > XForcing.Bathy[0].ny - 3)
+				{
+					dummybathy[i + j * XForcing.Bathy[0].nx] = 100.0;
+				}
+				if (i > XForcing.Bathy[0].nx - 3)
+				{
+					dummybathy[i + j * XForcing.Bathy[0].nx] = 100.0;
+				}
+				if (i < 17)
+				{
+					dummybathy[i + j * XForcing.Bathy[0].nx] = 1000.0;
+				}
+			}
+
 			mintopo = utils::min(dummybathy[i + j * XForcing.Bathy[0].nx], mintopo);
 			//maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
 
@@ -2063,8 +2099,8 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	// Overrule whatever is set in the river forcing
 	T Q = T(1.0);
 
-	double rivery = (Dir == 2)? 6.0 : 25.0; //Dir=2 =>topward
-	double riverx = (Dir == 1)? 6.0 : 25.0; //Dir=1 =>leftward
+	double riverx = (Dir == 0 | Dir == 2)? 6.0 : 25.0; //Dir=1 =>leftward
+	double rivery = (Dir == 2 | Dir == 1)? 6.0 : 25.0; //Dir=2 =>topward
 	
 	//Create a temporary file with river fluxes
 	std::ofstream river_file(
@@ -2094,10 +2130,14 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 	XParam.dx = XForcing.Bathy[0].dx;
 
-	//XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
 	//XParam.zsoffset = 0.2;
-	XParam.endtime = 20.0;
+	XParam.endtime = 50.0;
 	XParam.dtinit = 0.1;
+	XParam.mask = 999.0;
+	XParam.outishift = 0;
+	XParam.outjshift = 0;
+
 
 	XParam.outputtimestep = 10.0;// XParam.endtime;
 
@@ -2163,7 +2203,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	printf("return : %f \n", (error/TheoryInput));
 
 
-	return error / TheoryInput < 0.05;
+	return error / TheoryInput < 0.01;
 
 }
 

@@ -15,15 +15,15 @@ public:
 	//general parameters
 	int test = -1; //-1: no test, 99: run all independent tests, X: run test X
 	double g = 9.81; // Gravity in m.s-2
-	double rho=1025.0; // Fluid density in kg/m-3
-	double eps= 0.0001; // Drying height in m (under eps, the surface is concidered dry)
-	double dt=0.0; // Model time step in s.
-	double CFL=0.5; // Current Freidrich Limiter
-	double theta=1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
+	double rho = 1025.0; // Fluid density in kg/m-3
+	double eps = 0.0001; // Drying height in m (under eps, the surface is concidered dry)
+	double dt = 0.0; // Model time step in s.
+	double CFL = 0.5; // Current Freidrich Limiter
+	double theta = 1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
 	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
-	int frictionmodel=0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model [REF])
-	double cf=0.0001; // Bottom friction coefficient for flow model cf (if constant)
-	double Cd=0.002; // Wind drag coefficient
+	int frictionmodel = 0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model [REF])
+	double cf = 0.0001; // Bottom friction coefficient for flow model cf (if constant)
+	double Cd = 0.002; // Wind drag coefficient
 	bool windforcing = false;
 	bool atmpforcing = false;
 	bool rainforcing = false;
@@ -43,11 +43,11 @@ public:
 	int doubleprecision = 0; // 0: float precision, 1: double precision
 
 	//grid parameters
-	double dx= nan(""); // Grid resolution in the coordinate system unit in m.
+	double dx = nan(""); // Grid resolution in the coordinate system unit in m.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
-	int nx=0; // Initial grid size
-	int ny=0; //Initial grid size
-	int nblk=0; // Number of compute blocks
+	int nx  =0; // Initial grid size
+	int ny = 0; //Initial grid size
+	int nblk = 0; // Number of compute blocks
 	int blkwidth = 16; //Block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
@@ -77,15 +77,19 @@ public:
 	std::string outfile="Output.nc"; // netcdf output file name
 
 	//Timekeeping
-	double outputtimestep=0.0; //Number of seconds between netCDF outputs, 0.0 for none
-	double endtime=0.0; // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
+	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for none
+	double endtime = 0.0; // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 
-	//Timeseries output
+	//Timeseries output (save as a vector containing information for each Time Serie output)
 	std::vector<TSoutnode> TSnodesout; 
-	/*vector containing i and j of each variables
-	Example: "TSnodesout: TOOOTOTOTOOOOT"
+	/*Time serie output, giving a file name and a (x,y) position 
+	(which will be converted to nearest grid position). 
+	This keyword can be used multiple times to extract time series at different locations.
+	The data is stocked for each timestep and written by flocs.
+	The resulting file contains (t,zs,h,u,v)
+	Example: "TSnodesout: Offshore.txt,3101.00,4982.57" (*filename,x,y*)
 	Default: None
 	*/
 

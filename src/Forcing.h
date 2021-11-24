@@ -159,15 +159,29 @@ struct Forcing
 	applied values along the boundary)
 	Ex: left = 0;
 	Ex: left = 2,leftBnd.txt;
-	Default: 1 *****TO DISCUSS******
+	Default: 1
 	*/
 
 	bndparam right;
-	/*Same as left boundary*/
+	/*Same as left boundary
+	Ex: right = 0;
+	Ex: right = 2,rightBnd.txt;
+	Default: 1
+	*/
+
 	bndparam top;
-	/*Same as left boundary*/
+	/*Same as left boundary
+	Ex: top = 0;
+	Ex: top = 2,topBnd.txt;
+	Default: 1
+	*/
+
 	bndparam bot;
-	/*Same as left boundary*/
+	/*Same as left boundary
+	Ex: bot = 0;
+	Ex: bot = 2,botBnd.txt;
+	Default: 1
+	*/
 	
 	
 };
