@@ -540,7 +540,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 	else
 	{
 		deformstep(XParam, XLoop, deform, XModel_g);
-		InitzbgradientGPU(XParam, XModel);
+		InitzbgradientGPU(XParam, XModel_g);
 	}
 }
 template void deformstep<float>(Param XParam, Loop<float> XLoop, std::vector<deformmap<float>> deform, Model<float> XModel, Model<float> XModel_g);
