@@ -23,25 +23,34 @@
 
 #include "Poly.h"
 
-// Copyright 2000 softSurfer, 2012 Dan Sunday
-// This code may be freely used and modified for any purpose
-// providing that this copyright notice is included with it.
-// SoftSurfer makes no warranty for this code, and cannot be held
-// liable for any real or imagined damage resulting from its use.
-// Users of this code must verify correctness for their application.
-// Code modified to fit the use in DisperGPU
 
+/*! \fn int isLeft(T P0x, T P0y, T P1x, T P1y, T P2x, T P2y)
+*
+* \brief isLeft(): tests if a point is Left|On|Right of an infinite line.
+*
+* ## Description
+* a Point is defined by its coordinates {int x, y;}
+* ===================================================================
+*
+* isLeft(): tests if a point is Left|On|Right of an infinite line.
+*	Input:  three points P0, P1, and P2
+*	Return: >0 for P2 left of the line through P0 and P1
+*			=0 for P2  on the line
+*			<0 for P2  right of the line
+*	See: Algorithm 1 "Area of Triangles and Polygons"
+* 
+* ## Where does this come from:
+* Copyright 2000 softSurfer, 2012 Dan Sunday
+* ### Original Licence
+* This code may be freely used and modified for any purpose
+* providing that this copyright notice is included with it.
+* SoftSurfer makes no warranty for this code, and cannot be held
+* liable for any real or imagined damage resulting from its use.
+* Users of this code must verify correctness for their application.
+* Code modified to fit the use in DisperGPU
+*
+*/
 
-// a Point is defined by its coordinates {int x, y;}
-//===================================================================
-
-
-// isLeft(): tests if a point is Left|On|Right of an infinite line.
-//    Input:  three points P0, P1, and P2
-//    Return: >0 for P2 left of the line through P0 and P1
-//            =0 for P2  on the line
-//            <0 for P2  right of the line
-//    See: Algorithm 1 "Area of Triangles and Polygons"
 template <class T> T isLeft(T P0x, T P0y, T P1x, T P1y, T P2x, T P2y)
 {
 	return ((P1x - P0x) * (P2y - P0y)
@@ -49,12 +58,27 @@ template <class T> T isLeft(T P0x, T P0y, T P1x, T P1y, T P2x, T P2y)
 }
 //===================================================================
 
-
-// cn_PnPoly(): crossing number test for a point in a polygon
-//      Input:   P = a point,
-//               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
-//      Return:  0 = outside, 1 = inside
-// This code is patterned after [Franklin, 2000]
+/*! \fn int cn_PnPoly(T Px, T Py, F* Vx, F* Vy, int n)
+* \brief cn_PnPoly(): crossing number test for a point in a polygon
+*
+* ## Description
+* cn_PnPoly(): crossing number test for a point in a polygon
+*      Input:   P = a point,
+*               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
+*      Return:  0 = outside, 1 = inside
+*
+* ## Where does this come from:
+* Copyright 2000 softSurfer, 2012 Dan Sunday
+* ### Original Licence
+* This code may be freely used and modified for any purpose
+* providing that this copyright notice is included with it.
+* SoftSurfer makes no warranty for this code, and cannot be held
+* liable for any real or imagined damage resulting from its use.
+* Users of this code must verify correctness for their application.
+* Code modified to fit the use in DisperGPU
+*
+* This code is patterned after [Franklin, 2000]
+*/
 template <class T, class F> int cn_PnPoly(T Px, T Py, F* Vx, F* Vy, int n)
 {
 	int    cn = 0;    // the  crossing number counter
@@ -74,11 +98,26 @@ template <class T, class F> int cn_PnPoly(T Px, T Py, F* Vx, F* Vy, int n)
 }
 //===================================================================
 
-
-// wn_PnPoly(): winding number test for a point in a polygon
-//      Input:   P = a point,
-//               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
-//      Return:  wn = the winding number (=0 only when P is outside)
+/*! \fn int wn_PnPoly(T Px, T Py, T* Vx, T* Vy, unsigned int n)
+*
+* \brief winding number test for a point in a polygon
+*
+* ## Description
+* wn_PnPoly(): winding number test for a point in a polygon
+*      Input:   P = a point,
+*               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
+*      Return:  wn = the winding number (=0 only when P is outside)
+*
+* ## Where does this come from:
+* Copyright 2000 softSurfer, 2012 Dan Sunday
+* ### Original Licence
+* This code may be freely used and modified for any purpose
+* providing that this copyright notice is included with it.
+* SoftSurfer makes no warranty for this code, and cannot be held
+* liable for any real or imagined damage resulting from its use.
+* Users of this code must verify correctness for their application.
+* Code modified to fit the use in DisperGPU
+*/
 template <class T> int wn_PnPoly(T Px, T Py, T* Vx, T* Vy, unsigned int n)
 {
 	int    wn = 0;    // the  winding number counter
@@ -99,10 +138,26 @@ template <class T> int wn_PnPoly(T Px, T Py, T* Vx, T* Vy, unsigned int n)
 	return wn;
 }
 
-// wn_PnPoly(): winding number test for a point in a polygon
-//      Input:   P = a point,
-//               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
-//      Return:  wn = the winding number (=0 only when P is outside)
+/*! \fn int wn_PnPoly(T Px, T Py, Polygon Poly)
+*
+* \brief winding number test for a point in a polygon
+*
+* ## Description
+* wn_PnPoly(): winding number test for a point in a polygon
+*      Input:   P = a point,
+*               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
+*      Return:  wn = the winding number (=0 only when P is outside)
+*
+* ## Where does this come from:
+* Copyright 2000 softSurfer, 2012 Dan Sunday
+* ### Original Licence
+* This code may be freely used and modified for any purpose
+* providing that this copyright notice is included with it.
+* SoftSurfer makes no warranty for this code, and cannot be held
+* liable for any real or imagined damage resulting from its use.
+* Users of this code must verify correctness for their application.
+* Code modified to fit the use in DisperGPU
+*/
 template <class T> int wn_PnPoly(T Px, T Py, Polygon Poly)
 {
 	int    wn = 0;    // the  winding number counter
@@ -126,6 +181,16 @@ template int wn_PnPoly<float>(float Px, float Py, Polygon Poly);
 template int wn_PnPoly<double>(double Px, double Py, Polygon Poly);
 //===================================================================
 
+
+/*! \fn Polygon CounterCWPoly(Polygon Poly)
+* 
+* \brief check polygon handedness and reverse if necessary. 
+* 
+* ## Description
+* check polygon handedness and enforce left-handesness (Counter-clockwise). 
+* This function is used to ensure the right polygon handedness for the winding number inpoly (using the isleft())
+*
+*/
 Polygon CounterCWPoly(Polygon Poly)
 {
 	double sum = 0.0;
@@ -161,7 +226,9 @@ Polygon CounterCWPoly(Polygon Poly)
 
 }
 
-
+/*! \fn Vertex VertAdd(Vertex A, Vertex B)
+* \brief Vertex Add.
+*/
 Vertex VertAdd(Vertex A, Vertex B)
 {
 	Vertex v;
@@ -171,6 +238,9 @@ Vertex VertAdd(Vertex A, Vertex B)
 	return v;
 }
 
+/*! \fn Vertex VertSub(Vertex A, Vertex B)
+* \brief Vertex Substract
+*/
 Vertex VertSub(Vertex A, Vertex B)
 {
 	Vertex v;
@@ -180,6 +250,9 @@ Vertex VertSub(Vertex A, Vertex B)
 	return v;
 }
 
+/*! \fn double dotprod(Vertex A, Vertex B)
+* \brief Vertex dot product
+*/
 double dotprod(Vertex A, Vertex B)
 {
 	double a = 0.0;
@@ -187,6 +260,9 @@ double dotprod(Vertex A, Vertex B)
 	return a;
 }
 
+/*! \fn double xprod(Vertex A, Vertex B)
+* \brief Vertex cross-product
+*/
 double xprod(Vertex A, Vertex B)
 {
 	double a = 0.0;
@@ -194,8 +270,17 @@ double xprod(Vertex A, Vertex B)
 	return a;
 }
 
-//===================================================================
-// Intersection between segments
+/*! \fn bool SegmentIntersect(Polygon P, Polygon Q)
+* \brief Intersection between segments
+* 
+* ## Description
+*  Check whether 2 polygon segment intersect. Polygon P and Q are only 2 vertex long each.
+* i.e. they represent a segment each.
+* 
+* ## Where does this come from:
+* https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+* Best answer from Gareth Rees
+*/
 bool SegmentIntersect(Polygon P, Polygon Q)
 {
 	//
@@ -265,6 +350,14 @@ bool SegmentIntersect(Polygon P, Polygon Q)
 	return intersect;
 }
 
+/*! \fn bool PolygonIntersect(Polygon P, Polygon Q)
+* \brief Intersection between 2 polygons
+*
+* ## Description
+*  Check whether 2 polygons intersect. The function checks whether each segment of Polygon P intersect any segment of Poly Q.
+* if an intersect is detected theh loops are broken and true is returned.
+*
+*/
 bool PolygonIntersect(Polygon P, Polygon Q)
 {
 	bool intersect=false;
@@ -295,7 +388,15 @@ bool PolygonIntersect(Polygon P, Polygon Q)
 
 }
 
-
+/*! \fn bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly)
+*
+* \brief check whether a block is inside or intersectin a polygon
+*
+* ## Description
+* Check whether a block is inside or intersectin a polygon
+* 
+*
+*/
 template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly)
 {
 	bool insidepoly = false;
@@ -362,6 +463,12 @@ template bool blockinpoly<float>(float xo, float yo, float dx, int blkwidth, Pol
 template bool blockinpoly<double>(double xo, double yo, double dx, int blkwidth, Polygon Poly);
 //template <class T> Poly<T> ReadPoly();
 
+/*! \fn bool test_wninpoly()
+*
+* \brief Test winding number inpoly function
+*
+*
+*/
 bool test_wninpoly()
 {
 	int in, out;
@@ -386,6 +493,12 @@ bool test_wninpoly()
 
 }
 
+/*! \fn bool test_SegmentIntersect()
+*
+* \brief Test segment intersect function
+*
+*
+*/
 bool test_SegmentIntersect()
 {
 	bool in, out, success;
@@ -418,6 +531,12 @@ bool test_SegmentIntersect()
 	return success;
 }
 
+/*! \fn bool test_intersectpoly()
+*
+* \brief Test polygon intersect function
+*
+*
+*/
 bool test_intersectpoly()
 {
 	bool success = false;
