@@ -323,66 +323,6 @@ template __host__ void bndCPU<float>(Param XParam, bndparam side, BlockP<float> 
 template __host__ void bndCPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, double* zs, double* h, double* un, double* ut);
 
 
-// function to apply bnd at the boundary in the halo 
-template <class T> __host__ void inhalobndCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> & Xev, Forcing<float> XForcing, T* zb)
-{
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = XParam.blkmemwidth;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	int isright, istop;
-
-	T zsnew, hnew, vnew, unew, zbnew;
-	T zsinside, hinside, utinside, uninside, zbinside;
-
-	//bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
-
-	//left bnd
-	for (int ibl = 0; ibl < XForcing.left.nblk; ibl++)
-	{
-		int ib = XForcing.left.blks[ibl];
-		int lev = XBlock.level[ib];
-		T delta = calcres(T(XParam.dx), lev);
-
-		isright = XForcing.left.isright;
-		istop = XForcing.left.istop;
-
-		int ix = -1;
-
-		for (int iy = 0; iy < XParam.blkwidth; iy++)
-		{
-			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-			//Getting the location of the inside value near the halo
-			int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
-
-			//Initialisation on the variables in the halo
-			zsinside = Xev.zs[inside];
-			uninside = Xev.u[inside];
-			utinside = Xev.v[inside];
-			hinside = Xev.h[inside];
-			zbinside = zb[inside];
-			unew = Xev.u[i];
-			vnew = Xev.v[i];
-			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
-			zbnew = zb[i];
-			
-			wallinhalo(zsinside, uninside, utinside, hinside,zbinside, unew, vnew, zsnew, hnew, zbnew);
-			//halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
-
-			Xev.u[i] = unew;
-			Xev.v[i] = vnew;
-			Xev.zs[i] = zsnew;
-			Xev.h[i] = hnew;
-			zb[i] = zbnew;
-
-		}
-
-	}
-}
-template __host__ void inhalobndCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> & Xev, Forcing<float> XForcing, float* zb);
-template __host__ void inhalobndCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> & Xev, Forcing<float> XForcing, double* zb);
-
-
 // function to apply bnd at the boundary with masked blocked
 // here a wall is applied in the halo 
 template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
@@ -804,19 +744,6 @@ __device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop
 	isbotleft = (side & bl) == bl;
 }
 
-
-template <class T> __device__ __host__ void wallinhalo(T zsinside, T uninside, T utinside, T hinside, T zbinside, T& un, T& ut, T& zs, T& h, T& zb)
-{
-	// This function is used to make a free slip wall boundary condition
-	// We impose the same tangential velocity and water surface.
-	// We also impose the opposite normal flux by imposing and opposite velocity and forcing the same h=zs-zb.
-	//un = 0;// uninside; //Same value as we want an opposite flux and normal vector are opposed
-	//zs = zsinside+10;
-	//ut = 0;// utinside;
-	//h = 0;// hinside;
-	zb = zsinside+10;// zbinside;
-
-}
 
 template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T& zs, T& h,T&zb)
 {
