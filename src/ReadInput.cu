@@ -214,11 +214,14 @@ Param readparamstr(std::string line, Param param)
 		param.eps = std::stod(parametervalue);
 	}
 	
-	parameterstr = "cf";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "cf","roughness"};
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.cf = std::stod(parametervalue);
+		if (std::isdigit(parametervalue) == true)
+		{
+			param.cf = std::stod(parametervalue);
+		}
 	}
 
 	paramvec = { "VelThreshold","vthresh","vmax","velmax" };
@@ -789,18 +792,19 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 	}
 
-	// Mapped friction
-	paramvec = { "cfmap","roughnessmap"};
+	// friction coefficient (mapped or constant)
+	paramvec = { "cf","roughness"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-
-		forcing.cf = readfileinfo(parametervalue, forcing.cf);
-
+		if (std::isdigit(parametervalue) == false)
+		{
+			forcing.cf = readfileinfo(parametervalue, forcing.cf);
+		}
 	}
 
 	// wind forcing
-	paramvec = { "Wind","windfiles" }; //## Forcing.Wind
+	paramvec = { "Wind","windfiles" }; //## forcing.Wind
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{

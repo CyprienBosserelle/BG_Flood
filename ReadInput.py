@@ -5,8 +5,6 @@ Spyder Editor
 This is a temporary script file.
 """
 #%% Configuration
-
-
 import re;
 
 BG_ReadInput="src/ReadInput.cu"
@@ -67,12 +65,27 @@ F.close()
 P.close() 
 
 
+class InfoTable:
+    def __init__(self):
+        self.Reference=[]
+        self.Keys=[]
+        self.Default=[]
+        self.Example=[]
+        self.Comment=[]
+
+ParamTable=InfoTable()
+ForcingTable=InfoTable()
+NonIdTable=InfoTable()
+
+
 ##Creation of the variables for the tables
 for ind in range(len(ref_name)):
     refword=ref_name[ind]
+    key=keys[ind]
     #print(refword)
     if (refword in myParams):
-        Domain[ind]='Param'
+        print('Param')
+        #Domain='Param'
         com=[]
         for i in range(len(P_lines)):
             line=P_lines[i]
@@ -83,9 +96,9 @@ for ind in range(len(ref_name)):
             #found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
             if len(found) > 0:
                 com=found[0]
-                Default[ind]=''
-                Example[ind]=''
-                Comment[ind]=''
+                Default=''
+                Example=''
+                Comment=''
                 if (re.search(r'\s*\/\*', P_lines[i+1])):
                     j=1
                     while j > 0:
@@ -101,26 +114,32 @@ for ind in range(len(ref_name)):
                         #if (EXX):
                         #    Example[ind] = Example[ind] + '<br>' + EXX[1]
                         if (DEF):
-                            Default[ind]=Default[ind] + '<br>' + DEF[1]
+                            Default=Default + '<br>' + DEF[1]
                         else:
                             if (re.search(r'\w',line)):
-                                Comment[ind] = Comment[ind] + '<br>' + line
+                                Comment = Comment + '<br>' + line
                         if (ENDCOM):
                             j=-1
         if com:
-            Comment[ind]=Comment[ind] + '<br>' + com[2]
-            Default[ind]=Default[ind] + '<br>' + com[0]
+            Comment=Comment + '<br>' + com[2]
+            Default=Default + '<br>' + com[0]
+        ParamTable.Reference.append(refword)
+        ParamTable.Keys.append(key)
+        ParamTable.Default.append(Default)
+        ParamTable.Comment.append(Comment)
+        ###
     if (refword in myForcings):
-        Domain[ind]='Forcing'
+        print('Forcing')
+        Domain='Forcing'
         com=[]
         for i in range(len(F_lines)):
             found=re.findall(rf"\.*{re.escape(refword)}\s*;", F_lines[i])
             #print(i)
             if (len(found) > 0) and (re.search(r'\s*\/\*', F_lines[i+1])):
                 j=1
-                Default[ind]=''
-                Example[ind]=''
-                Comment[ind]=''
+                Default=''
+                Example=''
+                Comment=''
                 while j > 0:
                     #print(j)
                     line=F_lines[i+j]
@@ -132,15 +151,24 @@ for ind in range(len(ref_name)):
                     line=line.replace("*/","")
                     line=line.replace("/*","")
                     if (EXX):
-                        Example[ind] = Example[ind] + '<br>' + EXX[1]
+                        Example = Example + '<br>' + EXX[1]
                     elif (DEF):
-                        Default[ind]=Default[ind] + '<br>' + DEF[1]
+                        Default=Default + '<br>' + DEF[1]
                     else:
                         if (re.search(r'\w',line)):
-                            Comment[ind] = Comment[ind] + '<br>' + line
+                            Comment = Comment + '<br>' + line
                     if (ENDCOM):
                         j=-1
-        
+        ForcingTable.Reference.append(refword)
+        ForcingTable.Keys.append(key)
+        ForcingTable.Default.append(Default)
+        ForcingTable.Example.append(Example)
+        ForcingTable.Comment.append(Comment)
+    if not ((refword in myForcings) or (refword in myParams)):
+        print('NonId')
+        NonIdTable.Reference.append(refword)
+        NonIdTable.Keys.append(key)
+
 
 
 #%% Creation of the output file
@@ -156,34 +184,31 @@ Out.write('## List of the Parameters\' input\n\n')
 Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
 Out.write('|---|---|---|---|\n')
 
-for ind in range(len(ref_name)):
-    if (Domain[ind] == 'Param'):
-        mystr= "|" + str(ref_name[ind]) + "|" + str(keys[ind]) + "|" + str(Default[ind][4:]) + "|" + str(Comment[ind][4:]) + "|\n"
-        Out.write(mystr)
+for ind in range(len(ParamTable.Reference)):
+    mystr= "|" + str(ParamTable.Reference[ind]) + "|" + str(ParamTable.Keys[ind]) + "|" + str(ParamTable.Default[ind][4:]) + "|" + str(ParamTable.Comment[ind][4:]) + "|\n"
+    Out.write(mystr)
 Out.write('---\n\n')
 
 #Creation of the Forcing table in MD
-#####Paramters
+#####Forcings
 Out.write('## List of the Forcings\' inputs\n\n')
 Out.write('|_Reference_|_Keys_|_default_|_Example_|_Explanation_|\n')
 Out.write('|---|---|---|---|---|\n')
 
-for ind in range(len(ref_name)):
-    if (Domain[ind] == 'Forcing'):
-        mystr= "|" + str(ref_name[ind]) + "|" + str(keys[ind]) + "|" + str(Default[ind][4:]) + "|" + str(Example[ind][4:]) + "|"+ str(Comment[ind][4:]) + "|\n"
-        Out.write(mystr)
+for ind in range(len(ForcingTable.Reference)):
+    mystr= "|" + str(ForcingTable.Reference[ind]) + "|" + str(ForcingTable.Keys[ind]) + "|" + str(ForcingTable.Default[ind][4:]) + "|" + str(ForcingTable.Example[ind][4:]) + "|"+ str(ForcingTable.Comment[ind][4:]) + "|\n"
+    Out.write(mystr)
 Out.write('---\n\n')
 
 
 #Creation of the non-identified entries table in MD
-#####Paramters
+#####Non-identified
 Out.write('## List of the non-identified inputs\n\n')
 Out.write('|_Reference_|_Keys_|\n')
 Out.write('|---|---|\n')
 
-for ind in range(len(ref_name)):
-    if (Domain[ind] == 'NN'):
-        mystr= "|" + str(ref_name[ind]) + "|" + str(keys[ind]) + "|\n"
+for ind in range(len(NonIdTable.Reference)):
+        mystr= "|" + str(NonIdTable.Reference[ind]) + "|" + str(NonIdTable.Keys[ind]) + "|\n"
         Out.write(mystr)
 Out.write('---\n\n')
 

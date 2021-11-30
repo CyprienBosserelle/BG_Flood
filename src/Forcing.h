@@ -103,6 +103,13 @@ struct Forcing
 {
 	DynForcingP<T> UWind;
 	DynForcingP<T> VWind;
+	//Forcing the Wind;
+	/* The wind is forced......
+	Ex:toooooot
+	Defaults: NONE
+	*/
+	
+
 	DynForcingP<T> Rain;
 	/* Rain dynamic forcing: This allow to force a time varying, space varying rain on the model, in mm/h.
 	The rain can also be forced using a time serie (rain will be considered uniform on the domain)
@@ -125,12 +132,11 @@ struct Forcing
 	Default: None but input NECESSARY
 	*/
 
-	StaticForcingP<T> cf; //cfmap;
+	StaticForcingP<T> cf;
 	/*Bottom friction coefficient map (associated to the chosen bottom friction model)
-	NEED TO BE MODIFIED TO HAVE THE GOOD KEYS
 	Ex: cf=0.001;
-	Ex: cfmap=bottom_friction.nc?bfc;
-	Default: 0.0001 (constant)
+	Ex: cf=bottom_friction.nc?bfc;
+	Default: (see constant in parameters)
 	*/
 
 	std::vector<StaticForcingP<int>> targetadapt;
