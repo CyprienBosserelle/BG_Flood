@@ -13,8 +13,8 @@ BG_flood user interface consists in a text file, associating key words to user c
 |initlevel|initlevel| 0|Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)|
 |conserveElevation|conserveElevation| false||
 |membuffer|membuffer| 1.05|needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
-|eps|eps| 0.0001|Drying height in m (under eps, the surface is concidered dry)|
-|cf| cf , roughness | 0.0001|Bottom friction coefficient for flow model cf (if constant)|
+|eps|eps| 0.0001|Drying height in m (if h<eps, the surface is concidered dry)|
+|cf| cf , roughness | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |Pa2m|Pa2m| 0.00009916|XXXX in Pa (if unit is hPa then user should use 0.009916)|
@@ -59,7 +59,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |hotstep|hotstep| 0|Step to read if hotstart file has multiple steps (step and not (computation) time)|
 |spherical|spherical| 0|Flag for geographical coordinate. Can be activated by using the keyword geographic|
 |Radius|Radius| 6371220.|Earth radius [m]|
-|frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model [REF])|
+|frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 ---
 
 ## List of the Forcings' inputs
