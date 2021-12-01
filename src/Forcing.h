@@ -105,8 +105,8 @@ struct Forcing
 	DynForcingP<T> VWind;
 	//Forcing the Wind;
 	/* The wind is forced......
-	Ex:toooooot
-	Defaults: NONE
+	Ex: XXXXXXXXX
+	Default: None
 	*/
 	
 
@@ -118,6 +118,10 @@ struct Forcing
 	Default: None
 	*/
 	DynForcingP<T> Atmp;
+	/* Atmospheric forcing
+	Ex: XXXXXX
+	Default: None
+	*/
 
 	std::vector<StaticForcingP<T>> Bathy; //Should be a vector at some point
 	/* Bathymetry/Topography input, ONLY NECESSARY INPUT

@@ -74,8 +74,8 @@ BG_flood user interface consists in a text file, associating key words to user c
 |bot| bot , botbndfile , botbnd , bottom |1|bot = 0;<br>bot = 2,botBnd.txt;|Same as left boundary|
 |deform|deform|None|XXXXXXXXXXXXXXXX|Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave<br>Here you can spread the deformation across a certain amount of time and apply it at any point in the model|
 |rivers| rivers , river |None|river = Votualevu_R.txt,1867430,1867455,3914065,3914090;|The river is added as a vertical discharge on a chosen area (the user input consisting in a Time serie and a rectangular area definition: river = Fluxfile,xstart,xend,ystart,yend).<br>The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.<br>To add multiple rivers, just add different lines in the input file (one by river).|
-|Wind| Wind , windfiles ||toooooot| The wind is forced......<br>Defaults: NONE|
-|Atmp| Atmp , atmpfile ||toooooot| The wind is forced......<br>Defaults: NONE|
+|Wind| Wind , windfiles |None|XXXXXXXXX| The wind is forced......|
+|Atmp| Atmp , atmpfile |None|XXXXXX| Atmospheric forcing|
 |Rain| Rain , rainfile |None|For a uniform rain: "rain=rain_forcing.txt" (2 column values, time (not necessary unformly distributed) and rain intensity)<br>For a non-uniform rain: "rain=rain_forcing.nc?rain" (to define the entry netcdf file and the variable associated to the rain "rain", after the "?")| Rain dynamic forcing: This allow to force a time varying, space varying rain on the model, in mm/h.<br>The rain can also be forced using a time serie (rain will be considered uniform on the domain)|
 ---
 
