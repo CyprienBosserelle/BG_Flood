@@ -218,7 +218,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue) == true)
+		if (std::isdigit(parametervalue[0]) == true)
 		{
 			param.cf = std::stod(parametervalue);
 		}
@@ -797,7 +797,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue) == false)
+		if (std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.cf = readfileinfo(parametervalue, forcing.cf);
 		}
