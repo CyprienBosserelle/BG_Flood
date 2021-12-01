@@ -269,13 +269,29 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 			}
 
-			XForcing.rivers[Rin].i = idis;
-			XForcing.rivers[Rin].j = jdis;
-			XForcing.rivers[Rin].block = blockdis;
-			XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+
+			
+				XForcing.rivers[Rin].i = idis;
+				XForcing.rivers[Rin].j = jdis;
+				XForcing.rivers[Rin].block = blockdis;
+				XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+			
 
 			
 		}
+
+		for (auto it = XForcing.rivers.begin(); it != XForcing.rivers.end(); it++)
+		{
+
+			if (it->disarea == 0.0)
+			{
+				log("Warning river outside active model domain found. This river has been removed!\n");
+				XForcing.rivers.erase(it--);
+			}
+		}
+
+
+
 		//Now identify sort and unique blocks where rivers are being inserted
 		std::vector<int> activeRiverBlk;
 

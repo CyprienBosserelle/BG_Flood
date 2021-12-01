@@ -16,15 +16,15 @@ public:
 	int test = -1; //-1: no test, 99: run all independent tests, X: run test X
 	double g = 9.81; // Gravity in m.s-2
 	double rho = 1025.0; // Fluid density in kg/m-3
-	double eps = 0.0001; // Drying height in m (under eps, the surface is concidered dry)
+	double eps = 0.0001; // Drying height in m (if h<eps, the surface is concidered dry)
 	double dt = 0.0; // Model time step in s.
 	double CFL = 0.5; // Current Freidrich Limiter
 	double theta = 1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
 	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
-	int frictionmodel = 0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model [REF])
-	double cf = 0.0001; // Bottom friction coefficient for flow model cf (if constant)
+	int frictionmodel = 0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)
+	double cf = 0.0001; // Bottom friction coefficient for flow model (if constant)
 	double Cd = 0.002; // Wind drag coefficient
-	bool windforcing = false;
+	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
 

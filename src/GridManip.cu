@@ -174,7 +174,7 @@ template <class T>  void setedgessideLR(Param XParam, int ib,int blkA, int blkB,
 
 template <class T>  void setedgessideBT(Param XParam, int ib, int blkA, int blkB, int jread, int jwrite, T*& zb)
 {
-	if (blkA == ib || blkA == ib)
+	if (blkA == ib || blkB == ib)
 	{
 		int n, k;
 		int istart, iend;
@@ -214,7 +214,7 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
 				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
 
-				z[n] = interp2BUQ(x, y, forcing);
+				z[n] = interp2BUQ(x, y, T(blkdx), forcing);
 
 			}
 		}
@@ -251,14 +251,14 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
 
 				// Interpolate to fill in values from the whole domain (even if the domain outspan the domain fo the bathy)
-				z[n] = interp2BUQ(x, y, forcing[0]);
+				z[n] = interp2BUQ(x, y, T(blkdx), forcing[0]);
 
 				// now interpolat to other grids
 				for (int nf = 0; nf < forcing.size(); nf++)
 				{
 					if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
 					{
-						z[n] = interp2BUQ(x, y, forcing[nf]);
+						z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
 					}
 				}
 
@@ -271,7 +271,63 @@ template void interp2BUQ<float>(Param XParam, BlockP<float> XBlock, std::vector<
 template void interp2BUQ<double>(Param XParam, BlockP<double> XBlock, std::vector<StaticForcingP<float>> forcing, double* z);
 
 
+template <class T, class F> T interp2BUQ(T x, T y, T dx, F forcing)
+{
+	T z;
+	if (dx <= T(forcing.dx)) // bilinear interpolation
+	{
+		z = interp2BUQ(x, y, forcing);
+	}
+	else //blockmean interpolation
+	{
+		z = blockmean(x, y, dx, forcing);
+	}
+	return z;
+}
 
+
+template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
+{
+	double xmin, xmax, ymin, ymax,z;
+	int imin,imax,jmin,jmax,ni, nj,cfi,cfj;
+
+
+	xmin = x - dx * 0.5;
+	xmax = x + dx * 0.5;
+	ymin = y - dx * 0.5;
+	ymax = y + dx * 0.5;
+
+	imin = max(ftoi(floor((xmin - forcing.xo) / forcing.dx)), 0);
+	imax = min(ftoi(floor((xmax - forcing.xo) / forcing.dx)), forcing.nx - 1);
+
+	jmin = max(ftoi(floor((ymin - forcing.yo) / forcing.dx)), 0);
+	jmax = min(ftoi(floor((ymax - forcing.yo) / forcing.dx)), forcing.ny - 1);
+
+	//printf("imin=%d; imax=%d, jmin=%d, jmax=%d\t",imin, imax, jmin, jmax);
+
+	ni = max(imax - imin + 1, 1);
+	nj = max(jmax - jmin + 1, 1);
+
+
+	//printf("ni=%d; nj=%d\n", ni, nj);
+	z = 0.0;
+	for (int i = 0; i < ni; i++)
+	{
+		for (int j = 0; j < nj; j++)
+		{
+			cfi = min(imin + i, forcing.nx - 1);
+			cfj = min(jmin + j, forcing.ny - 1);
+			z = z + forcing.val[cfi + cfj * forcing.nx];
+		}
+
+	}
+
+	z = z / (ni * nj);
+
+
+	return z;
+
+}
 
 template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 {

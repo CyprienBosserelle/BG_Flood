@@ -203,7 +203,8 @@ void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 	memset(&Tex.texDesc, 0, sizeof(cudaTextureDesc));
 	Tex.texDesc.addressMode[0] = cudaAddressModeClamp;
 	Tex.texDesc.addressMode[1] = cudaAddressModeClamp;
-	Tex.texDesc.filterMode = cudaFilterModeLinear;
+	//Tex.texDesc.filterMode = cudaFilterModeLinear;
+	Tex.texDesc.filterMode = cudaFilterModePoint;
 	Tex.texDesc.normalizedCoords = false;
 
 	memset(&Tex.resDesc, 0, sizeof(cudaResourceDesc));

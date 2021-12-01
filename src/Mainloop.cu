@@ -36,6 +36,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+		//log("timestep = " + std::to_string(XLoop.totaltime));
 
 		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
 		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
@@ -382,6 +383,12 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 	if (XParam.dtinit > 0)
 	{
 		XLoop.dtmax = XParam.dtinit / 1.5;
+	}
+	else
+	{
+		// WARNING here we specify at least an initial time step if there was 10.0m of water at the highest resolution cell.
+		// The modle will recalculate the optimal dt in subsequent step;
+		XLoop.dtmax = calcres(XParam.dx, XParam.maxlevel) / (sqrt(XParam.g * 10.0));
 	}
 
 	BlockP<T> XBlock = XModel.blocks;
