@@ -10,6 +10,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+	inhalobndCPU(XParam, XModel.blocks, XModel.evolv, XForcing, XModel.zb);
 
 	//============================================
 	// Reset DTmax
