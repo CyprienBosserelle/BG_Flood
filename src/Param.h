@@ -45,7 +45,7 @@ public:
 	//grid parameters
 	double dx = nan(""); // Grid resolution in the coordinate system unit in m.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
-	int nx  =0; // Initial grid size
+	int nx = 0; // Initial grid size
 	int ny = 0; //Initial grid size
 	int nblk = 0; // Number of compute blocks
 	int blkwidth = 16; //Block width in number of cells
@@ -57,7 +57,7 @@ public:
 	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double ymax = nan(""); // Grid ymax (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
-	double grdalpha= nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
+	double grdalpha = nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
 	int spherical = 0; // Flag for geographical coordinate. Can be activated by using the keyword geographic
 	double Radius = 6371220.; //Earth radius [m]

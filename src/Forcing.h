@@ -108,22 +108,23 @@ struct Forcing
 	/* If 2 files are given, 1st file is U wind and second is V wind ( no rotation of the data is performed)
 	If 1 file is given then a 3 column file is expected, showing time, windspeed and direction.
 	Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)
-	Ex: Wind = 'Uwind.txt','Vwind.txt'
-	Ex: Wind = 'MyWind.txt'
+	Ex: Wind = Uwind.txt,Vwind.txt
+	Ex: Wind = MyWind.txt
 	Default: None
 	*/
 	
 
 	DynForcingP<T> Rain;
-	/* Rain dynamic forcing: This allow to force a time varying, space varying rain on the model, in mm/h.
-	The rain can also be forced using a time serie (rain will be considered uniform on the domain)
-	Ex: For a uniform rain: "rain=rain_forcing.txt" (2 column values, time (not necessary unformly distributed) and rain intensity)
-	Ex: For a non-uniform rain: "rain=rain_forcing.nc?rain" (to define the entry netcdf file and the variable associated to the rain "rain", after the "?")
+	/* Rain dynamic forcing: This allow to force a time varying, space varying rain intensity on the model, in mm/h.
+	For a rain map, a netcdf file is expected (with the variable associated to the rain after "?").
+	The rain can also be forced using a time serie (rain will be considered uniform on the domain) using a 2 column values table containing time (not necessary unformly distributed) and rain.
+	Ex: Uniform: rain=rain_forcing.txt 
+	Ex: Non-uniform: rain=rain_forcing.nc?RI
 	Default: None
 	*/
 	DynForcingP<T> Atmp;
 	/* Atmospheric forcing (XXXXXX)
-	Ex: Atmp='AtmosphericPressure.nc'
+	Ex: Atmp=AtmosphericPressure.nc?p
 	Default: None
 	*/
 
@@ -135,8 +136,8 @@ struct Forcing
 	A list of file can also be use to provide a thiner resolution localy for example.
 	The first file will be use to define the domain area and base resolution but the following file
 	will be used during the refinement process.
-	Ex: "bathy=Westport_DEM_2020.nc?z" or "topo=Westport_DEM_2020.asc"
-	Ex: "bathy=South_Island_200.nc?z, West_Coast_100.nc?z, Westport_10.nc?z"
+	Ex: bathy=Westport_DEM_2020.nc?z OR topo=Westport_DEM_2020.asc
+	Ex: bathy=South_Island_200.nc?z, West_Coast_100.nc?z, Westport_10.nc?z
 	Default: None but input NECESSARY
 	*/
 

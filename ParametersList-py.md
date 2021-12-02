@@ -13,8 +13,8 @@ BG_flood user interface consists in a text file, associating key words to user c
 |initlevel|initlevel| 0|Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)|
 |conserveElevation|conserveElevation| false||
 |membuffer|membuffer| 1.05|needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
-|eps|eps| 0.0001|Drying height in m (under eps, the surface is concidered dry)|
-|cf| cf , roughness | 0.0001|Bottom friction coefficient for flow model cf (if constant)|
+|eps|eps| 0.0001|Drying height in m (if h<eps, the surface is concidered dry)|
+|cf| cf , roughness | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |Pa2m|Pa2m| 0.00009916|XXXX in Pa (if unit is hPa then user should use 0.009916)|
@@ -33,10 +33,10 @@ BG_flood user interface consists in a text file, associating key words to user c
 |resetmax|resetmax| false||
 |outishift|outishift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output |
 |outjshift|outjshift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output |
-|nx|nx|0|Initial grid size|
+|nx|nx| 0|Initial grid size|
 |ny|ny| 0|Initial grid size|
 |dx|dx| nan("")|Grid resolution in the coordinate system unit in m.|
-|grdalpha|grdalpha| nan("")|Grid resolution in the coordinate system unit in m.|
+|grdalpha|grdalpha| nan("")|Grid rotation Y axis from the North input in degrees but later converted to rad|
 |xo| xo , xmin | nan("")|Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)|
 |yo| yo , ymin | nan("")|Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)|
 |xmax|xmax| nan("")|Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)|
@@ -59,7 +59,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |hotstep|hotstep| 0|Step to read if hotstart file has multiple steps (step and not (computation) time)|
 |spherical|spherical| 0|Flag for geographical coordinate. Can be activated by using the keyword geographic|
 |Radius|Radius| 6371220.|Earth radius [m]|
-|frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model [REF])|
+|frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 ---
 
 ## List of the Forcings' inputs
@@ -67,16 +67,16 @@ BG_flood user interface consists in a text file, associating key words to user c
 |_Reference_|_Keys_|_default_|_Example_|_Explanation_|
 |---|---|---|---|---|
 |cf| cf , roughness |(see constant in parameters)|cf=0.001;<br>cf=bottom_friction.nc?bfc;|Bottom friction coefficient map (associated to the chosen bottom friction model)|
-|Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|"bathy=Westport_DEM_2020.nc?z" or "topo=Westport_DEM_2020.asc"<br>"bathy=South_Island_200.nc?z, West_Coast_100.nc?z, Westport_10.nc?z"| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spheric (To be check).<br>A list of file can also be use to provide a thiner resolution localy for example.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
-|left| left , leftbndfile , leftbnd |1|left = 0;<br>left = 2,leftBnd.txt;| 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)<br>For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first time<br>column (with possibly variable time steps) and levels in the following columns (1 column correspond to a constant value along the boundary,<br>2 column will correspond to values at boundary edges with linear evolution in between, n colums will correspond to n regularly space<br>applied values along the boundary)|
-|right| right , rightbndfile , rightbnd |1|right = 0;<br>right = 2,rightBnd.txt;|Same as left boundary|
-|top| top , topbndfile , topbnd |1|top = 0;<br>top = 2,topBnd.txt;|Same as left boundary|
-|bot| bot , botbndfile , botbnd , bottom |1|bot = 0;<br>bot = 2,botBnd.txt;|Same as left boundary|
+|Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|bathy=Westport_DEM_2020.nc?z OR topo=Westport_DEM_2020.asc<br>bathy=South_Island_200.nc?z, West_Coast_100.nc?z, Westport_10.nc?z| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spheric (To be check).<br>A list of file can also be use to provide a thiner resolution localy for example.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
+|left| left , leftbndfile , leftbnd |1|left = 0;<br>left = leftBnd.txt,2;| 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)<br>For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first time<br>column (with possibly variable time steps) and levels in the following columns (1 column correspond to a constant value along the boundary,<br>2 column will correspond to values at boundary edges with linear evolution in between, n colums will correspond to n regularly space<br>applied values along the boundary)|
+|right| right , rightbndfile , rightbnd |1|right = 0;<br>right = rightBnd.txt,2;|Same as left boundary|
+|top| top , topbndfile , topbnd |1|top = 0;<br>top = topBnd.txt,2;|Same as left boundary|
+|bot| bot , botbndfile , botbnd , bottom |1|bot = 0;<br>bot = botBnd.txt,2;|Same as left boundary|
 |deform|deform|None|XXXXXXXXXXXXXXXX|Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave<br>Here you can spread the deformation across a certain amount of time and apply it at any point in the model|
 |rivers| rivers , river |None|river = Votualevu_R.txt,1867430,1867455,3914065,3914090;|The river is added as a vertical discharge on a chosen area (the user input consisting in a Time serie and a rectangular area definition: river = Fluxfile,xstart,xend,ystart,yend).<br>The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.<br>To add multiple rivers, just add different lines in the input file (one by river).|
-|Wind| Wind , windfiles |None|XXXXXXXXX| The wind is forced......|
-|Atmp| Atmp , atmpfile |None|XXXXXX| Atmospheric forcing|
-|Rain| Rain , rainfile |None|For a uniform rain: "rain=rain_forcing.txt" (2 column values, time (not necessary unformly distributed) and rain intensity)<br>For a non-uniform rain: "rain=rain_forcing.nc?rain" (to define the entry netcdf file and the variable associated to the rain "rain", after the "?")| Rain dynamic forcing: This allow to force a time varying, space varying rain on the model, in mm/h.<br>The rain can also be forced using a time serie (rain will be considered uniform on the domain)|
+|Wind| Wind , windfiles |None|Wind = Uwind.txt,Vwind.txt<br>Wind = MyWind.txt| If 2 files are given, 1st file is U wind and second is V wind ( no rotation of the data is performed)<br>If 1 file is given then a 3 column file is expected, showing time, windspeed and direction.<br>Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)|
+|Atmp| Atmp , atmpfile |None|Atmp=AtmosphericPressure.nc?p| Atmospheric forcing (XXXXXX)|
+|Rain| Rain , rainfile |None|Uniform: rain=rain_forcing.txt <br>Non-uniform: rain=rain_forcing.nc?RI| Rain dynamic forcing: This allow to force a time varying, space varying rain intensity on the model, in mm/h.<br>For a rain map, a netcdf file is expected (with the variable associated to the rain after "?").<br>The rain can also be forced using a time serie (rain will be considered uniform on the domain) using a 2 column values table containing time (not necessary unformly distributed) and rain.|
 ---
 
 ## List of the non-identified inputs

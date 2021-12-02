@@ -1,8 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
+Created on Thurs Dec 2 15:18:25 2021
 
-This is a temporary script file.
+@author: haranga
+
+Creation of a md table containing the input parameters and their description.
+This table is based only on BG_Flood files used to read, allocate and initiate 
+the code variables.
+First, the ReadInput.cu file is used to get the list of available input keys
+and code variable associated to the "param" and "forcing" objects. We concidere 
+that the fist input key correspond to the variable name.
+Then, having the list of keys and their associated variable, the "Param.h"/"Forcing.h"
+files are used to get the description of the variable, default value, and possibly 
+examples.
+Finally, these keys are listed in tables: one for the parameter, one for the forcings
+(and a last one for the non-identified keys).
+
 """
 #%% Configuration
 import re;
@@ -84,7 +97,6 @@ for ind in range(len(ref_name)):
     key=keys[ind]
     #print(refword)
     if (refword in myParams):
-        print('Param')
         #Domain='Param'
         com=[]
         for i in range(len(P_lines)):
@@ -129,7 +141,6 @@ for ind in range(len(ref_name)):
         ParamTable.Comment.append(Comment)
         ###
     if (refword in myForcings):
-        print('Forcing')
         Domain='Forcing'
         com=[]
         for i in range(len(F_lines)):
@@ -165,7 +176,6 @@ for ind in range(len(ref_name)):
         ForcingTable.Example.append(Example)
         ForcingTable.Comment.append(Comment)
     if not ((refword in myForcings) or (refword in myParams)):
-        print('NonId')
         NonIdTable.Reference.append(refword)
         NonIdTable.Keys.append(key)
 
