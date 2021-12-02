@@ -821,7 +821,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		else if (vars.size() == 1)
 		{
 			// if 1 parameter(file) is given then a 3 column file is expected showing time windspeed and direction
-			// wind direction is rotated (later) to the grid direction (via grdalfa)
+			// wind direction is rotated (later) to the grid direction (via grdalpha)
 			forcing.UWind = readfileinfo(parametervalue, forcing.UWind);
 			forcing.UWind.uniform = 1;
 			
