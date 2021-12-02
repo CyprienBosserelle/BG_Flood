@@ -81,6 +81,7 @@ class bndparam {
 public:
 	std::vector<SLTS> data;
 	bool on = false;
+	//If changing this default value, please change documentation later on the file
 	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
 	std::string inputfile;
 	int nbnd; // number of forcing bnds along the side (>=1 is side is on)
@@ -104,8 +105,11 @@ struct Forcing
 	DynForcingP<T> UWind;
 	DynForcingP<T> VWind;
 	//Forcing the Wind;
-	/* The wind is forced......
-	Ex: XXXXXXXXX
+	/* If 2 files are given, 1st file is U wind and second is V wind ( no rotation of the data is performed)
+	If 1 file is given then a 3 column file is expected, showing time, windspeed and direction.
+	Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)
+	Ex: Wind = 'Uwind.txt','Vwind.txt'
+	Ex: Wind = 'MyWind.txt'
 	Default: None
 	*/
 	
@@ -118,8 +122,8 @@ struct Forcing
 	Default: None
 	*/
 	DynForcingP<T> Atmp;
-	/* Atmospheric forcing
-	Ex: XXXXXX
+	/* Atmospheric forcing (XXXXXX)
+	Ex: Atmp='AtmosphericPressure.nc'
 	Default: None
 	*/
 
@@ -168,28 +172,28 @@ struct Forcing
 	2 column will correspond to values at boundary edges with linear evolution in between, n colums will correspond to n regularly space
 	applied values along the boundary)
 	Ex: left = 0;
-	Ex: left = 2,leftBnd.txt;
+	Ex: left = leftBnd.txt,2;
 	Default: 1
 	*/
 
 	bndparam right;
 	/*Same as left boundary
 	Ex: right = 0;
-	Ex: right = 2,rightBnd.txt;
+	Ex: right = rightBnd.txt,2;
 	Default: 1
 	*/
 
 	bndparam top;
 	/*Same as left boundary
 	Ex: top = 0;
-	Ex: top = 2,topBnd.txt;
+	Ex: top = topBnd.txt,2;
 	Default: 1
 	*/
 
 	bndparam bot;
 	/*Same as left boundary
 	Ex: bot = 0;
-	Ex: bot = 2,botBnd.txt;
+	Ex: bot = botBnd.txt,2;
 	Default: 1
 	*/
 	
