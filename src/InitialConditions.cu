@@ -341,7 +341,7 @@ template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
 
-// Initialise all storage involving parameter the outzone objects
+// Initialise all storage involving parameters of the outzone objects
 template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 {
 	int ib, i;
@@ -432,6 +432,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		//XzoneB.xmax = XParam.xo + max(XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]) + (XParam.blkwidth - 1) * levdx;
 		//XzoneB.ymax = XParam.yo + max(XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[1]]) + (XParam.blkwidth - 1) * levdx;
 
+		printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
 
 		if (XParam.maxlevel != XParam.minlevel) //if adapatation
 		{
@@ -724,9 +725,9 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 }
 
-/*! \fn RectCornerBlk(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)
+/*! \fn RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double xo, double yo, double xmax, double ymax, bool isEps, std::vector<int>& cornerblk)
 	* Find the block containing the border of a rectangular box (used for the defining the output zones)
-	* The indice of the blocks are returned trhough "cornerblk" from bottom left turning in the clockwise direction
+	* The indice of the blocks are returned through "cornerblk" from bottom left turning in the clockwise direction
 	*/
 template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double xo, double yo, double xmax, double ymax, bool isEps, std::vector<int>& cornerblk)
 {
@@ -765,13 +766,13 @@ template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double x
 		{
 			cornerblk[1] = ib;
 		}
-		// Getting the bottom right corner coordinate of the output area
-		if (xmax + eps >= xl && xmax - eps <= xr && yo + eps >= yb && yo - eps <= yt)
+		// Getting the top right corner coordinate of the output area
+		if (xmax + eps >= xl && xmax - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
 		{
 			cornerblk[2] = ib;
 		}
-		// Getting the top right corner coordinate of the output area
-		if (xmax + eps >= xl && xmax - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
+		// Getting the bottom right corner coordinate of the output area
+		if (xmax + eps >= xl && xmax - eps <= xr && yo + eps >= yb && yo - eps <= yt)
 		{
 			cornerblk[3] = ib;
 		}

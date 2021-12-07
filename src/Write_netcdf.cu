@@ -149,7 +149,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	
 	//########################
 	//static size_t tst[] = { 0 };
-	size_t blkstart[] = { Xzone.blk[0] };
+	size_t blkstart[] = { 0 }; // Xzone.blk[0]};
 	size_t blkcount[] = { (size_t) Xzone.nblk };
 	size_t xcount[] = { 0 };
 	size_t ycount[] = { 0 };
@@ -191,8 +191,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		
 		Calcnxnyzone(XParam, lev, nx, ny, Xzone);
 
-		printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xmax, xmin,nx);
-		printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, ymax, ymin, ny);
+		printf("lev=%d;  xxmin=%f; xxmax=%f; nx=%d\n", lev, xmin, xmax, nx);
+		printf("lev=%d;  yymin=%f; yymax=%f; ny=%d\n", lev,  ymin, ymax, ny);
 
 		//to change type from int to size_t
 		nxx = nx;
@@ -239,12 +239,13 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	AllocateCPU(1, nblk, blkwidth);
 	AllocateCPU(1, nblk, blkid);
 
-
+	printf("blockId:\n");
 	for (int ib = 0; ib < nblk; ib++)
 	{
 		int ibl = activeblk[Xzone.blk[ib]];
 		blkwidth[ib] = (float)calcres(XParam.dx, level[ibl]);
 		blkid[ib] = ibl;
+		printf("%i\n", blkid[ib]);
 	}
 	
 	int iib;
@@ -265,8 +266,11 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	}
 
 	status = nc_put_vara_int(ncid, blkid_id, blkstart, blkcount, blkid);
+	if (status != NC_NOERR) handle_ncerror(status);
+
 	//status = nc_put_vara_int(ncid, blkstatus_id, blkstart, blkcount, activeblk);
 	status = nc_put_vara_float(ncid, blkwidth_id, blkstart, blkcount, blkwidth);
+	if (status != NC_NOERR) handle_ncerror(status);
 
 
 	// Reusing blkwidth/blkid for other array (for blkxo/blklevel and blkyo) to save memory space
@@ -281,6 +285,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	}
 
 	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blkwidth);
+	if (status != NC_NOERR) handle_ncerror(status);
+
 	status = nc_put_vara_int(ncid, blklevel_id, blkstart, blkcount, blkid);
 
 	for (int ib = 0; ib < nblk; ib++)
