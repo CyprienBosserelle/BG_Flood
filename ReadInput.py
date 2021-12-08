@@ -85,6 +85,7 @@ class InfoTable:
         self.Default=[]
         self.Example=[]
         self.Comment=[]
+        self.Line=[]
 
 ParamTable=InfoTable()
 ForcingTable=InfoTable()
@@ -102,12 +103,13 @@ for ind in range(len(ref_name)):
         for i in range(len(P_lines)):
             line=P_lines[i]
             if 'std' in line:
-                found=re.findall(rf"\s*std.*\s* {re.escape(refword)}(\.*);\s*(\/\/)*\s*(.*)" , line)
+                found=re.findall(rf"\s*std.*\s* {re.escape(refword)}\s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
             else:
                 found=re.findall(rf"\s*\w\s* {re.escape(refword)} \s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
             #found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
             if len(found) > 0:
                 com=found[0]
+                Line=i
                 Default=''
                 Example=''
                 Comment=''
@@ -139,6 +141,7 @@ for ind in range(len(ref_name)):
         ParamTable.Keys.append(key)
         ParamTable.Default.append(Default)
         ParamTable.Comment.append(Comment)
+        ParamTable.Line.append(Line)
         ###
     if (refword in myForcings):
         Domain='Forcing'
@@ -180,6 +183,15 @@ for ind in range(len(ref_name)):
         NonIdTable.Keys.append(key)
 
 
+#%% Reading the subgroups in the Param.h file
+SubTitle={}
+for i in range(len(P_lines)):
+    line=P_lines[i]
+    if '//*' in line:
+        found=re.findall(r"\s*(\/\/\*)(.*)", line, re.IGNORECASE)
+        SubTitle[i]=found[0][1]
+
+print(SubTitle[44])
 
 #%% Creation of the output file
 
@@ -191,12 +203,23 @@ Out.write('BG_flood user interface consists in a text file, associating key word
 #Creation of the Parameter table in MD
 #####Paramters
 Out.write('## List of the Parameters\' input\n\n')
-Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
-Out.write('|---|---|---|---|\n')
-
-for ind in range(len(ParamTable.Reference)):
-    mystr= "|" + str(ParamTable.Reference[ind]) + "|" + str(ParamTable.Keys[ind]) + "|" + str(ParamTable.Default[ind][4:]) + "|" + str(ParamTable.Comment[ind][4:]) + "|\n"
-    Out.write(mystr)
+#Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
+#Out.write('|---|---|---|---|\n')
+First=0
+for ii in range(len(P_lines)):
+    if ii in SubTitle:
+        #if not First == 0:
+            #Out.write('---\n\n')
+        #else:
+        #    First=1
+        Out.write("### " + str(SubTitle[ii]) + "\n")
+        Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
+        Out.write('|---|---|---|---|\n')
+    else:
+        for ind in range(len(ParamTable.Reference)):
+            if ParamTable.Line[ind] == ii:
+                mystr= "|" + str(ParamTable.Reference[ind]) + "|" + str(ParamTable.Keys[ind]) + "|" + str(ParamTable.Default[ind][4:]) + "|" + str(ParamTable.Comment[ind][4:]) + "|\n"
+                Out.write(mystr)
 Out.write('---\n\n')
 
 #Creation of the Forcing table in MD

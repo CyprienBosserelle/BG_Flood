@@ -12,10 +12,10 @@
 class Param {
 public:
 
-	//general parameters
+	//*General parameters
 	int test = -1; //-1: no test, 99: run all independent tests, X: run test X
 	double g = 9.81; // Gravity in m.s-2
-	double rho = 1025.0; // Fluid density in kg/m-3
+	double rho = 1025.0; // Fluid density in kg.m-3
 	double eps = 0.0001; // Drying height in m (if h<eps, the surface is concidered dry)
 	double dt = 0.0; // Model time step in s.
 	double CFL = 0.5; // Current Freidrich Limiter
@@ -28,25 +28,25 @@ public:
 	bool atmpforcing = false;
 	bool rainforcing = false;
 
-	bool conserveElevation = false;
+	bool conserveElevation = false; //Switch to force the conservation of h
 
 	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
 
-	double Pa2m = 0.00009916; // XXXX in Pa (if unit is hPa then user should use 0.009916)
+	double Pa2m = 0.00009916; // Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)
 	double Paref = 101300.0; // Reference pressure in Pa (if unit is hPa then user should use 1013.0)
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE = 0; // 0: first available GPU, -1: CPU single core, 2+: other GPU
 
 	int doubleprecision = 0; // 0: float precision, 1: double precision
 
-	//grid parameters
+	//*Grid parameters
 	double dx = nan(""); // Grid resolution in the coordinate system unit in m.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
-	int nx = 0; // Initial grid size
-	int ny = 0; //Initial grid size
+	int nx = 0; // Initial grid size in x direction
+	int ny = 0; //Initial grid size in y direction
 	int nblk = 0; // Number of compute blocks
 	int blkwidth = 16; //Block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
@@ -59,28 +59,46 @@ public:
 	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double grdalpha = nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
-	int spherical = 0; // Flag for geographical coordinate. Can be activated by using the keyword geographic
+	int spherical = 0; // Flag for sperical coordinate (still in development)
 	double Radius = 6371220.; //Earth radius [m]
+	double mask = 9999.0; //Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory
 
-	//Adaptation
+	//*Adaptation
 	int initlevel = 0; //Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)
 	int maxlevel = 0; //Maximum level for grid adaptation (overwrite the adaptation map if use) 
 	int minlevel = 0; //Minumim level for grid adaptation (overwrite the adaptation map if use) 
 	int nblkmem = 0;
 	int navailblk = 0;
-	double membuffer = 1.05; //needs to allocate more memory than initially needed so adaptation can happen without memory reallocation
+	double membuffer = 1.05; //Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation
 
-	double mask = 9999.0; //mask any zb above this value. if the entire Block is masked then it is not allocated in the memory
-	//files
-	//std::string Bathymetryfile;// bathymetry file name
-	//inputmap Bathymetry;
-	std::string outfile="Output.nc"; // netcdf output file name
 
-	//Timekeeping
+
+	//*Timekeeping
 	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for none
 	double endtime = 0.0; // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
+
+	//* Initialisation
+	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
+
+	double zsoffset = nan(""); //Add a water level offset in m to initial conditions and boundaries (0.0 by default)
+
+
+	std::string hotstartfile;
+	/*Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb, h or zs, u and v
+	Default: None
+	*/
+	//std::string deformfile;
+	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
+	//other
+	clock_t startcputime, endcputime, setupcputime;
+
+
+	//*Outputs
+	//std::string Bathymetryfile;// bathymetry file name
+	//inputmap Bathymetry;
+	std::string outfile = "Output.nc"; // netcdf output file name
 
 	//Timeseries output (save as a vector containing information for each Time Serie output)
 	std::vector<TSoutnode> TSnodesout; 
@@ -96,10 +114,23 @@ public:
 	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
 
 	std::vector<std::string> outvars; 
-	/*list of names of the variables to output (for 2D maps),
-	<br> supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
+	/*List of names of the variables to output (for 2D maps)
+	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
 	Default: "zb", "zs", "u", "v", "h"
 	*/
+
+
+	// Output switch controls
+	bool resetmax = false; //Switch to reset the "max" outputs after each output
+	bool outmax = false;
+	bool outmean = false;
+	bool outvort = false;
+
+	// WARNING FOR DEBUGGING PURPOSE ONLY
+// For debugging one can shift the output by 1 or -1 in the i and j direction.
+// this will save the value in the halo to the output file allowing debugging of values there.
+	int outishift = 0; //DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output 
+	int outjshift = 0; //DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output 
 
 
 	//Rivers
@@ -115,47 +146,25 @@ public:
 
 	int nmaskblk = 0;
 
-	//hot start
-	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
-
-	double zsoffset = nan(""); //Add a water level offset in m to initial conditions and boundaries (0.0 by default)
 
 
-	std::string hotstartfile; 
-	/*Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb, h or zs, u and v
-	Default= None
-	*/
-	//std::string deformfile;
-	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
-	//other
-	clock_t startcputime, endcputime, setupcputime;
-
-	//Netcdf parameters
+	//*Netcdf parameters
 	int smallnc = 1; //Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float
 	float scalefactor = 0.01f; //Scale factor used for the short integer conversion for netcdf outputs
 	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs
 
 #ifdef USE_CATALYST
-        // ParaView Catalyst parameters
+        //* ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)
         int use_catalyst = 0; // Switch to use ParaView Catalyst
         int catalyst_python_pipeline = 0; //Pipeline to use ParaView Catalyst
         int vtk_output_frequency = 0; // Output frequency for ParaView Catalyst
-        double vtk_output_time_interval = 1.0; // XXX  for ParaView Catalyst
+        double vtk_output_time_interval = 1.0; // Output time step for ParaView Catalyst
         std::string vtk_outputfile_root = "bg_out"; //output file name for ParaView Catalyst
         std::string python_pipeline = "coproc.py"; //python pipeline for ParaView Catalyst
 #endif
 
-	// Output switch controls
-	bool resetmax = false;
-	bool outmax = false;
-	bool outmean = false;
-	bool outvort = false;
 
-	// WARNING FOR DEBUGGING PURPOSE ONLY
-	// For debugging one can shift the output by 1 or -1 in the i and j direction.
-	// this will save the value in the halo to the output file allowing debugging of values there.
-	int outishift = 0; //DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output 
-	int outjshift = 0; //DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output 
+
 
 	// info of the mapped cf
 	//inputmap roughnessmap;
