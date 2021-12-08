@@ -2648,7 +2648,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
-
+	XParam.rainbnd = true;
 	//output vars
 	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
 	std::vector<std::string> outv;
@@ -2867,7 +2867,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
 	Surf = (XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo);
 	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
-
+	XParam.rainbnd = true;
 	XParam.zsinit = zinit;
 
 	//Output times for comparisons
