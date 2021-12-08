@@ -6,7 +6,7 @@ on:
 #  push:
 #    branches: [self-hosted-CI]
   pull_request:
-    branches: [self-hosted-CI]
+    branches: [development]
  
 jobs:
   repo-sync:

@@ -6,9 +6,9 @@ name: Input-Keys, Python script
 
 on:
   push:
-    branches: [ self-hosted-CI ]
+    branches: [ development ]
   pull_request:
-    branches: [ self-hosted-CI ]
+    branches: [ development ]
 
 jobs:
   update-file:
