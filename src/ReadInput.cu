@@ -214,7 +214,7 @@ Param readparamstr(std::string line, Param param)
 		param.eps = std::stod(parametervalue);
 	}
 	
-	paramvec = { "cf","roughness"};
+	paramvec = { "cf","roughness","cfmap"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -793,7 +793,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// friction coefficient (mapped or constant)
-	paramvec = { "cf","roughness"};
+	// if it is a constant no-need to do anyjting below but if it is a file it overides any other values 
+	paramvec = { "cf","roughness","cfmap"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{

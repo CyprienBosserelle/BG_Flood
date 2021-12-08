@@ -591,8 +591,8 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 		}
 	}
 
-	bool Modif = false;
-	if (Modif == true) {
+	//bool Modif = false;
+	if (XParam.rainbnd== false) {
 		// Remove rain from boundary cells
 		for (int ibl = 0; ibl < XParam.nbndblkleft; ibl++)
 		{

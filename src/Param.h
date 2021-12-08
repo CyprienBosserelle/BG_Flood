@@ -177,7 +177,7 @@ public:
 	// deformation forcing for tsunami generation
 	//std::vector<deformmap> deform;
 	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-
+	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be ==0. would be 
 
 	// This here should be stored in a structure at a later stage
 	std::string AdatpCrit;
