@@ -254,7 +254,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		}
 	}
 
@@ -359,6 +360,7 @@ void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
 	if (Dforcing.nx > 0 && Dforcing.ny > 0)
 	{
 		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
+		//
 		readforcingdata(totaltime, Dforcing);
 		if (gpgpu)
 		{
@@ -1063,6 +1065,7 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	readvardata(forcing.inputfile, forcing.varname, step, forcing.before);
 	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after);
 	InterpstepCPU(forcing.nx, forcing.ny, step, totaltime, forcing.dt, forcing.now, forcing.before, forcing.after);
+	forcing.val = forcing.now;
 }
 
 /*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
@@ -1082,7 +1085,14 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 		log("Reading Forcing file as netcdf file");
 		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
 		
-
+		if (Fmap.nt > 1)
+		{
+			Fmap.dt = (Fmap.tmax - Fmap.to) / (Fmap.nt - 1);
+		}
+		else
+		{
+			Fmap.dt = Fmap.tmax; // Or a very large number!
+		}
 	}
 	else
 	{
@@ -1378,6 +1388,8 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 	//std::getline(fs, line);
 	int linehead = 0;
 
+	bool pixelreg = true;
+
 	while (linehead < 6)
 	{
 		std::getline(fs, line);
@@ -1431,7 +1443,7 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 			}
 			if (left.compare("yllcenter") == 0) // found the parameter
 			{
-
+				pixelreg = false;
 				//
 				yo = std::stod(right);
 
@@ -1439,7 +1451,7 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 			//if gridnode registration this should happen
 			if (left.compare("xllcorner") == 0) // found the parameter
 			{
-
+				pixelreg = false;
 				//
 				xo = std::stod(right);
 
@@ -1457,6 +1469,13 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 			linehead++;
 		}
 	}
+
+	if (!pixelreg)
+	{
+		xo = xo + 0.5 * dx;
+		yo = yo + 0.5 * dx;
+	}
+
 	grdalpha = 0.0;
 	fs.close();
 

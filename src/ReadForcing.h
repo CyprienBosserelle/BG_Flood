@@ -6,7 +6,7 @@
 #include "Input.h"
 #include "Param.h"
 #include "Write_txtlog.h"
-#include "read_netcdf.h"
+#include "Read_netcdf.h"
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "Setup_GPU.h"
@@ -24,6 +24,7 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
 
 void readDynforcing(bool gpgpu,double totaltime, DynForcingP<float>& Dforcing);
 
+DynForcingP<float> readforcinghead(DynForcingP<float> Fmap);
 template<class T> T readforcinghead(T Fmap);
 //template<class T> T readBathyhead(T BathyParam);
 template<class T> void readstaticforcing(T& Sforcing);
@@ -35,6 +36,7 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 template <class T> void readbathyMD(std::string filename, T*& zb);
 template <class T> void readXBbathy(std::string filename, int nx, int ny, T*& zb);
 
+void InitDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing);
 
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 template <class T> void readbathyASCzb(std::string filename, int nx, int ny, T*& zb);

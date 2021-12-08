@@ -2,3 +2,5 @@ build
 *~
 CMakeSettings.json
 .vs
+*.dll
+*.exe

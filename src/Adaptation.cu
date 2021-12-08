@@ -96,19 +96,11 @@ template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcin
 		log("Adapting mesh");
 		Adaptation(XParam, XForcing, XModel);
 
-		//recalculate river positions (They may belong to a different block)
-		InitRivers(XParam, XForcing, XModel);
 
-		//rerun boundary block (there may be new bnd block and old ones that do not belong anymore)
-		//Initbnds(XParam, XForcing, XModel);
-		Calcbndblks(XParam, XForcing, XModel.blocks);
-		Findbndblks(XParam, XModel, XForcing);
+		InitialConditions(XParam, XForcing, XModel);
 
-		//Recalculate the masks
-		FindMaskblk(XParam, XModel.blocks);
 
-		// Re run initial contions to avoid dry/wet issues
-		initevolv(XParam, XModel.blocks, XForcing, XModel.evolv, XModel.zb);
+		
 	}
 }
 template void InitialAdaptation<float>(Param& XParam, Forcing<float> &XForcing, Model<float>& XModel);

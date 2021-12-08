@@ -106,7 +106,7 @@ template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBloc
 					}
 					else if (XParam.frictionmodel == -1)// Manning friction formulation
 					{
-						T n = cfi;
+						T n = cf[i];
 						cfi = manningfriction(g, hi, n);
 
 
@@ -126,7 +126,7 @@ template __host__ void bottomfrictionCPU<float>(Param XParam, BlockP<float> XBlo
 template __host__ void bottomfrictionCPU<double>(Param XParam, BlockP<double> XBlock,double dt, double* cf, EvolvingP<double> XEvolv);
 
 /*!\fn void XiafrictionCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv)
-* apply bottom friction follwing the procedure from Xia and Lang 2018
+* apply bottom friction following the procedure from Xia and Lang 2018
 * https://doi.org/10.1016/j.advwatres.2018.05.004
 * 
 *
@@ -171,7 +171,7 @@ template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, 
 					}
 					else if (XParam.frictionmodel == -1)// Manning friction formulation
 					{
-						T n = cfi;
+						T n = cf[i];
 						cfi = manningfriction(g, hi, n);
 
 
@@ -237,7 +237,7 @@ template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock
 		}
 		else if (XParam.frictionmodel == -1)// Manning friction formulation
 		{
-			T n = cfi;
+			T n = cf[i];
 			cfi = manningfriction(g, hi, n);
 
 
@@ -283,3 +283,117 @@ template <class T> __host__ __device__ T manningfriction(T g, T hi, T n)
 	T cfi= g * n * n / cbrt(hi);
 	return cfi;
 }
+
+
+
+
+/*! \fn void TheresholdVelGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
+*
+* \brief Function Used to prevent crazy velocity on the GPU
+*
+* The function wraps the main function for the GPU.
+*/
+template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
+{
+	
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	bool bustedThreshold = false;
+
+
+	T ui, vi;
+
+	
+	ui = XEvolv.u[i];
+	vi = XEvolv.v[i];
+
+	bustedThreshold = ThresholdVelocity(T(XParam.VelThreshold), ui, vi);
+
+	XEvolv.u[i] = ui;
+
+	XEvolv.v[i] = vi;
+	
+
+}
+template __global__ void TheresholdVelGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEvolv);
+template __global__ void TheresholdVelGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEvolv);
+
+/*! \fn void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
+*
+* \brief Function Used to prevent crazy velocity on the CPU
+*
+* The function wraps teh main functio for the CPU.
+*/
+template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
+{
+
+	T ui, vi, normu;
+
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				bool bustedThreshold = false;
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				ui = XEvolv.u[i];
+
+				vi = XEvolv.v[i];
+
+				bustedThreshold = ThresholdVelocity(T(XParam.VelThreshold), ui, vi);
+
+				if (bustedThreshold)
+				{
+					log("Velocity Threshold exceeded!");
+				}
+				XEvolv.u[i] = ui;
+
+				XEvolv.v[i] = vi;
+			}
+		}
+	}
+}
+template __host__ void TheresholdVelCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEvolv);
+template __host__ void TheresholdVelCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEvolv);
+
+/*! \fn bool ThresholdVelocity(T Threshold, T& u, T& v)
+* 
+* \brief Function Used to prevent crazy velocity
+* 
+* The function scale velocities so it doesn't exceeds a given threshold. 
+* Default threshold is/should be 16.0m/s
+*/
+template <class T> __host__ __device__ bool ThresholdVelocity(T Threshold, T& u, T& v)
+{
+	T normvel = sqrt(u * u + v * v);
+
+	bool alert = normvel > Threshold;
+
+	if (alert)
+	{
+		u /= normvel / Threshold;
+		v /= normvel / Threshold;
+	}
+	return alert;
+}
+
+

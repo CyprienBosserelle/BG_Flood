@@ -20,7 +20,7 @@
 
 #include "Adaptation.h"
 
-template <class T> void Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
+template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
 
 template <class T> bool GaussianHumptest(T zsnit, int gpu,bool compare);
 
@@ -30,5 +30,12 @@ template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z);
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo);
 //template <class T> void Gaussianhump(Param XParam, Model<T> XModel, Model<T> XModel_g);
+template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit);
+bool Raintestinput(int gpu);
+template <class T> bool Rivertest(T zsnit, int gpu);
+template <class T> bool MassConserveSteepSlope(T zsnit, int gpu);
+template <class T> bool Raintest(T zsnit, int gpu, float alpha);
+template <class T> bool testboundaries(Param XParam, T maxslope);
+
 // End of global definition
 #endif

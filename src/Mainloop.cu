@@ -12,19 +12,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
-	// fill halo for zb
-	// only need to do that once 
-	fillHaloC(XParam, XModel.blocks, XModel.zb);
-	if (XParam.GPUDEVICE >= 0)
-	{
-		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
-		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
-
-		cudaStreamDestroy(XLoop.streams[0]);
-	}
-
-
-
+	
 	log("\t\tCompleted");
 	log("Model Running...");
 	while (XLoop.totaltime < XParam.endtime)
@@ -48,6 +36,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+		//log("timestep = " + std::to_string(XLoop.totaltime));
 
 		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
 		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
@@ -74,6 +63,96 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 template void MainLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
 template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
 
+
+
+/*! \fn  void  DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
+* Debugging loop 
+* This function was crated to debug to properly wrap the debug flow engine of the model
+*/
+template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
+{
+
+	log("Initialising model main loop");
+
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	//Define some useful variables 
+	Initmeanmax(XParam, XLoop, XModel, XModel_g);
+
+	// fill halo for zb
+	// only need to do that once 
+	fillHaloC(XParam, XModel.blocks, XModel.zb);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	if (XParam.GPUDEVICE >= 0)
+	{
+		dim3 blockDim(16, 16, 1);
+		dim3 gridDim(XParam.nblk, 1, 1);
+		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[0]));
+		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
+		cudaStreamDestroy(XLoop.streams[0]);
+
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+
+	}
+
+
+
+	log("\t\tCompleted");
+	log("Model Running...");
+	while (XLoop.nstep < 100)
+	{
+		// Bnd stuff here
+		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+
+
+		// Calculate Forcing at this step
+		updateforcing(XParam, XLoop, XForcing);
+
+		// Core engine
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//HalfStepGPU(XParam, XLoop, XForcing, XModel_g);
+		}
+		else
+		{
+			HalfStepCPU(XParam, XLoop, XForcing, XModel);
+		}
+
+		// Time keeping
+		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
+
+		// Force output at every step
+		XLoop.nextoutputtime = XLoop.totaltime;
+
+		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
+		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
+
+		// Do Sum & Max variables Here
+		Calcmeanmax(XParam, XLoop, XModel, XModel_g);
+
+		// Check & collect TSoutput
+		pointoutputstep(XParam, XLoop, XModel, XModel_g);
+
+		// Check for map output
+		mapoutput(XParam, XLoop, XModel, XModel_g);
+
+		// Reset mean/Max if needed
+		resetmeanmax(XParam, XLoop, XModel, XModel_g);
+
+		printstatus(XLoop.totaltime, XLoop.dt);
+		XLoop.nstep++;
+	}
+
+
+
+
+}
+template void DebugLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
+template void DebugLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
 
 
 
@@ -167,8 +246,8 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	//
-	dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
-	dim3 gridDim = (XModel.bndblk.nblkTs, 1, 1);
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XModel.bndblk.nblkTs, 1, 1);
 	FILE* fsSLTS;
 	if (XParam.GPUDEVICE>=0)
 	{
@@ -187,8 +266,9 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 					
 			
 			storeTSout << <gridDim, blockDim, 0 >> > (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
+			CUDA_CHECK(cudaDeviceSynchronize());
 		}
-		CUDA_CHECK(cudaDeviceSynchronize());
+		//CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
@@ -274,6 +354,7 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
+	//printf("ib=%d; ix=%d; iy=%d; blknode=%d; inode=%d; jnode=%d\n", ib, ix,iy,blknode,inode,jnode);
 
 	if (ib == blknode && ix == inode && iy == jnode)
 	{
@@ -281,6 +362,10 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 		store[1 + outnode * 4 + istep * noutnodes * 4] = XEv.zs[i];
 		store[2 + outnode * 4 + istep * noutnodes * 4] = XEv.u[i];
 		store[3 + outnode * 4 + istep * noutnodes * 4] = XEv.v[i];
+
+
+
+		//printf("XEv.h[i]=%f; store[h]=%f\n", XEv.h[i], store[0 + outnode * 4 + istep * noutnodes * 4]);
 	}
 }
 
@@ -294,6 +379,17 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 
 	XLoop.dtmax = XLoop.hugeposval;
 
+	//to limit the initial time steps (by user input)
+	if (XParam.dtinit > 0)
+	{
+		XLoop.dtmax = XParam.dtinit / 1.5;
+	}
+	else
+	{
+		// WARNING here we specify at least an initial time step if there was 10.0m of water at the highest resolution cell.
+		// The modle will recalculate the optimal dt in subsequent step;
+		XLoop.dtmax = calcres(XParam.dx, XParam.maxlevel) / (sqrt(XParam.g * 10.0));
+	}
 
 	BlockP<T> XBlock = XModel.blocks;
 

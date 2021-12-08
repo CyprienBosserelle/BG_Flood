@@ -33,7 +33,12 @@ inline int nc_get_var_T(int ncid, int varid, double * &zb)
 	status = nc_get_var_double(ncid, varid, zb);
 	return status;
 }
-
+inline int nc_get_var_T(int ncid, int varid, int*& zb)
+{
+	int status;
+	status = nc_get_var_int(ncid, varid, zb);
+	return status;
+}
 
 inline int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, int*& zb)
 {
@@ -544,15 +549,18 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 	// The role of this function is to offload and simplify the rest of the code
 
 
-	int nx, ny, nt, status, ncid, varid, sferr, oferr,ndims;
+	int nx, ny, nt, status, ncid, varid, sferr, oferr, merr,ndims;
 	size_t * start, * count, *ddim;
-	double scalefac, offset;
+	double scalefac, offset, missing;
+
+
 
 	ndims = readvarinfo(filename, Varname, ddim);
 
 	start = (size_t *)malloc(ndims*sizeof(size_t));
 	count = (size_t *)malloc(ndims*sizeof(size_t));
 
+	
 
 	//
 	status = nc_open(filename.c_str(), 0, &ncid);
@@ -587,13 +595,13 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		nt = (int)ddim[0];
 		ny = (int)ddim[1];
 		nx = (int)ddim[2];
-		start[0] = utils::min(step, nt - 1);
-		start[1] = 0;
-		start[2] = 0;
+		start[0] = size_t(utils::min(step, nt - 1));
+		start[1] = size_t(0);
+		start[2] = size_t(0);
 
-		count[0] = 1;
-		count[1] = ny;
-		count[2] = nx;
+		count[0] = size_t(1);
+		count[1] = size_t(ny);
+		count[2] = size_t(nx);
 
 
 
@@ -603,17 +611,49 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 
 	if (ndims > 1)
 	{
+
 		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
 		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
 
+		merr = nc_get_att_double(ncid, varid, "missingvalue", &missing);
+		if (merr != NC_NOERR)
+		{
+			merr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
+		}
+
+
+		// remove fill value
+		if (merr == NC_NOERR)
+		{
+			//T maxval = T(-99999.0);
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					bool test = missing != missing ? vardata[i + j * nx] != vardata[i + j * nx] : (vardata[i + j * nx] > T(0.9 * missing));
+					if (test) // i.e. if vardata is anywhere near missing
+					{
+						
+						vardata[i + j * nx] = T(0.0);
+					}
+					//maxval = utils::max(maxval, vardata[i + j * nx]);
+				}
+			}
+			//printf("maxval = %f\n", float(maxval));
+		}
+
+
+
+		// apply scale and offset
 		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 		{
 			for (int j = 0; j < ny; j++)
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					vardata[i + j*nx] = vardata[i + j*nx] * (T)scalefac + (T)offset;
+					vardata[i + j * nx] = vardata[i + j * nx] * (T)scalefac + (T)offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
+					
 				}
 			}
 		}
@@ -637,10 +677,10 @@ template int readvardata<double>(std::string filename, std::string Varname, int 
 
 
 
-std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD)
+std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE)
 {
 	int varid;
-	int errorA, errorB,errorC,errorD;
+	int errorA, errorB,errorC,errorD,errorE;
 	std::string outstring;
 
 	//std::vector<std::string> teststr;
@@ -652,6 +692,8 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	errorB = nc_inq_varid(ncid, stringB.c_str(), &varid);
 	errorC = nc_inq_varid(ncid, stringC.c_str(), &varid);
 	errorD = nc_inq_varid(ncid, stringD.c_str(), &varid);
+	errorE = nc_inq_varid(ncid, stringE.c_str(), &varid);
+
 
 	if (errorA == NC_NOERR)
 	{
@@ -669,7 +711,10 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	{
 		outstring = stringD;
 	}
-
+	else if (errorE == NC_NOERR)
+	{
+		outstring = stringE;
+	}
 
 	return outstring;
 
@@ -830,5 +875,41 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 
 }
 
+// The following functions are simple tools to create 2D or 3D netcdf files (for testing for example)
 
+extern "C" void read3Dnc(int nx, int ny, int ntheta, char ncfile[], float * &ee)
+{
+	int status;
+	int ncid, ee_id;
+	static size_t count[] = { nx, ny,ntheta };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "z", &ee_id);
+	status = nc_get_var_float(ncid, ee_id, ee);
+	status = nc_close(ncid);
 
+}
+
+extern "C" void read2Dnc(int nx, int ny, char ncfile[], float * &hh)
+{
+	int status;
+	int ncid, hh_id;
+	static size_t count[] = { nx, ny };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "hh", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, hh);
+	status = nc_close(ncid);
+
+}
+
+extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
+{
+	int status;
+	int ncid, hh_id;
+	static size_t count[] = { nx, ny };
+
+	status = nc_open(ncfile.c_str(), NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "zb", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, zb);
+	status = nc_close(ncid);
+
+}

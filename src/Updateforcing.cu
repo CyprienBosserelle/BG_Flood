@@ -47,7 +47,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 		while (difft < 0.0)
 		{
 			Rstepinbnd++;
-			difft = XDynForcing.unidata[Rstepinbnd].time - XParam.totaltime;
+			difft = XDynForcing.unidata[Rstepinbnd].time - XLoop.totaltime;
 		}
 
 		XDynForcing.nowvalue = T(interptime(XDynForcing.unidata[Rstepinbnd].wspeed, XDynForcing.unidata[Rstepinbnd - 1].wspeed, XDynForcing.unidata[Rstepinbnd].time - XDynForcing.unidata[Rstepinbnd - 1].time, XLoop.totaltime - XDynForcing.unidata[Rstepinbnd - 1].time));
@@ -98,7 +98,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 		}
 		else
 		{
-			InterpstepCPU(XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, XLoop.totaltime, XDynForcing.dt, XDynForcing.now, XDynForcing.before, XDynForcing.after);
+			InterpstepCPU(XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, XLoop.totaltime, XDynForcing.dt, XDynForcing.val, XDynForcing.before, XDynForcing.after);
 		}
 		//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
 		//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
@@ -158,11 +158,19 @@ template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T q
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T xl, yb, xr, yt, xllo, yllo;
+	xllo = XParam.xo + XBlock.xo[ib];
+	yllo = XParam.yo + XBlock.yo[ib];
 
-	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+	xl = xllo + ix * delta - 0.5 * delta;
+	yb = yllo + iy * delta - 0.5 * delta;
 
-	if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+	xr = xllo + ix * delta + 0.5 * delta;
+	yt = yllo + iy * delta + 0.5 * delta;
+	// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+	// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+	//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+	if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart), T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
 	{
 
 		XAdv.dh[i] += qnow  / XRiver.disarea;
@@ -181,9 +189,18 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
+	T xllo, yllo, xl, yb, xr, yt, levdx;
+
 	for (int ibl = 0; ibl < nblkriver; ibl++)
 	{
 		ib = Riverblks[ibl];
+
+		levdx = calcres(XParam.dx, XBlock.level[ib]);
+
+		xllo = XParam.xo + XBlock.xo[ib];
+		yllo = XParam.yo + XBlock.yo[ib];
+
+
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -196,10 +213,19 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 
 				T Rainhh;
 
-				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				//T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				//T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
-				if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+				//if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
+				xl = xllo + ix * levdx - 0.5 * levdx;
+				yb = yllo + iy * levdx - 0.5 * levdx;
+
+				xr = xllo + ix * levdx + 0.5 * levdx;
+				yt = yllo + iy * levdx + 0.5 * levdx;
+				// the conditions are that the discharge area as defined by the user have to include at least a model grid node
+				// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
+				//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
+				if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart),T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
 				{
 					XAdv.dh[i] += qnow / XRiver.disarea;
 
@@ -243,10 +269,50 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 
 	Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
 
-	XAdv.dh[i] += Rainhh;
+	XAdv.dh[i] += Rainhh * XBlock.activeCell[i];
 }
 template __global__ void AddrainforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
 template __global__ void AddrainforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
+
+
+template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T Rainhh;
+
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+	if (Rain.uniform)
+	{
+		Rainhh = Rain.nowvalue;
+	}
+	else
+	{
+		Rainhh = T(interpDyn2BUQ(x, y, Rain.GPU));
+	}
+
+	
+
+	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt,T(0.0)); // convert from mm/hrs to m/s
+
+	
+	XEv.h[i] += Rainhh * XBlock.activeCell[i];
+	XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+
+}
+template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
+template __global__ void AddrainforcingImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
 
 template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
@@ -287,7 +353,9 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 
 				Rainhh = Rainhh / T(1000.0) / T(3600.0); // convert from mm/hrs to m/s
 
-				XAdv.dh[i] += Rainhh;
+				
+
+				XAdv.dh[i] += Rainhh * XBlock.activeCell[i];
 			}
 		}
 	}
@@ -295,6 +363,50 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 template __host__ void AddrainforcingCPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
 template __host__ void AddrainforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
 
+template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv)
+{
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+				T Rainhh;
+
+				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				if (Rain.uniform)
+				{
+					Rainhh = Rain.nowvalue;
+				}
+				else
+				{
+					Rainhh = interp2BUQ(x, y, Rain);
+				}
+
+
+				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt, T(0.0)); // convert from mm/hrs to m/s
+
+				XEv.h[i] += Rainhh * XBlock.activeCell[i];
+				XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+			}
+		}
+	}
+}
+template __host__ void AddrainforcingImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
+template __host__ void AddrainforcingImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
 template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
 {

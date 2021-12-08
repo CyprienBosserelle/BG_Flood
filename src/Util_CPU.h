@@ -26,5 +26,9 @@ template <class T>  __host__ __device__ T BarycentricInterpolation(T q1, T x1, T
 
 template <class T> __host__ __device__ T calcres(T dx, int level);
 template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2);
+
+template <class T> __host__  __device__  bool OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax);
+
+template <class T> int ftoi(T value);
 // End of global definition
 #endif

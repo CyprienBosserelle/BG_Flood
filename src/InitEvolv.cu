@@ -62,7 +62,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 
 		//case 0 (i.e. zsinint not specified by user and no boundaries were specified)
 		
-		if (std::isnan(XParam.zsinit) && (!XParam.leftbnd && !XParam.rightbnd && !XParam.topbnd && !XParam.botbnd)) //zsinit is default
+		if (std::isnan(XParam.zsinit) && (!XForcing.left.on && !XForcing.right.on && !XForcing.top.on && !XForcing.bot.on)) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value than nan
 		}
@@ -131,8 +131,8 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 template <class T>
 void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
-	// This function read water level boundary if they have nbeen setup and calculate thedistance to the boundary 
-	// toward the end the water level value is calculated as an inverse distnace to the available boundaries.
+	// This function read water level boundary if they have been setup and calculate the distance to the boundary 
+	// toward the end the water level value is calculated as an inverse distance to the available boundaries.
 	// While this may look convoluted its working quite simply.
 	// look for each boundary side and calculate the closest water level value and the distance to that value
 
@@ -383,11 +383,11 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
-	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z");
-	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA");
-	hname = checkncvarname(ncid, "h", "hh", "hhh", "hhhh");
-	uname = checkncvarname(ncid, "u", "uu", "uvel", "UVEL");
-	vname = checkncvarname(ncid, "v", "vv", "vvel", "VVEL");
+	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z", "zb_P0");
+	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA", "zs_P0");
+	hname = checkncvarname(ncid, "h", "hh", "hhh", "hhhh", "h_P0");
+	uname = checkncvarname(ncid, "u", "uu", "uvel", "UVEL", "u_P0");
+	vname = checkncvarname(ncid, "v", "vv", "vvel", "VVEL", "v_P0");
 
 	//by default we assume that the x axis is called "xx" but that is not sure "x" shoudl be accepted and so does "lon" for spherical grid
 	// The folowing section figure out which one is in the file and if none exits with the netcdf error
@@ -425,7 +425,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 
 
 	}
-	// second check if zs or hh are in teh file
+	// second check if zs or hh are in the file
 
 
 	//zs Section

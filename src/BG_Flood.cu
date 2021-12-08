@@ -25,30 +25,31 @@
 #include "BG_Flood.h"
 
 
-
-
 /*! \fn int main(int argc, char **argv)
 * Main function 
 * This function is the entry point to the software
+* The main function setups all the init of the model and then calls the mainloop to actually run the model
+*
+*	There are 3 main class storing information about the model: XParam (class Param), XModel (class Model) and XForcing (class Forcing)
+*	Leading X stands for eXecution and is to avoid confusion between the class variable and the class declaration
+*	When running with the GPU there is also XModel_g
+*	which is the same as XModel but with GPU specific pointers
+*
+*
+* This function does:
+* * Reads the inputs to the model
+* * Allocate memory on GPU and CPU
+* * Prepare and initialise memory and arrays on CPU and GPU
+* * Setup initial condition
+* * Adapt grid if require
+* * Prepare output file
+* * Run main loop
+* * Clean up and close
 */
 int main(int argc, char **argv)
 {
 
-	//The main function setups all the init of the model and then calls the mainloop to actually run the model
-
-	// There are 3 main class storing information about the model: XParam (class Param), XModel (class Model) and XForcing (class Forcing)
-	// Leading X stands for eXecution and is to avoid confusion between the class variable and the class declaration
-	// When running with the GPU there is also XModel_g
-	// which is the same as XModel but with GPU specific pointers
-
-	//First part reads the inputs to the model
-	//then allocate memory on GPU and CPU
-	//Then prepare and initialise memory and arrays on CPU and GPU
-	// Setup initial condition
-	// Adapt grid if require
-	// Prepare output file
-	// Run main loop
-	// Clean up and close
+	
 
 	//===========================================
 	//  Define the main parameter controling the model (XModels class at produced later) 
@@ -57,7 +58,8 @@ int main(int argc, char **argv)
 	// Start timer to keep track of time
 	XParam.startcputime = clock();
 
-	// Create/overight existing 
+
+	// Create/overwrite existing 
 	create_logfile();
 
 	//============================================
@@ -90,7 +92,7 @@ int main(int argc, char **argv)
 	InitMesh(XParam, XForcing, XModel);
 
 	//============================================
-	// Prepare initial conditions
+	// Prepare initial conditions on CPU
 	InitialConditions(XParam, XForcing, XModel);
 
 	//============================================
@@ -101,6 +103,8 @@ int main(int argc, char **argv)
 	// Setup GPU (bypassed within the function if no suitable GPU is available)
 	SetupGPU(XParam, XModel,XForcing, XModel_g);
 
+
+
 	//
 	log("\nModel setup complete");
 	log("#################################");
@@ -108,6 +112,7 @@ int main(int argc, char **argv)
 	//   End of Initialisation time
 	//===========================================
 	XParam.setupcputime = clock();
+	bool isfailed = false;
 
 	if (XParam.test < 0)
 	{
@@ -120,22 +125,35 @@ int main(int argc, char **argv)
 		//============================================
 		// Testing
 		//Gaussianhump(XParam, XModel, XModel_g);
-		Testing(XParam, XForcing, XModel, XModel_g);
-
+		isfailed = Testing(XParam, XForcing, XModel, XModel_g);
 	}
 
-	//log(std::to_string(XForcing.Bathy.val[50]));
-	//TestingOutput(XParam, XModel);
-	//CompareCPUvsGPU(XParam, XForcing, XModel, XModel_g);
-	//Gaussianhump(XParam, XModel, XModel_g);
-	
+		
 
 	//===========================================
 	//   End of Model
 	//===========================================
 	XParam.endcputime = clock();
+
+	//===========================================
+	//   Log the timer
+	//===========================================
+	log("#################################");
+	log("End Computation");
+	log("#################################");
+	log("Total runtime= " + std::to_string((XParam.endcputime - XParam.startcputime) / CLOCKS_PER_SEC) + " seconds");
+	log("Model Setup time= " + std::to_string((XParam.setupcputime - XParam.startcputime) / CLOCKS_PER_SEC) + " seconds");
+	log("Model runtime= " + std::to_string((XParam.endcputime - XParam.setupcputime) / CLOCKS_PER_SEC) + " seconds");
 	//============================================
 	// Cleanup and free memory
-
-	exit(0);
+	//
+	if (XParam.test < 0)
+	{
+		exit(isfailed);
+	}
+	else 
+	{
+		exit(0);
+	}
+	
 }

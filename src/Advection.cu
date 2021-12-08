@@ -182,13 +182,17 @@ template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, 
 	T eps = T(XParam.eps);
 	T hold = XEv.h[i];
 	T ho, uo, vo;
-	ho = hold + dt * XAdv.dh[i];
+	T dhi = XAdv.dh[i];
+
+	T edt = dt;// dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
+
+	ho = hold + edt * dhi;
 
 
 	if (ho > eps) {
 		//
-		uo = (hold * XEv.u[i] + dt * XAdv.dhu[i]) / ho;
-		vo = (hold * XEv.v[i] + dt * XAdv.dhv[i]) / ho;
+		uo = (hold * XEv.u[i] + edt * XAdv.dhu[i]) / ho;
+		vo = (hold * XEv.v[i] + edt * XAdv.dhv[i]) / ho;
 		
 	}
 	else
@@ -232,14 +236,19 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 
 				
 				T hold = XEv.h[i];
-				T ho, uo, vo;
-				ho = hold + dt * XAdv.dh[i];
+				T ho, uo, vo, dhi;
+
+				dhi = XAdv.dh[i];
+
+				T edt = dt;// dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
+
+				ho = hold + edt * dhi;
 
 
 				if (ho > eps) {
 					//
-					uo = (hold * XEv.u[i] + dt * XAdv.dhu[i]) / ho;
-					vo = (hold * XEv.v[i] + dt * XAdv.dhv[i]) / ho;
+					uo = (hold * XEv.u[i] + edt * XAdv.dhu[i]) / ho;
+					vo = (hold * XEv.v[i] + edt * XAdv.dhv[i]) / ho;
 
 				}
 				else
@@ -317,7 +326,8 @@ template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, Evol
 template __host__ void cleanupCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, EvolvingP<float> XEv_o);
 template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, EvolvingP<double> XEv_o);
 
-template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
+
+template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -325,7 +335,7 @@ template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, Block
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 
-	T dt=T(1.0)/epsi;
+	T dt = T(1.0) / epsi;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -343,6 +353,19 @@ template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, Block
 			}
 		}
 	}
+
+	return dt;
+}
+template __host__ float timestepreductionCPU(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
+template __host__ double timestepreductionCPU(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
+
+template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
+{
+	
+
+	T dt= timestepreductionCPU(XParam,XLoop,XBlock,XTime);
+
+	
 
 	// also don't allow dt to be larger than 1.5*dtmax (usually the last time step or smallest delta/sqrt(gh) if the first step)
 	if (dt > (1.5 * XLoop.dtmax))
@@ -394,8 +417,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 	dim3 blockDimLine(threads, 1, 1);
 	dim3 gridDimLine(blocks, 1, 1);
 
-	float mindtmaxB;
-
+	
 	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -482,7 +504,7 @@ template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;

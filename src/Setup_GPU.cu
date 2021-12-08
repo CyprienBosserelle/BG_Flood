@@ -47,7 +47,7 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 
 
 		// things are quite different for Time Series output. Why is that?.
-		if (XModel.bndblk.nblkTs > 0)
+		if (XParam.TSnodesout.size() > 0)
 		{
 
 			AllocateGPU(XModel.bndblk.nblkTs, 1, XModel_g.bndblk.Tsout);
@@ -75,6 +75,8 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		}
 
 		Initmaparray(XModel_g);
+
+		InitzbgradientGPU(XParam, XModel_g);
 	}
 }
 template void SetupGPU<float>(Param XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);
@@ -157,6 +159,7 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	//Block info
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.active, XModel_gpu.blocks.active);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.activeCell, XModel_gpu.blocks.activeCell);
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.level, XModel_gpu.blocks.level);
 
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.xo, XModel_gpu.blocks.xo);
@@ -200,7 +203,8 @@ void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 	memset(&Tex.texDesc, 0, sizeof(cudaTextureDesc));
 	Tex.texDesc.addressMode[0] = cudaAddressModeClamp;
 	Tex.texDesc.addressMode[1] = cudaAddressModeClamp;
-	Tex.texDesc.filterMode = cudaFilterModeLinear;
+	//Tex.texDesc.filterMode = cudaFilterModeLinear;
+	Tex.texDesc.filterMode = cudaFilterModePoint;
 	Tex.texDesc.normalizedCoords = false;
 
 	memset(&Tex.resDesc, 0, sizeof(cudaResourceDesc));

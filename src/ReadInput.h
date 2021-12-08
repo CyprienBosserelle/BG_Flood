@@ -25,7 +25,7 @@ std::string findparameter(std::string parameterstr, std::string line);
 void split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
 std::string trim(const std::string& str, const std::string& whitespace);
-
+std::size_t case_insensitive_compare(std::string s1, std::string s2);
 
 
 // End of global definition
