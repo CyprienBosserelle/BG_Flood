@@ -15,7 +15,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
-|cf| cf , roughness | 0.0001|Bottom friction coefficient for flow model (if constant)|
+|cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |conserveElevation|conserveElevation| false|Switch to force the conservation of h|
 |Pa2m|Pa2m| 0.00009916|Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)|
@@ -88,7 +88,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 
 |_Reference_|_Keys_|_default_|_Example_|_Explanation_|
 |---|---|---|---|---|
-|cf| cf , roughness |(see constant in parameters)|cf=0.001;<br>cf=bottom_friction.nc?bfc;|Bottom friction coefficient map (associated to the chosen bottom friction model)|
+|cf| cf , roughness , cfmap |(see constant in parameters)|cf=0.001;<br>cf=bottom_friction.nc?bfc;|Bottom friction coefficient map (associated to the chosen bottom friction model)|
 |Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|bathy=Westport_DEM_2020.nc?z<br>topo=Westport_DEM_2020.asc| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spherical (still in development).<br>A list of file can also be use to provide a thiner resolution localy by using the key word each time on a different line.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
 |left| left , leftbndfile , leftbnd |1|left = 0;<br>left = leftBnd.txt,2;| 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)<br>For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first column containing time (with possibly variable time steps) and forcing values in the following columns (1 column of values corresponding to a constant value along the boundary, 2 columns correspond to values at boundary edges with linear evolution in between, n columns correspond to n regularly spaced values applied along the boundary)|
 |right| right , rightbndfile , rightbnd |1|right = 0;<br>right = rightBnd.txt,2;|Same as left boundary|
