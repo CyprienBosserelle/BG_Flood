@@ -322,6 +322,7 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 template __host__ void bndCPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, float* zs, float* h, float* un, float* ut);
 template __host__ void bndCPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, double* zs, double* h, double* un, double* ut);
 
+
 // function to apply bnd at the boundary with masked blocked
 // here a wall is applied in the halo 
 template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
@@ -742,8 +743,6 @@ __device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop
 	isbotright = (side & br) == br;
 	isbotleft = (side & bl) == bl;
 }
-
-
 
 
 template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T& zs, T& h,T&zb)

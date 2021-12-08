@@ -112,6 +112,7 @@ int main(int argc, char **argv)
 	//   End of Initialisation time
 	//===========================================
 	XParam.setupcputime = clock();
+	bool isfailed = false;
 
 	if (XParam.test < 0)
 	{
@@ -124,8 +125,7 @@ int main(int argc, char **argv)
 		//============================================
 		// Testing
 		//Gaussianhump(XParam, XModel, XModel_g);
-		Testing(XParam, XForcing, XModel, XModel_g);
-
+		isfailed = Testing(XParam, XForcing, XModel, XModel_g);
 	}
 
 		
@@ -146,6 +146,14 @@ int main(int argc, char **argv)
 	log("Model runtime= " + std::to_string((XParam.endcputime - XParam.setupcputime) / CLOCKS_PER_SEC) + " seconds");
 	//============================================
 	// Cleanup and free memory
-
-	exit(0);
+	//
+	if (XParam.test < 0)
+	{
+		exit(isfailed);
+	}
+	else 
+	{
+		exit(0);
+	}
+	
 }

@@ -390,6 +390,7 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 		// The modle will recalculate the optimal dt in subsequent step;
 		XLoop.dtmax = calcres(XParam.dx, XParam.maxlevel) / (sqrt(XParam.g * 10.0));
 	}
+
 	BlockP<T> XBlock = XModel.blocks;
 
 	/*

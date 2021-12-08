@@ -132,7 +132,7 @@ template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 	{
 		int ib = XBlock.active[bl];
 		// Now check each corner of each block
-
+		//printf("bl=%i\t ib=%i\t,LB=%i\t,LT=%i\t,RB=%i\t,RT=%i\t,TL=%i\t,TR=%i\t,BL=%i\t,BR=%i\n ", bl, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock.BotLeft[ib], XBlock.BotRight[ib]);
 
 		// Left
 		setedgessideLR(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], 1, 0, zb);
@@ -362,7 +362,8 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 	q22 = forcing.val[cfip + cfjp * forcing.nx];
 
 	return T(BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, xi, yi));
-	//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
+
+
 }
 template float interp2BUQ<float, StaticForcingP<float>>(float x, float y, StaticForcingP<float> forcing);
 template double interp2BUQ<double, StaticForcingP<float>>(double x, double y, StaticForcingP<float> forcing);

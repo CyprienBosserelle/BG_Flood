@@ -304,14 +304,12 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 
 	
 
-
 	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt,T(0.0)); // convert from mm/hrs to m/s
 
 	
-	
-
 	XEv.h[i] += Rainhh * XBlock.activeCell[i];
 	XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+
 }
 template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __global__ void AddrainforcingImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
