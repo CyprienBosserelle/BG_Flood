@@ -533,10 +533,12 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 	if (XParam.GPUDEVICE < 0)
 	{
 		deformstep(XParam, XLoop, deform, XModel);
+		InitzbgradientCPU(XParam, XModel); // need to recalculate the zb halo and gradients to avoid blow up in topographic terms
 	}
 	else
 	{
 		deformstep(XParam, XLoop, deform, XModel_g);
+		InitzbgradientGPU(XParam, XModel_g);
 	}
 }
 template void deformstep<float>(Param XParam, Loop<float> XLoop, std::vector<deformmap<float>> deform, Model<float> XModel, Model<float> XModel_g);

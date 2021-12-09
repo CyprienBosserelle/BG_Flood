@@ -405,7 +405,10 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.resetmax = std::stoi(parametervalue);
+		if (std::stoi(parametervalue) == 1)
+		{
+			param.resetmax = true;
+		}
 	}
 
 	// WARNING FOR DEBUGGING PURPOSE ONLY
