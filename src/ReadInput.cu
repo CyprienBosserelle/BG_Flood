@@ -76,11 +76,12 @@ template deformmap<float> readfileinfo<deformmap<float>>(std::string input, defo
 * Open the BG_param.txt file and read the parameters
 * save the parameter in the Param class and or Forcing class.
 */
-void Readparamfile(Param &XParam, Forcing<float> & XForcing)
+void Readparamfile(Param &XParam, Forcing<float> & XForcing, std::string Paramfile)
 {
 	//
-	log("\nReading BG_param.txt ...");
-	std::ifstream fs("BG_param.txt");
+	log("\nReading parameter file: "+ Paramfile +" ...");
+	//std::ifstream fs("BG_param.txt");
+	std::ifstream fs(Paramfile);
 
 	if (fs.fail()) {
 		//std::cerr << "BG_param.txt file could not be opened" << std::endl;

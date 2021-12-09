@@ -11,7 +11,7 @@
 
 template <class T> T readfileinfo(std::string input, T outinfo);
 
-void Readparamfile(Param& XParam, Forcing<float>& XForcing);
+void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfile);
 
 template <class T> Forcing<T> readparamstr(std::string line, Forcing<T> forcing);
 

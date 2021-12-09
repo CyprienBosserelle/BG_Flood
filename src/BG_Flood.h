@@ -20,5 +20,8 @@
 
 #include "Testing.h"
 
+
+template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
+
 // End of global definition
 #endif
