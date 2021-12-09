@@ -46,10 +46,22 @@
 * * Run main loop
 * * Clean up and close
 */
-int main(int argc, char **argv)
+int main(int argc, char* argv[])
 {
+	//===========================================
+	// Read model argument (filename). If one is not given use the default name
+	std::string ParamFile;
 
-	
+	if (argc > 1)
+	{
+		ParamFile = argv[1];
+	}
+	else
+	{
+		ParamFile = "BG_param.txt";
+	}
+
+	//std::cout << ParamFile << '\n';
 
 	//===========================================
 	//  Define the main parameter controling the model (XModels class at produced later) 
@@ -66,19 +78,34 @@ int main(int argc, char **argv)
 	// Read Operational file
 	// Also check XParam sanity
 
-	Readparamfile(XParam,XForcing);
-	
+	Readparamfile(XParam, XForcing, ParamFile);
+
 
 	//============================================
 	// Create external forcing and model pointers
 	// Before this is done we need to check
 	// if the model will be double or float precision
-	
 
-	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
-	Model<decltype(modeltype)> XModel; // For CPU pointers
-	Model<decltype(modeltype)> XModel_g; // For GPU pointers
+	Model<double> XModel_d; // For CPU double pointers
+	Model<double> XModel_gd; // For GPU double pointers
 
+	Model<float> XModel_f; // For CPU float pointers
+	Model<float> XModel_gf; // For GPU float pointers
+
+	if (XParam.doubleprecision < 1)
+	{
+		// Call the Float precision run
+		mainwork(XParam, XForcing, XModel_f, XModel_gf);
+	}
+	else
+	{
+		mainwork(XParam, XForcing, XModel_d, XModel_gd);
+	}
+
+}
+
+template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+{
 	//============================================
 	// Read the forcing data (Including bathymetry)
 	readforcing(XParam, XForcing);
@@ -149,11 +176,11 @@ int main(int argc, char **argv)
 	//
 	if (XParam.test < 0)
 	{
-		exit(isfailed);
+		exit(0);
 	}
 	else 
 	{
-		exit(0);
+		exit(isfailed);
 	}
 	
 }
