@@ -392,7 +392,7 @@ void creatncfileBUQ(Param& XParam, BlockP<T> &XBlock)
 template void creatncfileBUQ<float>(Param &XParam, BlockP<float> &XBlock);
 template void creatncfileBUQ<double>(Param &XParam, BlockP<double> &XBlock);
 
-template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, T * blockxo, T *blockyo, std::string varst, int vdim, T * var, outzoneB Xzone)
+template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, int vdim, T* var, outzoneB Xzone)
 {
 	std::string outfile = Xzone.outname;
 	int smallnc = XParam.smallnc;
@@ -406,8 +406,8 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	int  var_dimid3D[3];
 	//int  var_dimid4D[4];
 
-	short *varblk_s;
-	float * varblk;
+	short* varblk_s;
+	float* varblk;
 	int recid, xid, yid;
 	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
@@ -422,6 +422,12 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
 	//static size_t count3D[] = { 1, ny, nx };
 	static size_t count3D[] = { 1, XParam.blkwidth, XParam.blkwidth };
+	//size_t count3D[3];
+	//count3D[0] = 1;
+	//count3D[1] = XParam.blkwidth;
+	//count3D[2] = XParam.blkwidth;
+	
+
 
 	nc_type VarTYPE;
 
@@ -434,7 +440,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		VarTYPE = NC_FLOAT;
 	}
 
-
+	printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
 
 
 	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
@@ -533,6 +539,8 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	status = nc_enddef(ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
 
+	printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+
 	// Now write the initial value of the Variable out
 	int lev, bl;
 	//std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
@@ -600,8 +608,8 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 
 		if (vdim == 2)
 		{
-			start2D[0] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start2D[1] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start2D[0] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start2D[1] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 
 			if (smallnc > 0)
 			{
@@ -618,8 +626,8 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		{
 			//
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n",bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
-			start3D[1] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start3D[2] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start3D[1] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start3D[2] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 
@@ -632,11 +640,15 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 			else
 			{
 				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
+				//printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+				//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
+				//printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
 
 				if (status != NC_NOERR)
 				{
-					//printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel,initdx,lev, XParam.xo, XParam.yo,blockxo[bl],xxmin, blockyo[bl],yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-					handle_ncerror(status);
+					printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel,initdx,lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+					//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
+					//handle_ncerror(status);
 				}
 			}
 
@@ -755,8 +767,8 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		}
 		if (vdim == 2)
 		{
-			start2D[0] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start2D[1] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start2D[0] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start2D[1] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 
 			if (smallnc > 0)
 			{
@@ -773,8 +785,8 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		}
 		else if (vdim == 3)
 		{
-			start3D[1] = (size_t)round((Xzone.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-			start3D[2] = (size_t)round((Xzone.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+			start3D[1] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+			start3D[2] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
 			if (smallnc > 0)
 			{
 				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);

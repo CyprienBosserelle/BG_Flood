@@ -63,7 +63,7 @@ struct outzoneB
 {
 	int nblk; //number of blocks concerned
 	int* blk; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
-	double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)(center of corner cells)
+	double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)(corner of cells, as Xparam.xo)
 	std::string outname; // name for the output file (one for each zone)
 };
 
