@@ -1,5 +1,6 @@
 
 #include "Write_netcdf.h"
+#include "Util_CPU.h"
 
 void handle_ncerror(int status) {
 
@@ -42,8 +43,8 @@ void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzoneB Xzone)
 	xxmin = Xzone.xo;
 	yymin = Xzone.yo;
 
-	nx = round((xxmax - xxmin) / ddx ) + 1.0;
-	ny = round((yymax - yymin) / ddx ) + 1.0;
+	nx = ftoi((xxmax - xxmin) / ddx);
+	ny = ftoi((yymax - yymin) / ddx);
 }
 
 std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzone)
@@ -846,6 +847,7 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 {
 	if (!XParam.outvars.empty())
 	{
+		printf("\nBEGIN INISAVE2NETCDF - L850\n");
 		log("Create netCDF output file...");
 		creatncfileBUQ(XParam, XModel.blocks);
 		//creatncfileBUQ(XParam);
@@ -854,7 +856,7 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 			writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
-
+				printf("\nIN INISAVE2NETCDF - L859, var=%s, zoneNum=%i\n", XParam.outvars[ivar], o);
 				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], 3, XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
 
 			}
@@ -869,12 +871,14 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
 {
 	if (!XParam.outvars.empty())
 	{
+		printf("\nBEGIN SAVE2NETCDF - L874\n");
 		//creatncfileBUQ(XParam);
 		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
 			writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
+				printf("\nIN SAVE2NETCDF - L881\n");
 				writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
 			}
 		}

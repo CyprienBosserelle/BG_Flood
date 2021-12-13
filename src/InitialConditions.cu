@@ -517,6 +517,11 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		}
 
+		printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
+		printf("corners=[%d,%d,%d,%d] \n", cornerblk[0], cornerblk[1], cornerblk[2], cornerblk[3]);
+		printf("x=[%f,%f,%f,%f] \n", XBlock.xo[cornerblk[0]], XBlock.xo[cornerblk[1]], XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]);
+		printf("y=[%f,%f,%f,%f] \n", XBlock.yo[cornerblk[0]], XBlock.yo[cornerblk[1]], XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[3]]);
+
 		// Get the list of all blocks in the zone
 		for (i = 0; i < XParam.nblk; i++)
 		{
