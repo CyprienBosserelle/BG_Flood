@@ -15,3 +15,4 @@ The adaptive version of the model is currently under heavy development. Makefile
 development: [![Build Status](https://travis-ci.com/CyprienBosserelle/BG_Flood.svg?branch=development)](https://travis-ci.com/CyprienBosserelle/BG_Flood)
 
 ## Testing
+![example workflow](https://github.com/CyprienBosserelle/BG_Flood/actions/workflows//main.yml/badge.svg)
