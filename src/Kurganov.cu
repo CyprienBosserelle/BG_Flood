@@ -90,10 +90,7 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 		{
 			dtmax[i] = dt;
 		}
-		else
-		{
-			dtmax[i] = T(1.0) / epsi;
-		}
+		
 		
 
 
@@ -361,10 +358,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 					{
 						dtmax[i] = dt;
 					}
-					else
-					{
-						dtmax[i] = T(1.0) / epsi;
-					}
+					
 
 
 
@@ -402,6 +396,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 					{
 						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 						hn = XEv.h[ilc];
 						zn = zb[ilc];
 					}
@@ -622,10 +617,7 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 		{
 			dtmax[i] = dt;
 		}
-		else
-		{
-			dtmax[i] = T(1.0) / epsi;
-		}
+		
 
 		
 		if (fh > T(0.0))
@@ -873,10 +865,7 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 					{
 						dtmax[i] = dt;
 					}
-					else
-					{
-						dtmax[i] = T(1.0) / epsi;
-					}
+					
 
 
 					if (fh > T(0.0))

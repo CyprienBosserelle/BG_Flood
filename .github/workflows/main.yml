@@ -1,0 +1,81 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  Build_and_CI_Tests:
+    # The type of runner that the job will run on
+    runs-on: [self-hosted, linux, x64, gpu]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      #- name: Launch of BG_Flood tests
+      #  run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: creation of the bathy and Params files
+        run: |
+          echo "ncols 3" > bathy.asc
+          echo "nrows 3" >> bathy.asc
+          echo "xllcenter -1" >> bathy.asc
+          echo "yllcenter -1" >> bathy.asc
+          echo "cellsize 1" >> bathy.asc
+          echo "nodata_value -9999" >> bathy.asc
+          printf "0.0 0.0 0.0" >> bathy.asc
+          printf "0.0 0.0 0.0" >> bathy.asc
+          printf "0.0 0.0 0.0" >> bathy.asc
+          echo "test = 0;">BG_param.txt
+          echo "gpudevice = 0;"
+          echo "bathy = bathy.asc;">>BG_param.txt
+      # Compilation of the code
+      - name: compilation of the code
+        run: make
+      # Running the tests
+      - name: running test 0,  Gaussian hump propagation
+        run: ./BG_Flood
+      - name: running test 1, Vertical discharge in all directions, different grid adaptation
+        run: |
+          sed -i 's/test = 0/test = 1/' BG_param.txt
+          ./BG_Flood
+      - name: running test 2, Gaussian wave - CPU vs GPU
+        run: |
+          sed -i 's/test = 1/test = 2/' BG_param.txt
+          ./BG_Flood
+      - name: running test 3, Reduction algorithm
+        run: |
+          sed -i 's/test = 2/test = 3/' BG_param.txt
+          ./BG_Flood
+      - name: running test 5, Lake at rest
+        run: |
+          sed -i 's/test = 3/test = 5/' BG_param.txt
+          ./BG_Flood
+      - name: running test 6, Mass conservation on slope
+        run: |
+          sed -i 's/test = 5/test = 6/' BG_param.txt
+          ./BG_Flood
+      - name: running test 7, rain mass conservation
+        run: |
+          sed -i 's/test = 6/test = 7/' BG_param.txt
+          ./BG_Flood
+      - name: running test 8, rain input validation
+        run: |
+          sed -i 's/test = 7/test = 8/' BG_param.txt
+          ./BG_Flood
+

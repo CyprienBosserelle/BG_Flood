@@ -425,7 +425,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 
 
 	}
-	// second check if zs or hh are in teh file
+	// second check if zs or hh are in the file
 
 
 	//zs Section

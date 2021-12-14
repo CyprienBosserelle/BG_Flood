@@ -19,7 +19,11 @@ template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, Evol
 template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime);
 template <class T> __host__ T CalctimestepGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime);
 
+template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime);
+
 template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned int n);
+
+template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_idata, T* g_odata);
 
 // End of global definition
 #endif

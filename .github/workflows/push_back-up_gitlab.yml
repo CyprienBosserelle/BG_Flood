@@ -1,0 +1,30 @@
+## from https://github.community/t/push-from-action-to-different-remote-repo/17848/2
+
+name: push to gitlab for back-up
+
+on: 
+#  push:
+#    branches: [self-hosted-CI]
+  pull_request:
+    branches: [development]
+ 
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+        ref: 'master'
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+         key: ${{ secrets.SSH_PRIVATE_KEY }}
+         name: id_rsa # optional
+         known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - run: |
+        git remote add gitlab git@bitbucket.org:jingzhuyan/new1.git
+        git config --global user.email " ****@***"
+        git config --global user.name "yanjingzhu"
+        git checkout master
+        git push -u gitlab master

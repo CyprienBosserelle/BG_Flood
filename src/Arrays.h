@@ -18,6 +18,9 @@ struct GradientsP
 	T* dhdy;
 	T* dudy;
 	T* dvdy;
+
+	T* dzbdx;
+	T* dzbdy;
 };
 
 
