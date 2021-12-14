@@ -641,9 +641,9 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 			else
 			{
 				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
-				//printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
-				//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
-				//printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+				printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+				printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
+				printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
 
 				if (status != NC_NOERR)
 				{
@@ -719,6 +719,24 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 	std::string xxname, yyname, varname, sign;
 	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+
+	int iib;
+	printf("activeblk:\n");
+	for (iib = 0; iib < XParam.nblk; iib++)
+	{
+		printf("%i\n", activeblk[iib]);
+	}
+	printf("Xzone blocks:\n");
+	for (iib = 0; iib < Xzone.nblk; iib++)
+	{
+		printf("%i\n", Xzone.blk[iib]);
+	}
+	printf("Xzone blocks active:\n");
+	for (iib = 0; iib < Xzone.nblk; iib++)
+	{
+		printf("%i\n", activeblk[Xzone.blk[iib]]);
+	}
+
 
 	int lev, bl;
 	for (int ibl = 0; ibl < Xzone.nblk; ibl++)
@@ -797,12 +815,15 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 			{
 				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
 				if (status != NC_NOERR) handle_ncerror(status);
+				printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+				printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
+				printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+				printf("\n ib=%d; level=%d; blockxo[ib]=%f blockyo[ib]=%f \n", bl, lev, blockxo[bl], blockyo[bl]);
 			}
 
 		}
 
 	}
-
 
 
 	if (smallnc > 0)
