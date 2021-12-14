@@ -599,7 +599,15 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 			XzoneB.blk[ib]=ib;
 		}
 		//XBlock.outZone.reserve(1);
-		XBlock.outZone.push_back(XzoneB);
+		if (XBlock.outZone.size() > 0) //If adaptative, the zone need to be over-writed
+		{
+			XBlock.outZone[0] = XzoneB;
+		}
+		else
+		{
+			XBlock.outZone.push_back(XzoneB);
+		}
+		
 	}
 }
 template void Initoutzone<float>(Param& XParam, BlockP<float>& XBlock);
