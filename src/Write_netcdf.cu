@@ -48,24 +48,6 @@ void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzoneB Xzone)
 	ny = ftoi((yymax - yymin) / ddx);
 }
 
-//return a sorted list of the resolution levels in an output zone
-void Calclevelzone(Param XParam, int* levZone, outzoneB Xzone, int* level)
-{
-	std::vector<int> levelzone;
-	int lev, bl, ib, levbl;
-
-	for (bl = 0; bl <= Xzone.nblk; bl++)
-	{
-		ib = Xzone.blk[bl];
-		levelzone.push_back(level[ib]);
-	}
-
-	//sort and remove duplicate
-	std::sort(levelzone.begin(), levelzone.end());
-	levelzone.erase(unique(levelzone.begin(), levelzone.end()), levelzone.end());
-	levZone = levelzone.data();
-}
-
 std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzone)
 {
 	std::vector<int> actblkzone(Xzone.nblk, -1);
@@ -105,8 +87,12 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	size_t nxx, nyy;
 	int ncid, xx_dim, yy_dim, time_dim, blockid_dim, nblk;
 	double * xval, *yval;
-	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
 
+	//const int minlevzone = XParam.minlevel;
+	//const int maxlevzone = XParam.maxlevel;
+
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+	//Calclevelzone(XParam, minlevzone, maxlevzone, Xzone, level);
 	nblk = Xzone.nblk;
 
 
@@ -159,10 +145,10 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	ymax = Xzone.ymax ;
 
 	// Define global attributes
-	status = nc_put_att_int(ncid, NC_GLOBAL, "maxlevel", NC_INT, 1, &XParam.maxlevel);
+	status = nc_put_att_int(ncid, NC_GLOBAL, "maxlevel", NC_INT, 1, &Xzone.maxlevel);
 	if (status != NC_NOERR) handle_ncerror(status);
 
-	status = nc_put_att_int(ncid, NC_GLOBAL, "minlevel", NC_INT, 1, &XParam.minlevel);
+	status = nc_put_att_int(ncid, NC_GLOBAL, "minlevel", NC_INT, 1, &Xzone.minlevel);
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	status = nc_put_att_double(ncid, NC_GLOBAL, "xmin", NC_DOUBLE, 1, &xmin);
@@ -223,10 +209,9 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	//int* levZone;
-	//Calclevelzone(XParam, levZone, Xzone, level);
 
 	// For each level Define xx yy 
-	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
+	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	{
 		
 		Calcnxnyzone(XParam, lev, nx, ny, Xzone);
@@ -356,7 +341,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	
 	std::string xxname, yyname, sign;
 
-for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
+for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 {
 	Calcnxnyzone(XParam, lev, nx, ny, Xzone);
 
@@ -445,8 +430,7 @@ template void creatncfileBUQ<double>(Param &XParam, BlockP<double> &XBlock);
 
 template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, int vdim, T* var, outzoneB Xzone)
 {
-	std::string outfile = Xzone.outname;
-	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+
 
 	int smallnc = XParam.smallnc;
 	float scalefactor = XParam.scalefactor;
@@ -480,6 +464,11 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 	//count3D[1] = XParam.blkwidth;
 	//count3D[2] = XParam.blkwidth;
 	
+	//int minlevzone, maxlevzone;
+
+	std::string outfile = Xzone.outname;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+	//Calclevelzone(XParam, minlevzone, maxlevzone, Xzone, level);
 
 
 	nc_type VarTYPE;
@@ -516,7 +505,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 	std::string xxname, yyname, varname,sign;
 
 	//generate a different variable name for each level and add attribute as necessary
-	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
+	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	{
 
 		//std::string xxname, yyname, sign;

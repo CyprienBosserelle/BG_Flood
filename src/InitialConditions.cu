@@ -596,7 +596,10 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		printf("x=[%f,%f,%f,%f] \n", XBlock.xo[cornerblk[0]], XBlock.xo[cornerblk[1]], XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]);
 		printf("y=[%f,%f,%f,%f] \n", XBlock.yo[cornerblk[0]], XBlock.yo[cornerblk[1]], XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[3]]);
 
-		// Get the list of all blocks in the zone
+		// Get the list of all blocks in the zone and the maximum and minimum level of refinement
+		int maxlevel = XParam.minlevel;
+		int minlevel = XParam.maxlevel;
+
 		for (i = 0; i < XParam.nblk; i++)
 		{
 			ib = XBlock.active[i];
@@ -615,9 +618,18 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 				// This block belongs to the output zone defined by the user
 				blkzone.push_back(ib);
 				nblk++;
+
+				//min/max levels
+				if (XBlock.level[ib] > maxlevel) { maxlevel = XBlock.level[ib]; }
+				if (XBlock.level[ib] < minlevel) { minlevel = XBlock.level[ib]; }
 			}
+			
+
 		}
 		XzoneB.nblk = nblk;
+		XzoneB.maxlevel = maxlevel;
+		XzoneB.minlevel = minlevel;
+
 		AllocateCPU(blkzone.size(), 1, XzoneB.blk);
 		for (int b = 0; b < blkzone.size(); b++)
 		{
