@@ -511,11 +511,11 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		levdx = calcres(XParam.dx, XBlock.level[ib]);
 		XzoneB.yo = XParam.yo + XBlock.yo[ib] - levdx / 2;
 		//right edge border
-		int ir = (XBlock.level[cornerblk[2]] > XBlock.level[cornerblk[3]]) ? cornerblk[2] : cornerblk[3];
+		int ir = (XBlock.level[cornerblk[2]] < XBlock.level[cornerblk[3]]) ? cornerblk[2] : cornerblk[3];
 		levdx = calcres(XParam.dx, XBlock.level[ir]);
 		XzoneB.xmax = XParam.xo + XBlock.xo[ir] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		//top edge border
-		int it = (XBlock.level[cornerblk[1]] > XBlock.level[cornerblk[2]]) ? cornerblk[1] : cornerblk[2];
+		int it = (XBlock.level[cornerblk[1]] < XBlock.level[cornerblk[2]]) ? cornerblk[1] : cornerblk[2];
 		levdx = calcres(XParam.dx, XBlock.level[it]);
 		XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		//XzoneB.xmax = XParam.xo + max(XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]) + (XParam.blkwidth - 1) * levdx;
@@ -582,11 +582,11 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			levdx = calcres(XParam.dx, XBlock.level[ib]);
 			XzoneB.yo = XParam.yo + XBlock.yo[ib] - levdx/2;
 			//right edge border
-			int ir = (XBlock.level[cornerblk[2]] > XBlock.level[cornerblk[3]]) ? cornerblk[2] : cornerblk[3];
+			int ir = (XBlock.level[cornerblk[2]] < XBlock.level[cornerblk[3]]) ? cornerblk[2] : cornerblk[3];
 			levdx = calcres(XParam.dx, XBlock.level[ir]);
 			XzoneB.xmax = XParam.xo + XBlock.xo[ir] + (XParam.blkwidth - 1) * levdx + levdx/2;
 			//top edge border
-			int it = (XBlock.level[cornerblk[1]] > XBlock.level[cornerblk[2]]) ? cornerblk[1] : cornerblk[2];
+			int it = (XBlock.level[cornerblk[1]] < XBlock.level[cornerblk[2]]) ? cornerblk[1] : cornerblk[2];
 			levdx = calcres(XParam.dx, XBlock.level[it]);
 			XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		}
@@ -857,7 +857,7 @@ template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double x
 
 		if (isEps == true)
 		{
-			eps = levdx / 3;
+			eps = levdx/3;
 		}
 
 		// get the corners' locations of the block (edge of the corner cell)
@@ -867,22 +867,22 @@ template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double x
 		yt = XParam.yo + XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx + levdx/2;
 
 		// Getting the bottom left corner coordinate of the output area
-		if (xo + eps >= xl && xo - eps <= xr && yo + eps >= yb && yo - eps <= yt)
+		if (xo + eps >= xl && xo + eps <= xr && yo + eps >= yb && yo + eps <= yt)
 		{
 			cornerblk[0] = ib;
 		}
 		// Getting the top left corner coordinate of the output area
-		if (xo + eps >= xl && xo - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
+		if (xo + eps >= xl && xo + eps <= xr && ymax - eps >= yb && ymax - eps <= yt)
 		{
 			cornerblk[1] = ib;
 		}
 		// Getting the top right corner coordinate of the output area
-		if (xmax + eps >= xl && xmax - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
+		if (xmax - eps >= xl && xmax - eps <= xr && ymax - eps >= yb && ymax - eps <= yt)
 		{
 			cornerblk[2] = ib;
 		}
 		// Getting the bottom right corner coordinate of the output area
-		if (xmax + eps >= xl && xmax - eps <= xr && yo + eps >= yb && yo - eps <= yt)
+		if (xmax - eps >= xl && xmax - eps <= xr && yo + eps >= yb && yo + eps <= yt)
 		{
 			cornerblk[3] = ib;
 		}

@@ -1,6 +1,7 @@
 
 #include "Write_netcdf.h"
 #include "Util_CPU.h"
+#include "General.h"
 
 void handle_ncerror(int status) {
 
@@ -47,14 +48,49 @@ void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzoneB Xzone)
 	ny = ftoi((yymax - yymin) / ddx);
 }
 
+//return a sorted list of the resolution levels in an output zone
+void Calclevelzone(Param XParam, int* levZone, outzoneB Xzone, int* level)
+{
+	std::vector<int> levelzone;
+	int lev, bl, ib, levbl;
+
+	for (bl = 0; bl <= Xzone.nblk; bl++)
+	{
+		ib = Xzone.blk[bl];
+		levelzone.push_back(level[ib]);
+	}
+
+	//sort and remove duplicate
+	std::sort(levelzone.begin(), levelzone.end());
+	levelzone.erase(unique(levelzone.begin(), levelzone.end()), levelzone.end());
+	levZone = levelzone.data();
+}
+
 std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzone)
 {
-	int nblkzone = Xzone.nblk;
-	std::vector<int> actblkzone(XParam.nblk, -1);
+	std::vector<int> actblkzone(Xzone.nblk, -1);
+	int * inactive, * inblock;
 
-	for (int ibz = 0; ibz < nblkzone; ibz++)
+	for (int ib = 0; ib < Xzone.nblk; ib++)
 	{
-		actblkzone[Xzone.blk[ibz]] = activeblk[Xzone.blk[ibz]];
+		//printf("loop=%i \n", Xzone.blk[ib]);
+		inactive = std::find (activeblk, activeblk + XParam.nblk, Xzone.blk[ib]);
+		inblock = std::find (Xzone.blk, Xzone.blk + Xzone.nblk, Xzone.blk[ib]);
+		//if ((inactive != activeblk + XParam.nblk) && (inblock != Xzone.blk + Xzone.nblk))
+		if (inactive != activeblk + XParam.nblk)
+		{
+			//printf("active=%i \n", Xzone.blk[ib]);
+			if (inblock != Xzone.blk + Xzone.nblk)
+			{
+				actblkzone[ib] = Xzone.blk[ib];
+				//printf("block=%i \n", Xzone.blk[ib]);
+			}
+			else { actblkzone[ib] = -1; }
+		}
+		else
+		{
+			actblkzone[ib] = -1;
+		}
 	}
 	return(actblkzone);
 }
@@ -69,6 +105,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	size_t nxx, nyy;
 	int ncid, xx_dim, yy_dim, time_dim, blockid_dim, nblk;
 	double * xval, *yval;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
 
 	nblk = Xzone.nblk;
 
@@ -185,6 +222,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_def_var(ncid, "blockstatus", NC_INT, 1, biddim, &blkstatus_id);
 	if (status != NC_NOERR) handle_ncerror(status);
 
+	//int* levZone;
+	//Calclevelzone(XParam, levZone, Xzone, level);
 
 	// For each level Define xx yy 
 	for (int lev = XParam.minlevel; lev <= XParam.maxlevel; lev++)
@@ -235,6 +274,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	float* blkwidth;
 	int* blkid;
+	int ibl;
 
 
 	AllocateCPU(1, nblk, blkwidth);
@@ -243,7 +283,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	printf("blockId:\n");
 	for (int ib = 0; ib < nblk; ib++)
 	{
-		int ibl = activeblk[Xzone.blk[ib]];
+		//int ibl = activeblk[Xzone.blk[ib]];
+		ibl = activeblkzone[ib];
 		blkwidth[ib] = (float)calcres(XParam.dx, level[ibl]);
 		blkid[ib] = ibl;
 		printf("%i\n", blkid[ib]);
@@ -265,6 +306,13 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	{
 		printf("%i\n", activeblk[Xzone.blk[iib]]);
 	}
+	printf("Xzone blocks active from function:\n");
+	//Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzone)
+	//std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+	for (iib = 0; iib < nblk; iib++)
+	{
+		printf("%i\n", activeblkzone[iib]);
+	}
 
 	status = nc_put_vara_int(ncid, blkid_id, blkstart, blkcount, blkid);
 	if (status != NC_NOERR) handle_ncerror(status);
@@ -279,7 +327,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	// This is needed because the blockxo array may be shuffled to memory block beyond nblk
 	for (int ib = 0; ib < nblk; ib++)
 	{
-		int ibl = activeblk[Xzone.blk[ib]];
+		//int ibl = activeblk[Xzone.blk[ib]];
+		ibl = activeblkzone[ib];
 		blkwidth[ib] = XParam.xo + blockxo[ibl];
 		blkid[ib] = level[ibl];
 		
@@ -292,7 +341,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	for (int ib = 0; ib < nblk; ib++)
 	{
-		int ibl = activeblk[Xzone.blk[ib]];
+		//int ibl = activeblk[Xzone.blk[ib]];
+		ibl = activeblkzone[ib];
 		blkwidth[ib] = XParam.yo + blockyo[ibl];
 	}
 
@@ -396,6 +446,8 @@ template void creatncfileBUQ<double>(Param &XParam, BlockP<double> &XBlock);
 template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, int vdim, T* var, outzoneB Xzone)
 {
 	std::string outfile = Xzone.outname;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+
 	int smallnc = XParam.smallnc;
 	float scalefactor = XParam.scalefactor;
 	float addoffset = XParam.addoffset;
@@ -441,7 +493,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 		VarTYPE = NC_FLOAT;
 	}
 
-	printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+	//printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
 
 
 	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
@@ -550,8 +602,8 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 	for (int ibl = 0; ibl < Xzone.nblk; ibl++)
 	{
 		
-		bl = activeblk[Xzone.blk[ibl]];
-		//bl = activeblkzone[ibl];
+		//bl = activeblk[Xzone.blk[ibl]];
+		bl = activeblkzone[ibl];
 		lev = level[bl];
 
 
@@ -569,7 +621,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 		//yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
 		xxmin = Xzone.xo + calcres(XParam.dx, lev) / 2.0;
 		yymin = Xzone.yo + calcres(XParam.dx, lev )/2.0;
-
+		printf("xxmin=%f, yymin=%f, lev=$d \n", xxmin, yymin, lev);
 
 
 		//std::string xxname, yyname, sign;
@@ -629,7 +681,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n",bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 			start3D[1] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 			start3D[2] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
-			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
+			printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 			//printf("id=%d\tlev=%d\tblockxo=%f\tblockyo=%f\txxo=%f\tyyo=%f\n", bl, lev, blockxo[bl], blockyo[bl], round((blockxo[bl] - xxmin) / calcres(XParam.dx, lev)), round((blockyo[bl] - yymin) / calcres(XParam.dx, lev)));
 
 
@@ -643,13 +695,13 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varblk);
 				printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 				printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
-				printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+				printf("\n ib=%d count3D=[%d,%d,%d]\n",bl, count3D[0], count3D[1], count3D[2]);
 
 				if (status != NC_NOERR)
 				{
 					printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel,initdx,lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 					//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
-					//handle_ncerror(status);
+					handle_ncerror(status);
 				}
 			}
 
@@ -736,15 +788,19 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 	{
 		printf("%i\n", activeblk[Xzone.blk[iib]]);
 	}
-
+	printf("Xzone blocks active function:\n");
+	for (iib = 0; iib < Xzone.nblk; iib++)
+	{
+		printf("%i\n", activeblkzone[iib]);
+	}
 
 	int lev, bl;
 	for (int ibl = 0; ibl < Xzone.nblk; ibl++)
 	{
-		bl = activeblk[Xzone.blk[ibl]];
+		//bl = activeblk[Xzone.blk[ibl]];
 	//for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	//{
-		//bl = activeblkzone[ibl];
+		bl = activeblkzone[ibl];
 		lev = level[bl];
 		lev < 0 ? sign = "N" : sign = "P";
 		double xxmax, xxmin, yymax, yymin;
