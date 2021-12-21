@@ -17,6 +17,7 @@
 * Test 6 Mass conservation on a slope
 * Test 7 Mass conservation with rain fall on grid
 * Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
+* Test 9 Zoned output (test zoned outputs with adaptative grid)
 
 * Test 99 Run all the test with test number < 99.
 
@@ -157,7 +158,6 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			isfailed = (!testSteepSlope || isfailed) ? true : false;
 			log("\t\tMass conservation test: " + result);
 		}
-
 		if (mytest == 7)
 		{
 			bool testrainGPU, testrainCPU;
@@ -189,6 +189,25 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			raintest2 = Raintestinput(gpu);
 			result = raintest2 ? "successful" : "failed";
 			log("\t\tNon-uniform rain forcing : " + result);
+		}
+		if (mytest == 9)
+		{
+			bool testzoneOutDef, testzoneOutUser;
+			/* Test 9 is basic configuration to test the zoned outputs, with different resolutions.
+			 The default (without zoned defined by user) configuration is tested.
+			 Then, the creation of 3 zones is then tested(whole, zoned complexe, zoned with part of the levels).
+			 The size of the created nc files is used to verified this fonctionnality.
+			 Parameter: number of zones
+			*/
+
+			log("\t### Test zoned output ###");
+			testzoneOutDef = ZoneOutputTest(0);
+			result = testzoneOutDef ? "successful" : "failed";
+			log("\t\tDefault zoned Outputs: " + result);
+			testzoneOutUser = ZoneOutputTest(3);
+			result = testzoneOutUser ? "successful" : "failed";
+			log("\t\tUser defined zones Outputs: " + result);
+			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
 		}
 		if (mytest == 998)
 		{
@@ -3224,6 +3243,192 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 }
 template std::vector<float> Raintestmap<float>(int gpu, int dimf, float Zsinit);
 template std::vector<float> Raintestmap<double>(int gpu, int dimf, double Zsinit);
+
+
+/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones)
+*
+* This function test the zoned output for a basic configuration
+*/
+template <class T> bool ZoneOutputTest(int nzones)
+{
+	log("#####");
+
+	Param XParam;
+	Forcing<float> XForcing; 
+
+	
+	if (nzones  == 3)
+	{
+		// Creation of the param file
+		std::ofstream param_file(
+			"BG_param.txt", std::ios_base::out | std::ios_base::trunc);
+		param_file << "outzone = zoomed.nc,-0.2,0.2,-0.2,0.2; "<< std::endl;
+		param_file << "outzone = whole.nc, -10, 10, -10, 10;" << std::endl;
+		param_file << "outzone = zoomed_part.nc, -0.2, 0.2, -0.4, -0.2;" << std::endl;
+		param_file.close(); //destructor implicitly does it
+		// read param file
+		Readparamfile(XParam, XForcing, param_file);
+	}
+
+	// initialise domain and required resolution
+	XParam.dx = 1.0 / ((1 << 6)); //1<<8  = 2^8
+	XParam.xo = -0.5;
+	XParam.yo = -0.5;
+	XParam.xmax = 0.5;
+	XParam.ymax = 0.5;
+
+	XParam.initlevel = 0;
+	XParam.minlevel = -1;
+	XParam.maxlevel = 1;
+
+	//XParam.zsinit = zsnit;
+	//XParam.zsoffset = 0.0;
+
+	//Output times for comparisons
+	XParam.endtime = 1.0;
+	XParam.outputtimestep = 0.1;
+
+	XParam.smallnc = 0;
+
+	XParam.cf = 0.0001;
+	XParam.frictionmodel = 1;
+
+	//Specification of the test
+	//XParam.test = 7;
+	XParam.rainforcing = true;
+
+	// Enforce GPU/CPU
+	//XParam.GPUDEVICE = gpu;
+	//XParam.rainbnd = true;
+
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to a central hill
+	XForcing.Bathy[0].xo = -1.0;
+	XForcing.Bathy[0].yo = -1.0;
+	XForcing.Bathy[0].xmax = 1.0;
+	XForcing.Bathy[0].ymax = 1.0;
+	XForcing.Bathy[0].nx = 21;
+	XForcing.Bathy[0].ny = 21;
+
+	XForcing.Bathy[0].dx = 0.1;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+	
+	float rs, x, y, r, hm;
+	rs = 0.5; //hill radio
+	hm = 0.1; //hill top
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
+			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+			r = x * x + y * y;
+			if (r < rs)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm*(1-r/rs);
+			}
+		}
+	}
+
+	//Adaptation
+	XParam.AdaptCrit = "Targetlevel";
+	XForcing.AdaptCrit[0].xo = -1.0;
+	XForcing.AdaptCrit[0].yo = -1.0;
+	XForcing.AdaptCrit[0].xmax = 1.0;
+	XForcing.AdaptCrit[0].ymax = 1.0;
+	XForcing.AdaptCrit[0].nx = 21;
+	XForcing.AdaptCrit[0].ny = 21;
+
+	XForcing.AdaptCrit[0].dx = 0.1;
+
+	AllocateCPU(XForcing.AdaptCrit[0].nx, XForcing.AdaptCrit[0].ny, XForcing.AdaptCrit[0].val);
+
+	for (int j = 0; j < XForcing.AdaptCrit[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.AdaptCrit[0].nx; i++)
+		{
+			x = XForcing.AdaptCrit[0].xo + i * XForcing.AdaptCrit[0].dx;
+			y = XForcing.AdaptCrit[0].yo + j * XForcing.AdaptCrit[0].dx;
+			if (x < 0.0)
+			{
+				XForcing.AdaptCrit[0].val[i + j * XForcing.AdaptCrit0].nx] = 0;
+			}
+			else
+			{
+				if (y < 0.0)
+				{
+					XForcing.AdaptCrit[0].val[i + j * XForcing.AdaptCrit0].nx] = 1;
+				}
+				else 
+				{
+					XForcing.AdaptCrit[0].val[i + j * XForcing.AdaptCrit0].nx] = -1;
+				}
+			}
+		}
+	}
+
+	// Add wall boundary conditions
+	XForcing.right.type = 0;
+	XForcing.left.type = 0;
+	XForcing.top.type = 0;
+	XForcing.bot.type = 0;
+
+
+	//Create a temporary file with river fluxes
+	float Q = 1;
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = -0.01;
+	thisriver.xend = 0.01;
+	thisriver.ystart = -0.01;
+	thisriver.yend = 0.01;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+
+	T error = 0;
+
+	bool modelgood = error < 0.05;
+
+	//log("#####");
+	return modelgood;
+}
+template bool ZoneOutputTest<float>(int nzones);
+template bool ZoneOutputTest<double>(int nzones);
+
+
 
 /*! \fn void alloc_init2Darray(float** arr, int NX, int NY)
 * This function allocates and fills a 2D array with zero values
