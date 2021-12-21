@@ -197,14 +197,18 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			 The default (without zoned defined by user) configuration is tested.
 			 Then, the creation of 3 zones is then tested(whole, zoned complexe, zoned with part of the levels).
 			 The size of the created nc files is used to verified this fonctionnality.
-			 Parameter: number of zones
+			 Parameter: nbzones: number of zones for output defined by the user
+						zsinit: initial water elevation
 			*/
 
 			log("\t### Test zoned output ###");
-			testzoneOutDef = ZoneOutputTest(0);
+			int nbzones = 0;
+			T zsinit = 0.01;
+			testzoneOutDef = ZoneOutputTest(nbzones, zsinit);
 			result = testzoneOutDef ? "successful" : "failed";
 			log("\t\tDefault zoned Outputs: " + result);
-			testzoneOutUser = ZoneOutputTest(3);
+			nbzones = 3;
+			testzoneOutUser = ZoneOutputTest(nbzones, zsinit);
 			result = testzoneOutUser ? "successful" : "failed";
 			log("\t\tUser defined zones Outputs: " + result);
 			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
@@ -3245,11 +3249,11 @@ template std::vector<float> Raintestmap<float>(int gpu, int dimf, float Zsinit);
 template std::vector<float> Raintestmap<double>(int gpu, int dimf, double Zsinit);
 
 
-/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones)
+/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
 *
 * This function test the zoned output for a basic configuration
 */
-template <class T> bool ZoneOutputTest(int nzones)
+template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 {
 	log("#####");
 
@@ -3266,8 +3270,9 @@ template <class T> bool ZoneOutputTest(int nzones)
 		param_file << "outzone = whole.nc, -10, 10, -10, 10;" << std::endl;
 		param_file << "outzone = zoomed_part.nc, -0.2, 0.2, -0.4, -0.2;" << std::endl;
 		param_file.close(); //destructor implicitly does it
+
 		// read param file
-		Readparamfile(XParam, XForcing, param_file);
+		readforcing(XParam, XForcing);
 	}
 
 	// initialise domain and required resolution
@@ -3281,7 +3286,7 @@ template <class T> bool ZoneOutputTest(int nzones)
 	XParam.minlevel = -1;
 	XParam.maxlevel = 1;
 
-	//XParam.zsinit = zsnit;
+	XParam.zsinit = zsinit;
 	//XParam.zsoffset = 0.0;
 
 	//Output times for comparisons
@@ -3342,36 +3347,36 @@ template <class T> bool ZoneOutputTest(int nzones)
 
 	//Adaptation
 	XParam.AdaptCrit = "Targetlevel";
-	XForcing.AdaptCrit[0].xo = -1.0;
-	XForcing.AdaptCrit[0].yo = -1.0;
-	XForcing.AdaptCrit[0].xmax = 1.0;
-	XForcing.AdaptCrit[0].ymax = 1.0;
-	XForcing.AdaptCrit[0].nx = 21;
-	XForcing.AdaptCrit[0].ny = 21;
+	XForcing.targetadapt[0].xo = -1.0;
+	XForcing.targetadapt[0].yo = -1.0;
+	XForcing.targetadapt[0].xmax = 1.0;
+	XForcing.targetadapt[0].ymax = 1.0;
+	XForcing.targetadapt[0].nx = 21;
+	XForcing.targetadapt[0].ny = 21;
 
-	XForcing.AdaptCrit[0].dx = 0.1;
+	XForcing.targetadapt[0].dx = 0.1;
 
-	AllocateCPU(XForcing.AdaptCrit[0].nx, XForcing.AdaptCrit[0].ny, XForcing.AdaptCrit[0].val);
+	AllocateCPU(XForcing.targetadapt[0].nx, XForcing.targetadapt[0].ny, XForcing.targetadapt[0].val);
 
-	for (int j = 0; j < XForcing.AdaptCrit[0].ny; j++)
+	for (int j = 0; j < XForcing.targetadapt[0].ny; j++)
 	{
-		for (int i = 0; i < XForcing.AdaptCrit[0].nx; i++)
+		for (int i = 0; i < XForcing.targetadapt[0].nx; i++)
 		{
-			x = XForcing.AdaptCrit[0].xo + i * XForcing.AdaptCrit[0].dx;
-			y = XForcing.AdaptCrit[0].yo + j * XForcing.AdaptCrit[0].dx;
+			x = XForcing.targetadapt[0].xo + i * XForcing.targetadapt[0].dx;
+			y = XForcing.targetadapt[0].yo + j * XForcing.targetadapt[0].dx;
 			if (x < 0.0)
 			{
-				XForcing.AdaptCrit[0].val[i + j * XForcing.AdaptCrit0].nx] = 0;
+				XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 0;
 			}
 			else
 			{
 				if (y < 0.0)
 				{
-					XForcing.AdaptCrit[0].val[i + j * XForcing.AdaptCrit0].nx] = 1;
+					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 1;
 				}
 				else 
 				{
-					XForcing.AdaptCrit[0].val[i + j * XForcing.AdaptCrit0].nx] = -1;
+					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = -1;
 				}
 			}
 		}
@@ -3425,8 +3430,8 @@ template <class T> bool ZoneOutputTest(int nzones)
 	//log("#####");
 	return modelgood;
 }
-template bool ZoneOutputTest<float>(int nzones);
-template bool ZoneOutputTest<double>(int nzones);
+template bool ZoneOutputTest<float>(int nzones, T zsinit);
+template bool ZoneOutputTest<double>(int nzones, T zsinit);
 
 
 

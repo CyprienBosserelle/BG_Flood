@@ -36,7 +36,6 @@ template <class T> bool Rivertest(T zsnit, int gpu);
 template <class T> bool MassConserveSteepSlope(T zsnit, int gpu);
 template <class T> bool Raintest(T zsnit, int gpu, float alpha);
 template <class T> bool testboundaries(Param XParam, T maxslope);
-template <class T> bool ZoneOutputTest(int nzones);
-
+template <class T> bool ZoneOutputTest(int nzones, T zsinit);
 // End of global definition
 #endif
