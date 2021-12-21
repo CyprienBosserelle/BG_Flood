@@ -159,7 +159,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	
 	//=====================
 	// Target level
-	if (XParam.AdatpCrit.compare("Targetlevel") == 0)
+	if (XParam.AdaptCrit.compare("Targetlevel") == 0)
 	{
 		log("\nRead Target level data...");
 		for (int nd = 0; nd < XForcing.targetadapt.size(); nd++)

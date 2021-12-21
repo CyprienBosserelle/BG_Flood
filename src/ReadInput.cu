@@ -648,7 +648,7 @@ Param readparamstr(std::string line, Param param)
 
 		if (!adaptpar.empty())
 		{
-			param.AdatpCrit = adaptpar[0];
+			param.AdaptCrit = adaptpar[0];
 			if (adaptpar.size() > 1)
 				param.Adapt_arg1 = adaptpar[1];
 			if (adaptpar.size() > 2)
@@ -1134,9 +1134,9 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	if (XParam.minlevel != XParam.maxlevel)
 	{
-		if (XParam.AdatpCrit.empty())
+		if (XParam.AdaptCrit.empty())
 		{
-			XParam.AdatpCrit = "Threshold";
+			XParam.AdaptCrit = "Threshold";
 			XParam.Adapt_arg1 = "0.0";
 			XParam.Adapt_arg2 = "h";
 		}

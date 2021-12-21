@@ -7,15 +7,15 @@
 template <class T> int AdaptCriteria(Param XParam, Forcing<float> XForcing, Model<T> XModel)
 {
 	int success = 0;
-	if (XParam.AdatpCrit.compare("Threshold") == 0)
+	if (XParam.AdaptCrit.compare("Threshold") == 0)
 	{
 		success = Thresholdcriteria(XParam, T(std::stod(XParam.Adapt_arg1)), XModel.OutputVarMap[XParam.Adapt_arg2], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 	}
-	if (XParam.AdatpCrit.compare("Inrange") == 0)
+	if (XParam.AdaptCrit.compare("Inrange") == 0)
 	{
 		success = inrangecriteria(XParam, T(std::stod(XParam.Adapt_arg1)), T(std::stod(XParam.Adapt_arg2)), XModel.OutputVarMap[XParam.Adapt_arg3], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 	}
-	if (XParam.AdatpCrit.compare("Targetlevel") == 0)
+	if (XParam.AdaptCrit.compare("Targetlevel") == 0)
 	{
 		for (int ig = 0; ig < XForcing.targetadapt.size(); ig++)
 		{

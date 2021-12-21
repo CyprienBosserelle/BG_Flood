@@ -761,7 +761,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XParam.minlevel = -1;
 	XParam.maxlevel = 1;
 
-	XParam.AdatpCrit = "Threshold";
+	XParam.AdaptCrit = "Threshold";
 	XParam.Adapt_arg1 = "3.5";
 	XParam.Adapt_arg2 = "zb";
 
@@ -1563,7 +1563,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 
 	//Fine to coarse
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "28.0";
 	XParam.Adapt_arg2 = "40.0";
 	XParam.Adapt_arg3 = "zb";
@@ -1591,7 +1591,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 
 	//coarse to fine
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "0.0";
 	XParam.Adapt_arg2 = "2.0";
 	XParam.Adapt_arg3 = "zb";
@@ -1904,7 +1904,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 
 	//Fine to coarse
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "28.0";
 	XParam.Adapt_arg2 = "40.0";
 	XParam.Adapt_arg3 = "zb";
@@ -1932,7 +1932,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 
 	//coarse to fine
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "0.0";
 	XParam.Adapt_arg2 = "2.0";
 	XParam.Adapt_arg3 = "zb";
