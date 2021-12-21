@@ -3,14 +3,23 @@
 
 
 
-template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &XForcing, Model<T>& XModel_g)
+template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &XForcing, Model<T>& XModel_g)
 {
 	if (XParam.GPUDEVICE >= 0)
 	{
 		log("Setting up GPU");
 
+		size_t free_byte;
+
+		size_t total_byte;
 
 		cudaSetDevice(XParam.GPUDEVICE);
+
+		CUDA_CHECK(cudaMemGetInfo(&free_byte, &total_byte));
+
+		XParam.GPU_initmem_byte = total_byte - free_byte;
+
+
 		//Allocate memory for the model on the GPU
 		AllocateGPU(XParam.nblkmem, XParam.blksize, XParam, XModel_g);
 		
@@ -79,8 +88,8 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		InitzbgradientGPU(XParam, XModel_g);
 	}
 }
-template void SetupGPU<float>(Param XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);
-template void SetupGPU<double>(Param XParam, Model<double> XModel, Forcing<float>& XForcing, Model<double>& XModel_g);
+template void SetupGPU<float>(Param &XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);
+template void SetupGPU<double>(Param &XParam, Model<double> XModel, Forcing<float>& XForcing, Model<double>& XModel_g);
 
 
 void CUDA_CHECK(cudaError CUDerr)

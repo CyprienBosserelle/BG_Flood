@@ -93,6 +93,7 @@ public:
 	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
 	//other
 	clock_t startcputime, endcputime, setupcputime;
+	size_t GPU_initmem_byte, GPU_totalmem_byte;
 
 
 	//*Outputs
