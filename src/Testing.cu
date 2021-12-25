@@ -3254,6 +3254,7 @@ template std::vector<float> Raintestmap<double>(int gpu, int dimf, double Zsinit
 * This function test the zoned output for a basic configuration
 */
 template <class T> bool ZoneOutputTest(int nzones, T zsinit)
+template bool ZoneOutputTest<float>(int nzones, float zsinit);
 {
 	log("#####");
 
@@ -3430,8 +3431,8 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	//log("#####");
 	return modelgood;
 }
-template bool ZoneOutputTest<float>(int nzones, T zsinit);
-template bool ZoneOutputTest<double>(int nzones, T zsinit);
+template bool ZoneOutputTest<float>(int nzones, float zsinit);
+template bool ZoneOutputTest<double>(int nzones, double zsinit);
 
 
 
