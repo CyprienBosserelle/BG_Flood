@@ -62,7 +62,7 @@ void create_logfile()
 	//strftime(buffer, 80, "%d-%m-%Y %H:%M:%S", timeinfo);
 	//std::string strtimenow(buffer);
 
-	time_t rawtime, dstart;
+	time_t rawtime;
 	struct tm* timeinfo;
 	char buffer[80];
 
