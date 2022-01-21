@@ -204,9 +204,9 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t### Test zoned output ###");
 			int nbzones = 0;
 			T zsinit = 0.01;
-			testzoneOutDef = ZoneOutputTest(nbzones, zsinit);
-			result = testzoneOutDef ? "successful" : "failed";
-			log("\t\tDefault zoned Outputs: " + result);
+			//testzoneOutDef = ZoneOutputTest(nbzones, zsinit);
+			//result = testzoneOutDef ? "successful" : "failed";
+			//log("\t\tDefault zoned Outputs: " + result);
 			nbzones = 3;
 			testzoneOutUser = ZoneOutputTest(nbzones, zsinit);
 			result = testzoneOutUser ? "successful" : "failed";
@@ -3254,7 +3254,7 @@ template std::vector<float> Raintestmap<double>(int gpu, int dimf, double Zsinit
 * This function test the zoned output for a basic configuration
 */
 template <class T> bool ZoneOutputTest(int nzones, T zsinit)
-template bool ZoneOutputTest<float>(int nzones, float zsinit);
+//template bool ZoneOutputTest<float>(int nzones, float zsinit);
 {
 	log("#####");
 
@@ -3264,7 +3264,7 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 	
 	if (nzones  == 3)
 	{
-		// Creation of the param file
+		/*// Creation of the param file
 		std::ofstream param_file(
 			"BG_param.txt", std::ios_base::out | std::ios_base::trunc);
 		param_file << "outzone = zoomed.nc,-0.2,0.2,-0.2,0.2; "<< std::endl;
@@ -3274,6 +3274,26 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 
 		// read param file
 		readforcing(XParam, XForcing);
+		*/
+		outzone zone;
+		zone.outname = "zoomed.nc";
+		zone.xstart =-0.2;
+		zone.xend =0.2;
+		zone.ystart = -0.2;
+		zone.yend = 0.2;
+		XParam.outzone.push_back(zone);
+		zone.outname = "whole.nc";
+		zone.xstart = -10;
+		zone.xend = 10;
+		zone.ystart = -10;
+		zone.yend = 10;
+		XParam.outzone.push_back(zone);
+		zone.outname = "zoomed2.nc";
+		zone.xstart = -0.2;
+		zone.xend = 0.2;
+		zone.ystart = -0.4;
+		zone.yend = 0.2;
+		XParam.outzone.push_back(zone);
 	}
 
 	// initialise domain and required resolution
@@ -3316,12 +3336,12 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 	XForcing.Bathy.push_back(bathy);
 
 	// initialise forcing bathymetry to a central hill
-	XForcing.Bathy[0].xo = -1.0;
-	XForcing.Bathy[0].yo = -1.0;
-	XForcing.Bathy[0].xmax = 1.0;
-	XForcing.Bathy[0].ymax = 1.0;
-	XForcing.Bathy[0].nx = 21;
-	XForcing.Bathy[0].ny = 21;
+	XForcing.Bathy[0].xo = -100.0;
+	XForcing.Bathy[0].yo = -100.0;
+	XForcing.Bathy[0].xmax = 100.0;
+	XForcing.Bathy[0].ymax = 100.0;
+	XForcing.Bathy[0].nx = 5001;
+	XForcing.Bathy[0].ny = 5001;
 
 	XForcing.Bathy[0].dx = 0.1;
 
@@ -3330,32 +3350,40 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 	
 	float rs, x, y, r, hm;
-	rs = 0.5; //hill radio
-	hm = 0.1; //hill top
+	rs = 20; //hill radio 
+	hm = 5; //hill top
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
 			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
 			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
-			r = x * x + y * y;
+			r = sqrt(x * x + y * y);
 			if (r < rs)
 			{
 				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm*(1-r/rs);
+			}
+			if (x < -97 | x > 97 | y < -97 | y > 97)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 10;
 			}
 		}
 	}
 
 	//Adaptation
 	XParam.AdaptCrit = "Targetlevel";
-	XForcing.targetadapt[0].xo = -1.0;
-	XForcing.targetadapt[0].yo = -1.0;
-	XForcing.targetadapt[0].xmax = 1.0;
-	XForcing.targetadapt[0].ymax = 1.0;
-	XForcing.targetadapt[0].nx = 21;
-	XForcing.targetadapt[0].ny = 21;
+	
+	StaticForcingP<int> Target;
+	XForcing.targetadapt.push_back(Target);
 
-	XForcing.targetadapt[0].dx = 0.1;
+	XForcing.targetadapt[0].xo = -100;
+	XForcing.targetadapt[0].yo = -100;
+	XForcing.targetadapt[0].xmax = 100.0;
+	XForcing.targetadapt[0].ymax = 100.0;
+	XForcing.targetadapt[0].nx = 501;
+	XForcing.targetadapt[0].ny = 501;
+
+	XForcing.targetadapt[0].dx = 1;
 
 	AllocateCPU(XForcing.targetadapt[0].nx, XForcing.targetadapt[0].ny, XForcing.targetadapt[0].val);
 
@@ -3367,18 +3395,18 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 			y = XForcing.targetadapt[0].yo + j * XForcing.targetadapt[0].dx;
 			if (x < 0.0)
 			{
-				XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 0;
+				XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = -1;
 			}
 			else
 			{
-				if (y < 0.0)
-				{
+				//if (y < 0.0)
+				//{
+				//	XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = -1;
+				//}
+				//else
+				//{
 					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 1;
-				}
-				else 
-				{
-					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = -1;
-				}
+				//}
 			}
 		}
 	}
@@ -3400,10 +3428,10 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 
 	River thisriver;
 	thisriver.Riverflowfile = "testriver.tmp";
-	thisriver.xstart = -0.01;
-	thisriver.xend = 0.01;
-	thisriver.ystart = -0.01;
-	thisriver.yend = 0.01;
+	thisriver.xstart = -1;
+	thisriver.xend = 1;
+	thisriver.ystart = -1;
+	thisriver.yend = 1;
 
 	XForcing.rivers.push_back(thisriver);
 
@@ -3423,10 +3451,29 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
+	//Test if file exist and can be open:
+	int error = 1;
+	std::vector<int> observedSize{ 941100,4569717,1392076 };
+	for (int o = 0; o < XModel.blocks.outZone.size(); o++)
+	{
+		std::ifstream fs(XModel.blocks.outZone[o].outname);
+		if (fs.fail()) 
+		{
+			error++;
+		}
+		else
+		{
+			//Calculate the size of the file in bytes
+			std::ifstream in_file(XModel.blocks.outZone[o].outname, std::ios::binary);
+			in_file.seekg(0, std::ios::end);
+			int file_size = in_file.tellg();
+			printf("\n length of the file %s: %i in bytes\n", XModel.blocks.outZone[o].outname, file_size);
+			error = error * observedSize[o] / file_size;
+			printf("\n error=%f", error);
+		}
+	}
 
-	T error = 0;
-
-	bool modelgood = error < 0.05;
+	bool modelgood = (1-abs(error)) < 0.05;
 
 	//log("#####");
 	return modelgood;

@@ -73,7 +73,6 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	initoutput(XParam, XModel);
 
 }
-
 template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
 
