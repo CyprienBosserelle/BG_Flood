@@ -69,6 +69,11 @@ struct DynForcingP: public forcingmap
 };
 
 template <class T>
+struct AtmPForcing : public DynForcingP
+{
+	T* dPdx, * dPdy;
+};
+template <class T>
 struct StaticForcingP : public inputmap
 {
 	T *val;
@@ -122,7 +127,7 @@ struct Forcing
 	Ex: rain=rain_forcing.nc?RainIntensity
 	Default: None
 	*/
-	DynForcingP<T> Atmp;
+	AtmPForcing<T> Atmp;
 	/* The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using Pa2.
 	Ex: Atmp=AtmosphericPressure.nc?p
 	Default: None

@@ -42,6 +42,8 @@ public:
 
 	int doubleprecision = 0; // 0: float precision, 1: double precision
 
+	int engine = 1; // 1: Buttinger, 2: Kurganov, 3: KurganovATMP
+
 	//*Grid parameters
 	double dx = nan(""); // Grid resolution in the coordinate system unit in m.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
