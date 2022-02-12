@@ -106,6 +106,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.atmpforcing)
 	{
+		AllocateCPU(nblk, blksize, XModel.Patm);
 		AllocateCPU(nblk, blksize, XModel.datmpdx);
 		AllocateCPU(nblk, blksize, XModel.datmpdy);
 	}
@@ -235,6 +236,7 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.atmpforcing)
 	{
+		ReallocArray(nblk, blksize, XModel.Patm);
 		ReallocArray(nblk, blksize, XModel.datmpdx);
 		ReallocArray(nblk, blksize, XModel.datmpdy);
 	}
@@ -336,6 +338,7 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.atmpforcing)
 	{
+		AllocateGPU(nblk, blksize, XModel.Patm);
 		AllocateGPU(nblk, blksize, XModel.datmpdx);
 		AllocateGPU(nblk, blksize, XModel.datmpdy);
 	}

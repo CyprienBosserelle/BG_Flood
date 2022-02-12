@@ -138,10 +138,7 @@ struct Forcing
 	Default: None
 	*/
 
-	ATMPmesh<T> atmparr;
-	ATMPmesh<T> atmparr_g;
-	/* Arrays to store and calcuate intermediate steps for atm pressure forcing*/
-
+	
 	std::vector<StaticForcingP<T>> Bathy; //Should be a vector at some point
 	/* Bathymetry/Topography input, ONLY NECESSARY INPUT
 	Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.

@@ -13,6 +13,8 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
 	
+
+	
 	log("\t\tCompleted");
 	log("Model Running...");
 	while (XLoop.totaltime < XParam.endtime)

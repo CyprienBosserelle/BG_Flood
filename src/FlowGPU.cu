@@ -17,6 +17,27 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		CUDA_CHECK(cudaStreamCreate(&XLoop.streams[i]));
 	}
+
+	if (XParam.atmpforcing)
+	{
+		//Update atm press forcing
+		AddPatmforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Atmp, XModel);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//Fill atmp halo
+		cudaStream_t atmpstreams[1];
+		CUDA_CHECK(cudaStreamCreate(&atmpstreams[0]));
+		fillHaloGPU(XParam, XModel.blocks, atmpstreams[0], XModel.Patm);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		cudaStreamDestroy(atmpstreams[0]);
+
+		//Calc dpdx and dpdy
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		//
+
+
+	}
 	
 	//============================================
 	// Predictor step in reimann solver
