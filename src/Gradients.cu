@@ -92,26 +92,29 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 		gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 		gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
-		//  wet slope limiter
-		WetsloperesetXGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		if (XParam.engine == 1)
+		{
+			//  wet slope limiter
+			WetsloperesetXGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		WetsloperesetYGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			WetsloperesetYGPU << < gridDim, blockDim, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		// ALso do the slope limiter on the halo
-		WetsloperesetHaloLeftGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			// ALso do the slope limiter on the halo
+			WetsloperesetHaloLeftGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		WetsloperesetHaloRightGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			WetsloperesetHaloRightGPU << < gridDim, blockDimLR, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		WetsloperesetHaloBotGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			WetsloperesetHaloBotGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		WetsloperesetHaloTopGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
+			WetsloperesetHaloTopGPU << < gridDim, blockDimBT, 0 >> > (XParam, XBlock, XEv, XGrad, zb);
 
-		CUDA_CHECK(cudaDeviceSynchronize());
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
 
 	}
 	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
@@ -345,13 +348,15 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 
 	}
 	
-	WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb);
+	if (XParam.engine == 1)
+	{
+		WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb);
 
-	WetsloperesetHaloLeftCPU(XParam, XBlock, XEv, XGrad, zb);
-	WetsloperesetHaloRightCPU(XParam, XBlock, XEv, XGrad, zb);
-	WetsloperesetHaloBotCPU(XParam, XBlock, XEv, XGrad, zb);
-	WetsloperesetHaloTopCPU(XParam, XBlock, XEv, XGrad, zb);
-		
+		WetsloperesetHaloLeftCPU(XParam, XBlock, XEv, XGrad, zb);
+		WetsloperesetHaloRightCPU(XParam, XBlock, XEv, XGrad, zb);
+		WetsloperesetHaloBotCPU(XParam, XBlock, XEv, XGrad, zb);
+		WetsloperesetHaloTopCPU(XParam, XBlock, XEv, XGrad, zb);
+	}
 
 
 	

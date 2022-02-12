@@ -69,10 +69,14 @@ struct DynForcingP: public forcingmap
 };
 
 template <class T>
-struct AtmPForcing : public DynForcingP
+struct ATMPmesh
 {
+	T* AtmP;
 	T* dPdx, * dPdy;
 };
+
+
+
 template <class T>
 struct StaticForcingP : public inputmap
 {
@@ -127,11 +131,16 @@ struct Forcing
 	Ex: rain=rain_forcing.nc?RainIntensity
 	Default: None
 	*/
-	AtmPForcing<T> Atmp;
+
+	DynForcingP<T> Atmp;
 	/* The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using Pa2.
 	Ex: Atmp=AtmosphericPressure.nc?p
 	Default: None
 	*/
+
+	ATMPmesh<T> atmparr;
+	ATMPmesh<T> atmparr_g;
+	/* Arrays to store and calcuate intermediate steps for atm pressure forcing*/
 
 	std::vector<StaticForcingP<T>> Bathy; //Should be a vector at some point
 	/* Bathymetry/Topography input, ONLY NECESSARY INPUT

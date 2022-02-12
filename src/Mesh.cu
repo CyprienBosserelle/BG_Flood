@@ -118,6 +118,7 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 	// Allocate CPU memory for the whole model
 	AllocateCPU(XParam.nblkmem, XParam.blksize, XParam, XModel);
 
+
 	//==============================
 	// Initialise blockinfo info
 	InitBlockInfo(XParam, XForcing, XModel.blocks);
