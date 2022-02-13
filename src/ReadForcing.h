@@ -43,5 +43,7 @@ template <class T> void readbathyASCzb(std::string filename, int nx, int ny, T*&
 
 template <class T> void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, T*& Ux, T* Uo, T* Un);
 
+template <class T> void clampedges(int nx, int ny, T clamp, T* z);
+
 // End of global definition
 #endif

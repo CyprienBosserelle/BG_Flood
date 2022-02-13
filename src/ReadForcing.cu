@@ -123,22 +123,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			//XForcing.deform[nd].grid = readcfmaphead(XForcing.deform[nd].grid);
 
 			//Clamp edges to 0.0
-			int ii;
-			for (int ix = 0; ix < XForcing.deform[nd].nx; ix++)
-			{
-				ii = ix + 0 * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-				ii = ix + (XForcing.deform[nd].ny-1) * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-			}
-
-			for (int iy = 0; iy < XForcing.deform[nd].ny; iy++)
-			{
-				ii = 0 + iy * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-				ii = (XForcing.deform[nd].nx - 1) + (iy) * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-			}
+			clampedges(XForcing.deform[nd].nx, XForcing.deform[nd].ny, 0.0f, XForcing.deform[nd].val);
+			
 
 			
 			XParam.deformmaxtime = utils::max(XParam.deformmaxtime, XForcing.deform[nd].startime + XForcing.deform[nd].duration);
@@ -215,6 +201,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			//
 			readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
 			readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
+
 
 			
 		}
@@ -1064,6 +1051,9 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
 	readvardata(forcing.inputfile, forcing.varname, step, forcing.before);
 	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after);
+	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.before);
+	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.after);
+
 	InterpstepCPU(forcing.nx, forcing.ny, step, totaltime, forcing.dt, forcing.now, forcing.before, forcing.after);
 	forcing.val = forcing.now;
 }
@@ -1524,7 +1514,26 @@ template <class T> void readbathyASCzb(std::string filename,int nx, int ny, T* &
 template void readbathyASCzb<int>(std::string filename, int nx, int ny, int*& zb);
 template void readbathyASCzb<float>(std::string filename, int nx, int ny, float*& zb);
 
+template <class T> void clampedges(int nx, int ny, T clamp, T* z)
+{
+	//
+	int ii;
+	for (int ix = 0; ix <nx; ix++)
+	{
+		ii = ix + 0 * nx;
+		z[ii] = clamp;
+		ii = ix + (ny - 1) * nx;
+		z[ii] = clamp;
+	}
 
+	for (int iy = 0; iy < ny; iy++)
+	{
+		ii = 0 + iy * nx;
+		z[ii] = clamp;
+		ii = (nx - 1) + (iy)* nx;
+		z[ii] = clamp;
+	}
+}
 /*! \fn void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
 * linearly interpolate between 2 cartesian arrays (of the same size)
 * This is used to interpolate dynamic forcing to a current time step 

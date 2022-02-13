@@ -11,6 +11,8 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
 	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
 
+	//dim3 blockDimHalo(XParam.blkwidth + XParam.halowidth*2, XParam.blkwidth + XParam.halowidth * 2, 1);
+	
 	//============================================
 	// Build cuda threads for multitasking on the GPU
 	for (int i = 0; i < XLoop.num_streams; i++)
@@ -93,9 +95,18 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
-	else //if (XParam.engine == 3)
+	else if (XParam.engine == 3)
 	{
-		//
+		// 
+		updateKurgXATMGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
+		// //AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		// Y- direction
+		updateKurgYATMGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
+		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+		// //updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	//============================================
 	// Fill Halo for flux from fine to coarse
@@ -175,9 +186,16 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
-	else //if (XParam.engine == 3)
+	else if (XParam.engine == 3)
 	{
 		//
+		//
+		updateKurgXATMGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		// Y- direction
+		updateKurgYATMGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	//============================================
 	// Fill Halo for flux from fine to coarse

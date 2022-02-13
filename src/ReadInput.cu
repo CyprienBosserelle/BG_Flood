@@ -850,6 +850,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		// needs to be a netcdf file 
 		forcing.Atmp = readfileinfo(parametervalue, forcing.Atmp);
+
 	}
 
 	// rain forcing
@@ -1027,6 +1028,14 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XForcing.bot.side = 2;
 	XForcing.bot.isright = 0;
 	XForcing.bot.istop = -1;
+
+	XForcing.Atmp.clampedge = XParam.Paref;
+
+	if (!XForcing.Atmp.inputfile.empty())
+	{
+		XParam.atmpforcing = true;
+		XParam.engine = 3;
+	}
 
 
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent

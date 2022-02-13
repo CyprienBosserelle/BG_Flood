@@ -50,7 +50,7 @@ public:
 	double duration = 0.0;
 	T* val;
 	
-
+	T clampedge = 0.0;
 	TexSetP GPU;
 };
 
@@ -66,14 +66,11 @@ struct DynForcingP: public forcingmap
 	T* now_g;
 	T* before_g, * after_g;
 
+	T clampedge=0.0;
+
 };
 
-template <class T>
-struct ATMPmesh
-{
-	T* AtmP;
-	T* dPdx, * dPdy;
-};
+
 
 
 

@@ -466,7 +466,7 @@ template <class T> __global__ void AddPatmforcingGPU(Param XParam, BlockP<T> XBl
 	atmpi = interpDyn2BUQ(x, y, PAtm.GPU);
 	
 
-	XModel.Patm[i] = atmpi;
+	XModel.Patm[i] = atmpi - XParam.Paref;
 	
 }
 template __global__ void AddPatmforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> PAtm, Model<float> XModel);
