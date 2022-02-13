@@ -7,6 +7,22 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	// Predictor step in reimann solver
 	//============================================
 
+
+	if (XParam.atmpforcing)
+	{
+		//Update atm press forcing
+		AddPatmforcingCPU(XParam, XModel.blocks, XForcing.Atmp, XModel);
+		
+		//Fill atmp halo
+		fillHaloC(XParam, XModel.blocks, XModel.Patm);
+			
+
+		//Calc dpdx and dpdy
+		gradientC(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		gradientHalo(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		
+	}
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);

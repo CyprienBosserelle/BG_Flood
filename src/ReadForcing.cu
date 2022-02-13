@@ -223,7 +223,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
+			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
+			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
 
