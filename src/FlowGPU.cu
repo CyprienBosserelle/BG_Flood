@@ -36,6 +36,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		//Calc dpdx and dpdy
 		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
+		gradientHaloGPU(XParam, XBlock, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		//
 
 
