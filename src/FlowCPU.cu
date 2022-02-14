@@ -21,6 +21,11 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 		gradientC(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		gradientHalo(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 
+		refine_linear(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		gradientHalo(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		
+
 		
 	}
 	//============================================

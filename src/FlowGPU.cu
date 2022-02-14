@@ -38,6 +38,14 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		CUDA_CHECK(cudaDeviceSynchronize());
 		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		//
+			
+
+		refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 
 
 	}
