@@ -154,6 +154,13 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.doubleprecision = std::stoi(parametervalue);
 	}
+
+	parameterstr = "engine";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.engine = std::stoi(parametervalue);
+	}
 	///////////////////////////////////////////////////////
 	// Adaptation
 	//

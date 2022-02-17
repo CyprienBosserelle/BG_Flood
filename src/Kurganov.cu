@@ -277,14 +277,14 @@ template <class T> __global__ void updateKurgXATMGPU(Param XParam, BlockP<T> XBl
 			int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + blockDim.y / 2;
 			int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 			hi = XEv.h[iright];
-			zi = zb[iright];
+			zi = zb[iright] + XParam.Pa2m * Patm[iright];
 		}
 		if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo
 		{
 			int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + blockDim.y / 2;
 			int ilc = memloc(halowidth, blkmemwidth, blockDim.y - 1, jj, LB);
 			hn = XEv.h[ilc];
-			zn = zb[ilc];
+			zn = zb[ilc] + XParam.Pa2m * Patm[ilc];
 		}
 
 		sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
@@ -715,7 +715,7 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
-						zi = zb[iright];
+						zi = zb[iright] + XParam.Pa2m * Patm[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
@@ -723,7 +723,7 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
 						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 						hn = XEv.h[ilc];
-						zn = zb[ilc];
+						zn = zb[ilc] + XParam.Pa2m * Patm[ilc];
 					}
 
 					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
@@ -1114,14 +1114,14 @@ template <class T> __global__ void updateKurgYATMGPU(Param XParam, BlockP<T> XBl
 			int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
 			int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);;
 			hi = XEv.h[itop];
-			zi = zb[itop];
+			zi = zb[itop] + XParam.Pa2m * Patm[itop];
 		}
 		if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
 		{
 			int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
 			int ibc = memloc(halowidth, blkmemwidth, jj, blockDim.x - 1, BL);
 			hn = XEv.h[ibc];
-			zn = zb[ibc];
+			zn = zb[ibc] + +XParam.Pa2m * Patm[ibc];
 		}
 
 		sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
@@ -1508,14 +1508,14 @@ template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBloc
 						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
 						hi = XEv.h[itop];
-						zi = zb[itop];
+						zi = zb[itop] + XParam.Pa2m * Patm[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
 					{
 						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
 						hn = XEv.h[ibc];
-						zn = zb[ibc];
+						zn = zb[ibc] + XParam.Pa2m * Patm[ibc];
 					}
 
 					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
