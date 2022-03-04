@@ -159,7 +159,23 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.engine = std::stoi(parametervalue);
+		std::vector<std::string> buttingerstr = { "b","butt","buttinger","2" };
+		std::size_t found;
+		bool foo = false;
+		for (int ii = 0; ii < buttingerstr.size(); ii++)
+		{
+			found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
+			if (found == 0)
+			{
+				param.engine = 2;
+				foo = true;
+			}
+				
+		}
+		if (!foo)
+		{
+			param.engine = 1;
+		}
 	}
 	///////////////////////////////////////////////////////
 	// Adaptation
