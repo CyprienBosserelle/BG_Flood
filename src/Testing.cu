@@ -3029,6 +3029,8 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			//Write the netcdf file
 			create3dnc("rainTemp.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
 
+			printf("non-uniform forcing\n")
+
 			//End creation of the nc file for rain forcing
 		}
 		//Create a uniform time-variable rain forcing using a map forcing (nc file)
@@ -3056,6 +3058,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			//Write the netcdf file
 			create3dnc("rainTemp.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
 
+			printf("non-uniform forcing 31\n")
 			//End creation of the nc file for rain forcing
 		}
 		/*
