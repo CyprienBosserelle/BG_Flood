@@ -401,7 +401,7 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 			jl = j;
 
 			ip = XParam.blkwidth - 1;
-			jp = XBlock.RightBot[ibLB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
+			jp = XBlock.RightBot[ibLB] == ib ? ftoi(floor(j / 2)) : ftoi(floor(j / 2) + XParam.blkwidth / 2);
 
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
@@ -537,7 +537,7 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 			jl = j;
 
 			ip = 0;
-			jp = XBlock.LeftBot[ibRB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
+			jp = XBlock.LeftBot[ibRB] == ib ? ftoi(floor(j / 2)) : ftoi(floor(j / 2) + XParam.blkwidth / 2);
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
 
@@ -671,7 +671,7 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 			il = i;
 
 			jp = 0;
-			ip = XBlock.BotLeft[ibTL] == ib ? floor(i / 2) : (floor(i / 2) + XParam.blkwidth / 2);
+			ip = XBlock.BotLeft[ibTL] == ib ? ftoi(floor(i / 2)) : ftoi(floor(i / 2) + XParam.blkwidth / 2);
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
 
@@ -803,7 +803,7 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 			il = i;
 
 			jp = XParam.blkwidth - 1;
-			ip = XBlock.TopLeft[ibBL] == ib ? floor(i / 2) : (floor(i / 2) + XParam.blkwidth / 2);
+			ip = XBlock.TopLeft[ibBL] == ib ? ftoi(floor(i / 2)) : ftoi(floor(i / 2) + XParam.blkwidth / 2);
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
 
@@ -930,7 +930,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 			jl = j;
 
 			ip = XParam.blkwidth - 1;
-			jp = XBlock.RightBot[ibLB] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
+			jp = XBlock.RightBot[ibLB] == ib ? ftoi(floor(j * T(0.5))) : ftoi(floor(j * T(0.5)) + XParam.blkwidth / 2);
 
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
@@ -1047,7 +1047,7 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 			jl = j;
 
 			ip = 0;
-			jp = XBlock.LeftBot[ibn] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
+			jp = XBlock.LeftBot[ibn] == ib ? ftoi(floor(j * T(0.5))) : ftoi(floor(j * T(0.5)) + XParam.blkwidth / 2);
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
 
@@ -1163,7 +1163,7 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 			jl = XParam.blkwidth - 1;
 
 			jp = 0;
-			ip = XBlock.BotLeft[ibn] == ib ? floor(i * T(0.5)) : (floor(i * T(0.5)) + XParam.blkwidth / 2);
+			ip = XBlock.BotLeft[ibn] == ib ? ftoi(floor(i * T(0.5))) : ftoi(floor(i * T(0.5)) + XParam.blkwidth / 2);
 
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
@@ -1280,7 +1280,7 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 			jl = 0;
 
 			jp = XParam.blkwidth - 1;
-			ip = XBlock.TopLeft[ibn] == ib ? floor(i * T(0.5)) : (floor(i * T(0.5)) + XParam.blkwidth / 2);
+			ip = XBlock.TopLeft[ibn] == ib ? ftoi(floor(i * T(0.5))) : ftoi(floor(i * T(0.5)) + XParam.blkwidth / 2);
 
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;

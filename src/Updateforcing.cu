@@ -227,7 +227,7 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 				//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
 				if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart),T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
 				{
-					XAdv.dh[i] += qnow / XRiver.disarea;
+					XAdv.dh[i] += qnow / T(XRiver.disarea);
 
 				}
 			}

@@ -997,8 +997,8 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	//printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, calcres(1.0, XParam.initlevel));
 
 	// First estimate nx and ny
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+	XParam.nx = ftoi((XParam.xmax - XParam.xo) / (levdx));
+	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
 	//if desire size in one direction is under the bathy resolution or dx requested
 	if (XParam.nx == 0) { XParam.nx = 1; }
 	if (XParam.ny == 0) { XParam.ny = 1; }
@@ -1009,8 +1009,8 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth)) * levdx;
 
 	// Update nx and ny 
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+	XParam.nx = ftoi((XParam.xmax - XParam.xo) / (levdx));
+	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
 
 	log("\nAdjusted model domain (xo/xmax/yo/ymax): ");
 	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax) );

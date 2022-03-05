@@ -783,7 +783,7 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 			}
 			else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 			{
-				jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+				jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(ceil(iy * (T)0.5)) : ftoi(ceil(iy * (T)0.5) + XParam.blkwidth / 2);
 				T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
 
 				ii = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 1), jj, XBlock.LeftBot[ib]);
@@ -1099,7 +1099,7 @@ template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock,
 			}
 			else if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 			{
-				jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+				jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(ceil(iy * (T)0.5)) : ftoi(ceil(iy * (T)0.5) + XParam.blkwidth / 2);
 				T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
 
 				ii = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
@@ -1417,7 +1417,7 @@ template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, E
 			}
 			else if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 			{
-				jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
+				jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(ceil(ix * (T)0.5)) : ftoi(ceil(ix * (T)0.5) + XParam.blkwidth / 2);
 				T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
 
 				ii = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
@@ -1729,7 +1729,7 @@ template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, 
 			}
 			else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 			{
-				jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
+				jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(ceil(ix * (T)0.5)) : ftoi(ceil(ix * (T)0.5) + XParam.blkwidth / 2);
 				T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
 
 				ii = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopLeft[ib]);
@@ -1918,7 +1918,7 @@ template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, 
 	}
 	else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
-		jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+		jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(ceil(iy * (T)0.5)) : ftoi(ceil(iy * (T)0.5) + XParam.blkwidth / 2);
 		//T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.75) : T(0.25);// This is the wrong way around
 		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75); // This is right (e.g. at iy==0 use 0.75 at iy==1 use 0.25)
 
@@ -2051,7 +2051,7 @@ template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib,
 	}
 	else if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
-		jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+		jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(ceil(iy * (T)0.5)) : ftoi(ceil(iy * (T)0.5) + XParam.blkwidth / 2);
 		T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
@@ -2186,7 +2186,7 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 	}
 	else if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
-		jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
+		jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(ceil(ix * (T)0.5)) : ftoi(ceil(ix * (T)0.5) + XParam.blkwidth / 2);
 		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam, jj, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
@@ -2320,7 +2320,7 @@ template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, i
 	}
 	else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
-		jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
+		jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(ceil(ix * (T)0.5)) : ftoi(ceil(ix * (T)0.5) + XParam.blkwidth / 2);
 		T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
 
 		ii = memloc(XParam, jj, 0, XBlock.TopLeft[ib]);

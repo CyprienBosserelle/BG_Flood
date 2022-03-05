@@ -452,8 +452,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 				nbx = 256 / 16;
 				
 
-				ibx = floor(ii / 16);
-				iby = floor(jj / 16);
+				ibx = ftoi(floor(ii / 16));
+				iby = ftoi(floor(jj / 16));
 
 				ib = (iby)*nbx + ibx;
 
@@ -3029,7 +3029,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			//Write the netcdf file
 			create3dnc("rainTemp.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
 
-			printf("non-uniform forcing\n")
+			printf("non-uniform forcing\n");
 
 			//End creation of the nc file for rain forcing
 		}
@@ -3058,7 +3058,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			//Write the netcdf file
 			create3dnc("rainTemp.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
 
-			printf("non-uniform forcing 31\n")
+			printf("non-uniform forcing 31\n");
 			//End creation of the nc file for rain forcing
 		}
 		/*
@@ -3182,7 +3182,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				{
 					ixx = ix;
 					bl = ibl;
-					dist = abs(XModel.blocks.xo[ibl] + ix * delta - 24.0);
+					dist = T(abs(XModel.blocks.xo[ibl] + ix * delta - 24.0));
 				}
 			}
 		}
@@ -3210,7 +3210,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				int n = memloc(XParam, ixx, iy, ib);
 				finalFlux = finalFlux + XModel.evolv.h[n] * XModel.evolv.u[n] * delta;
 			}
-			finalFlux = finalFlux / (XParam.ymax - XParam.yo)*100*100;
+			finalFlux = finalFlux / float(XParam.ymax - XParam.yo)*100.0f*100.0f;
 			Flux.push_back(finalFlux);
 			XLoop.nextoutputtime = XLoop.nextoutputtime + XParam.outputtimestep;
 			printf("\tTime = %f, Flux at bottom end of slope : %f \n", XLoop.totaltime, finalFlux);

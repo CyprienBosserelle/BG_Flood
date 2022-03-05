@@ -1293,8 +1293,8 @@ template <class T> void readbathyMD(std::string filename, T*& zb)
 
 		nx = std::stoi(lineelements[0]);
 		ny = std::stoi(lineelements[1]);
-		dx = std::stod(lineelements[2]);
-		grdalpha = std::stod(lineelements[4]);
+		dx = std::stof(lineelements[2]);
+		grdalpha = std::stof(lineelements[4]);
 	}
 
 	int j = 0;

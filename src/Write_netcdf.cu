@@ -26,8 +26,8 @@ void Calcnxny(Param XParam, int level, int& nx, int& ny)
 	xxmin = XParam.xo + dxp;
 	yymin = XParam.yo + dxp;
 
-	nx = round((xxmax - xxmin) / ddx + 1.0);
-	ny = round((yymax - yymin) / ddx + 1.0);
+	nx = ftoi(round((xxmax - xxmin) / ddx + 1.0));
+	ny = ftoi(round((yymax - yymin) / ddx + 1.0));
 }
 
 template<class T>
@@ -223,7 +223,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		int ibl = activeblk[ib];
-		blkwidth[ib] = XParam.xo + blockxo[ibl];
+		blkwidth[ib] = T(XParam.xo) + blockxo[ibl];
 		blkid[ib] = level[ibl];
 		
 	}
@@ -233,7 +233,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		int ibl = activeblk[ib];
-		blkwidth[ib] = XParam.yo + blockyo[ibl];
+		blkwidth[ib] = T(XParam.yo) + blockyo[ibl];
 	}
 
 	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blkwidth);
