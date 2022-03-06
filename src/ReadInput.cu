@@ -1062,7 +1062,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
-	XParam.nrivers = XForcing.rivers.size();
+	XParam.nrivers = int(XForcing.rivers.size());
 
 
 

@@ -646,19 +646,19 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 
 					// along X
 					dx = delta * T(0.5);
-					zi = XEv.zs[i] - hi + XParam.Pa2m * Patm[i];
+					zi = XEv.zs[i] - hi + T(XParam.Pa2m) * Patm[i];
 
 					//printf("%f\n", zi);
 
 
 					//zl = zi - dx*(dzsdx[i] - dhdx[i]);
-					zl = zi - dx * (XGrad.dzsdx[i] - dhdxi + XParam.Pa2m * dPdx[i]);
+					zl = zi - dx * (XGrad.dzsdx[i] - dhdxi + T(XParam.Pa2m) * dPdx[i]);
 					//printf("%f\n", zl);
 
-					zn = XEv.zs[ileft] - hn + XParam.Pa2m * Patm[ileft];
+					zn = XEv.zs[ileft] - hn + T(XParam.Pa2m) * Patm[ileft];
 
 					//printf("%f\n", zn);
-					zr = zn + dx * (XGrad.dzsdx[ileft] - dhdxmin + XParam.Pa2m * dPdx[ileft]);
+					zr = zn + dx * (XGrad.dzsdx[ileft] - dhdxmin + T(XParam.Pa2m) * dPdx[ileft]);
 
 
 					zlr = max(zl, zr);
@@ -715,7 +715,7 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
-						zi = zb[iright] + XParam.Pa2m * Patm[iright];
+						zi = zb[iright] + T(XParam.Pa2m) * Patm[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
@@ -723,7 +723,7 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
 						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 						hn = XEv.h[ilc];
-						zn = zb[ilc] + XParam.Pa2m * Patm[ilc];
+						zn = zb[ilc] + T(XParam.Pa2m) * Patm[ilc];
 					}
 
 					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
@@ -770,7 +770,7 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(XParam.dx, lev);
+		delta = T(calcres(XParam.dx, lev));
 
 		// neighbours for source term
 		int RB, LBRB, LB, RBLB, levRB, levLB;
@@ -1282,7 +1282,7 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 
 		lev = XBlock.level[ib];
 
-		delta = calcres(XParam.dx, lev);
+		delta = T(calcres(XParam.dx, lev));
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -1425,7 +1425,7 @@ template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBloc
 
 		lev = XBlock.level[ib];
 
-		delta = calcres(XParam.dx, lev);
+		delta = T(calcres(XParam.dx, lev));
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -1457,10 +1457,10 @@ template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBloc
 					//zn = XEv.zs[ibot] - hn;
 					//zr = zn + dx * (XGrad.dzsdy[ibot] - dhdymin);
 
-					zi = XEv.zs[i] - hi + XParam.Pa2m * Patm[i];
-					zl = zi - dx * (XGrad.dzsdy[i] - dhdyi + XParam.Pa2m * dPdy[i]);
-					zn = XEv.zs[ibot] - hn + XParam.Pa2m * Patm[ibot];
-					zr = zn + dx * (XGrad.dzsdy[ibot] - dhdymin + XParam.Pa2m * dPdy[ibot]);
+					zi = XEv.zs[i] - hi + T(XParam.Pa2m) * Patm[i];
+					zl = zi - dx * (XGrad.dzsdy[i] - dhdyi + T(XParam.Pa2m) * dPdy[i]);
+					zn = XEv.zs[ibot] - hn + T(XParam.Pa2m) * Patm[ibot];
+					zr = zn + dx * (XGrad.dzsdy[ibot] - dhdymin + T(XParam.Pa2m) * dPdy[ibot]);
 
 					zlr = max(zl, zr);
 
@@ -1505,17 +1505,17 @@ template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBloc
 
 					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the top halo
 					{
-						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = BLTL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
 						hi = XEv.h[itop];
-						zi = zb[itop] + XParam.Pa2m * Patm[itop];
+						zi = zb[itop] + T(XParam.Pa2m) * Patm[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
 					{
-						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = TLBL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
 						hn = XEv.h[ibc];
-						zn = zb[ibc] + XParam.Pa2m * Patm[ibc];
+						zn = zb[ibc] + T(XParam.Pa2m) * Patm[ibc];
 					}
 
 					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
@@ -1562,7 +1562,7 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 		
 
 		int lev = XBlock.level[ib];
-		delta = calcres(XParam.dx, lev);
+		delta = T(calcres(XParam.dx, lev));
 		// neighbours for source term
 		int TL, BLTL, BL, TLBL, levTL, levBL;
 		TL = XBlock.TopLeft[ib];
@@ -1623,14 +1623,14 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 
 					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = BLTL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);;
 						hi = XEv.h[itop];
 						zi = zb[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = TLBL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
 						hn = XEv.h[ibc];
 						zn = zb[ibc];

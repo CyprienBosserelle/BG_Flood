@@ -198,7 +198,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	//status = nc_close(ncid);
 	//if (status != NC_NOERR) handle_ncerror(status);
 
-	float* blkwidth;
+	T* blkwidth;
 	int* blkid;
 
 
@@ -687,7 +687,7 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 				}
 				else
 				{
-					varblk[r] = var[n];
+					varblk[r] = float(var[n]);
 				}
 			}
 		}

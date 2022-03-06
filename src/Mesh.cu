@@ -33,8 +33,8 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
-	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
-	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
+	int maxnbx = ftoi(ceil(XParam.nx / (double)XParam.blkwidth));
+	int maxnby = ftoi(ceil(XParam.ny / (double)XParam.blkwidth));
 
 	for (int nblky = 0; nblky < maxnby; nblky++)
 	{
@@ -206,8 +206,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
 	
-	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
-	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
+	int maxnbx = ftoi(ceil(XParam.nx / (double)XParam.blkwidth));
+	int maxnby = ftoi(ceil(XParam.ny / (double)XParam.blkwidth));
 
 	for (int nblky = 0; nblky < maxnby; nblky++)
 	{

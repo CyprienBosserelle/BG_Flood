@@ -182,7 +182,7 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 {
 	int ib;
 	T levdx;
-	bnd.nblkTs = XParam.TSnodesout.size();
+	bnd.nblkTs = int(XParam.TSnodesout.size());
 
 	AllocateCPU(bnd.nblkTs, 1, bnd.Tsout);
 
@@ -198,7 +198,7 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 		{
 
 			ib = XBlock.active[blk];
-			levdx = calcres(XParam.dx,XBlock.level[ib]);
+			levdx = T(calcres(XParam.dx,XBlock.level[ib]));
 			if (XParam.TSnodesout[o].x >= (XParam.xo + XBlock.xo[ib]) && XParam.TSnodesout[o].x <= (XParam.xo + XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= (XParam.yo + XBlock.yo[ib]) && XParam.TSnodesout[o].y <= (XParam.yo + XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
 			{
 				XParam.TSnodesout[o].block = ib;
@@ -305,7 +305,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		if (activeRiverBlk.size() > size_t(XModel.bndblk.nblkriver))
 		{
 			ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
-			XModel.bndblk.nblkriver = activeRiverBlk.size();
+			XModel.bndblk.nblkriver = int(activeRiverBlk.size());
 		}
 
 		

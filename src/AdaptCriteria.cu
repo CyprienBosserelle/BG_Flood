@@ -141,7 +141,7 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 	{
 		int ib = XBlock.active[ibl];
 
-		delta = calcres(XParam.dx, XBlock.level[ib]);
+		delta = T(calcres(XParam.dx, XBlock.level[ib]));
 
 		uplevel = false;
 		samelevel = false;

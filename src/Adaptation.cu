@@ -340,11 +340,11 @@ template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T
 	{
 		if (rightortop)
 		{
-			expecteddistance = blocko + calcres(T(dx), levelib) * 15.5 + 0.5 * calcres(T(dx), levelneighbour);
+			expecteddistance = blocko + calcres(T(dx), levelib) * T(15.5) + T(0.5) * calcres(T(dx), levelneighbour);
 		}
 		else
 		{
-			expecteddistance = blocko - calcres(T(dx), levelib) * 0.5 - 15.5 * calcres(T(dx), levelneighbour);
+			expecteddistance = blocko - calcres(T(dx), levelib) * T(0.5) - T(15.5) * calcres(T(dx), levelneighbour);
 		}
 
 	}
@@ -661,10 +661,10 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 
 
 					// These are the only guys that need to be coarsen, other are recalculated on the fly or interpolated from forcing
-					XEv.h[i] = 0.25 * (XEvo.h[ii] + XEvo.h[ir] + XEvo.h[it] + XEvo.h[itr]);
-					XEv.zs[i] = 0.25 * (XEvo.zs[ii] + XEvo.zs[ir] + XEvo.zs[it] + XEvo.zs[itr]);
-					XEv.u[i] = 0.25 * (XEvo.u[ii] + XEvo.u[ir] + XEvo.u[it] + XEvo.u[itr]);
-					XEv.v[i] =  0.25 * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
+					XEv.h[i] = T(0.25) * (XEvo.h[ii] + XEvo.h[ir] + XEvo.h[it] + XEvo.h[itr]);
+					XEv.zs[i] = T(0.25) * (XEvo.zs[ii] + XEvo.zs[ir] + XEvo.zs[it] + XEvo.zs[itr]);
+					XEv.u[i] = T(0.25) * (XEvo.u[ii] + XEvo.u[ir] + XEvo.u[it] + XEvo.u[itr]);
+					XEv.v[i] =  T(0.25) * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
 					//zb will be interpolated from input grid later // I wonder is this makes the bilinear interpolation scheme crash at the refining step for zb?
 					// No because zb is also interpolated later from the original mesh data
 					//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
@@ -760,8 +760,8 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 
 			// Bot and left blk should remain unchanged at this stage(they will change if the neighbour themselves change)
 
-			XBlock.xo[ib] = XBlock.xo[ib] + calcres(XParam.dx, XBlock.level[ib] + 1);
-			XBlock.yo[ib] = XBlock.yo[ib] + calcres(XParam.dx, XBlock.level[ib] + 1);
+			XBlock.xo[ib] = XBlock.xo[ib] + T(calcres(XParam.dx, XBlock.level[ib] + 1));
+			XBlock.yo[ib] = XBlock.yo[ib] + T(calcres(XParam.dx, XBlock.level[ib] + 1));
 
 
 
@@ -957,8 +957,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							
 							T lx, ly, rx, ry;
 
-							lx = ix * 0.5 - 0.25;
-							ly = iy * 0.5 - 0.25;
+							lx = ix * T(0.5) - T(0.25);
+							ly = iy * T(0.5) - T(0.25);
 
 
 							fx = (int)floor(lx) + kx[kk];
@@ -966,8 +966,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							fy = (int)floor(ly) + ky[kk];
 							cy = (int)ceil(ly) + ky[kk];
 
-							rx = (lx)+(double)kx[kk];
-							ry = (ly)+(double)ky[kk];
+							rx = (lx)+T(kx[kk]);
+							ry = (ly)+T(ky[kk]);
 
 							o = memloc(XParam,ix,iy, kb[kk]);//ix + iy * 16 + kb[kk] * XParam.blksize;
 
@@ -1043,17 +1043,17 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				XAdapt.newlevel[ibtl] = XBlock.level[ib] + 1;
 				XAdapt.newlevel[ibtr] = XBlock.level[ib] + 1;
 
-				XBlock.xo[ib] = xoblk;
-				XBlock.yo[ib] = yoblk;
+				XBlock.xo[ib] = T(xoblk);
+				XBlock.yo[ib] = T(yoblk);
 				//bottom right blk
-				XBlock.xo[ibr] = xoblk + (XParam.blkwidth) * delx;
-				XBlock.yo[ibr] = yoblk;
+				XBlock.xo[ibr] = T(xoblk + (XParam.blkwidth) * delx);
+				XBlock.yo[ibr] = T(yoblk);
 				//top left blk
-				XBlock.xo[ibtl] = xoblk;
-				XBlock.yo[ibtl] = yoblk + (XParam.blkwidth) * delx;
+				XBlock.xo[ibtl] = T(xoblk);
+				XBlock.yo[ibtl] = T(yoblk + (XParam.blkwidth) * delx);
 				//top right blk
-				XBlock.xo[ibtr] = xoblk + (XParam.blkwidth) * delx;
-				XBlock.yo[ibtr] = yoblk + (XParam.blkwidth) * delx;
+				XBlock.xo[ibtr] = T(xoblk + (XParam.blkwidth) * delx);
+				XBlock.yo[ibtr] = T(yoblk + (XParam.blkwidth) * delx);
 
 
 				//sort out internal blocks neighbour

@@ -195,7 +195,7 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 	{
 		ib = Riverblks[ibl];
 
-		levdx = calcres(XParam.dx, XBlock.level[ib]);
+		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
 
 		xllo = XParam.xo + XBlock.xo[ib];
 		yllo = XParam.yo + XBlock.yo[ib];
@@ -554,7 +554,7 @@ template <class T> __host__ void AddPatmforcingCPU(Param XParam, BlockP<T> XBloc
 				
 				if (PAtm.uniform)
 				{
-					atmpi = PAtm.nowvalue;
+					atmpi = T(PAtm.nowvalue);
 				}
 				else
 				{

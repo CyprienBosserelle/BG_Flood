@@ -340,14 +340,14 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 					// well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
 					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
 						zi = zb[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
-						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth- 1, jj, LB);
 						
 						hn = XEv.h[ilc];
@@ -613,7 +613,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 		lev = XBlock.level[ib];
 
-		delta = calcres(XParam.dx, lev);
+		delta = calcres(T(XParam.dx), lev);
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -721,14 +721,14 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 					// well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
 					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the top halo
 					{
-						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = BLTL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
 						hi = XEv.h[itop];
 						zi = zb[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
 					{
-						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = TLBL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
 						// Warning I think the above is wrong and should be as below to be consistent with halo flux scheme:
 						//int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth, BL);

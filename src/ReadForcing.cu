@@ -51,7 +51,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		XForcing.left.data = readbndfile(XForcing.left.inputfile, XParam, 0);
 
 		XForcing.left.on = true; 
-		XForcing.left.nbnd = XForcing.left.data[0].wlevs.size();
+		XForcing.left.nbnd = int(XForcing.left.data[0].wlevs.size());
 
 		if (gpgpu)
 		{
@@ -64,7 +64,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.right.data = readbndfile(XForcing.right.inputfile, XParam, 2);
 		XForcing.right.on = true;
-		XForcing.right.nbnd = XForcing.right.data[0].wlevs.size();
+		XForcing.right.nbnd = int(XForcing.right.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.right);
@@ -74,7 +74,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.top.data = readbndfile(XForcing.top.inputfile, XParam, 3);
 		XForcing.top.on = true;
-		XForcing.top.nbnd = XForcing.top.data[0].wlevs.size();
+		XForcing.top.nbnd = int(XForcing.top.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.top);
@@ -84,7 +84,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.bot.data = readbndfile(XForcing.bot.inputfile, XParam, 1);
 		XForcing.bot.on = true;
-		XForcing.bot.nbnd = XForcing.bot.data[0].wlevs.size();
+		XForcing.bot.nbnd = int(XForcing.bot.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.bot);
@@ -1348,7 +1348,7 @@ template <class T> void readXBbathy(std::string filename, int nx,int ny, T *&zb)
 		for (int inod = 0; inod < nx; inod++)
 		{
 			//fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
-			zb[inod + jnod * nx] = std::stof(lineelements[0]);
+			zb[inod + jnod * nx] = T(std::stod(lineelements[0]));
 
 		}
 	}
