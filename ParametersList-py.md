@@ -22,6 +22,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
 |doubleprecision|doubleprecision| 0|0: float precision, 1: double precision|
+|engine|engine| 1|1: Buttinger, 2: Kurganov, 3: KurganovATMP|
 ### Grid parameters
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
