@@ -6,8 +6,9 @@ on:
 #  push:
 #    branches: [self-hosted-CI]
 #  pull_request:
-#    branches: [development]
- 
+#    branches: [master]
+  workflow_dispatch: 
+
 jobs:
   repo-sync:
     runs-on: ubuntu-latest
