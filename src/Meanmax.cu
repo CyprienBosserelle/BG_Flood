@@ -77,7 +77,8 @@ template void Calcmeanmax<double>(Param XParam, Loop<double>& XLoop, Model<doubl
 template <class T> void resetmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	// Reset mean and or max only at output steps
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001))
+	//XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001)
+	if (XLoop.nstepout == 0) //This implis an output was just produced so need to reset
 	{
 		//Define some useful variables 
 		if (XParam.outmean)
@@ -129,8 +130,11 @@ template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.h);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.zs);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.u);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
 

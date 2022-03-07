@@ -12,7 +12,7 @@
 
 void CUDA_CHECK(cudaError CUDerr);
 
-template <class T> void SetupGPU(Param XParam, Model<T> XModel, Forcing<float>& XForcing, Model<T>& XModel_g);
+template <class T> void SetupGPU(Param &XParam, Model<T> XModel, Forcing<float>& XForcing, Model<T>& XModel_g);
 void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input);
 void AllocateBndTEX(bndparam& side);
 

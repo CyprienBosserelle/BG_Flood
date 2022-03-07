@@ -132,7 +132,7 @@ template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 	{
 		int ib = XBlock.active[bl];
 		// Now check each corner of each block
-
+		//printf("bl=%i\t ib=%i\t,LB=%i\t,LT=%i\t,RB=%i\t,RT=%i\t,TL=%i\t,TR=%i\t,BL=%i\t,BR=%i\n ", bl, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock.BotLeft[ib], XBlock.BotRight[ib]);
 
 		// Left
 		setedgessideLR(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], 1, 0, zb);
@@ -254,11 +254,14 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 				z[n] = interp2BUQ(x, y, T(blkdx), forcing[0]);
 
 				// now interpolat to other grids
-				for (int nf = 0; nf < forcing.size(); nf++)
+				if (forcing.size() > 1)
 				{
-					if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
+					for (int nf = 1; nf < forcing.size(); nf++)
 					{
-						z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+						if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
+						{
+							z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+						}
 					}
 				}
 
@@ -303,17 +306,20 @@ template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 	jmin = max(ftoi(floor((ymin - forcing.yo) / forcing.dx)), 0);
 	jmax = min(ftoi(floor((ymax - forcing.yo) / forcing.dx)), forcing.ny - 1);
 
+	//printf("imin=%d; imax=%d, jmin=%d, jmax=%d\t",imin, imax, jmin, jmax);
 
 	ni = max(imax - imin + 1, 1);
 	nj = max(jmax - jmin + 1, 1);
 
+
+	//printf("ni=%d; nj=%d\n", ni, nj);
 	z = 0.0;
 	for (int i = 0; i < ni; i++)
 	{
 		for (int j = 0; j < nj; j++)
 		{
-			cfi = imin + i;
-			cfj = jmin + j;
+			cfi = min(imin + i, forcing.nx - 1);
+			cfj = min(jmin + j, forcing.ny - 1);
 			z = z + forcing.val[cfi + cfj * forcing.nx];
 		}
 
@@ -359,7 +365,8 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 	q22 = forcing.val[cfip + cfjp * forcing.nx];
 
 	return T(BilinearInterpolation(q11, q12, q21, q22, x1, x2, y1, y2, xi, yi));
-	//printf("x=%f\ty=%f\tcfi=%d\tcfj=%d\tn=%d\tzb_buq[n] = %f\n", x,y,cfi,cfj,n,zb_buq[n]);
+
+
 }
 template float interp2BUQ<float, StaticForcingP<float>>(float x, float y, StaticForcingP<float> forcing);
 template double interp2BUQ<double, StaticForcingP<float>>(double x, double y, StaticForcingP<float> forcing);

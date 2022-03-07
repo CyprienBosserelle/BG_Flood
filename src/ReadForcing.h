@@ -37,6 +37,7 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 template <class T> void readbathyMD(std::string filename, T*& zb);
 template <class T> void readXBbathy(std::string filename, int nx, int ny, T*& zb);
 
+void InitDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing);
 
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha);
 template <class T> void readbathyASCzb(std::string filename, int nx, int ny, T*& zb);

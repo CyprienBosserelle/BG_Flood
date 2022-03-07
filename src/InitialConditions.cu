@@ -269,13 +269,29 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 			}
 
-			XForcing.rivers[Rin].i = idis;
-			XForcing.rivers[Rin].j = jdis;
-			XForcing.rivers[Rin].block = blockdis;
-			XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+
+			
+				XForcing.rivers[Rin].i = idis;
+				XForcing.rivers[Rin].j = jdis;
+				XForcing.rivers[Rin].block = blockdis;
+				XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+			
 
 			
 		}
+
+		for (auto it = XForcing.rivers.begin(); it != XForcing.rivers.end(); it++)
+		{
+
+			if (it->disarea == 0.0)
+			{
+				log("Warning river outside active model domain found. This river has been removed!\n");
+				XForcing.rivers.erase(it--);
+			}
+		}
+
+
+
 		//Now identify sort and unique blocks where rivers are being inserted
 		std::vector<int> activeRiverBlk;
 
@@ -582,56 +598,60 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 			}
 		}
 	}
-	// Remove rain from boundary cells
-	for (int ibl = 0; ibl < XParam.nbndblkleft; ibl++)
-	{
-		ib = XForcing.left.blks[ibl];
-		for (int j = 0; j < XParam.blkwidth; j++)
-		{
-			n = memloc(XParam, 0, j, ib);
-			XBlock.activeCell[n] = 0;
 
-			n = memloc(XParam, 1, j, ib);
-			XBlock.activeCell[n] = 0;
+	//bool Modif = false;
+	if (XParam.rainbnd== false) {
+		// Remove rain from boundary cells
+		for (int ibl = 0; ibl < XParam.nbndblkleft; ibl++)
+		{
+			ib = XForcing.left.blks[ibl];
+			for (int j = 0; j < XParam.blkwidth; j++)
+			{
+				n = memloc(XParam, 0, j, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, 1, j, ib);
+				XBlock.activeCell[n] = 0;
+			}
+		}
+		for (int ibl = 0; ibl < XParam.nbndblkright; ibl++)
+		{
+			ib = XForcing.right.blks[ibl];
+			for (int j = 0; j < XParam.blkwidth; j++)
+			{
+				n = memloc(XParam, XParam.blkwidth - 1, j, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, XParam.blkwidth - 2, j, ib);
+				XBlock.activeCell[n] = 0;
+			}
+		}
+		for (int ibl = 0; ibl < XParam.nbndblkbot; ibl++)
+		{
+			ib = XForcing.bot.blks[ibl];
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				n = memloc(XParam, i, 0, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, i, 1, ib);
+				XBlock.activeCell[n] = 0;
+			}
+		}
+		for (int ibl = 0; ibl < XParam.nbndblktop; ibl++)
+		{
+			ib = XForcing.top.blks[ibl];
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				n = memloc(XParam, i, XParam.blkwidth - 1, ib);
+				XBlock.activeCell[n] = 0;
+
+				n = memloc(XParam, i, XParam.blkwidth - 2, ib);
+				XBlock.activeCell[n] = 0;
+			}
 		}
 	}
-	for (int ibl = 0; ibl < XParam.nbndblkright; ibl++)
-	{
-		ib = XForcing.right.blks[ibl];
-		for (int j = 0; j < XParam.blkwidth; j++)
-		{
-			n = memloc(XParam, XParam.blkwidth-1, j, ib);
-			XBlock.activeCell[n] = 0;
-
-			n = memloc(XParam, XParam.blkwidth-2, j, ib);
-			XBlock.activeCell[n] = 0;
-		}
-	}
-	for (int ibl = 0; ibl < XParam.nbndblkbot; ibl++)
-	{
-		ib = XForcing.bot.blks[ibl];
-		for (int i = 0; i < XParam.blkwidth; i++)
-		{
-			n = memloc(XParam, i, 0, ib);
-			XBlock.activeCell[n] = 0;
-
-			n = memloc(XParam, i, 1, ib);
-			XBlock.activeCell[n] = 0;
-		}
-	}
-	for (int ibl = 0; ibl < XParam.nbndblktop; ibl++)
-	{
-		ib = XForcing.top.blks[ibl];
-		for (int i = 0; i < XParam.blkwidth; i++)
-		{
-			n = memloc(XParam,i , XParam.blkwidth - 1, ib);
-			XBlock.activeCell[n] = 0;
-
-			n = memloc(XParam,i , XParam.blkwidth - 2, ib);
-			XBlock.activeCell[n] = 0;
-		}
-	}
-
+	
 }
 
 
