@@ -198,7 +198,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	//status = nc_close(ncid);
 	//if (status != NC_NOERR) handle_ncerror(status);
 
-	T* blkwidth;
+	float* blkwidth;
 	int* blkid;
 
 
@@ -223,7 +223,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		int ibl = activeblk[ib];
-		blkwidth[ib] = T(XParam.xo) + blockxo[ibl];
+		blkwidth[ib] = float(T(XParam.xo) + blockxo[ibl]);
 		blkid[ib] = level[ibl];
 		
 	}
@@ -233,7 +233,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		int ibl = activeblk[ib];
-		blkwidth[ib] = T(XParam.yo) + blockyo[ibl];
+		blkwidth[ib] = float(T(XParam.yo) + blockyo[ibl]);
 	}
 
 	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blkwidth);
