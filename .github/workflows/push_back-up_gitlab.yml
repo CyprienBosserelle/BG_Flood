@@ -5,8 +5,8 @@ name: push to gitlab for back-up
 on: 
 #  push:
 #    branches: [self-hosted-CI]
-  pull_request:
-    branches: [development]
+#  pull_request:
+#    branches: [development]
  
 jobs:
   repo-sync:
