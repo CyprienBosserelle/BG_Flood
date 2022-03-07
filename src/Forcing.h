@@ -125,6 +125,11 @@ struct Forcing
 	bndparam bot;
 
 	AOIinfo AOI;
+	/*Area of interest polygon
+	Ex: AOI=myarea.gmt;
+	the iinput file is a text file with 2 column containing the cordinat of a closed polygon (last line==first line)
+	Default: N/A
+	*/
 	
 };
 
