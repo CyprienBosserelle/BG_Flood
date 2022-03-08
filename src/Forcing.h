@@ -95,8 +95,12 @@ public:
 };
 
 
-
-
+class AOIinfo {
+public:
+	std::string file;
+	Polygon poly;
+	bool active=false;
+};
 
 
 template <class T>
@@ -196,7 +200,13 @@ struct Forcing
 	Ex: bot = botBnd.txt,2;
 	Default: 1
 	*/
-	
+
+	AOIinfo AOI;
+	/*Area of interest polygon
+	Ex: AOI=myarea.gmt;
+	the iinput file is a text file with 2 column containing the cordinat of a closed polygon (last line==first line)
+	Default: N/A
+	*/
 	
 };
 

@@ -26,8 +26,8 @@ void Calcnxny(Param XParam, int level, int& nx, int& ny)
 	xxmin = XParam.xo + dxp;
 	yymin = XParam.yo + dxp;
 
-	nx = round((xxmax - xxmin) / ddx + 1.0);
-	ny = round((yymax - yymin) / ddx + 1.0);
+	nx = ftoi(round((xxmax - xxmin) / ddx + 1.0));
+	ny = ftoi(round((yymax - yymin) / ddx + 1.0));
 }
 
 template<class T>
@@ -223,7 +223,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		int ibl = activeblk[ib];
-		blkwidth[ib] = XParam.xo + blockxo[ibl];
+		blkwidth[ib] = float(XParam.xo + blockxo[ibl]);
 		blkid[ib] = level[ibl];
 		
 	}
@@ -233,7 +233,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	for (int ib = 0; ib < XParam.nblk; ib++)
 	{
 		int ibl = activeblk[ib];
-		blkwidth[ib] = XParam.yo + blockyo[ibl];
+		blkwidth[ib] = float(XParam.yo + blockyo[ibl]);
 	}
 
 	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blkwidth);
@@ -266,10 +266,9 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 		double ddx = calcres(XParam.dx, lev );
 		double dxp = calcres(XParam.dx, lev + 1);
-		double xxmax, xxmin, yymax, yymin;
+		double xxmin,yymin;
 
-		xxmax = XParam.xmax - dxp;
-		yymax = XParam.ymax - dxp;
+		
 
 		xxmin = XParam.xo + dxp;
 		yymin = XParam.yo + dxp;
@@ -359,11 +358,11 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 	//short fillval = 32767
 	static size_t start2D[] = { 0, 0 }; // start at first value 
 	//static size_t count2D[] = { ny, nx };
-	static size_t count2D[] = { XParam.blkwidth, XParam.blkwidth };
+	static size_t count2D[] = { size_t(XParam.blkwidth), size_t(XParam.blkwidth) };
 
 	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
 	//static size_t count3D[] = { 1, ny, nx };
-	static size_t count3D[] = { 1, XParam.blkwidth, XParam.blkwidth };
+	static size_t count3D[] = { 1, size_t(XParam.blkwidth), size_t(XParam.blkwidth) };
 
 	nc_type VarTYPE;
 
@@ -483,15 +482,13 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 		lev = level[bl];
 
 
-		double xxmax, yymax;
+		
 		double xxmin, yymin;
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
 		//xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
 		//yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev )/2.0;
 
-		xxmax = XParam.xmax - calcres(XParam.dx, lev) / 2.0;
-		yymax = XParam.ymax - calcres(XParam.dx, lev )/2.0;
 
 		//xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
 		//yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev )/2.0;
@@ -606,22 +603,22 @@ template void defncvarBUQ<double>(Param XParam, int* activeblk, int* level, doub
 
 template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activeblk, int* level, T * blockxo, T *blockyo, std::string varst, T * var)
 {
-	int status, ncid, recid, var_id, ndims;
+	int status, ncid, recid, var_id;
 	static size_t nrec;
 	short *varblk_s;
 	float * varblk;
-	int nx, ny;
-	int dimids[NC_MAX_VAR_DIMS];
-	size_t  *ddim, *start, *count;
+	
+	
+
 	//XParam.outfile.c_str()
 
 	static size_t start2D[] = { 0, 0 }; // start at first value 
 	//static size_t count2D[] = { ny, nx };
-	static size_t count2D[] = { XParam.blkwidth, XParam.blkwidth };
+	static size_t count2D[] = { size_t(XParam.blkwidth), size_t(XParam.blkwidth) };
 
 	static size_t start3D[] = { 0, 0, 0 }; // start at first value // This is updated to nrec-1 further down
 	//static size_t count3D[] = { 1, ny, nx };
-	static size_t count3D[] = { 1, XParam.blkwidth, XParam.blkwidth };
+	static size_t count3D[] = { 1, size_t(XParam.blkwidth), size_t(XParam.blkwidth) };
 
 	int smallnc = XParam.smallnc;
 	float scalefactor = XParam.scalefactor;
@@ -653,14 +650,13 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		bl = activeblk[ibl];
 		lev = level[bl];
 		lev < 0 ? sign = "N" : sign = "P";
-		double xxmax, xxmin, yymax, yymin;
+		double xxmin, yymin;
 
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
 		//xxmax = XParam.xmax + initdx / 2.0 - calcres(XParam.dx, lev) / 2.0;
 		//yymax = XParam.ymax + initdx / 2.0 - calcres(XParam.dx, lev) / 2.0;
-		xxmax = XParam.xmax - calcres(XParam.dx, lev) / 2.0;
-		yymax = XParam.ymax - calcres(XParam.dx, lev) / 2.0;
+		
 
 		//xxmin = XParam.xo - initdx / 2.0 + calcres(XParam.dx, lev) / 2.0;
 		//yymin = XParam.yo - initdx / 2.0 + calcres(XParam.dx, lev) / 2.0;
@@ -687,7 +683,7 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 				}
 				else
 				{
-					varblk[r] = var[n];
+					varblk[r] = float(var[n]);
 				}
 			}
 		}
@@ -814,12 +810,12 @@ template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double
 extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* yy, double* var, char* varname)
 {
 	int status;
-	int ncid, xx_dim, yy_dim, time_dim, p_dim, tvar_id;
+	int ncid, xx_dim, yy_dim, tvar_id;
 
-	size_t nxx, nyy, ntt;
+	size_t nxx, nyy;
 	static size_t start[] = { 0, 0 }; // start at first value
-	static size_t count[] = { ny, nx };
-	int time_id, xx_id, yy_id; //
+	static size_t count[] = { size_t(ny), size_t(nx) };
+	int  xx_id, yy_id; //
 	nxx = nx;
 	nyy = ny;
 
@@ -845,12 +841,12 @@ extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* y
 	status = nc_def_var(ncid, varname, NC_DOUBLE, 2, var_dimids, &tvar_id);
 
 	status = nc_enddef(ncid);
-
+	if (status != NC_NOERR) handle_ncerror(status);
 	static size_t xstart[] = { 0 }; // start at first value
-	static size_t xcount[] = { nx };
+	static size_t xcount[] = { size_t(nx) };
 	
 	static size_t ystart[] = { 0 }; // start at first value
-	static size_t ycount[] = { ny };
+	static size_t ycount[] = { size_t(ny) };
 
 
 
@@ -860,7 +856,7 @@ extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* y
 
 	status = nc_put_vara_double(ncid, tvar_id, start, count, var);
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_ncerror(status);
 }
 
 //Create a ncdf file containing a 3D variable (the file is overwritten if it was existing before)
@@ -870,7 +866,7 @@ extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, doubl
 	int ncid, xx_dim, yy_dim, tt_dim, tvar_id;
 	size_t nxx, nyy, ntt;
 	static size_t start[] = { 0, 0, 0 }; // start at first value
-	static size_t count[] = { nt, ny, nx };
+	static size_t count[] = { size_t(nt), size_t(ny), size_t(nx) };
 	int xx_id, yy_id, tt_id; //
 	nxx = nx;
 	nyy = ny;
@@ -899,15 +895,15 @@ extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, doubl
 	status = nc_def_var(ncid, varname, NC_DOUBLE, 3, var_dimids, &tvar_id);
 
 	status = nc_enddef(ncid);
-
-	static size_t tst[] = { 0 };
+	if (status != NC_NOERR) handle_ncerror(status);
+	
 	static size_t xstart[] = { 0 }; // start at first value
-	static size_t xcount[] = { nx };
+	static size_t xcount[] = { size_t(nx) };
 	static size_t ystart[] = { 0 }; // start at first value
-	static size_t ycount[] = { ny };
+	static size_t ycount[] = { size_t(ny) };
 
 	static size_t tstart[] = { 0 }; // start at first value
-	static size_t tcount[] = { nt };
+	static size_t tcount[] = { size_t(nt) };
 
 	//Provide values for variables
 	status = nc_put_vara_double(ncid, xx_id, xstart, xcount, xx);
@@ -917,20 +913,20 @@ extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, doubl
 	status = nc_put_vara_double(ncid, tvar_id, start, count, var);
 	status = nc_close(ncid);
 
+	if (status != NC_NOERR) handle_ncerror(status);
+
 }
 
 extern "C" void write3dvarnc(int nx, int ny, int nt, double totaltime, double* var)
 {
 	int status;
-	int ncid, time_dim, recid;
-	size_t nxx, nyy;
+	int ncid, recid;
+
 	static size_t start[] = { 0, 0, 0, 0 }; // start at first value
-	static size_t count[] = { 1, nt, ny, nx };
+	static size_t count[] = { 1, size_t(nt), size_t(ny), size_t(nx) };
 	static size_t tst[] = { 0 };
 	int time_id, var_id;
 
-	nxx = nx;
-	nyy = ny;
 
 	static size_t nrec;
 	status = nc_open("3Dvar.nc", NC_WRITE, &ncid);
@@ -949,21 +945,21 @@ extern "C" void write3dvarnc(int nx, int ny, int nt, double totaltime, double* v
 	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
 	status = nc_put_vara_double(ncid, var_id, start, count, var);
 	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
 
 }
 
 extern "C" void write2dvarnc(int nx, int ny, double totaltime, double* var)
 {
 	int status;
-	int ncid, time_dim, recid;
-	size_t nxx, nyy;
+	int ncid, recid;
+	
 	static size_t start[] = { 0, 0, 0 }; // start at first value
-	static size_t count[] = { 1, ny, nx };
+	static size_t count[] = { 1, size_t(ny), size_t(nx) };
 	static size_t tst[] = { 0 };
 	int time_id, var_id;
 
-	nxx = nx;
-	nyy = ny;
+	
 
 	static size_t nrec;
 	status = nc_open("3Dvar.nc", NC_WRITE, &ncid);
@@ -984,6 +980,8 @@ extern "C" void write2dvarnc(int nx, int ny, double totaltime, double* var)
 	status = nc_put_var1_double(ncid, time_id, tst, &totaltime);
 	status = nc_put_vara_double(ncid, var_id, start, count, var);
 	status = nc_close(ncid);
+
+	if (status != NC_NOERR) handle_ncerror(status);
 
 }
 

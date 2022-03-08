@@ -147,7 +147,7 @@ template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T q
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -195,10 +195,10 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 	{
 		ib = Riverblks[ibl];
 
-		levdx = calcres(XParam.dx, XBlock.level[ib]);
+		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
 
-		xllo = XParam.xo + XBlock.xo[ib];
-		yllo = XParam.yo + XBlock.yo[ib];
+		xllo = T(XParam.xo + XBlock.xo[ib]);
+		yllo = T(XParam.yo + XBlock.yo[ib]);
 
 
 
@@ -211,23 +211,21 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 
 				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
-				T Rainhh;
-
 				//T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 				//T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 
 				//if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
-				xl = xllo + ix * levdx - 0.5 * levdx;
-				yb = yllo + iy * levdx - 0.5 * levdx;
+				xl = xllo + ix * levdx - T(0.5) * levdx;
+				yb = yllo + iy * levdx - T(0.5) * levdx;
 
-				xr = xllo + ix * levdx + 0.5 * levdx;
-				yt = yllo + iy * levdx + 0.5 * levdx;
+				xr = xllo + ix * levdx + T(0.5) * levdx;
+				yt = yllo + iy * levdx + T(0.5) * levdx;
 				// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 				// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
 				//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
 				if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart),T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
 				{
-					XAdv.dh[i] += qnow / XRiver.disarea;
+					XAdv.dh[i] += qnow / T(XRiver.disarea);
 
 				}
 			}
@@ -243,7 +241,7 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -279,7 +277,7 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -336,12 +334,12 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 
 				T Rainhh;
 
-				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
+				T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
 
 				if (Rain.uniform)
 				{
-					Rainhh = Rain.nowvalue;
+					Rainhh = T(Rain.nowvalue);
 				}
 				else
 				{
@@ -384,12 +382,12 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 
 				T Rainhh;
 
-				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
+				T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
 
 				if (Rain.uniform)
 				{
-					Rainhh = Rain.nowvalue;
+					Rainhh = T(Rain.nowvalue);
 				}
 				else
 				{
@@ -397,7 +395,7 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 				}
 
 
-				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt, T(0.0)); // convert from mm/hrs to m/s
+				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)); // convert from mm/hrs to m/s
 
 				XEv.h[i] += Rainhh * XBlock.activeCell[i];
 				XEv.zs[i] += Rainhh * XBlock.activeCell[i];
@@ -412,7 +410,7 @@ template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBl
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -465,13 +463,13 @@ template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBloc
 				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 				T uwindi, vwindi;
 
-				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
+				T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
 
 				T rhoairrhowater = T(0.00121951); // density ratio rho(air)/rho(water) 
 				if (Uwind.uniform)
 				{
-					uwindi = Uwind.nowvalue;
+					uwindi = T(Uwind.nowvalue);
 				}
 				else
 				{
@@ -479,7 +477,7 @@ template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBloc
 				}
 				if (Vwind.uniform)
 				{
-					vwindi = Vwind.nowvalue;
+					vwindi = T(Vwind.nowvalue);
 				}
 				else
 				{
@@ -621,8 +619,8 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb)
 {
 	int ib;
-	int halowidth = XParam.halowidth;
-	int blkmemwidth = XParam.blkmemwidth;
+	
+	
 
 	T def;
 
@@ -638,8 +636,8 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 				
 
-				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+				T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
+				T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
 
 				def = interp2BUQ(x, y, defmap);
 

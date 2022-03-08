@@ -10,6 +10,7 @@
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "Setup_GPU.h"
+#include "Poly.h"
 
 template<class T> void readforcing(Param& XParam, Forcing<T> & XForcing);
 
@@ -42,6 +43,10 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 template <class T> void readbathyASCzb(std::string filename, int nx, int ny, T*& zb);
 
 template <class T> void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, T*& Ux, T* Uo, T* Un);
+
+std::vector<std::string> DelimLine(std::string line, int n, char delim);
+std::vector<std::string> DelimLine(std::string line, int n);
+Polygon readPolygon(std::string filename);
 
 // End of global definition
 #endif

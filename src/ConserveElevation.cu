@@ -97,14 +97,14 @@ template <class T> __host__ __device__ void ProlongationElevationGH(int halowidt
 
 template <class T> __host__ __device__ void conserveElevation(int halowidth,int blkmemwidth,T eps, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
 {
-	int ii, ir, it, itr, jj;
+	int ii, ir, it, itr;
 	T iiwet, irwet, itwet, itrwet;
 	T zswet, hwet;
 
 	int write;
 
 	write = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
-	//jj = j * 2;
+	
 	ii = memloc(halowidth, blkmemwidth, i, j, ibn);
 	ir = memloc(halowidth, blkmemwidth, i + 1, j, ibn);
 	it = memloc(halowidth, blkmemwidth, i, j + 1, ibn);
@@ -278,7 +278,7 @@ template <class T> __host__ __device__ void conserveElevationGradHaloB(int halow
 
 	T hwet, zswet;
 	int write, pii;
-	int iiwet, irwet, itwet, itrwet;
+	T iiwet, irwet, itwet, itrwet;
 	write = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
 	pii = memloc(halowidth, blkmemwidth, ip, jp, ib);
 	
@@ -347,7 +347,7 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(XParam.dx, XBlock.level[ib]);
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 	ihalo = -1;
 	ip = 0;
 
@@ -401,7 +401,7 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 			jl = j;
 
 			ip = XParam.blkwidth - 1;
-			jp = XBlock.RightBot[ibLB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
+			jp = XBlock.RightBot[ibLB] == ib ? ftoi(floor(j / 2)) : ftoi(floor(j / 2) + XParam.blkwidth / 2);
 
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
@@ -417,9 +417,9 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 
 template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<T> XBlock, T* h, T*zs, T*zb, T* dhdx, T* dzsdx)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	
+	
+	
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -486,7 +486,7 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(XParam.dx, XBlock.level[ib]);
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 	ihalo = XParam.blkwidth;
 	ip = XParam.blkwidth-1;
 
@@ -537,7 +537,7 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 			jl = j;
 
 			ip = 0;
-			jp = XBlock.LeftBot[ibRB] == ib ? floor(j / 2) : (floor(j / 2) + XParam.blkwidth / 2);
+			jp = XBlock.LeftBot[ibRB] == ib ? ftoi(floor(j / 2)) : ftoi(floor(j / 2) + XParam.blkwidth / 2);
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
 
@@ -549,9 +549,9 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 
 template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP<T> XBlock, T* h, T*zs, T*zb, T* dhdx, T* dzsdx)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = blockDim.y-1;
+	
+	
+	
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -621,7 +621,7 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(XParam.dx, XBlock.level[ib]);
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 	jhalo = XParam.blkwidth;
 	jp = XParam.blkwidth - 1;
 
@@ -671,7 +671,7 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 			il = i;
 
 			jp = 0;
-			ip = XBlock.BotLeft[ibTL] == ib ? floor(i / 2) : (floor(i / 2) + XParam.blkwidth / 2);
+			ip = XBlock.BotLeft[ibTL] == ib ? ftoi(floor(i / 2)) : ftoi(floor(i / 2) + XParam.blkwidth / 2);
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
 
@@ -683,8 +683,8 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 
 template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T> XBlock, T* h, T*zs, T*zb, T* dhdx, T* dzsdx)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	
+	
 	unsigned int iy = blockDim.x - 1;
 	unsigned int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
@@ -752,7 +752,7 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(XParam.dx, XBlock.level[ib]);
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 	jhalo = -1;
 	jp = 0;
 
@@ -803,7 +803,7 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 			il = i;
 
 			jp = XParam.blkwidth - 1;
-			ip = XBlock.TopLeft[ibBL] == ib ? floor(i / 2) : (floor(i / 2) + XParam.blkwidth / 2);
+			ip = XBlock.TopLeft[ibBL] == ib ? ftoi(floor(i / 2)) : ftoi(floor(i / 2) + XParam.blkwidth / 2);
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
 
@@ -815,9 +815,9 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 
 template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int iy = blockDim.x - 1;
+	
+	
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -930,7 +930,7 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 			jl = j;
 
 			ip = XParam.blkwidth - 1;
-			jp = XBlock.RightBot[ibLB] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
+			jp = XBlock.RightBot[ibLB] == ib ? ftoi(floor(j * T(0.5))) : ftoi(floor(j * T(0.5)) + XParam.blkwidth / 2);
 
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
@@ -945,8 +945,8 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	
+	
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -955,11 +955,9 @@ template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T>
 	int LB = XBlock.LeftBot[ib];
 	int LT = XBlock.LeftTop[ib];
 
-	int ii, ir, it, itr, jj;
-	T iiwet, irwet, itwet, itrwet;
-	T zswet, hwet;
+	
 
-	int ihalo , jhalo, i, j, ibn, write;
+	int ihalo , jhalo, i, j, ibn;
 
 	ihalo = -1;
 	jhalo = iy;
@@ -1047,7 +1045,7 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 			jl = j;
 
 			ip = 0;
-			jp = XBlock.LeftBot[ibn] == ib ? floor(j * T(0.5)) : (floor(j * T(0.5)) + XParam.blkwidth / 2);
+			jp = XBlock.LeftBot[ibn] == ib ? ftoi(floor(j * T(0.5))) : ftoi(floor(j * T(0.5)) + XParam.blkwidth / 2);
 			im = ip;
 			jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
 
@@ -1060,8 +1058,8 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = blockDim.y - 1;
+	
+	
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -1070,11 +1068,10 @@ template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T
 	int RB = XBlock.RightBot[ib];
 	int RT = XBlock.RightTop[ib];
 
-	int ii, ir, it, itr, jj;
-	T iiwet, irwet, itwet, itrwet;
-	T zswet, hwet;
+	
+	
 
-	int ihalo, jhalo, i, j, ibn, write;
+	int ihalo, jhalo, i, j, ibn;
 
 	ihalo = blockDim.y;
 	jhalo = iy;
@@ -1163,7 +1160,7 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 			jl = XParam.blkwidth - 1;
 
 			jp = 0;
-			ip = XBlock.BotLeft[ibn] == ib ? floor(i * T(0.5)) : (floor(i * T(0.5)) + XParam.blkwidth / 2);
+			ip = XBlock.BotLeft[ibn] == ib ? ftoi(floor(i * T(0.5))) : ftoi(floor(i * T(0.5)) + XParam.blkwidth / 2);
 
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
@@ -1177,8 +1174,8 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int iy = blockDim.x - 1;
+	
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -1187,11 +1184,9 @@ template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> 
 	int TL = XBlock.TopLeft[ib];
 	int TR = XBlock.TopRight[ib];
 
-	int ii, ir, it, itr, jj;
-	T iiwet, irwet, itwet, itrwet;
-	T zswet, hwet;
+		
 
-	int ihalo, jhalo, i, j, ibn, write;
+	int ihalo, jhalo, i, j, ibn;
 
 	ihalo = ix;
 	jhalo = blockDim.x;
@@ -1243,7 +1238,7 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 {
 	int ihalo, jhalo, ibn, ip, jp;
 
-	int write;
+	
 
 	if (XBlock.level[ib] < XBlock.level[ibBL])
 	{
@@ -1280,7 +1275,7 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 			jl = 0;
 
 			jp = XParam.blkwidth - 1;
-			ip = XBlock.TopLeft[ibn] == ib ? floor(i * T(0.5)) : (floor(i * T(0.5)) + XParam.blkwidth / 2);
+			ip = XBlock.TopLeft[ibn] == ib ? ftoi(floor(i * T(0.5))) : ftoi(floor(i * T(0.5)) + XParam.blkwidth / 2);
 
 			jm = jp;
 			im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
@@ -1295,8 +1290,8 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int iy = 0;
+	
+	
 	unsigned int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -1305,11 +1300,10 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 	int BL = XBlock.BotLeft[ib];
 	int BR = XBlock.BotRight[ib];
 
-	int ii, ir, it, itr, jj;
-	T iiwet, irwet, itwet, itrwet;
-	T zswet, hwet;
+	
+	
 
-	int ihalo, jhalo, ibn, write;
+	int ihalo, jhalo, ibn;
 	int i, j;
 
 	ihalo = ix;
