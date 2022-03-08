@@ -170,14 +170,14 @@ Param readparamstr(std::string line, Param param)
 			found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
 			if (found == 0)
 			{
-				param.engine = 2;
+				param.engine = 1;
 				foo = true;
 			}
 				
 		}
 		if (!foo)
 		{
-			param.engine = 1;
+			param.engine = 2;
 		}
 	}
 	///////////////////////////////////////////////////////
