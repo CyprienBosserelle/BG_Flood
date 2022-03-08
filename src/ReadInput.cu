@@ -41,9 +41,11 @@ template <class T> T readfileinfo(std::string input,T outinfo)
 
 	//outinfo.inputfile = extvec.front();
 
-	std::vector<std::string> nameelements;
+	std::vector<std::string> nameelements,filename;
 	//
 	nameelements = split(extvec.back(), '?');
+
+	filename = split(input, '?');
 	if (nameelements.size() > 1)
 	{
 		//variable name for bathy is not given so it is assumed to be zb
@@ -54,11 +56,12 @@ template <class T> T readfileinfo(std::string input,T outinfo)
 	else
 	{
 		outinfo.extension = extvec.back();
+		outinfo.varname = "z";
 	}
 
 	//Reconstruct filename with extension but without varname
-	outinfo.inputfile = extvec.front() + "." + outinfo.extension;
-
+	//outinfo.inputfile = extvec.front() + "." + outinfo.extension;
+	outinfo.inputfile = filename.front();
 
 	return outinfo;
 }
