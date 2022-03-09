@@ -571,7 +571,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float>& XForcing, T* zb)
 {
-	int ib,n;
+	int ib,n,wn;
 
 	// Remove rain from area above mask elevatio
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -582,8 +582,16 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
+				double levdx = calcres(XParam.dx, XBlock.level[ib]);
+				double x = XParam.xo + XBlock.xo[ib] + i * levdx;
+				double y = XParam.yo + XBlock.yo[ib] + j * levdx;
+				wn = 1;
+				if (XForcing.AOI.active)
+				{
+					wn = wn_PnPoly(x, y, XForcing.AOI.poly);
+				}
 				n = memloc(XParam, i, j, ib);
-				if (zb[n] < XParam.mask)
+				if (zb[n] < XParam.mask && wn != 0)
 				{
 					XBlock.activeCell[n] = 1;
 				}

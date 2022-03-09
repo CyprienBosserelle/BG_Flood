@@ -248,6 +248,20 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	}
 
 	//======================
+	// Polygon data
+	if (!XForcing.AOI.file.empty())
+	{
+		log("\nRead AOI polygon");
+
+		//Polygon Poly;
+		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
+		
+		// = CounterCWPoly(Poly);
+		//
+		
+	}
+
+	//======================
 	// Done
 	//======================
 }
@@ -1005,6 +1019,123 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 }
 
 
+
+/*! \fn void read
+* Read polygon
+*
+*/
+Polygon readPolygon(std::string filename)
+{
+	Polygon poly, polyB;
+	Vertex v;
+
+	std::string line;
+	std::vector<std::string> lineelements;
+
+	std::ifstream fs(filename);
+
+	if (fs.fail()) {
+		//std::cerr << filename << "ERROR: Wind file could not be opened" << std::endl;
+		log("ERROR: Polygon file could not be opened : " + filename);
+		return poly;
+	}
+	
+	while (std::getline(fs, line))
+	{
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//
+			//line.substr(0, 1).compare(">") != 0
+			//by default we expect tab delimitation
+			lineelements = DelimLine(line, 2);
+			v.x = std::stod(lineelements[0]);
+			v.y = std::stod(lineelements[1]);
+
+			poly.vertices.push_back(v);
+
+		}
+	}
+
+
+	size_t nv = poly.vertices.size();
+
+	// Make sure ploygon is closed
+	double epsilon = std::numeric_limits<double>::epsilon() * 1000.0;
+
+	if ( !(abs(poly.vertices[0].x - poly.vertices[nv - 1].x) < epsilon && abs(poly.vertices[0].y - poly.vertices[nv - 1].y) < epsilon) )
+	{
+		v.x = poly.vertices[0].x;
+		v.y = poly.vertices[0].y;
+
+		poly.vertices.push_back(v);
+	}
+
+	polyB = CounterCWPoly(poly);
+
+	polyB.xmin = polyB.vertices[0].x;
+	polyB.xmax = polyB.vertices[0].x;
+
+	polyB.ymin = polyB.vertices[0].y;
+	polyB.ymax = polyB.vertices[0].y;
+
+	for (int i = 0; i < polyB.vertices.size(); i++)
+	{
+		polyB.xmin = utils::min(polyB.vertices[i].x, polyB.xmin);
+		polyB.xmax = utils::max(polyB.vertices[i].x, polyB.xmax);
+		polyB.ymin = utils::min(polyB.vertices[i].y, polyB.ymin);
+		polyB.ymax = utils::max(polyB.vertices[i].y, polyB.ymax);
+	}
+
+
+	return polyB;
+}
+
+
+std::vector<std::string> DelimLine(std::string line, int n, char delim)
+{
+	std::vector<std::string> lineelements;
+	lineelements = split(line, delim);
+	if (lineelements.size() != n)
+	{
+		lineelements.clear();
+
+
+	}
+	return lineelements;
+}
+
+std::vector<std::string> DelimLine(std::string line, int n)
+{
+	std::vector<std::string> LeTab;
+	std::vector<std::string> LeSpace;
+	std::vector<std::string> LeComma;
+	
+	//std::vector<std::string> lineelements;
+
+	LeTab = DelimLine(line, n, '\t');
+	LeSpace = DelimLine(line, n, ' ');
+	LeComma = DelimLine(line, n, ',');
+	
+	if (LeTab.size() == n)
+	{
+		return LeTab;
+	}
+	if (LeSpace.size() == n)
+	{
+		return LeSpace;
+	}
+	if (LeComma.size() == n)
+	{
+		return LeComma;
+	}
+
+	LeTab.clear();
+
+	return LeTab;
+		
+}
+
 /*! \fn void readforcingdata(int step,T forcing)
 * Read static forcing data 
 *
@@ -1122,8 +1253,8 @@ template<class T> T readforcinghead(T ForcingParam)
 			readbathyHeadMD(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.grdalpha);
 			ForcingParam.xo = 0.0;
 			ForcingParam.yo = 0.0;
-			ForcingParam.xmax = ForcingParam.xo + (ForcingParam.nx - 1)* ForcingParam.dx;
-			ForcingParam.ymax = ForcingParam.yo + (ForcingParam.ny - 1)* ForcingParam.dx;
+			ForcingParam.xmax = ForcingParam.xo + (double(ForcingParam.nx) - 1.0) * ForcingParam.dx;
+			ForcingParam.ymax = ForcingParam.yo + (double(ForcingParam.ny) - 1.0) * ForcingParam.dx;
 
 		}
 		if (ForcingParam.extension.compare("nc") == 0)

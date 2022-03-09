@@ -74,6 +74,16 @@ public:
 	double time, zs, h, u,v;
 };
 
+class Vertex {
+public:
+	double x, y;
+};
+
+class Polygon {
+public:
+	double xmin, xmax, ymin, ymax;
+	std::vector<Vertex> vertices;
+};
 
 // End of global definition
 #endif
