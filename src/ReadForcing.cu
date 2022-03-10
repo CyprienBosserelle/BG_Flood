@@ -51,7 +51,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		XForcing.left.data = readbndfile(XForcing.left.inputfile, XParam, 0);
 
 		XForcing.left.on = true; 
-		XForcing.left.nbnd = XForcing.left.data[0].wlevs.size();
+		XForcing.left.nbnd = int(XForcing.left.data[0].wlevs.size());
 
 		if (gpgpu)
 		{
@@ -64,7 +64,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.right.data = readbndfile(XForcing.right.inputfile, XParam, 2);
 		XForcing.right.on = true;
-		XForcing.right.nbnd = XForcing.right.data[0].wlevs.size();
+		XForcing.right.nbnd = int(XForcing.right.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.right);
@@ -74,7 +74,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.top.data = readbndfile(XForcing.top.inputfile, XParam, 3);
 		XForcing.top.on = true;
-		XForcing.top.nbnd = XForcing.top.data[0].wlevs.size();
+		XForcing.top.nbnd = int(XForcing.top.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.top);
@@ -84,7 +84,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.bot.data = readbndfile(XForcing.bot.inputfile, XParam, 1);
 		XForcing.bot.on = true;
-		XForcing.bot.nbnd = XForcing.bot.data[0].wlevs.size();
+		XForcing.bot.nbnd = int(XForcing.bot.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.bot);
@@ -123,22 +123,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			//XForcing.deform[nd].grid = readcfmaphead(XForcing.deform[nd].grid);
 
 			//Clamp edges to 0.0
-			int ii;
-			for (int ix = 0; ix < XForcing.deform[nd].nx; ix++)
-			{
-				ii = ix + 0 * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-				ii = ix + (XForcing.deform[nd].ny-1) * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-			}
-
-			for (int iy = 0; iy < XForcing.deform[nd].ny; iy++)
-			{
-				ii = 0 + iy * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-				ii = (XForcing.deform[nd].nx - 1) + (iy) * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-			}
+			clampedges(XForcing.deform[nd].nx, XForcing.deform[nd].ny, 0.0f, XForcing.deform[nd].val);
+			
 
 			
 			XParam.deformmaxtime = utils::max(XParam.deformmaxtime, XForcing.deform[nd].startime + XForcing.deform[nd].duration);
@@ -216,6 +202,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
 			readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
 
+
 			
 		}
 
@@ -236,7 +223,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
+			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
+			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
 
@@ -1195,6 +1183,9 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
 	readvardata(forcing.inputfile, forcing.varname, step, forcing.before);
 	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after);
+	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.before);
+	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.after);
+
 	InterpstepCPU(forcing.nx, forcing.ny, step, totaltime, forcing.dt, forcing.now, forcing.before, forcing.after);
 	forcing.val = forcing.now;
 }
@@ -1488,7 +1479,7 @@ template <class T> void readXBbathy(std::string filename, int nx,int ny, T *&zb)
 		for (int inod = 0; inod < nx; inod++)
 		{
 			//fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
-			zb[inod + jnod * nx] = std::stof(lineelements[0]);
+			zb[inod + jnod * nx] = T(std::stod(lineelements[0]));
 
 		}
 	}
@@ -1655,7 +1646,26 @@ template <class T> void readbathyASCzb(std::string filename,int nx, int ny, T* &
 template void readbathyASCzb<int>(std::string filename, int nx, int ny, int*& zb);
 template void readbathyASCzb<float>(std::string filename, int nx, int ny, float*& zb);
 
+template <class T> void clampedges(int nx, int ny, T clamp, T* z)
+{
+	//
+	int ii;
+	for (int ix = 0; ix <nx; ix++)
+	{
+		ii = ix + 0 * nx;
+		z[ii] = clamp;
+		ii = ix + (ny - 1) * nx;
+		z[ii] = clamp;
+	}
 
+	for (int iy = 0; iy < ny; iy++)
+	{
+		ii = 0 + iy * nx;
+		z[ii] = clamp;
+		ii = (nx - 1) + (iy)* nx;
+		z[ii] = clamp;
+	}
+}
 /*! \fn void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
 * linearly interpolate between 2 cartesian arrays (of the same size)
 * This is used to interpolate dynamic forcing to a current time step 

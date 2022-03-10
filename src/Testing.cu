@@ -452,13 +452,13 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 				nbx = 256 / 16;
 				
 
-				ibx = floor(ii / 16);
-				iby = floor(jj / 16);
+				ibx = ftoi(floor(ii / XParam.blkwidth));
+				iby = ftoi(floor(jj / XParam.blkwidth));
 
 				ib = (iby)*nbx + ibx;
 
-				ix = ii - ibx * 16;
-				iy = jj - iby * 16;
+				ix = ii - ibx * XParam.blkwidth;
+				iy = jj - iby * XParam.blkwidth;
 
 				int n = memloc(XParam, ix, iy, ib);
 
@@ -573,7 +573,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	//
 	// 
 	T Q = T(0.001);
-	TheoryInput = Q * XParam.outputtimestep;
+	TheoryInput = Q * T(XParam.outputtimestep);
 
 
 	//Create a temporary file with river fluxes
@@ -625,7 +625,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
-		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -676,7 +676,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 			{
 				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 				int ib = XModel.blocks.active[ibl];
-				delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+				delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
 
 
 				for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -795,14 +795,14 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = i * 4;
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(i * 4);
 		}
 	}
 	//
 	//
 	// 
 	T Q = T(0.10);
-	TheoryInput = Q * XParam.outputtimestep;
+	TheoryInput = Q * T(XParam.outputtimestep);
 
 
 	//Create a temporary file with river fluxes
@@ -894,7 +894,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
-		delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -946,7 +946,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 			{
 				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 				int ib = XModel.blocks.active[ibl];
-				delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+				delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
 
 
 				for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -1015,10 +1015,10 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	}
 
 	// randomly select a block a i and a j were the maximum value will be relocated
-	int ibbl = floor(T(rand()) / T(RAND_MAX) * XParam.nblk);
+	int ibbl = ftoi(floor(T(rand()) / T(RAND_MAX) * XParam.nblk));
 	int ibb = XModel.blocks.active[ibbl];
-	int ixx = floor(T(rand()) / T(RAND_MAX) * XParam.blkwidth);
-	int iyy = floor(T(rand()) / T(RAND_MAX) * XParam.blkwidth);
+	int ixx = ftoi(floor(T(rand()) / T(RAND_MAX) * XParam.blkwidth));
+	int iyy = ftoi(floor(T(rand()) / T(RAND_MAX) * XParam.blkwidth));
 
 	int nn = memloc(XParam, ixx, iyy, ibb);
 
@@ -1429,9 +1429,9 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
-			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
-			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = ThackerBathy(x, y, Lo, Do);
+			x = T(XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx);
+			y = T(XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx);
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = float(ThackerBathy(x, y, Lo, Do));
 		}
 	}
 
@@ -1663,11 +1663,11 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
-			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+			x = T(XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx);
+			y = T(XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx);
 
 			
-			dummybathy[i + j * XForcing.Bathy[0].nx] = ValleyBathy(y, x, slope, center);
+			dummybathy[i + j * XForcing.Bathy[0].nx] = float( ValleyBathy(y, x, slope, center));
 
 			maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
 
@@ -1796,7 +1796,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
 			{
 				int i = memloc(XParam, ix, iy, ib);
-				initVol = initVol + XModel.evolv.h[i] * delta * delta;
+				initVol = initVol + T(XModel.evolv.h[i]) * delta * delta;
 			}
 		}
 	}
@@ -2037,11 +2037,11 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
-			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+			x = T(XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx);
+			y = T(XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx);
 
 
-			dummybathy[i + j * XForcing.Bathy[0].nx] = ValleyBathy(y, x, slope, center);
+			dummybathy[i + j * XForcing.Bathy[0].nx] = float(ValleyBathy(y, x, slope, center));
 
 			//Add physical walls
 			if (PhysWall == 1)
@@ -2437,16 +2437,16 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 		//To avoid high velocities near dry cells, we reconstruct velocities according to Bouchut.
 		T ul, ur, vl, vr, sl, sr;
 		if (hi > eps) {
-			ur = ui - (1. + dx * dhdxi / hi) * dx * dudxi;
-			vr = vi - (1. + dx * dhdxi / hi) * dx * dvdxi;
+			ur = ui - (T(1.) + dx * dhdxi / hi) * dx * dudxi;
+			vr = vi - (T(1.) + dx * dhdxi / hi) * dx * dvdxi;
 		}
 		else {
 			ur = ui - dx * dudxi;
 			vr = vi - dx * dvdxi;
 		}
 		if (hn > eps) {
-			ul = uli + (1. - dx * dhdxil / hn) * dx * dudxil;
-			vl = vli + (1. - dx * dhdxil / hn) * dx * dvdxil;
+			ul = uli + (T(1.) - dx * dhdxil / hn) * dx * dudxil;
+			vl = vli + (T(1.) - dx * dhdxil / hn) * dx * dvdxil;
 		}
 		else {
 			ul = uli + dx * dudxil;
@@ -2474,14 +2474,14 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 		// well-balancing at coarse/fine faces (see [notes/balanced.tm]()). 
 		if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
 		{
-			int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+			int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 			int iright = memloc(XParam.halowidth, XParam.blkmemwidth, 0, jj, RB);;
 			hi = XModel.evolv.h[iright];
 			zi = XModel.zb[iright];
 		}
 		if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 		{
-			int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+			int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 			int ilc = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth - 1, jj, LB);
 			//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 			hn = XModel.evolv.h[ilc];
@@ -2865,7 +2865,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	double Xmax_exp = 28.0; //minimum Xmax position (adjust to have a "full blocks" config)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
-	Surf = (XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo);
+	Surf = T((XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo));
 	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
 	XParam.rainbnd = true;
 	XParam.zsinit = zinit;
@@ -2928,15 +2928,15 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = -10.0;
 			if (i < (9 / XForcing.Bathy[0].dx + 1))
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.2 + (9.0 - i * XForcing.Bathy[0].dx) * 2.0 / 100.0;
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(0.2 + (9.0 - i * XForcing.Bathy[0].dx) * 2.0 / 100.0);
 			}
 			else if (i < (17 / XForcing.Bathy[0].dx + 1))
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.08 + (17.0 - i * XForcing.Bathy[0].dx) * 1.5 / 100.0;
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(0.08 + (17.0 - i * XForcing.Bathy[0].dx) * 1.5 / 100.0);
 			}
 			else if (i < (25 / XForcing.Bathy[0].dx + 1))
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0 + (25.0 - i * XForcing.Bathy[0].dx) * 1.0 / 100.0;
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(0.0 + (25.0 - i * XForcing.Bathy[0].dx) * 1.0 / 100.0);
 			}
 		}
 	}
@@ -3029,6 +3029,8 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			//Write the netcdf file
 			create3dnc("rainTemp.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
 
+			printf("non-uniform forcing\n");
+
 			//End creation of the nc file for rain forcing
 		}
 		//Create a uniform time-variable rain forcing using a map forcing (nc file)
@@ -3056,6 +3058,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			//Write the netcdf file
 			create3dnc("rainTemp.nc", NX, NY, NT, xRain, yRain, tRain, rainForcing, "myrainforcing");
 
+			printf("non-uniform forcing 31\n");
 			//End creation of the nc file for rain forcing
 		}
 		/*
@@ -3167,11 +3170,11 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 		// Getting the coordinate for the flux calculation
 		int bl, ixx, ibl, ix, ib, n;
-		float dist = 1000000000;
+		T dist = T(1000000000.0);
 		for (ibl = 0; ibl < XParam.nblk; ibl++)
 		{
 			ib = XModel.blocks.active[ibl];
-			delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+			delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
 			for (ix = 0; ix < XParam.blkwidth; ix++)
 			{
 				n = memloc(XParam, ix, 0, ib);
@@ -3179,14 +3182,14 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				{
 					ixx = ix;
 					bl = ibl;
-					dist = abs(XModel.blocks.xo[ibl] + ix * delta - 24.0);
+					dist = T(abs(XModel.blocks.xo[ibl] + ix * delta - 24.0));
 				}
 			}
 		}
 
 		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
 		{
-			float finalFlux = 0.0;
+			T finalFlux = T(0.0);
 			if (XParam.GPUDEVICE >= 0)
 			{
 				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -3200,14 +3203,14 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 			//Calculation of the flux at the bottom of the slope (x=24m)
 			ib = XModel.blocks.active[bl];
-			delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+			delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
 
 			for (int iy = 0; iy < XParam.blkwidth; iy++)
 			{
 				int n = memloc(XParam, ixx, iy, ib);
 				finalFlux = finalFlux + XModel.evolv.h[n] * XModel.evolv.u[n] * delta;
 			}
-			finalFlux = finalFlux / (XParam.ymax - XParam.yo)*100*100;
+			finalFlux = finalFlux / float(XParam.ymax - XParam.yo)*100.0f*100.0f;
 			Flux.push_back(finalFlux);
 			XLoop.nextoutputtime = XLoop.nextoutputtime + XParam.outputtimestep;
 			printf("\tTime = %f, Flux at bottom end of slope : %f \n", XLoop.totaltime, finalFlux);
@@ -3311,7 +3314,7 @@ template <class T> void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XBlock.active[ibl];
-		delta = calcres(XParam.dx, XBlock.level[ib]);
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -3320,9 +3323,9 @@ template <class T> void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
 			{
 				//
 				int n = memloc(XParam, ix, iy, ib);
-				x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				y = XParam.yo + XBlock.yo[ib] + iy * delta;
-				z[n] = z[n] + amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc));
+				x = T(XParam.xo + XBlock.xo[ib] + ix * delta);
+				y = T(XParam.yo + XBlock.yo[ib] + iy * delta);
+				z[n] = z[n] + amp * exp(T(-1.0) * T(((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (2.0 * cc * cc)));
 
 
 			}
@@ -3435,7 +3438,7 @@ template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 				int n = memloc(XParam, ix, iy, ib);
-				z[n] = ib;
+				z[n] = T(ib);
 			}
 		}
 	}

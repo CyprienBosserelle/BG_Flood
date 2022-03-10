@@ -302,7 +302,7 @@ template <class T> __host__ __device__ void conserveElevationGradHaloB(int halow
 	itwet = h[qit] > eps ? h[qit] : T(0.0);
 	itrwet = h[qitr] > eps ? h[qitr] : T(0.0);
 
-	hwet = (iiwet + irwet + itwet + itrwet);
+	hwet = T(iiwet + irwet + itwet + itrwet);
 	zswet = iiwet * (zb[qii] + h[qii]) + irwet * (zb[qir] + h[qir]) + itwet * (zb[qit] + h[qit]) + itrwet * (zb[qitr] + h[qitr]);
 	
 	if (hwet > T(0.0))

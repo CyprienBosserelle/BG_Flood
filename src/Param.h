@@ -42,6 +42,8 @@ public:
 
 	int doubleprecision = 0; // 0: float precision, 1: double precision
 
+	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
+
 	//*Grid parameters
 	double dx = nan(""); // Grid resolution in the coordinate system unit in m.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0

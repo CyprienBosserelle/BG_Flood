@@ -13,6 +13,8 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
 	
+
+	
 	log("\t\tCompleted");
 	log("Model Running...");
 	while (XLoop.totaltime < XParam.endtime)
@@ -160,7 +162,7 @@ template void DebugLoop<double>(Param& XParam, Forcing<float> XForcing, Model<do
 template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 {
 	Loop<T> XLoop;
-	XLoop.atmpuni = XParam.Paref;
+	XLoop.atmpuni = T(XParam.Paref);
 	XLoop.totaltime = XParam.totaltime;
 	XLoop.nextoutputtime = XParam.totaltime + XParam.outputtimestep;
 	
@@ -304,7 +306,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 			{
 				for (int istep = 0; istep < XLoop.TSAllout[o].size(); istep++)
 				{
-					oo = o * 4 + istep * XParam.TSnodesout.size() * 4;
+					oo = o * 4 + istep * int(XParam.TSnodesout.size()) * 4;
 					//
 					XLoop.TSAllout[o][istep].h = XModel.TSstore[0 + oo];
 					XLoop.TSAllout[o][istep].zs = XModel.TSstore[1 + oo];
@@ -421,7 +423,7 @@ template <class T> __host__ void CalcInitdtCPU(Param XParam, BlockP<T> XBlock, E
 	{
 		ib = XBlock.active[ibl];
 
-		delta = calcres(XParam.dx, XBlock.level[ib]);
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -429,7 +431,7 @@ template <class T> __host__ void CalcInitdtCPU(Param XParam, BlockP<T> XBlock, E
 			{
 				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
 
-				dtmax[i] = delta / sqrt(XParam.g * std::max(XEvolv.h[i],T(XParam.eps)));
+				dtmax[i] = delta / sqrt(T(XParam.g) * std::max(XEvolv.h[i],T(XParam.eps)));
 			}
 		}
 	}

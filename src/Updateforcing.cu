@@ -440,6 +440,35 @@ template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBl
 template __global__ void AddwindforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<float> XAdv);
 template __global__ void AddwindforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<double> XAdv);
 
+template <class T> __global__ void AddPatmforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> PAtm, Model<T> XModel)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+	T atmpi;
+
+	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+	
+
+	atmpi = interpDyn2BUQ(x, y, PAtm.GPU);
+	
+
+	XModel.Patm[i] = atmpi - XParam.Paref;
+	
+}
+template __global__ void AddPatmforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> PAtm, Model<float> XModel);
+template __global__ void AddPatmforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> PAtm, Model<double> XModel);
 
 
 template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
@@ -493,6 +522,55 @@ template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBloc
 }
 template __host__ void AddwindforcingCPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<float> XAdv);
 template __host__ void AddwindforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<double> XAdv);
+
+
+
+template <class T> __host__ void AddPatmforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> PAtm, Model<T> XModel)
+{
+	//
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+				T atmpi;
+
+				T x = XParam.xo + XBlock.xo[ib] + ix * delta;
+				T y = XParam.yo + XBlock.yo[ib] + iy * delta;
+
+				
+				if (PAtm.uniform)
+				{
+					atmpi = T(PAtm.nowvalue);
+				}
+				else
+				{
+					atmpi = interp2BUQ(x, y, PAtm);
+				}
+				
+
+				XModel.Patm[i] = atmpi;
+				
+
+			}
+		}
+	}
+}
+template __host__ void AddPatmforcingCPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> PAtm, Model<float> XModel);
+template __host__ void AddPatmforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> PAtm, Model<double> XModel);
+
+
 
 
 template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing)

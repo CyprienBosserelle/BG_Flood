@@ -41,9 +41,11 @@ template <class T> T readfileinfo(std::string input,T outinfo)
 
 	//outinfo.inputfile = extvec.front();
 
-	std::vector<std::string> nameelements;
+	std::vector<std::string> nameelements,filename;
 	//
 	nameelements = split(extvec.back(), '?');
+
+	filename = split(input, '?');
 	if (nameelements.size() > 1)
 	{
 		//variable name for bathy is not given so it is assumed to be zb
@@ -54,11 +56,12 @@ template <class T> T readfileinfo(std::string input,T outinfo)
 	else
 	{
 		outinfo.extension = extvec.back();
+		outinfo.varname = "z";
 	}
 
 	//Reconstruct filename with extension but without varname
-	outinfo.inputfile = extvec.front() + "." + outinfo.extension;
-
+	//outinfo.inputfile = extvec.front() + "." + outinfo.extension;
+	outinfo.inputfile = filename.front();
 
 	return outinfo;
 }
@@ -153,6 +156,29 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.doubleprecision = std::stoi(parametervalue);
+	}
+
+	parameterstr = "engine";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> buttingerstr = { "b","butt","buttinger","2" };
+		std::size_t found;
+		bool foo = false;
+		for (int ii = 0; ii < buttingerstr.size(); ii++)
+		{
+			found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
+			if (found == 0)
+			{
+				param.engine = 1;
+				foo = true;
+			}
+				
+		}
+		if (!foo)
+		{
+			param.engine = 2;
+		}
 	}
 	///////////////////////////////////////////////////////
 	// Adaptation
@@ -368,7 +394,7 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"};
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy" };
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -892,6 +918,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		// needs to be a netcdf file 
 		forcing.Atmp = readfileinfo(parametervalue, forcing.Atmp);
+
 	}
 
 	// rain forcing
@@ -1015,8 +1042,8 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	//printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, calcres(1.0, XParam.initlevel));
 
 	// First estimate nx and ny
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+	XParam.nx = ftoi((XParam.xmax - XParam.xo) / (levdx));
+	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
 	//if desire size in one direction is under the bathy resolution or dx requested
 	if (XParam.nx == 0) { XParam.nx = 1; }
 	if (XParam.ny == 0) { XParam.ny = 1; }
@@ -1027,8 +1054,8 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth)) * levdx;
 
 	// Update nx and ny 
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+	XParam.nx = ftoi((XParam.xmax - XParam.xo) / (levdx));
+	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
 
 	log("\nAdjusted model domain (xo/xmax/yo/ymax): ");
 	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax) );
@@ -1070,9 +1097,17 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XForcing.bot.isright = 0;
 	XForcing.bot.istop = -1;
 
+	XForcing.Atmp.clampedge = XParam.Paref;
+
+	if (!XForcing.Atmp.inputfile.empty())
+	{
+		XParam.atmpforcing = true;
+		XParam.engine = 3;
+	}
+
 
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
-	XParam.nrivers = XForcing.rivers.size();
+	XParam.nrivers = int(XForcing.rivers.size());
 
 
 

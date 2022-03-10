@@ -211,8 +211,8 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				n = (i+XParam.halowidth) + (j+XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
-				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
+				x = T(XParam.xo + XBlock.xo[ib] + i * blkdx);
+				y = T(XParam.yo + XBlock.yo[ib] + j * blkdx);
 
 				z[n] = interp2BUQ(x, y, T(blkdx), forcing);
 
@@ -247,8 +247,8 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
-				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
+				x = T(XParam.xo + XBlock.xo[ib] + i * blkdx);
+				y = T(XParam.yo + XBlock.yo[ib] + j * blkdx);
 
 				// Interpolate to fill in values from the whole domain (even if the domain outspan the domain fo the bathy)
 				z[n] = interp2BUQ(x, y, T(blkdx), forcing[0]);
@@ -395,7 +395,7 @@ template <class T, class F> void InterpstepCPU(int nx, int ny, int hdstep, F tot
 			Uxo = Uo[i + nx*j];
 			Uxn = Un[i + nx*j];
 
-			Ux[i + nx*j] = Uxo + (totaltime - hddt*hdstep)*(Uxn - Uxo) / hddt;
+			Ux[i + nx*j] = T(Uxo + (totaltime - hddt*hdstep)*(Uxn - Uxo) / hddt);
 		}
 	}
 }
