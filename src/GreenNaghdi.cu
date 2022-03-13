@@ -33,6 +33,7 @@ template <class T> T dx(int ix, int iy,int ib, T* s)
 
 
 /*
+#define dx(s)  ((s[1,0] - s[-1,0])/(2.*Delta))
 #define dy(s)  ((s[0,1] - s[0,-1])/(2.*Delta))
 #define d2x(s) ((s[1,0] + s[-1,0] - 2.*s[])/sq(Delta))
 #define d2y(s) ((s[0,1] + s[0,-1] - 2.*s[])/sq(Delta))
@@ -43,6 +44,88 @@ template <class T> T dx(int ix, int iy,int ib, T* s)
 
 */
 
+template <class T> T residual_GN_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv)
+{
+	//
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	int TL, BLTL, BL, TLBL, levTL, levBL, lev;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		lev = XBlock.level[ib];
+
+		delta = calcres(T(XParam.dx), lev);
+		itdelta = T(1.0) / (T(2.0) * delta);
+
+		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ileft= memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+				int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+
+				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+				int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+
+				int itr = memloc(halowidth, blkmemwidth, ix + 1, iy + 1, ib);
+				int itl = memloc(halowidth, blkmemwidth, ix - 1, iy + 1, ib);
+				int ibr = memloc(halowidth, blkmemwidth, ix + 1, iy - 1, ib);
+				int ibl = memloc(halowidth, blkmemwidth, ix - 1, iy - 1, ib);
+
+
+				T hi= XEv.h[i];
+				T hleft = XEv.h[ileft];
+				T hright = XEv.h[iright];
+
+				T dxh, dxzb, dxzs, hl3, hr3, res;
+
+				if (hleft >= XParam.eps && hi >= XParam.eps && hright >= XParam.eps)
+				{
+					//
+					dxh = (hright - hleft) * itdelta;
+					dxzb = (zb[iright] - zb[ileft]) * itdelta;
+					dyzb = ((zb[itop] - zb[ibot]) * itdelta);
+					dxDy = (Dy[iright] - Dy[ileft]) * itdelta;
+
+					dyDy = ((Dy[itop] - Dy[ibot]) * itdelta);
+					dxeta = dxzb + dxh;
+
+					d2xzb = ((zb[iright] + zb[ileft] - 2. * zb[i]) / sq(delta));
+
+					d2xyzb = ((zb[itr] - zb[itl] - zb[ibr] + zb[ibl]) / sq(2. * delta));
+					d2xyDy = ((Dy[itr] - Dy[itl] - Dy[ibr] + Dy[ibl]) / sq(2. * delta));
+
+					hl3 = (hi + hleft) / T(2.0);
+					hl3 = hl3 * hl3 * hl3;
+
+					hr3= (hi + hright) / T(2.0);
+					hr3 = hr3 * hr3 * hr3;
+
+
+
+					resx[i] = bx[i] -
+						(-alpha_d / 3. * (hr3 * Dx[iright] + hl3 * Dx[ileft] -
+						(hr3 + hl3) * Dx[i]) / sq(delta) +
+							hc * (alpha_d * (dxeta * dxzb + hc / T(2.) * d2xzb) + T(1.)) * Dx[i] +
+							alpha_d * hc * ((hc / 2. * d2xyzb + dxeta * dyzb)) * Dy[i] +
+								hc / T(2.) * dyzb * dxDy - sq(hc) / T(3.) * d2xyDy
+								- hc * dyDy * (dxh + dxzb) / T(2.))));
+					
+
+
+				}
+
+
+			}
+		}
+	}
+}
 /*
 static double residual_GN(scalar* a, scalar* r, scalar* resl, void* data)
 {
