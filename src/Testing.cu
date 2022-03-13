@@ -243,7 +243,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Verification data
 	// This is a transect across iy=15:16:127 at ix=127 (or vice versa because the solution is symetrical)
 	// These values are based on single precision output from Netcdf file so are only accurate to 10-7 
-	double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
+	//double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
 	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
 	double ZsVerifButtinger[8] = { 0.100000000023, 0.100000063119, 0.100093580546, 0.195088199869, 0.136767978925, 0.0850706353898, 0.0663028448129, 0.063727949607 };
 
@@ -2618,7 +2618,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 {
 	log("#####");
 	Param XParam;
-	T delta, initVol, finalVol, TheoryInput, TheoryVol, Surface;
+	T initVol, TheoryInput, TheoryVol, Surface;
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 6)); //1<<8  = 2^8
 	XParam.xo = -0.5;
@@ -2783,7 +2783,7 @@ bool Raintestinput(int gpu)
 	//Results of the experiment of Aureli, interpolated to output values
 	bool modelgood1, modelgood2;
 	std::string result;
-	int dim_flux;
+	//int dim_flux;
 	std::vector<float> Flux1D, Flux3DUni, Flux3D, Flux_obs;
 	float diff, ref, error;
 	
@@ -2852,7 +2852,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	double* yRain;
 	double* tRain;
 	double* rainForcing;
-	FILE* fp;
+	
 
 	Param XParam;
 	T delta, TheoryInput, Surf;

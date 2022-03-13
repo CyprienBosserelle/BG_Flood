@@ -424,39 +424,39 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	//
 	//printf("%d\n", side);
 
-	double xxo, xxmax, yy;
+	double xxmax;
 	int hor;
 	switch (side)
 	{
 		case 0://Left bnd
 		{
-			xxo = XParam.yo;
+			//xxo = XParam.yo;
 			xxmax = XParam.ymax;
-			yy = XParam.xo;
+			//yy = XParam.xo;
 			hor = 0;
 			break;
 		}
 		case 1://Bot bnd
 		{
-			xxo = XParam.xo;
+			//xxo = XParam.xo;
 			xxmax = XParam.xmax;
-			yy = XParam.yo;
+			//yy = XParam.yo;
 			hor = 1;
 			break;
 		}
 		case 2://Right bnd
 		{
-			xxo = XParam.yo;
+			//xxo = XParam.yo;
 			xxmax = XParam.ymax;
-			yy = XParam.xmax;
+			//yy = XParam.xmax;
 			hor = 0;
 			break;
 		}
 		case 3://Top bnd
 		{
-			xxo = XParam.xo;
+			//xxo = XParam.xo;
 			xxmax = XParam.xmax;
-			yy = XParam.ymax;
+			//yy = XParam.ymax;
 			hor = 1;
 			break;
 		}
@@ -1260,7 +1260,7 @@ template<class T> T readforcinghead(T ForcingParam)
 		if (ForcingParam.extension.compare("nc") == 0)
 		{
 			int dummy;
-			double dummya, dummyb, dummyc;
+			double dummyb, dummyc;
 			//log("netcdf file");
 			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc);
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");

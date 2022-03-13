@@ -601,7 +601,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 		{
 			double dxfac = calcres(XParam.dx, XBlock.level[ib]);
 			int xnode = int((XBlock.xo[ib]) / dxfac / XParam.blkwidth);
-			int ynode = int((XBlock.yo[ib]) / dxfac / XParam.blkwidth);
+			//int ynode = int((XBlock.yo[ib]) / dxfac / XParam.blkwidth);
 
 			int ibr = XBlock.RightBot[ib];
 			int ibtl = XBlock.TopLeft[ib];
@@ -775,7 +775,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-		int i, ii, ir, it, itr;
+		int ii, ir, it, itr;
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 

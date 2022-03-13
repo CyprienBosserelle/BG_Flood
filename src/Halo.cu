@@ -58,7 +58,7 @@ template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 */
 template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
-	int ib,n,left, right, top,bot;
+	int ib, n;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];

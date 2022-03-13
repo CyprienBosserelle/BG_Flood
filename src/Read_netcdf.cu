@@ -388,7 +388,7 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 	int wet = 1;
 
-	size_t *start, *count;
+	size_t *start;
 	//std::string Varname = "time";
 	ndims = 3;
 
