@@ -3458,7 +3458,8 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 			std::ifstream in_file(XModel.blocks.outZone[o].outname, std::ios::binary);
 			in_file.seekg(0, std::ios::end);
 			int file_size = in_file.tellg();
-			printf("\n length of the file %s: %i in bytes\n", XModel.blocks.outZone[o].outname, file_size);
+			printf("\n length of the file %s:", XModel.blocks.outZone[o].outname);
+			printf("%i in bytes\n", file_size);
 			error = error * (observedSize[o] / file_size);
 		}
 	}
