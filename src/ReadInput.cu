@@ -404,7 +404,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		outzone zone;
+		outzoneP zone;
 		std::vector<std::string> zoneitems = split(parametervalue, ',');
 		if (zoneitems.size() >= 5)
 		{

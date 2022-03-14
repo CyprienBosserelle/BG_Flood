@@ -114,7 +114,7 @@ public:
 	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
 	Default: "zb", "zs", "u", "v", "h"
 	*/
-	std::vector<outzone> outzone; // vector containing information for the zoned nc output
+	std::vector<outzoneP> outzone; // vector containing information for the zoned nc output
 
 	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
 

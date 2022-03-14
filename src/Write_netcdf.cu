@@ -345,8 +345,6 @@ for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 {
 	Calcnxnyzone(XParam, lev, nx, ny, Xzone);
 
-	//printf("lev=%d; xxmax=%f; xxmin=%f; nx=%d\n", lev, xxmax, xxmin, nx);
-	//printf("lev=%d; yymax=%f; yymin=%f; ny=%d\n", lev, yymax, yymin, ny);
 	// start at first value
 	//static size_t thstart[] = { 0 };
 	xcount[0] = nx;
@@ -375,9 +373,6 @@ for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 		yval[i] = yymin + double(i) * ddx;
 	}
 
-
-	//printf("yval[0]=%f\tyval[1]=%f\t yymin=%f\n", yval[0], yval[1], yymin);
-	//std::string xxname, yyname, sign;
 
 	lev < 0 ? sign = "N" : sign = "P";
 

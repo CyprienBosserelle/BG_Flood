@@ -191,7 +191,6 @@ for i in range(len(P_lines)):
         found=re.findall(r"\s*(\/\/\*)(.*)", line, re.IGNORECASE)
         SubTitle[i]=found[0][1]
 
-print(SubTitle[44])
 
 #%% Creation of the output file
 

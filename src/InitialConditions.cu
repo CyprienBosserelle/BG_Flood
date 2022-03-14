@@ -420,7 +420,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 	int ib, i;
 	T levdx;
 	std::vector<int> cornerblk; //index of the blocks at the corner of the zone 
-	outzone Xzone; //info on outzone given by the user
+	outzoneP Xzone; //info on outzone given by the user
 	outzoneB XzoneB; //info on outzone computed and used actually for writing nc files
 	double eps;
 
@@ -455,52 +455,6 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		RectCornerBlk(XParam, XBlock, XParam.outzone[o].xstart, XParam.outzone[o].ystart, XParam.outzone[o].xend, XParam.outzone[o].yend, false, cornerblk);
 
 
-		//for (i = 0; i < XParam.nblk; i++)
-		//{
-		//	ib = XBlock.active[i];
-		//	levdx = calcres(XParam.dx, XBlock.level[ib]);
-
-		//	// get the corners' locations of the block (center of the corner cell)
-		//	xl = XParam.xo + XBlock.xo[ib];
-		//	yb = XParam.yo + XBlock.yo[ib];
-		//	xr = XParam.xo + XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		//	yt = XParam.yo + XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-
-		//	// Getting the bottom left corner coordinate of the output area
-		//	if (XParam.outzone[o].xstart >= xl && XParam.outzone[o].xstart <= xr && XParam.outzone[o].ystart >= yb && XParam.outzone[o].ystart <= yt)
-		//	{
-		//		ibl = ib;
-
-		//	}
-		//	// Getting the top left corner coordinate of the output area
-		//	if (XParam.outzone[o].xstart >= xl && XParam.outzone[o].xstart <= xr && XParam.outzone[o].yend >= yb && XParam.outzone[o].yend <= yt)
-		//	{
-		//		itl = ib;
-
-		//	}
-		//	// Getting the top right corner coordinate of the output area
-		//	if (XParam.outzone[o].xend >= xl && XParam.outzone[o].xend <= xr && XParam.outzone[o].ystart >= yb && XParam.outzone[o].ystart <= yt)
-		//	{
-		//		itr = ib;
-
-		//	}
-		//	// Getting the bottom right corner coordinate of the output area
-		//	if (XParam.outzone[o].xend >= xl && XParam.outzone[o].xend <= xr && XParam.outzone[o].ystart >= yb && XParam.outzone[o].ystart <= yt)
-		//	{
-		//		ibr = ib;
-
-		//	}
-		//}
-
-		// get the minimal rectangle (if uniform level grid in this area)
-		//levdx = calcres(XParam.dx, XBlock.level[cornerblk[0]]);
-		//printf("corners=[%d,%d,%d,%d] \n", cornerblk[0], cornerblk[1], cornerblk[2], cornerblk[3]);
-
-		//XzoneB.xo = XParam.xo + min(XBlock.xo[cornerblk[0]], XBlock.xo[cornerblk[1]]) - levdx/2;
-		//XzoneB.yo = XParam.yo + min(XBlock.yo[cornerblk[0]], XBlock.yo[cornerblk[3]]) - levdx/2;
-		//printf("xo=%f, yo=%f \n", XzoneB.xo, XzoneB.yo);
-
-
 		//left edge border
 		int il = (XBlock.level[cornerblk[0]] < XBlock.level[cornerblk[1]]) ? cornerblk[0] : cornerblk[1];
 		levdx = calcres(XParam.dx, XBlock.level[il]);
@@ -517,10 +471,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		int it = (XBlock.level[cornerblk[1]] < XBlock.level[cornerblk[2]]) ? cornerblk[1] : cornerblk[2];
 		levdx = calcres(XParam.dx, XBlock.level[it]);
 		XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
-		//XzoneB.xmax = XParam.xo + max(XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]) + (XParam.blkwidth - 1) * levdx;
-		//XzoneB.ymax = XParam.yo + max(XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[1]]) + (XParam.blkwidth - 1) * levdx;
 
-		//printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
 
 		if (XParam.maxlevel != XParam.minlevel) //if adapatation
 		{
@@ -530,48 +481,11 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			
 			//In order of avoiding rounding error, a slightly smaller rectangular is used
 			RectCornerBlk(XParam, XBlock, XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax, true, cornerblk);
-
-			
-			//for (i = 0; i < XParam.nblk; i++)
-			//{
-			//	ib = XBlock.active[i];
-			//	levdx = calcres(XParam.dx, XBlock.level[ib]);
-			//	double eps = levdx / 3; //margin to search for block boundaries, to avoid machine error
-
-			//	// get the corners' locations of the block (center of the corner cell)
-			//	xl = XParam.xo + XBlock.xo[ib];
-			//	yb = XParam.yo + XBlock.yo[ib];
-			//	xr = XParam.xo + XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-			//	yt = XParam.yo + XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-
-			//	// Getting the bottom left corner coordinate of the output area
-			//	if (xo + eps >= xl && xo - eps <= xr && yo + eps >= yb && yo - eps <= yt)
-			//	{
-			//		ibl = ib;
-			//	}
-			//	// Getting the top left corner coordinate of the output area
-			//	if (xo + eps >= xl && xo - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
-			//	{
-			//		itl = ib;
-			//	}
-			//	// Getting the bottom right corner coordinate of the output area
-			//	if (xmax + eps >= xl && xmax - eps <= xr && yo + eps >= yb && yo - eps <= yt)
-			//	{
-			//		ibr = ib;
-			//	}
-			//	// Getting the top right corner coordinate of the output area
-			//	if (xmax + eps >= xl && xmax - eps <= xr && ymax + eps >= yb && ymax - eps <= yt)
-			//	{
-			//		itr = ib;
-			//	}
-			//}
 	
 
 			// for each side, the border is imposed by the larger block (the "further out" one) if adaptative,
 			// if the grid is.
 
-			//XzoneB.xo = XParam.xo + min(XBlock.xo[cornerblk[0]], XBlock.xo[cornerblk[1]]);
-			//XzoneB.yo = XParam.yo + min(XBlock.yo[cornerblk[0]], XBlock.yo[cornerblk[3]]);
 			//left edge border
 			int il = (XBlock.level[cornerblk[0]] < XBlock.level[cornerblk[1]]) ? cornerblk[0] : cornerblk[1];
 			levdx = calcres(XParam.dx, XBlock.level[il]);
@@ -589,11 +503,6 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			levdx = calcres(XParam.dx, XBlock.level[it]);
 			XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		}
-
-		//printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
-		//printf("corners=[%d,%d,%d,%d] \n", cornerblk[0], cornerblk[1], cornerblk[2], cornerblk[3]);
-		//printf("x=[%f,%f,%f,%f] \n", XBlock.xo[cornerblk[0]], XBlock.xo[cornerblk[1]], XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]);
-		//printf("y=[%f,%f,%f,%f] \n", XBlock.yo[cornerblk[0]], XBlock.yo[cornerblk[1]], XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[3]]);
 
 		// Get the list of all blocks in the zone and the maximum and minimum level of refinement
 		int maxlevel = XParam.minlevel;
@@ -634,7 +543,6 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		for (int b = 0; b < blkzone.size(); b++)
 		{
 			XzoneB.blk[b] = blkzone[b];
-			//printf("the user-defined zone: %f \n", blkzone[b]);
 		}
 		XzoneB.outname = XParam.outzone[o].outname;
 		
@@ -687,8 +595,6 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		for (int ib = 0; ib < XParam.nblk; ib++)
 		{
 			XzoneB.blk[ib] = XBlock.active[ib];
-			//printf("the auto zone= %i \n", XzoneB.blk[ib]);
-			//printf("active? %i \n", XBlock.active[ib]);
 		}
 
 		if (XBlock.outZone.size() > 0) //If adaptative, the zone need to be written over

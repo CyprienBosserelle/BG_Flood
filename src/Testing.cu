@@ -3275,7 +3275,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 		// read param file
 		readforcing(XParam, XForcing);
 		*/
-		outzone zone;
+		outzoneP zone;
 		zone.outname = "whole.nc";
 		zone.xstart = -10;
 		zone.xend = 10;
