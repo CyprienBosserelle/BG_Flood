@@ -520,7 +520,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		//XzoneB.xmax = XParam.xo + max(XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]) + (XParam.blkwidth - 1) * levdx;
 		//XzoneB.ymax = XParam.yo + max(XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[1]]) + (XParam.blkwidth - 1) * levdx;
 
-		printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
+		//printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
 
 		if (XParam.maxlevel != XParam.minlevel) //if adapatation
 		{
@@ -590,10 +590,10 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		}
 
-		printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
-		printf("corners=[%d,%d,%d,%d] \n", cornerblk[0], cornerblk[1], cornerblk[2], cornerblk[3]);
-		printf("x=[%f,%f,%f,%f] \n", XBlock.xo[cornerblk[0]], XBlock.xo[cornerblk[1]], XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]);
-		printf("y=[%f,%f,%f,%f] \n", XBlock.yo[cornerblk[0]], XBlock.yo[cornerblk[1]], XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[3]]);
+		//printf("xo=%f, yo=%f, xm=%f, ym=%f \n", XzoneB.xo, XzoneB.yo, XzoneB.xmax, XzoneB.ymax);
+		//printf("corners=[%d,%d,%d,%d] \n", cornerblk[0], cornerblk[1], cornerblk[2], cornerblk[3]);
+		//printf("x=[%f,%f,%f,%f] \n", XBlock.xo[cornerblk[0]], XBlock.xo[cornerblk[1]], XBlock.xo[cornerblk[2]], XBlock.xo[cornerblk[3]]);
+		//printf("y=[%f,%f,%f,%f] \n", XBlock.yo[cornerblk[0]], XBlock.yo[cornerblk[1]], XBlock.yo[cornerblk[2]], XBlock.yo[cornerblk[3]]);
 
 		// Get the list of all blocks in the zone and the maximum and minimum level of refinement
 		int maxlevel = XParam.minlevel;
@@ -628,11 +628,13 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.nblk = nblk;
 		XzoneB.maxlevel = maxlevel;
 		XzoneB.minlevel = minlevel;
+		
 
 		AllocateCPU(blkzone.size(), 1, XzoneB.blk);
 		for (int b = 0; b < blkzone.size(); b++)
 		{
 			XzoneB.blk[b] = blkzone[b];
+			//printf("the user-defined zone: %f \n", blkzone[b]);
 		}
 		XzoneB.outname = XParam.outzone[o].outname;
 		
@@ -678,13 +680,18 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.xmax = XParam.xmax;
 		XzoneB.ymax = XParam.ymax;
 		XzoneB.nblk = XParam.nblk;
+		XzoneB.maxlevel = XParam.maxlevel;
+		XzoneB.minlevel = XParam.minlevel;
 		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
+		int I = 0;
 		for (int ib = 0; ib < XParam.nblk; ib++)
 		{
-			XzoneB.blk[ib]=ib;
+			XzoneB.blk[ib] = XBlock.active[ib];
+			//printf("the auto zone= %i \n", XzoneB.blk[ib]);
+			//printf("active? %i \n", XBlock.active[ib]);
 		}
-		//XBlock.outZone.reserve(1);
-		if (XBlock.outZone.size() > 0) //If adaptative, the zone need to be over-writed
+
+		if (XBlock.outZone.size() > 0) //If adaptative, the zone need to be written over
 		{
 			XBlock.outZone[0] = XzoneB;
 		}
@@ -692,7 +699,7 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		{
 			XBlock.outZone.push_back(XzoneB);
 		}
-		
+
 	}
 }
 template void Initoutzone<float>(Param& XParam, BlockP<float>& XBlock);

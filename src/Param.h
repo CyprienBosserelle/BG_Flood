@@ -104,7 +104,7 @@ public:
 	This keyword can be used multiple times to extract time series at different locations.
 	The data is stocked for each timestep and written by flocs.
 	The resulting file contains (t,zs,h,u,v)
-	Example: "TSnodesout: Offshore.txt,3101.00,4982.57" (*filename,x,y*)
+	Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)
 	Default: None
 	*/
 

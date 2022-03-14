@@ -204,13 +204,13 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t### Test zoned output ###");
 			int nbzones = 0;
 			T zsinit = 0.01;
-			//testzoneOutDef = ZoneOutputTest(nbzones, zsinit);
-			//result = testzoneOutDef ? "successful" : "failed";
-			//log("\t\tDefault zoned Outputs: " + result);
-			nbzones = 3;
+			testzoneOutDef = ZoneOutputTest(nbzones, zsinit);
+			result = testzoneOutDef ? "successful" : "failed";
+			log("\n\nDefault zoned Outputs: " + result);
+			nbzones = 3; // 3 only
 			testzoneOutUser = ZoneOutputTest(nbzones, zsinit);
 			result = testzoneOutUser ? "successful" : "failed";
-			log("\t\tUser defined zones Outputs: " + result);
+			log("\n\nUser defined zones Outputs: " + result);
 			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
 		}
 		if (mytest == 998)
@@ -3276,32 +3276,32 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 		readforcing(XParam, XForcing);
 		*/
 		outzone zone;
-		zone.outname = "zoomed.nc";
-		zone.xstart =-0.2;
-		zone.xend =0.2;
-		zone.ystart = -0.2;
-		zone.yend = 0.2;
-		XParam.outzone.push_back(zone);
 		zone.outname = "whole.nc";
 		zone.xstart = -10;
 		zone.xend = 10;
 		zone.ystart = -10;
 		zone.yend = 10;
 		XParam.outzone.push_back(zone);
+		zone.outname = "zoomed.nc";
+		zone.xstart =1;
+		zone.xend =2;
+		zone.ystart = -2;
+		zone.yend = 2;
+		XParam.outzone.push_back(zone);
 		zone.outname = "zoomed2.nc";
-		zone.xstart = -0.2;
-		zone.xend = 0.2;
-		zone.ystart = -0.4;
-		zone.yend = 0.2;
+		zone.xstart = -2;
+		zone.xend = 2;
+		zone.ystart = -4;
+		zone.yend = 2;
 		XParam.outzone.push_back(zone);
 	}
 
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 6)); //1<<8  = 2^8
-	XParam.xo = -0.5;
-	XParam.yo = -0.5;
-	XParam.xmax = 0.5;
-	XParam.ymax = 0.5;
+	XParam.xo = -5;
+	XParam.yo = -5;
+	XParam.xmax = 5;
+	XParam.ymax = 5;
 
 	XParam.initlevel = 0;
 	XParam.minlevel = -1;
@@ -3336,12 +3336,12 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	XForcing.Bathy.push_back(bathy);
 
 	// initialise forcing bathymetry to a central hill
-	XForcing.Bathy[0].xo = -100.0;
-	XForcing.Bathy[0].yo = -100.0;
-	XForcing.Bathy[0].xmax = 100.0;
-	XForcing.Bathy[0].ymax = 100.0;
-	XForcing.Bathy[0].nx = 5001;
-	XForcing.Bathy[0].ny = 5001;
+	XForcing.Bathy[0].xo = -10.0;
+	XForcing.Bathy[0].yo = -10.0;
+	XForcing.Bathy[0].xmax = 10.0;
+	XForcing.Bathy[0].ymax = 10.0;
+	XForcing.Bathy[0].nx = 501;
+	XForcing.Bathy[0].ny = 501;
 
 	XForcing.Bathy[0].dx = 0.1;
 
@@ -3363,7 +3363,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 			{
 				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm*(1-r/rs);
 			}
-			if (x < -97 | x > 97 | y < -97 | y > 97)
+			if (x < -4.7 | x > 4.7 | y < -4.7 | y > 4.7)
 			{
 				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 10;
 			}
@@ -3376,14 +3376,14 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	StaticForcingP<int> Target;
 	XForcing.targetadapt.push_back(Target);
 
-	XForcing.targetadapt[0].xo = -100;
-	XForcing.targetadapt[0].yo = -100;
-	XForcing.targetadapt[0].xmax = 100.0;
-	XForcing.targetadapt[0].ymax = 100.0;
+	XForcing.targetadapt[0].xo = -10;
+	XForcing.targetadapt[0].yo = -10;
+	XForcing.targetadapt[0].xmax = 10.0;
+	XForcing.targetadapt[0].ymax = 10.0;
 	XForcing.targetadapt[0].nx = 501;
 	XForcing.targetadapt[0].ny = 501;
 
-	XForcing.targetadapt[0].dx = 1;
+	XForcing.targetadapt[0].dx = 0.1;
 
 	AllocateCPU(XForcing.targetadapt[0].nx, XForcing.targetadapt[0].ny, XForcing.targetadapt[0].val);
 
@@ -3399,14 +3399,14 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 			}
 			else
 			{
-				//if (y < 0.0)
-				//{
-				//	XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = -1;
-				//}
-				//else
-				//{
+				if (y < 0.0)
+				{
+					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 0;
+				}
+				else
+				{
 					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 1;
-				//}
+				}
 			}
 		}
 	}
@@ -3428,10 +3428,10 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 
 	River thisriver;
 	thisriver.Riverflowfile = "testriver.tmp";
-	thisriver.xstart = -1;
-	thisriver.xend = 1;
-	thisriver.ystart = -1;
-	thisriver.yend = 1;
+	thisriver.xstart = -0.2;
+	thisriver.xend = 0.2;
+	thisriver.ystart = -0.2;
+	thisriver.yend = 0.2;
 
 	XForcing.rivers.push_back(thisriver);
 
@@ -3453,7 +3453,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 
 	//Test if file exist and can be open:
 	int error = 1;
-	std::vector<int> observedSize{ 941100,4569717,1392076 };
+	std::vector<int> observedSize{ 473251462,23304761,130802886 };
 	for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 	{
 		std::ifstream fs(XModel.blocks.outZone[o].outname);
@@ -3467,9 +3467,8 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 			std::ifstream in_file(XModel.blocks.outZone[o].outname, std::ios::binary);
 			in_file.seekg(0, std::ios::end);
 			int file_size = in_file.tellg();
-			printf("\n length of the file %s: %i in bytes\n", XModel.blocks.outZone[o].outname, file_size);
-			error = error * observedSize[o] / file_size;
-			printf("\n error=%f", error);
+			//printf("\n length of the file %s: %i in bytes\n", XModel.blocks.outZone[o].outname, file_size);
+			error = error * (observedSize[o] / file_size);
 		}
 	}
 
