@@ -3264,14 +3264,6 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	
 	if (nzones  == 3)
 	{
-		/*// Creation of the param file
-		std::ofstream param_file(
-			"BG_param.txt", std::ios_base::out | std::ios_base::trunc);
-		param_file << "outzone = zoomed.nc,-0.2,0.2,-0.2,0.2; "<< std::endl;
-		param_file << "outzone = whole.nc, -10, 10, -10, 10;" << std::endl;
-		param_file << "outzone = zoomed_part.nc, -0.2, 0.2, -0.4, -0.2;" << std::endl;
-		param_file.close(); //destructor implicitly does it
-
 		// read param file
 		readforcing(XParam, XForcing);
 		*/
@@ -3467,7 +3459,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 			std::ifstream in_file(XModel.blocks.outZone[o].outname, std::ios::binary);
 			in_file.seekg(0, std::ios::end);
 			int file_size = in_file.tellg();
-			//printf("\n length of the file %s: %i in bytes\n", XModel.blocks.outZone[o].outname, file_size);
+			printf("\n length of the file %s: %i in bytes\n", XModel.blocks.outZone[o].outname, file_size);
 			error = error * (observedSize[o] / file_size);
 		}
 	}
