@@ -3266,7 +3266,6 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	{
 		// read param file
 		readforcing(XParam, XForcing);
-		*/
 		outzoneP zone;
 		zone.outname = "whole.nc";
 		zone.xstart = -10;
@@ -3304,7 +3303,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 
 	//Output times for comparisons
 	XParam.endtime = 1.0;
-	XParam.outputtimestep = 0.1;
+	XParam.outputtimestep = 0.5;
 
 	XParam.smallnc = 0;
 
