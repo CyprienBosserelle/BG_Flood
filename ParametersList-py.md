@@ -62,10 +62,9 @@ BG_flood user interface consists in a text file, associating key words to user c
 ### Outputs
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
-|TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position <br>(which will be converted to nearest grid position). <br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
 |outfile|outfile| "Output.nc"|netcdf output file name|
+|TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position <br>(which will be converted to nearest grid position). <br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout: Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
 |outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"<br>|
-|outzone|outzone|Full domain<br>|Zoned output (netcdf file), giving a file name and the position of two corner points<br>(which will be converted to a rectagle containing full blocks).<br>This keyword can be used multiple times to output maps of different areas.<br>Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*)<br>|
 |resetmax|resetmax| false|Switch to reset the "max" outputs after each output|
 |outishift|outishift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output |
 |outjshift|outjshift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output |
