@@ -117,7 +117,13 @@ public:
 	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
 	Default: "zb", "zs", "u", "v", "h"
 	*/
-	std::vector<outzoneP> outzone; // vector containing information for the zoned nc output
+	std::vector<outzoneP> outzone; 
+	/*Zoned output (netcdf file), giving a file name and the position of two corner points
+	(which will be converted to a rectagle containing full blocks).
+	This keyword can be used multiple times to output maps of different areas.
+	Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*)
+	Default: Full domain
+	*/
 
 	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
 
