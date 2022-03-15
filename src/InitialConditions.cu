@@ -181,7 +181,7 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 {
 	int ib;
 	T levdx;
-	bnd.nblkTs = XParam.TSnodesout.size();
+	bnd.nblkTs = int(XParam.TSnodesout.size());
 
 	AllocateCPU(bnd.nblkTs, 1, bnd.Tsout);
 
@@ -197,7 +197,7 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 		{
 
 			ib = XBlock.active[blk];
-			levdx = calcres(XParam.dx,XBlock.level[ib]);
+			levdx = T(calcres(XParam.dx,XBlock.level[ib]));
 			if (XParam.TSnodesout[o].x >= (XParam.xo + XBlock.xo[ib]) && XParam.TSnodesout[o].x <= (XParam.xo + XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= (XParam.yo + XBlock.yo[ib]) && XParam.TSnodesout[o].y <= (XParam.yo + XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
 			{
 				XParam.TSnodesout[o].block = ib;
@@ -304,7 +304,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		if (activeRiverBlk.size() > size_t(XModel.bndblk.nblkriver))
 		{
 			ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
-			XModel.bndblk.nblkriver = activeRiverBlk.size();
+			XModel.bndblk.nblkriver = int(activeRiverBlk.size());
 		}
 
 		
@@ -408,6 +408,10 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["dhv"] = XModel.adv.dhv;
 
 	XModel.OutputVarMap["cf"] = XModel.cf;
+
+	XModel.OutputVarMap["Patm"] = XModel.Patm;
+	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
+	XModel.OutputVarMap["datmpdy"] = XModel.datmpdy;
 }
 
 template void Initmaparray<float>(Model<float>& XModel);
@@ -817,7 +821,7 @@ template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double x
 
 template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float>& XForcing, T* zb)
 {
-	int ib,n;
+	int ib,n,wn;
 
 	// Remove rain from area above mask elevatio
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -828,8 +832,16 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 		{
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
+				double levdx = calcres(XParam.dx, XBlock.level[ib]);
+				double x = XParam.xo + XBlock.xo[ib] + i * levdx;
+				double y = XParam.yo + XBlock.yo[ib] + j * levdx;
+				wn = 1;
+				if (XForcing.AOI.active)
+				{
+					wn = wn_PnPoly(x, y, XForcing.AOI.poly);
+				}
 				n = memloc(XParam, i, j, ib);
-				if (zb[n] < XParam.mask)
+				if (zb[n] < XParam.mask && wn != 0)
 				{
 					XBlock.activeCell[n] = 1;
 				}

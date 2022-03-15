@@ -7,6 +7,27 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	// Predictor step in reimann solver
 	//============================================
 
+
+	if (XParam.atmpforcing)
+	{
+		//Update atm press forcing
+		AddPatmforcingCPU(XParam, XModel.blocks, XForcing.Atmp, XModel);
+		
+		//Fill atmp halo
+		fillHaloC(XParam, XModel.blocks, XModel.Patm);
+			
+
+		//Calc dpdx and dpdy
+		gradientC(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		gradientHalo(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		refine_linear(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		gradientHalo(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		
+
+		
+	}
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
@@ -22,14 +43,36 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Flux and Source term reconstruction
 	// X- direction
-	UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+	if (XParam.engine == 1)
+	{
+		// X- direction
+		UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 
-	// Y- direction
-	UpdateButtingerYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+		// Y- direction
+		UpdateButtingerYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	}
+	else if (XParam.engine == 2)
+	{
+		// X- direction
+		updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+
+		// Y- direction
+		updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+	}
+	else if (XParam.engine == 3)
+	{
+		// X- direction
+		updateKurgXATMCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
+		//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+
+		// Y- direction
+
+		updateKurgYATMCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
+		//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
+	}
+	
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
@@ -80,15 +123,41 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	//============================================
 	// Flux and Source term reconstruction
-	// X- direction
-	UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//updateKurgXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
-	
-	// Y- direction
-	UpdateButtingerYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//updateKurgYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
-	//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+	if (XParam.engine == 1)
+	{
+
+		// X- direction
+		UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//updateKurgXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+
+		// Y- direction
+		UpdateButtingerYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//updateKurgYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+	}
+	else if (XParam.engine == 2)
+	{
+		// X- direction
+		updateKurgXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+
+		// Y- direction
+		updateKurgYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+	}
+	else if (XParam.engine == 3)
+	{
+		// X- direction
+		//UpdateButtingerXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		updateKurgXATMCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
+		//AddSlopeSourceXCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+
+		// Y- direction
+		//UpdateButtingerYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		updateKurgYATMCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
+		//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
+	}
 
 	//============================================
 	// Fill Halo for flux from fine to coarse

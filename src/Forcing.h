@@ -50,7 +50,7 @@ public:
 	double duration = 0.0;
 	T* val;
 	
-
+	T clampedge = 0.0;
 	TexSetP GPU;
 };
 
@@ -66,7 +66,13 @@ struct DynForcingP: public forcingmap
 	T* now_g;
 	T* before_g, * after_g;
 
+	T clampedge=0.0;
+
 };
+
+
+
+
 
 template <class T>
 struct StaticForcingP : public inputmap
@@ -95,8 +101,12 @@ public:
 };
 
 
-
-
+class AOIinfo {
+public:
+	std::string file;
+	Polygon poly;
+	bool active=false;
+};
 
 
 template <class T>
@@ -122,12 +132,14 @@ struct Forcing
 	Ex: rain=rain_forcing.nc?RainIntensity
 	Default: None
 	*/
+
 	DynForcingP<T> Atmp;
 	/* The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using Pa2.
 	Ex: Atmp=AtmosphericPressure.nc?p
 	Default: None
 	*/
 
+	
 	std::vector<StaticForcingP<T>> Bathy; //Should be a vector at some point
 	/* Bathymetry/Topography input, ONLY NECESSARY INPUT
 	Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.
@@ -196,7 +208,13 @@ struct Forcing
 	Ex: bot = botBnd.txt,2;
 	Default: 1
 	*/
-	
+
+	AOIinfo AOI;
+	/*Area of interest polygon
+	Ex: AOI=myarea.gmt;
+	the iinput file is a text file with 2 column containing the cordinat of a closed polygon (last line==first line)
+	Default: N/A
+	*/
 	
 };
 

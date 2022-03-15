@@ -51,7 +51,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		XForcing.left.data = readbndfile(XForcing.left.inputfile, XParam, 0);
 
 		XForcing.left.on = true; 
-		XForcing.left.nbnd = XForcing.left.data[0].wlevs.size();
+		XForcing.left.nbnd = int(XForcing.left.data[0].wlevs.size());
 
 		if (gpgpu)
 		{
@@ -64,7 +64,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.right.data = readbndfile(XForcing.right.inputfile, XParam, 2);
 		XForcing.right.on = true;
-		XForcing.right.nbnd = XForcing.right.data[0].wlevs.size();
+		XForcing.right.nbnd = int(XForcing.right.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.right);
@@ -74,7 +74,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.top.data = readbndfile(XForcing.top.inputfile, XParam, 3);
 		XForcing.top.on = true;
-		XForcing.top.nbnd = XForcing.top.data[0].wlevs.size();
+		XForcing.top.nbnd = int(XForcing.top.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.top);
@@ -84,7 +84,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		XForcing.bot.data = readbndfile(XForcing.bot.inputfile, XParam, 1);
 		XForcing.bot.on = true;
-		XForcing.bot.nbnd = XForcing.bot.data[0].wlevs.size();
+		XForcing.bot.nbnd = int(XForcing.bot.data[0].wlevs.size());
 		if (gpgpu)
 		{
 			AllocateBndTEX(XForcing.bot);
@@ -123,22 +123,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			//XForcing.deform[nd].grid = readcfmaphead(XForcing.deform[nd].grid);
 
 			//Clamp edges to 0.0
-			int ii;
-			for (int ix = 0; ix < XForcing.deform[nd].nx; ix++)
-			{
-				ii = ix + 0 * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-				ii = ix + (XForcing.deform[nd].ny-1) * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-			}
-
-			for (int iy = 0; iy < XForcing.deform[nd].ny; iy++)
-			{
-				ii = 0 + iy * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-				ii = (XForcing.deform[nd].nx - 1) + (iy) * XForcing.deform[nd].nx;
-				XForcing.deform[nd].val[ii] = 0.0f;
-			}
+			clampedges(XForcing.deform[nd].nx, XForcing.deform[nd].ny, 0.0f, XForcing.deform[nd].val);
+			
 
 			
 			XParam.deformmaxtime = utils::max(XParam.deformmaxtime, XForcing.deform[nd].startime + XForcing.deform[nd].duration);
@@ -216,6 +202,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
 			readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
 
+
 			
 		}
 
@@ -236,7 +223,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
+			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
+			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
 
@@ -257,6 +245,20 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		}
+	}
+
+	//======================
+	// Polygon data
+	if (!XForcing.AOI.file.empty())
+	{
+		log("\nRead AOI polygon");
+
+		//Polygon Poly;
+		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
+		
+		// = CounterCWPoly(Poly);
+		//
+		
 	}
 
 	//======================
@@ -422,39 +424,39 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	//
 	//printf("%d\n", side);
 
-	double xxo, xxmax, yy;
+	double xxmax;
 	int hor;
 	switch (side)
 	{
 		case 0://Left bnd
 		{
-			xxo = XParam.yo;
+			//xxo = XParam.yo;
 			xxmax = XParam.ymax;
-			yy = XParam.xo;
+			//yy = XParam.xo;
 			hor = 0;
 			break;
 		}
 		case 1://Bot bnd
 		{
-			xxo = XParam.xo;
+			//xxo = XParam.xo;
 			xxmax = XParam.xmax;
-			yy = XParam.yo;
+			//yy = XParam.yo;
 			hor = 1;
 			break;
 		}
 		case 2://Right bnd
 		{
-			xxo = XParam.yo;
+			//xxo = XParam.yo;
 			xxmax = XParam.ymax;
-			yy = XParam.xmax;
+			//yy = XParam.xmax;
 			hor = 0;
 			break;
 		}
 		case 3://Top bnd
 		{
-			xxo = XParam.xo;
+			//xxo = XParam.xo;
 			xxmax = XParam.xmax;
-			yy = XParam.ymax;
+			//yy = XParam.ymax;
 			hor = 1;
 			break;
 		}
@@ -1017,6 +1019,123 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 }
 
 
+
+/*! \fn void read
+* Read polygon
+*
+*/
+Polygon readPolygon(std::string filename)
+{
+	Polygon poly, polyB;
+	Vertex v;
+
+	std::string line;
+	std::vector<std::string> lineelements;
+
+	std::ifstream fs(filename);
+
+	if (fs.fail()) {
+		//std::cerr << filename << "ERROR: Wind file could not be opened" << std::endl;
+		log("ERROR: Polygon file could not be opened : " + filename);
+		return poly;
+	}
+	
+	while (std::getline(fs, line))
+	{
+		// skip empty lines and lines starting with #
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			//
+			//line.substr(0, 1).compare(">") != 0
+			//by default we expect tab delimitation
+			lineelements = DelimLine(line, 2);
+			v.x = std::stod(lineelements[0]);
+			v.y = std::stod(lineelements[1]);
+
+			poly.vertices.push_back(v);
+
+		}
+	}
+
+
+	size_t nv = poly.vertices.size();
+
+	// Make sure ploygon is closed
+	double epsilon = std::numeric_limits<double>::epsilon() * 1000.0;
+
+	if ( !(abs(poly.vertices[0].x - poly.vertices[nv - 1].x) < epsilon && abs(poly.vertices[0].y - poly.vertices[nv - 1].y) < epsilon) )
+	{
+		v.x = poly.vertices[0].x;
+		v.y = poly.vertices[0].y;
+
+		poly.vertices.push_back(v);
+	}
+
+	polyB = CounterCWPoly(poly);
+
+	polyB.xmin = polyB.vertices[0].x;
+	polyB.xmax = polyB.vertices[0].x;
+
+	polyB.ymin = polyB.vertices[0].y;
+	polyB.ymax = polyB.vertices[0].y;
+
+	for (int i = 0; i < polyB.vertices.size(); i++)
+	{
+		polyB.xmin = utils::min(polyB.vertices[i].x, polyB.xmin);
+		polyB.xmax = utils::max(polyB.vertices[i].x, polyB.xmax);
+		polyB.ymin = utils::min(polyB.vertices[i].y, polyB.ymin);
+		polyB.ymax = utils::max(polyB.vertices[i].y, polyB.ymax);
+	}
+
+
+	return polyB;
+}
+
+
+std::vector<std::string> DelimLine(std::string line, int n, char delim)
+{
+	std::vector<std::string> lineelements;
+	lineelements = split(line, delim);
+	if (lineelements.size() != n)
+	{
+		lineelements.clear();
+
+
+	}
+	return lineelements;
+}
+
+std::vector<std::string> DelimLine(std::string line, int n)
+{
+	std::vector<std::string> LeTab;
+	std::vector<std::string> LeSpace;
+	std::vector<std::string> LeComma;
+	
+	//std::vector<std::string> lineelements;
+
+	LeTab = DelimLine(line, n, '\t');
+	LeSpace = DelimLine(line, n, ' ');
+	LeComma = DelimLine(line, n, ',');
+	
+	if (LeTab.size() == n)
+	{
+		return LeTab;
+	}
+	if (LeSpace.size() == n)
+	{
+		return LeSpace;
+	}
+	if (LeComma.size() == n)
+	{
+		return LeComma;
+	}
+
+	LeTab.clear();
+
+	return LeTab;
+		
+}
+
 /*! \fn void readforcingdata(int step,T forcing)
 * Read static forcing data 
 *
@@ -1064,6 +1183,9 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
 	readvardata(forcing.inputfile, forcing.varname, step, forcing.before);
 	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after);
+	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.before);
+	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.after);
+
 	InterpstepCPU(forcing.nx, forcing.ny, step, totaltime, forcing.dt, forcing.now, forcing.before, forcing.after);
 	forcing.val = forcing.now;
 }
@@ -1131,14 +1253,14 @@ template<class T> T readforcinghead(T ForcingParam)
 			readbathyHeadMD(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.grdalpha);
 			ForcingParam.xo = 0.0;
 			ForcingParam.yo = 0.0;
-			ForcingParam.xmax = ForcingParam.xo + (ForcingParam.nx - 1)* ForcingParam.dx;
-			ForcingParam.ymax = ForcingParam.yo + (ForcingParam.ny - 1)* ForcingParam.dx;
+			ForcingParam.xmax = ForcingParam.xo + (double(ForcingParam.nx) - 1.0) * ForcingParam.dx;
+			ForcingParam.ymax = ForcingParam.yo + (double(ForcingParam.ny) - 1.0) * ForcingParam.dx;
 
 		}
 		if (ForcingParam.extension.compare("nc") == 0)
 		{
 			int dummy;
-			double dummya, dummyb, dummyc;
+			double dummyb, dummyc;
 			//log("netcdf file");
 			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc);
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
@@ -1302,8 +1424,8 @@ template <class T> void readbathyMD(std::string filename, T*& zb)
 
 		nx = std::stoi(lineelements[0]);
 		ny = std::stoi(lineelements[1]);
-		dx = std::stod(lineelements[2]);
-		grdalpha = std::stod(lineelements[4]);
+		dx = std::stof(lineelements[2]);
+		grdalpha = std::stof(lineelements[4]);
 	}
 
 	int j = 0;
@@ -1357,7 +1479,7 @@ template <class T> void readXBbathy(std::string filename, int nx,int ny, T *&zb)
 		for (int inod = 0; inod < nx; inod++)
 		{
 			//fscanf(fid, "%f", &zb[inod + (jnod)*nx]);
-			zb[inod + jnod * nx] = std::stof(lineelements[0]);
+			zb[inod + jnod * nx] = T(std::stod(lineelements[0]));
 
 		}
 	}
@@ -1524,7 +1646,26 @@ template <class T> void readbathyASCzb(std::string filename,int nx, int ny, T* &
 template void readbathyASCzb<int>(std::string filename, int nx, int ny, int*& zb);
 template void readbathyASCzb<float>(std::string filename, int nx, int ny, float*& zb);
 
+template <class T> void clampedges(int nx, int ny, T clamp, T* z)
+{
+	//
+	int ii;
+	for (int ix = 0; ix <nx; ix++)
+	{
+		ii = ix + 0 * nx;
+		z[ii] = clamp;
+		ii = ix + (ny - 1) * nx;
+		z[ii] = clamp;
+	}
 
+	for (int iy = 0; iy < ny; iy++)
+	{
+		ii = 0 + iy * nx;
+		z[ii] = clamp;
+		ii = (nx - 1) + (iy)* nx;
+		z[ii] = clamp;
+	}
+}
 /*! \fn void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
 * linearly interpolate between 2 cartesian arrays (of the same size)
 * This is used to interpolate dynamic forcing to a current time step 

@@ -58,7 +58,7 @@ template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 */
 template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
-	int ib,n,left, right, top,bot;
+	int ib, n;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
@@ -652,7 +652,7 @@ template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBloc
 		double ilevdx = calcres(XParam.dx, XBlock.level[ib])*T(0.25);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 			int il = memloc(XParam, XParam.blkwidth - 1, jj , XBlock.LeftBot[ib]);
 			int write = memloc(XParam, -1, j, ib);
 			T faclr = T(-1.0);
@@ -711,7 +711,7 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 		double ilevdx = calcres(XParam.dx, XBlock.level[ib] ) * T(0.25);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
-			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 			int il = memloc(XParam, 0, jj , XBlock.RightBot[ib]);
 			int write = memloc(XParam, XParam.blkwidth, j, ib);
 			T faclr = T(1.0);
@@ -768,7 +768,7 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
 		for (int i = 0; i < XParam.blkwidth; i++)
 		{
-			int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
+			int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(floor(i * (T)0.5)) : ftoi(floor(i * (T)0.5) + XParam.blkwidth / 2);
 			int jl = memloc(XParam,  ii, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 			int write = memloc(XParam, i, -1, ib);
 			
@@ -825,7 +825,7 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
 		for (int i = 0; i < XParam.blkwidth; i++)
 		{
-			int ii = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
+			int ii = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(floor(i * (T)0.5)) : ftoi(floor(i * (T)0.5) + XParam.blkwidth / 2);
 			int jl = memloc(XParam, ii , 0, XBlock.TopLeft[ib]);
 			int write = memloc(XParam, i, XParam.blkwidth, ib);
 			
@@ -1404,7 +1404,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 			T w1, w2, w3;
 			
 
-			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib?ceil(j * (T)0.5): ceil(j * (T)0.5)+ XParam.blkwidth/2;
+			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib? ftoi(ceil(j * (T)0.5)): ftoi(ceil(j * (T)0.5)+ XParam.blkwidth/2);
 			w1 = T(1.0 / 3.0);
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
@@ -1784,7 +1784,7 @@ template <class T> void fillLeftFlux(Param XParam, bool doProlongation, int ib, 
 			T w1, w2, w3;
 
 
-			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
 			
 
 			ii = memloc(XParam, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
@@ -1920,7 +1920,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			T w1, w2, w3;
 			
 
-			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
 			w1 = 1.0 / 3.0;
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
@@ -2298,7 +2298,7 @@ template <class T> void fillRightFlux(Param XParam, bool doProlongation, int ib,
 			write = memloc(XParam, XParam.blkwidth, j, ib);
 
 
-			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 
 			ii = memloc(XParam, 0, jj, XBlock.RightBot[ib]);
 			if (doProlongation)
@@ -2548,7 +2548,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			T w1, w2, w3;
 			
 
-			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
 			w1 = 1.0 / 3.0;
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
@@ -2915,7 +2915,7 @@ template <class T> void fillBotFlux(Param XParam, bool doProlongation, int ib, B
 			T w1, w2, w3;
 
 
-			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
 			
 
 			//ii = memloc(XParam, j, 0, ib);
@@ -3045,7 +3045,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			T w1, w2, w3;
 			
 
-			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(j * (T)0.5) : ceil(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
 			w1 = 1.0 / 3.0;
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
@@ -3410,7 +3410,7 @@ template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, B
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			write = memloc(XParam, j, XParam.blkwidth, ib);
-			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 						
 			ir = memloc(XParam, jj, 0, XBlock.TopLeft[ib]);
 			

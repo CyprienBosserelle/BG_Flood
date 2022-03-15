@@ -31,22 +31,29 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	int nmask = 0;
 	//int mloc = 0;
 
+	bool insidepoly = false;
+
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
-	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
-	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
+	int maxnbx = ftoi(ceil(XParam.nx / (double)XParam.blkwidth));
+	int maxnby = ftoi(ceil(XParam.ny / (double)XParam.blkwidth));
 
 	for (int nblky = 0; nblky < maxnby; nblky++)
 	{
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
+			insidepoly = true;
+			if (XForcing.AOI.active)
+			{
+				insidepoly = blockinpoly(XParam.xo + nblkx * XParam.blkwidth * levdx, XParam.yo + nblky * XParam.blkwidth * levdx, levdx, XParam.blkwidth, XForcing.AOI.poly);
+			}
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx) * levdx + 0.5 * levdx;
-					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky) * levdx + 0.5 * levdx;
+					double x = XParam.xo + (double(i) + (double)XParam.blkwidth * (double)nblkx) * levdx + 0.5 * levdx;
+					double y = XParam.yo + (double(j) + (double)XParam.blkwidth * (double)nblky) * levdx + 0.5 * levdx;
 
 					//if (x >= XForcing.Bathy.xo && x <= XForcing.Bathy.xmax && y >= XForcing.Bathy.yo && y <= XForcing.Bathy.ymax)
 					{
@@ -89,7 +96,7 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 				}
 			}
-			if (nmask < (XParam.blkwidth* XParam.blkwidth))
+			if ((nmask < (XParam.blkwidth* XParam.blkwidth)) && insidepoly)
 				nblk++;
 		}
 	}
@@ -106,7 +113,7 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 	log("\nInitializing mesh");
 	int nblk;
 
-	nblk= CalcInitnblk(XParam, XForcing);
+	nblk = CalcInitnblk(XParam, XForcing);
 		
 	XParam.nblk = nblk;
 	// allocate a few extra blocks for adaptation
@@ -117,6 +124,7 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 	//==============================
 	// Allocate CPU memory for the whole model
 	AllocateCPU(XParam.nblkmem, XParam.blksize, XParam, XModel);
+
 
 	//==============================
 	// Initialise blockinfo info
@@ -204,21 +212,27 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 	int blkid = 0;
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
+	bool insidepoly = true;
 	
-	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
-	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
+	int maxnbx = ftoi(ceil(XParam.nx / (double)XParam.blkwidth));
+	int maxnby = ftoi(ceil(XParam.ny / (double)XParam.blkwidth));
 
 	for (int nblky = 0; nblky < maxnby; nblky++)
 	{
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
+			insidepoly = true;
+			if (XForcing.AOI.active)
+			{
+				insidepoly = blockinpoly(XParam.xo + nblkx * XParam.blkwidth * levdx, XParam.yo + nblky * XParam.blkwidth * levdx, levdx, XParam.blkwidth, XForcing.AOI.poly);
+			}
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx)*levdx + 0.5 * levdx;
-					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky)*levdx + 0.5 * levdx;
+					double x = XParam.xo + (double(i) + (T)XParam.blkwidth * (T)nblkx)*levdx + 0.5 * levdx;
+					double y = XParam.yo + (double(j) + (T)XParam.blkwidth * (T)nblky)*levdx + 0.5 * levdx;
 
 					int n = memloc(XParam, i, j, blkid);
 
@@ -265,7 +279,7 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 
 				}
 			}
-			if (nmask < (XParam.blkwidth * XParam.blkwidth))
+			if ((nmask < (XParam.blkwidth * XParam.blkwidth)) && insidepoly)
 			{
 				//
 				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * levdx + 0.5 * levdx;

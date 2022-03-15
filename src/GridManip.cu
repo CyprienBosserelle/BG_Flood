@@ -211,8 +211,8 @@ template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F fo
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				n = (i+XParam.halowidth) + (j+XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
-				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
+				x = T(XParam.xo + XBlock.xo[ib] + i * blkdx);
+				y = T(XParam.yo + XBlock.yo[ib] + j * blkdx);
 
 				z[n] = interp2BUQ(x, y, T(blkdx), forcing);
 
@@ -247,18 +247,21 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-				x = XParam.xo + XBlock.xo[ib] + i * blkdx;
-				y = XParam.yo + XBlock.yo[ib] + j * blkdx;
+				x = T(XParam.xo + XBlock.xo[ib] + i * blkdx);
+				y = T(XParam.yo + XBlock.yo[ib] + j * blkdx);
 
 				// Interpolate to fill in values from the whole domain (even if the domain outspan the domain fo the bathy)
 				z[n] = interp2BUQ(x, y, T(blkdx), forcing[0]);
 
 				// now interpolat to other grids
-				for (int nf = 0; nf < forcing.size(); nf++)
+				if (forcing.size() > 1)
 				{
-					if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
+					for (int nf = 1; nf < forcing.size(); nf++)
 					{
-						z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+						if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
+						{
+							z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+						}
 					}
 				}
 
@@ -392,7 +395,7 @@ template <class T, class F> void InterpstepCPU(int nx, int ny, int hdstep, F tot
 			Uxo = Uo[i + nx*j];
 			Uxn = Un[i + nx*j];
 
-			Ux[i + nx*j] = Uxo + (totaltime - hddt*hdstep)*(Uxn - Uxo) / hddt;
+			Ux[i + nx*j] = T(Uxo + (totaltime - hddt*hdstep)*(Uxn - Uxo) / hddt);
 		}
 	}
 }
@@ -443,3 +446,8 @@ template void Copy2CartCPU<int>(int nx, int ny, int* dest, int* src);
 template void Copy2CartCPU<bool>(int nx, int ny, bool* dest, bool* src);
 template void Copy2CartCPU<float>(int nx, int ny, float* dest, float* src);
 template void Copy2CartCPU<double>(int nx, int ny, double* dest, double* src);
+
+
+
+
+

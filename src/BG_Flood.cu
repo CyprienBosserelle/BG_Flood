@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 	// Start timer to keep track of time
 	XParam.startcputime = clock();
 
-
+	
 	// Create/overwrite existing 
 	create_logfile();
 
@@ -171,6 +171,22 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 	log("Total runtime= " + std::to_string((XParam.endcputime - XParam.startcputime) / CLOCKS_PER_SEC) + " seconds");
 	log("Model Setup time= " + std::to_string((XParam.setupcputime - XParam.startcputime) / CLOCKS_PER_SEC) + " seconds");
 	log("Model runtime= " + std::to_string((XParam.endcputime - XParam.setupcputime) / CLOCKS_PER_SEC) + " seconds");
+
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		size_t free_byte;
+
+		size_t total_byte;
+
+		CUDA_CHECK(cudaMemGetInfo(&free_byte, &total_byte));
+
+		XParam.GPU_totalmem_byte = (total_byte - free_byte) - XParam.GPU_initmem_byte;
+		log("Model final memory usage= " + std::to_string((XParam.GPU_totalmem_byte) / 1024.0 / 1024.0) + " MB");
+
+	}
+
+
 	//============================================
 	// Cleanup and free memory
 	//
