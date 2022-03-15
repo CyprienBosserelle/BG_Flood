@@ -152,8 +152,8 @@ template <class T> __global__ void gradient(int halowidth, int* active, int* lev
 
 	int iright, ileft, itop, ibot;
 	// shared array index to make the code bit more readable
-	unsigned int sx = ix + halowidth;
-	unsigned int sy = iy + halowidth;
+	//unsigned int sx = ix + halowidth;
+	//unsigned int sy = iy + halowidth;
 
 
 	T a_l, a_t, a_r, a_b,a_i;
@@ -825,7 +825,7 @@ template <class T> __global__ void WetsloperesetHaloRightGPU(Param XParam, Block
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
 	int i, j, jj, ii, ir, it, itr;
-	int xminus, read;
+	int read;
 
 	int lev = XBlock.level[ib];
 
@@ -987,7 +987,7 @@ template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock,
 			
 			unsigned int ib = XBlock.active[ibl];
 			int i, j, jj, ii, ir, it, itr;
-			int xminus, read;
+			int read;
 
 			int lev = XBlock.level[ib];
 
@@ -1763,7 +1763,7 @@ template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, 
 template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	int ib;
-	int xplus;
+	//int xplus;
 
 	//T delta;
 
@@ -2075,7 +2075,7 @@ template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib,
 template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
 	int i, j, iy, jj, ii, ir, it, itr;
-	int xplus, xminus, yplus, read;
+	int yplus, read;
 
 	T delta, atop, abot;
 
@@ -2209,7 +2209,7 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
 	int i, iy, jj, ii, ir, it, itr;
-	int xplus, xminus, yminus, read;
+	int yminus, read;
 
 	T delta, atop, abot;
 
@@ -2628,7 +2628,7 @@ template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBl
 
 
 	int i, j, jj, ii, ir, it, itr;
-	int xplus, xminus, yplus, read;
+	int yplus, read;
 
 	T delta, atop, abot;
 
@@ -2772,7 +2772,7 @@ template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBl
 
 
 	int i, j, jj, ii, ir, it, itr;
-	int xplus, xminus, yplus, yminus, read;
+	int yminus, read;
 
 	T delta, atop, abot;
 

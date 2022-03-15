@@ -379,7 +379,7 @@ int readnctime(std::string filename, double * &time)
 template <class T>
 int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T * &zsa)
 {
-	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr, varerr;
+	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr;
 	double scalefac, offset, missing, fillval;
 
 	double hha,zza;
@@ -819,7 +819,7 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 	int status;
 	int ncid;
 	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
-	int uu_id, vv_id;
+	int uu_id;
 	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
 	// right now the model will catch anexception
 	printf("Reading atm pressure data. step: %d ...", steptoread);

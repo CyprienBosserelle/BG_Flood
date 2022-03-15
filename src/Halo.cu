@@ -1781,7 +1781,7 @@ template <class T> void fillLeftFlux(Param XParam, bool doProlongation, int ib, 
 		{
 			write = memloc(XParam, -1, j, ib);
 
-			T w1, w2, w3;
+			//T w1, w2, w3;
 
 
 			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
@@ -2343,7 +2343,7 @@ template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongat
 	int read;
 	int jj, ii, ir, it, itr;
 	T a_read;
-	T w1, w2, w3;
+	//T w1, w2;
 
 
 	if (RB == ib)
@@ -2912,7 +2912,7 @@ template <class T> void fillBotFlux(Param XParam, bool doProlongation, int ib, B
 		{
 			write = memloc(XParam, j, -1, ib);
 
-			T w1, w2, w3;
+			//T w1, w2, w3;
 
 
 			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
@@ -3452,7 +3452,7 @@ template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongatio
 	int read;
 	int jj, ii, ir, it, itr;
 	T a_read;
-	T w1, w2, w3;
+	//T w1, w2, w3;
 
 	if (TL == ib)
 	{

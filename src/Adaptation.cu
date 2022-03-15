@@ -600,7 +600,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 		if (XAdapt.coarsen[ib] == true)
 		{
 			double dxfac = calcres(XParam.dx, XBlock.level[ib]);
-			int xnode = int((XBlock.xo[ib]) / dxfac / XParam.blkwidth);
+			//int xnode = int((XBlock.xo[ib]) / dxfac / XParam.blkwidth);
 			//int ynode = int((XBlock.yo[ib]) / dxfac / XParam.blkwidth);
 
 			int ibr = XBlock.RightBot[ib];

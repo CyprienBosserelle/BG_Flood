@@ -423,7 +423,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 
 	//
 	//printf("%d\n", side);
-
+	/*
 	double xxmax;
 	int hor;
 	switch (side)
@@ -461,7 +461,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 			break;
 		}
 	}
-
+	*/
 
 	//printf("%f\t%f\t%f\n", xxo, xxmax, yy);
 
