@@ -490,7 +490,7 @@ bool test_wninpoly()
 	out = wn_PnPoly(1.2, 0.3, Polyblock);
 
 	success = (out == 0 && in != 0);
-
+	return success;
 }
 
 /*! \fn bool test_SegmentIntersect()

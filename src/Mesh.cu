@@ -381,7 +381,7 @@ template <class T> int CalcMaskblk(Param XParam, BlockP<T> XBlock)
 {
 	int nmask = 0;
 	bool neighbourmask = false;
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+	T leftxo, rightxo, topyo,  botyo;
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -391,12 +391,12 @@ template <class T> int CalcMaskblk(Param XParam, BlockP<T> XBlock)
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-		leftyo = XBlock.yo[ib];
+		//leftyo = XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
+		//rightyo = XBlock.yo[ib];
+		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
+		//botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
 		neighbourmask = false;
@@ -439,7 +439,7 @@ template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 	{
 		int nmask = 0;
 		bool neighbourmask = false;
-		T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+		T leftxo, rightxo,  topyo, botyo;
 
 		// Reallocate array if necessary
 		ReallocArray(XBlock.mask.nblk, 1, XBlock.mask.side);
@@ -453,12 +453,12 @@ template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 
 			leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-			leftyo = XBlock.yo[ib];
+			//leftyo = XBlock.yo[ib];
 			rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-			rightyo = XBlock.yo[ib];
-			topxo = XBlock.xo[ib];
+			//rightyo = XBlock.yo[ib];
+			//topxo = XBlock.xo[ib];
 			topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-			botxo = XBlock.xo[ib];
+			//botxo = XBlock.xo[ib];
 			botyo = XBlock.yo[ib];
 
 			neighbourmask = false;

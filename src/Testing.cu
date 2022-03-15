@@ -1843,7 +1843,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 {
 	//T maxslope = 0.45; // the mass conservation is better with smaller slopes 
 
-	bool Wall_B, Wall_R, Wall_L, Wall_T;
+	bool Wall_B;// , Wall_R, Wall_L, Wall_T;
 	//bool ctofA, ctofB, ctofC, ctofD;
 	//bool ftocA, ftocB, ftocC, ftocD;
 
@@ -2618,7 +2618,8 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 {
 	log("#####");
 	Param XParam;
-	T initVol, TheoryInput, TheoryVol, Surface;
+	T initVol, TheoryInput;
+	TheoryInput = T(0.0);
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 6)); //1<<8  = 2^8
 	XParam.xo = -0.5;
@@ -2855,7 +2856,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	
 
 	Param XParam;
-	T delta, TheoryInput, Surf;
+	T delta;
 
 	// initialise domain and required resolution
 	XParam.xo = 0;
@@ -2865,7 +2866,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	double Xmax_exp = 28.0; //minimum Xmax position (adjust to have a "full blocks" config)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
-	Surf = T((XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo));
+	//Surf = T((XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo));
 	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
 	XParam.rainbnd = true;
 	XParam.zsinit = zinit;

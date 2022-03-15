@@ -425,7 +425,7 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	//=====================================
 	// Find how many blocks are on each bnds
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+	T leftxo, rightxo,  topyo,  botyo;
 
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
 
@@ -439,12 +439,12 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-		leftyo =XBlock.yo[ib];
+		//leftyo =XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
+		//rightyo = XBlock.yo[ib];
+		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
+		//botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
 		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * levdx))
@@ -504,7 +504,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 	int blbr = 0, blbb = 0, blbl = 0, blbt = 0;
 	BlockP<T> XBlock = XModel.blocks;
 	T initlevdx = calcres(XParam.dx, XParam.initlevel);
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+	T leftxo, rightxo,  topyo, botyo;
 
 
 	// Reallocate array if necessary
@@ -523,12 +523,12 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-		leftyo = XBlock.yo[ib];
+		//leftyo = XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
+		//rightyo = XBlock.yo[ib];
+		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
+		//botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
 		if ((rightxo - (XParam.xmax-XParam.xo)) > (-1.0 * levdx))
