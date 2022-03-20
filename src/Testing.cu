@@ -691,7 +691,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 				}
 			}
 			T error = ((finalVol - initVol) - TheoryInput) / TheoryInput;
-			printf("error = %g %, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f \n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
+			printf("error = %g %%, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f \n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
 
 
 			modelgood = abs(error) < 0.05;
@@ -2032,7 +2032,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 
 	//float maxtopo = std::numeric_limits<float>::min();
-	float mintopo = 1000000000000;
+	float mintopo = 1000000000000.0f;
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
@@ -2867,7 +2867,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
 	//Surf = T((XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo));
-	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
+	XParam.nblk = ftoi(((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16));
 	XParam.rainbnd = true;
 	XParam.zsinit = zinit;
 
@@ -2914,8 +2914,8 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XForcing.Bathy[0].xmax = 28.0;
 	XForcing.Bathy[0].ymax = 1.0;
 	XForcing.Bathy[0].dx = 0.1;
-	XForcing.Bathy[0].nx = (XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1;
-	XForcing.Bathy[0].ny = (XForcing.Bathy[0].ymax - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx + 1;
+	XForcing.Bathy[0].nx = ftoi((XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1);
+	XForcing.Bathy[0].ny = ftoi((XForcing.Bathy[0].ymax - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx + 1);
 
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);

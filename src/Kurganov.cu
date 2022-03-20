@@ -6,7 +6,7 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 	
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -162,7 +162,7 @@ template <class T> __global__ void updateKurgXATMGPU(Param XParam, BlockP<T> XBl
 
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -318,7 +318,7 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -543,14 +543,14 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
 						zi = zb[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
-						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
 						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 						hn = XEv.h[ilc];
@@ -712,14 +712,14 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 
 					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
 						zi = zb[iright] + T(XParam.Pa2m) * Patm[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
-						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
 						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 						hn = XEv.h[ilc];
@@ -838,14 +838,14 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 
 					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
 						zi = zb[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
-						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
 						hn = XEv.h[ilc];
 						zn = zb[ilc];
@@ -873,7 +873,7 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -1009,7 +1009,7 @@ template <class T> __global__ void updateKurgYATMGPU(Param XParam, BlockP<T> XBl
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -1153,7 +1153,7 @@ template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XB
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -1354,14 +1354,14 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 
 					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the top halo
 					{
-						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = BLTL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
 						hi = XEv.h[itop];
 						zi = zb[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
 					{
-						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = TLBL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
 						hn = XEv.h[ibc];
 						zn = zb[ibc];

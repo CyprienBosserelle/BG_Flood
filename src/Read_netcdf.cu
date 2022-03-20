@@ -82,7 +82,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	//read the dimentions of grid, levels and time
 	int status;
 	int ncid, ndimshh, ndims;
-	double *xcoord, *ycoord, *tcoord;
+	double *xcoord, *ycoord;
 	int varid;
 
 	//int ndimsp, nvarsp, nattsp, unlimdimidp;

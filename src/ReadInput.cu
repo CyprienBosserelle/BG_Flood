@@ -204,6 +204,13 @@ Param readparamstr(std::string line, Param param)
 		param.initlevel = std::stoi(parametervalue);
 	}
 
+	paramvec = { "adaptmaxiteration","maxiterationadapt" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.adaptmaxiteration = std::stoi(parametervalue);
+	}
+
 	parameterstr = "conserveElevation";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())

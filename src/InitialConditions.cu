@@ -127,8 +127,8 @@ template void InitzbgradientGPU<float>(Param XParam, Model<float> XModel);
 template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
 	
-	int ib;
-	T levdx;
+	
+	
 	//FILE* fsSLTS;
 	// Initialise all storage involving parameters
 	//CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
@@ -226,7 +226,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 	{
 		//
 		double xl, yb, xr, yt ;
-		int n,ib;
+		int ib;
 		double levdx;
 		double dischargeArea;
 		log("\tInitializing rivers");

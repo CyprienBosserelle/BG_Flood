@@ -329,7 +329,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int isright,istop;
 	
 	T zsinside,zsnew,hnew,vnew,unew,zbnew;
@@ -356,8 +356,8 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 					
 			int ix = -1;
 
-			int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
-			int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+			int yst = isleftbot ? 0 : ftoi(XParam.blkwidth * 0.5);
+			int ynd = islefttop ? XParam.blkwidth : ftoi(XParam.blkwidth * 0.5);
 
 			for (int iy = yst; iy < ynd; iy++)
 			{
@@ -390,8 +390,8 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 
 			int iy = XParam.blkwidth;
 
-			int xst = istopleft ? 0 : XParam.blkwidth * 0.5;
-			int xnd = istopright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+			int xst = istopleft ? 0 : ftoi(XParam.blkwidth * 0.5);
+			int xnd = istopright ? XParam.blkwidth : ftoi(XParam.blkwidth * 0.5);
 
 			for (int ix = xst; ix < xnd; ix++)
 			{
@@ -424,8 +424,8 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 
 			int ix = XParam.blkwidth;
 
-			int yst = isrightbot ? 0 : XParam.blkwidth * 0.5;
-			int ynd = isrighttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+			int yst = isrightbot ? 0 : ftoi(XParam.blkwidth * 0.5);
+			int ynd = isrighttop ? XParam.blkwidth : ftoi(XParam.blkwidth * 0.5);
 
 			for (int iy = yst; iy < ynd; iy++)
 			{
@@ -459,8 +459,8 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 
 			int iy = -1;
 
-			int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
-			int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+			int xst = isbotleft ? 0 : ftoi(XParam.blkwidth * 0.5);
+			int xnd = isbotright ? XParam.blkwidth :ftoi( XParam.blkwidth * 0.5);
 
 			for (int ix = xst; ix < xnd; ix++)
 			{
@@ -498,7 +498,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ibl = blockIdx.x;
 	int ix, iy;
 
@@ -555,7 +555,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ix, iy;
 
@@ -611,7 +611,7 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ix, iy;
 
@@ -668,7 +668,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ibl = blockIdx.x;
 	int ix, iy;
 

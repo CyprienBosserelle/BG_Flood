@@ -137,7 +137,7 @@ template <class T> __global__ void gradient(int halowidth, int* active, int* lev
 	//int ix = threadIdx.x+1;
 	//int iy = threadIdx.y+1;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -437,7 +437,7 @@ template <class T> void WetsloperesetCPU(Param XParam, BlockP<T>XBlock, Evolving
 template <class T> __global__ void WetsloperesetXGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -476,7 +476,7 @@ template <class T> __global__ void WetsloperesetXGPU(Param XParam, BlockP<T>XBlo
 template <class T> __global__ void WetsloperesetYGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -516,7 +516,7 @@ template <class T> __global__ void WetsloperesetYGPU(Param XParam, BlockP<T>XBlo
 template <class T> __global__ void WetsloperesetHaloLeftGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = -1;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -665,7 +665,7 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 
 
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = -1;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -819,7 +819,7 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 template <class T> __global__ void WetsloperesetHaloRightGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = XParam.blkwidth;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -973,7 +973,7 @@ template <class T> __global__ void WetsloperesetHaloRightGPU(Param XParam, Block
 template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = XParam.blkwidth;
 	
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -986,7 +986,7 @@ template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock,
 
 			
 			unsigned int ib = XBlock.active[ibl];
-			int i, j, jj, ii, ir, it, itr;
+			int i, jj, ii, ir, it, itr;
 			int read;
 
 			int lev = XBlock.level[ib];
@@ -996,7 +996,7 @@ template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock,
 
 			i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
 
-			int iright, ileft;
+			int  ileft;
 
 			ileft = memloc(XParam.halowidth, blkmemwidth, ix - 1, iy, ib);
 
@@ -1137,7 +1137,7 @@ template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock,
 template <class T> __global__ void WetsloperesetHaloBotGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = -1;
 	int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
@@ -1288,7 +1288,7 @@ template <class T> __global__ void WetsloperesetHaloBotGPU(Param XParam, BlockP<
 template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = -1;
 	
 
@@ -1300,7 +1300,7 @@ template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, E
 
 		 
 
-		int i, j, jj, ii, ir, it, itr;
+		int i, jj, ii, ir, it, itr;
 
 		int lev = XBlock.level[ib];
 
@@ -1450,7 +1450,7 @@ template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, E
 template <class T> __global__ void WetsloperesetHaloTopGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = XParam.blkwidth;
 	int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
@@ -1604,7 +1604,7 @@ template <class T> __global__ void WetsloperesetHaloTopGPU(Param XParam, BlockP<
 template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = XParam.blkwidth;
 	
 
@@ -1612,7 +1612,7 @@ template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, 
 	{
 		unsigned int ib = XBlock.active[ibl];
 
-		int i, j, jj, ii, ir, it, itr;
+		int i, jj, ii, ir, it, itr;
 
 		int lev = XBlock.level[ib];
 
@@ -1623,7 +1623,7 @@ template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, 
 
 			i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
 
-			int itop, ibot, read;
+			int ibot, read;
 
 			ibot = memloc(XParam.halowidth, blkmemwidth, ix, iy - 1, ib);
 
@@ -1809,7 +1809,7 @@ template <class T> void gradientHaloGPU(Param XParam, BlockP<T>XBlock, T* a, T* 
 
 template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
 {
-	int i, j, ix, jj, ii, ir, it, itr;
+	int i, ix, jj, ii, ir, it, itr;
 	int xplus, read;
 	
 	T delta, aright, aleft;
@@ -2074,7 +2074,7 @@ template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib,
 
 template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
-	int i, j, iy, jj, ii, ir, it, itr;
+	int i, iy, jj, ii, ir, it, itr;
 	int yplus, read;
 
 	T delta, atop, abot;
@@ -2345,7 +2345,7 @@ template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, i
 template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = -1;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -2353,7 +2353,7 @@ template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XB
 	int i, j,  jj, ii, ir, it, itr;
 	int xplus, read;
 
-	T delta, aright, aleft, abot, atop;
+	T delta, aright, aleft;
 
 	
 
@@ -2482,7 +2482,7 @@ template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XB
 template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = XParam.blkwidth;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -2490,7 +2490,7 @@ template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>X
 	int i, j, jj, ii, ir, it, itr;
 	int xminus, read;
 
-	T delta, aright, aleft, abot, atop;
+	T delta, aright, aleft;
 
 
 
@@ -2620,7 +2620,7 @@ template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>X
 template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = -1;
 	int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
@@ -2764,7 +2764,7 @@ template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBl
 template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
-	unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = XParam.blkwidth;
 	int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;

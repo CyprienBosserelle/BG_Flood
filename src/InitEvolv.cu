@@ -368,7 +368,7 @@ template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
 	int status;
-	int ncid, ndims;
+	int ncid;
 	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
 	int ib;
 	double scalefac = 1.0;

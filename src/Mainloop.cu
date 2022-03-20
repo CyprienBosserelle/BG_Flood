@@ -179,8 +179,8 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	// GPU stuff
 	if (XParam.GPUDEVICE >= 0)
 	{
-		XLoop.blockDim = (16, 16, 1);
-		XLoop.gridDim = (XParam.nblk, 1, 1);
+		//XLoop.blockDim = (16, 16, 1);
+		//XLoop.gridDim = (XParam.nblk, 1, 1);
 	}
 
 	//XLoop.hugenegval = std::numeric_limits<T>::min();
