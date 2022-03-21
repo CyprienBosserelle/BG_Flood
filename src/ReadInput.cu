@@ -1311,8 +1311,13 @@ bndparam readbndline(std::string parametervalue)
 	else if (items.size() >= 2)
 	{
 		const char* cstr = items[1].c_str();
-		if (isdigit(cstr[0]))
+		if (items[1].length()<2)
 		{
+			if (!isdigit(cstr[0]))
+			{
+				// Error
+				//exit?
+			}
 			bnd.type = std::stoi(items[1]);
 			bnd.inputfile = items[0];
 			bnd.on = true;
