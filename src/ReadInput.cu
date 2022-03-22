@@ -394,7 +394,7 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "tWet", "vort", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "U"};
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "vort", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "U"};
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -422,7 +422,7 @@ Param readparamstr(std::string line, Param param)
 			param.outmax = (vvar.compare("Umax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("hUmax") == 0) ? true : param.outmax;
 
-			param.outtwet = (vvar.compare("tWet") == 0) ? true : param.outtwet;
+			param.outtwet = (vvar.compare("twet") == 0) ? true : param.outtwet;
 
 			param.outvort = (vvar.compare("vort") == 0) ? true : param.outvort;
 			param.outU = (vvar.compare("U") == 0) ? true : param.outU;

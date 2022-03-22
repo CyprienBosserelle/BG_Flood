@@ -88,13 +88,12 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 		if (XParam.GPUDEVICE >= 0)
 		{
 			// Add value GPU
-			addwettime_GPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.wettime, XModel_g.evolv.h, T(0.1), T(XLoop.dt));
-
+			addwettime_GPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.wettime, XModel_g.evolv.h, T(XParam.wet_threshold), T(XLoop.dt));
 		}
 		else
 		{
 			// Add value CPU
-			addwettime_CPU(XParam, XModel.blocks, XModel.wettime, XModel.evolv.h, T(0.1), T(XLoop.dt));
+			addwettime_CPU(XParam, XModel.blocks, XModel.wettime, XModel.evolv.h, T(XParam.wet_threshold), T(XLoop.dt));
 		}
 	}
 }

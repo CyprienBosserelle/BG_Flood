@@ -426,7 +426,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["U"] = XModel.U;
 
-	XModel.OutputVarMap["tWet"] = XModel.wettime;
+	XModel.OutputVarMap["twet"] = XModel.wettime;
 
 	XModel.OutputVarMap["vort"] = XModel.vort;
 }
