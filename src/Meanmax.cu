@@ -83,6 +83,20 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			max_hU_CPU(XParam, XModel.blocks, XModel.evmax.hU, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
 		}
 	}
+	if (XParam.outtwet)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			// Add value GPU
+			addwettime_GPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.wettime, XModel_g.evolv.h, T(0.1), T(XLoop.dt));
+
+		}
+		else
+		{
+			// Add value CPU
+			addwettime_CPU(XParam, XModel.blocks, XModel.wettime, XModel.evolv.h, T(0.1), T(XLoop.dt));
+		}
+	}
 }
 template void Calcmeanmax<float>(Param XParam, Loop<float>& XLoop, Model<float> XModel, Model<float> XModel_g);
 template void Calcmeanmax<double>(Param XParam, Loop<double>& XLoop, Model<double> XModel, Model<double> XModel_g);
@@ -119,6 +133,19 @@ template <class T> void resetmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMod
 			{
 				resetmaxCPU(XParam, XLoop, XModel.blocks, XModel.evmax);
 
+			}
+		}
+
+		//Reset Wet duration
+		if (XParam.outtwet && XParam.resetmax)
+		{
+			if (XParam.GPUDEVICE >= 0)
+			{
+				resetvalGPU(XParam, XModel_g.blocks, XModel_g.wettime, T(0.0));
+			}
+			else
+			{
+				resetvalCPU(XParam, XModel.blocks, XModel.wettime, T(0.0));
 			}
 		}
 	}
@@ -205,7 +232,25 @@ template void resetmeanGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float>
 template void resetmeanGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, EvolvingP_M<double>& XEv);
 
 
+template <class T> void resetvalCPU(Param XParam, BlockP<T> XBlock, T*& var, T val)
+{
 
+	InitArrayBUQ(XParam, XBlock, val, var);
+
+}
+template void resetvalCPU<float>(Param XParam, BlockP<float> XBlock, float*& var, float val);
+template void resetvalCPU<double>(Param XParam, BlockP<double> XBlock, double*& var, double val);
+
+template <class T> void resetvalGPU(Param XParam, BlockP<T> XBlock, T*& var, T val)
+{
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, val, var);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+}
+template void resetvalGPU<float>(Param XParam, BlockP<float> XBlock, float*& var, float val);
+template void resetvalGPU<double>(Param XParam, BlockP<double> XBlock, double*& var, double val);
 
 
 
@@ -429,6 +474,49 @@ template <class T> __host__ void max_hU_CPU(Param XParam, BlockP<T> XBlock, T* V
 				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
 				Var_hU = h[i] * sqrt((u[i] * u[i]) + (v[i] * v[i]));
 				Varmax[i] = utils::max(Varmax[i], Var_hU);
+			}
+		}
+	}
+
+}
+
+template <class T> __global__ void addwettime_GPU(Param XParam, BlockP<T> XBlock, T* wett, T* h, T thresold, T time)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	if (h[i] > thresold)
+	{
+		wett[i] = wett[i] + time;
+	}
+
+}
+
+
+template <class T> __host__ void addwettime_CPU(Param XParam, BlockP<T> XBlock, T* wett, T* h, T thresold, T time)
+{
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				if (h[i] > thresold)
+				{
+					wett[i] = wett[i] + time;
+				}
 			}
 		}
 	}

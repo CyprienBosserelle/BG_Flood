@@ -139,7 +139,11 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateCPU(nblk, blksize, XModel.evmean);
 	}
-	
+	if (XParam.outtwet)
+	{
+		AllocateCPU(nblk, blksize, XModel.wettime);
+	}
+
 	if (XParam.outvort)
 	{
 		AllocateCPU(nblk, blksize, XModel.vort);
@@ -295,7 +299,10 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		ReallocArray(nblk, blksize, XModel.evmean);
 	}
-
+	if (XParam.outtwet)
+	{
+		ReallocArray(nblk, blksize, XModel.wettime);
+	}
 	//ReallocArray(nx, ny, XModel.);
 
 
@@ -415,6 +422,10 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	if (XParam.outmean)
 	{
 		AllocateGPU(nblk, blksize, XModel.evmean);
+	}
+	if (XParam.outtwet)
+	{
+		AllocateGPU(nblk, blksize, XModel.wettime);
 	}
 
 	

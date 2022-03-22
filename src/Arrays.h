@@ -165,6 +165,7 @@ struct Model
 	T* U;
 	EvolvingP_M<T> evmean;
 	EvolvingP_M<T> evmax;
+	T* wettime; //Inundation duration (h > 0.1)
 
 	//Block information
 	BlockP<T> blocks;

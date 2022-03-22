@@ -207,7 +207,10 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 	{
 		CopytoGPU(nblk, blksize, XModel_cpu.evmean, XModel_gpu.evmean);
 	}
-
+	if (XParam.outtwet)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.wettime, XModel_gpu.wettime);
+	}
 }
 template void CopytoGPU<float>(int nblk, int blksize, Param XParam, Model<float> XModel_cpu, Model<float> XModel_gpu);
 template void CopytoGPU<double>(int nblk, int blksize, Param XParam, Model<double> XModel_cpu, Model<double> XModel_gpu);
