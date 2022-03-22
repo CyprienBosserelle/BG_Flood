@@ -118,7 +118,7 @@ public:
 
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
-	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
+	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax","vort", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "U";
 	Default: "zb", "zs", "u", "v", "h"
 	*/
 
@@ -128,6 +128,7 @@ public:
 	bool outmax = false;
 	bool outmean = false;
 	bool outvort = false;
+	bool outU = false;
 
 	// WARNING FOR DEBUGGING PURPOSE ONLY
 // For debugging one can shift the output by 1 or -1 in the i and j direction.

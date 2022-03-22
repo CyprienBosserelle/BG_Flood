@@ -128,7 +128,6 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
 	
 	int ib;
-	T levdx;
 	//FILE* fsSLTS;
 	// Initialise all storage involving parameters
 	//CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
@@ -356,6 +355,14 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["vort"] = XModel.vort;
 
+	XModel.OutputVarMap["Umean"] = XModel.evmean.U;
+
+	XModel.OutputVarMap["Umax"] = XModel.evmax.U;
+
+	XModel.OutputVarMap["hUmean"] = XModel.evmean.hU;
+
+	XModel.OutputVarMap["hUmax"] = XModel.evmax.hU;
+
 	//others
 
 	XModel.OutputVarMap["uo"] = XModel.evolv_o.u;
@@ -413,6 +420,8 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
 	XModel.OutputVarMap["datmpdy"] = XModel.datmpdy;
+
+	XModel.OutputVarMap["U"] = XModel.U;
 }
 
 template void Initmaparray<float>(Model<float>& XModel);

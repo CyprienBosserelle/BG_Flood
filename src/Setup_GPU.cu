@@ -134,7 +134,19 @@ template <class T> void CopytoGPU(int nblk, int blksize, EvolvingP<T> XEv_cpu, E
 	CopytoGPU(nblk, blksize, XEv_cpu.v, XEv_gpu.v);
 }
 template void CopytoGPU<float>(int nblk, int blksize, EvolvingP<float> XEv_cpu, EvolvingP<float> XEv_gpu);
-template void CopytoGPU < double >(int nblk, int blksize, EvolvingP<double> XEv_cpu, EvolvingP < double >  XEv_gpu);
+template void CopytoGPU < double >(int nblk, int blksize, EvolvingP<double> XEv_cpu, EvolvingP<double> XEv_gpu);
+
+template <class T> void CopytoGPU(int nblk, int blksize, EvolvingP_M<T> XEv_cpu, EvolvingP_M<T> XEv_gpu)
+{
+	CopytoGPU(nblk, blksize, XEv_cpu.h, XEv_gpu.h);
+	CopytoGPU(nblk, blksize, XEv_cpu.zs, XEv_gpu.zs);
+	CopytoGPU(nblk, blksize, XEv_cpu.u, XEv_gpu.u);
+	CopytoGPU(nblk, blksize, XEv_cpu.v, XEv_gpu.v);
+	CopytoGPU(nblk, blksize, XEv_cpu.U, XEv_gpu.U);
+	CopytoGPU(nblk, blksize, XEv_cpu.hU, XEv_gpu.hU);
+}
+template void CopytoGPU<float>(int nblk, int blksize, EvolvingP_M<float> XEv_cpu, EvolvingP_M<float> XEv_gpu);
+template void CopytoGPU < double >(int nblk, int blksize, EvolvingP_M<double> XEv_cpu, EvolvingP_M < double >  XEv_gpu);
 
 
 template <class T> void CopytoGPU(int nblk, int blksize, GradientsP<T> XGrad_cpu, GradientsP<T> XGrad_gpu)
@@ -189,11 +201,11 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	if (XParam.outmax)
 	{
-		CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evmax);
+		CopytoGPU(nblk, blksize, XModel_cpu.evmax, XModel_gpu.evmax);
 	}
 	if (XParam.outmean)
 	{
-		CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evmean);
+		CopytoGPU(nblk, blksize, XModel_cpu.evmean, XModel_gpu.evmean);
 	}
 
 }

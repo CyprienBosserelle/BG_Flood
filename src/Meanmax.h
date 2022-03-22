@@ -17,7 +17,10 @@ template <class T> void Initmeanmax(Param XParam, Loop<T> XLoop, Model<T> XModel
 
 template <class T> __global__ void addavg_varGPU(Param XParam, BlockP<T> XBlock, T* Varmean, T* Var);
 template <class T> __global__ void divavg_varGPU(Param XParam, BlockP<T> XBlock, T ntdiv, T* Varmean);
+template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock, T* h, T* u, T* v, T* U, T* hU);
 template <class T> __global__ void max_varGPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var);
+template <class T> __global__ void max_Norm_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2);
+template <class T> __global__ void max_hU_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2, T* Var3);
 
 // End of global definition
 #endif
