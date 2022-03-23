@@ -41,8 +41,8 @@ jobs:
           printf "0.0 0.0 0.0" >> bathy.asc
           printf "0.0 0.0 0.0" >> bathy.asc
           printf "0.0 0.0 0.0" >> bathy.asc
-          echo "test = 0;">BG_param.txt
-          echo "gpudevice = 0;"
+          echo "test = 0;" >> BG_param.txt
+          echo "gpudevice = 0;" >> BG_param.txt
           echo "bathy = bathy.asc;">>BG_param.txt
       # Compilation of the code
       - name: compilation of the code
