@@ -534,9 +534,13 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx"};
-
+	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx", "twet", "hUmax", "Umean"};
 	XParam.outvars = outv;
+
+	XParam.outmax = true;
+	XParam.outmean = true;
+	XParam.outtwet = true;
+
 	// create Model setup
 	Model<T> XModel;
 	Model<T> XModel_g;
@@ -601,6 +605,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	InitMesh(XParam, XForcing, XModel);
 
 	InitialConditions(XParam, XForcing, XModel);
+	InitialAdaptation(XParam, XForcing, XModel);
 
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
@@ -641,7 +646,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	}
 
 
-	//InitSave2Netcdf(XParam, XModel);
+	InitSave2Netcdf(XParam, XModel);
 	bool modelgood = true;
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
@@ -669,7 +674,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 				}
 			}
 
-			//Save2Netcdf(XParam, XModel);
+			Save2Netcdf(XParam, XLoop, XModel);
 			// Verify the Validity of results
 			finalVol = T(0.0);
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)

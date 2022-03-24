@@ -148,7 +148,6 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	{
 		FindTSoutNodes(XParam, XModel.blocks,XModel.bndblk);
 
-		
 	}
 	
 
