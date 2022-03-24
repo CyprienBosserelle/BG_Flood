@@ -646,7 +646,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	}
 
 
-	InitSave2Netcdf(XParam, XModel);
+	//InitSave2Netcdf(XParam, XModel);
 	bool modelgood = true;
 
 	while (XLoop.totaltime < XLoop.nextoutputtime)
@@ -674,7 +674,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 				}
 			}
 
-			Save2Netcdf(XParam, XLoop, XModel);
+			//Save2Netcdf(XParam, XLoop, XModel);
 			// Verify the Validity of results
 			finalVol = T(0.0);
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)

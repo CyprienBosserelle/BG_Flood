@@ -144,14 +144,14 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(nblk, blksize, XModel.wettime);
 	}
 
-	if (XParam.outvort)
+	/*if (XParam.outvort)
 	{
 		AllocateCPU(nblk, blksize, XModel.vort);
 	}
 	if (XParam.outU)
 	{
 		AllocateCPU(nblk, blksize, XModel.U);
-	}
+	}*/
 
 	if (XParam.TSnodesout.size() > 0)
 	{
@@ -429,14 +429,14 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	}
 
 	
-	if (XParam.outvort)
+	/*if (XParam.outvort)
 	{
 		AllocateGPU(nblk, blksize, XModel.vort);
 	}
 	if (XParam.outU)
 	{
 		AllocateGPU(nblk, blksize, XModel.U);
-	}
+	}*/
 
 	if (XParam.TSnodesout.size() > 0)
 	{

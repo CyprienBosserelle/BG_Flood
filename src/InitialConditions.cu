@@ -423,11 +423,11 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
 	XModel.OutputVarMap["datmpdy"] = XModel.datmpdy;
 
-	XModel.OutputVarMap["U"] = XModel.U;
+	//XModel.OutputVarMap["U"] = XModel.U;
 
 	XModel.OutputVarMap["twet"] = XModel.wettime;
 
-	XModel.OutputVarMap["vort"] = XModel.vort;
+	//XModel.OutputVarMap["vort"] = XModel.vort;
 }
 
 template void Initmaparray<float>(Model<float>& XModel);

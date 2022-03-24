@@ -161,8 +161,8 @@ struct Model
 	//other output
 	//std::vector< std::vector< Pointout > > TSallout;
 	T* TSstore;//buffer for TS data so not to save to disk too often
-	T* vort;
-	T* U;
+	//T* vort;
+	//T* U;
 	EvolvingP_M<T> evmean;
 	EvolvingP_M<T> evmax;
 	T* wettime; //Inundation duration (h > 0.1)
