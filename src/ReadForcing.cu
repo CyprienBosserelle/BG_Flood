@@ -1268,12 +1268,12 @@ template<class T> T readforcinghead(T ForcingParam)
 			//Check that the x and y variable are in crescent order:
 			if (ForcingParam.xmax < ForcingParam.xo)
 			{
-				log("FATAL ERROR:  x coordinate isn't in crescent order in file " + ForcingParam.inputfile);
+				log("FATAL ERROR:  x coordinate isn't in crescent order in file: " + ForcingParam.inputfile);
 				exit(1);
 			}
 			if (ForcingParam.ymax < ForcingParam.yo)
 			{
-				log("FATAL ERROR:  y coordinate isn't in crescent order in file " + ForcingParam.inputfile);
+				log("FATAL ERROR:  y coordinate isn't in crescent order in file: " + ForcingParam.inputfile);
 				exit(1);
 			}
 
