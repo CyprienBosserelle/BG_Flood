@@ -64,7 +64,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |---|---|---|---|
 |outfile|outfile| "Output.nc"|netcdf output file name|
 |TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position <br>(which will be converted to nearest grid position). <br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout: Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
-|outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy";<br>|
+|outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"<br>|
 |resetmax|resetmax| false|Switch to reset the "max" outputs after each output|
 |outishift|outishift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output |
 |outjshift|outjshift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output |
@@ -83,6 +83,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |vtk_output_time_interval|vtk_output_time_interval| 1.0|Output time step for ParaView Catalyst|
 |vtk_outputfile_root|vtk_outputfile_root| "bg_out"|output file name for ParaView Catalyst|
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
+|adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
 ---
 
 ## List of the Forcings' inputs
@@ -91,7 +92,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |---|---|---|---|---|
 |cf| cf , roughness , cfmap |(see constant in parameters)|cf=0.001;<br>cf=bottom_friction.nc?bfc;|Bottom friction coefficient map (associated to the chosen bottom friction model)|
 |Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|bathy=Westport_DEM_2020.nc?z<br>topo=Westport_DEM_2020.asc| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spherical (still in development).<br>A list of file can also be use to provide a thiner resolution localy by using the key word each time on a different line.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
-|AOI| AOI , aoipoly |N/A|AOI=myarea.gmt;|Area of interest polygon<br>the iinput file is a text file with 2 column containing the cordinat of a closed polygon (last line==first line)|
+|AOI| AOI , aoipoly |N/A|AOI=myarea.gmt;|Area of interest polygon<br>the input file is a text file with 2 columns containing the coordinate of a closed polygon (last line==first line)|
 |left| left , leftbndfile , leftbnd |1|left = 0;<br>left = leftBnd.txt,2;| 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)<br>For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first column containing time (with possibly variable time steps) and forcing values in the following columns (1 column of values corresponding to a constant value along the boundary, 2 columns correspond to values at boundary edges with linear evolution in between, n columns correspond to n regularly spaced values applied along the boundary)|
 |right| right , rightbndfile , rightbnd |1|right = 0;<br>right = rightBnd.txt,2;|Same as left boundary|
 |top| top , topbndfile , topbnd |1|top = 0;<br>top = topBnd.txt,2;|Same as left boundary|
