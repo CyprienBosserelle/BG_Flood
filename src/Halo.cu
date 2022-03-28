@@ -673,7 +673,7 @@ template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T>
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	//unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -999,7 +999,7 @@ template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock
 	int jj, i, il, itl;
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	//unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -1419,7 +1419,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 				{
 					if (XBlock.BotRight[XBlock.LeftBot[ib]] == XBlock.LeftBot[ib]) // no botom of leftbot block
 					{
-						w3 = (T)0.5 * (1.0 - w1);
+						w3 = T(0.5) * (T(1.0) - w1);
 						w2 = w3;
 						it = ir;
 
@@ -1454,7 +1454,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 				{
 					if (XBlock.TopRight[XBlock.LeftTop[ib]] == XBlock.LeftTop[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5*(1.0-w1);
+						w3 = T(0.5*(1.0-w1));
 						w2 = w3;
 						ir = it;
 
@@ -1499,7 +1499,7 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	//unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
@@ -1935,7 +1935,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.BotLeft[XBlock.RightBot[ib]] == XBlock.RightBot[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						it = ir;
 
@@ -2012,14 +2012,14 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = blockDim.y - 1;
+	//unsigned int ix = blockDim.y - 1;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
-	int LB = leftbot[ib];
+	//int LB = leftbot[ib];
 	//int BL = botleft[ib];
 	int LBRB = leftbot[RB];
 	int TLRT = topleft[RT];
@@ -2319,29 +2319,29 @@ template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongat
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = blockDim.y - 1;
+	//unsigned int ix = blockDim.y - 1;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
-	int LB = leftbot[ib];
+	//int LB = leftbot[ib];
 	//int BL = botleft[ib];
 	int LBRB = leftbot[RB];
-	int TLRT = topleft[RT];
-	int BLRB = botleft[RB];
+	//int TLRT = topleft[RT];
+	//int BLRB = botleft[RB];
 
 
 	int lev = level[ib];
 	int levRB = level[RB];
-	int levRT = level[RT];
-	int levBLRB = level[BLRB];
-	int levTLRT = level[TLRT];
+	//int levRT = level[RT];
+	//int levBLRB = level[BLRB];
+	//int levTLRT = level[TLRT];
 
 	int write = memloc(halowidth, blkmemwidth, blockDim.y, iy, ib);
 	int read;
-	int jj, ii, ir, it, itr;
+	int jj, ii, ir, it;
 	T a_read;
 	//T w1, w2;
 
@@ -2640,7 +2640,7 @@ template <class T> __global__ void fillBot(int halowidth, int* active, int* leve
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
-	unsigned int iy = 0;
+	//unsigned int iy = 0;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
@@ -3060,7 +3060,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.LeftBot[XBlock.TopLeft[ib]] == XBlock.TopLeft[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						it = ir;
 
@@ -3136,7 +3136,7 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
-	unsigned int iy = blockDim.x-1;
+	//unsigned int iy = blockDim.x-1;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
@@ -3431,26 +3431,26 @@ template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongatio
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
-	unsigned int iy = blockDim.x - 1;
+	//unsigned int iy = blockDim.x - 1;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
 	int TL = topleft[ib];
 	int TR = topright[ib];
-	int LBTL = leftbot[TL];
+	//int LBTL = leftbot[TL];
 	int BLTL = botleft[TL];
-	int RBTR = rightbot[TR];
+	//int RBTR = rightbot[TR];
 
 
 	int lev = level[ib];
 	int levTL = level[TL];
-	int levTR = level[TR];
-	int levLBTL = level[LBTL];
-	int levRBTR = level[RBTR];
+	//int levTR = level[TR];
+	//int levLBTL = level[LBTL];
+	//int levRBTR = level[RBTR];
 
 	int write = memloc(halowidth, blkmemwidth, ix, blockDim.x, ib);
 	int read;
-	int jj, ii, ir, it, itr;
+	int jj, ii, ir, it;
 	T a_read;
 	//T w1, w2, w3;
 

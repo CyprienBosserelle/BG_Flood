@@ -727,7 +727,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	//
 	int status;
 	int ncid;
-	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
+	//float NanValU = -9999, NanValV = -9999, NanValH = -9999;
 	int uu_id, vv_id;
 	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
 	// right now the model will catch anexception
@@ -740,7 +740,7 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};
-	static ptrdiff_t stridel[] = { 1, 1, 1 };
+	//static ptrdiff_t stridel[] = { 1, 1, 1 };
 
 	std::string ncfilestrU, ncfilestrV;
 	std::string Uvarstr, Vvarstr;
@@ -818,7 +818,7 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 	//
 	int status;
 	int ncid;
-	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
+	//float NanValU = -9999, NanValV = -9999, NanValH = -9999;
 	int uu_id;
 	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
 	// right now the model will catch anexception
@@ -831,7 +831,7 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 	//size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};
-	static ptrdiff_t stridel[] = { 1, 1, 1 };
+	//static ptrdiff_t stridel[] = { 1, 1, 1 };
 
 	std::string ncfilestr;
 	std::string atmpvarstr;
@@ -881,35 +881,35 @@ extern "C" void read3Dnc(int nx, int ny, int ntheta, char ncfile[], float * &ee)
 {
 	int status;
 	int ncid, ee_id;
-	static size_t count[] = { nx, ny,ntheta };
+	//static size_t count[] = { nx, ny,ntheta };
 	status = nc_open(ncfile, NC_NOWRITE, &ncid);
 	status = nc_inq_varid(ncid, "z", &ee_id);
 	status = nc_get_var_float(ncid, ee_id, ee);
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_ncerror(status);
 }
 
 extern "C" void read2Dnc(int nx, int ny, char ncfile[], float * &hh)
 {
 	int status;
 	int ncid, hh_id;
-	static size_t count[] = { nx, ny };
+	//static size_t count[] = { nx, ny };
 	status = nc_open(ncfile, NC_NOWRITE, &ncid);
 	status = nc_inq_varid(ncid, "hh", &hh_id);
 	status = nc_get_var_float(ncid, hh_id, hh);
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_ncerror(status);
 }
 
 extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
 {
 	int status;
 	int ncid, hh_id;
-	static size_t count[] = { nx, ny };
+	//static size_t count[] = { nx, ny };
 
 	status = nc_open(ncfile.c_str(), NC_NOWRITE, &ncid);
 	status = nc_inq_varid(ncid, "zb", &hh_id);
 	status = nc_get_var_float(ncid, hh_id, zb);
 	status = nc_close(ncid);
-
+	if (status != NC_NOERR) handle_ncerror(status);
 }

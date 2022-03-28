@@ -444,7 +444,7 @@ template <class T> __global__ void AddPatmforcingGPU(Param XParam, BlockP<T> XBl
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;

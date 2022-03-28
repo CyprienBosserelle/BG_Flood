@@ -23,7 +23,7 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -51,8 +51,8 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 
 
 
-	T dhdxi = XGrad.dhdx[i];
-	T dhdxmin = XGrad.dhdx[ileft];
+	//T dhdxi = XGrad.dhdx[i];
+	//T dhdxmin = XGrad.dhdx[ileft];
 	T cm = T(1.0);
 	T fmu = T(1.0);
 
@@ -244,8 +244,8 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 
 
 
-				T dhdxi = XGrad.dhdx[i];
-				T dhdxmin = XGrad.dhdx[ileft];
+				//T dhdxi = XGrad.dhdx[i];
+				//T dhdxmin = XGrad.dhdx[ileft];
 				T cm = T(1.0);
 				T fmu = T(1.0);
 
@@ -402,7 +402,7 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -430,8 +430,8 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 
 
 
-	T dhdyi = XGrad.dhdy[i];
-	T dhdymin = XGrad.dhdy[ibot];
+	//T dhdyi = XGrad.dhdy[i];
+	//T dhdymin = XGrad.dhdy[ibot];
 	T cm = T(1.0);
 	T fmu = T(1.0);
 
@@ -625,8 +625,8 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 
 
-				T dhdyi = XGrad.dhdy[i];
-				T dhdymin = XGrad.dhdy[ibot];
+				//T dhdyi = XGrad.dhdy[i];
+				//T dhdymin = XGrad.dhdy[ibot];
 				T cm = T(1.0);
 				T fmu = T(1.0);
 

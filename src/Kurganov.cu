@@ -353,7 +353,7 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 
 	T dhdxi = XGrad.dhdx[i];
 	T dhdxmin = XGrad.dhdx[ileft];
-	T cm = T(1.0);
+	//T cm = T(1.0);
 	T fmu = T(1.0);
 
 	T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
@@ -757,8 +757,8 @@ template __host__ void updateKurgXATMCPU<double>(Param XParam, BlockP<double> XB
 template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
 {
 	T delta;
-	T g = T(XParam.g);
-	T CFL = T(XParam.CFL);
+	//T g = T(XParam.g);
+	//T CFL = T(XParam.CFL);
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
 
@@ -784,8 +784,8 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 
 
 
-		T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-		T eps = T(XParam.eps) + epsi;
+		//T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+		//T eps = T(XParam.eps) + epsi;
 
 		T g = T(XParam.g);
 		T ga = T(0.5) * g;
@@ -801,7 +801,7 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 
 				T dhdxi = XGrad.dhdx[i];
 				T dhdxmin = XGrad.dhdx[ileft];
-				T cm = T(1.0);
+				//T cm = T(1.0);
 				T fmu = T(1.0);
 
 				T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
@@ -1185,7 +1185,7 @@ template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XB
 
 
 	
-	T cm = T(1.0);
+	//T cm = T(1.0);
 	T fmv = T(1.0);
 
 	T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
@@ -1587,7 +1587,7 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 
 
 
-				T cm = T(1.0);
+				//T cm = T(1.0);
 				T fmv = T(1.0);
 
 				T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;

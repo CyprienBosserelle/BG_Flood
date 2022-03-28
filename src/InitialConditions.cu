@@ -244,7 +244,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				{
 					for (int i = 0; i < XParam.blkwidth; i++)
 					{
-						int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+						//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 						
 						
 						xl = XParam.xo + XModel.blocks.xo[ib] + i * levdx - 0.5 * levdx;
@@ -431,7 +431,7 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		double espdist = 0.00000001;///WARMING
+		//double espdist = 0.00000001;///WARMING
 
 		int ib = XBlock.active[ibl];
 
@@ -515,7 +515,7 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		double espdist = 0.00000001;///WARMING
+		//double espdist = 0.00000001;///WARMING
 
 		int ib = XBlock.active[ibl];
 		T levdx = calcres(XParam.dx, XModel.blocks.level[ib]);

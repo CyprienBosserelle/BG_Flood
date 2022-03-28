@@ -210,7 +210,7 @@ template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock
 	T eps = T(XParam.eps);
 	T g = T(XParam.g);
 
-	int frictionmodel = XParam.frictionmodel;
+	//int frictionmodel = XParam.frictionmodel;
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
@@ -317,9 +317,13 @@ template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlo
 
 	bustedThreshold = ThresholdVelocity(T(XParam.VelThreshold), ui, vi);
 
-	XEvolv.u[i] = ui;
+	if (bustedThreshold)
+	{
+		XEvolv.u[i] = ui;
+		XEvolv.v[i] = vi;
+	}
 
-	XEvolv.v[i] = vi;
+
 	
 
 }
