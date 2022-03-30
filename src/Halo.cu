@@ -297,7 +297,7 @@ template <class T> void fillHaloLeftRightGPU(Param XParam, BlockP<T> XBlock, cud
 {
 
 	dim3 blockDimHaloLR(1, 16, 1);
-	dim3 blockDimHaloBT(16, 1, 1);
+	//dim3 blockDimHaloBT(16, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 
@@ -317,7 +317,7 @@ template void fillHaloLeftRightGPU<float>(Param XParam, BlockP<float> XBlock, cu
 template <class T> void fillHaloBotTopGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
-	dim3 blockDimHaloLR(1, 16, 1);
+	//dim3 blockDimHaloLR(1, 16, 1);
 	dim3 blockDimHaloBT(16, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
