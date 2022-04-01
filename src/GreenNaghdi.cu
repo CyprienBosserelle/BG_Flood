@@ -3,9 +3,7 @@
 //Copyright (C) 2018 Bosserelle                                                 //
 // This code contains an adaptation of the St Venant equation from Basilisk		//
 // See																			//
-// http://basilisk.fr/src/saint-venant.h and									//
-// S. Popinet. Quadtree-adaptive tsunami modelling. Ocean Dynamics,				//
-// doi: 61(9) : 1261 - 1285, 2011												//
+// http://basilisk.fr/src/green-naghdi.h										//
 //                                                                              //
 //This program is free software: you can redistribute it and/or modify          //
 //it under the terms of the GNU General Public License as published by          //
@@ -44,7 +42,7 @@ template <class T> T dx(int ix, int iy,int ib, T* s)
 
 */
 
-template <class T> T residual_GN_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv)
+template <class T> T residual_GN_X_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, T* Dx,T* Dy,T * resx,T* bx)
 {
 	//
 	int ib;
@@ -53,14 +51,18 @@ template <class T> T residual_GN_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T
 
 	int TL, BLTL, BL, TLBL, levTL, levBL, lev;
 
+	T alpha_d = T(1.153);
+
+	T resmax = T(0.0);
+
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
 
 		lev = XBlock.level[ib];
 
-		delta = calcres(T(XParam.dx), lev);
-		itdelta = T(1.0) / (T(2.0) * delta);
+		T delta = calcres(T(XParam.dx), lev);
+		T itdelta = T(1.0) / (T(2.0) * delta);
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -83,8 +85,11 @@ template <class T> T residual_GN_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T
 				T hleft = XEv.h[ileft];
 				T hright = XEv.h[iright];
 
-				T dxh, dxzb, dxzs, hl3, hr3, res;
-
+				T dxh, dxzb, dyzb, dxzs, hl3, hr3, res;
+				T dxeta;
+				T d2xzb, d2xyzb;
+				
+				T dxDy, dyDy,d2xyDy;
 				if (hleft >= XParam.eps && hi >= XParam.eps && hright >= XParam.eps)
 				{
 					//
@@ -112,10 +117,10 @@ template <class T> T residual_GN_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T
 					resx[i] = bx[i] -
 						(-alpha_d / 3. * (hr3 * Dx[iright] + hl3 * Dx[ileft] -
 						(hr3 + hl3) * Dx[i]) / sq(delta) +
-							hc * (alpha_d * (dxeta * dxzb + hc / T(2.) * d2xzb) + T(1.)) * Dx[i] +
-							alpha_d * hc * ((hc / 2. * d2xyzb + dxeta * dyzb)) * Dy[i] +
-								hc / T(2.) * dyzb * dxDy - sq(hc) / T(3.) * d2xyDy
-								- hc * dyDy * (dxh + dxzb) / T(2.))));
+							hi * (alpha_d * (dxeta * dxzb + hi / T(2.) * d2xzb) + T(1.)) * Dx[i] +
+							alpha_d * hi * ((hi / 2. * d2xyzb + dxeta * dyzb)) * Dy[i] +
+								hi / T(2.) * dyzb * dxDy - sq(hi) / T(3.) * d2xyDy
+								- hi * dyDy * (dxh + dxzb) / T(2.));
 					
 
 
