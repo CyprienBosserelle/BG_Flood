@@ -9,5 +9,18 @@
 #include "MemManagement.h"
 #include "Util_CPU.h"
 
+
+template <class T>
+struct GNP
+{
+	T* Dx;
+	T* Dy;
+	T* bx;
+	T* by;
+	T* resx;
+	T* resy;
+};
+
+
 // End of global definition
 #endif
