@@ -259,7 +259,7 @@ template <class T> void relax_GN_X_CPU(Param XParam, BlockP<T> XBlock, EvolvingP
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
-
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 				int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 
@@ -355,7 +355,7 @@ template <class T> void relax_GN_Y_CPU(Param XParam, BlockP<T> XBlock, EvolvingP
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
-
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 				int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 
@@ -425,6 +425,198 @@ template <class T> void relax_GN_Y_CPU(Param XParam, BlockP<T> XBlock, EvolvingP
 		}
 	}
 }
+
+
+template <class T> void prep_green_naghdi_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, T* c, T* d)
+{
+	//double dt = update_saint_venant(current, updates, dtmax);
+	//scalar h = current[0];
+	//vector u = vector(current[1]);
+
+	//T c, d;
+
+	int ib, lev;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		lev = XBlock.level[ib];
+
+		T delta = calcres(T(XParam.dx), lev);
+		T itdelta = T(1.0) / (T(2.0) * delta);
+
+		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+				int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+
+				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+				int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+
+
+				int itr = memloc(halowidth, blkmemwidth, ix + 1, iy + 1, ib);
+				int itl = memloc(halowidth, blkmemwidth, ix - 1, iy + 1, ib);
+				int ibr = memloc(halowidth, blkmemwidth, ix + 1, iy - 1, ib);
+				int ibl = memloc(halowidth, blkmemwidth, ix - 1, iy - 1, ib);
+
+
+				T ui = XEv.u[i];
+				T vi = XEv.v[i];
+
+				T dxu = (XEv.u[iright] - XEv.u[ileft]) * itdelta;
+				T dxv = (XEv.v[iright] - XEv.v[ileft]) * itdelta;
+				T dyu = (XEv.u[itop] - XEv.u[ibot]) * itdelta;
+				T dyv = (XEv.v[itop] - XEv.v[ibot]) * itdelta;
+
+				T d2xzb = ((zb[iright] + zb[ileft] - 2. * zb[i]) / sq(delta));
+				T d2yzb = ((zb[itop] + zb[ibot] - 2. * zb[i]) / sq(delta));
+
+				T d2xyzb = ((zb[itr] - zb[itl] - zb[ibr] + zb[ibl]) / sq(2. * delta));
+
+
+				//T dxux = dx(u.x), dyuy = dy(u.y);
+				c[i] = -dxu * dyv + dxv * dyu + sq(dxu + dyv);
+				d[i] = sq(ui) * d2xzb + sq(vi) * d2yzb + 2. * ui * vi * d2xyzb;
+
+
+
+
+			}
+		}
+	}
+}
+
+
+template <class T> void update_green_naghdi_X_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, GNP<T> XGn, T* c, T* d)
+{
+	int ib, lev;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		lev = XBlock.level[ib];
+
+		T delta = calcres(T(XParam.dx), lev);
+		T itdelta = T(1.0) / (T(2.0) * delta);
+
+		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+				int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+
+				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+				int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+
+
+				int itr = memloc(halowidth, blkmemwidth, ix + 1, iy + 1, ib);
+				int itl = memloc(halowidth, blkmemwidth, ix - 1, iy + 1, ib);
+				int ibr = memloc(halowidth, blkmemwidth, ix + 1, iy - 1, ib);
+				int ibl = memloc(halowidth, blkmemwidth, ix - 1, iy - 1, ib);
+
+				T hi = XEv.h[i];
+
+				T dxc = (c[iright] - c[ileft]) * itdelta;
+				T dxd = (d[iright] - d[ileft]) * itdelta;
+
+				T dxh = (XEv.h[iright] - XEv.h[ileft]) * itdelta;
+				T dxeta = (XEv.zs[iright] - XEv.zs[ileft]) * itdelta;
+				T dxzb = (zb[iright] - zb[ileft]) * itdelta;
+
+
+
+
+				T R1 = (-hi * (hi / 3. * dxc + c[i] * (dxh + dxzb / 2.)));
+				T R2 = (hi / 2. * dxd + d[i] * (dxzb + dxh));
+
+				XGn.bx[i] = XEv.h[i] * (XParam.g / alpha_d * dxeta - T(2.0) * R1 + R2);
+			}
+		}
+	}
+}
+
+
+template <class T> void update_green_naghdi_Y_CPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, GNP<T> XGn, T* c, T* d)
+{
+	int ib, lev;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		lev = XBlock.level[ib];
+
+		T delta = calcres(T(XParam.dx), lev);
+		T itdelta = T(1.0) / (T(2.0) * delta);
+
+		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+				int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+
+				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+				int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+
+
+				int itr = memloc(halowidth, blkmemwidth, ix + 1, iy + 1, ib);
+				int itl = memloc(halowidth, blkmemwidth, ix - 1, iy + 1, ib);
+				int ibr = memloc(halowidth, blkmemwidth, ix + 1, iy - 1, ib);
+				int ibl = memloc(halowidth, blkmemwidth, ix - 1, iy - 1, ib);
+
+				T hi = XEv.h[i];
+
+				T dyc = (c[itop] - c[ibot]) * itdelta;
+				T dyd = (d[itop] - d[ibot]) * itdelta;
+
+				T dyh = (XEv.h[itop] - XEv.h[ibot]) * itdelta;
+				T dyeta = (XEv.zs[itop] - XEv.zs[ibot]) * itdelta;
+				T dyzb = (zb[itop] - zb[ibot]) * itdelta;
+
+
+
+
+				T R1 = (-hi * (hi / 3. * dyc + c[i] * (dyh + dyzb / 2.)));
+				T R2 = (hi / 2. * dyd + d[i] * (dyzb + dyh));
+
+				XGn.by[i] = XEv.h[i] * (XParam.g / alpha_d * dyeta - T(2.0) * R1 + R2);
+			}
+		}
+	}
+}
+
+
+
+/*
+			foreach_dimension()
+			b.x[] = h[] * (G / alpha_d * dx(eta) - 2. * R1(h, zb, c) + R2(h, zb, d));
+	
+	scalar wet[];
+	foreach()
+		wet[] = h[] > dry;
+	scalar* list = { h, zb, wet };
+	restriction(list);
+	mgD = mg_solve((scalar*) { D }, (scalar*) { b },
+		residual_GN, relax_GN, list, mgD.nrelax);
+	vector dhu = vector(updates[1]);
+	foreach()
+		if (fabs(dx(eta)) < breaking && fabs(dy(eta)) < breaking)
+			foreach_dimension()
+			if (wet[-1] == 1 && wet[] == 1 && wet[1] == 1)
+				dhu.x[] += h[] * (G / alpha_d * dx(eta) - D.x[]);
+
+	return dt;
+}
+*/
+
+
+
 /*
 static double residual_GN(scalar* a, scalar* r, scalar* resl, void* data)
 {
