@@ -8,7 +8,7 @@ template <class T> __global__ void bottomfrictionGPU(Param XParam, BlockP<T> XBl
 	// Taub=cf*rho*U*sqrt(U^2+V^2)
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -201,7 +201,7 @@ template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock
 	// Taub=cf*rho*U*sqrt(U^2+V^2)
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -210,7 +210,7 @@ template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock
 	T eps = T(XParam.eps);
 	T g = T(XParam.g);
 
-	int frictionmodel = XParam.frictionmodel;
+	//int frictionmodel = XParam.frictionmodel;
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
@@ -298,7 +298,7 @@ template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlo
 	
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -317,9 +317,13 @@ template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlo
 
 	bustedThreshold = ThresholdVelocity(T(XParam.VelThreshold), ui, vi);
 
-	XEvolv.u[i] = ui;
+	if (bustedThreshold)
+	{
+		XEvolv.u[i] = ui;
+		XEvolv.v[i] = vi;
+	}
 
-	XEvolv.v[i] = vi;
+
 	
 
 }
@@ -335,7 +339,7 @@ template __global__ void TheresholdVelGPU<double>(Param XParam, BlockP<double> X
 template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
 {
 
-	T ui, vi, normu;
+	T ui, vi;
 
 	int ib;
 	int halowidth = XParam.halowidth;

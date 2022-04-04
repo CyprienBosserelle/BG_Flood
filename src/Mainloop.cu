@@ -179,8 +179,8 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	// GPU stuff
 	if (XParam.GPUDEVICE >= 0)
 	{
-		XLoop.blockDim = (16, 16, 1);
-		XLoop.gridDim = (XParam.nblk, 1, 1);
+		//XLoop.blockDim = (16, 16, 1);
+		//XLoop.gridDim = (XParam.nblk, 1, 1);
 	}
 
 	//XLoop.hugenegval = std::numeric_limits<T>::min();
@@ -348,7 +348,7 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;

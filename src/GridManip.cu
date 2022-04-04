@@ -291,7 +291,8 @@ template <class T, class F> T interp2BUQ(T x, T y, T dx, F forcing)
 
 template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 {
-	double xmin, xmax, ymin, ymax,z;
+	double xmin, xmax, ymin, ymax;
+	T z;
 	int imin,imax,jmin,jmax,ni, nj,cfi,cfj;
 
 

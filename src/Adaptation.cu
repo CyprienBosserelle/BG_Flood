@@ -11,7 +11,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 
 	int niteration = 0;
 
-	int maxiteration = 20;
+	int maxiteration = XParam.adaptmaxiteration;
 	//fillHalo(XParam, XModel.blocks, XModel.evolv_o);
 	//fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 	if (XParam.maxlevel != XParam.minlevel)
@@ -775,7 +775,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-		int ii, ir, it, itr;
+		
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 
@@ -861,7 +861,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-		int i, ii, ir, it, itr;
+		
 		if (ib >= 0 && (XAdapt.newlevel[ib] < XBlock.level[ib])) // ib can be -1 for newly inactive blocks
 		{
 			if (XAdapt.newlevel[XBlock.LeftBot[ib]] <= XAdapt.newlevel[ib])
@@ -930,7 +930,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 		//
 
 		int ib = XBlock.active[ibl];
-		int o, oo, ooo, oooo;
+		int o;
 		int  ii, ir, it,itr;
 
 
@@ -1010,20 +1010,21 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				double xoblk = XBlock.xo[ib] - 0.5 * delx;
 				double yoblk = XBlock.yo[ib] - 0.5 * delx;
 
-				int oldtopleft, oldleftbot, oldrightbot, oldbotleft;
+				int oldtopleft, oldrightbot;
+				//int oldleftbot, oldbotleft;
 				int oldtopright, oldlefttop, oldrighttop, oldbotright;
 
 
 				oldtopleft = XBlock.TopLeft[ib];
 				oldtopright = XBlock.TopRight[ib];
 
-				oldbotleft = XBlock.BotLeft[ib];
+				//oldbotleft = XBlock.BotLeft[ib];
 				oldbotright = XBlock.BotRight[ib];
 
 				oldrightbot = XBlock.RightBot[ib];
 				oldrighttop = XBlock.RightTop[ib];
 
-				oldleftbot = XBlock.LeftBot[ib];
+				//oldleftbot = XBlock.LeftBot[ib];
 				oldlefttop = XBlock.LeftTop[ib];
 
 				// One block becomes 4 blocks:
@@ -1701,7 +1702,7 @@ template <class T> void Adaptationcleanup(Param &XParam, BlockP<T>& XBlock, Adap
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		//
-		int oldlevel;
+		
 		int ib = XBlock.active[ibl];
 
 

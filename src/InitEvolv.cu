@@ -124,7 +124,7 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 	}
 	
 	coldstartsucess = 1;
-	return coldstartsucess = 1;
+	return coldstartsucess;
 }
 
 
@@ -368,11 +368,11 @@ template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
 	int status;
-	int ncid, ndims;
+	int ncid;
 	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
 	int ib;
-	double scalefac = 1.0;
-	double offset = 0.0;
+	//double scalefac = 1.0;
+	//double offset = 0.0;
 	
 	std::string zbname, zsname, hname, uname, vname, xname, yname;
 	// Open the file for read access

@@ -212,7 +212,7 @@ struct Forcing
 	AOIinfo AOI;
 	/*Area of interest polygon
 	Ex: AOI=myarea.gmt;
-	the iinput file is a text file with 2 column containing the cordinat of a closed polygon (last line==first line)
+	the input file is a text file with 2 columns containing the coordinate of a closed polygon (last line==first line)
 	Default: N/A
 	*/
 	

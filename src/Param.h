@@ -193,7 +193,7 @@ public:
 	std::string AdaptCrit;
 	int* AdaptCrit_funct_pointer;
 	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
-
+	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
 
 };
 

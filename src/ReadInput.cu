@@ -203,6 +203,13 @@ Param readparamstr(std::string line, Param param)
 		param.initlevel = std::stoi(parametervalue);
 	}
 
+	paramvec = { "adaptmaxiteration","maxiterationadapt" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.adaptmaxiteration = std::stoi(parametervalue);
+	}
+
 	parameterstr = "conserveElevation";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -762,37 +769,15 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.left.type = std::stoi(items[0]);
+		forcing.left = readbndline(parametervalue);
 			
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.left.type = std::stoi(items[1]);
-			forcing.left.inputfile = items[0];
-			forcing.left.on = true;
-		}
-				
 	}
 	
 	paramvec = { "right","rightbndfile","rightbnd"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.right.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.right.type = std::stoi(items[1]);
-			forcing.right.inputfile = items[0];
-			forcing.right.on = true;
-		}
+		forcing.right = readbndline(parametervalue);
 
 	}
 
@@ -800,38 +785,14 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.top.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.top.type = std::stoi(items[1]);
-			forcing.top.inputfile = items[0];
-			forcing.top.on = true;
-		}
-
+		forcing.top = readbndline(parametervalue);
 	}
 
 	paramvec = { "bot","botbndfile","botbnd","bottom" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.bot.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.bot.type = std::stoi(items[1]);
-			forcing.bot.inputfile = items[0];
-			forcing.bot.on = true;
-		}
-
+		forcing.bot = readbndline(parametervalue);
 	}
 
 
@@ -1361,3 +1322,39 @@ std::size_t case_insensitive_compare(std::string s1, std::string s2)
 //if (s1.compare(s2) == 0)
 	return s1.compare(s2);
 }
+
+bndparam readbndline(std::string parametervalue)
+{
+	bndparam bnd;
+	std::vector<std::string> items = split(parametervalue, ',');
+	if (items.size() == 1)
+	{
+		bnd.type = std::stoi(items[0]);
+
+	}
+	else if (items.size() >= 2)
+	{
+		const char* cstr = items[1].c_str();
+		if (items[1].length()<2)
+		{
+			if (!isdigit(cstr[0]))
+			{
+				// Error
+				//exit?
+			}
+			bnd.type = std::stoi(items[1]);
+			bnd.inputfile = items[0];
+			bnd.on = true;
+		}
+		else
+		{
+			bnd.type = std::stoi(items[0]);
+			bnd.inputfile = items[1];
+			bnd.on = true;
+		}
+	}
+	return bnd;
+}
+
+
+
