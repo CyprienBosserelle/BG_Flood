@@ -297,7 +297,7 @@ template <class T> void fillHaloLeftRightGPU(Param XParam, BlockP<T> XBlock, cud
 {
 
 	dim3 blockDimHaloLR(1, 16, 1);
-	dim3 blockDimHaloBT(16, 1, 1);
+	//dim3 blockDimHaloBT(16, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 
@@ -317,7 +317,7 @@ template void fillHaloLeftRightGPU<float>(Param XParam, BlockP<float> XBlock, cu
 template <class T> void fillHaloBotTopGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
-	dim3 blockDimHaloLR(1, 16, 1);
+	//dim3 blockDimHaloLR(1, 16, 1);
 	dim3 blockDimHaloBT(16, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
@@ -672,8 +672,8 @@ template void refine_linear_Left<double>(Param XParam, int ib, BlockP<double> XB
 template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx,T*dzdy)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -708,7 +708,7 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 {
 	if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib] ) * T(0.25);
+		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib] ) * T(0.25);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
@@ -731,7 +731,7 @@ template void refine_linear_Right<double>(Param XParam, int ib, BlockP<double> X
 template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -765,7 +765,7 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 {
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib]) * T(0.25);
 		for (int i = 0; i < XParam.blkwidth; i++)
 		{
 			int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(floor(i * (T)0.5)) : ftoi(floor(i * (T)0.5) + XParam.blkwidth / 2);
@@ -773,7 +773,7 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 			int write = memloc(XParam, i, -1, ib);
 			
 			T facbt = T(-1.0);
-			T faclr = floor(i * (T)0.5) * T(2.0) > i ? 1.0 : -1.0;
+			T faclr = floor(i * (T)0.5) * T(2.0) > i ? T(1.0) : T(-1.0);
 
 			T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -790,7 +790,7 @@ template void refine_linear_Bot<double>(Param XParam, int ib, BlockP<double> XBl
 template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
 	unsigned int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
@@ -830,7 +830,7 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 			int write = memloc(XParam, i, XParam.blkwidth, ib);
 			
 			T facbt = T(1.0);
-			T faclr = floor(i * (T)0.5) * T(2.0) > i ? 1.0 : -1.0;
+			T faclr = floor(i * (T)0.5) * T(2.0) > i ? T(1.0) : T(-1.0);
 
 			T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -846,7 +846,7 @@ template void refine_linear_Top<double>(Param XParam, int ib, BlockP<double> XBl
 template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
 	unsigned int ix = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
@@ -998,8 +998,8 @@ template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock
 {
 	int jj, i, il, itl;
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
@@ -1192,7 +1192,7 @@ template <class T> __global__ void HaloFluxGPUBT(Param XParam, BlockP<T> XBlock,
 {
 	int jj, i, il, itl;
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	//unsigned int iy = threadIdx.x;
 	unsigned int ibl = blockIdx.x;
@@ -1419,7 +1419,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 				{
 					if (XBlock.BotRight[XBlock.LeftBot[ib]] == XBlock.LeftBot[ib]) // no botom of leftbot block
 					{
-						w3 = (T)0.5 * (1.0 - w1);
+						w3 = T(0.5) * (T(1.0) - w1);
 						w2 = w3;
 						it = ir;
 
@@ -1454,16 +1454,16 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 				{
 					if (XBlock.TopRight[XBlock.LeftTop[ib]] == XBlock.LeftTop[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5*(1.0-w1);
+						w3 = T(0.5*(1.0-w1));
 						w2 = w3;
 						ir = it;
 
 					}
 					else if (XBlock.level[XBlock.TopRight[XBlock.LeftTop[ib]]] < XBlock.level[XBlock.LeftTop[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 1.0 / 10.0;
-						w3 = 5.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(1.0 / 10.0);
+						w3 = T(5.0 / 10.0);
 						ir = memloc(XParam, XParam.blkwidth - 1,0, XBlock.TopRight[XBlock.LeftTop[ib]]);
 					}
 					else if (XBlock.level[XBlock.TopRight[XBlock.LeftTop[ib]]] == XBlock.level[XBlock.LeftTop[ib]]) // exists with same level
@@ -1472,9 +1472,9 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 					}
 					else if (XBlock.level[XBlock.TopRight[XBlock.LeftTop[ib]]] > XBlock.level[XBlock.LeftTop[ib]]) // exists with higher level
 					{
-						w1 = 1.0 / 4.0;
-						w2 = 1.0 / 2.0;
-						w3 = 1.0 / 4.0;
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
 						ir = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.TopRight[XBlock.LeftTop[ib]]);
 					}
 				}
@@ -1498,8 +1498,8 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 template <class T> __global__ void fillLeft(int halowidth, int* active, int * level, int* leftbot, int * lefttop, int * rightbot, int* botright,int * topright, T * a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = 0;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
@@ -1672,7 +1672,7 @@ template <class T> void fillLeftFlux(Param XParam, bool doProlongation, int ib, 
 {
 	int jj, bb;
 	int read, write;
-	int ii, ir, it, itr;
+	int ii,  it;
 
 
 	if (XBlock.LeftBot[ib] == ib)//The lower half is a boundary 
@@ -1921,7 +1921,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			
 
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
-			w1 = 1.0 / 3.0;
+			w1 = T(1.0 / 3.0);
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
 
@@ -1935,16 +1935,16 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.BotLeft[XBlock.RightBot[ib]] == XBlock.RightBot[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						it = ir;
 
 					}
 					else if (XBlock.level[XBlock.BotLeft[XBlock.RightBot[ib]]] < XBlock.level[XBlock.RightBot[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 5.0 / 10.0;
-						w3 = 1.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(5.0 / 10.0);
+						w3 = T(1.0 / 10.0);
 						it = memloc(XParam, 0, XParam.blkwidth - 1, XBlock.BotLeft[XBlock.RightBot[ib]]);
 					}
 					else if (XBlock.level[XBlock.BotLeft[XBlock.RightBot[ib]]] == XBlock.level[XBlock.RightBot[ib]]) // exists with same level
@@ -1953,9 +1953,9 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					}
 					else if (XBlock.level[XBlock.BotLeft[XBlock.RightBot[ib]]] > XBlock.level[XBlock.RightBot[ib]]) // exists with higher level
 					{
-						w1 = 1.0 / 4.0;
-						w2 = 1.0 / 2.0;
-						w3 = 1.0 / 4.0;
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
 						it = memloc(XParam, 0, XParam.blkwidth - 1, XBlock.BotLeft[XBlock.RightBot[ib]]);
 					}
 
@@ -1970,16 +1970,16 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.TopLeft[XBlock.RightTop[ib]] == XBlock.RightTop[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						ir = it;
 
 					}
 					else if (XBlock.level[XBlock.TopLeft[XBlock.RightTop[ib]]] < XBlock.level[XBlock.RightTop[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 1.0 / 10.0;
-						w3 = 5.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(1.0 / 10.0);
+						w3 = T(5.0 / 10.0);
 						ir = memloc(XParam, 0, 0, XBlock.TopLeft[XBlock.RightTop[ib]]);
 					}
 					else if (XBlock.level[XBlock.TopLeft[XBlock.RightTop[ib]]] == XBlock.level[XBlock.RightTop[ib]]) // exists with same level
@@ -2011,16 +2011,16 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 template <class T> __global__ void fillRight(int halowidth, int* active, int* level, int * rightbot,int* righttop,int * leftbot,int*botleft,int* topleft, T* a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = blockDim.y - 1;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = blockDim.y - 1;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
-	int LB = leftbot[ib];
-	int BL = botleft[ib];
+	//int LB = leftbot[ib];
+	//int BL = botleft[ib];
 	int LBRB = leftbot[RB];
 	int TLRT = topleft[RT];
 	int BLRB = botleft[RB];
@@ -2187,7 +2187,7 @@ template <class T> void fillRightFlux(Param XParam, bool doProlongation, int ib,
 {
 	int jj, bb;
 	int read, write;
-	int ii, ir, it, itr;
+	int ii, it;
 
 
 	if (XBlock.RightBot[ib] == ib)//The lower half is a boundary 
@@ -2318,30 +2318,30 @@ template void fillRightFlux<double>(Param XParam, bool doProlongation, int ib, B
 template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = blockDim.y - 1;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = blockDim.y - 1;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
-	int LB = leftbot[ib];
-	int BL = botleft[ib];
+	//int LB = leftbot[ib];
+	//int BL = botleft[ib];
 	int LBRB = leftbot[RB];
-	int TLRT = topleft[RT];
-	int BLRB = botleft[RB];
+	//int TLRT = topleft[RT];
+	//int BLRB = botleft[RB];
 
 
 	int lev = level[ib];
 	int levRB = level[RB];
-	int levRT = level[RT];
-	int levBLRB = level[BLRB];
-	int levTLRT = level[TLRT];
+	//int levRT = level[RT];
+	//int levBLRB = level[BLRB];
+	//int levTLRT = level[TLRT];
 
 	int write = memloc(halowidth, blkmemwidth, blockDim.y, iy, ib);
 	int read;
-	int jj, ii, ir, it, itr;
+	int jj, ii, ir, it;
 	T a_read;
 	//T w1, w2;
 
@@ -2549,7 +2549,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			
 
 			int jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
-			w1 = 1.0 / 3.0;
+			w1 = T(1.0 / 3.0);
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
 
@@ -2563,16 +2563,16 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.LeftTop[XBlock.BotLeft[ib]] == XBlock.BotLeft[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						it = ir;
 
 					}
 					else if (XBlock.level[XBlock.LeftTop[XBlock.BotLeft[ib]]] < XBlock.level[XBlock.BotLeft[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 5.0 / 10.0;
-						w3 = 1.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(5.0 / 10.0);
+						w3 = T(1.0 / 10.0);
 						it = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.LeftTop[XBlock.BotLeft[ib]]);
 					}
 					else if (XBlock.level[XBlock.LeftTop[XBlock.BotLeft[ib]]] == XBlock.level[XBlock.BotLeft[ib]]) // exists with same level
@@ -2581,9 +2581,9 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					}
 					else if (XBlock.level[XBlock.LeftTop[XBlock.BotLeft[ib]]] > XBlock.level[XBlock.BotLeft[ib]]) // exists with higher level
 					{
-						w1 = 1.0 / 4.0;
-						w2 = 1.0 / 2.0;
-						w3 = 1.0 / 4.0;
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
 						it = memloc(XParam, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.LeftTop[XBlock.BotLeft[ib]]);
 					}
 
@@ -2598,16 +2598,16 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.RightTop[XBlock.BotRight[ib]] == XBlock.BotRight[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						ir = it;
 
 					}
 					else if (XBlock.level[XBlock.RightTop[XBlock.BotRight[ib]]] < XBlock.level[XBlock.BotRight[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 1.0 / 10.0;
-						w3 = 5.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(1.0 / 10.0);
+						w3 = T(5.0 / 10.0);
 						ir = memloc(XParam, 0,XParam.blkwidth - 1, XBlock.RightTop[XBlock.BotRight[ib]]);
 					}
 					else if (XBlock.level[XBlock.RightTop[XBlock.BotRight[ib]]] == XBlock.level[XBlock.BotRight[ib]]) // exists with same level
@@ -2616,9 +2616,9 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					}
 					else if (XBlock.level[XBlock.RightTop[XBlock.BotRight[ib]]] > XBlock.level[XBlock.BotRight[ib]]) // exists with higher level
 					{
-						w1 = 1.0 / 4.0;
-						w2 = 1.0 / 2.0;
-						w3 = 1.0 / 4.0;
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
 						ir = memloc(XParam,0,XParam.blkwidth - 1, XBlock.RightTop[XBlock.BotRight[ib]]);
 					}
 				}
@@ -2638,9 +2638,9 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 template <class T> __global__ void fillBot(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, T* a)
 {
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
-	unsigned int iy = 0;
+	//unsigned int iy = 0;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
@@ -2803,7 +2803,7 @@ template <class T> void fillBotFlux(Param XParam, bool doProlongation, int ib, B
 {
 	int jj, bb;
 	int read, write;
-	int ii, ir, it, itr;
+	int ii, ir, it;
 
 
 	if (XBlock.BotLeft[ib] == ib)//The lower half is a boundary 
@@ -3046,7 +3046,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 			
 
 			int jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(ceil(j * (T)0.5)) : ftoi(ceil(j * (T)0.5) + XParam.blkwidth / 2);
-			w1 = 1.0 / 3.0;
+			w1 = T(1.0 / 3.0);
 			w2 = ceil(j * (T)0.5) * 2 > j ? T(1.0 / 6.0) : T(0.5);
 			w3 = ceil(j * (T)0.5) * 2 > j ? T(0.5) : T(1.0 / 6.0);
 
@@ -3060,16 +3060,16 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.LeftBot[XBlock.TopLeft[ib]] == XBlock.TopLeft[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						it = ir;
 
 					}
 					else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] < XBlock.level[XBlock.TopLeft[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 5.0 / 10.0;
-						w3 = 1.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(5.0 / 10.0);
+						w3 = T(1.0 / 10.0);
 						it = memloc(XParam, XParam.blkwidth - 1,0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
 					}
 					else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] == XBlock.level[XBlock.TopLeft[ib]]) // exists with same level
@@ -3078,9 +3078,9 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					}
 					else if (XBlock.level[XBlock.LeftBot[XBlock.TopLeft[ib]]] > XBlock.level[XBlock.TopLeft[ib]]) // exists with higher level
 					{
-						w1 = 1.0 / 4.0;
-						w2 = 1.0 / 2.0;
-						w3 = 1.0 / 4.0;
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
 						it = memloc(XParam, XParam.blkwidth - 1, 0, XBlock.LeftBot[XBlock.TopLeft[ib]]);
 					}
 
@@ -3095,16 +3095,16 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 				{
 					if (XBlock.RightBot[XBlock.TopRight[ib]] == XBlock.TopRight[ib]) // no botom of leftbot block
 					{
-						w3 = 0.5 * (1.0 - w1);
+						w3 = T(0.5 * (1.0 - w1));
 						w2 = w3;
 						ir = it;
 
 					}
 					else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] < XBlock.level[XBlock.TopRight[ib]]) // exists but is coarser
 					{
-						w1 = 4.0 / 10.0;
-						w2 = 1.0 / 10.0;
-						w3 = 5.0 / 10.0;
+						w1 = T(4.0 / 10.0);
+						w2 = T(1.0 / 10.0);
+						w3 = T(5.0 / 10.0);
 						ir = memloc(XParam, 0, 0, XBlock.RightBot[XBlock.TopRight[ib]]);
 					}
 					else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] == XBlock.level[XBlock.TopRight[ib]]) // exists with same level
@@ -3113,9 +3113,9 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 					}
 					else if (XBlock.level[XBlock.RightBot[XBlock.TopRight[ib]]] > XBlock.level[XBlock.TopRight[ib]]) // exists with higher level
 					{
-						w1 = 1.0 / 4.0;
-						w2 = 1.0 / 2.0;
-						w3 = 1.0 / 4.0;
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
 						ir = memloc(XParam, 0,0, XBlock.RightBot[XBlock.TopRight[ib]]);
 					}
 				}
@@ -3134,9 +3134,9 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 template <class T> __global__ void fillTop(int halowidth, int* active, int* level,int * topleft, int * topright,int * botleft, int* leftbot, int* rightbot,  T* a)
 {
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
-	unsigned int iy = blockDim.x-1;
+	//unsigned int iy = blockDim.x-1;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
@@ -3302,7 +3302,7 @@ template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, B
 {
 	int jj, bb;
 	int read, write;
-	int ii, ir, it, itr;
+	int ii, ir, it;
 
 
 	if (XBlock.TopLeft[ib] == ib)//The lower half is a boundary 
@@ -3429,28 +3429,28 @@ template void fillTopFlux<double>(Param XParam, bool doProlongation, int ib, Blo
 template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
 {
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
-	unsigned int iy = blockDim.x - 1;
+	//unsigned int iy = blockDim.x - 1;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = active[ibl];
 
 	int TL = topleft[ib];
 	int TR = topright[ib];
-	int LBTL = leftbot[TL];
+	//int LBTL = leftbot[TL];
 	int BLTL = botleft[TL];
-	int RBTR = rightbot[TR];
+	//int RBTR = rightbot[TR];
 
 
 	int lev = level[ib];
 	int levTL = level[TL];
-	int levTR = level[TR];
-	int levLBTL = level[LBTL];
-	int levRBTR = level[RBTR];
+	//int levTR = level[TR];
+	//int levLBTL = level[LBTL];
+	//int levRBTR = level[RBTR];
 
 	int write = memloc(halowidth, blkmemwidth, ix, blockDim.x, ib);
 	int read;
-	int jj, ii, ir, it, itr;
+	int jj, ii, ir, it;
 	T a_read;
 	//T w1, w2, w3;
 

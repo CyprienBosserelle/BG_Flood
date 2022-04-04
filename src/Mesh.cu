@@ -282,8 +282,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 			if ((nmask < (XParam.blkwidth * XParam.blkwidth)) && insidepoly)
 			{
 				//
-				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * levdx + 0.5 * levdx;
-				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * levdx + 0.5 * levdx;
+				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * levdx + T(0.5) * levdx;
+				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * levdx + T(0.5) * levdx;
 				XBlock.active[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;

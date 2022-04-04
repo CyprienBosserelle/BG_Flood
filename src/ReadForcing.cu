@@ -1391,8 +1391,9 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 template <class T> void readbathyMD(std::string filename, T*& zb)
 {
 	// Shit that doesn'y wor... Needs fixing 
-	int nx, ny;
-	float dx, grdalpha;
+	int nx;
+	//int ny;
+	//float dx;
 	std::ifstream fs(filename);
 
 	if (fs.fail()) {
@@ -1434,9 +1435,9 @@ template <class T> void readbathyMD(std::string filename, T*& zb)
 		}
 
 		nx = std::stoi(lineelements[0]);
-		ny = std::stoi(lineelements[1]);
-		dx = std::stof(lineelements[2]);
-		grdalpha = std::stof(lineelements[4]);
+		//ny = std::stoi(lineelements[1]);
+		//dx = std::stof(lineelements[2]);
+		//grdalpha = std::stof(lineelements[4]);
 	}
 
 	int j = 0;

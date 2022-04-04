@@ -273,7 +273,7 @@ template <class T> __global__ void addavg_varGPU(Param XParam, BlockP<T> XBlock,
 
 template <class T> __host__ void addavg_varCPU(Param XParam, BlockP<T> XBlock, T* Varmean, T* Var)
 {
-	int ib, n;
+	int ib;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
@@ -309,7 +309,7 @@ template <class T> __global__ void divavg_varGPU(Param XParam, BlockP<T> XBlock,
 
 template <class T> __host__ void divavg_varCPU(Param XParam, BlockP<T> XBlock, T ntdiv, T* Varmean)
 {
-	int ib, n;
+	int ib;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
@@ -419,7 +419,7 @@ template <class T> __global__ void max_hU_GPU(Param XParam, BlockP<T> XBlock, T*
 
 template <class T> __host__ void max_varCPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var)
 {
-	int ib, n;
+	int ib;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];

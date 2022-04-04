@@ -118,7 +118,7 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 
-				T fc = (T)XParam.lat * pi / T(21600.0);
+				T fc = T(XParam.lat * pi / 21600.0);
 
 				int iright, itop;
 
@@ -277,7 +277,7 @@ template <class T> __global__ void cleanupGPU(Param XParam, BlockP<T> XBlock, Ev
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;

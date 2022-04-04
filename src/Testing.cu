@@ -696,7 +696,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 				}
 			}
 			T error = ((finalVol - initVol) - TheoryInput) / TheoryInput;
-			printf("error = %g %, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f \n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
+			printf("error = %g %%, initial volume=%4.4f; final Volume=%4.4f; abs. difference=%4.4f, Theoretical  input=%4.4f \n", error, initVol, finalVol, abs(finalVol - initVol), TheoryInput);
 
 
 			modelgood = abs(error) < 0.05;
@@ -1854,12 +1854,12 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 
 
 	std::string details;
-	int Dir, Bound_type;
+	int Bound_type;
 
 	
 	XParam.GPUDEVICE = 0;
 	maxslope = 0.0;
-	Dir = 3;
+	//Dir = 3;
 	Bound_type = -1;
 	Wall_B = RiverOnBoundary(XParam, maxslope, 3, Bound_type);
 	//Wall_R = RiverOnBoundary(XParam, maxslope, 0, 0);
@@ -2037,7 +2037,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 
 	//float maxtopo = std::numeric_limits<float>::min();
-	float mintopo = 1000000000000;
+	float mintopo = 1000000000000.0f;
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
@@ -2497,7 +2497,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 		sr = ga * (hCNl + hn) * (zn - zCN);
 
 
-		printf("etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n", etar,etal,zCN,zi,zn,zA, zr,zl);
+		printf("dt=%f; etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n",dt, etar,etal,zCN,zi,zn,zA, zr,zl);
 
 
 		printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hCNl=%f; hCNr=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", hi, hn, fh, fu, sl, sr, hCNl, hCNr, hr, hl, zr, zl);
@@ -2872,7 +2872,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
 	//Surf = T((XParam.xmax - XParam.xo) * (XParam.ymax - XParam.yo));
-	XParam.nblk = ((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16);
+	XParam.nblk = ftoi(((XParam.xmax - XParam.xo) / XParam.dx / 16) * ((XParam.ymax - XParam.yo) / XParam.dx / 16));
 	XParam.rainbnd = true;
 	XParam.zsinit = zinit;
 
@@ -2919,8 +2919,8 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XForcing.Bathy[0].xmax = 28.0;
 	XForcing.Bathy[0].ymax = 1.0;
 	XForcing.Bathy[0].dx = 0.1;
-	XForcing.Bathy[0].nx = (XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1;
-	XForcing.Bathy[0].ny = (XForcing.Bathy[0].ymax - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx + 1;
+	XForcing.Bathy[0].nx = ftoi((XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1);
+	XForcing.Bathy[0].ny = ftoi((XForcing.Bathy[0].ymax - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx + 1);
 
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
@@ -2954,9 +2954,9 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	//XForcing.bot.type = 0;
 
 	//Value definition for surface rain fall
-	T r1 = 3888; // mm/hr
-	T r2 = 2296.8; //mm/hr
-	T r3 = 2880; //mm/hr
+	T r1 = T(3888.0); // mm/hr
+	T r2 = T(2296.8); //mm/hr
+	T r3 = T(2880.0); //mm/hr
 	T Q = (r1 + r2 + r3) / 3;
 	//TheoryInput = Q * XParam.outputtimestep / T(1000.0) / T(3600.0) * Surf; //m3/s
 	//printf("# Theoretical volume of water input during the simulation in m3: %f , from a mean rain input of: %f mm/hr.\n", TheoryInput, Q);
@@ -3175,7 +3175,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 
 		// Getting the coordinate for the flux calculation
-		int bl, ixx, ibl, ix, ib, n;
+		int bl, ixx, ibl, ix, ib;
 		T dist = T(1000000000.0);
 		for (ibl = 0; ibl < XParam.nblk; ibl++)
 		{
@@ -3183,7 +3183,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
 			for (ix = 0; ix < XParam.blkwidth; ix++)
 			{
-				n = memloc(XParam, ix, 0, ib);
+				//n = memloc(XParam, ix, 0, ib);
 				if (abs(XModel.blocks.xo[ibl] + ix * delta - 24.0) < dist)
 				{
 					ixx = ix;
