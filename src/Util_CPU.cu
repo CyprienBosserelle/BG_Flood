@@ -142,14 +142,35 @@ template double BarycentricInterpolation(double q1, double x1, double y1, double
 
 
 template <class T>
-__host__ __device__ T calcres(T dx, int level)
+__host__ __device__ T calcresold(T dx, int level)
 {
 	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
 	//should be 1<< -level
 }
+template __host__ __device__ double calcresold<double>(double dx, int level);
+template __host__ __device__ float calcresold<float>(float dx, int level);
 
+template <class T>
+__host__ __device__ T calcres(T dx, int level)
+{
+	return  dx * (1 << level);
+	//should be 1<< -level
+}
 template __host__ __device__ double calcres<double>(double dx, int level);
 template __host__ __device__ float calcres<float>(float dx, int level);
+
+template <class T>
+__host__ __device__ T calcres(T dx, int level, T scale)
+{
+
+	T ddx = XParam.dx * (1 << level) * scale;
+
+	
+	return ddx;
+	//should be 1<< -level
+}
+template __host__ __device__ double calcres<double>(double dx, int level, double scale);
+template __host__ __device__ float calcres<float>(float dx, int level, float scale);
 
 template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2)
 {

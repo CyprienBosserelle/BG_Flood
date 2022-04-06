@@ -61,7 +61,7 @@ public:
 	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double grdalpha = nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
-	int spherical = 0; // Flag for sperical coordinate (still in development)
+	bool spherical = 0; // Flag for sperical coordinate (still in development)
 	double Radius = 6371220.; //Earth radius [m]
 	double mask = 9999.0; //Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory
 
