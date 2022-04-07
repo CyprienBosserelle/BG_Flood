@@ -86,6 +86,7 @@ template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel)
 	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradientC(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	
@@ -383,6 +384,10 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["dzsdx"] = XModel.grad.dzsdx;
 
 	XModel.OutputVarMap["dzsdy"] = XModel.grad.dzsdy;
+
+	XModel.OutputVarMap["dzbdx"] = XModel.grad.dzbdx;
+
+	XModel.OutputVarMap["dzbdy"] = XModel.grad.dzbdy;
 
 	//Flux
 	XModel.OutputVarMap["Fhu"] = XModel.flux.Fhu;

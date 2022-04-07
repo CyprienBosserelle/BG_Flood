@@ -109,12 +109,12 @@ template void RecalculateZs<double>(Param XParam, BlockP<double> XBlock, Evolvin
 */
 template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
-	unsigned int blkmemwidth = XParam.blkmemwidth;
+	int blkmemwidth = XParam.blkmemwidth;
 	
 	int ix = threadIdx.x -1;
 	int iy = threadIdx.y -1;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 	
 	int  n;
 	

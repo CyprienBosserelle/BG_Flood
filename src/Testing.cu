@@ -1077,8 +1077,8 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 {
 	bool test = true;
 
-	T initdepth = T(0.1);
-	T testamp = T(1.0);
+	//T initdepth = T(0.1);
+	//T testamp = T(1.0);
 
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
@@ -1087,25 +1087,27 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
 	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
 
-	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.zb);
-	InitArrayBUQ(XParam, XModel.blocks, T(initdepth), XModel.evolv.zs);
-	InitArrayBUQ(XParam, XModel.blocks, T(initdepth), XModel.evolv.h);
-	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
-	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
+	dim3 blockDimLR(1, XParam.blkwidth, 1);
+	dim3 blockDimBT(XParam.blkwidth, 1, 1);
+	dim3 blockDimfull(XParam.blkmemwidth, XParam.blkmemwidth, 1);
 
 
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.zb);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.zb);
+	//InitArrayBUQ(XParam, XModel.blocks, T(initdepth), XModel.evolv.zs);
+	//InitArrayBUQ(XParam, XModel.blocks, T(initdepth), XModel.evolv.h);
+	//InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
+	//InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
+
+
+	//reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.zb);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 	// Create some usefull vectors
-	std::string evolvst[4] = { "h","zs","u","v" };
-
-	std::vector<std::string> evolvVar;
-
-	for (int nv = 0; nv < 4; nv++)
-	{
-		evolvVar.push_back(evolvst[nv]);
-	}
-
+	std::vector<std::string> evolvVar = { "h","zs","u","v","zb" };
+	std::vector<std::string> grdzbVar = { "dzbdx","dzbdy" };
+	std::vector<std::string> gradVar = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy","dzbdx","dzbdy" };
+	std::vector<std::string> evoVar = { "zso","ho","uo","vo" };
+	std::vector<std::string> advVar = { "dh","dhu","dhv" };
+	std::vector<std::string> fluxVar = { "Fhu","Su","Fqux","Fqvx","Fhv","Sv","Fqvy","Fquy" };
 
 	// Check fillhalo function
 
@@ -1115,12 +1117,12 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	fillrandom(XParam, XModel.blocks, XModel.evolv.h);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.u);
 	fillrandom(XParam, XModel.blocks, XModel.evolv.v);
-	*/
+	
 	fillgauss(XParam, XModel.blocks, testamp, XModel.evolv.zs);
 	fillgauss(XParam, XModel.blocks, testamp, XModel.evolv.h);
 	fillgauss(XParam, XModel.blocks, T(0.5 * testamp), XModel.evolv.u);
 	fillgauss(XParam, XModel.blocks, T(0.5 * testamp), XModel.evolv.v);
-
+	*/
 	//copy to GPU
 	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv, XModel_g.evolv);
 
@@ -1131,13 +1133,21 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evolvVar, true);
 
+	
+	InitzbgradientCPU(XParam, XModel);
+	InitzbgradientGPU(XParam, XModel_g);
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, grdzbVar, true);
 	//============================================
 	//perform gradient reconstruction
+	
 	//gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
-	//gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel.zb);
-
+	//gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	//CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
+	
 
 	// CPU gradients
+	
 	std::thread t0(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
 	std::thread t1(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.zs, XModel.grad.dzsdx, XModel.grad.dzsdy);
 	std::thread t2(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
@@ -1147,28 +1157,29 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	t1.join();
 	t2.join();
 	t3.join();
+	
+	//gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
 
 	//GPU gradients
-
+	
 	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
 	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
+	
+	//gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
 
-	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
+	//============================================
+	// Synchronise all ongoing streams
+	CUDA_CHECK(cudaDeviceSynchronize());
 
-	std::vector<std::string> gradVar;
-
-	for (int nv = 0; nv < 8; nv++)
-	{
-		gradVar.push_back(gradst[nv]);
-	}
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, false);
 
@@ -1186,19 +1197,113 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
 	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
 
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, false);
+
+	// Refine linear
+
+	//CPU
+	refine_linear(XParam, XModel.blocks, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
+	refine_linear(XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	refine_linear(XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+
+	RecalculateZs(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+
+
+	//GPU
+	refine_linearGPU(XParam, XModel_g.blocks, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	//refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	refine_linearGPU(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	refine_linearGPU(XParam, XModel_g.blocks, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+
+	RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, evolvVar, true);
+
+	std::thread t4(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
+	std::thread t5(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.zs, XModel.grad.dzsdx, XModel.grad.dzsdy);
+	std::thread t6(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	std::thread t7(&gradientC<T>, XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+
+	t4.join();
+	t5.join();
+	t6.join();
+	t7.join();
+
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.zs, XModel.grad.dzsdx, XModel.grad.dzsdy);
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	gradientHalo(XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+
+	
+	//gradient << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradient << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradient << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradient << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	
+
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
+
+
+	WetsloperesetXGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	WetsloperesetYGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	WetsloperesetCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
+
+	WetsloperesetHaloLeftCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	WetsloperesetHaloLeftGPU << < gridDim, blockDimLR, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
+
+	WetsloperesetHaloRightCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	WetsloperesetHaloRightGPU << < gridDim, blockDimLR, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
+	
+	WetsloperesetHaloBotCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	WetsloperesetHaloBotGPU << < gridDim, blockDimBT, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
+
+
+	WetsloperesetHaloTopCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	WetsloperesetHaloTopGPU << < gridDim, blockDimBT, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+
+	CUDA_CHECK(cudaDeviceSynchronize());
+
 	CompareCPUvsGPU(XParam, XModel, XModel_g, gradVar, true);
 
 	//============================================
 	// Kurganov scheme
 
-	std::string fluxst[8] = { "Fhu","Su","Fqux","Fqvx","Fhv","Sv","Fqvy","Fquy" };
+	
 
-	std::vector<std::string> fluxVar;
-
-	for (int nv = 0; nv < 8; nv++)
-	{
-		fluxVar.push_back(fluxst[nv]);
-	}
+	
 
 	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 
@@ -1224,14 +1329,8 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//============================================
 	// Update step
-	std::string advst[3] = { "dh","dhu","dhv" };
-
-	std::vector<std::string> advVar;
-
-	for (int nv = 0; nv < 3; nv++)
-	{
-		advVar.push_back(advst[nv]);
-	}
+	
+	
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
 	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.flux, XModel_g.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -1240,14 +1339,9 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//============================================
 	// Advance step
-	std::string evost[4] = { "zso","ho","uo","vo" };
+	
 
-	std::vector<std::string> evoVar;
-
-	for (int nv = 0; nv < 4; nv++)
-	{
-		evoVar.push_back(evost[nv]);
-	}
+	
 	AdvkernelCPU(XParam, XModel.blocks, T(0.0005), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	AdvkernelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(0.0005), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -1264,7 +1358,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
 
-
+	/*
 	//============================================
 	// Repeat the full test
 	Loop<T> XLoop;
@@ -1329,7 +1423,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 			XLoop_g.nextoutputtime = XLoop.nextoutputtime;
 		}
 	}
-
+	*/
 
 	return test;
 }
