@@ -38,7 +38,7 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 	
 	T dhdxi = XGrad.dhdx[i];
 	T dhdxmin = XGrad.dhdx[ileft];
-	T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 	T fmu = T(1.0);
 
 	T hi = XEv.h[i];
@@ -194,7 +194,7 @@ template <class T> __global__ void updateKurgXATMGPU(Param XParam, BlockP<T> XBl
 
 	T dhdxi = XGrad.dhdx[i];
 	T dhdxmin = XGrad.dhdx[ileft];
-	T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 	T fmu = T(1.0);
 
 	T hi = XEv.h[i];
@@ -463,7 +463,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 				T dhdxi = XGrad.dhdx[i];
 				T dhdxmin = XGrad.dhdx[ileft];
-				T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);;
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);;
 				T fmu = T(1.0);
 
 				T hi = XEv.h[i];
@@ -632,7 +632,7 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 
 				T dhdxi = XGrad.dhdx[i];
 				T dhdxmin = XGrad.dhdx[ileft];
-				T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);;
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);;
 				T fmu = T(1.0);
 
 				T hi = XEv.h[i];
@@ -900,8 +900,8 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix , iy-1, ib);
 
-	T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);;
-	T fmv = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);;
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 		
 	T dhdyi = XGrad.dhdy[i];
 	T dhdymin = XGrad.dhdy[ibot];
@@ -1036,8 +1036,8 @@ template <class T> __global__ void updateKurgYATMGPU(Param XParam, BlockP<T> XBl
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
-	T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);
-	T fmv = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);;
 
 	T dhdyi = XGrad.dhdy[i];
 	T dhdymin = XGrad.dhdy[ibot];
@@ -1186,7 +1186,7 @@ template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XB
 
 	
 	//T cm = T(1.0);
-	T fmv = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 
 	T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
 
@@ -1291,8 +1291,8 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
-				T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);
-				T fmv = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 
 				T dhdyi = XGrad.dhdy[i];
 				T dhdymin = XGrad.dhdy[ibot];
@@ -1434,8 +1434,8 @@ template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBloc
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
-				T cm = XParam.spherical ? calcCM(XParam, delta, XBlock.yo[ib], iy) : T(1.0);
-				T fmv = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 
 				T dhdyi = XGrad.dhdy[i];
 				T dhdymin = XGrad.dhdy[ibot];
@@ -1588,7 +1588,7 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 
 
 				//T cm = T(1.0);
-				T fmv = T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 
 				T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
 

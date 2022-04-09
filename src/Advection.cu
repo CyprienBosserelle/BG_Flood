@@ -38,16 +38,18 @@ struct SharedMemory<double>
 template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv)
 {
 	
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
 
 	//T eps = T(XParam.eps);
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.dx), lev);
 	T g = T(XParam.g);
 	
 
@@ -61,10 +63,11 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 	itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
 	
-
-	T cm = T(1.0);// 0.1;
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 	T fmu = T(1.0);
-	T fmv = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
+	T fmup = T(1.0);
+	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy + 1) : T(1.0);
 
 	T hi = XEv.h[i];
 	T uui = XEv.u[i];
@@ -83,8 +86,8 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 
 	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 	//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-	T dmdl = (fmu - fmu) / (cm * delta);// absurd if not spherical!
-	T dmdt = (fmv - fmv) / (cm * delta);
+	T dmdl = (fmup - fmu) / (cm * delta);// absurd if not spherical!
+	T dmdt = (fmvp - fmv) / (cm * delta);
 	T fG = vvi * dmdl - uui * dmdt;
 	XAdv.dhu[i] = (XFlux.Fqux[i] + XFlux.Fquy[i] - XFlux.Su[iright] - XFlux.Fquy[itop]) * cmdinv + fc * hi * vvi;
 	XAdv.dhv[i] = (XFlux.Fqvy[i] + XFlux.Fqvx[i] - XFlux.Sv[itop] - XFlux.Fqvx[iright]) * cmdinv - fc * hi * uui;
@@ -105,14 +108,18 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 	T g = T(XParam.g);
 	
 
-	int ib;
+	int ib,lev;
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		lev = XBlock.level[ib];
+		delta = calcres(T(XParam.dx), lev);
+
+		
+
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
@@ -129,9 +136,11 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 
 
 
-				T cm = T(1.0);// 0.1;
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
 				T fmu = T(1.0);
-				T fmv = T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy) : T(1.0);
+				T fmup = T(1.0);
+				T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, T(XBlock.yo[ib]), iy + 1) : T(1.0);
 
 				T hi = XEv.h[i];
 				T uui = XEv.u[i];
@@ -150,8 +159,8 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 
 				//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 				//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-				T dmdl = (fmu - fmu) / (cm * delta);// absurd if not spherical!
-				T dmdt = (fmv - fmv) / (cm * delta);
+				T dmdl = (fmup - fmu) / (cm * delta);// absurd if not spherical!
+				T dmdt = (fmvp - fmv) / (cm * delta);
 				T fG = vvi * dmdl - uui * dmdt;
 				XAdv.dhu[i] = (XFlux.Fqux[i] + XFlux.Fquy[i] - XFlux.Su[iright] - XFlux.Fquy[itop]) * cmdinv + fc * hi * vvi;
 				XAdv.dhv[i] = (XFlux.Fqvy[i] + XFlux.Fqvx[i] - XFlux.Sv[itop] - XFlux.Fqvx[iright]) * cmdinv - fc * hi * uui;

@@ -3,9 +3,10 @@
 
 
 
-template <class T> __device__ __host__ T calcCM(Param XParam, T delta, T yo, int iy)
+template <class T> 
+__host__ __device__ T calcCM(T Radius, T delta, T yo, int iy)
 {
-	T y = XBlock.yo[ib] + iy * delta / XParam.Radius * T(180.0 / pi);
+	T y = yo + iy * delta / Radius * T(180.0 / pi);
 	// THis should be the y of the face so fo the v face you need to remove 0.5*delta
 
 	T phi = y * T(pi / 180.0);
@@ -16,13 +17,15 @@ template <class T> __device__ __host__ T calcCM(Param XParam, T delta, T yo, int
 
 	return cm;
 }
-template __device__ __host__ double calcCM(Param XParam, double delta, double yo, double iy);
-template __device__ __host__ float calcCM(Param XParam, float delta, float yo, float iy);
+template __host__ __device__ double calcCM(double Radius, double delta, double yo, int iy);
+template __host__ __device__ float calcCM(float Radius, float delta, float yo, int iy);
 
 
-template <class T> __device__ __host__ T calcFM(Param XParam, T delta, T yo, int iy)
+template <class T> 
+__host__ __device__  T calcFM(T Radius, T delta, T yo, int iy)
 {
-	T y = XBlock.yo[ib] + iy * delta / XParam.Radius * T(180.0 / pi);
+	T dy = delta / Radius * T(180.0 / pi);
+	T y = yo + iy * dy;
 	// THis should be the y of the face so fo the v face you need to remove 0.5*delta
 
 	T phi = y * T(pi / 180.0);
@@ -33,6 +36,6 @@ template <class T> __device__ __host__ T calcFM(Param XParam, T delta, T yo, int
 
 	return fmu;
 }
-template __device__ __host__ double calcFM(Param XParam, double delta, double yo, double iy);
-template __device__ __host__ float calcFM(Param XParam, float delta, float yo, float iy);
+template __host__ __device__ double calcFM(double Radius, double delta, double yo, int iy);
+template __host__ __device__ float calcFM(float Radius, float delta, float yo, int iy);
 

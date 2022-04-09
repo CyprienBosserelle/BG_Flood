@@ -9,5 +9,8 @@
 #include "Util_CPU.h"
 #include "Kurganov.h"
 
+template <class T> __host__ __device__ T calcCM(T Radius, T delta, T yo, int iy);
+template <class T> __host__ __device__  T calcFM(T Radius, T delta, T yo, int iy);
+
 
 #endif
