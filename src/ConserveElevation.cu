@@ -347,7 +347,7 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	ihalo = -1;
 	ip = 0;
 
@@ -431,7 +431,7 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 	int ip, jp, iq, jq;
 
 	int ihalo, jhalo, ibn;
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 
 	ihalo = -1;
@@ -486,7 +486,7 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	ihalo = XParam.blkwidth;
 	ip = XParam.blkwidth-1;
 
@@ -564,7 +564,7 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 
 	int ihalo, jhalo, iq, jq, ip, jp, ibn;
 
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 	ihalo = blockDim.y;
 	jhalo = iy;
@@ -621,7 +621,7 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	jhalo = XParam.blkwidth;
 	jp = XParam.blkwidth - 1;
 
@@ -697,7 +697,7 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 
 
 	int ihalo, jhalo, iq, jq, ip, jp, ibn;
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 	ihalo = ix;
 	jhalo = iy+1;
@@ -752,7 +752,7 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	jhalo = -1;
 	jp = 0;
 
@@ -829,7 +829,7 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 	int ip, jp, iq, jq;
 
 	int ihalo, jhalo, ibn;
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 	ihalo = ix;
 	jhalo = -1;

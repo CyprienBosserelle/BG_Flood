@@ -209,7 +209,7 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+				//T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 				//T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 				//T y = XParam.yo + XBlock.yo[ib] + iy * delta;

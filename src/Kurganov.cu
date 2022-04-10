@@ -24,7 +24,7 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps)+epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	// This is based on kurganov and Petrova 2007
@@ -180,7 +180,7 @@ template <class T> __global__ void updateKurgXATMGPU(Param XParam, BlockP<T> XBl
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	// This is based on kurganov and Petrova 2007
@@ -340,7 +340,7 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 
 	T ga = T(0.5) * g;
@@ -435,7 +435,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(T(XParam.dx), lev);
+		delta = calcres(T(XParam.delta), lev);
 
 		// neighbours for source term
 		
@@ -604,7 +604,7 @@ template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBloc
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(T(XParam.dx), lev);
+		delta = calcres(T(XParam.delta), lev);
 
 		// neighbours for source term
 
@@ -770,7 +770,7 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = T(calcres(XParam.dx, lev));
+		delta = T(calcres(XParam.delta, lev));
 
 		// neighbours for source term
 		int RB, LBRB, LB, RBLB, levRB, levLB;
@@ -892,7 +892,7 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps)+epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	
@@ -1028,7 +1028,7 @@ template <class T> __global__ void updateKurgYATMGPU(Param XParam, BlockP<T> XBl
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
@@ -1175,7 +1175,7 @@ template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XB
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T ga = T(0.5) * g;
 
@@ -1282,7 +1282,7 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 
 		lev = XBlock.level[ib];
 
-		delta = T(calcres(XParam.dx, lev));
+		delta = T(calcres(XParam.delta, lev));
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -1425,7 +1425,7 @@ template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBloc
 
 		lev = XBlock.level[ib];
 
-		delta = T(calcres(XParam.dx, lev));
+		delta = T(calcres(XParam.delta, lev));
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -1562,7 +1562,7 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 		
 
 		int lev = XBlock.level[ib];
-		delta = T(calcres(XParam.dx, lev));
+		delta = T(calcres(XParam.delta, lev));
 		// neighbours for source term
 		int TL, BLTL, BL, TLBL, levTL, levBL;
 		TL = XBlock.TopLeft[ib];
