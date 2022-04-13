@@ -69,6 +69,18 @@ struct maskinfo
 	int* side; // e.g. 11000000 for the entire left side being a mask
 };
 
+// outzone info used to actually write the nc files (one nc file by zone, the default zone is the full domain)
+struct outzoneB 
+{
+	int nblk; //number of blocks concerned
+	int* blk; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
+	double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)(corner of cells, as Xparam.xo)
+	std::string outname; // name for the output file (one for each zone)
+	int maxlevel; // maximum level in the zone
+	int minlevel; //minimum level in the zone
+};
+
+
 template <class T>
 struct BlockP
 {
@@ -84,6 +96,7 @@ struct BlockP
 
 	maskinfo mask;
 	
+	std::vector<outzoneB> outZone;
 };
 
 

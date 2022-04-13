@@ -1,5 +1,3 @@
-
-
 #ifndef PARAM_H
 #define PARAM_H
 
@@ -86,7 +84,6 @@ public:
 
 	double zsoffset = nan(""); //Add a water level offset in m to initial conditions and boundaries (0.0 by default)
 
-
 	std::string hotstartfile;
 	/*Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb, h or zs, u and v
 	Default: None
@@ -101,7 +98,7 @@ public:
 	//*Outputs
 	//std::string Bathymetryfile;// bathymetry file name
 	//inputmap Bathymetry;
-	std::string outfile = "Output.nc"; // netcdf output file name
+
 
 	//Timeseries output (save as a vector containing information for each Time Serie output)
 	std::vector<TSoutnode> TSnodesout; 
@@ -110,18 +107,30 @@ public:
 	This keyword can be used multiple times to extract time series at different locations.
 	The data is stocked for each timestep and written by flocs.
 	The resulting file contains (t,zs,h,u,v)
-	Example: "TSnodesout: Offshore.txt,3101.00,4982.57" (*filename,x,y*)
+	Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)
 	Default: None
 	*/
 
-	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
-
+	std::string outfile = "Output.nc"; // netcdf output file name
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
 	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy";
 	Default: "zb", "zs", "u", "v", "h"
 	*/
 	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
+	
+	std::vector<outzoneP> outzone; 
+	/*Zoned output (netcdf file), giving a file name and the position of two corner points
+	(which will be converted to a rectagle containing full blocks).
+	This keyword can be used multiple times to output maps of different areas.
+	Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*)
+	Default: Full domain
+	*/
+
+	int maxTSstorage = 16384; //maximum strorage (nTSnodes*4*nTSsteps) before time series output are flushed to disk [2^14]
+
+
+
 
 	// Output switch controls
 	bool resetmax = false; //Switch to reset the "max" outputs after each output
@@ -185,8 +194,8 @@ public:
 	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be ==0. would be 
 
 	// This here should be stored in a structure at a later stage
-	std::string AdatpCrit;
-	int* AdatpCrit_funct_pointer;
+	std::string AdaptCrit;
+	int* AdaptCrit_funct_pointer;
 	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
 	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
 

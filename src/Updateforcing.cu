@@ -79,7 +79,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 
 			// Read the actual file data
 
-			readvardata(XDynForcing.inputfile, XDynForcing.varname, readfirststep + 1, XDynForcing.after);
+			readvardata(XDynForcing.inputfile, XDynForcing.varname, readfirststep + 1, XDynForcing.after, XDynForcing.flipxx, XDynForcing.flipyy);
 			if (XParam.GPUDEVICE >= 0)
 			{
 				CUDA_CHECK(cudaMemcpy(XDynForcing.after_g, XDynForcing.after, XDynForcing.nx * XDynForcing.ny * sizeof(float), cudaMemcpyHostToDevice));

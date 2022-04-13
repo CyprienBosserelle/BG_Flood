@@ -12,6 +12,15 @@ public:
 	std::string outname;
 };
 
+// Special output zones for nc files, informatin given by the user
+class outzoneP {
+public:
+	//std::vector<int> blocks; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
+	double xstart, xend, ystart, yend; // definition of the zone needed for special nc output (rectangular zone) by the user
+	//double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)
+	std::string outname; // name for the output file (one for each zone)
+};
+
 class Flowin {
 public:
 	double time, q;
@@ -42,6 +51,8 @@ public:
 	double ymax = 0.0;
 	double dx = 0.0;
 	double grdalpha=0.0;
+	bool flipxx = false;
+	bool flipyy = false;
 	std::string inputfile;
 	std::string extension;
 	std::string varname;

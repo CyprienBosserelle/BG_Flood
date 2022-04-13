@@ -77,7 +77,7 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 
 
 
-void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax)
+void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
 {
 	//read the dimentions of grid, levels and time
 	int status;
@@ -277,11 +277,17 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 
 	dx = dxx;
 
-	xo = xcoord[0];
-	xmax = xcoord[nx - 1];
-	yo= ycoord[0];
-	ymax= ycoord[(ny - 1)*nx];
+	xo = utils::min(xcoord[0], xcoord[nx - 1]);
+	xmax = utils::max(xcoord[0], xcoord[nx - 1]);
+	yo = utils::min(ycoord[0], ycoord[(ny - 1) * nx]);
+	ymax = utils::max(ycoord[(ny - 1)*nx], ycoord[0]);
 
+
+	if (xcoord[0] > xcoord[nx - 1])
+		flipx = true;
+
+	if (ycoord[0] > ycoord[ny - 1])
+		flipy = true;
 
 
 	status = nc_close(ncid);
@@ -543,7 +549,7 @@ template int readncslev1<double>(std::string filename, std::string varstr, size_
 
 
 template <class T>
-int readvardata(std::string filename, std::string Varname, int step, T * &vardata)
+int readvardata(std::string filename, std::string Varname, int step, T * &vardata, bool flipx, bool flipy)
 {
 	// function to standardise the way to read netCDF data off a file
 	// The role of this function is to offload and simplify the rest of the code
@@ -552,6 +558,8 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 	int nx, ny, nt, status, ncid, varid, sferr, oferr, merr,ndims;
 	size_t * start, * count, *ddim;
 	double scalefac, offset, missing;
+
+	
 
 
 
@@ -588,6 +596,8 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		count[0] = ny;
 		count[1] = nx;
 
+		
+
 
 	}
 	else //(ndim>2)
@@ -606,6 +616,10 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 
 
 	}
+
+	//double* xo,xnd;
+	
+
 	status = nc_get_vara_T(ncid, varid, start, count, vardata);
 	if (status != NC_NOERR) handle_ncerror(status);
 
@@ -642,6 +656,50 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 			//printf("maxval = %f\n", float(maxval));
 		}
 
+		if (flipx)
+		{
+			T* xdata;
+			xdata=(T*)malloc(nx * sizeof(T));
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					xdata[i] = vardata[i + j * nx];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+				for (int i = 0; i < nx; i++)
+				{
+					vardata[i + j * nx] = xdata[nx - 1 - i];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+			}
+			free(xdata);
+		}
+
+		if (flipy)
+		{
+			T* ydata;
+			ydata = (T*)malloc(ny * sizeof(T));
+			for (int i = 0; i < nx; i++)
+			{
+				for (int j = 0; j < ny; j++)
+				{
+					ydata[j] = vardata[i + j * nx];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+				for (int j = 0; j < ny; j++)
+				{
+					vardata[i + j * nx] = ydata[ny - 1 - j];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+			}
+			free(ydata);
+		}
+
 
 
 		// apply scale and offset
@@ -670,9 +728,9 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 	return status;
 
 }
-template int readvardata<int>(std::string filename, std::string Varname, int step, int*& vardata);
-template int readvardata<float>(std::string filename, std::string Varname, int step, float * &vardata);
-template int readvardata<double>(std::string filename, std::string Varname, int step, double * &vardata);
+template int readvardata<int>(std::string filename, std::string Varname, int step, int*& vardata, bool flipx, bool flipy);
+template int readvardata<float>(std::string filename, std::string Varname, int step, float * &vardata, bool flipx, bool flipy);
+template int readvardata<double>(std::string filename, std::string Varname, int step, double * &vardata, bool flipx, bool flipy);
 
 
 
