@@ -162,7 +162,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> buttingerstr = { "b","butt","buttinger","2" };
+		std::vector<std::string> buttingerstr = { "b","butt","buttinger","1" };
 		std::size_t found;
 		bool foo = false;
 		for (int ii = 0; ii < buttingerstr.size(); ii++)
@@ -1032,6 +1032,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	{
 		//Geo grid
 		XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+		XParam.engine = 2;
 		//printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
 		log("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
 		if (XParam.grdalpha != 0.0)

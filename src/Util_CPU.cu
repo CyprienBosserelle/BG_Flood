@@ -153,7 +153,7 @@ template __host__ __device__ float calcresold<float>(float dx, int level);
 template <class T>
 __host__ __device__ T calcres(T dx, int level)
 {
-	return  dx * (1 << level);
+	return  dx / (1 << level);
 	//should be 1<< -level
 }
 template __host__ __device__ double calcres<double>(double dx, int level);
