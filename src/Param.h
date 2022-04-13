@@ -114,9 +114,11 @@ public:
 	std::string outfile = "Output.nc"; // netcdf output file name
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
-	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
+	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy";
 	Default: "zb", "zs", "u", "v", "h"
 	*/
+	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
+	
 	std::vector<outzoneP> outzone; 
 	/*Zoned output (netcdf file), giving a file name and the position of two corner points
 	(which will be converted to a rectagle containing full blocks).
@@ -134,7 +136,9 @@ public:
 	bool resetmax = false; //Switch to reset the "max" outputs after each output
 	bool outmax = false;
 	bool outmean = false;
-	bool outvort = false;
+	//bool outvort = false;
+	bool outtwet = false;
+	//bool outU = false;
 
 	// WARNING FOR DEBUGGING PURPOSE ONLY
 // For debugging one can shift the output by 1 or -1 in the i and j direction.

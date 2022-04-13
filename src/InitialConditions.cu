@@ -126,8 +126,7 @@ template void InitzbgradientGPU<float>(Param XParam, Model<float> XModel);
 template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
 	
-	
-	
+
 	//FILE* fsSLTS;
 	// Initialise all storage involving parameters
 	//CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evolv_o);
@@ -139,7 +138,11 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 	{
 		CopyArrayBUQ(XParam, XModel.blocks, XModel.evolv, XModel.evmean);
 	}
-	
+	if (XParam.outtwet)
+	{
+		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.wettime);
+	}
+
 	if (XParam.TSnodesout.size() > 0)
 	{
 		FindTSoutNodes(XParam, XModel.blocks, XModel.bndblk);
@@ -353,7 +356,13 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["vmax"] = XModel.evmax.v;
 
-	XModel.OutputVarMap["vort"] = XModel.vort;
+	XModel.OutputVarMap["Umean"] = XModel.evmean.U;
+
+	XModel.OutputVarMap["Umax"] = XModel.evmax.U;
+
+	XModel.OutputVarMap["hUmean"] = XModel.evmean.hU;
+
+	XModel.OutputVarMap["hUmax"] = XModel.evmax.hU;
 
 	//others
 
@@ -364,6 +373,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["zso"] = XModel.evolv_o.zs;
 
 	XModel.OutputVarMap["ho"] = XModel.evolv_o.h;
+
 
 	// Gradients
 
@@ -412,6 +422,12 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
 	XModel.OutputVarMap["datmpdy"] = XModel.datmpdy;
+
+	//XModel.OutputVarMap["U"] = XModel.U;
+
+	XModel.OutputVarMap["twet"] = XModel.wettime;
+
+	//XModel.OutputVarMap["vort"] = XModel.vort;
 }
 
 template void Initmaparray<float>(Model<float>& XModel);

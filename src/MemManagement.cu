@@ -38,6 +38,21 @@ template void AllocateCPU<double>(int nx, int ny, double *&zs, double *&h, doubl
 template void AllocateCPU<float>(int nx, int ny, float *&zs, float *&h, float *&u, float *&v);
 template void AllocateCPU<int>(int nx, int ny, int *&zs, int *&h, int *&u, int *&v);
 
+template <class T> __host__ void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+{
+
+	AllocateCPU(nx, ny, zs);
+	AllocateCPU(nx, ny, h);
+	AllocateCPU(nx, ny, u);
+	AllocateCPU(nx, ny, v);
+	AllocateCPU(nx, ny, U);
+	AllocateCPU(nx, ny, hU);
+}
+
+template void AllocateCPU<double>(int nx, int ny, double*& zs, double*& h, double*& u, double*& v, double*& U, double*& hU);
+template void AllocateCPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
+template void AllocateCPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
+
 template <class T> __host__
 void AllocateCPU(int nx, int ny, GradientsP<T>& Grad)
 {
@@ -55,7 +70,11 @@ template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP<T> & Ev)
 	AllocateCPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v);
 }
 
+template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP_M<T>& Ev)
+{
+	AllocateCPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU);
 
+}
 
 template <class T>
 void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
@@ -139,11 +158,19 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateCPU(nblk, blksize, XModel.evmean);
 	}
-	
-	if (XParam.outvort)
+	if (XParam.outtwet)
+	{
+		AllocateCPU(nblk, blksize, XModel.wettime);
+	}
+
+	/*if (XParam.outvort)
 	{
 		AllocateCPU(nblk, blksize, XModel.vort);
 	}
+	if (XParam.outU)
+	{
+		AllocateCPU(nblk, blksize, XModel.U);
+	}*/
 
 	if (XParam.TSnodesout.size() > 0)
 	{
@@ -199,10 +226,26 @@ template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u
 	ReallocArray(nblk, blksize, v);
 	//return nblkmem
 }
+template void ReallocArray<int>(int nblk, int blksize, int*& zs, int*& h, int*& u, int*& v);
+template void ReallocArray<float>(int nblk, int blksize, float*& zs, float*& h, float*& u, float*& v);
+template void ReallocArray<double>(int nblk, int blksize, double*& zs, double*& h, double*& u, double*& v);
 
-template void ReallocArray<int>(int nblk, int blksize, int* & zs, int*& h, int*& u, int*& v);
-template void ReallocArray<float>(int nblk, int blksize, float* & zs, float*& h, float*& u, float*& v );
-template void ReallocArray<double>(int nblk, int blksize, double* & zs, double*& h, double*& u, double*& v);
+template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+{
+	//
+
+	ReallocArray(nblk, blksize, zs);
+	ReallocArray(nblk, blksize, h);
+	ReallocArray(nblk, blksize, u);
+	ReallocArray(nblk, blksize, v);
+	ReallocArray(nblk, blksize, U);
+	ReallocArray(nblk, blksize, hU);
+	//return nblkmem
+}
+
+template void ReallocArray<int>(int nblk, int blksize, int* & zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
+template void ReallocArray<float>(int nblk, int blksize, float* & zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
+template void ReallocArray<double>(int nblk, int blksize, double* & zs, double*& h, double*& u, double*& v, double*& U, double*& hU);
 
 template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev)
 {
@@ -211,6 +254,12 @@ template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev)
 template void ReallocArray<float>(int nblk, int blksize, EvolvingP<float>& Ev);
 template void ReallocArray<double>(int nblk, int blksize, EvolvingP<double>& Ev);
 
+template <class T> void ReallocArray(int nblk, int blksize, EvolvingP_M<T>& Ev)
+{
+	ReallocArray(nblk, blksize, Ev.zs, Ev.h, Ev.u, Ev.v, Ev.U, Ev.hU);
+}
+template void ReallocArray<float>(int nblk, int blksize, EvolvingP_M<float>& Ev);
+template void ReallocArray<double>(int nblk, int blksize, EvolvingP_M<double>& Ev);
 
 template <class T>
 void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
@@ -270,7 +319,10 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		ReallocArray(nblk, blksize, XModel.evmean);
 	}
-
+	if (XParam.outtwet)
+	{
+		ReallocArray(nblk, blksize, XModel.wettime);
+	}
 	//ReallocArray(nx, ny, XModel.);
 
 
@@ -295,10 +347,24 @@ template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v)
 	AllocateGPU(nx, ny, v);
 
 }
-
 template void AllocateGPU<double>(int nx, int ny, double*& zs, double*& h, double*& u, double*& v);
 template void AllocateGPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v);
 template void AllocateGPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v);
+
+template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+{
+
+	AllocateGPU(nx, ny, zs);
+	AllocateGPU(nx, ny, h);
+	AllocateGPU(nx, ny, u);
+	AllocateGPU(nx, ny, v);
+	AllocateGPU(nx, ny, U);
+	AllocateGPU(nx, ny, hU);
+
+}
+template void AllocateGPU<double>(int nx, int ny, double*& zs, double*& h, double*& u, double*& v, double*& U, double*& hU);
+template void AllocateGPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
+template void AllocateGPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
 
 template <class T> 
 void AllocateGPU(int nx, int ny, GradientsP<T>& Grad)
@@ -314,6 +380,11 @@ template void AllocateGPU<double>(int nx, int ny, GradientsP<double>& Grad);
 template <class T> void AllocateGPU(int nblk, int blksize, EvolvingP<T>& Ev)
 {
 	AllocateGPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v);
+}
+
+template <class T> void AllocateGPU(int nblk, int blksize, EvolvingP_M<T>& Ev)
+{
+	AllocateGPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU);
 }
 
 template <class T>
@@ -372,12 +443,20 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateGPU(nblk, blksize, XModel.evmean);
 	}
+	if (XParam.outtwet)
+	{
+		AllocateGPU(nblk, blksize, XModel.wettime);
+	}
 
 	
-	if (XParam.outvort)
+	/*if (XParam.outvort)
 	{
 		AllocateGPU(nblk, blksize, XModel.vort);
 	}
+	if (XParam.outU)
+	{
+		AllocateGPU(nblk, blksize, XModel.U);
+	}*/
 
 	if (XParam.TSnodesout.size() > 0)
 	{

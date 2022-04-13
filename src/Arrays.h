@@ -33,6 +33,14 @@ struct EvolvingP
 	T* v;
 };
 
+//subclass inheriting from EvolvingP for Mean/Max
+template <class T>
+struct EvolvingP_M : public EvolvingP<T>
+{
+	T* U;  //Norm of the velocity
+	T* hU; //h*sqrt(u^2+v^2)
+};
+
 template <class T>
 struct FluxP
 {
@@ -166,9 +174,11 @@ struct Model
 	//other output
 	//std::vector< std::vector< Pointout > > TSallout;
 	T* TSstore;//buffer for TS data so not to save to disk too often
-	T* vort;
-	EvolvingP<T> evmean;
-	EvolvingP<T> evmax;
+	//T* vort;
+	//T* U;
+	EvolvingP_M<T> evmean;
+	EvolvingP_M<T> evmax;
+	T* wettime; //Inundation duration (h > 0.1)
 
 	//Block information
 	BlockP<T> blocks;
