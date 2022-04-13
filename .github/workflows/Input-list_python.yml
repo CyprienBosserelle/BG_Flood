@@ -6,9 +6,9 @@ name: Input-Keys, Python script
 
 on:
   push:
-    branches: [ Add_Flooding_outputs ]
+    branches: [ development ]
   pull_request:
-    branches: [ Add_Flooding_outputs ]
+    branches: [ development ]
 
 jobs:
   update-file:
