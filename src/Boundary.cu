@@ -162,7 +162,7 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 		}
 		else
 		{
-			unbnd = uninside*T(0.1);
+			unbnd =T(0.1);
 			utbnd = T(0.0);
 		}
 	}
@@ -179,9 +179,12 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 	{
 		Dirichlet1D(T(XParam.g), sign, zsbnd, zsinside, hinside, uninside, unnew, utnew, zsnew, hnew);
 	}
-	else if (side.type == 3)
+	else if (side.type == 3 )
 	{
-		ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+		if (hnew > XParam.eps && hinside > XParam.eps)
+		{
+			ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+		}
 	}
 	else if (side.type == 4)
 	{
