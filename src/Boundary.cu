@@ -160,11 +160,7 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 			utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
 
 		}
-		else
-		{
-			unbnd = T(0.0);
-			//utbnd = T(0.0);
-		}
+		
 	}
 
 	if (side.type == 0) // No slip == no friction wall
@@ -312,7 +308,10 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 			}
 			else if (side.type == 3)
 			{
-				ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+				if (hnew > XParam.eps && hinside > XParam.eps)
+				{
+					ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+				}
 			}
 			else if (side.type == 4)
 			{
