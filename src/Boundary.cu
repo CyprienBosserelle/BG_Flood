@@ -162,8 +162,8 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 		}
 		else
 		{
-			unbnd = 0.5*(uninside + unnew);
-			
+			unbnd = T(0.0);
+			//utbnd = T(0.0);
 		}
 	}
 
