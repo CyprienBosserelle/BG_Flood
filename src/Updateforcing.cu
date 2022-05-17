@@ -427,8 +427,22 @@ template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBl
 
 	T rhoairrhowater = T(0.00121951); // density ratio rho(air)/rho(water) 
 
-	uwindi = interpDyn2BUQ(x, y, Uwind.GPU);
-	vwindi = interpDyn2BUQ(x, y, Vwind.GPU);
+	if (Uwind.uniform)
+	{
+		uwindi = T(Uwind.nowvalue);
+	}
+	else
+	{
+		uwindi = interpDyn2BUQ(x, y, Uwind.GPU);
+	}
+	if (Vwind.uniform)
+	{
+		vwindi = T(Vwind.nowvalue);
+	}
+	else
+	{
+		vwindi = interpDyn2BUQ(x, y, Vwind.GPU);
+	}
 
 	XAdv.dhu[i] += rhoairrhowater * T(XParam.Cd) * uwindi * abs(uwindi);
 	XAdv.dhv[i] += rhoairrhowater * T(XParam.Cd) * vwindi * abs(vwindi);

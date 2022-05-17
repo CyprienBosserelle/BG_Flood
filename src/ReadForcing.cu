@@ -180,6 +180,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		// the full initialisation of the cuda array and texture is done in model initialisation
 		if (XForcing.UWind.uniform == 1)
 		{
+			XForcing.VWind.uniform = true;
+
 			// grid uniform time varying wind input: wlevs[0] is wind speed and wlev[1] is direction
 			XForcing.VWind.inputfile = XForcing.UWind.inputfile;
 			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.grdalpha);
