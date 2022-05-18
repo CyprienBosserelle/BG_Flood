@@ -189,12 +189,12 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 
 	//int ix = threadIdx.x+1;
 	//int iy = threadIdx.y+1;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int blkmemwidth = blockDim.x + halowidth * 2;
+	int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int lev = level[ib];
 
@@ -205,8 +205,8 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 
 	int iright, ileft, itop, ibot;
 	// shared array index to make the code bit more readable
-	unsigned int sx = ix + halowidth;
-	unsigned int sy = iy + halowidth;
+	int sx = ix + halowidth;
+	int sy = iy + halowidth;
 
 
 
@@ -258,6 +258,53 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 	__syncthreads;
 	dady[i] = minmod2(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
 
+
+}
+
+template <class T> __global__ void gradientSMB(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
+{
+	//int *leftblk,int *rightblk,int* topblk, int * botblk,
+
+	//int ix = threadIdx.x+1;
+	//int iy = threadIdx.y+1;
+	int blkmemwidth = blockDim.x + halowidth * 2;
+	int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x-1;
+	int iy = threadIdx.y-1;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
+
+	int lev = level[ib];
+
+	T delta = calcres(dx, lev);
+
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	int iright, ileft, itop, ibot;
+	// shared array index to make the code bit more readable
+	int sx = ix + 1;
+	int sy = iy + 1;
+
+
+
+	__shared__ T a_s[18][18];
+
+
+
+
+	a_s[sx][sy] = a[i];
+	__syncthreads;
+	//syncthread is needed here ?
+
+
+	if (ix >= 0 && ix < blockDim.x && iy >=0 && iy < blockDim.x)
+	{
+
+		dadx[i] = minmod2(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
+
+		dady[i] = minmod2(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
+	}
 
 }
 
