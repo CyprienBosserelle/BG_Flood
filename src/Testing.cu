@@ -3481,6 +3481,114 @@ template bool ZoneOutputTest<float>(int nzones, float zsinit);
 template bool ZoneOutputTest<double>(int nzones, double zsinit);
 
 
+/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
+*
+* This function test the zoned output for a basic configuration
+*/
+template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	//
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
+	dim3 blockDimX2(XParam.blkwidth + XParam.halowidth*2, XParam.blkwidth + XParam.halowidth * 2, 1);
+
+
+
+	// Allocate CUDA events that we'll use for timing
+	cudaEvent_t start;
+	cudaEvent_t stop;
+
+
+	cudaEventCreate(&start);
+
+	
+	cudaEventCreate(&stop);
+
+	// Record the start event
+	cudaEventRecord(start, NULL);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Record the stop event
+	cudaEventRecord(stop, NULL);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stop);
+
+	float msecTotalGrad = 0.0f;
+	cudaEventElapsedTime(&msecTotalGrad, start, stop);
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
+
+
+	cudaEventCreate(&start);
+
+
+	cudaEventCreate(&stop);
+
+	// Record the start event
+	cudaEventRecord(start, NULL);
+	gradientSM << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Record the stop event
+	cudaEventRecord(stop, NULL);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stop);
+
+	float msecTotalSM = 0.0f;
+	cudaEventElapsedTime(&msecTotalSM, start, stop);
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
+
+
+	cudaEventCreate(&start);
+
+
+	cudaEventCreate(&stop);
+
+	// Record the start event
+	cudaEventRecord(start, NULL);
+	gradientSMB << < gridDim, blockDimX2, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Record the stop event
+	cudaEventRecord(stop, NULL);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stop);
+
+	float msecTotalSMB = 0.0f;
+	cudaEventElapsedTime(&msecTotalSMB, start, stop);
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
+
+
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdx, XModel_g.grad.dzbdx);
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				//
+			}
+		}
+	}
+	
+
+}
+
 
 /*! \fn void alloc_init2Darray(float** arr, int NX, int NY)
 * This function allocates and fills a 2D array with zero values
