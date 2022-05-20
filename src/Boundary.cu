@@ -539,7 +539,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -547,7 +547,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}
@@ -596,7 +596,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -604,7 +604,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}
@@ -653,7 +653,7 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -661,7 +661,7 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}
@@ -708,7 +708,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -716,7 +716,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}
