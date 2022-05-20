@@ -178,6 +178,9 @@ template <class T> __global__ void gradient(int halowidth, int* active, int* lev
 
 
 }
+template __global__ void gradient<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
+template __global__ void gradient<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
+
 
 /*! \fn void gradientSM(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 * Depreciated shared memory version of Device kernel for calculating gradients
@@ -260,6 +263,8 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 
 
 }
+template __global__ void gradientSM<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
+template __global__ void gradientSM<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
 template <class T> __global__ void gradientSMB(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 {
@@ -267,7 +272,7 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 
 	//int ix = threadIdx.x+1;
 	//int iy = threadIdx.y+1;
-	int blkmemwidth = blockDim.x + halowidth * 2;
+	int blkmemwidth = 16 + halowidth * 2;
 	int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x-1;
 	int iy = threadIdx.y-1;
@@ -298,7 +303,7 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 	//syncthread is needed here ?
 
 
-	if (ix >= 0 && ix < blockDim.x && iy >=0 && iy < blockDim.x)
+	if (ix >= 0 && ix < 17 && iy >=0 && iy < 17)
 	{
 
 		dadx[i] = minmod2(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
@@ -307,7 +312,8 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 	}
 
 }
-
+template __global__ void gradientSMB<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
+template __global__ void gradientSMB<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
 template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx, T* dady)
 {

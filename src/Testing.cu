@@ -213,6 +213,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\n\nUser defined zones Outputs: " + result);
 			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
 		}
+		if (mytest == 997)
+		{
+			TestGradientSpeed(XParam, XModel, XModel_g);
+		}
 		if (mytest == 998)
 		{
 			//
@@ -3488,6 +3492,7 @@ template bool ZoneOutputTest<double>(int nzones, double zsinit);
 template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
 	//
+	int fastest = 1;
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
@@ -3497,84 +3502,87 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 
 	// Allocate CUDA events that we'll use for timing
-	cudaEvent_t start;
-	cudaEvent_t stop;
+	cudaEvent_t startA, startB, startC;
+	cudaEvent_t stopA, stopB, stopC ;
 
 
-	cudaEventCreate(&start);
+	cudaEventCreate(&startA);
 
 	
-	cudaEventCreate(&stop);
+	cudaEventCreate(&stopA);
 
 	// Record the start event
-	cudaEventRecord(start, NULL);
+	cudaEventRecord(startA, NULL);
 	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
-	cudaEventRecord(stop, NULL);
+	cudaEventRecord(stopA, NULL);
 
 	// Wait for the stop event to complete
-	cudaEventSynchronize(stop);
+	cudaEventSynchronize(stopA);
 
 	float msecTotalGrad = 0.0f;
-	cudaEventElapsedTime(&msecTotalGrad, start, stop);
+	cudaEventElapsedTime(&msecTotalGrad, startA, stopA);
 
-	cudaEventDestroy(start);
-	cudaEventDestroy(stop);
-
-
-	cudaEventCreate(&start);
+	cudaEventDestroy(startA);
+	cudaEventDestroy(stopA);
 
 
-	cudaEventCreate(&stop);
+	cudaEventCreate(&startB);
+
+
+	cudaEventCreate(&stopB);
 
 	// Record the start event
-	cudaEventRecord(start, NULL);
+	cudaEventRecord(startB, NULL);
 	gradientSM << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
-	cudaEventRecord(stop, NULL);
+	cudaEventRecord(stopB, NULL);
 
 	// Wait for the stop event to complete
-	cudaEventSynchronize(stop);
+	cudaEventSynchronize(stopB);
 
 	float msecTotalSM = 0.0f;
-	cudaEventElapsedTime(&msecTotalSM, start, stop);
+	cudaEventElapsedTime(&msecTotalSM, startB, stopB);
 
-	cudaEventDestroy(start);
-	cudaEventDestroy(stop);
-
-
-	cudaEventCreate(&start);
+	cudaEventDestroy(startB);
+	cudaEventDestroy(stopB);
 
 
-	cudaEventCreate(&stop);
+	cudaEventCreate(&startC);
+
+
+	cudaEventCreate(&stopC);
 
 	// Record the start event
-	cudaEventRecord(start, NULL);
+	cudaEventRecord(startC, NULL);
 	gradientSMB << < gridDim, blockDimX2, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
-	cudaEventRecord(stop, NULL);
+	cudaEventRecord(stopC, NULL);
 
 	// Wait for the stop event to complete
-	cudaEventSynchronize(stop);
+	cudaEventSynchronize(stopC);
 
 	float msecTotalSMB = 0.0f;
-	cudaEventElapsedTime(&msecTotalSMB, start, stop);
+	cudaEventElapsedTime(&msecTotalSMB, startC, stopC);
 
-	cudaEventDestroy(start);
-	cudaEventDestroy(stop);
+	cudaEventDestroy(startC);
+	cudaEventDestroy(stopC);
+
+
+	printf("speed : A=%f, B=%f, C=%f in msec\n", msecTotalGrad, msecTotalSM, msecTotalSMB);
 
 
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdx, XModel_g.grad.dzbdx);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
-		int ib = XBlock.active[ibl];
+		int ib = XModel.blocks.active[ibl];
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
@@ -3586,6 +3594,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 		}
 	}
 	
+	return fastest;
 
 }
 
