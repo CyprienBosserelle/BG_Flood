@@ -259,16 +259,10 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 	__syncthreads;
 
 
-	l_s[sx][sy] = a_s[sx - 1][sy];
-	r_s[sx][sy] = a_s[sx + 1][sy];
-	t_s[sx][sy] = a_s[sx][sy + 1];
-	b_s[sx][sy] = a_s[sx][sy - 1];
 
-	__syncthreads;
-
-	dadx[i] = minmod2(theta, l_s[sx ][sy], a_s[sx][sy], r_s[sx][sy]) / delta;
+	dadx[i] = minmod2(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
 	
-	dady[i] = minmod2(theta, b_s[sx][sy], a_s[sx][sy], t_s[sx][sy]) / delta;
+	dady[i] = minmod2(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
 
 
 }
@@ -315,9 +309,9 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 	if (ix >= 0 && ix < 16 && iy >=0 && iy < 16)
 	{
 
-		dadx[o] = minmod2(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
+		dadx[i] = minmod2(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
 
-		dady[o] = minmod2(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
+		dady[i] = minmod2(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
 	}
 
 }
