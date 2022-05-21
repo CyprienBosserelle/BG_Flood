@@ -214,8 +214,10 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 
 
 	__shared__ T a_s[18][18];
-
-
+	__shared__ T l_s[18][18];
+	__shared__ T r_s[18][18];
+	__shared__ T t_s[18][18];
+	__shared__ T b_s[18][18];
 
 
 	a_s[sx][sy] = a[i];
@@ -257,9 +259,16 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 	__syncthreads;
 
 
-	dadx[i] = minmod2(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
+	l_s[sx][sy] = a_s[sx - 1][sy];
+	r_s[sx][sy] = a_s[sx + 1][sy];
+	t_s[sx][sy] = a_s[sx][sy + 1];
+	b_s[sx][sy] = a_s[sx][sy - 1];
+
+	__syncthreads;
+
+	dadx[i] = minmod2(theta, l_s[sx ][sy], a_s[sx][sy], r_s[sx][sy]) / delta;
 	
-	dady[i] = minmod2(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
+	dady[i] = minmod2(theta, b_s[sx][sy], a_s[sx][sy], t_s[sx][sy]) / delta;
 
 
 }
