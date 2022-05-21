@@ -214,10 +214,7 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 
 
 	__shared__ T a_s[18][18];
-	__shared__ T l_s[18][18];
-	__shared__ T r_s[18][18];
-	__shared__ T t_s[18][18];
-	__shared__ T b_s[18][18];
+	
 
 
 	a_s[sx][sy] = a[i];
