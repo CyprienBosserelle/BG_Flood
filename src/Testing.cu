@@ -3551,7 +3551,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startB, NULL);
-	gradientSM << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientSM << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3574,7 +3574,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startC, NULL);
-	gradientSMB << < gridDim, blockDimX2, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientSMB << < gridDim, blockDimX2 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3602,6 +3602,15 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
 
 	printf("Runtime : normal=%f, shared mem=%f, SharedmemB=%f in msec\n", msecTotalGrad, msecTotalSM, msecTotalSMB);
+
+	creatncfileBUQ(XParam, XModel.blocks);
+
+	std::vector<std::string> varlist = { "zb", "dzbdx", "dzbdy" };
+
+	for (int ivar = 0; ivar < varlist.size(); ivar++)
+	{
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varlist[ivar], 3, XModel.OutputVarMap[varlist[ivar]], XModel.blocks.outZone[0]);
+	}
 
 	diffArray(XParam, XLoop, XModel.blocks, "SMdx", false, XModel.grad.dzbdx, XModel_g.grad.dzsdx, XModel.time.arrmax, XModel.grad.dzsdx);
 	
