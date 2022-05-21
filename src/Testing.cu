@@ -3595,14 +3595,15 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdx, XModel_g.grad.dzbdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdy, XModel_g.grad.dzbdy);
 
-	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdx, XModel_g.grad.dzsdx);
-	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdy, XModel_g.grad.dzsdy);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdx, XModel_g.grad.dzsdx);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdy, XModel_g.grad.dzsdy);
 
-	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
-	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
 
 	printf("Runtime : normal=%f, shared mem=%f, SharedmemB=%f in msec\n", msecTotalGrad, msecTotalSM, msecTotalSMB);
 
+	/*
 	creatncfileBUQ(XParam, XModel.blocks);
 
 	std::vector<std::string> varlist = { "zb", "dzbdx", "dzbdy" };
@@ -3619,10 +3620,16 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	diffArray(XParam, XLoop, XModel.blocks, "SMBdy", false, XModel.grad.dzbdy, XModel_g.grad.dhdy, XModel.time.arrmax, XModel.grad.dhdy);
 	diffArray(XParam, XLoop, XModel.blocks, "SMdy", false, XModel.grad.dzbdy, XModel_g.grad.dzsdy, XModel.time.arrmax, XModel.grad.dzsdy);
-
-	T maxdiffsm = T(0.0);
-	T maxdiffsmb = T(0.0);
+	*/
+	T maxdiffsmx, maxdiffsmy;
+	maxdiffsmx = T(0.0);
+	maxdiffsmy = T(0.0);
+	T maxdiffsmbx, maxdiffsmby;
+	maxdiffsmbx = T(0.0);
+	maxdiffsmby = T(0.0);
 	T diffsm, diffsmb;
+
+	
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -3632,18 +3639,26 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
-				diffsm = max(abs(XModel.grad.dzbdx[i] - XModel.grad.dzsdx[i]), abs(XModel.grad.dzbdy[i] - XModel.grad.dzsdy[i]));
-				maxdiffsm = max(maxdiffsm, diffsm);
+				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dzsdx[i]);
+				
+				maxdiffsmx = max(maxdiffsmx, diffsm);
 
-				diffsmb = max(abs(XModel.grad.dzbdx[i] - XModel.grad.dhdx[i]), abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]));
-				maxdiffsmb = max(maxdiffsmb, diffsmb);
+				diffsm = abs(XModel.grad.dzbdy[i] - XModel.grad.dzsdy[i]);
+
+				maxdiffsmy = max(maxdiffsmy, diffsm);
+
+				diffsmb = abs(XModel.grad.dzbdx[i] - XModel.grad.dhdx[i]);
+				maxdiffsmbx = max(maxdiffsmbx, diffsmb);
+
+				diffsmb =  abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]);
+				maxdiffsmby = max(maxdiffsmby, diffsmb);
 				//
 			}
 		}
 	}
 
 	
-	printf("max error : , sm=%e, smb=%e in m\n", maxdiffsm, maxdiffsmb);
+	printf("max error : , smx=%e, smy=%e,  smbx=%e, smby=%e in m\n", maxdiffsmx, maxdiffsmy, maxdiffsmbx, maxdiffsmby);
 	
 	return fastest;
 
