@@ -228,7 +228,7 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 	{
 		iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 		a_s[sx + 1][sy] = a[iright];
-		__syncthreads;
+		
 	}
 	
 
@@ -236,22 +236,22 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 	{
 		ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);;
 		a_s[sx - 1][sy] = a[ileft];
-		__syncthreads;
+		
 	}
-	
+	__syncthreads;
 
 	if (threadIdx.y == blockDim.y - 1)
 	{
 		itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);;
 		a_s[sx][sy + 1] = a[itop];
-		__syncthreads;
+		
 	}
 	
 	if (threadIdx.y == 0)
 	{
 		ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 		a_s[sx][sy - 1] = a[ibot];
-		__syncthreads;
+		
 	}
 
 	__syncthreads;
