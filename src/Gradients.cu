@@ -218,7 +218,7 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 
 
 	a_s[sx][sy] = a[i];
-	__syncthreads;
+	
 	//syncthread is needed here ?
 		
 
@@ -237,7 +237,6 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 		a_s[sx - 1][sy] = a[ileft];
 		
 	}
-	__syncthreads;
 
 	if (threadIdx.y == blockDim.y - 1)
 	{
@@ -253,7 +252,7 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 		
 	}
 
-	__syncthreads;
+	__syncthreads();
 
 
 
@@ -291,7 +290,7 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 	int sy = iy + 1;
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	int o = memloc(halowidth, blkmemwidth, sx, sy, ib);
+	//int o = memloc(halowidth, blkmemwidth, sx, sy, ib);
 
 	__shared__ T a_s[18][18];
 
@@ -299,16 +298,22 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 
 
 	a_s[sx][sy] = a[i];
-	__syncthreads;
+	__syncthreads();
 	//syncthread is needed here ?
+
+	T aleft, aright, atop, abot;
+	aleft = a_s[sx - 1][sy];
+	aright = a_s[sx + 1][sy];
+	atop = a_s[sx][sy + 1];
+	abot = a_s[sx][sy - 1];
 
 
 	if (ix >= 0 && ix < 16 && iy >=0 && iy < 16)
 	{
 
-		dadx[i] = minmod2(theta, a_s[sx - 1][sy], a_s[sx][sy], a_s[sx + 1][sy]) / delta;
+		dadx[i] = minmod2(theta, aleft, a_s[sx][sy], aright) / delta;
 
-		dady[i] = minmod2(theta, a_s[sx][sy - 1], a_s[sx][sy], a_s[sx][sy + 1]) / delta;
+		dady[i] = minmod2(theta, abot, a_s[sx][sy], atop) / delta;
 	}
 
 }

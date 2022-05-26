@@ -3598,7 +3598,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdx, XModel_g.grad.dzsdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdy, XModel_g.grad.dzsdy);
 
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdx, XModel_g.grad.dhdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
 
 	printf("Runtime : normal=%f, shared mem=%f, SharedmemB=%f in msec\n", msecTotalGrad, msecTotalSM, msecTotalSMB);
@@ -3647,11 +3647,11 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 				maxdiffsmy = max(maxdiffsmy, diffsm);
 
-				diffsmb = abs(XModel.grad.dzbdx[i] - XModel.grad.dhdx[i]);
-				maxdiffsmbx = max(maxdiffsmbx, diffsmb);
+				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dhdx[i]);
+				maxdiffsmbx = max(maxdiffsmbx, diffsm);
 
-				diffsmb =  abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]);
-				maxdiffsmby = max(maxdiffsmby, diffsmb);
+				diffsm =  abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]);
+				maxdiffsmby = max(maxdiffsmby, diffsm);
 				//
 			}
 		}
