@@ -3679,6 +3679,15 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	cudaEventDestroy(startG);
 	cudaEventDestroy(stopG);
 
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdx, XModel_g.grad.dzbdx);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdy, XModel_g.grad.dzbdy);
+
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdx, XModel_g.grad.dzsdx);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdy, XModel_g.grad.dzsdy);
+
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdx, XModel_g.grad.dhdx);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
+
 	cudaEventCreate(&startGnew);
 
 
@@ -3696,6 +3705,8 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	cudaEventDestroy(startGnew);
 	cudaEventDestroy(stopGnew);
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, { "dhdx","dhdy", "dzsdx","dzsdy","dudx","dudy","dvdx","dvdy" }, true);
 
 	printf("Runtime : old gradient=%f, new Gradient=%f in msec\n", msecTotalG, msecTotalGnew);
 	
