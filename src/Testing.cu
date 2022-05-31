@@ -3502,8 +3502,8 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 
 	// Allocate CUDA events that we'll use for timing
-	cudaEvent_t startA, startB, startC;
-	cudaEvent_t stopA, stopB, stopC ;
+	cudaEvent_t startA, startB, startC, startG, startGnew;
+	cudaEvent_t stopA, stopB, stopC, stopG, stopGnew;
 
 
 
@@ -3659,6 +3659,45 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	
 	printf("max error : , smx=%e, smy=%e,  smbx=%e, smby=%e in m\n", maxdiffsmx, maxdiffsmy, maxdiffsmbx, maxdiffsmby);
+
+
+	cudaEventCreate(&startG);
+
+
+	cudaEventCreate(&stopG);
+
+	cudaEventRecord(startG, NULL);
+	gradientGPU(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	cudaEventRecord(stopG, NULL);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stopG);
+
+	float msecTotalG = 0.0f;
+	cudaEventElapsedTime(&msecTotalG, startG, stopG);
+
+	cudaEventDestroy(startG);
+	cudaEventDestroy(stopG);
+
+	cudaEventCreate(&startGnew);
+
+
+	cudaEventCreate(&stopGnew);
+
+	cudaEventRecord(startGnew, NULL);
+	gradientGPUnew(XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.zb);
+	cudaEventRecord(stopGnew, NULL);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stopGnew);
+
+	float msecTotalGnew = 0.0f;
+	cudaEventElapsedTime(&msecTotalGnew, startGnew, stopGnew);
+
+	cudaEventDestroy(startGnew);
+	cudaEventDestroy(stopGnew);
+
+	printf("Runtime : old gradient=%f, new Gradient=%f in msec\n", msecTotalG, msecTotalGnew);
 	
 	return fastest;
 
