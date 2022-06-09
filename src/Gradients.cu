@@ -521,7 +521,66 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 template __global__ void gradientSMB<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
 template __global__ void gradientSMB<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
+template <class T> __global__ void gradientSMC(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
+{
+	//int *leftblk,int *rightblk,int* topblk, int * botblk,
 
+	//int ix = threadIdx.x+1;
+	//int iy = threadIdx.y+1;
+	int blkmemwidth = blockDim.x + halowidth * 2;
+	int flatenwidth = blockDim.x * blockDim.y;
+	int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
+
+	int lev = level[ib];
+
+	T delta = calcres(dx, lev);
+
+	int ism =ix + iy * blockDim.x;
+
+	int istore = ism + ib * (blkmemwidth * blkmemwidth);
+	//memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	int iright, ileft, itop, ibot;
+	// shared array index to make the code bit more readable
+	int sx = ix + halowidth;
+	int sy = iy + halowidth;
+
+
+
+	__shared__ T a_s[324];
+
+
+	a_s[ism] = a[istore];
+
+	if (ism < (324 - (flatenwidth)))
+	{
+		a_s[ism + flatenwidth] = a[istore + flatenwidth];
+	}
+
+
+	__syncthreads();
+
+	int ileft, iright, itop, ibot, i;
+	int iwrite= memloc(halowidth, blkmemwidth, ix, iy, ib);
+	i = memloc(halowidth, blkmemwidth, ix, iy, 0);
+	ileft= memloc(halowidth, blkmemwidth, ix - 1, iy, 0);
+	iright = memloc(halowidth, blkmemwidth, ix + 1, iy, 0);
+	itop = memloc(halowidth, blkmemwidth, ix, iy+1, 0);
+	ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, 0);
+
+
+	dadx[iwrite] = minmod2(theta, a_s[ileft], a_s[i], a_s[iright]) / delta;
+
+	dady[iwrite] = minmod2(theta, a_s[ibot], a_s[i], a_s[itop]) / delta;
+
+
+}
+template __global__ void gradientSMC<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
+template __global__ void gradientSMC<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
 
 
