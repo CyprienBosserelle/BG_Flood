@@ -60,6 +60,11 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 template <class T> __global__ void fillBot(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, T* a);
 template <class T> __global__ void fillTop(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a);
 
+template <class T> __global__ void fillLeftnew(int halowidth, int nblk, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, T* a);
+template <class T> __global__ void fillRightnew(int halowidth, int nblk, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a);
+template <class T> __global__ void fillBotnew(int halowidth, int nblk, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, T* a);
+template <class T> __global__ void fillTopnew(int halowidth, int nblk, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a);
+
 template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a);
 template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a);
 

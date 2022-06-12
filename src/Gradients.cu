@@ -544,7 +544,7 @@ template <class T> __global__ void gradientSMC(int halowidth, int* active, int* 
 	int istore = ism + ib * (blkmemwidth * blkmemwidth);
 	//memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-	int iright, ileft, itop, ibot;
+	//int iright, ileft, itop, ibot;
 	// shared array index to make the code bit more readable
 	int sx = ix + halowidth;
 	int sy = iy + halowidth;
