@@ -62,65 +62,67 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	}
 	else
 	{
-		refine_linearGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-		//refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-		refine_linearGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-		refine_linearGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+		if (XParam.maxlevel > XParam.minlevel)
+		{
+			refine_linearGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+			//refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+			refine_linearGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+			refine_linearGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
-		RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XBlock, XEv, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XBlock, XEv, zb);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		//gradient << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			//gradient << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		//gradient << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			//gradient << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		//gradient << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
-		CUDA_CHECK(cudaDeviceSynchronize());
+			//gradient << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
-		//gradient << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-
-
-		/*
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx);
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth-1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx);
-
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdy);
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth-1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdy);
-
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx);
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx);
-
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdy);
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdy);
-
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx);
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx);
-
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudy);
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudy);
-
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx);
-		gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx);
-
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdy);
-		gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdy);
-		CUDA_CHECK(cudaDeviceSynchronize());
-		*/
+			//gradient << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+			CUDA_CHECK(cudaDeviceSynchronize());
 
 
-		gradientHaloGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-		gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-		gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-		gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
+			/*
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx);
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth-1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx);
+
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdy);
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth-1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdy);
+
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx);
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx);
+
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdy);
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdy);
+
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx);
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx);
+
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudy);
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudy);
+
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx);
+			gradientedgeX << < gridDim, blockDimLR, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx);
+
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, 0, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdy);
+			gradientedgeY << < gridDim, blockDimBT, 0 >> > (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdy);
+			CUDA_CHECK(cudaDeviceSynchronize());
+			*/
+
+
+			gradientHaloGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+			gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+			gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+			gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+		}
 		if (XParam.engine == 1)
 		{
 			//  wet slope limiter
@@ -166,33 +168,45 @@ template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<
 
 	dim3 gridDim(XParam.nblk, 1, 1);
 
+	const int num_streams = 4;
+	
+	cudaStream_t streams[num_streams];
+
+	for (int i = 0; i < num_streams; i++)
+	{
+		CUDA_CHECK(cudaStreamCreate(&streams[i]));
+	}
+
 	//gradient << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	gradientSM << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientSMC << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//gradient << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	gradientSM << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientSMC << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//gradient << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
-	gradientSM << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientSMC << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//gradient << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
-	gradientSM << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	gradientSMC << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 
 	//CUDA_CHECK(cudaDeviceSynchronize());
-	
+	for (int i = 0; i < num_streams; i++)
+	{
+		cudaStreamDestroy(streams[i]);
+	}
 	
 
 
 	//fillHaloGPU(XParam, XBlock, XGrad);
-	gradientHaloGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-	gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	gradientHaloGPUnew(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	gradientHaloGPUnew(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	gradientHaloGPUnew(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	gradientHaloGPUnew(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
 
 	if (XParam.conserveElevation)
@@ -287,10 +301,10 @@ template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<
 				cudaStreamDestroy(streams[i]);
 			}
 			*/
-			gradientHaloGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-			gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-			gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-			gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+			gradientHaloGPUnew(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+			gradientHaloGPUnew(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+			gradientHaloGPUnew(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+			gradientHaloGPUnew(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 		}
 		if (XParam.engine == 1)
 		{
@@ -542,9 +556,13 @@ template <class T> __global__ void gradientSMC(int halowidth, int* active, int* 
 	int ism =ix + iy * blockDim.x;
 
 	int istore = ism + ib * (blkmemwidth * blkmemwidth);
+	//(i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth * blkmemwidth);
 	//memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-	//int iright, ileft, itop, ibot;
+
+	int ileft, iright, itop, ibot, i, iwrite;
+	
+	
 	// shared array index to make the code bit more readable
 	int sx = ix + halowidth;
 	int sy = iy + halowidth;
@@ -552,30 +570,61 @@ template <class T> __global__ void gradientSMC(int halowidth, int* active, int* 
 
 
 	__shared__ T a_s[324];
+	//__shared__ T dadx_out[18 * 18];
+	//__shared__ T dady_out[18 * 18];
+	//__shared__ T a_s[324];
+	//__shared__ T a_left[324];
+	//__shared__ T a_right[324];
+	//__shared__ T a_top[324];
+	//__shared__ T a_bot[324];
 
 
+	
+	//(i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth * blkmemwidth);
+	//memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+//
 	a_s[ism] = a[istore];
-
+	
 	if (ism < (324 - (flatenwidth)))
 	{
 		a_s[ism + flatenwidth] = a[istore + flatenwidth];
 	}
-
+	
 
 	__syncthreads();
-
-	int ileft, iright, itop, ibot, i;
-	int iwrite= memloc(halowidth, blkmemwidth, ix, iy, ib);
 	i = memloc(halowidth, blkmemwidth, ix, iy, 0);
-	ileft= memloc(halowidth, blkmemwidth, ix - 1, iy, 0);
+	ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, 0);
 	iright = memloc(halowidth, blkmemwidth, ix + 1, iy, 0);
-	itop = memloc(halowidth, blkmemwidth, ix, iy+1, 0);
+	itop = memloc(halowidth, blkmemwidth, ix, iy + 1, 0);
 	ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, 0);
+	iwrite = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
+	//a_left[i] = a_s[ileft];
+	//a_right[i] = a_s[iright];
+	//a_top[i] = a_s[itop];
+	//a_bot[i] = a_s[ibot];
 
+	//dadx[iwrite] = minmod2(theta, a_left[i], a_s[i], a_right[i]) / delta;
+	//dady[iwrite] = minmod2(theta, a_bot[i], a_s[i], a_top[i]) / delta;
 	dadx[iwrite] = minmod2(theta, a_s[ileft], a_s[i], a_s[iright]) / delta;
 
 	dady[iwrite] = minmod2(theta, a_s[ibot], a_s[i], a_s[itop]) / delta;
+
+	/*
+	dadx_out[i] = minmod2(theta, a_s[ileft], a_s[i], a_s[iright]) / delta;
+	dady_out[i] = minmod2(theta, a_s[ibot], a_s[i], a_s[itop]) / delta;
+
+
+	dadx[istore] = dadx_out[ism];// = a[istore];
+	dady[istore] = dady_out[ism];
+
+	if (ism < (324 - (flatenwidth)))
+	{
+		dadx[istore + flatenwidth] = dadx_out[ism + flatenwidth];
+		dady[istore + flatenwidth] = dady_out[ism + flatenwidth];
+	}
+	*/
 
 
 }
@@ -2264,6 +2313,43 @@ template <class T> void gradientHaloGPU(Param XParam, BlockP<T>XBlock, T* a, T* 
 	
 }
 
+template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
+{
+	const int num_streams = 4;
+	
+	cudaStream_t streams[num_streams];
+
+	for (int i = 0; i < num_streams; i++)
+	{
+		CUDA_CHECK(cudaStreamCreate(&streams[i]));
+	}
+	
+	dim3 blockDimL(2, XParam.blkwidth, 1);
+	dim3 blockDimB(XParam.blkwidth, 2, 1);
+	dim3 gridDim(ceil(XParam.nblk/2), 1, 1);
+
+
+	gradientHaloLeftGPU << < gridDim, blockDimL, 0, streams[0] >> > (XParam, XBlock, a, dadx, dady);
+	
+
+	gradientHaloRightGPU << < gridDim, blockDimL, 0, streams[1] >> > (XParam, XBlock, a, dadx, dady);
+	
+
+	gradientHaloBotGPU << < gridDim, blockDimB, 0, streams[2] >> > (XParam, XBlock, a, dadx, dady);
+	
+
+	gradientHaloTopGPU << < gridDim, blockDimB, 0, streams[3] >> > (XParam, XBlock, a, dadx, dady);
+
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	
+	for (int i = 0; i < num_streams; i++)
+	{
+		cudaStreamDestroy(streams[i]);
+	}
+
+
+}
+
 
 template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
 {
@@ -2937,6 +3023,147 @@ template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XB
 
 }
 
+template <class T> __global__ void gradientHaloLeftGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
+{
+	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	int ix = -1;
+	int iy = threadIdx.y;
+
+	int ibl = threadIdx.x + blockIdx.x * blockDim.x;;
+	if (ibl < XParam.nblk)
+	{
+
+		int ib = XBlock.active[ibl];
+		int i, jj, ii, ir, it, itr;
+		int xplus, read;
+
+		T delta, aright, aleft;
+
+
+
+		i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+		xplus = memloc(XParam.halowidth, blkmemwidth, ix + 1, iy, ib);
+
+
+		aright = a[xplus];
+
+
+
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+
+		if (XBlock.LeftBot[ib] == ib)//The lower half is a boundary 
+		{
+			if (iy < (XParam.blkwidth / 2))
+			{
+
+				read = memloc(XParam.halowidth, blkmemwidth, 0, iy, ib);// or memloc(XParam, -1, j, ib) but they should be the same
+
+				aleft = a[read];
+			}
+
+			if (XBlock.LeftTop[ib] == ib) // boundary on the top half too
+			{
+				if (iy >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, 0, iy, ib);
+
+					aleft = a[read];
+				}
+			}
+			else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+			{
+
+				if (iy >= (XParam.blkwidth / 2))
+				{
+
+					jj = (iy - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 3), jj, XBlock.LeftTop[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 4), jj, XBlock.LeftTop[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 3), jj + 1, XBlock.LeftTop[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 4), jj + 1, XBlock.LeftTop[ib]);
+
+					aleft = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+
+				}
+			}
+		}
+		else if (XBlock.level[ib] == XBlock.level[XBlock.LeftBot[ib]]) // LeftTop block does not exist
+		{
+
+			read = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 2), iy, XBlock.LeftBot[ib]);
+			aleft = a[read];
+
+		}
+		else if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])
+		{
+
+			if (iy < (XParam.blkwidth / 2))
+			{
+
+				jj = iy * 2;
+				int bb = XBlock.LeftBot[ib];
+
+				ii = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 3), jj, bb);
+				ir = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 4), jj, bb);
+				it = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 3), jj + 1, bb);
+				itr = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 4), jj + 1, bb);
+
+				aleft = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			//now find out aboy lefttop block
+			if (XBlock.LeftTop[ib] == ib)
+			{
+				if (iy >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, 0, iy, ib);
+
+					aleft = a[read];
+				}
+			}
+			else
+			{
+				if (iy >= (XParam.blkwidth / 2))
+				{
+					//
+					jj = (iy - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 3), jj, XBlock.LeftTop[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 4), jj, XBlock.LeftTop[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 3), jj + 1, XBlock.LeftTop[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 4), jj + 1, XBlock.LeftTop[ib]);
+
+					aleft = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+
+		}
+		else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+		{
+			jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+			T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
+
+			ii = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 1), jj, XBlock.LeftBot[ib]);
+			ir = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 2), jj, XBlock.LeftBot[ib]);
+			it = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 1), jj - 1, XBlock.LeftBot[ib]);
+			itr = memloc(XParam.halowidth, blkmemwidth, (XParam.blkwidth - 2), jj - 1, XBlock.LeftBot[ib]);
+
+			aleft = BilinearInterpolation(a[itr], a[ir], a[it], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+		}
+
+
+
+
+
+		dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
+		//dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
+	}
+}
+
 template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3074,6 +3301,145 @@ template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>X
 
 }
 
+
+template <class T> __global__ void gradientHaloRightGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
+{
+	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	int ix = XParam.blkwidth;
+	int iy = threadIdx.y;
+	int ibl = threadIdx.x + blockIdx.x * blockDim.x;;
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+		int i, jj, ii, ir, it, itr;
+		int xminus, read;
+
+		T delta, aright, aleft;
+
+
+
+		i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+		xminus = memloc(XParam.halowidth, blkmemwidth, ix - 1, iy, ib);
+
+
+		aleft = a[xminus];
+
+
+
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+
+		if (XBlock.RightBot[ib] == ib)//The lower half is a boundary 
+		{
+			if (iy < (XParam.blkwidth / 2))
+			{
+
+				read = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, iy, ib);// or memloc(XParam, -1, j, ib) but they should be the same
+
+				aright = a[read];;
+			}
+
+			if (XBlock.RightTop[ib] == ib) // boundary on the top half too
+			{
+				if (iy >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, iy, ib);
+
+					aright = a[read];
+				}
+			}
+			else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+			{
+
+				if (iy >= (XParam.blkwidth / 2))
+				{
+
+					jj = (iy - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, 3, jj, XBlock.RightTop[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, 2, jj, XBlock.RightTop[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, 3, jj + 1, XBlock.RightTop[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, 2, jj + 1, XBlock.RightTop[ib]);
+
+					aright = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+
+				}
+			}
+		}
+		else if (XBlock.level[ib] == XBlock.level[XBlock.RightBot[ib]]) // LeftTop block does not exist
+		{
+
+			read = memloc(XParam.halowidth, blkmemwidth, 1, iy, XBlock.RightBot[ib]);
+			aright = a[read];
+
+		}
+		else if (XBlock.level[XBlock.RightBot[ib]] > XBlock.level[ib])
+		{
+
+			if (iy < (XParam.blkwidth / 2))
+			{
+
+				jj = iy * 2;
+				int bb = XBlock.RightBot[ib];
+
+				ii = memloc(XParam.halowidth, blkmemwidth, 3, jj, bb);
+				ir = memloc(XParam.halowidth, blkmemwidth, 2, jj, bb);
+				it = memloc(XParam.halowidth, blkmemwidth, 3, jj + 1, bb);
+				itr = memloc(XParam.halowidth, blkmemwidth, 2, jj + 1, bb);
+
+				aright = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			//now find out aboy lefttop block
+			if (XBlock.RightTop[ib] == ib)
+			{
+				if (iy >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, iy, ib);
+
+					aright = a[read];
+				}
+			}
+			else
+			{
+				if (iy >= (XParam.blkwidth / 2))
+				{
+					//
+					jj = (iy - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, 3, jj, XBlock.RightTop[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, 2, jj, XBlock.RightTop[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, 3, jj + 1, XBlock.RightTop[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, 2, jj + 1, XBlock.RightTop[ib]);
+
+					aright = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+
+		}
+		else if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+		{
+			jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + XParam.blkwidth / 2;
+			T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
+
+			ii = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
+			ir = memloc(XParam.halowidth, blkmemwidth, 1, jj, XBlock.RightBot[ib]);
+			it = memloc(XParam.halowidth, blkmemwidth, 0, jj - 1, XBlock.RightBot[ib]);
+			itr = memloc(XParam.halowidth, blkmemwidth, 1, jj - 1, XBlock.RightBot[ib]);
+
+			aright = BilinearInterpolation(a[it], a[ii], a[itr], a[ir], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), jr);
+		}
+
+
+
+
+
+		dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
+		//dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
+	}
+}
 
 template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
@@ -3218,6 +3584,151 @@ template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBl
 
 }
 
+template <class T> __global__ void gradientHaloBotGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
+{
+	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	int iy = -1;
+	int ix = threadIdx.x;
+	int ibl = threadIdx.y + blockIdx.x * blockDim.y;
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+
+
+		int i, jj, ii, ir, it, itr;
+		int yplus, read;
+
+		T delta, atop, abot;
+
+
+		i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+		yplus = memloc(XParam.halowidth, blkmemwidth, ix, iy + 1, ib);
+
+
+
+
+		atop = a[yplus];
+
+
+
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+
+		if (XBlock.BotLeft[ib] == ib)//The lower half is a boundary 
+		{
+			if (ix < (XParam.blkwidth / 2))
+			{
+
+				read = memloc(XParam.halowidth, blkmemwidth, ix, 0, ib);// or memloc(XParam, -1, j, ib) but they should be the same
+
+				abot = a[read];
+
+			}
+
+			if (XBlock.BotRight[ib] == ib) // boundary on the top half too
+			{
+				if (ix >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, ix, 0, ib);
+
+					abot = a[read];
+				}
+			}
+			else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+			{
+
+				if (ix >= (XParam.blkwidth / 2))
+				{
+
+					jj = (ix - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 3), XBlock.BotRight[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 4), XBlock.BotRight[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, jj + 1, (XParam.blkwidth - 3), XBlock.BotRight[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, jj + 1, (XParam.blkwidth - 4), XBlock.BotRight[ib]);
+
+					abot = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+
+				}
+			}
+		}
+		else if (XBlock.level[ib] == XBlock.level[XBlock.BotLeft[ib]]) // LeftTop block does not exist
+		{
+
+			read = memloc(XParam.halowidth, blkmemwidth, ix, (XParam.blkwidth - 2), XBlock.BotLeft[ib]);
+			abot = a[read];
+
+
+
+		}
+		else if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+
+			if (ix < (XParam.blkwidth / 2))
+			{
+
+				jj = ix * 2;
+				int bb = XBlock.BotLeft[ib];
+
+				ii = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 3), bb);
+				ir = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 4), bb);
+				it = memloc(XParam.halowidth, blkmemwidth, jj + 1, (XParam.blkwidth - 3), bb);
+				itr = memloc(XParam.halowidth, blkmemwidth, jj + 1, (XParam.blkwidth - 4), bb);
+
+				abot = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			//now find out aboy lefttop block
+			if (XBlock.BotRight[ib] == ib)
+			{
+				if (ix >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, ix, 0, ib);
+
+					abot = a[read];
+				}
+			}
+			else
+			{
+				if (ix >= (XParam.blkwidth / 2))
+				{
+					//
+					jj = (ix - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 3), XBlock.BotRight[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 4), XBlock.BotRight[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, jj + 1, (XParam.blkwidth - 3), XBlock.BotRight[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, jj + 1, (XParam.blkwidth - 4), XBlock.BotRight[ib]);
+
+					abot = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+
+		}
+		else if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+		{
+			jj = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
+			T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
+
+			ii = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
+			ir = memloc(XParam.halowidth, blkmemwidth, jj, (XParam.blkwidth - 2), XBlock.BotLeft[ib]);
+			it = memloc(XParam.halowidth, blkmemwidth, jj - 1, (XParam.blkwidth - 1), XBlock.BotLeft[ib]);
+			itr = memloc(XParam.halowidth, blkmemwidth, jj - 1, (XParam.blkwidth - 2), XBlock.BotLeft[ib]);
+
+			abot = BilinearInterpolation(a[itr], a[it], a[ir], a[ii], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.75));
+		}
+
+
+
+
+
+		//dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
+		dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
+	}
+}
+
 
 template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
@@ -3360,4 +3871,151 @@ template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBl
 	//dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
 	dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
 
+}
+
+template <class T> __global__ void gradientHaloTopGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
+{
+	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
+	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
+	int iy = XParam.blkwidth;
+	int ix = threadIdx.x;
+
+	
+	int ibl = threadIdx.y + blockIdx.x * blockDim.y;
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+
+
+		int i, jj, ii, ir, it, itr;
+		int yminus, read;
+
+		T delta, atop, abot;
+
+
+		i = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+		yminus = memloc(XParam.halowidth, blkmemwidth, ix, XParam.blkwidth - 1, ib);
+
+
+
+
+		abot = a[yminus];
+
+
+
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+
+
+		if (XBlock.TopLeft[ib] == ib)//The lower half is a boundary 
+		{
+			if (ix < (XParam.blkwidth / 2))
+			{
+
+				read = memloc(XParam.halowidth, blkmemwidth, ix, XParam.blkwidth - 1, ib);// or memloc(XParam, -1, j, ib) but they should be the same
+
+				atop = a[read];
+
+			}
+
+			if (XBlock.TopRight[ib] == ib) // boundary on the top half too
+			{
+				if (ix >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, ix, XParam.blkwidth - 1, ib);
+
+					atop = a[read];
+				}
+			}
+			else // boundary is only on the bottom half and implicitely level of lefttopib is levelib+1
+			{
+
+				if (ix >= (XParam.blkwidth / 2))
+				{
+
+					jj = (ix - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, jj, 3, XBlock.TopRight[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, jj, 2, XBlock.TopRight[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, jj + 1, 3, XBlock.TopRight[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, jj + 1, 2, XBlock.TopRight[ib]);
+
+					atop = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+
+				}
+			}
+		}
+		else if (XBlock.level[ib] == XBlock.level[XBlock.TopLeft[ib]]) // LeftTop block does not exist
+		{
+
+			read = memloc(XParam.halowidth, blkmemwidth, ix, 1, XBlock.TopLeft[ib]);
+			atop = a[read];
+
+
+
+		}
+		else if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+		{
+
+			if (ix < (XParam.blkwidth / 2))
+			{
+
+				jj = ix * 2;
+				int bb = XBlock.TopLeft[ib];;
+
+				ii = memloc(XParam.halowidth, blkmemwidth, jj, 3, bb);
+				ir = memloc(XParam.halowidth, blkmemwidth, jj, 2, bb);
+				it = memloc(XParam.halowidth, blkmemwidth, jj + 1, 3, bb);
+				itr = memloc(XParam.halowidth, blkmemwidth, jj + 1, 2, bb);
+
+				atop = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			//now find out aboy lefttop block
+			if (XBlock.TopRight[ib] == ib)
+			{
+				if (ix >= (XParam.blkwidth / 2))
+				{
+					//
+
+					read = memloc(XParam.halowidth, blkmemwidth, ix, XParam.blkwidth - 1, ib);
+
+					atop = a[read];
+				}
+			}
+			else
+			{
+				if (ix >= (XParam.blkwidth / 2))
+				{
+					//
+					jj = (ix - XParam.blkwidth / 2) * 2;
+					ii = memloc(XParam.halowidth, blkmemwidth, jj, 3, XBlock.TopRight[ib]);
+					ir = memloc(XParam.halowidth, blkmemwidth, jj, 2, XBlock.TopRight[ib]);
+					it = memloc(XParam.halowidth, blkmemwidth, jj + 1, 3, XBlock.TopRight[ib]);
+					itr = memloc(XParam.halowidth, blkmemwidth, jj + 1, 2, XBlock.TopRight[ib]);
+
+					atop = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+
+		}
+		else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
+		{
+			jj = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + XParam.blkwidth / 2;
+			T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
+
+			ii = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopLeft[ib]);
+			ir = memloc(XParam.halowidth, blkmemwidth, jj, 1, XBlock.TopLeft[ib]);
+			it = memloc(XParam.halowidth, blkmemwidth, jj - 1, 0, XBlock.TopLeft[ib]);
+			itr = memloc(XParam.halowidth, blkmemwidth, jj - 1, 1, XBlock.TopLeft[ib]);
+
+			atop = BilinearInterpolation(a[it], a[itr], a[ii], a[ir], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.25));
+		}
+
+
+
+
+
+		//dadx[i] = minmod2(T(XParam.theta), aleft, a[i], aright) / delta;
+		dady[i] = minmod2(T(XParam.theta), abot, a[i], atop) / delta;
+	}
 }

@@ -34,7 +34,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		cudaStreamDestroy(atmpstreams[0]);
 
 		//Calc dpdx and dpdy
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		gradient<< < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		//
@@ -66,7 +66,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Calculate gradient for evolving parameters for predictor step
-	gradientGPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	gradientGPUnew(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
 	
 	//============================================
 	// Synchronise all ongoing streams
@@ -166,7 +166,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	//============================================
 	// Calculate gradient for evolving parameters
-	gradientGPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.zb);
+	gradientGPUnew(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	//============================================
