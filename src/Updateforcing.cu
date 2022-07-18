@@ -643,8 +643,10 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 	for (int nd = 0; nd < deform.size(); nd++)
 	{
-		//
-		if ((XLoop.totaltime - deform[nd].startime) <= XLoop.dt && (XLoop.totaltime - deform[nd].startime) > 0.0)
+		// This should be: st >= tt-dt && st < tt here tt is at the end of the flow step rather then at the start
+		// ((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime)
+		// how to account for round-off error? 
+		if (((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime))
 		{
 			updatezbhalo = true;
 
