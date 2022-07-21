@@ -648,7 +648,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 		// how to account for round-off error? 
 		if (((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime))
 		{
-			log("Applying deform")
+			log("Applying deform");
 			updatezbhalo = true;
 
 			T scale = (deform[nd].duration > 0.0) ? T(1.0 / deform[nd].duration * (XLoop.totaltime - deform[nd].startime)) : T(1.0);
