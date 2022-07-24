@@ -829,6 +829,34 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}
 
+	//Tsunami deformation input files
+	parameterstr = "cavity";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		deformmap<float> thisdeform;
+
+		thisdeform.iscavity = true;
+		std::vector<std::string> items = split(parametervalue, ',');
+		//Need sanity check here
+		thisdeform = readfileinfo(items[0], thisdeform);
+		//thisdeform.inputfile = items[0];
+		if (items.size() > 1)
+		{
+			thisdeform.startime = std::stod(items[1]);
+
+		}
+		if (items.size() > 2)
+		{
+			thisdeform.duration = std::stod(items[2]);
+
+		}
+
+		forcing.deform.push_back(thisdeform);
+
+	}
+
 	//River
 	paramvec = { "rivers","river" };
 	parametervalue = findparameter(paramvec, line);

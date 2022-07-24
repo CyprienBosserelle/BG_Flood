@@ -696,6 +696,7 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 	unsigned int ib = XBlock.active[ibl];
 	int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
 
+	T zss, zbb;
 	T def;
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
@@ -704,8 +705,21 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 
 	def= interpDyn2BUQ(x, y, defmap.GPU);
 
-	zs[i] = zs[i] + def * scale;
-	zb[i] = zb[i] + def * scale;
+	zss = zs[i] + def * scale;
+	if (defmap.iscavity == true)
+	{
+		zbb = min(zss, zb[i]);
+	}
+	else
+	{
+		zbb = zb[i] + def * scale;
+	}
+
+	zs[i] = zss;
+	zb[i] = zbb;
+
+	//zs[i] = zs[i] + def * scale;
+	//zb[i] = zb[i] + def * scale;
 
 
 
@@ -715,7 +729,7 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 {
 	int ib;
 	
-	
+	T zbb,zss;
 
 	T def;
 
@@ -736,8 +750,18 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 
 				def = interp2BUQ(x, y, defmap);
 
-				zs[i] = zs[i] + def * scale;
-				zb[i] = zb[i] + def * scale;
+				zss = zs[i] + def * scale;
+				if (defmap.iscavity == true)
+				{
+					zbb = min(zss, zb[i]);
+				}
+				else
+				{
+					zbb = zb[i] + def * scale;
+				}
+
+				zs[i] = zss;
+				zb[i] = zbb;
 			}
 		}
 	}
