@@ -629,8 +629,8 @@ Param readparamstr(std::string line, Param param)
 	}
 	
 
-	parameterstr = "spherical";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = {"spherical", "geo"};
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		param.spherical = std::stoi(parametervalue);

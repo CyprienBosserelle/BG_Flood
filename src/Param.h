@@ -183,7 +183,7 @@ public:
 	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be ==0. would be 
 
 	// This here should be stored in a structure at a later stage
-	std::string AdatpCrit;
+	std::string AdatpCrit; 
 	int* AdatpCrit_funct_pointer;
 	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
 	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
