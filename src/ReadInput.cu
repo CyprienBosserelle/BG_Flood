@@ -1,4 +1,3 @@
-
 //////////////////////////////////////////////////////////////////////////////////
 //                                                                              //
 //Copyright (C) 2018 Bosserelle                                                 //
@@ -401,7 +400,7 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy" };
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy"};
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -419,13 +418,20 @@ Param readparamstr(std::string line, Param param)
 			param.outmean = (vvar.compare("zsmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("umean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("vmean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("Umean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("hUmean") == 0) ? true : param.outmean;
 
 			param.outmax = (vvar.compare("hmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("zsmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("umax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("vmax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("Umax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("hUmax") == 0) ? true : param.outmax;
 
-			param.outvort = (vvar.compare("vort") == 0) ? true : param.outvort;
+			param.outtwet = (vvar.compare("twet") == 0) ? true : param.outtwet;
+
+			//param.outvort = (vvar.compare("vort") == 0) ? true : param.outvort;
+			//param.outU = (vvar.compare("U") == 0) ? true : param.outU;
 		}
 		
 
@@ -433,6 +439,31 @@ Param readparamstr(std::string line, Param param)
 	}
 
 	
+	// Same as for TSnodesout, the same key word can be used for different zones Output
+	parameterstr = "outzone";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		outzoneP zone;
+		std::vector<std::string> zoneitems = split(parametervalue, ',');
+		if (zoneitems.size() >= 5)
+		{
+			zone.outname = zoneitems[0];
+			zone.xstart = std::stod(zoneitems[1]);
+			zone.xend = std::stod(zoneitems[2]);
+			zone.ystart = std::stod(zoneitems[3]);
+			zone.yend = std::stod(zoneitems[4]);
+			param.outzone.push_back(zone);
+		}
+		else
+		{
+			std::cerr << "Zone input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details" << std::endl;
+
+			log("Node input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details. Input was: " + parametervalue);
+
+		}
+
+	}
 
 
 	parameterstr = "resetmax";
@@ -658,7 +689,7 @@ Param readparamstr(std::string line, Param param)
 
 		if (!adaptpar.empty())
 		{
-			param.AdatpCrit = adaptpar[0];
+			param.AdaptCrit = adaptpar[0];
 			if (adaptpar.size() > 1)
 				param.Adapt_arg1 = adaptpar[1];
 			if (adaptpar.size() > 2)
@@ -1150,9 +1181,9 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	if (XParam.minlevel != XParam.maxlevel)
 	{
-		if (XParam.AdatpCrit.empty())
+		if (XParam.AdaptCrit.empty())
 		{
-			XParam.AdatpCrit = "Threshold";
+			XParam.AdaptCrit = "Threshold";
 			XParam.Adapt_arg1 = "0.0";
 			XParam.Adapt_arg2 = "h";
 		}

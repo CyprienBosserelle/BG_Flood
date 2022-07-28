@@ -121,6 +121,33 @@ template <class T> void CopyArrayBUQ(Param XParam, BlockP<T> XBlock, EvolvingP<T
 template void CopyArrayBUQ<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> source, EvolvingP<float>& dest);
 template void CopyArrayBUQ<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> source, EvolvingP<double>& dest);
 
+template <class T> void CopyArrayBUQ(Param XParam, BlockP<T> XBlock, EvolvingP<T> source, EvolvingP_M<T>& dest)
+{
+	CopyArrayBUQ(XParam, XBlock, source.h, dest.h);
+	CopyArrayBUQ(XParam, XBlock, source.u, dest.u);
+	CopyArrayBUQ(XParam, XBlock, source.v, dest.v);
+	CopyArrayBUQ(XParam, XBlock, source.zs, dest.zs);
+	// For U and hU:
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+				dest.U[n] = sqrt((source.u[n]*source.u[n]) + (source.v[n]*source.v[n]));
+				dest.hU[n] = source.h[n] * dest.U[n];
+			}
+		}
+	}
+
+}
+template void CopyArrayBUQ<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> source, EvolvingP_M<float>& dest);
+template void CopyArrayBUQ<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> source, EvolvingP_M<double>& dest);
+
 
 template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 {

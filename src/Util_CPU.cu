@@ -218,6 +218,7 @@ template <class T> __host__  __device__  bool OBBdetect(T Axmin, T Axmax, T Aymi
 template __host__  __device__  bool OBBdetect(float Axmin, float Axmax, float Aymin, float Aymax, float Bxmin, float Bxmax, float Bymin, float Bymax);
 template __host__  __device__  bool OBBdetect(double Axmin, double Axmax, double Aymin, double Aymax, double Bxmin, double Bxmax, double Bymin, double Bymax);
 
+
 template <class T> int ftoi(T value) {
 	return (value >= 0 ? static_cast<int>(value + 0.5)
 		: static_cast<int>(value - 0.5));

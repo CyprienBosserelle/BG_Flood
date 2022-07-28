@@ -160,6 +160,7 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 			utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
 
 		}
+		
 	}
 
 	if (side.type == 0) // No slip == no friction wall
@@ -174,9 +175,12 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 	{
 		Dirichlet1D(T(XParam.g), sign, zsbnd, zsinside, hinside, uninside, unnew, utnew, zsnew, hnew);
 	}
-	else if (side.type == 3)
+	else if (side.type == 3 )
 	{
-		ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+		if (hnew > XParam.eps && hinside > XParam.eps)
+		{
+			ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+		}
 	}
 	else if (side.type == 4)
 	{
@@ -304,7 +308,10 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 			}
 			else if (side.type == 3)
 			{
-				ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+				if (hnew > XParam.eps && hinside > XParam.eps)
+				{
+					ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+				}
 			}
 			else if (side.type == 4)
 			{
@@ -532,7 +539,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -540,7 +547,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}
@@ -589,7 +596,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -597,7 +604,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}
@@ -646,7 +653,7 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -654,7 +661,7 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}
@@ -701,7 +708,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 			unew = Xev.u[i];
 			vnew = Xev.v[i];
 			zsnew = Xev.zs[i];
-			hnew = Xev.zs[i];
+			hnew = Xev.h[i];
 			zbnew = zb[i];
 
 			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -709,7 +716,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 			Xev.u[i] = unew;
 			Xev.v[i] = vnew;
 			Xev.zs[i] = zsnew;
-			Xev.zs[i] = hnew;
+			Xev.h[i] = hnew;
 			zb[i] = zbnew;
 
 		}

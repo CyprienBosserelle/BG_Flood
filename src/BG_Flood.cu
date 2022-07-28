@@ -131,7 +131,6 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 	SetupGPU(XParam, XModel,XForcing, XModel_g);
 
 
-
 	//
 	log("\nModel setup complete");
 	log("#################################");

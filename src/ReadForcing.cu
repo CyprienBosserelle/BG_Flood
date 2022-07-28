@@ -145,7 +145,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	
 	//=====================
 	// Target level
-	if (XParam.AdatpCrit.compare("Targetlevel") == 0)
+	if (XParam.AdaptCrit.compare("Targetlevel") == 0)
 	{
 		log("\nRead Target level data...");
 		for (int nd = 0; nd < XForcing.targetadapt.size(); nd++)
@@ -180,6 +180,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		// the full initialisation of the cuda array and texture is done in model initialisation
 		if (XForcing.UWind.uniform == 1)
 		{
+			XForcing.VWind.uniform = true;
+
 			// grid uniform time varying wind input: wlevs[0] is wind speed and wlev[1] is direction
 			XForcing.VWind.inputfile = XForcing.UWind.inputfile;
 			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.grdalpha);
@@ -199,9 +201,10 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		else
 		{
 			//
-			readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
-			readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
-
+			//readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
+			//readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
+			InitDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
+			InitDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
 
 			
 		}
@@ -605,9 +608,11 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	double * ttt, *zsa;
 	bool checkhh = false;
 	int iswet;
+	bool flipx = false;
+	bool flipy = false;
 
 	// Read NC info
-	readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax);
+	readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax, flipx, flipy);
 	
 	if (hor == 0)
 	{
@@ -1155,7 +1160,7 @@ void readforcingdata(int step,T forcing)
 	}
 	if (fileext.compare("nc") == 0)
 	{
-		readvardata(forcing.inputfile, forcing.varname,step, forcing.val);
+		readvardata(forcing.inputfile, forcing.varname,step, forcing.val, forcing.flipxx, forcing.flipyy);
 	}
 	if (fileext.compare("bot") == 0 || fileext.compare("dep") == 0)
 	{
@@ -1181,8 +1186,8 @@ template void readforcingdata<StaticForcingP<int>>(int step, StaticForcingP<int>
 void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 {
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
-	readvardata(forcing.inputfile, forcing.varname, step, forcing.before);
-	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after);
+	readvardata(forcing.inputfile, forcing.varname, step, forcing.before, forcing.flipxx, forcing.flipyy);
+	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after, forcing.flipxx, forcing.flipyy);
 	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.before);
 	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.after);
 
@@ -1205,7 +1210,7 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 	if (fileext.compare("nc") == 0)
 	{
 		log("Reading Forcing file as netcdf file");
-		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax);
+		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
 		
 		if (Fmap.nt > 1)
 		{
@@ -1262,9 +1267,20 @@ template<class T> T readforcinghead(T ForcingParam)
 			int dummy;
 			double dummyb, dummyc;
 			//log("netcdf file");
-			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc);
+			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
+			//Check that the x and y variable are in crescent order:
+			if (ForcingParam.xmax < ForcingParam.xo)
+			{
+				log("FATAL ERROR:  x coordinate isn't in crescent order in file: " + ForcingParam.inputfile);
+				exit(1);
+			}
+			if (ForcingParam.ymax < ForcingParam.yo)
+			{
+				log("FATAL ERROR:  y coordinate isn't in crescent order in file: " + ForcingParam.inputfile);
+				exit(1);
+			}
 
 		}
 		if (ForcingParam.extension.compare("dep") == 0 || ForcingParam.extension.compare("bot") == 0)

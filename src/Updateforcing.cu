@@ -79,7 +79,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 
 			// Read the actual file data
 
-			readvardata(XDynForcing.inputfile, XDynForcing.varname, readfirststep + 1, XDynForcing.after);
+			readvardata(XDynForcing.inputfile, XDynForcing.varname, readfirststep + 1, XDynForcing.after, XDynForcing.flipxx, XDynForcing.flipyy);
 			if (XParam.GPUDEVICE >= 0)
 			{
 				CUDA_CHECK(cudaMemcpy(XDynForcing.after_g, XDynForcing.after, XDynForcing.nx * XDynForcing.ny * sizeof(float), cudaMemcpyHostToDevice));
@@ -427,8 +427,22 @@ template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBl
 
 	T rhoairrhowater = T(0.00121951); // density ratio rho(air)/rho(water) 
 
-	uwindi = interpDyn2BUQ(x, y, Uwind.GPU);
-	vwindi = interpDyn2BUQ(x, y, Vwind.GPU);
+	if (Uwind.uniform)
+	{
+		uwindi = T(Uwind.nowvalue);
+	}
+	else
+	{
+		uwindi = interpDyn2BUQ(x, y, Uwind.GPU);
+	}
+	if (Vwind.uniform)
+	{
+		vwindi = T(Vwind.nowvalue);
+	}
+	else
+	{
+		vwindi = interpDyn2BUQ(x, y, Vwind.GPU);
+	}
 
 	XAdv.dhu[i] += rhoairrhowater * T(XParam.Cd) * uwindi * abs(uwindi);
 	XAdv.dhv[i] += rhoairrhowater * T(XParam.Cd) * vwindi * abs(vwindi);
@@ -629,8 +643,10 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 	for (int nd = 0; nd < deform.size(); nd++)
 	{
-		//
-		if ((XLoop.totaltime - deform[nd].startime) <= XLoop.dt && (XLoop.totaltime - deform[nd].startime) > 0.0)
+		// This should be: st >= tt-dt && st < tt here tt is at the end of the flow step rather then at the start
+		// ((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime)
+		// how to account for round-off error? 
+		if (((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime))
 		{
 			updatezbhalo = true;
 

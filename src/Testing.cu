@@ -17,6 +17,7 @@
 * Test 6 Mass conservation on a slope
 * Test 7 Mass conservation with rain fall on grid
 * Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
+* Test 9 Zoned output (test zoned outputs with adaptative grid)
 
 * Test 99 Run all the test with test number < 99.
 
@@ -157,7 +158,6 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			isfailed = (!testSteepSlope || isfailed) ? true : false;
 			log("\t\tMass conservation test: " + result);
 		}
-
 		if (mytest == 7)
 		{
 			bool testrainGPU, testrainCPU;
@@ -189,6 +189,29 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			raintest2 = Raintestinput(gpu);
 			result = raintest2 ? "successful" : "failed";
 			log("\t\tNon-uniform rain forcing : " + result);
+		}
+		if (mytest == 9)
+		{
+			bool testzoneOutDef, testzoneOutUser;
+			/* Test 9 is basic configuration to test the zoned outputs, with different resolutions.
+			 The default (without zoned defined by user) configuration is tested.
+			 Then, the creation of 3 zones is then tested(whole, zoned complexe, zoned with part of the levels).
+			 The size of the created nc files is used to verified this fonctionnality.
+			 Parameter: nbzones: number of zones for output defined by the user
+						zsinit: initial water elevation
+			*/
+
+			log("\t### Test zoned output ###");
+			int nbzones = 0;
+			T zsinit = 0.01;
+			testzoneOutDef = ZoneOutputTest(nbzones, zsinit);
+			result = testzoneOutDef ? "successful" : "failed";
+			log("\n\nDefault zoned Outputs: " + result);
+			nbzones = 3; // 3 only
+			testzoneOutUser = ZoneOutputTest(nbzones, zsinit);
+			result = testzoneOutUser ? "successful" : "failed";
+			log("\n\nUser defined zones Outputs: " + result);
+			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
 		}
 		if (mytest == 998)
 		{
@@ -534,9 +557,13 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx" };
-
+	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx", "twet", "hUmax", "Umean"};
 	XParam.outvars = outv;
+
+	XParam.outmax = true;
+	XParam.outmean = true;
+	XParam.outtwet = true;
+
 	// create Model setup
 	Model<T> XModel;
 	Model<T> XModel_g;
@@ -601,6 +628,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	InitMesh(XParam, XForcing, XModel);
 
 	InitialConditions(XParam, XForcing, XModel);
+	InitialAdaptation(XParam, XForcing, XModel);
 
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
@@ -669,7 +697,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 				}
 			}
 
-			//Save2Netcdf(XParam, XModel);
+			//Save2Netcdf(XParam, XLoop, XModel);
 			// Verify the Validity of results
 			finalVol = T(0.0);
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -742,7 +770,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XParam.minlevel = -1;
 	XParam.maxlevel = 1;
 
-	XParam.AdatpCrit = "Threshold";
+	XParam.AdaptCrit = "Threshold";
 	XParam.Adapt_arg1 = "3.5";
 	XParam.Adapt_arg2 = "zb";
 
@@ -1515,8 +1543,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 	XParam.maxlevel = 1;
 	XParam.initlevel = 1;
 	
-
-
+	
 	UnitestA=RiverVolumeAdapt(XParam, maxslope, false, false);
 	UnitestB=RiverVolumeAdapt(XParam, maxslope, true, false);
 	UnitestC=RiverVolumeAdapt(XParam, maxslope, false, true);
@@ -1545,7 +1572,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 
 	//Fine to coarse
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "28.0";
 	XParam.Adapt_arg2 = "40.0";
 	XParam.Adapt_arg3 = "zb";
@@ -1573,7 +1600,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 
 	//coarse to fine
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "0.0";
 	XParam.Adapt_arg2 = "2.0";
 	XParam.Adapt_arg3 = "zb";
@@ -1597,6 +1624,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 		log("\t Flow from coarse to fine adapted mesh C :" + details);
 		details = ctofD ? "successful" : "failed";
 		log("\t Flow from coarse to fine adapted mesh D :" + details);
+
 	}
 
 	return (UnitestA * UnitestB * UnitestC * UnitestD * ctofA * ctofB * ctofC * ctofD * ftocA * ftocB * ftocC * ftocD);
@@ -1885,7 +1913,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 
 	//Fine to coarse
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "28.0";
 	XParam.Adapt_arg2 = "40.0";
 	XParam.Adapt_arg3 = "zb";
@@ -1913,7 +1941,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 
 	//coarse to fine
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdatpCrit = "Inrange";
+	XParam.AdaptCrit = "Inrange";
 	XParam.Adapt_arg1 = "0.0";
 	XParam.Adapt_arg2 = "2.0";
 	XParam.Adapt_arg3 = "zb";
@@ -2332,20 +2360,20 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotRight, XModel.grad.dvdx);
 		copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotLeft, XModel.grad.dvdy);
 
-		creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "blockID", 3, XModel.flux.Fhu);
+		creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XModel.blocks.outZone[0]);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "blockID", 3, XModel.flux.Fhu, XModel.blocks.outZone[0]);
 
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftBot", 3, XModel.grad.dhdx);
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftTop", 3, XModel.grad.dhdy);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftBot", 3, XModel.grad.dhdx, XModel.blocks.outZone[0]);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftTop", 3, XModel.grad.dhdy, XModel.blocks.outZone[0]);
 
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopLeft", 3, XModel.grad.dzsdx);
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopRight", 3, XModel.grad.dzsdy);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopLeft", 3, XModel.grad.dzsdx, XModel.blocks.outZone[0]);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopRight", 3, XModel.grad.dzsdy, XModel.blocks.outZone[0]);
 
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightTop", 3, XModel.grad.dudx);
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightBot", 3, XModel.grad.dudy);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightTop", 3, XModel.grad.dudx, XModel.blocks.outZone[0]);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightBot", 3, XModel.grad.dudy, XModel.blocks.outZone[0]);
 
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotLeft", 3, XModel.grad.dvdx);
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotRight", 3, XModel.grad.dvdy);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotLeft", 3, XModel.grad.dvdx, XModel.blocks.outZone[0]);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotRight", 3, XModel.grad.dvdy, XModel.blocks.outZone[0]);
 	}
 
 	return test;
@@ -3230,6 +3258,231 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 template std::vector<float> Raintestmap<float>(int gpu, int dimf, float Zsinit);
 template std::vector<float> Raintestmap<double>(int gpu, int dimf, double Zsinit);
 
+
+/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
+*
+* This function test the zoned output for a basic configuration
+*/
+template <class T> bool ZoneOutputTest(int nzones, T zsinit)
+//template bool ZoneOutputTest<float>(int nzones, float zsinit);
+{
+	log("#####");
+
+	Param XParam;
+	Forcing<float> XForcing; 
+
+	
+	if (nzones  == 3)
+	{
+		// read param file
+		readforcing(XParam, XForcing);
+		outzoneP zone;
+		zone.outname = "whole.nc";
+		zone.xstart = -10;
+		zone.xend = 10;
+		zone.ystart = -10;
+		zone.yend = 10;
+		XParam.outzone.push_back(zone);
+		zone.outname = "zoomed.nc";
+		zone.xstart =1;
+		zone.xend =2;
+		zone.ystart = -2;
+		zone.yend = 2;
+		XParam.outzone.push_back(zone);
+		zone.outname = "zoomed2.nc";
+		zone.xstart = -2;
+		zone.xend = 2;
+		zone.ystart = -4;
+		zone.yend = 2;
+		XParam.outzone.push_back(zone);
+	}
+
+	// initialise domain and required resolution
+	XParam.dx = 1.0 / ((1 << 6)); //1<<8  = 2^8
+	XParam.xo = -5;
+	XParam.yo = -5;
+	XParam.xmax = 5;
+	XParam.ymax = 5;
+
+	XParam.initlevel = 0;
+	XParam.minlevel = -1;
+	XParam.maxlevel = 1;
+
+	XParam.zsinit = zsinit;
+	//XParam.zsoffset = 0.0;
+
+	//Output times for comparisons
+	XParam.endtime = 1.0;
+	XParam.outputtimestep = 0.5;
+
+	XParam.smallnc = 0;
+
+	XParam.cf = 0.0001;
+	XParam.frictionmodel = 1;
+
+	//Specification of the test
+	//XParam.test = 7;
+	XParam.rainforcing = true;
+
+	// Enforce GPU/CPU
+	//XParam.GPUDEVICE = gpu;
+	//XParam.rainbnd = true;
+
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to a central hill
+	XForcing.Bathy[0].xo = -10.0;
+	XForcing.Bathy[0].yo = -10.0;
+	XForcing.Bathy[0].xmax = 10.0;
+	XForcing.Bathy[0].ymax = 10.0;
+	XForcing.Bathy[0].nx = 501;
+	XForcing.Bathy[0].ny = 501;
+
+	XForcing.Bathy[0].dx = 0.1;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+	
+	float rs, x, y, r, hm;
+	rs = 20; //hill radio 
+	hm = 5; //hill top
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
+			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+			r = sqrt(x * x + y * y);
+			if (r < rs)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm*(1-r/rs);
+			}
+			if (x < -4.7 | x > 4.7 | y < -4.7 | y > 4.7)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 10;
+			}
+		}
+	}
+
+	//Adaptation
+	XParam.AdaptCrit = "Targetlevel";
+	
+	StaticForcingP<int> Target;
+	XForcing.targetadapt.push_back(Target);
+
+	XForcing.targetadapt[0].xo = -10;
+	XForcing.targetadapt[0].yo = -10;
+	XForcing.targetadapt[0].xmax = 10.0;
+	XForcing.targetadapt[0].ymax = 10.0;
+	XForcing.targetadapt[0].nx = 501;
+	XForcing.targetadapt[0].ny = 501;
+
+	XForcing.targetadapt[0].dx = 0.1;
+
+	AllocateCPU(XForcing.targetadapt[0].nx, XForcing.targetadapt[0].ny, XForcing.targetadapt[0].val);
+
+	for (int j = 0; j < XForcing.targetadapt[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.targetadapt[0].nx; i++)
+		{
+			x = XForcing.targetadapt[0].xo + i * XForcing.targetadapt[0].dx;
+			y = XForcing.targetadapt[0].yo + j * XForcing.targetadapt[0].dx;
+			if (x < 0.0)
+			{
+				XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = -1;
+			}
+			else
+			{
+				if (y < 0.0)
+				{
+					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 0;
+				}
+				else
+				{
+					XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = 1;
+				}
+			}
+		}
+	}
+
+	// Add wall boundary conditions
+	XForcing.right.type = 0;
+	XForcing.left.type = 0;
+	XForcing.top.type = 0;
+	XForcing.bot.type = 0;
+
+
+	//Create a temporary file with river fluxes
+	float Q = 1;
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = -0.2;
+	thisriver.xend = 0.2;
+	thisriver.ystart = -0.2;
+	thisriver.yend = 0.2;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	//Test if file exist and can be open:
+	int error = 1;
+	std::vector<int> observedSize{ 473251462,23304761,130802886 };
+	for (int o = 0; o < XModel.blocks.outZone.size(); o++)
+	{
+		std::ifstream fs(XModel.blocks.outZone[o].outname);
+		if (fs.fail()) 
+		{
+			error++;
+		}
+		else
+		{
+			//Calculate the size of the file in bytes
+			std::ifstream in_file(XModel.blocks.outZone[o].outname, std::ios::binary);
+			in_file.seekg(0, std::ios::end);
+			int file_size = in_file.tellg();
+			printf("sizes : %i in bytes\n", file_size);
+			error = error * (observedSize[o] / file_size);
+		}
+	}
+
+	bool modelgood = (1-abs(error)) < 0.05;
+
+	//log("#####");
+	return modelgood;
+}
+template bool ZoneOutputTest<float>(int nzones, float zsinit);
+template bool ZoneOutputTest<double>(int nzones, double zsinit);
+
+
+
 /*! \fn void alloc_init2Darray(float** arr, int NX, int NY)
 * This function allocates and fills a 2D array with zero values
 *
@@ -3364,18 +3617,18 @@ void TestingOutput(Param XParam, Model<T> XModel)
 	//FlowCPU(XParam, XLoop, XModel);
 
 	//log(std::to_string(XForcing.Bathy.val[50]));
-	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
+	creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XModel.blocks.outZone[0]);
 	outvar = "h";
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 	outvar = "u";
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 	outvar = "v";
 	//copyID2var(XParam, XModel.blocks, XModel.OutputVarMap[outvar]);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 	outvar = "zb";
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 	outvar = "zs";
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 
 
 	FlowCPU(XParam, XLoop, XForcing, XModel);
@@ -3383,40 +3636,40 @@ void TestingOutput(Param XParam, Model<T> XModel)
 
 	//outvar = "cf";
 	//defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, 3, XModel.cf);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx", 3, XModel.grad.dhdx);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdy", 3, XModel.grad.dhdy);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdx", 3, XModel.grad.dhdx, XModel.blocks.outZone[0]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhdy", 3, XModel.grad.dhdy, XModel.blocks.outZone[0]);
 
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhv", 3, XModel.flux.Fhv);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhu", 3, XModel.flux.Fhu);
-
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqux", 3, XModel.flux.Fqux);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fquy", 3, XModel.flux.Fquy);
-
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvx", 3, XModel.flux.Fqvx);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvy", 3, XModel.flux.Fqvy);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhv", 3, XModel.flux.Fhv, XModel.blocks.outZone[0]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fhu", 3, XModel.flux.Fhu, XModel.blocks.outZone[0]);
 
 
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Su", 3, XModel.flux.Su);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Sv", 3, XModel.flux.Sv);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqux", 3, XModel.flux.Fqux, XModel.blocks.outZone[0]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fquy", 3, XModel.flux.Fquy, XModel.blocks.outZone[0]);
+
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvx", 3, XModel.flux.Fqvx, XModel.blocks.outZone[0]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Fqvy", 3, XModel.flux.Fqvy, XModel.blocks.outZone[0]);
 
 
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dh", 3, XModel.adv.dh);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", 3, XModel.adv.dhu);
-	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", 3, XModel.adv.dhv);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Su", 3, XModel.flux.Su, XModel.blocks.outZone[0]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "Sv", 3, XModel.flux.Sv, XModel.blocks.outZone[0]);
+
+
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dh", 3, XModel.adv.dh, XModel.blocks.outZone[0]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhu", 3, XModel.adv.dhu, XModel.blocks.outZone[0]);
+	defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "dhv", 3, XModel.adv.dhv, XModel.blocks.outZone[0]);
 
 	writenctimestep(XParam.outfile, XLoop.totaltime + XLoop.dt);
 
 
 	outvar = "h";
-	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar]);
+	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 
 	outvar = "zs";
-	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar]);
+	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 	outvar = "u";
-	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar]);
+	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 	outvar = "v";
-	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar]);
+	writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, outvar, XModel.OutputVarMap[outvar], XModel.blocks.outZone[0]);
 
 }
 
@@ -3520,7 +3773,7 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 
 	for (int ivar = 0; ivar < varlist.size(); ivar++)
 	{
-		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varlist[ivar], 3, XModel.OutputVarMap[varlist[ivar]]);
+		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varlist[ivar], 3, XModel.OutputVarMap[varlist[ivar]], XModel.blocks.outZone[0]);
 	}
 
 	/*
@@ -3677,9 +3930,9 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 	else
 	{
 		log(varname + " FAIL: " + " Max difference: " + std::to_string(maxdiff) + " (at: ix = " + std::to_string(ixmd) + " iy = " + std::to_string(iymd) + " ib = " + std::to_string(ibmd) + ") RMS difference: " + std::to_string(rmsdiff) + " Eps: " + std::to_string(XLoop.epsilon));
-		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_CPU", 3, cpu);
-		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_GPU", 3, dummy);
-		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_diff", 3, out);
+		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_CPU", 3, cpu, XBlock.outZone[0]);
+		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_GPU", 3, dummy, XBlock.outZone[0]);
+		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_diff", 3, out, XBlock.outZone[0]);
 	}
 
 
