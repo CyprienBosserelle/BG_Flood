@@ -78,6 +78,7 @@ public:
 	double endtime = 0.0; // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
+	double dtmin = 0.005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
 
 	//* Initialisation
 	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0

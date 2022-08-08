@@ -56,6 +56,14 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		resetmeanmax(XParam, XLoop, XModel, XModel_g);
 
 		printstatus(XLoop.totaltime, XLoop.dt);
+
+		// Stop calculation if crashed
+		if (XLoop.dt < XParam.dtmin)
+		{
+			XLoop.totaltime = XParam.endtime + 1;
+			log(" \n ");
+			log("\t\tModel CRASHED: time steps inferior to " + std::to_string(XParam.dtmin) + "\n");
+		}
 	}
 	
 
@@ -221,7 +229,8 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 {
 	XLoop.nstepout++;
 
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+	if ((XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		|| (XLoop.dt < XParam.dtmin))
 	{
 		char buffer[256];
 		sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
