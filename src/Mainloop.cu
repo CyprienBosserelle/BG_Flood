@@ -56,7 +56,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		resetmeanmax(XParam, XLoop, XModel, XModel_g);
 
 		// Stop calculation if crashed
-		if ((XLoop.dt < XParam.dtmin) && (XLoop.totaltime < XParam.endtime))
+		if ((XLoop.dt < 0.1 * XLoop.dtmin) && (XLoop.totaltime < XParam.endtime))
 		{
 			XParam.endtime = XLoop.totaltime;
 			XLoop.nextoutputtime = XLoop.totaltime;
@@ -64,6 +64,10 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 			log(" \n ");
 			log("\t\tModel CRASHED: time steps inferior to " + std::to_string(XParam.dtmin) + "\n");
 		}
+		double weight = 0.25;
+		log("\t\tdt=" + std::to_string(XLoop.dt) + ", dtmin=" + std::to_string(XLoop.dtmin) + "\n");
+		XLoop.dtmin = weight * XLoop.dt + (1 - weight) * XLoop.dtmin;
+
 
 		printstatus(XLoop.totaltime, XLoop.dt);
 	}
@@ -201,6 +205,7 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 
 
 	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	XLoop.dtmin = XLoop.dtmax;
 
 	return XLoop;
 
