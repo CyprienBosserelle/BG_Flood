@@ -56,7 +56,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		resetmeanmax(XParam, XLoop, XModel, XModel_g);
 
 		// Stop calculation if crashed
-		if (XLoop.dt < XParam.dtmin)
+		if ((XLoop.dt < XParam.dtmin) && (XLoop.totaltime < XParam.endtime))
 		{
 			XParam.endtime = XLoop.totaltime;
 			XLoop.nextoutputtime = XLoop.totaltime;
