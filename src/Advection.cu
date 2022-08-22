@@ -76,7 +76,7 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 		}
 		if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 		{
-			yup = iy + 1.25;
+			yup = iy + 2.0;
 		}
 	}
 	
@@ -166,7 +166,7 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 					}
 					if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 					{
-						yup = iy + 1.25;
+						yup = iy + 2.0;
 					}
 				}
 
