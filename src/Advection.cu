@@ -174,7 +174,7 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 
 				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 				T fmu = T(1.0);
-				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 				T fmup = T(1.0);
 				T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
 
