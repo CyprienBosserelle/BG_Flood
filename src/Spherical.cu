@@ -21,8 +21,9 @@ template __host__ __device__ double calcCM(double Radius, double delta, double y
 template __host__ __device__ float calcCM(float Radius, float delta, float yo, int iy);
 
 
+
 template <class T> 
-__host__ __device__  T calcFM(T Radius, T delta, T yo, int iy)
+__host__ __device__  T calcFM(T Radius, T delta, T yo, T iy)
 {
 	T dy = delta / Radius * T(180.0 / pi);
 	T y = yo + iy * dy;
@@ -36,6 +37,8 @@ __host__ __device__  T calcFM(T Radius, T delta, T yo, int iy)
 
 	return fmu;
 }
-template __host__ __device__ double calcFM(double Radius, double delta, double yo, int iy);
-template __host__ __device__ float calcFM(float Radius, float delta, float yo, int iy);
+template __host__ __device__ double calcFM(double Radius, double delta, double yo, double iy);
+template __host__ __device__ float calcFM(float Radius, float delta, float yo, float iy);
+
+
 
