@@ -76,9 +76,11 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 		}
 		if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 		{
-			yup = iy + 2.0;
+			//yup = iy +1.5;
 		}
 	}
+
+
 	
 	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
