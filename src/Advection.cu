@@ -168,7 +168,7 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 					}
 					if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 					{
-						yup = iy + 2.0;
+						yup = iy + 1.5;
 					}
 				}
 
