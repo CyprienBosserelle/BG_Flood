@@ -400,7 +400,7 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy"};
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl"};
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -857,7 +857,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// friction coefficient (mapped or constant)
-	// if it is a constant no-need to do anyjting below but if it is a file it overides any other values 
+	// if it is a constant no-need to do anything below but if it is a file it overwrites any other value
 	paramvec = { "cf","roughness","cfmap"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
@@ -865,6 +865,26 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		if (std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.cf = readfileinfo(parametervalue, forcing.cf);
+		}
+	}
+
+	// Rain losses, initial and continuous loss
+	paramvec = { "il","Rain_il","initialloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::isdigit(parametervalue[0]) == false)
+		{
+			forcing.il = readfileinfo(parametervalue, forcing.il);
+		}
+	}
+	paramvec = { "cl","Rain_cl","continuousloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::isdigit(parametervalue[0]) == false)
+		{
+			forcing.cl = readfileinfo(parametervalue, forcing.cl);
 		}
 	}
 

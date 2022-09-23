@@ -83,6 +83,21 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 		// Set edges of friction map
 		setedges(XParam, XModel.blocks, XModel.cf);
 
+		//=====================================
+		// Initialise the continuous losses map
+		if (!XForcing.il.inputfile.empty())
+		{
+			interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+			// Set edges of friction map
+			setedges(XParam, XModel.blocks, XModel.il);
+		}
+		if (!XForcing.cl.inputfile.empty())
+		{
+			interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+			// Set edges of friction map
+			setedges(XParam, XModel.blocks, XModel.cl);
+		}
+
 	}
 }
 template void Adaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);

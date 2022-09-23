@@ -114,7 +114,7 @@ public:
 	std::string outfile = "Output.nc"; // netcdf output file name
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
-	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy";
+	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl";
 	Default: "zb", "zs", "u", "v", "h"
 	*/
 	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
@@ -191,7 +191,7 @@ public:
 	// deformation forcing for tsunami generation
 	//std::vector<deformmap> deform;
 	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be ==0. would be 
+	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be null.
 
 	// This here should be stored in a structure at a later stage
 	std::string AdaptCrit;
