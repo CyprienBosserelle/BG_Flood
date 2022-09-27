@@ -159,6 +159,8 @@ struct Model
 	//external forcing
 	T* zb;
 	T* cf;
+	T* il;
+	T* cl;
 	
 	// Used for external forcing too
 	// May need a better placeholder

@@ -161,15 +161,13 @@ struct Forcing
 	*/
 
 	StaticForcingP<T> il;
-	/*Initial Rain loss coefficient map
-	Ex: il=0.01; (in mm)
+	/*Initial Rain loss coefficient map (in mm)
 	Ex: il=rain_loss.nc?initial_loss;
 	Default: (see constant in parameters)
 	*/
 
 	StaticForcingP<T> cl;
-	/*Continuous Rain loss coefficient map
-	Ex: cl=0.05; (in mm/s)
+	/*Continuous Rain loss coefficient map (in mm/h)
 	Ex: cl=rain_loss.nc?continuous_loss;
 	Default: (see constant in parameters)
 	*/

@@ -149,6 +149,10 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(nblk, blksize, XModel.datmpdy);
 	}
 
+	if (XParam.rainforcing)
+	{
+		AllocateCPU(nblk, blksize, XModel.il, XModel.cl);
+	}
 
 	if (XParam.outmax)
 	{
@@ -310,6 +314,10 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		ReallocArray(nblk, blksize, XModel.datmpdy);
 	}
 
+	if (XParam.rainforcing)
+	{
+		ReallocArray(nblk, blksize, XModel.il, XModel.cl);
+	}
 
 	if (XParam.outmax)
 	{
@@ -434,6 +442,10 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateGPU(nblk, blksize, XModel.datmpdy);
 	}
 
+	if (XParam.rainforcing)
+	{
+		AllocateGPU(nblk, blksize, XModel.il, XModel.cl);
+	}
 
 	if (XParam.outmax)
 	{
