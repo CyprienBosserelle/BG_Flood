@@ -206,7 +206,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	if (XParam.infiltration)
 	{
-		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.il, XForcing.cl, XModel.evolv, XModel.infiltration);
+		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.infiltration);
 	}
 
 	if (XParam.VelThreshold > 0.0)

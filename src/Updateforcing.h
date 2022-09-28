@@ -25,9 +25,8 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv);
 template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv);
 
-template <class T> __host__ void  AddinfiltrationImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, StaticForcingP<T> il, StaticForcingP<T> cl, EvolvingP<T> XEv, T* infiltration);
-template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, StaticForcingP<T> il, StaticForcingP<T> cl, EvolvingP<T> XEv, T* infiltration);
-
+template <class T> __host__ void  AddinfiltrationImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* infiltration);
+template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* infiltration);
 
 template <class T> __global__ void AddPatmforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> PAtm, Model<T> XModel);
 template <class T> __host__ void AddPatmforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> PAtm, Model<T> XModel);

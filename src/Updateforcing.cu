@@ -406,7 +406,7 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 template __host__ void AddrainforcingImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __host__ void AddrainforcingImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
-template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, StaticForcingP<T> il, StaticForcingP<T> cl, EvolvingP<T> XEv, T* infiltration)
+template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* infiltration)
 {
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -427,6 +427,7 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 				T infiltrationLoc = 0.0;
 				T availinitialinfiltration;
 
+
 				if (waterOut > 0)
 				{
 					//Computation of the initial loss
@@ -446,10 +447,10 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 		}
 	}
 }
-template __host__ void AddinfiltrationImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, StaticForcingP<float> il, StaticForcingP<float> cl, EvolvingP<float> XEv, float* infiltration);
-template __host__ void AddinfiltrationImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, StaticForcingP<double> il, StaticForcingP<double> cl, EvolvingP<double> XEv, double* infiltration);
+template __host__ void AddinfiltrationImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, float* il, float* cl, EvolvingP<float> XEv, float* infiltration);
+template __host__ void AddinfiltrationImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* infiltration);
 
-template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, StaticForcingP<T> il, StaticForcingP<T> cl, EvolvingP<T> XEv, T* infiltration)
+template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* infiltration)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
@@ -483,8 +484,8 @@ template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop
 	XEv.zs[i] -= infiltrationLoc * XBlock.activeCell[i];
 
 }
-template __global__ void AddinfiltrationImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, StaticForcingP<float> il, StaticForcingP<float> cl, EvolvingP<float> XEv, float* infiltration);
-template __global__ void AddinfiltrationImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, StaticForcingP<double> il, StaticForcingP<double> cl, EvolvingP<double> XEv, double* infiltration);
+template __global__ void AddinfiltrationImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, float* il, float* cl, EvolvingP<float> XEv, float* infiltration);
+template __global__ void AddinfiltrationImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* infiltration);
 
 
 
