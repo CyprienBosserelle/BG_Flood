@@ -37,7 +37,7 @@ struct SharedMemory<double>
 
 template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv)
 {
-	
+
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
@@ -53,16 +53,16 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 	T g = T(XParam.g);
 
 	T ybo = T(XParam.yo + XBlock.yo[ib]);
-	
 
-	T fc = XParam.spherical ? sin((ybo + calcres(T(XParam.dx), lev) * iy) * pi / 180.0) * pi / T(21600.0) : sin(T(XParam.lat * pi / 180.0)) *  pi / T(21600.0); // 2*(2*pi/24/3600)
+
+	T fc = 0.0;// XParam.spherical ? sin((ybo + calcres(T(XParam.dx), lev) * iy) * pi / 180.0) * pi / T(21600.0) : sin(T(XParam.lat * pi / 180.0)) * pi / T(21600.0); // 2*(2*pi/24/3600)
 	// fc should be pi / T(21600.0) * sin(phi)
 
 
 	int iright, itop;
-	
+
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	
+
 	iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 	itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
@@ -70,18 +70,18 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 
 	if (iy == XParam.blkwidth - 1)
 	{
-		if (XBlock.level[XBlock.TopLeft[ib]] >XBlock.level[ib])
+		if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
 		{
 			yup = iy + 0.75;
 		}
 		if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 		{
-			yup = iy + 1.5;
+			yup = iy + 1.000;
 		}
 	}
 
 
-	
+
 	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
 	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
@@ -97,12 +97,12 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 
 	T cmdinv, ga;
 
-	cmdinv = T(1.0)/ (cm * delta);
+	cmdinv = T(1.0) / (cm * delta);
 	ga = T(0.5) * g;
-		
+
 
 	XAdv.dh[i] = T(-1.0) * (XFlux.Fhu[iright] - XFlux.Fhu[i] + XFlux.Fhv[itop] - XFlux.Fhv[i]) * cmdinv;
-		
+
 
 
 	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
@@ -112,9 +112,18 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 	T fG = vvi * dmdl - uui * dmdt;
 	XAdv.dhu[i] = (XFlux.Fqux[i] + XFlux.Fquy[i] - XFlux.Su[iright] - XFlux.Fquy[itop]) * cmdinv + fc * hi * vvi;
 	XAdv.dhv[i] = (XFlux.Fqvy[i] + XFlux.Fqvx[i] - XFlux.Sv[itop] - XFlux.Fqvx[iright]) * cmdinv - fc * hi * uui;
-		
+
 	XAdv.dhu[i] += hi * (ga * hi * dmdl + fG * vvi);// This term is == 0 so should be commented here
 	XAdv.dhv[i] += hi * (ga * hi * dmdt - fG * uui);// Need double checking before doing that
+
+	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
+	{
+		if (iy == XParam.blkwidth - 1)
+		{
+			printf("XAdv.dh[i]=%e, XAdv.dhv[i]=%e, XAdv.dhv[i]=%e, dmdt=%e \n", XAdv.dh[i], XAdv.dhv[i], XAdv.dhu[i], dmdt);
+		}
+
+	}
 	
 }
 template __global__ void updateEVGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, FluxP<float> XFlux, AdvanceP<float> XAdv);
