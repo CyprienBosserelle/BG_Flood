@@ -149,7 +149,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(nblk, blksize, XModel.datmpdy);
 	}
 
-	if (XParam.rainforcing)
+	if (XParam.infiltration)
 	{
 		AllocateCPU(nblk, blksize, XModel.il, XModel.cl);
 	}
@@ -314,7 +314,7 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		ReallocArray(nblk, blksize, XModel.datmpdy);
 	}
 
-	if (XParam.rainforcing)
+	if (XParam.infiltration)
 	{
 		ReallocArray(nblk, blksize, XModel.il, XModel.cl);
 	}

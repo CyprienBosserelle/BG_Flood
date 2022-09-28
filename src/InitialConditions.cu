@@ -44,21 +44,21 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	setedges(XParam, XModel.blocks, XModel.cf);
 
 
-	//=====================================
-	// Initialise the rain losses map
+	////=====================================
+	//// Initialise the rain losses map
 
-	if (!XForcing.il.inputfile.empty())
-	{
-		interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
-		// Set edges of friction map
-		setedges(XParam, XModel.blocks, XModel.il);
-	}
-	if (!XForcing.cl.inputfile.empty())
-	{
-		interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
-		// Set edges of friction map
-		setedges(XParam, XModel.blocks, XModel.cl);
-	}
+	//if (!XForcing.il.inputfile.empty())
+	//{
+	//	interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+	//	// Set edges of friction map
+	//	setedges(XParam, XModel.blocks, XModel.il);
+	//}
+	//if (!XForcing.cl.inputfile.empty())
+	//{
+	//	interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+	//	// Set edges of friction map
+	//	setedges(XParam, XModel.blocks, XModel.cl);
+	//}
 
 	//=====================================
 	// Initial Condition
@@ -449,8 +449,8 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["cf"] = XModel.cf;
 
-	XModel.OutputVarMap["il"] = XModel.il;
-	XModel.OutputVarMap["cl"] = XModel.cl;
+//	XModel.OutputVarMap["il"] = XModel.il;
+//	XModel.OutputVarMap["cl"] = XModel.cl;
 
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;

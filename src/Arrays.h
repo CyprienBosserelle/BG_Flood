@@ -161,6 +161,9 @@ struct Model
 	T* cf;
 	T* il;
 	T* cl;
+
+	//GroundWater infiltration left
+	T* infiltration;
 	
 	// Used for external forcing too
 	// May need a better placeholder

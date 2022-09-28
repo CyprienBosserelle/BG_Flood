@@ -204,6 +204,11 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 		AddrainforcingImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
 	}
 
+	if (XParam.infiltration)
+	{
+		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.il, XForcing.cl, XModel.evolv, XModel.infiltration);
+	}
+
 	if (XParam.VelThreshold > 0.0)
 	{
 		TheresholdVelCPU(XParam, XModel.blocks, XModel.evolv);

@@ -3623,13 +3623,21 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	ilForcing = (double*)malloc(sizeof(double) * NY * NX);
 	clForcing = (double*)malloc(sizeof(double) * NY * NX);
 
-	//Create the rain forcing:
+	//Create the Losses forcing:
 	for (int j = 0; j < NY; j++)
 	{
 		for (int i = 0; i < NX; i++)
 		{
-			ilForcing[j * NX + i] = IL;
-			clForcing[j * NX + i] = CL;
+			if (xLoss[i] < 0)
+			{
+				ilForcing[j * NX + i] = IL;
+				clForcing[j * NX + i] = CL;
+			}
+			else
+			{
+				ilForcing[j * NX + i] = IL;
+				clForcing[j * NX + i] = CL;
+			}
 		}
 	}
 	create2dnc("ilrainlossTempt.nc", NX, NY, xLoss, yLoss, ilForcing, "initialloss");

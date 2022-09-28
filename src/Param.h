@@ -25,6 +25,7 @@ public:
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
+	bool infiltration = false;
 
 	bool conserveElevation = false; //Switch to force the conservation of h
 
