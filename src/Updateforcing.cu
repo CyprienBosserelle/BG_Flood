@@ -651,7 +651,14 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 			
 			updatezbhalo = true;
 
-			T scale = (deform[nd].duration > 0.0) ? T(1.0 / deform[nd].duration * (XLoop.totaltime - deform[nd].startime)) : T(1.0);
+			T dtdef = min(XLoop.dt, XLoop.totaltime - deform[nd].startime);
+			if (XLoop.totaltime > deform[nd].startime + deform[nd].duration)
+			{
+				dtdef = min(XLoop.dt, XLoop.totaltime - (deform[nd].startime + deform[nd].duration));
+			}
+				
+
+			T scale = (deform[nd].duration > 0.0) ? T(1.0 / deform[nd].duration * dtdef) : T(1.0);
 
 			log("Applying deform: " + std::to_string(scale));
 
