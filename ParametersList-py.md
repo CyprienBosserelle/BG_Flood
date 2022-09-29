@@ -64,7 +64,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |---|---|---|---|
 |TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position <br>(which will be converted to nearest grid position). <br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
 |outfile|outfile| "Output.nc"|netcdf output file name|
-|outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy";<br>|
+|outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl";<br>|
 |outzone|outzone|Full domain<br>|Zoned output (netcdf file), giving a file name and the position of two corner points<br>(which will be converted to a rectagle containing full blocks).<br>This keyword can be used multiple times to output maps of different areas.<br>Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*)<br>|
 |resetmax|resetmax| false|Switch to reset the "max" outputs after each output|
 |outishift|outishift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output |
@@ -100,6 +100,8 @@ BG_flood user interface consists in a text file, associating key words to user c
 |bot| bot , botbndfile , botbnd , bottom |1|bot = 0;<br>bot = botBnd.txt,2;|Same as left boundary|
 |deform|deform|None|deform = myDeform.nc?z_def,3.0,10.0;<br>deform = *filename*, *time of initial rupture*, *rising time*;|Deform are maps to apply to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave<br>Here you can spread the deformation across a certain amount of time and apply it at any point in the model.|
 |rivers| rivers , river |None|river = Votualevu_R.txt,1867430,1867455,3914065,3914090;<br>river = *Fluxfile*, *xstart*, *xend*, *ystart*, *yend*;|The river is added as a vertical discharge on a chosen area (the user input consisting in a Time serie and a rectangular area definition).<br>The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.<br>To add multiple rivers, just add different lines in the input file (one by river).|
+|il| il , Rain_il , initialloss |(see constant in parameters)|il=rain_loss.nc?initial_loss;|Initial Rain loss coefficient map (in mm)|
+|cl| cl , Rain_cl , continuousloss |(see constant in parameters)|cl=rain_loss.nc?continuous_loss;|Continuous Rain loss coefficient map (in mm/h)|
 |Wind| Wind , windfiles |None|Wind = mywind.nc?uw,mywind.nc?vw<br>Wind = MyWind.txt|Spacially varying: 2 files are given, 1st file is U wind and second is V wind ( no rotation of the data is performed)<br>Spacially uniform: 1 file is given then a 3 column file is expected, showing time, windspeed and direction.<br>Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)|
 |Atmp| Atmp , atmpfile |None|Atmp=AtmosphericPressure.nc?p| The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using Pa2.|
 |Rain| Rain , rainfile |None|rain=rain_forcing.txt <br>rain=rain_forcing.nc?RainIntensity| This allow to force a time varying, space varying rain intensity on the model, in mm/h.<br>Spacially varrying (rain map), a netcdf file is expected (with the variable associated to the rain after "?").<br>Spacially uniform: the rain is forced using a time serie using a 2 column values table containing time (not necessary unformly distributed) and rain.|
@@ -114,7 +116,6 @@ BG_flood user interface consists in a text file, associating key words to user c
 |bathyfile|bathyfile|
 |bathymetry|bathymetry|
 |depfile|depfile|
-|cavity|cavity|
 ---
 
 *Note* : The keys are not case sensitive.
