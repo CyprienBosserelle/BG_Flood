@@ -47,17 +47,15 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Initialise the rain losses map
 
-	if (!XForcing.il.inputfile.empty())
+	if (XParam.infiltration)
 	{
 		interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
-		// Set edges of friction map
-		setedges(XParam, XModel.blocks, XModel.il);
-	}
-	if (!XForcing.cl.inputfile.empty())
-	{
 		interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
 		// Set edges of friction map
+		setedges(XParam, XModel.blocks, XModel.il);
 		setedges(XParam, XModel.blocks, XModel.cl);
+		coldinit(XParam, XModel.blocks, XModel.infiltration);
+
 	}
 
 	//=====================================
@@ -451,6 +449,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["il"] = XModel.il;
 	XModel.OutputVarMap["cl"] = XModel.cl;
+	XModel.OutputVarMap["infiltr"] = XModel.infiltration;
 
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
@@ -976,5 +975,27 @@ template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBl
 	else
 	{
 		XBlock.activeCell[n] = 0;
+	}
+}
+
+template <class T>
+void coldinit(Param XParam, BlockP<T> XBlock, T* infiltration)
+{
+//Initialisation to 0 (cold or hot start)
+
+	int sucess = 0;
+	int ib;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+
+				infiltration[n] = T(0.0);
+			}
+		}
 	}
 }

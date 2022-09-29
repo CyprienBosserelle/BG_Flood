@@ -225,10 +225,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 					- the slope (%)
 			*/
 			log("\t### IL-CL Rain losses test on GPU ###");
-			testrainlossesGPU = Rainlossestest(0.1, 0, 10);
-			result = testrainlossesGPU ? "successful" : "failed";
-			log("\t\tIL-CL Rain losses test GPU: " + result);
-			testrainlossesCPU = Rainlossestest(0.1, -1, 10);
+			//testrainlossesGPU = Rainlossestest(0.1, 0, 10);
+			//result = testrainlossesGPU ? "successful" : "failed";
+			//log("\t\tIL-CL Rain losses test GPU: " + result);
+			testrainlossesCPU = Rainlossestest(0.0, -1, 10);
 			result = testrainlossesCPU ? "successful" : "failed";
 			log("\t\tIL-CL Rain losses test CPU: " + result);
 			isfailed = (!testrainlossesCPU || !testrainlossesGPU || isfailed) ? true : false;
@@ -808,7 +808,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	XParam.conserveElevation = false;
 
-	// Enforece GPU/CPU
+	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
 	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy" };
 
@@ -3531,6 +3531,8 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	XParam.zsinit = zsinit;
 	//XParam.zsoffset = 0.0;
 
+	XParam.infiltration = true;
+
 	//Output times for comparisons
 	XParam.endtime = 1.0;
 	XParam.outputtimestep = 0.1;
@@ -3544,9 +3546,9 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	XParam.GPUDEVICE = gpu;
 	XParam.rainbnd = true;
 	//output vars
-	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
+	std::string outvi[17] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv", "infiltr" };
 	std::vector<std::string> outv;
-	for (int nv = 0; nv < 15; nv++)
+	for (int nv = 0; nv < 17; nv++)
 	{
 		outv.push_back(outvi[nv]);
 	}
@@ -3630,8 +3632,8 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 		{
 			if (xLoss[i] < 0)
 			{
-				ilForcing[j * NX + i] = IL;
-				clForcing[j * NX + i] = CL;
+				ilForcing[j * NX + i] = 0;
+				clForcing[j * NX + i] = 0;
 			}
 			else
 			{
@@ -3661,6 +3663,8 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	free(clForcing);
 	free(xLoss);
 	free(yLoss);
+
+	//XParam.infiltration = false;
 
     //// General code
 	checkparamsanity(XParam, XForcing);

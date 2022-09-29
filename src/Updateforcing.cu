@@ -420,13 +420,11 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
-
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
 				T waterOut = XEv.h[i];
 				T infiltrationLoc = 0.0;
 				T availinitialinfiltration;
-
 
 				if (waterOut > 0)
 				{
@@ -437,9 +435,20 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 
 					//Computation of the continuous loss
 					T continuousloss = cl[i] / T(1000.0) / T(3600.0) * T(XLoop.dt); //convert from mm/hs to m/s
-						infiltrationLoc += min(continuousloss, waterOut);
+					infiltrationLoc += min(continuousloss, waterOut);
+
+					infiltration[i] += infiltrationLoc;
+
+
+					//TEMP
+					T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+					T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
+					T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
+					if (x > 0.5 && y > 0.5)
+					{
+						printf("infiltration=%f\twaterOut=%f\tcontinuousloss=%f\n", infiltrationLoc, waterOut, continuousloss);
+					}
 				}
-				infiltration[i] += infiltrationLoc;
 
 				XEv.h[i] -= infiltrationLoc * XBlock.activeCell[i];
 				XEv.zs[i] -= infiltrationLoc * XBlock.activeCell[i];

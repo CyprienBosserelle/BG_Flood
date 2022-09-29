@@ -400,7 +400,7 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl"};
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl", "infiltr"};
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -1207,6 +1207,23 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 			XParam.Adapt_arg2 = "h";
 		}
 	}
+
+	//Check that we have both initial loss and continuous loss if one is given
+	if (!XForcing.il.inputfile.empty())
+	{
+		if (XForcing.cl.inputfile.empty())
+		{
+			log("Error: File identified for initial loss but no data entered for continuous loss.\n Please, enter a ");
+		}
+	}
+	if (!XForcing.cl.inputfile.empty())
+	{
+		if (XForcing.il.inputfile.empty())
+		{
+			log("Error: File identified for continuous loss but no data entered for initial loss");
+		}
+	}
+
 	
 }
 

@@ -151,7 +151,9 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.infiltration)
 	{
-		AllocateCPU(nblk, blksize, XModel.il, XModel.cl);
+		AllocateCPU(nblk, blksize, XModel.il);
+		AllocateCPU(nblk, blksize, XModel.cl);
+		AllocateCPU(nblk, blksize, XModel.infiltration);
 	}
 
 	if (XParam.outmax)
@@ -316,7 +318,10 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.infiltration)
 	{
-		ReallocArray(nblk, blksize, XModel.il, XModel.cl);
+		ReallocArray(nblk, blksize, XModel.il);
+		ReallocArray(nblk, blksize, XModel.cl);
+		ReallocArray(nblk, blksize, XModel.infiltration);
+
 	}
 
 	if (XParam.outmax)
@@ -442,9 +447,11 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateGPU(nblk, blksize, XModel.datmpdy);
 	}
 
-	if (XParam.rainforcing)
+	if (XParam.infiltration)
 	{
-		AllocateGPU(nblk, blksize, XModel.il, XModel.cl);
+		AllocateGPU(nblk, blksize, XModel.il);
+		AllocateGPU(nblk, blksize, XModel.cl);
+		AllocateGPU(nblk, blksize, XModel.infiltration);
 	}
 
 	if (XParam.outmax)
