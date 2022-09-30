@@ -714,10 +714,10 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 
 	def= interpDyn2BUQ(x, y, defmap.GPU);
 
-	if (x > 42000 && x < 43000 && y>7719000 && y < 7721000)
-	{
-		printf("x=%f, y=%f, def=%f\n ", x, y, def);
-	}
+	//if (x > 42000 && x < 43000 && y>7719000 && y < 7721000)
+	//{
+	//	printf("x=%f, y=%f, def=%f\n ", x, y, def);
+	//}
 
 	zss = zs[i] + def * scale;
 	if (defmap.iscavity == true)
