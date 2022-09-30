@@ -183,7 +183,7 @@ void InitTSOutput(Param XParam)
 template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP & bnd)
 {
 	int ib;
-	T levdx;
+	T levdx,x,y,blkxmin,blkxmax,blkymin,blkymax,dxblk;
 	bnd.nblkTs = int(XParam.TSnodesout.size());
 
 	AllocateCPU(bnd.nblkTs, 1, bnd.Tsout);
@@ -201,7 +201,20 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 
 			ib = XBlock.active[blk];
 			levdx = T(calcres(XParam.dx,XBlock.level[ib]));
-			if (XParam.TSnodesout[o].x >= (XParam.xo + XBlock.xo[ib]) && XParam.TSnodesout[o].x <= (XParam.xo + XBlock.xo[ib] + (T)(XParam.blkwidth - 1) * levdx) && XParam.TSnodesout[o].y >= (XParam.yo + XBlock.yo[ib]) && XParam.TSnodesout[o].y <= (XParam.yo + XBlock.yo[ib] + (T)(XParam.blkwidth - 1) * levdx))
+
+			x = XParam.TSnodesout[o].x;
+			y = XParam.TSnodesout[o].y;
+
+			dxblk = (T)(XParam.blkwidth) * levdx;
+
+			blkxmin = (XParam.xo + XBlock.xo[ib] - 0.5 * levdx);
+			blkymin = (XParam.yo + XBlock.yo[ib] - 0.5 * levdx);
+
+			blkxmax = (blkxmin + dxblk);
+			blkymax = (blkymin + dxblk);
+
+
+			if (x > blkxmin && x <= blkxmax && y > blkymin && y <= blkymax)
 			{
 				XParam.TSnodesout[o].block = ib;
 				XParam.TSnodesout[o].i = min(max((int)round((XParam.TSnodesout[o].x - (XParam.xo + XBlock.xo[ib])) / levdx), 0), XParam.blkwidth - 1);

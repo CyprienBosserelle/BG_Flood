@@ -537,20 +537,24 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				zsinside = Xev.zs[inside];
-				unew = Xev.u[i];
-				vnew = Xev.v[i];
-				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
-				zbnew = zb[i];
 
-				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+			zsinside = Xev.zs[inside];
+			unew = Xev.u[i];
+			vnew = Xev.v[i];
+			zsnew = Xev.zs[i];
+			hnew = Xev.h[i];
+			zbnew = zb[i];
 
-				Xev.u[i] = unew;
-				Xev.v[i] = vnew;
-				Xev.zs[i] = zsnew;
-				Xev.zs[i] = hnew;
-				zb[i] = zbnew;
+
+			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+
+			Xev.u[i] = unew;
+			Xev.v[i] = vnew;
+			Xev.zs[i] = zsnew;
+			Xev.h[i] = hnew;
+			zb[i] = zbnew;
+
 
 			}
 
@@ -597,22 +601,24 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
+
 				zsinside = Xev.zs[inside];
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
+				hnew = Xev.h[i];
 				zbnew = zb[i];
 
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
 
+
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
 				Xev.zs[i] = zsnew;
-				Xev.zs[i] = hnew;
+				Xev.h[i] = hnew;
 				zb[i] = zbnew;
 
-			}
+
 
 		}
 	}
@@ -657,22 +663,24 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
+
 				zsinside = Xev.zs[inside];
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
+				hnew = Xev.h[i];
 				zbnew = zb[i];
 
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
 
+
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
 				Xev.zs[i] = zsnew;
-				Xev.zs[i] = hnew;
+				Xev.h[i] = hnew;
 				zb[i] = zbnew;
 
-			}
+
 
 		}
 	}
@@ -705,21 +713,24 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 			isright = 0;
 			istop = -1;
 
+
 			iy = -1;
 			ix = threadIdx.x;
 			int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
 			int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
 
 			if (ix >= xst && ix < xnd)
 			{
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
+
 				zsinside = Xev.zs[inside];
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
+				hnew = Xev.h[i];
 				zbnew = zb[i];
 
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -727,7 +738,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
 				Xev.zs[i] = zsnew;
-				Xev.zs[i] = hnew;
+				Xev.h[i] = hnew;
 				zb[i] = zbnew;
 
 			}
