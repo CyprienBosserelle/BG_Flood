@@ -681,7 +681,7 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 				zb[i] = zbnew;
 
 
-
+			}
 		}
 	}
 }
