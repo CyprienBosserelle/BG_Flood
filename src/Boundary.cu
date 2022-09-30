@@ -538,22 +538,22 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
 
-			zsinside = Xev.zs[inside];
-			unew = Xev.u[i];
-			vnew = Xev.v[i];
-			zsnew = Xev.zs[i];
-			hnew = Xev.h[i];
-			zbnew = zb[i];
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.h[i];
+				zbnew = zb[i];
 
 
-			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
 
 
-			Xev.u[i] = unew;
-			Xev.v[i] = vnew;
-			Xev.zs[i] = zsnew;
-			Xev.h[i] = hnew;
-			zb[i] = zbnew;
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.h[i] = hnew;
+				zb[i] = zbnew;
 
 
 			}
@@ -619,7 +619,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 				zb[i] = zbnew;
 
 
-
+			}
 		}
 	}
 }
