@@ -444,7 +444,7 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 					T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 					T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
 					T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
-					if (x > 0.5 && y > 0.5)
+					if (x > 0.2 && y > 0.2)
 					{
 						printf("infiltration=%f\twaterOut=%f\tcontinuousloss=%f\n", infiltrationLoc, waterOut, continuousloss);
 					}
