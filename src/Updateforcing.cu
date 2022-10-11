@@ -643,9 +643,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 	for (int nd = 0; nd < deform.size(); nd++)
 	{
-		// This should be: st >= tt-dt && st < tt here tt is at the end of the flow step rather then at the start
-		// ((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime)
-		// how to account for round-off error? 
+		// if deformation happend in the last computational step
 		if (((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime))
 		{
 			
@@ -660,7 +658,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 			T scale = (deform[nd].duration > 0.0) ? T(1.0 / deform[nd].duration * dtdef) : T(1.0);
 
-			log("Applying deform: " + std::to_string(scale));
+			//log("Applying deform: " + std::to_string(scale));
 
 			if (XParam.GPUDEVICE < 0)
 			{
