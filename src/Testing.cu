@@ -3488,7 +3488,7 @@ template bool ZoneOutputTest<double>(int nzones, double zsinit);
 /*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
 *
 * This function test the spped and accuracy of a new gradient function
-* gradien are only calculated for zb but assigned to different gradient variable for storage
+* gradient are only calculated for zb but assigned to different gradient variable for storage
 */
 template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
@@ -3733,6 +3733,28 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	printf("Runtime : old gradient=%f, new Gradient=%f in msec\n", msecTotalG, msecTotalGnew);
 	
 	return fastest;
+
+}
+
+/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
+*
+* This function test the spped and accuracy of a new gradient function
+* gradient are only calculated for zb but assigned to different gradient variable for storage
+*/
+template <class T> int TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	// Copy h from CPU to GPU 
+	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.h, XModel_g.evolvo.h);
+	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.h, XModel_g.evolv.h);
+
+	cudaStream_t streams[2];
+	CUDA_CHECK(cudaStreamCreate(&streams[0]));
+	CUDA_CHECK(cudaStreamCreate(&streams[1]));
+
+
+	fillHaloC(XParam,XModel.blocks, XModel.evolv.h)
+	fillHaloGPU(XParam, XBlock, streams[0], XModel_g.evolv.h);
+	fillHaloGPUnew(XParam, XBlock, streams[0], XModel_g.evolvo.h);
 
 }
 
