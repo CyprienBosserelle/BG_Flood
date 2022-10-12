@@ -3487,7 +3487,8 @@ template bool ZoneOutputTest<double>(int nzones, double zsinit);
 
 /*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
 *
-* This function test the zoned output for a basic configuration
+* This function test the spped and accuracy of a new gradient function
+* gradien are only calculated for zb but assigned to different gradient variable for storage
 */
 template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
@@ -3505,6 +3506,10 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	cudaEvent_t startA, startB, startC, startG, startGnew;
 	cudaEvent_t stopA, stopB, stopC, stopG, stopGnew;
 
+	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+
+	std::thread t0(&gradientC<T>, XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	t0.join();
 
 
 	Loop<T> XLoop;
@@ -3592,8 +3597,8 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	
 
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdx, XModel_g.grad.dzbdx);
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdy, XModel_g.grad.dzbdy);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudx, XModel_g.grad.dzbdx);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudy, XModel_g.grad.dzbdy);
 
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdx, XModel_g.grad.dzsdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdy, XModel_g.grad.dzsdy);
@@ -3621,6 +3626,9 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	diffArray(XParam, XLoop, XModel.blocks, "SMBdy", false, XModel.grad.dzbdy, XModel_g.grad.dhdy, XModel.time.arrmax, XModel.grad.dhdy);
 	diffArray(XParam, XLoop, XModel.blocks, "SMdy", false, XModel.grad.dzbdy, XModel_g.grad.dzsdy, XModel.time.arrmax, XModel.grad.dzsdy);
 	*/
+	T maxdiffx, maxdiffy;
+	maxdiffx = T(0.0);
+	maxdiffy = T(0.0);
 	T maxdiffsmx, maxdiffsmy;
 	maxdiffsmx = T(0.0);
 	maxdiffsmy = T(0.0);
@@ -3639,6 +3647,15 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dudx[i]);
+
+				maxdiffx = max(maxdiffx, diffsm);
+
+				diffsm = abs(XModel.grad.dzbdy[i] - XModel.grad.dudy[i]);
+
+				maxdiffx = max(maxdiffx, diffsm);
+
 				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dzsdx[i]);
 				
 				maxdiffsmx = max(maxdiffsmx, diffsm);
@@ -3658,7 +3675,10 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	}
 
 	
-	printf("max error : , smx=%e, smy=%e,  smbx=%e, smby=%e in m\n", maxdiffsmx, maxdiffsmy, maxdiffsmbx, maxdiffsmby);
+	printf("max error : normx=%e, normy=%e, smx=%e, smy=%e,  smbx=%e, smby=%e in m\n", maxdiffx, maxdiffy, maxdiffsmx, maxdiffsmy, maxdiffsmbx, maxdiffsmby);
+
+
+	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
 
 
 	cudaEventCreate(&startG);
@@ -3679,14 +3699,16 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	cudaEventDestroy(startG);
 	cudaEventDestroy(stopG);
 
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdx, XModel_g.grad.dzbdx);
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdy, XModel_g.grad.dzbdy);
+	CompareCPUvsGPU(XParam, XModel, XModel_g, { "dhdx","dhdy", "dzsdx","dzsdy","dudx","dudy","dvdx","dvdy" }, true);
 
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdx, XModel_g.grad.dzsdx);
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdy, XModel_g.grad.dzsdy);
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdx, XModel_g.grad.dzbdx);
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzbdy, XModel_g.grad.dzbdy);
 
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdx, XModel_g.grad.dhdx);
-	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdx, XModel_g.grad.dzsdx);
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dzsdy, XModel_g.grad.dzsdy);
+
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdx, XModel_g.grad.dhdx);
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
 
 	cudaEventCreate(&startGnew);
 

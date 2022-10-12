@@ -2329,16 +2329,16 @@ template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, 
 	dim3 gridDim(ceil(XParam.nblk/2), 1, 1);
 
 
-	gradientHaloLeftGPU << < gridDim, blockDimL, 0, streams[0] >> > (XParam, XBlock, a, dadx, dady);
+	gradientHaloLeftGPUnew << < gridDim, blockDimL, 0, streams[0] >> > (XParam, XBlock, a, dadx, dady);
 	
 
-	gradientHaloRightGPU << < gridDim, blockDimL, 0, streams[1] >> > (XParam, XBlock, a, dadx, dady);
+	gradientHaloRightGPUnew << < gridDim, blockDimL, 0, streams[1] >> > (XParam, XBlock, a, dadx, dady);
 	
 
-	gradientHaloBotGPU << < gridDim, blockDimB, 0, streams[2] >> > (XParam, XBlock, a, dadx, dady);
+	gradientHaloBotGPUnew << < gridDim, blockDimB, 0, streams[2] >> > (XParam, XBlock, a, dadx, dady);
 	
 
-	gradientHaloTopGPU << < gridDim, blockDimB, 0, streams[3] >> > (XParam, XBlock, a, dadx, dady);
+	gradientHaloTopGPUnew << < gridDim, blockDimB, 0, streams[3] >> > (XParam, XBlock, a, dadx, dady);
 
 	//CUDA_CHECK(cudaDeviceSynchronize());
 	
