@@ -48,6 +48,7 @@ class deformmap : public inputmap
 public:
 	double startime = 0.0;
 	double duration = 0.0;
+	bool iscavity = false;
 	T* val;
 	
 	T clampedge = 0.0;
