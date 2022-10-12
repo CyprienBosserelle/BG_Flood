@@ -306,6 +306,10 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	{
 		AddrainforcingImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
 	}
+	if (XParam.infiltration)
+	{
+		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.infiltration);
+	}
 }
 template void HalfStepCPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void HalfStepCPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);

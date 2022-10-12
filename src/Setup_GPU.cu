@@ -203,6 +203,7 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 	{
 		CopytoGPU(nblk, blksize, XModel_cpu.il, XModel_gpu.il);
 		CopytoGPU(nblk, blksize, XModel_cpu.cl, XModel_gpu.cl);
+		CopytoGPU(nblk, blksize, XModel_cpu.infiltration, XModel_gpu.infiltration);
 	}
 
 	if (XParam.outmax)

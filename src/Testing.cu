@@ -228,7 +228,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			//testrainlossesGPU = Rainlossestest(0.1, 0, 10);
 			//result = testrainlossesGPU ? "successful" : "failed";
 			//log("\t\tIL-CL Rain losses test GPU: " + result);
-			testrainlossesCPU = Rainlossestest(0.0, -1, 10);
+			testrainlossesCPU = Rainlossestest(1.0, -1, 10);
 			result = testrainlossesCPU ? "successful" : "failed";
 			log("\t\tIL-CL Rain losses test CPU: " + result);
 			isfailed = (!testrainlossesCPU || !testrainlossesGPU || isfailed) ? true : false;
@@ -3668,14 +3668,17 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 
     //// General code
 	checkparamsanity(XParam, XForcing);
-
+	//printf("h: %f \n", XModel.evolv.h[10]);
 	InitMesh(XParam, XForcing, XModel);
 
 	InitialConditions(XParam, XForcing, XModel);
 
-	InitialAdaptation(XParam, XForcing, XModel);
+	printf("h: %f \n", XModel.evolv.h[10]);
 
+	InitialAdaptation(XParam, XForcing, XModel);
+	printf("h: %f \n", XModel.evolv.h[10]);
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
 	initVol = T(0.0);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{

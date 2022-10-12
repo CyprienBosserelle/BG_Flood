@@ -411,6 +411,7 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 	int ib;
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
+	int p = 0;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -444,14 +445,15 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 					T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 					T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
 					T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
-					if (x > 0.2 && y > 0.2)
+					if (x > 0.2 && y > 0.2 && p==0)
 					{
-						printf("infiltration=%f\twaterOut=%f\tcontinuousloss=%f\n", infiltrationLoc, waterOut, continuousloss);
+						p = 1;
+						printf("infiltration=%f\twaterOut=%f\tcontinuousloss=%f\th=%f\n", infiltrationLoc, waterOut, continuousloss, XEv.h[i]);
 					}
 				}
 
-				XEv.h[i] -= infiltrationLoc * XBlock.activeCell[i];
-				XEv.zs[i] -= infiltrationLoc * XBlock.activeCell[i];
+				XEv.h[i] -= max(infiltrationLoc * XBlock.activeCell[i],T(0.0));
+				XEv.zs[i] -= max(infiltrationLoc * XBlock.activeCell[i],T(0.0));
 			}
 		}
 	}

@@ -13,6 +13,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
 	
+	printf("dt: %f \n", XLoop.dt);
 
 	
 	log("\t\tCompleted");
@@ -23,7 +24,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
 		
 
-		// Calculate Forcing at this step
+		// Calculate dynamic forcing at this step
 		updateforcing(XParam, XLoop, XForcing);
 
 		// Core engine
@@ -177,11 +178,11 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	}
 
 	// GPU stuff
-	if (XParam.GPUDEVICE >= 0)
-	{
+	//if (XParam.GPUDEVICE >= 0)
+	//{
 		//XLoop.blockDim = (16, 16, 1);
 		//XLoop.gridDim = (XParam.nblk, 1, 1);
-	}
+	//}
 
 	//XLoop.hugenegval = std::numeric_limits<T>::min();
 
