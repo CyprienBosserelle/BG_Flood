@@ -488,10 +488,10 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	}
 	
 
-	fillHaloGPUnew(XParam, XBlock, streams[0], Xev.h);
-	fillHaloGPUnew(XParam, XBlock, streams[1], Xev.zs);
-	fillHaloGPUnew(XParam, XBlock, streams[2], Xev.u);
-	fillHaloGPUnew(XParam, XBlock, streams[3], Xev.v);
+	fillHaloGPU(XParam, XBlock, streams[0], Xev.h);
+	fillHaloGPU(XParam, XBlock, streams[1], Xev.zs);
+	fillHaloGPU(XParam, XBlock, streams[2], Xev.u);
+	fillHaloGPU(XParam, XBlock, streams[3], Xev.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	if (XParam.conserveElevation)
