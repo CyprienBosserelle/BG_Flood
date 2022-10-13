@@ -167,6 +167,16 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		{
 			// Now read the discharge input and store to  
 			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile);
+
+			//Check the time range of the river forcing
+			int nt = XForcing.rivers[Rin].flowinput.size();
+			XForcing.rivers[Rin].to = XForcing.rivers[Rin].flowinput[0].time;
+			XForcing.rivers[Rin].tmax = XForcing.rivers[Rin].flowinput[nt-1].time;
+			if (XForcing.rivers[Rin].to > XParam.totaltime || XForcing.rivers[Rin].tmax < XParam.endtime)
+			{
+				log("\nFATAL ERROR on the time range for the River number " + std::to_string(Rin));
+				exit(1);
+			}
 		}
 	}
 

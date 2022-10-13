@@ -36,6 +36,7 @@ public:
 	std::vector<int> i, j, block; // one river can spring across multiple cells
 	double disarea; // discharge area
 	double xstart,xend, ystart,yend; // location of the discharge as a rectangle
+	double to, tmax;
 	std::string Riverflowfile; // river flow input time[s] flow in m3/s
 	std::vector<Flowin> flowinput; // vector to store the data of the river flow input file
 	
