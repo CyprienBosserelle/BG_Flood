@@ -213,6 +213,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\n\nUser defined zones Outputs: " + result);
 			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
 		}
+		if (mytest == 996)
+		{
+			TestHaloSpeed(XParam,XModel,XModel_g);
+		}
 		if (mytest == 997)
 		{
 			TestGradientSpeed(XParam, XModel, XModel_g);
@@ -1656,7 +1660,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
 {
 	//bool test = true;
-	// Make a Parabolic bathy
+	//
 
 	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
 	Model<decltype(modeltype)> XModel; // For CPU pointers
@@ -1664,109 +1668,24 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 	Forcing<float> XForcing;
 
-	StaticForcingP<float> bathy;
-
-	float* dummybathy;
-
-	XForcing.Bathy.push_back(bathy);
-
-	XForcing.Bathy[0].xo = 0.0;
-	XForcing.Bathy[0].yo = 0.0;
-
-	XForcing.Bathy[0].xmax = 31.0;
-	XForcing.Bathy[0].ymax = 31.0;
-	XForcing.Bathy[0].nx = 32;
-	XForcing.Bathy[0].ny = 32;
-
-	XForcing.Bathy[0].dx = 1.0;
+	XForcing = MakValleyBathy(XParam, slope, bottop, flip);
 
 	T x, y;
 	T center = T(10.5);
 
-	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
-
-	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
-	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, dummybathy);
-
-
 	float maxtopo = std::numeric_limits<float>::min();
 	float mintopo = std::numeric_limits<float>::max();
-	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
-	{
-		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
-		{
-			x = T(XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx);
-			y = T(XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx);
-
-			
-			dummybathy[i + j * XForcing.Bathy[0].nx] = float( ValleyBathy(y, x, slope, center));
-
-			maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
-
-			
-		}
-	}
-
-	// Make surrounding wall
-	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
-	{
-
-		dummybathy[0 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-		dummybathy[1 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-
-		dummybathy[j + 0 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-		dummybathy[j + 1 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-
-		dummybathy[(XForcing.Bathy[0].nx - 1) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-		dummybathy[(XForcing.Bathy[0].nx - 2) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-
-		dummybathy[j + (XForcing.Bathy[0].ny - 1) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-		dummybathy[j + (XForcing.Bathy[0].ny - 2) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
-
-
-	}
-
-	// make a specially elevated spot 
-
-	dummybathy[(XForcing.Bathy[0].nx - 1) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
-	dummybathy[(XForcing.Bathy[0].nx - 2) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
-
-	dummybathy[(XForcing.Bathy[0].nx - 1) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
-	dummybathy[(XForcing.Bathy[0].nx - 2) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
 
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			mintopo = min(dummybathy[i + j * XForcing.Bathy[0].nx], mintopo);
+			maxtopo = max(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], maxtopo);
+			mintopo = min(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], mintopo);
 		}
 	}
 
-	// Flip or rotate the bathy according to what is requested
-	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
-	{
-		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
-		{
-			if (!flip && !bottop)
-			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
-			}
-			else if (flip && !bottop)
-			{
-				XForcing.Bathy[0].val[(XForcing.Bathy[0].nx - 1 - i) + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
-			}
-			else if (!flip && bottop)
-			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
-			}
-			else if (flip && bottop)
-			{
-				XForcing.Bathy[0].val[i + (XForcing.Bathy[0].ny - 1 - j) * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
-			}
-		}
-	}
-
-	free(dummybathy);
+	
 
 	// Overrule whatever is set in the river forcing
 	T Q = T(1.0);
@@ -3743,18 +3662,199 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 */
 template <class T> int TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
-	// Copy h from CPU to GPU 
-	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.h, XModel_g.evolvo.h);
-	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.h, XModel_g.evolv.h);
+	Forcing<float> XForcing;
+
+	XForcing = MakValleyBathy(XParam, T(0.4), true, true);
+
+	float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = std::numeric_limits<float>::max();
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			maxtopo = max(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], maxtopo);
+			mintopo = min(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], mintopo);
+		}
+	}
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	XParam.endtime = 20.0;
+
+	XParam.outputtimestep = XParam.endtime;
+
+	XParam.minlevel = 0;
+	XParam.maxlevel = 1;
+	XParam.initlevel = 0;
+
+	//coarse to fine
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdaptCrit = "Inrange";
+	XParam.Adapt_arg1 = "0.0";
+	XParam.Adapt_arg2 = "2.0";
+	XParam.Adapt_arg3 = "zb";
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	
+
+
+	// Copy zs from CPU to GPU ... again
+	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.zs, XModel_g.evolv_o.zs);
+	CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.zs, XModel_g.evolv.zs);
 
 	cudaStream_t streams[2];
 	CUDA_CHECK(cudaStreamCreate(&streams[0]));
 	CUDA_CHECK(cudaStreamCreate(&streams[1]));
 
 
-	fillHaloC(XParam,XModel.blocks, XModel.evolv.h)
-	fillHaloGPU(XParam, XBlock, streams[0], XModel_g.evolv.h);
-	fillHaloGPUnew(XParam, XBlock, streams[0], XModel_g.evolvo.h);
+	fillHaloC(XParam, XModel.blocks, XModel.evolv.zs);
+	fillHaloGPU(XParam, XModel_g.blocks, streams[0], XModel_g.evolv.zs);
+	fillHaloGPUnew(XParam, XModel_g.blocks, streams[1], XModel_g.evolv_o.zs);
+
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	cudaStreamDestroy(streams[0]);
+	cudaStreamDestroy(streams[1]);
+
+
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.evolv.u, XModel_g.evolv.zs);
+	//CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.evolv.v, XModel_g.evolvo.zs);
+
+	diffArray(XParam, XModel.blocks, "GPU_old", true, XModel.evolv.zs, XModel_g.evolv.zs, XModel.evolv.u, XModel.evolv_o.u);
+	diffArray(XParam, XModel.blocks, "GPU_new", true, XModel.evolv.zs, XModel_g.evolv_o.zs, XModel.evolv.v, XModel.evolv_o.v);
+
+
+}
+
+
+template <class T> Forcing<float> MakValleyBathy(Param XParam, T slope, bool bottop, bool flip)
+{
+	//
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	float* dummybathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	XForcing.Bathy[0].xo = 0.0;
+	XForcing.Bathy[0].yo = 0.0;
+
+	XForcing.Bathy[0].xmax = 31.0;
+	XForcing.Bathy[0].ymax = 31.0;
+	XForcing.Bathy[0].nx = 32;
+	XForcing.Bathy[0].ny = 32;
+
+	XForcing.Bathy[0].dx = 1.0;
+
+	T x, y;
+	T center = T(10.5);
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, dummybathy);
+
+
+	float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = std::numeric_limits<float>::max();
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			x = T(XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx);
+			y = T(XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx);
+
+
+			dummybathy[i + j * XForcing.Bathy[0].nx] = float(ValleyBathy(y, x, slope, center));
+
+			maxtopo = max(dummybathy[i + j * XForcing.Bathy[0].nx], maxtopo);
+
+
+		}
+	}
+
+	// Make surrounding wall
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+
+		dummybathy[0 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[1 + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[j + 0 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[j + 1 * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[(XForcing.Bathy[0].nx - 1) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[(XForcing.Bathy[0].nx - 2) + j * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+		dummybathy[j + (XForcing.Bathy[0].ny - 1) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+		dummybathy[j + (XForcing.Bathy[0].ny - 2) * XForcing.Bathy[0].nx] = maxtopo + 5.0f;
+
+
+	}
+
+	// make a specially elevated spot 
+
+	dummybathy[(XForcing.Bathy[0].nx - 1) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+	dummybathy[(XForcing.Bathy[0].nx - 2) + 0 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+
+	dummybathy[(XForcing.Bathy[0].nx - 1) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+	dummybathy[(XForcing.Bathy[0].nx - 2) + 1 * XForcing.Bathy[0].nx] = maxtopo + 10.0f;
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			mintopo = min(dummybathy[i + j * XForcing.Bathy[0].nx], mintopo);
+		}
+	}
+
+	// Flip or rotate the bathy according to what is requested
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			if (!flip && !bottop)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (flip && !bottop)
+			{
+				XForcing.Bathy[0].val[(XForcing.Bathy[0].nx - 1 - i) + j * XForcing.Bathy[0].nx] = dummybathy[i + j * XForcing.Bathy[0].nx];
+			}
+			else if (!flip && bottop)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+			else if (flip && bottop)
+			{
+				XForcing.Bathy[0].val[i + (XForcing.Bathy[0].ny - 1 - j) * XForcing.Bathy[0].nx] = dummybathy[j + i * XForcing.Bathy[0].nx];
+			}
+		}
+	}
+
+	free(dummybathy);
+
+	return XForcing;
 
 }
 
@@ -4044,14 +4144,14 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 
 	// calculate difference
 	//diffArray(XParam, XLoop, XModel.blocks, XModel.evolv.h, XModel_g.evolv.h, XModel.evolv_o.u);
-
+	/*
 	creatncfileBUQ(XParam, XModel.blocks);
 
 	for (int ivar = 0; ivar < varlist.size(); ivar++)
 	{
 		defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varlist[ivar], 3, XModel.OutputVarMap[varlist[ivar]], XModel.blocks.outZone[0]);
 	}
-
+	*/
 	/*
 	std::string varname = "dt";
 	if (abs(dtgpu - dtcpu) < (XLoop.epsilon * 2))
@@ -4067,7 +4167,7 @@ template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> 
 	//Check variable
 	for (int ivar = 0; ivar < varlist.size(); ivar++)
 	{
-		diffArray(XParam, XLoop, XModel.blocks, varlist[ivar], checkhalo, XModel.OutputVarMap[varlist[ivar]], XModel_g.OutputVarMap[varlist[ivar]], gpureceive, diff);
+		diffArray(XParam, XModel.blocks, varlist[ivar], checkhalo, XModel.OutputVarMap[varlist[ivar]], XModel_g.OutputVarMap[varlist[ivar]], gpureceive, diff);
 	}
 
 
@@ -4145,7 +4245,7 @@ template <class T> void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* S
 * This function is quite usefull to spot inconsistencies between the GPU and CPU algorithmes.
 * This function requires two (dummy and an output) CPU pointers to transition the GPU data on the CU RAM for comparison and saving to the disk
 */
-template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
+template <class T> void diffArray(Param XParam, BlockP<T> XBlock, std::string varname, bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
 {
 	T diff, maxdiff, rmsdiff;
 	unsigned int nit = 0;
@@ -4153,8 +4253,13 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 	//copy GPU back to the CPU (store in dummy)
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, dummy, gpu);
 
+
+	T hugeposval = std::numeric_limits<T>::max();
+	T hugenegval = T(-1.0) * hugeposval;
+	T epsilon = std::numeric_limits<T>::epsilon();
+
 	rmsdiff = T(0.0);
-	maxdiff = XLoop.hugenegval;
+	maxdiff = hugenegval;
 	ixmd = 0;
 	iymd = 0;
 	ibmd = 0;
@@ -4199,13 +4304,14 @@ template <class T> void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock,
 
 
 
-	if (maxdiff <= T(10000.0) * (XLoop.epsilon))
+	if (maxdiff <= T(10000.0) * (epsilon))
 	{
 		log(varname + " PASS");
 	}
 	else
 	{
-		log(varname + " FAIL: " + " Max difference: " + std::to_string(maxdiff) + " (at: ix = " + std::to_string(ixmd) + " iy = " + std::to_string(iymd) + " ib = " + std::to_string(ibmd) + ") RMS difference: " + std::to_string(rmsdiff) + " Eps: " + std::to_string(XLoop.epsilon));
+		creatncfileBUQ(XParam, XBlock);
+		log(varname + " FAIL: " + " Max difference: " + std::to_string(maxdiff) + " (at: ix = " + std::to_string(ixmd) + " iy = " + std::to_string(iymd) + " ib = " + std::to_string(ibmd) + ") RMS difference: " + std::to_string(rmsdiff) + " Eps: " + std::to_string(epsilon));
 		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_CPU", 3, cpu, XBlock.outZone[0]);
 		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_GPU", 3, dummy, XBlock.outZone[0]);
 		defncvarBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, varname + "_diff", 3, out, XBlock.outZone[0]);
