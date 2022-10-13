@@ -28,6 +28,8 @@
 template <class T>
 void readforcing(Param & XParam, Forcing<T> & XForcing)
 {
+	int nt;
+
 	//=================
 	// Read Bathymetry
 	log("\nReading bathymetry grid data...");
@@ -169,7 +171,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile);
 
 			//Check the time range of the river forcing
-			int nt = XForcing.rivers[Rin].flowinput.size();
+			nt = XForcing.rivers[Rin].flowinput.size();
 			XForcing.rivers[Rin].to = XForcing.rivers[Rin].flowinput[0].time;
 			XForcing.rivers[Rin].tmax = XForcing.rivers[Rin].flowinput[nt-1].time;
 			if (XForcing.rivers[Rin].to > XParam.totaltime || XForcing.rivers[Rin].tmax < XParam.endtime)
@@ -205,6 +207,14 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			for (int n = 0; n < XForcing.UWind.unidata.size(); n++)
 			{
 				XForcing.UWind.unidata[n].wspeed = XForcing.UWind.unidata[n].uwind;
+			}
+
+			nt = XForcing.UWind.unidata.size();
+			if (XForcing.UWind.unidata[0].time > XParam.totaltime || XForcing.UWind.unidata[nt - 1].time < XParam.endtime 
+				|| XForcing.VWind.unidata[0].time > XParam.totaltime || XForcing.VWind.unidata[nt - 1].time < XParam.endtime)
+			{
+				log("\nFATAL ERROR on the time range for the wind forcing ");
+				exit(1);
 			}
 			
 		}
