@@ -1160,6 +1160,11 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		XParam.outputtimestep = XParam.endtime;
 		//otherwise there is really no point running the model
 	}
+	if (XParam.outputtimestep > XParam.endtime)
+	{
+		XParam.outputtimestep = XParam.endtime;
+		//otherwise, no final output
+	}
 
 	
 
@@ -1224,7 +1229,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 */
 double setendtime(Param XParam,Forcing<float> XForcing)
 {
-	//endtime cannot be bigger thn the smallest time set in a boundary
+	//endtime cannot be bigger than the smallest time set in a boundary
 	SLTS tempSLTS;
 	double endtime = XParam.endtime;
 	if (XForcing.left.on)
@@ -1247,6 +1252,11 @@ double setendtime(Param XParam,Forcing<float> XForcing)
 	{
 		tempSLTS = XForcing.bot.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);
+	}
+
+	if (endtime < XParam.endtime)
+	{
+		log("WARNING: Boundary definition too short, endtime of the simulation reduced to : " + std::to_string(endtime));
 	}
 
 	return endtime;

@@ -221,7 +221,7 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 {
 	XLoop.nstepout++;
 
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.5) && XParam.outputtimestep > 0.0)
 	{
 		char buffer[256];
 		sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
