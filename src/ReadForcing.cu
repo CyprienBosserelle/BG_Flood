@@ -174,10 +174,15 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			nt = XForcing.rivers[Rin].flowinput.size();
 			XForcing.rivers[Rin].to = XForcing.rivers[Rin].flowinput[0].time;
 			XForcing.rivers[Rin].tmax = XForcing.rivers[Rin].flowinput[nt-1].time;
-			if (XForcing.rivers[Rin].to > XParam.totaltime || XForcing.rivers[Rin].tmax < XParam.endtime)
+			if ( XForcing.rivers[Rin].tmax < XParam.endtime)
 			{
-				log("\nFATAL ERROR on the time range for the River number " + std::to_string(Rin));
-				exit(1);
+				log("\nWARNING: change of simulation endtime to fit the time range of the River number " + std::to_string(Rin));
+				XParam.endtime = XForcing.rivers[Rin].tmax;
+			}
+			if (XForcing.rivers[Rin].to > XParam.totaltime)
+			{
+				log("\nWARNING: change of simulation initial time to fit the time range of the River number " + std::to_string(Rin));
+				XParam.totaltime = XForcing.rivers[Rin].to;
 			}
 		}
 	}
@@ -209,12 +214,17 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 				XForcing.UWind.unidata[n].wspeed = XForcing.UWind.unidata[n].uwind;
 			}
 
+			//Sanity check on the time range of the forcing
 			nt = XForcing.UWind.unidata.size();
-			if (XForcing.UWind.unidata[0].time > XParam.totaltime || XForcing.UWind.unidata[nt - 1].time < XParam.endtime 
-				|| XForcing.VWind.unidata[0].time > XParam.totaltime || XForcing.VWind.unidata[nt - 1].time < XParam.endtime)
+			if (XForcing.UWind.unidata[nt - 1].time < XParam.endtime || XForcing.VWind.unidata[nt - 1].time < XParam.endtime)
 			{
-				log("\nFATAL ERROR on the time range for the wind forcing ");
-				exit(1);
+				log("\nWARNING: change of simulation endtime to fit the time range of the wind forcing. ");
+				XParam.endtime = utils::min(UWind.unidata[nt - 1].time, XForcing.VWind.unidata[nt - 1].time);
+			}
+			if (XForcing.UWind.unidata[0].time > XParam.totaltime || XForcing.VWind.unidata[0].time > XParam.totaltime)
+			{
+				log("\nWARNING: change of simulation initial time to fit the time range of the wind forcing. ");
+				XParam.totaltime = utils::max(XForcing.UWind.unidata[0].time, XForcing.VWind.unidata[0].time);
 			}
 			
 		}

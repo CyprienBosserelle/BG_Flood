@@ -69,6 +69,8 @@ struct DynForcingP: public forcingmap
 
 	T clampedge=0.0;
 
+	double to, tmax;
+
 };
 
 
