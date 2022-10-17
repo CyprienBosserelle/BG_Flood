@@ -1256,7 +1256,7 @@ double setendtime(Param XParam,Forcing<float> XForcing)
 
 	if (endtime < XParam.endtime)
 	{
-		log("WARNING: Boundary definition too short, endtime of the simulation reduced to : " + std::to_string(endtime));
+		log("\nWARNING: Boundary definition too short, endtime of the simulation reduced to : " + std::to_string(endtime));
 	}
 
 	return endtime;

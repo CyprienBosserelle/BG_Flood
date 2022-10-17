@@ -3140,7 +3140,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		XForcing.Rain.varname = "myrainforcing";
 		
 
-		InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+		InitDynforcing(gpgpu, XParam, XForcing.Rain);
 
 		//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 
