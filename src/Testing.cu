@@ -3579,15 +3579,15 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 
-	/*
+	
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = i * alpha / 100;
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(0.0);
 		}
 	}
-	*/
+	
 
 	// Add wall boundary conditions
 	XForcing.right.type = 0;
