@@ -6,7 +6,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Predictor step in reimann solver
 	//============================================
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 
 	if (XParam.atmpforcing)
@@ -29,17 +28,14 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 		
 	}
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
-	printf("h: %f \n", XModel.evolv.h[100]);
 
 	//============================================
 	// Reset DTmax
 	InitArrayBUQ(XParam, XModel.blocks, XLoop.hugeposval, XModel.time.dtmax);
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	//============================================
 	// Calculate gradient for evolving parameters
@@ -78,7 +74,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 		//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 	}
 	
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
@@ -89,7 +84,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	XLoop.dt = double(CalctimestepCPU(XParam,XLoop, XModel.blocks, XModel.time));
 	XLoop.dtmax = XLoop.dt;
 	XModel.time.dt = T(XLoop.dt);
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 
 	//============================================
@@ -115,7 +109,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Update evolving variable by 1/2 time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	//============================================
 	// Corrector step in reimann solver
@@ -128,7 +121,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Calculate gradient for evolving parameters
 	gradientCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.zb);
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	//============================================
 	// Flux and Source term reconstruction
@@ -167,7 +159,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 		updateKurgYATMCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
 		//AddSlopeSourceYCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 	}
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	//============================================
 	// Fill Halo for flux from fine to coarse
@@ -196,7 +187,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Update evolving variable by 1 full time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 
 	//============================================
@@ -210,7 +200,6 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Copy updated evolving variable back
 	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 
 	if (!XForcing.Rain.inputfile.empty())

@@ -225,12 +225,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 					- the slope (%)
 			*/
 			log("\t### IL-CL Rain losses test on GPU ###");
-			//testrainlossesGPU = Rainlossestest(0.1, 0, 10);
-			//result = testrainlossesGPU ? "successful" : "failed";
-			//log("\t\tIL-CL Rain losses test GPU: " + result);
-			testrainlossesCPU = Rainlossestest(1.0, -1, 10);
+			testrainlossesGPU = Rainlossestest(0.0, 0, 10);
+			result = testrainlossesGPU ? "successful" : "failed";
+			log("\n\n\t IL-CL Rain losses test GPU: " + result);
+			testrainlossesCPU = Rainlossestest(0.0, -1, 10);
 			result = testrainlossesCPU ? "successful" : "failed";
-			log("\t\tIL-CL Rain losses test CPU: " + result);
+			log("\n\n\t IL-CL Rain losses test CPU: " + result);
 			isfailed = (!testrainlossesCPU || !testrainlossesGPU || isfailed) ? true : false;
 		}
 		if (mytest == 998)
@@ -3519,9 +3519,8 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	
 	log("#####");
 	Param XParam;
-	T initVol, TheoryInput, TheoryLoss;
+	T initVol, TheoryInput;
 	TheoryInput = T(0.0);
-	TheoryLoss = T(0.0);
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 6)); //1<<8  = 2^8
 	XParam.xo = -0.5;
@@ -3674,10 +3673,8 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 
 	InitialConditions(XParam, XForcing, XModel);
 
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	InitialAdaptation(XParam, XForcing, XModel);
-	printf("h: %f \n", XModel.evolv.h[10]);
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	initVol = T(0.0);
@@ -3699,10 +3696,10 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
 	TheoryInput = Q / T(1000.0) / T(3600.0) * XParam.endtime;
-	TheoryLoss = (IL + CL / T(1000.0) / T(3600.0) * XParam.endtime)/2;
 
 
 	T SimulatedVolume = T(0.0);
+	T Infiltration_model = T(0.0);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
@@ -3713,15 +3710,19 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 			{
 				int i = memloc(XParam, ix, iy, ib);
 				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
+				Infiltration_model = Infiltration_model + XModel.infiltration[i] * delta * delta;
 			}
 		}
 	}
 
+
 	SimulatedVolume = SimulatedVolume - initVol;
 
-	T error = abs(SimulatedVolume - TheoryInput + TheoryLoss);
+	T error = abs(SimulatedVolume - TheoryInput + Infiltration_model);
 
-	T modelgood = error / abs(TheoryInput - TheoryLoss) < 0.05;
+	T modelgood = error / abs(TheoryInput) < 0.05;
+
+	//printf("Simulatedvolume: %f , Theory input: %f , Calcultated loss: %f\n", SimulatedVolume, TheoryInput, Infiltration_model);
 
 	//log("#####");
 	return modelgood;

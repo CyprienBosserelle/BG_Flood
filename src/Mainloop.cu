@@ -13,8 +13,6 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
 	
-	printf("dt: %f \n", XLoop.dt);
-	printf("h: %f \n", XModel.evolv.h[10]);
 
 	
 	log("\t\tCompleted");
@@ -23,12 +21,10 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	{
 		// Bnd stuff here
 		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
-		printf("h: %f \n", XModel.evolv.h[10]);
 
 
 		// Calculate dynamic forcing at this step
 		updateforcing(XParam, XLoop, XForcing);
-		printf("h: %f \n", XModel.evolv.h[10]);
 
 		// Core engine
 		if (XParam.GPUDEVICE >= 0)

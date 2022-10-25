@@ -448,7 +448,7 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 					if (x > 0.2 && y > 0.2 && p==0)
 					{
 						p = 1;
-						printf("infiltration=%f\twaterOut=%f\tcontinuousloss=%f\th=%f\n", infiltrationLoc, waterOut, continuousloss, XEv.h[i]);
+						//printf("infiltration=%f\twaterOut=%f\tcontinuousloss=%f\th=%f\n", infiltrationLoc, waterOut, continuousloss, XEv.h[i]);
 					}
 				}
 
