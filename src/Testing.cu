@@ -169,8 +169,8 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 					- the slope (%)
 			*/
 			log("\t### Homogeneous rain on grid Mass conservation test ###");
-		//	testrainGPU = Raintest(0.0, 0, 10);
-		//	result = testrainGPU ? "successful" : "failed";
+			testrainGPU = Raintest(0.0, 0, 10);
+			result = testrainGPU ? "successful" : "failed";
 			log("\t\tHomogeneous rain on grid test GPU: " + result);
 			testrainCPU = Raintest(0.0, -1, 10);
 			result = testrainCPU ? "successful" : "failed";
