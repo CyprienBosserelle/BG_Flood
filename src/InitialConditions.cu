@@ -83,7 +83,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.infiltration);
 
 		// Initialise infiltration to IL where h is already wet
-		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.infiltration)
+		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.infiltration);
 
 	}
 
