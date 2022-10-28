@@ -44,19 +44,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	setedges(XParam, XModel.blocks, XModel.cf);
 
 
-	//=====================================
-	// Initialise the rain losses map
-
-	if (XParam.infiltration)
-	{
-		interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
-		interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
-		// Set edges of friction map
-		setedges(XParam, XModel.blocks, XModel.il);
-		setedges(XParam, XModel.blocks, XModel.cl);
-		coldinit(XParam, XModel.blocks, XModel.infiltration);
-
-	}
+	
 
 	//=====================================
 	// Initial Condition
@@ -81,6 +69,23 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Calculate Active cells
 	calcactiveCellCPU(XParam, XModel.blocks, XForcing, XModel.zb);
+
+	//=====================================
+	// Initialise the rain losses map
+
+	if (XParam.infiltration)
+	{
+		interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+		interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+		// Set edges of friction map
+		setedges(XParam, XModel.blocks, XModel.il);
+		setedges(XParam, XModel.blocks, XModel.cl);
+		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.infiltration);
+
+		// Initialise infiltration to IL where h is already wet
+		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.infiltration)
+
+	}
 
 
 	//=====================================
@@ -979,11 +984,11 @@ template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBl
 }
 
 template <class T>
-void coldinit(Param XParam, BlockP<T> XBlock, T* infiltration)
+void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* infiltration)
 {
 //Initialisation to 0 (cold or hot start)
 
-	int sucess = 0;
+	
 	int ib;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -994,7 +999,11 @@ void coldinit(Param XParam, BlockP<T> XBlock, T* infiltration)
 			{
 				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 
-				infiltration[n] = T(0.0);
+				if (h[n] > XParam.eps)
+				{
+					infiltration[n] = initLoss[n];
+				}
+				
 			}
 		}
 	}
