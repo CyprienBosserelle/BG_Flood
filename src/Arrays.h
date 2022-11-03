@@ -162,8 +162,8 @@ struct Model
 	T* il;
 	T* cl;
 
-	//GroundWater infiltration left
-	T* infiltration;
+	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
+	T* hgw;
 	
 	// Used for external forcing too
 	// May need a better placeholder

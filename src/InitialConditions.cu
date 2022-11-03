@@ -80,10 +80,10 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 		// Set edges of friction map
 		setedges(XParam, XModel.blocks, XModel.il);
 		setedges(XParam, XModel.blocks, XModel.cl);
-		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.infiltration);
+		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.hgw);
 
 		// Initialise infiltration to IL where h is already wet
-		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.infiltration);
+		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.hgw);
 
 	}
 
@@ -454,7 +454,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["il"] = XModel.il;
 	XModel.OutputVarMap["cl"] = XModel.cl;
-	XModel.OutputVarMap["infiltr"] = XModel.infiltration;
+	XModel.OutputVarMap["hgw"] = XModel.hgw;
 
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
@@ -984,7 +984,7 @@ template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBl
 }
 
 template <class T>
-void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* infiltration)
+void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 {
 //Initialisation to 0 (cold or hot start)
 
@@ -1001,7 +1001,7 @@ void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* infi
 
 				if (h[n] > XParam.eps)
 				{
-					infiltration[n] = initLoss[n];
+					hgw[n] = initLoss[n];
 				}
 				
 			}

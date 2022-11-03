@@ -3546,7 +3546,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	XParam.GPUDEVICE = gpu;
 	XParam.rainbnd = true;
 	//output vars
-	std::string outvi[17] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv", "infiltr" };
+	std::string outvi[17] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv", "hgw" };
 	std::vector<std::string> outv;
 	for (int nv = 0; nv < 17; nv++)
 	{
@@ -3710,7 +3710,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 			{
 				int i = memloc(XParam, ix, iy, ib);
 				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
-				Infiltration_model = Infiltration_model + XModel.infiltration[i] * delta * delta;
+				Infiltration_model = Infiltration_model + XModel.hgw[i] * delta * delta;
 			}
 		}
 	}

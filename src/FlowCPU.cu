@@ -209,7 +209,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 	if (XParam.infiltration)
 	{
-		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.infiltration);
+		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
 	}
 
 	if (XParam.VelThreshold > 0.0)
@@ -311,7 +311,7 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	}
 	if (XParam.infiltration)
 	{
-		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.infiltration);
+		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
 	}
 }
 template void HalfStepCPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
