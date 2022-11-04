@@ -37,6 +37,10 @@ The following figure shows a representation of the initial loss - continuing los
 ### *_Important note_*:
 All cells that are initially wet at the begining of the simulation ($h > XParam.eps$) will have their initial loss (il) set to 0.0, in order to be consistent with the physic of the model.
 
+```diff
+-> This model is meant to be used with the rain on grid feature. The model is applied indistinctively to water from any source and can cause unexpected results if misused.
+```
+
 ## Reference values
 Some reference values for the $il$ and $cl$ coefficeint can be found in the literature. 
 This is an example of compilation of some of these values from [https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model](https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model).
