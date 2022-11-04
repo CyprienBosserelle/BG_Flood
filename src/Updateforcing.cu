@@ -480,12 +480,12 @@ template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop
 	if (waterOut > 0)
 	{
 		//Computation of the initial loss
-		availinitialinfiltration = il[i] / T(1000.0) - hgw[i];
+		availinitialinfiltration = max(il[i] / T(1000.0) - hgw[i],T(0.0));
 		infiltrationLoc = min(waterOut, availinitialinfiltration);
 		waterOut -= infiltrationLoc;
 
 		//Computation of the continuous loss
-		T continuousloss = cl[i] / T(1000.0) / T(3600.0) * T(XLoop.dt); //convert from mm/hs to m/s
+		T continuousloss = cl[i] / T(1000.0) / T(3600.0) * T(XLoop.dt); //convert from mm/hs to m
 		infiltrationLoc += min(continuousloss, waterOut);
 	}
 

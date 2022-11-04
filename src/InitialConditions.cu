@@ -1001,7 +1001,7 @@ void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 
 				if (h[n] > XParam.eps)
 				{
-					hgw[n] = initLoss[n];
+					initLoss[n]=T(0.0);
 				}
 				
 			}
