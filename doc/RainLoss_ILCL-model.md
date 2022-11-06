@@ -34,8 +34,8 @@ The following figure shows a representation of the initial loss - continuing los
 
 *Initial loss and continuing loss reprensentation during a cell-wetting event*
 
-### *_Important note_*:
-All cells that are initially wet at the begining of the simulation ($h > XParam.eps$) will have their initial loss (il) set to 0.0, in order to be consistent with the physic of the model.
+### *_Important notes_*:
+-> All cells that are initially wet at the begining of the simulation ($h > XParam.eps$) will have their initial loss (il) set to 0.0, in order to be consistent with the physic of the model.
 
 ```diff
 -> This model is meant to be used with the rain on grid feature. The model is applied indistinctively to water from any source and can cause unexpected results if misused.

@@ -440,16 +440,6 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 
 					hgw[i] += infiltrationLoc;
 
-
-					//TEMP
-					//T delta = calcres(T(XParam.dx), XBlock.level[ib]);
-					//T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
-					//T y = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
-					//if (x > 0.2 && y > 0.2 && p==0)
-					//{
-					//	p = 1;
-					//	//printf("hgw=%f\twaterOut=%f\tcontinuousloss=%f\th=%f\n", hgwLoc, waterOut, continuousloss, XEv.h[i]);
-					//}
 				}
 
 				XEv.h[i] -= max(infiltrationLoc * XBlock.activeCell[i],T(0.0));
