@@ -10,7 +10,8 @@ The value of the initial loss $il$ is estimated to be the total of water infiltr
 The water absorbed in the ground will be tracked using the ground water elevation variable $hgw$ but wont be reintroduced to the surface flow through the computation process.
 
 On each cell, at each simulation step, we can express the quantity of water absorbed in the ground $ha_{t}$ using:
-$$
+
+$$ 
 \begin{equation}
   ha_{t} =
     \begin{cases}
