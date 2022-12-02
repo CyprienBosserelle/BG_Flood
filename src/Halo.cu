@@ -709,7 +709,7 @@ template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBloc
 {
 	if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib])*T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib])*T(0.5);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
@@ -744,7 +744,7 @@ template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T>
 	if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib])
 	{
 		int j = iy;
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		
 		int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
 		int il = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
@@ -768,7 +768,7 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 {
 	if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib])
 	{
-		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib] ) * T(0.25);
+		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib] ) * T(0.5);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
@@ -801,7 +801,7 @@ template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T
 
 	if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		int j = iy;
 		int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
 		int il = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
@@ -825,7 +825,7 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 {
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
 	{
-		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib]) * T(0.25);
+		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib]) * T(0.5);
 		for (int i = 0; i < XParam.blkwidth; i++)
 		{
 			int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(floor(i * (T)0.5)) : ftoi(floor(i * (T)0.5) + XParam.blkwidth / 2);
@@ -858,7 +858,7 @@ template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> 
 
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		int i = ix;
 		int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
 		int jl = memloc(XParam.halowidth, blkmemwidth, ii, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
@@ -882,7 +882,7 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 {
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		for (int i = 0; i < XParam.blkwidth; i++)
 		{
 			int ii = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(floor(i * (T)0.5)) : ftoi(floor(i * (T)0.5) + XParam.blkwidth / 2);
@@ -913,7 +913,7 @@ template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> 
 	unsigned int ib = XBlock.active[ibl];
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		int i = ix;
 		int ii = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
 		int jl = memloc(XParam.halowidth, blkmemwidth, ii , 0, XBlock.TopLeft[ib]);
