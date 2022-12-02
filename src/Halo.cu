@@ -715,8 +715,8 @@ template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBloc
 			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 			int il = memloc(XParam, XParam.blkwidth - 1, jj , XBlock.LeftBot[ib]);
 			int write = memloc(XParam, -1, j, ib);
-			T faclr = T(-1.0);
-			T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+			T faclr = T(1.0);
+			T facbt = floor(j * (T)0.5) * T(2.0) < (j-T(0.01)) ? 1.0 : -1.0;
 			
 			T newz = z[il] + (faclr*dzdx[il]+facbt*dzdy[il]) * ilevdx;
 
@@ -750,7 +750,7 @@ template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T>
 		int il = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, -1, j, ib);
 		T faclr = T(-1.0);
-		T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+		T facbt = floor(j * (T)0.5) * T(2.0) < (j - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[il] + (faclr * dzdx[il] + facbt * dzdy[il]) * ilevdx;
 
@@ -774,8 +774,8 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 			int il = memloc(XParam, 0, jj , XBlock.RightBot[ib]);
 			int write = memloc(XParam, XParam.blkwidth, j, ib);
-			T faclr = T(1.0);
-			T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+			T faclr = T(-1.0);
+			T facbt = floor(j * (T)0.5) * T(2.0) < (j - T(0.01)) ? 1.0 : -1.0;
 
 			T newz = z[il] + (faclr * dzdx[il] + facbt * dzdy[il]) * ilevdx;
 
@@ -807,8 +807,8 @@ template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T
 		int il = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
 
-		T faclr = T(1.0);
-		T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+		T faclr = T(-1.0);
+		T facbt = floor(j * (T)0.5) * T(2.0) < (j - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[il] + (faclr * dzdx[il] + facbt * dzdy[il]) * ilevdx;
 
@@ -832,8 +832,8 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 			int jl = memloc(XParam,  ii, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 			int write = memloc(XParam, i, -1, ib);
 			
-			T facbt = T(-1.0);
-			T faclr = floor(i * (T)0.5) * T(2.0) > i ? T(1.0) : T(-1.0);
+			T facbt = T(1.0);
+			T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 			T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -864,8 +864,8 @@ template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> 
 		int jl = memloc(XParam.halowidth, blkmemwidth, ii, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, i, -1, ib);
 
-		T facbt = T(-1.0);
-		T faclr = floor(i * (T)0.5) * T(2.0) > i ? 1.0 : -1.0;
+		T facbt = T(1.0);
+		T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -889,8 +889,8 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 			int jl = memloc(XParam, ii , 0, XBlock.TopLeft[ib]);
 			int write = memloc(XParam, i, XParam.blkwidth, ib);
 			
-			T facbt = T(1.0);
-			T faclr = floor(i * (T)0.5) * T(2.0) > i ? T(1.0) : T(-1.0);
+			T facbt = T(-1.0);
+			T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 			T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -919,8 +919,8 @@ template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> 
 		int jl = memloc(XParam.halowidth, blkmemwidth, ii , 0, XBlock.TopLeft[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, i, XParam.blkwidth, ib);
 
-		T facbt = T(1.0);
-		T faclr = floor(i * (T)0.5) * T(2.0) > i ? 1.0 : -1.0;
+		T facbt = T(-1.0);
+		T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
