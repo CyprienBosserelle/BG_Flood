@@ -3773,7 +3773,7 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 	XParam.dx = XForcing.Bathy[0].dx;
 
-	XParam.zsinit = mintopo + 5.1;// Had a water
+	XParam.zsinit = mintopo + 6.9;// Had a water level so that the wet and dry affects the 
 	XParam.endtime = 20.0;
 
 	XParam.outputtimestep = XParam.endtime;
@@ -3805,7 +3805,8 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 	
-	FlowCPU(XParam, XLoop, XForcing, XModel);
+	//FlowCPU(XParam, XLoop, XForcing, XModel);
+	HalfStepCPU(XParam, XLoop, XForcing, XModel);
 
 	T maxu = std::numeric_limits<float>::min();
 	T maxv = std::numeric_limits<float>::min();
