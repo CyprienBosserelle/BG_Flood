@@ -60,7 +60,8 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	{
 		conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
 	}
-	else
+
+	//else
 	{
 		if (XParam.maxlevel > XParam.minlevel)
 		{
@@ -68,6 +69,11 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 			//refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 			refine_linearGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 			refine_linearGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+			if (XParam.conserveElevation)
+			{
+				conserveElevationGPU(XParam, XBlock, XEv, zb);
+			}
 
 			RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XBlock, XEv, zb);
 			CUDA_CHECK(cudaDeviceSynchronize());
@@ -122,6 +128,10 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 			gradientHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 			gradientHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 			gradientHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+			if (XParam.conserveElevation)
+			{
+				conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
+			}
 		}
 		if (XParam.engine == 1)
 		{
@@ -841,8 +851,22 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	refine_linear(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 	refine_linear(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
+	if (XParam.conserveElevation)
+	{
+		conserveElevation(XParam, XBlock, XEv, zb);
+	}
+
 	RecalculateZs(XParam, XBlock, XEv, zb);
-				
+	
+	std::thread t4(&gradientC<T>, XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	std::thread t5(&gradientC<T>, XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	std::thread t6(&gradientC<T>, XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	std::thread t7(&gradientC<T>, XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+	t4.join();
+	t5.join();
+	t6.join();
+	t7.join();
 
 	gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
 	gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
