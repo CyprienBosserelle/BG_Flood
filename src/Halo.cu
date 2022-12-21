@@ -95,6 +95,46 @@ template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<
 template void RecalculateZs<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template void RecalculateZs<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+template <class T> void Recalculatehh(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		/*
+		//We only need to recalculate zs on the halo side
+		for (int n = -1; n <= (XParam.blkwidth); n++)
+		{
+			left = memloc(XParam.halowidth, XParam.blkmemwidth, -1, n, ib);
+			right = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth, n, ib);
+			top = memloc(XParam.halowidth, XParam.blkmemwidth, n, XParam.blkwidth, ib);
+			bot = memloc(XParam.halowidth, XParam.blkmemwidth, n, -1, ib);
+
+			Xev.zs[left] = zb[left] + Xev.h[left];
+			Xev.zs[right] = zb[right] + Xev.h[right];
+			Xev.zs[top] = zb[top] + Xev.h[top];
+			Xev.zs[bot] = zb[bot] + Xev.h[bot];
+
+			//printf("n=%d; zsold=%f; zsnew=%f (zb=%f + h=%f)\n",n, Xev.zs[n], zb[n] + Xev.h[n], zb[n] , Xev.h[n]);
+		}
+		*/
+
+		// Recalculate zs everywhere maybe we only need to do that on the halo ?
+		for (int j = -1; j < (XParam.blkwidth + 1); j++)
+		{
+			for (int i = -1; i < (XParam.blkwidth + 1); i++)
+			{
+				n = memloc(XParam.halowidth, XParam.blkmemwidth, i, j, ib);
+				
+				Xev.h[n] = max(Xev.zs[n]- zb[n],0.0) ;
+			}
+		}
+
+	}
+}
+template void Recalculatehh<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template void Recalculatehh<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
 
 /*! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 * \brief Recalculate water surface after recalculating the values on the halo on the GPU
