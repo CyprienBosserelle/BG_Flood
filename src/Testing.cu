@@ -3784,10 +3784,36 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 	// coarse to fine
 	// Change arg 1 and 2 if the slope is changed
-	XParam.AdaptCrit = "Inrange";
-	XParam.Adapt_arg1 = "8.2";
-	XParam.Adapt_arg2 = "8.4";
-	XParam.Adapt_arg3 = "zb";
+	XParam.AdaptCrit = "Targetlevel";
+	XParam.Adapt_arg1 = "";
+	XParam.Adapt_arg2 = "";
+	XParam.Adapt_arg3 = "";
+
+	StaticForcingP<int> targetlevel;
+	XForcing.targetadapt.push_back(targetlevel);
+
+	XForcing.targetadapt[0].xo = 0.0;
+	XForcing.targetadapt[0].yo = 0.0;
+
+	XForcing.targetadapt[0].xmax = 31.0;
+	XForcing.targetadapt[0].ymax = 31.0;
+	XForcing.targetadapt[0].nx = 32;
+	XForcing.targetadapt[0].ny = 32;
+
+	XForcing.targetadapt[0].dx = 1.0;
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.targetadapt[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			XForcing.targetadapt[0].val[i + j * XForcing.Bathy[0].nx] = 1;
+		}
+	}
+
+	XForcing.targetadapt[0].val[12 + 12 * XForcing.Bathy[0].nx] = 2;
+
 
 	// Setup Model(s)
 
