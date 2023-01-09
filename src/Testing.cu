@@ -213,9 +213,13 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\n\nUser defined zones Outputs: " + result);
 			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
 		}
-		if (mytest == 995)
+		if (mytest == 10)
 		{
-			TestInstability(XParam, XModel, XModel_g);
+			bool instab;
+			log("\t### Wet/dry Instability test with Conserve Elevation ###");
+			instab=TestInstability(XParam, XModel, XModel_g);
+			result = instab ? "successful" : "failed";
+			log("\t\tWet/dry Instability test : " + result);
 		}
 		if (mytest == 996)
 		{
@@ -3753,6 +3757,8 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 	XForcing = MakValleyBathy(XParam, T(0.4), true, true);
 
+	XParam.conserveElevation = true;
+
 	float maxtopo = std::numeric_limits<float>::min();
 	float mintopo = std::numeric_limits<float>::max();
 
@@ -3854,13 +3860,18 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 	bool test = false;
 
-	if (maxu > T(0.0) || maxv > T(0.0))
+	if (maxu > T(std::numeric_limits<T>::epsilon() * T(1000.0)) || maxv > T(std::numeric_limits<T>::epsilon() * T(1000.0)))
 	{
-		test = true;
+		//test = true;
 		XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy" };
 		InitSave2Netcdf(XParam, XModel);
 
 	}
+	else
+	{
+		test = true;
+	}
+
 
 	return test;
 
