@@ -506,7 +506,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	int ibl = threadIdx.y + blockIdx.x * blockDim.y;;
+	int ibl = blockIdx.x;
 	if (ibl < XBlock.mask.nblk)
 	{
 		int ix, iy;
@@ -570,10 +570,10 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	int ibl = threadIdx.y + blockIdx.x * blockDim.y;;
+	int ibl = blockIdx.x;
 	if (ibl < XBlock.mask.nblk)
 	{
-		unsigned int ix, iy;
+		int ix, iy;
 
 		int isright, istop;
 
@@ -631,10 +631,10 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	int ibl = threadIdx.y + blockIdx.x * blockDim.y;;
+	int ibl = blockIdx.x;
 	if (ibl < XBlock.mask.nblk)
 	{
-		unsigned int ix, iy;
+		int ix, iy;
 
 		int isright, istop;
 
@@ -693,7 +693,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	int ibl = threadIdx.y + blockIdx.x * blockDim.y;;
+	int ibl = blockIdx.x;
 	if (ibl < XBlock.mask.nblk)
 	{
 		int ix, iy;
