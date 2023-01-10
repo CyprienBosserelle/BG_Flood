@@ -213,6 +213,14 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\n\nUser defined zones Outputs: " + result);
 			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
 		}
+		if (mytest == 10)
+		{
+			bool instab;
+			log("\t### Wet/dry Instability test with Conserve Elevation ###");
+			instab=TestInstability(XParam, XModel, XModel_g);
+			result = instab ? "successful" : "failed";
+			log("\t\tWet/dry Instability test : " + result);
+		}
 		if (mytest == 996)
 		{
 			TestHaloSpeed(XParam,XModel,XModel_g);
@@ -3660,7 +3668,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 * This function test the spped and accuracy of a new gradient function
 * gradient are only calculated for zb but assigned to different gradient variable for storage
 */
-template <class T> int TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
+template <class T> bool TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
 	Forcing<float> XForcing;
 
@@ -3740,6 +3748,132 @@ template <class T> int TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XMo
 	diffArray(XParam, XModel.blocks, "GPU_old", true, XModel.evolv.zs, XModel_g.evolv.zs, XModel.evolv.u, XModel.evolv_o.u);
 	diffArray(XParam, XModel.blocks, "GPU_new", true, XModel.evolv.zs, XModel_g.evolv_o.zs, XModel.evolv.v, XModel.evolv_o.v);
 
+	return true;
+}
+
+template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	Forcing<float> XForcing;
+
+	XForcing = MakValleyBathy(XParam, T(0.4), true, true);
+
+	XParam.conserveElevation = true;
+
+	float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = std::numeric_limits<float>::max();
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			maxtopo = max(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], maxtopo);
+			mintopo = min(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], mintopo);
+		}
+	}
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = mintopo + 6.9;// Had a water level so that the wet and dry affects the 
+	XParam.endtime = 20.0;
+
+	XParam.outputtimestep = XParam.endtime;
+
+	XParam.minlevel = 0;
+	XParam.maxlevel = 2;
+	XParam.initlevel = 0;
+
+	// coarse to fine
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdaptCrit = "Targetlevel";
+	XParam.Adapt_arg1 = "";
+	XParam.Adapt_arg2 = "";
+	XParam.Adapt_arg3 = "";
+
+	StaticForcingP<int> targetlevel;
+	XForcing.targetadapt.push_back(targetlevel);
+
+	XForcing.targetadapt[0].xo = 0.0;
+	XForcing.targetadapt[0].yo = 0.0;
+
+	XForcing.targetadapt[0].xmax = 31.0;
+	XForcing.targetadapt[0].ymax = 31.0;
+	XForcing.targetadapt[0].nx = 32;
+	XForcing.targetadapt[0].ny = 32;
+
+	XForcing.targetadapt[0].dx = 1.0;
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.targetadapt[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			XForcing.targetadapt[0].val[i + j * XForcing.Bathy[0].nx] = 1;
+		}
+	}
+
+	XForcing.targetadapt[0].val[12 + 12 * XForcing.Bathy[0].nx] = 2;
+
+
+	// Setup Model(s)
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+	
+	//FlowCPU(XParam, XLoop, XForcing, XModel);
+	HalfStepCPU(XParam, XLoop, XForcing, XModel);
+
+	T maxu = std::numeric_limits<float>::min();
+	T maxv = std::numeric_limits<float>::min();
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				maxu = max(maxu, abs(XModel.evolv.u[i]));
+				maxv = max(maxv, abs(XModel.evolv.v[i]));
+			}
+		}
+	}
+
+	bool test = false;
+
+	if (maxu > T(std::numeric_limits<T>::epsilon() * T(1000.0)) || maxv > T(std::numeric_limits<T>::epsilon() * T(1000.0)))
+	{
+		//test = true;
+		XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy" };
+		InitSave2Netcdf(XParam, XModel);
+
+	}
+	else
+	{
+		test = true;
+	}
+
+
+	return test;
 
 }
 

@@ -95,6 +95,46 @@ template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<
 template void RecalculateZs<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template void RecalculateZs<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+template <class T> void Recalculatehh(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+	int ib, n;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		/*
+		//We only need to recalculate zs on the halo side
+		for (int n = -1; n <= (XParam.blkwidth); n++)
+		{
+			left = memloc(XParam.halowidth, XParam.blkmemwidth, -1, n, ib);
+			right = memloc(XParam.halowidth, XParam.blkmemwidth, XParam.blkwidth, n, ib);
+			top = memloc(XParam.halowidth, XParam.blkmemwidth, n, XParam.blkwidth, ib);
+			bot = memloc(XParam.halowidth, XParam.blkmemwidth, n, -1, ib);
+
+			Xev.zs[left] = zb[left] + Xev.h[left];
+			Xev.zs[right] = zb[right] + Xev.h[right];
+			Xev.zs[top] = zb[top] + Xev.h[top];
+			Xev.zs[bot] = zb[bot] + Xev.h[bot];
+
+			//printf("n=%d; zsold=%f; zsnew=%f (zb=%f + h=%f)\n",n, Xev.zs[n], zb[n] + Xev.h[n], zb[n] , Xev.h[n]);
+		}
+		*/
+
+		// Recalculate zs everywhere maybe we only need to do that on the halo ?
+		for (int j = -1; j < (XParam.blkwidth + 1); j++)
+		{
+			for (int i = -1; i < (XParam.blkwidth + 1); i++)
+			{
+				n = memloc(XParam.halowidth, XParam.blkmemwidth, i, j, ib);
+				
+				Xev.h[n] = max(Xev.zs[n]- zb[n],0.0) ;
+			}
+		}
+
+	}
+}
+template void Recalculatehh<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template void Recalculatehh<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
 
 /*! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 * \brief Recalculate water surface after recalculating the values on the halo on the GPU
@@ -709,14 +749,14 @@ template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBloc
 {
 	if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib])*T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib])*T(0.5);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 			int il = memloc(XParam, XParam.blkwidth - 1, jj , XBlock.LeftBot[ib]);
 			int write = memloc(XParam, -1, j, ib);
-			T faclr = T(-1.0);
-			T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+			T faclr = T(1.0);
+			T facbt = floor(j * (T)0.5) * T(2.0) < (j-T(0.01)) ? 1.0 : -1.0;
 			
 			T newz = z[il] + (faclr*dzdx[il]+facbt*dzdy[il]) * ilevdx;
 
@@ -731,12 +771,12 @@ template void refine_linear_Left<double>(Param XParam, int ib, BlockP<double> XB
 
 template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx,T*dzdy)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = 0;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 
 	
@@ -744,13 +784,13 @@ template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T>
 	if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib])
 	{
 		int j = iy;
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		
 		int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
 		int il = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, -1, j, ib);
-		T faclr = T(-1.0);
-		T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+		T faclr = T(1.0);
+		T facbt = floor(j * (T)0.5) * T(2.0) < (j - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[il] + (faclr * dzdx[il] + facbt * dzdy[il]) * ilevdx;
 
@@ -768,14 +808,14 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 {
 	if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib])
 	{
-		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib] ) * T(0.25);
+		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib] ) * T(0.5);
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? ftoi(floor(j * (T)0.5)) : ftoi(floor(j * (T)0.5) + XParam.blkwidth / 2);
 			int il = memloc(XParam, 0, jj , XBlock.RightBot[ib]);
 			int write = memloc(XParam, XParam.blkwidth, j, ib);
-			T faclr = T(1.0);
-			T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+			T faclr = T(-1.0);
+			T facbt = floor(j * (T)0.5) * T(2.0) < (j - T(0.01)) ? 1.0 : -1.0;
 
 			T newz = z[il] + (faclr * dzdx[il] + facbt * dzdy[il]) * ilevdx;
 
@@ -793,22 +833,22 @@ template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 
 
 	if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		int j = iy;
 		int jj = XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
 		int il = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
 
-		T faclr = T(1.0);
-		T facbt = floor(j * (T)0.5) * T(2.0) > j ? 1.0 : -1.0;
+		T faclr = T(-1.0);
+		T facbt = floor(j * (T)0.5) * T(2.0) < (j - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[il] + (faclr * dzdx[il] + facbt * dzdy[il]) * ilevdx;
 
@@ -825,15 +865,15 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 {
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
 	{
-		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib]) * T(0.25);
+		T ilevdx = calcres(T(XParam.dx), XBlock.level[ib]) * T(0.5);
 		for (int i = 0; i < XParam.blkwidth; i++)
 		{
 			int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? ftoi(floor(i * (T)0.5)) : ftoi(floor(i * (T)0.5) + XParam.blkwidth / 2);
 			int jl = memloc(XParam,  ii, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 			int write = memloc(XParam, i, -1, ib);
 			
-			T facbt = T(-1.0);
-			T faclr = floor(i * (T)0.5) * T(2.0) > i ? T(1.0) : T(-1.0);
+			T facbt = T(1.0);
+			T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 			T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -849,23 +889,23 @@ template void refine_linear_Bot<double>(Param XParam, int ib, BlockP<double> XBl
 
 template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		int i = ix;
 		int ii = XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
 		int jl = memloc(XParam.halowidth, blkmemwidth, ii, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, i, -1, ib);
 
-		T facbt = T(-1.0);
-		T faclr = floor(i * (T)0.5) * T(2.0) > i ? 1.0 : -1.0;
+		T facbt = T(1.0);
+		T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -882,15 +922,15 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 {
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		for (int i = 0; i < XParam.blkwidth; i++)
 		{
 			int ii = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? ftoi(floor(i * (T)0.5)) : ftoi(floor(i * (T)0.5) + XParam.blkwidth / 2);
 			int jl = memloc(XParam, ii , 0, XBlock.TopLeft[ib]);
 			int write = memloc(XParam, i, XParam.blkwidth, ib);
 			
-			T facbt = T(1.0);
-			T faclr = floor(i * (T)0.5) * T(2.0) > i ? T(1.0) : T(-1.0);
+			T facbt = T(-1.0);
+			T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 			T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -905,22 +945,22 @@ template void refine_linear_Top<double>(Param XParam, int ib, BlockP<double> XBl
 
 template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 	{
-		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.25);
+		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
 		int i = ix;
 		int ii = XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
 		int jl = memloc(XParam.halowidth, blkmemwidth, ii , 0, XBlock.TopLeft[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, i, XParam.blkwidth, ib);
 
-		T facbt = T(1.0);
-		T faclr = floor(i * (T)0.5) * T(2.0) > i ? 1.0 : -1.0;
+		T facbt = T(-1.0);
+		T faclr = floor(i * (T)0.5) * T(2.0) < (i - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[jl] + (faclr * dzdx[jl] + facbt * dzdy[jl]) * ilevdx;
 
@@ -940,8 +980,8 @@ template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* d
 		int ib = XBlock.active[ibl];
 		refine_linear_Left(XParam, ib, XBlock, z, dzdx, dzdy);
 		refine_linear_Right(XParam, ib, XBlock, z, dzdx, dzdy);
-		refine_linear_Top(XParam, ib, XBlock, z, dzdy, dzdy);
-		refine_linear_Bot(XParam, ib, XBlock, z, dzdy, dzdy);
+		refine_linear_Top(XParam, ib, XBlock, z, dzdx, dzdy);
+		refine_linear_Bot(XParam, ib, XBlock, z, dzdx, dzdy);
 	}
 }
 template void refine_linear<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
@@ -955,8 +995,8 @@ template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T
 		
 	refine_linear_LeftGPU<<<gridDim, blockDimHaloLR, 0>>>(XParam, XBlock, z, dzdx, dzdy);
 	refine_linear_RightGPU << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, z, dzdx, dzdy);
-	refine_linear_TopGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdy, dzdy);
-	refine_linear_BotGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdy, dzdy);
+	refine_linear_TopGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdx, dzdy);
+	refine_linear_BotGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdx, dzdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 }
