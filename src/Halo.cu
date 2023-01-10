@@ -789,7 +789,7 @@ template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T>
 		int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
 		int il = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
 		int write = memloc(XParam.halowidth, blkmemwidth, -1, j, ib);
-		T faclr = T(-1.0);
+		T faclr = T(1.0);
 		T facbt = floor(j * (T)0.5) * T(2.0) < (j - T(0.01)) ? 1.0 : -1.0;
 
 		T newz = z[il] + (faclr * dzdx[il] + facbt * dzdy[il]) * ilevdx;
@@ -980,8 +980,8 @@ template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* d
 		int ib = XBlock.active[ibl];
 		refine_linear_Left(XParam, ib, XBlock, z, dzdx, dzdy);
 		refine_linear_Right(XParam, ib, XBlock, z, dzdx, dzdy);
-		refine_linear_Top(XParam, ib, XBlock, z, dzdy, dzdy);
-		refine_linear_Bot(XParam, ib, XBlock, z, dzdy, dzdy);
+		refine_linear_Top(XParam, ib, XBlock, z, dzdx, dzdy);
+		refine_linear_Bot(XParam, ib, XBlock, z, dzdx, dzdy);
 	}
 }
 template void refine_linear<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
@@ -995,8 +995,8 @@ template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T
 		
 	refine_linear_LeftGPU<<<gridDim, blockDimHaloLR, 0>>>(XParam, XBlock, z, dzdx, dzdy);
 	refine_linear_RightGPU << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, z, dzdx, dzdy);
-	refine_linear_TopGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdy, dzdy);
-	refine_linear_BotGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdy, dzdy);
+	refine_linear_TopGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdx, dzdy);
+	refine_linear_BotGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z, dzdx, dzdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 }
