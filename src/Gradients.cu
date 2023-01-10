@@ -3787,8 +3787,8 @@ template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBl
 	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = XParam.blkwidth;
 	int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 
 	int i, jj, ii, ir, it, itr;
