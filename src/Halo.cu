@@ -771,12 +771,12 @@ template void refine_linear_Left<double>(Param XParam, int ib, BlockP<double> XB
 
 template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx,T*dzdy)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = 0;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 
 	
@@ -833,9 +833,9 @@ template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 
 
@@ -889,12 +889,12 @@ template void refine_linear_Bot<double>(Param XParam, int ib, BlockP<double> XBl
 
 template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
 	{
@@ -945,12 +945,12 @@ template void refine_linear_Top<double>(Param XParam, int ib, BlockP<double> XBl
 
 template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
 	{
 		double ilevdx = calcres(XParam.dx, XBlock.level[ib]) * T(0.5);
