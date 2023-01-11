@@ -1711,6 +1711,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 	}
 	else if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
+		/*
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			write = memloc(XParam, -1, j, ib);
@@ -1801,6 +1802,7 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 			
 
 		}
+		*/
 	}
 	
 
@@ -1903,6 +1905,7 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 	}
 	else if (levLB < lev)
 	{
+		/*
 		jj = RBLB==ib? ceil(iy * (T)0.5): ceil(iy * (T)0.5) + blockDim.y / 2;
 		w1 = (T)1.0 / (T)3.0;
 		w2 = ceil(iy * (T)0.5) * 2 > iy ? T(1.0 / 6.0) : T(0.5);
@@ -1974,6 +1977,7 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 			}
 		}
 		a_read = w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		*/
 	}
 
 	a[write] = a_read;
@@ -2413,6 +2417,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 	}
 	else if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
+		/*
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			write = memloc(XParam, XParam.blkwidth, j, ib);
@@ -2500,6 +2505,7 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 			z[write] = w1 * z[ii] + w2 * z[ir] + w3 * z[it];
 		}
+		*/
 	}
 
 
@@ -2606,6 +2612,7 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 	}
 	else if (levRB < lev)
 	{
+		/*
 		//
 		jj = LBRB == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + blockDim.y / 2;
 		w1 = 1.0 / 3.0;
@@ -2676,6 +2683,7 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 		}
 
 		a_read= w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		*/
 	}
 	a[write] = a_read;
 }
@@ -3221,6 +3229,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 	}
 	else if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
+		/*
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			write = memloc(XParam, j, -1, ib);
@@ -3308,6 +3317,7 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 			z[write] = w1 * z[ii] + w2 * z[ir] + w3 * z[it];
 		}
+		*/
 	}
 
 
@@ -3403,6 +3413,7 @@ template <class T> __global__ void fillBot(int halowidth, int* active, int* leve
 	}
 	else if (levBL < lev)
 	{
+		/*
 		jj = TLBL == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + blockDim.x / 2;
 		w1 = 1.0 / 3.0;
 		w2 = ceil(ix * (T)0.5) * 2 > ix ? T(1.0 / 6.0) : T(0.5);
@@ -3473,6 +3484,7 @@ template <class T> __global__ void fillBot(int halowidth, int* active, int* leve
 			}
 		}
 		a_read = w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		*/
 	}
 	a[write] = a_read;
 
@@ -3886,6 +3898,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 	}
 	else if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib]) // Neighbour is coarser; using barycentric interpolation (weights are precalculated) for the Halo 
 	{
+		/*
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
 			write = memloc(XParam,j, XParam.blkwidth, ib);
@@ -3973,6 +3986,7 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 			z[write] = w1 * z[ii] + w2 * z[ir] + w3 * z[it];
 		}
+		*/
 	}
 
 
@@ -4071,6 +4085,7 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 	}
 	else if (levTL < lev)
 	{
+		/*
 		jj = BLTL == ib ? ceil(ix * (T)0.5) : ceil(ix * (T)0.5) + blockDim.x / 2;
 		w1 = 1.0 / 3.0;
 		w2 = ceil(ix * (T)0.5) * 2 > ix ? T(1.0 / 6.0) : T(0.5);
@@ -4139,6 +4154,7 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 			}
 		}
 		a_read= w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		*/
 	}
 	a[write] = a_read;
 }
