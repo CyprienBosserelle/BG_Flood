@@ -6,10 +6,20 @@ In BUQ grid we keep track of a ring of cells (halo) on every edge of the block. 
 
 The halo cells exist for all variable including gradients so, even when looking at immediate neighbor of cells we can make 2nd order calculations. 
 
-![blockimg](./block_description.png)
+Here is a diagram for a block of 16x16 cells:
+
+![blockimg](./img/block_description.png)
 
 ## Restriction and prolongation
 In Basilisk the operation to calculate a value from one level to another are called restriction and prolongation depending whether you calculate from coarse to fine or fine to coarse.
+
+If the two blocks are the same level of refinement:
+
+![blockSCopy](./img/block_SCopy.png)
+
+otherwise:
+
+![blockProlog](./img/block_restriction.png)
 
 ### Prolongation
 prolongation is the action of extending a value from a coarse cell to a finer cell. Often this is done by using the gradient value. e.g.:
