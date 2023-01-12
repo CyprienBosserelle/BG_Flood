@@ -221,6 +221,11 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			result = instab ? "successful" : "failed";
 			log("\t\tWet/dry Instability test : " + result);
 		}
+
+		if (mytest == 995)
+		{
+			TestFirsthalfstep(XParam, XForcing, XModel, XModel_g);
+		}
 		if (mytest == 996)
 		{
 			TestHaloSpeed(XParam,XModel,XModel_g);
@@ -3874,6 +3879,54 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 
 	return test;
+
+}
+
+template <class T> int TestFirsthalfstep(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+{
+	
+	// Setup Model(s)
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	//FlowCPU(XParam, XLoop, XForcing, XModel);
+	HalfStepCPU(XParam, XLoop, XForcing, XModel);
+
+	T maxu = std::numeric_limits<float>::min();
+	T maxv = std::numeric_limits<float>::min();
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				maxu = max(maxu, abs(XModel.evolv.u[i]));
+				maxv = max(maxv, abs(XModel.evolv.v[i]));
+			}
+		}
+	}
+
+	bool test = false;
+
+	//test = true;
+	XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy" };
+	InitSave2Netcdf(XParam, XModel);
 
 }
 
