@@ -156,8 +156,8 @@ template <class T> __host__ __device__ void ProlongationElevationGH(int halowidt
 	if (!(h[ii] > eps && h[left] > eps && h[right] > eps && h[top] > eps && h[bot] > eps))
 	{
 
-		//dhdx[halo] = T(0.0);
-		//dzsdx[halo] = T(0.0);
+		dhdx[halo] = T(0.0);
+		dzsdx[halo] = T(0.0);
 	}
 
 
