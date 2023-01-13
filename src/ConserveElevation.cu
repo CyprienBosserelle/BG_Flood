@@ -78,6 +78,63 @@ template <class T> __host__ __device__ void ProlongationElevation(int halowidth,
 
 }
 
+
+template <class T> __host__ __device__ void RevertProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, int level, T dx, T* h, T* zb, T* dzbdx, T* dzbdy)
+{
+	int  halo;
+	//pp = memloc(halowidth, blkmemwidth, ip, jp, ibn);
+	//ll = memloc(halowidth, blkmemwidth, il, jl, ib);
+	//mm = memloc(halowidth, blkmemwidth, im, jm, ibn);
+
+	halo = memloc(halowidth, blkmemwidth, ihalo, jhalo, ib);
+	//Check if parent is dry or any of close neighbour
+	int ii, left, right, top, bot;
+	ii = memloc(halowidth, blkmemwidth, ip, jp, ibn);
+	left = memloc(halowidth, blkmemwidth, ip - 1, jp, ibn);
+	right = memloc(halowidth, blkmemwidth, ip + 1, jp, ibn);
+	top = memloc(halowidth, blkmemwidth, ip, jp + 1, ibn);
+	bot = memloc(halowidth, blkmemwidth, ip, jp - 1, ibn);
+
+	T ilevdx = calcres(dx, level) * T(0.5);
+
+	T facbt, faclr;
+
+	//if (!(h[ll] > eps && h[halo]>eps && h[pp] > eps && h[mm] > eps))
+	if (!(h[ii] > eps && h[left] > eps && h[right] > eps && h[top] > eps && h[bot] > eps))
+	{
+		if (ihalo == -1)
+		{
+			faclr = 1.0;
+			facbt = floor(jhalo * (T)0.5) * T(2.0) < (jhalo - T(0.01)) ? 1.0 : -1.0;
+		}
+		else if (ihalo == 16)
+		{
+			faclr = -1.0;
+			facbt = floor(jhalo * (T)0.5) * T(2.0) < (jhalo - T(0.01)) ? 1.0 : -1.0;
+		}
+		if (jhalo == -1)
+		{
+			facbt = 1.0;
+			facbt = floor(ihalo * (T)0.5) * T(2.0) < (ihalo - T(0.01)) ? 1.0 : -1.0;
+		}
+		else if (jhalo == 16)
+		{
+			facbt = -1.0;
+			facbt = floor(ihalo * (T)0.5) * T(2.0) < (ihalo - T(0.01)) ? 1.0 : -1.0;
+		}
+
+		//h[halo] = utils::max(T(0.0), zs[pp] - zb[halo]);
+		//zs[halo] = h[halo] + zb[halo];
+
+		zb[halo] = zb[ii] + (faclr * dzbdx[ii] + facbt * dzbdy[ii]) * ilevdx;
+
+
+	}
+
+
+
+}
+
 template <class T> __host__ __device__ void ProlongationElevationGH(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, T* h, T* dhdx, T* dzsdx)
 {
 	int halo;
@@ -99,8 +156,8 @@ template <class T> __host__ __device__ void ProlongationElevationGH(int halowidt
 	if (!(h[ii] > eps && h[left] > eps && h[right] > eps && h[top] > eps && h[bot] > eps))
 	{
 
-		dhdx[halo] = T(0.0);
-		dzsdx[halo] = T(0.0);
+		//dhdx[halo] = T(0.0);
+		//dzsdx[halo] = T(0.0);
 	}
 
 
