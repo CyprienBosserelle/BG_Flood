@@ -28,6 +28,8 @@
 template <class T>
 void readforcing(Param & XParam, Forcing<T> & XForcing)
 {
+	int nt;
+
 	//=================
 	// Read Bathymetry
 	log("\nReading bathymetry grid data...");
@@ -167,6 +169,21 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		{
 			// Now read the discharge input and store to  
 			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile);
+
+			//Check the time range of the river forcing
+			nt = XForcing.rivers[Rin].flowinput.size();
+			XForcing.rivers[Rin].to = XForcing.rivers[Rin].flowinput[0].time;
+			XForcing.rivers[Rin].tmax = XForcing.rivers[Rin].flowinput[nt-1].time;
+			if ( XForcing.rivers[Rin].tmax < XParam.endtime)
+			{
+				XParam.endtime = XForcing.rivers[Rin].tmax;
+				log("\nWARNING: simulation endtime reduced to " + std::to_string(XParam.endtime) + " to fit the time range of the River number " + std::to_string(Rin));
+			}
+			if (XForcing.rivers[Rin].to > XParam.totaltime)
+			{
+				XParam.totaltime = XForcing.rivers[Rin].to;
+				log("\nWARNING: simulation initial time increased to " + std::to_string(XParam.totaltime) + " to fit the time range of the River number " + std::to_string(Rin));
+			}
 		}
 	}
 
@@ -196,6 +213,19 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			{
 				XForcing.UWind.unidata[n].wspeed = XForcing.UWind.unidata[n].uwind;
 			}
+
+			//Sanity check on the time range of the forcing
+			nt = XForcing.UWind.unidata.size();
+			if (XForcing.UWind.unidata[nt - 1].time < XParam.endtime || XForcing.VWind.unidata[nt - 1].time < XParam.endtime)
+			{
+				XParam.endtime = min(XForcing.UWind.unidata[nt - 1].time, XForcing.VWind.unidata[nt - 1].time);
+				log("\nWARNING: simulation endtime reduced to " + std::to_string(XParam.endtime) + " to fit the time range of the wind forcing. ");
+			}
+			if (XForcing.UWind.unidata[0].time > XParam.totaltime || XForcing.VWind.unidata[0].time > XParam.totaltime)
+			{
+				XParam.totaltime = max(XForcing.UWind.unidata[0].time, XForcing.VWind.unidata[0].time);
+				log("\nWARNING: simulation initial time increased to " + std::to_string(XParam.totaltime) + " to fit the time range of the wind forcing. ");
+			}
 			
 		}
 		else
@@ -203,8 +233,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			//
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
-			InitDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
-			InitDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
+			InitDynforcing(gpgpu, XParam, XForcing.UWind);
+			InitDynforcing(gpgpu, XParam, XForcing.VWind);
+
 
 			
 		}
@@ -226,7 +257,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
+			InitDynforcing(gpgpu, XParam, XForcing.Atmp);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
@@ -245,7 +276,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
-			InitDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			InitDynforcing(gpgpu, XParam, XForcing.Rain);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		}
 	}
@@ -319,15 +350,27 @@ template void readstaticforcing<StaticForcingP<int>>(int step, StaticForcingP<in
 * 
 * Used for Rain, wind, Atm pressure
 */
-void InitDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
+void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing);
+
+	//Sanity check on the time range of the forcing
+	if (Dforcing.tmax < XParam.endtime)
+	{
+		XParam.endtime = Dforcing.tmax;
+		log("\nWARNING: simulation endtime reduced to " + std::to_string(XParam.endtime) + " to fit the time range provided in " + Dforcing.inputfile);
+	}
+	if (Dforcing.to > XParam.totaltime)
+	{
+		XParam.totaltime = Dforcing.to;
+		log("\nWARNING: simulation initial time increased to " + std::to_string(XParam.totaltime) + " to fit the time provided in " + Dforcing.inputfile);
+	}
 
 
 	if (Dforcing.nx > 0 && Dforcing.ny > 0)
 	{
 		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
-		readforcingdata(totaltime, Dforcing);
+		readforcingdata(XParam.totaltime, Dforcing);
 		if (gpgpu)
 		{ 
 			AllocateGPU(Dforcing.nx, Dforcing.ny, Dforcing.now_g);
@@ -1225,7 +1268,6 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 	{
 		log("Forcing file needs to be a .nc file you also need to specify the netcdf variable name like this ncfile.nc?myvar");
 	}
-	
 
 
 	return Fmap;
