@@ -221,6 +221,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			result = instab ? "successful" : "failed";
 			log("\t\tWet/dry Instability test : " + result);
 		}
+		if (mytest == 994)
+		{
+			Testzbinit(XParam, XForcing, XModel, XModel_g);
+		}
 
 		if (mytest == 995)
 		{
@@ -3887,6 +3891,8 @@ template <class T> int TestFirsthalfstep(Param XParam, Forcing<float> XForcing, 
 	
 	// Setup Model(s)
 
+	XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy", "dzbdx", "dzbdy" };
+
 	checkparamsanity(XParam, XForcing);
 
 	InitMesh(XParam, XForcing, XModel);
@@ -3901,8 +3907,21 @@ template <class T> int TestFirsthalfstep(Param XParam, Forcing<float> XForcing, 
 
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
-	//FlowCPU(XParam, XLoop, XForcing, XModel);
-	HalfStepCPU(XParam, XLoop, XForcing, XModel);
+	if (XParam.GPUDEVICE < 0)
+	{
+		//FlowCPU(XParam, XLoop, XForcing, XModel);
+		HalfStepCPU(XParam, XLoop, XForcing, XModel);
+	}
+	else
+	{
+		HalfStepGPU(XParam, XLoop, XForcing, XModel_g);
+
+		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+		{
+			CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+		}
+
+	}
 
 	T maxu = std::numeric_limits<float>::min();
 	T maxv = std::numeric_limits<float>::min();
@@ -3925,8 +3944,78 @@ template <class T> int TestFirsthalfstep(Param XParam, Forcing<float> XForcing, 
 	bool test = false;
 
 	//test = true;
-	XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy" };
+	
 	InitSave2Netcdf(XParam, XModel);
+
+}
+
+
+template <class T> int Testzbinit(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+{
+
+	// Setup Model(s)
+
+	XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy", "dzbdx", "dzbdy" };
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	Loop<T> XLoop = InitLoop(XParam, XModel);
+
+	
+	//FlowCPU(XParam, XLoop, XForcing, XModel);
+	//HalfStepCPU(XParam, XLoop, XForcing, XModel);
+	if (XParam.conserveElevation)
+	{
+		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	}
+	
+	//HalfStepGPU(XParam, XLoop, XForcing, XModel_g);
+
+	if (XParam.conserveElevation)
+	{
+		refine_linearGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+	}
+
+	//for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+	//{
+	//	CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+	//}
+
+	CompareCPUvsGPU(XParam, XModel, XModel_g, XParam.outvars, true);
+
+	//T maxu = std::numeric_limits<float>::min();
+	//T maxv = std::numeric_limits<float>::min();
+	/*
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				maxu = max(maxu, abs(XModel.evolv.u[i]));
+				maxv = max(maxv, abs(XModel.evolv.v[i]));
+			}
+		}
+	}
+	*/
+	bool test = false;
+
+	//test = true;
+
+	//InitSave2Netcdf(XParam, XModel);
 
 }
 
