@@ -244,6 +244,13 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 
 	}
+
+	if (XParam.conserveElevation)
+	{
+		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	}
+
+
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
