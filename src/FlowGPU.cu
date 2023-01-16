@@ -50,11 +50,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	}
 
-	if (XParam.conserveElevation)
-	{
-		refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
-	}
-	
+		
 	//============================================
 	// Predictor step in reimann solver
 	//============================================
@@ -269,6 +265,13 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
+
+	//============================================
+	// Reset zb in prolongation halo
+	if (XParam.conserveElevation)
+	{
+		refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	}
 	
 	for (int i = 0; i < XLoop.num_streams; i++)
 	{
@@ -329,10 +332,6 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	}
 
-	if (XParam.conserveElevation)
-	{
-		refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
-	}
 
 	//============================================
 	// Predictor step in reimann solver
@@ -463,6 +462,13 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	{
 		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
+	//============================================
+	// Reset zb in prolongation halo
+	if (XParam.conserveElevation)
+	{
+		refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	}
 
 	for (int i = 0; i < XLoop.num_streams; i++)

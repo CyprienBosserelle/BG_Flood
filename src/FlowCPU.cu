@@ -210,6 +210,13 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 		
 	}
 
+	//============================================
+	// Reset zb in halo from prolonggation injection
+	if (XParam.conserveElevation)
+	{
+		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	}
+
 
 }
 template void FlowCPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
@@ -245,12 +252,7 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	}
 
-	if (XParam.conserveElevation)
-	{
-		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
-	}
-
-
+	
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
@@ -351,6 +353,13 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	{
 		TheresholdVelCPU(XParam, XModel.blocks, XModel.evolv);
 
+	}
+
+	//============================================
+	// Reset zb in halo from prolonggation injection
+	if (XParam.conserveElevation)
+	{
+		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	}
 
 }
