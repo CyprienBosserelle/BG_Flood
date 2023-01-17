@@ -24,7 +24,6 @@ template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, Evolvi
 template void conserveElevation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
-
 template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	dim3 blockDimHaloLR(1, 16, 1);
@@ -32,18 +31,166 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 
-		conserveElevationLeft<<<gridDim, blockDimHaloLR, 0>>> (XParam, XBlock, XEv, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
-		conserveElevationRight<<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
-		conserveElevationTop<<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
-		conserveElevationBot<<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
-		CUDA_CHECK(cudaDeviceSynchronize());
-	
+	conserveElevationLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	conserveElevationRight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	conserveElevationTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	conserveElevationBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
 }
 template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+
+template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int ib, ibLB, ibTL, ibBL, ibRB,ibn;
+	int ihalo, jhalo, ip, jp;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		ibLB = XBlock.LeftBot[ib];
+		ibRB = XBlock.RightBot[ib];
+
+		ibTL = XBlock.TopLeft[ib];
+		ibBL = XBlock.BotLeft[ib];
+
+		//Left side
+		if (XBlock.level[ib] > XBlock.level[ibLB])
+		{
+			// Prolongation
+			for (int j = 0; j < XParam.blkwidth; j++)
+			{
+
+				ihalo = -1;
+				//
+				jhalo = j;
+				ibn = ibLB;
+
+				//il = 0;
+				//jl = j;
+
+
+
+
+				ip = XParam.blkwidth - 1;
+				jp = XBlock.RightBot[ibLB] == ib ? ftoi(floor(j * T(0.5))) : ftoi(floor(j * T(0.5)) + XParam.blkwidth / 2);
+
+				//im = ip;
+				//jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
+
+				ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+			}
+		}
+
+		//Right side
+		if (XBlock.level[ib] > XBlock.level[ibRB])
+		{
+			// Prolongation
+			for (int j = 0; j < XParam.blkwidth; j++)
+			{
+
+				ihalo = XParam.blkwidth;
+				//
+				jhalo = j;
+				ibn = ibRB;
+
+				//il = 0;
+				//jl = j;
+
+
+
+
+				ip = 0;
+				jp = XBlock.LeftBot[ibn] == ib ? ftoi(floor(j * T(0.5))) : ftoi(floor(j * T(0.5)) + XParam.blkwidth / 2);
+
+				//im = ip;
+				//jm = ceil(j * T(0.5)) * 2 > j ? jp + 1 : jp - 1;
+
+				ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+			}
+		}
+
+		// Top side
+		if (XBlock.level[ib] > XBlock.level[ibTL])
+		{
+			//
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				jhalo = XParam.blkwidth;
+				//
+				ihalo = i;
+				ibn = ibTL;
+
+				//il = i;
+				//jl = XParam.blkwidth - 1;
+
+				jp = 0;
+				ip = XBlock.BotLeft[ibn] == ib ? ftoi(floor(i * T(0.5))) : ftoi(floor(i * T(0.5)) + XParam.blkwidth / 2);
+
+				//jm = jp;
+				//im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
+
+				ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+			}
+
+		}
+
+		// Bot side
+		if (XBlock.level[ib] > XBlock.level[ibBL])
+		{
+			//
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				//
+				jhalo = -1;
+				ihalo = i;
+				ibn = ibBL;
+
+				//il = i;
+				//jl = 0;
+
+				jp = XParam.blkwidth - 1;
+				ip = XBlock.TopLeft[ibn] == ib ? ftoi(floor(i * T(0.5))) : ftoi(floor(i * T(0.5)) + XParam.blkwidth / 2);
+
+				//jm = jp;
+				//im = ceil(i * T(0.5)) * 2 > i ? ip + 1 : ip - 1;
+
+				ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+			}
+
+		}
+
+	}
+
+}
+template void WetDryProlongation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+template void WetDryProlongation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
+
+template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	dim3 blockDimHaloLR(1, 16, 1);
+	dim3 blockDimHaloBT(16, 1, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	//WetDryProlongationGPUBot
+
+	WetDryProlongationGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	WetDryProlongationGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	WetDryProlongationGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	WetDryProlongationGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+}
+template void WetDryProlongationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+template void WetDryProlongationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
 template <class T> __host__ __device__ void ProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo,  int ip, int jp, T* h, T* zs, T* zb)
 {
@@ -1074,6 +1221,46 @@ template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T>
 	}
 }
 
+template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+
+
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int LB = XBlock.LeftBot[ib];
+	int LT = XBlock.LeftTop[ib];
+	
+	int ip, jp, ihalo, jhalo, ibn;
+	
+	
+	ihalo = -1;
+
+	if (lev > XBlock.level[LB])
+	{
+		//
+
+		jhalo = iy;
+		ibn = LB;
+
+		//il = 0;
+		//jl = iy;
+
+		ip = XParam.blkwidth - 1;
+		jp = XBlock.RightBot[ibn] == ib ? floor(iy * T(0.5)) : (floor(iy * T(0.5)) + blockDim.y / 2);
+
+
+		//im = ip;
+		//jm = ceil(iy * T(0.5)) * 2 > iy ? jp + 1 : jp - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+
+
+	}
+}
 
 
 template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, int ibRT, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
@@ -1189,6 +1376,45 @@ template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T
 	
 }
 
+template <class T> __global__ void WetDryProlongationGPURight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+
+
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int RB = XBlock.RightBot[ib];
+	int RT = XBlock.RightTop[ib];
+
+	int ip, jp, ihalo, jhalo, ibn;
+	
+	ihalo = blockDim.y;
+	if (lev > XBlock.level[RB])
+	{
+		//
+
+		jhalo = iy;
+		ibn = RB;
+
+		//il = blockDim.y - 1;
+		//jl = iy;
+
+		ip = 0;
+		jp = XBlock.LeftBot[ibn] == ib ? floor(iy * T(0.5)) : (floor(iy * T(0.5)) + blockDim.y / 2);
+
+		//im = ip;
+		//jm = ceil(iy * T(0.5)) * 2 > iy ? jp + 1 : jp - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+
+
+	}
+
+}
+
 template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int ibTR, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	int ihalo, jhalo, ibn, ip, jp;
@@ -1285,6 +1511,44 @@ template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> 
 	{
 		//
 
+		ihalo = ix;
+		ibn = TL;
+
+		//il = ix;
+		//jl = blockDim.x - 1;
+
+		jp = 0;
+		ip = XBlock.BotLeft[ibn] == ib ? floor(ix * T(0.5)) : (floor(ix * T(0.5)) + blockDim.x / 2);
+
+		//jm = jp;
+		//im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+
+
+	}
+}
+
+template <class T> __global__ void WetDryProlongationGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int TL = XBlock.TopLeft[ib];
+	int TR = XBlock.TopRight[ib];
+	// Prolongation
+	int ip, jp,ihalo,jhalo,ibn;
+
+
+	if (lev > XBlock.level[TL])
+	{
+		//
+		jhalo = blockDim.x;
 		ihalo = ix;
 		ibn = TL;
 
@@ -1422,3 +1686,49 @@ template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> 
 	}
 
 }
+
+template <class T> __global__ void WetDryProlongationGPUBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int BL = XBlock.BotLeft[ib];
+	int BR = XBlock.BotRight[ib];
+
+
+
+
+	int ihalo, jhalo, ibn;
+
+	// Prolongation
+	int ip, jp;
+	//int ip, jp, il, jl, im, jm;
+	//jhalo = -1;
+
+	if (lev > XBlock.level[BL])
+	{
+		//
+		jhalo = -1;
+		ihalo = ix;
+		ibn = BL;
+
+		//il = ix;
+		//jl = 0;
+
+		jp = blockDim.x - 1;
+		ip = XBlock.TopLeft[ibn] == ib ? floor(ix * T(0.5)) : (floor(ix * T(0.5)) + blockDim.x / 2);
+
+		//jm = jp;
+		//im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+
+
+	}
+}
+

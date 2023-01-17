@@ -253,6 +253,10 @@ template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<
 		{
 			conserveElevationGPU(XParam, XBlock, XEv, zb);
 		}
+		else if (XParam.wetdryprolongation)
+		{
+			WetDryProlongationGPU(XParam, XBlock, XEv, zb);
+		}
 
 		RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XBlock, XEv, zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
@@ -881,6 +885,10 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	if (XParam.conserveElevation)
 	{
 		conserveElevation(XParam, XBlock, XEv, zb);
+	}
+	else if (XParam.wetdryprolongation)
+	{
+		WetDryProlongation(XParam, XBlock, XEv, zb);
 	}
 
 	RecalculateZs(XParam, XBlock, XEv, zb);
