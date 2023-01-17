@@ -540,6 +540,10 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	{
 		conserveElevationGPU(XParam, XBlock, Xev, zb);
 	}
+	else if (XParam.wetdryprolongation)
+	{
+		WetDryProlongationGPU(XParam, XBlock, Xev, zb);
+	}
 
 	RecalculateZsGPU << < gridDimfull, blockDimfull, 0 >> > (XParam, XBlock, Xev, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());

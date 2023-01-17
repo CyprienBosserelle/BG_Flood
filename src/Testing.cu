@@ -3955,7 +3955,7 @@ template <class T> int Testzbinit(Param XParam, Forcing<float> XForcing, Model<T
 
 	// Setup Model(s)
 
-	XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy", "dzbdx", "dzbdy" };
+	XParam.outvars = { "zb","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy", "dzbdx", "dzbdy" };
 
 	checkparamsanity(XParam, XForcing);
 
