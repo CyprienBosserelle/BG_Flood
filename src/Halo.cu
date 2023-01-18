@@ -457,7 +457,7 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		{
 			conserveElevation(XParam, XBlock, Xev, zb);
 		}
-		else if (XParam.wetdryprolongation)
+		else if (XParam.wetdryfix)
 		{
 			WetDryRestriction(XParam, XBlock, Xev, zb);
 		}
@@ -544,7 +544,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	{
 		conserveElevationGPU(XParam, XBlock, Xev, zb);
 	}
-	else if (XParam.wetdryprolongation)
+	else if (XParam.wetdryfix)
 	{
 		WetDryRestrictionGPU(XParam, XBlock, Xev, zb);
 	}
