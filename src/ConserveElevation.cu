@@ -171,6 +171,156 @@ template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, Evolv
 template void WetDryProlongation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 template void WetDryProlongation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
+template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int ib, ibLB, ibTL, ibBL, ibRB, ibLT, ibRT, ibTR, ibBR, ibn;
+	int ihalo, jhalo, ir, jr, lev;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		ibLB = XBlock.LeftBot[ib];
+		ibLT = XBlock.LeftTop[ib];
+
+		ibRB = XBlock.RightBot[ib];
+		ibRT = XBlock.RightTop[ib];
+
+		ibTL = XBlock.TopLeft[ib];
+		ibTR = XBlock.TopRight[ib];
+
+		ibBL = XBlock.BotLeft[ib];
+		ibBR = XBlock.BotRight[ib];
+
+		lev = XBlock.level[ib];
+		
+
+		//Left side
+		ir = XParam.blkwidth - 2;
+		ihalo = -1;
+		
+
+		if (lev < XBlock.level[ibLB])
+		{
+			
+			for (int iy = 0; iy < (XParam.blkwidth / 2); iy++)
+			{
+				jhalo = iy;
+				
+				ibn = ibLB;
+
+				
+				jr = iy * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+		if (lev < XBlock.level[ibLT])
+		{
+			for (int iy = (XParam.blkwidth / 2); iy < XParam.blkwidth; iy++)
+			{
+				jhalo = iy;
+				ibn = ibLT;
+				jr = (iy - (XParam.blkwidth / 2)) * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+		
+
+		//Right side
+
+		ihalo = XParam.blkwidth;
+		ir = 0;
+
+		if (lev < XBlock.level[ibRB] )
+		{
+
+			for (int iy = 0; iy < (XParam.blkwidth / 2); iy++)
+			{
+				jhalo = iy;
+				ibn = ibRB;
+				jr = iy * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+		if (lev < XBlock.level[ibRT] )
+		{
+			for (int iy = (XParam.blkwidth / 2); iy < XParam.blkwidth; iy++)
+			{
+				jhalo = iy;
+				ibn = ibRT;
+				jr = (iy - (XParam.blkwidth / 2)) * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+
+		// Top side
+		jhalo = XParam.blkwidth;
+		
+		jr = 0;
+
+		if (lev < XBlock.level[ibTL] )
+		{
+			for (int ix = 0; ix < (XParam.blkwidth / 2); ix++)
+			{
+				ihalo = ix;
+				ibn = ibTL;
+
+				ir = ix * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+		if (lev < XBlock.level[ibTR] )
+		{
+			for (int ix = (XParam.blkwidth / 2); ix < XParam.blkwidth; ix++)
+			{
+				ihalo = ix;
+				ibn = ibTR;
+				ir = (ix - (XParam.blkwidth / 2)) * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+
+		// Bot side
+		jhalo = -1;
+		
+		jr = XParam.blkwidth - 2;
+
+		if (lev < XBlock.level[ibBL] )
+		{
+			for (int ix = 0; ix < (XParam.blkwidth / 2); ix++)
+			{
+				ihalo = ix;
+				ibn = ibBL;
+
+				ir = ix * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+		if (lev < XBlock.level[ibBR] )
+		{
+			for (int ix = (XParam.blkwidth / 2); ix < XParam.blkwidth; ix++)
+			{
+				ihalo = ix;
+				ibn = ibBR;
+				ir = (ix - (XParam.blkwidth / 2)) * 2;
+
+				wetdryrestriction(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+			}
+		}
+
+	}
+
+}
+template void WetDryRestriction<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+template void WetDryRestriction<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
+
 template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	dim3 blockDimHaloLR(1, 16, 1);
@@ -191,6 +341,27 @@ template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, Ev
 }
 template void WetDryProlongationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 template void WetDryProlongationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
+
+template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	dim3 blockDimHaloLR(1, 16, 1);
+	dim3 blockDimHaloBT(16, 1, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	//WetDryProlongationGPUBot
+
+	WetDryRestrictionGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	WetDryRestrictionGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	WetDryRestrictionGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	WetDryRestrictionGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+}
+template void WetDryRestrictionGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+template void WetDryRestrictionGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
 template <class T> __host__ __device__ void ProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo,  int ip, int jp, T* h, T* zs, T* zb)
 {
@@ -398,7 +569,7 @@ template <class T> __host__ __device__ void wetdryrestriction(int halowidth, int
 
 
 		h[write] = hwet;
-		zs[write] = hwet + zbw;
+		//zs[write] = hwet + zbw;
 
 	}
 	
@@ -1287,27 +1458,11 @@ template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, Block
 	int LB = XBlock.LeftBot[ib];
 	int LT = XBlock.LeftTop[ib];
 	
-	int ip, jp, ihalo, jhalo, ibn, ir,jr;
+	int ip, jp, ihalo, jhalo, ibn;
 	
 	jhalo = iy;
 	ihalo = -1;
 
-	ir = XParam.blkwidth - 2;
-
-	if (lev < XBlock.level[LB] && iy < (blockDim.y / 2))
-	{
-		ibn = LB;
-		jr = iy * 2;
-
-		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
-	}
-	if (lev < XBlock.level[LT] && iy >= (blockDim.y / 2))
-	{
-		ibn = LT;
-		jr = (iy - (blockDim.y / 2)) * 2;
-
-		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
-	}
 
 	if (lev > XBlock.level[LB])
 	{
@@ -1330,6 +1485,44 @@ template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, Block
 
 
 	}
+}
+
+template <class T> __global__ void WetDryRestrictionGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+
+
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int LB = XBlock.LeftBot[ib];
+	int LT = XBlock.LeftTop[ib];
+
+	int ihalo, jhalo, ibn, ir, jr;
+
+	jhalo = iy;
+	ihalo = -1;
+
+	ir = XParam.blkwidth - 2;
+
+	if (lev < XBlock.level[LB] && iy < (blockDim.y / 2))
+	{
+		ibn = LB;
+		jr = iy * 2;
+
+		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+	}
+	if (lev < XBlock.level[LT] && iy >= (blockDim.y / 2))
+	{
+		ibn = LT;
+		jr = (iy - (blockDim.y / 2)) * 2;
+
+		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+	}
+
+
 }
 
 
@@ -1459,27 +1652,11 @@ template <class T> __global__ void WetDryProlongationGPURight(Param XParam, Bloc
 	int RB = XBlock.RightBot[ib];
 	int RT = XBlock.RightTop[ib];
 
-	int ip, jp, ihalo, jhalo, ibn, ir,jr;
+	int ip, jp, ihalo, jhalo, ibn;
 	
 	ihalo = blockDim.y;
 	jhalo = iy;
 
-	ir = 0;
-
-	if (lev < XBlock.level[RB] && iy < (blockDim.y / 2))
-	{
-		ibn = RB;
-		jr = iy * 2;
-
-		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
-	}
-	if (lev < XBlock.level[RT] && iy >= (blockDim.y / 2))
-	{
-		ibn = RT;
-		jr = (iy - (blockDim.y / 2)) * 2;
-
-		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
-	}
 
 	if (lev > XBlock.level[RB])
 	{
@@ -1501,6 +1678,45 @@ template <class T> __global__ void WetDryProlongationGPURight(Param XParam, Bloc
 
 
 	}
+
+}
+
+template <class T> __global__ void WetDryRestrictionGPURight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+
+
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int RB = XBlock.RightBot[ib];
+	int RT = XBlock.RightTop[ib];
+
+	int ihalo, jhalo, ibn, ir, jr;
+
+	ihalo = blockDim.y;
+	jhalo = iy;
+
+	ir = 0;
+
+	if (lev < XBlock.level[RB] && iy < (blockDim.y / 2))
+	{
+		ibn = RB;
+		jr = iy * 2;
+
+		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+	}
+	if (lev < XBlock.level[RT] && iy >= (blockDim.y / 2))
+	{
+		ibn = RT;
+		jr = (iy - (blockDim.y / 2)) * 2;
+
+		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+	}
+
+	
 
 }
 
@@ -1631,7 +1847,48 @@ template <class T> __global__ void WetDryProlongationGPUTop(Param XParam, BlockP
 	int TL = XBlock.TopLeft[ib];
 	int TR = XBlock.TopRight[ib];
 	// Prolongation
-	int ip, jp,ihalo,jhalo,ibn, ir, jr;
+	int ip, jp,ihalo,jhalo,ibn;
+
+	jhalo = blockDim.x;
+	ihalo = ix;
+
+
+
+	if (lev > XBlock.level[TL])
+	{
+		//
+		
+		ibn = TL;
+
+		//il = ix;
+		//jl = blockDim.x - 1;
+
+		jp = 0;
+		ip = XBlock.BotLeft[ibn] == ib ? floor(ix * T(0.5)) : (floor(ix * T(0.5)) + blockDim.x / 2);
+
+		//jm = jp;
+		//im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
+
+		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
+
+
+	}
+}
+
+template <class T> __global__ void WetDryRestrictionGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int TL = XBlock.TopLeft[ib];
+	int TR = XBlock.TopRight[ib];
+	// Prolongation
+	int ihalo, jhalo, ibn, ir, jr;
 
 	jhalo = blockDim.x;
 	ihalo = ix;
@@ -1655,25 +1912,7 @@ template <class T> __global__ void WetDryProlongationGPUTop(Param XParam, BlockP
 	}
 
 
-	if (lev > XBlock.level[TL])
-	{
-		//
-		
-		ibn = TL;
 
-		//il = ix;
-		//jl = blockDim.x - 1;
-
-		jp = 0;
-		ip = XBlock.BotLeft[ibn] == ib ? floor(ix * T(0.5)) : (floor(ix * T(0.5)) + blockDim.x / 2);
-
-		//jm = jp;
-		//im = ceil(ix * T(0.5)) * 2 > ix ? ip + 1 : ip - 1;
-
-		ProlongationElevation(XParam.halowidth, XParam.blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ip, jp, XEv.h, XEv.zs, zb);
-
-
-	}
 }
 
 template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int ibBR, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
@@ -1815,28 +2054,13 @@ template <class T> __global__ void WetDryProlongationGPUBot(Param XParam, BlockP
 	int ihalo, jhalo, ibn;
 
 	// Prolongation
-	int ip, jp, ir,jr;
+	int ip, jp;
 	//int ip, jp, il, jl, im, jm;
 	//jhalo = -1;
 	jhalo = -1;
 	ihalo = ix;
-	jr = blockDim.x - 2;
 
-	if (lev < XBlock.level[BL] && ix < (blockDim.x / 2))
-	{
-		ibn = BL;
 
-		ir = ix * 2;
-
-		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
-	}
-	if (lev < XBlock.level[BR] && ix >= (blockDim.x / 2))
-	{
-		ibn = BR;
-		ir = (ix - (blockDim.x / 2)) * 2;
-
-		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
-	}
 
 	if (lev > XBlock.level[BL])
 	{
@@ -1859,3 +2083,48 @@ template <class T> __global__ void WetDryProlongationGPUBot(Param XParam, BlockP
 	}
 }
 
+
+template <class T> __global__ void WetDryRestrictionGPUBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int BL = XBlock.BotLeft[ib];
+	int BR = XBlock.BotRight[ib];
+
+
+
+
+	int ihalo, jhalo, ibn;
+
+	// Prolongation
+	int ir, jr;
+	//int ip, jp, il, jl, im, jm;
+	//jhalo = -1;
+	jhalo = -1;
+	ihalo = ix;
+	jr = blockDim.x - 2;
+
+	if (lev < XBlock.level[BL] && ix < (blockDim.x / 2))
+	{
+		ibn = BL;
+
+		ir = ix * 2;
+
+		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+	}
+	if (lev < XBlock.level[BR] && ix >= (blockDim.x / 2))
+	{
+		ibn = BR;
+		ir = (ix - (blockDim.x / 2)) * 2;
+
+		wetdryrestriction(XParam.halowidth, blkmemwidth, T(XParam.eps), ib, ibn, ihalo, jhalo, ir, jr, XEv.h, XEv.zs, zb);
+	}
+
+	
+}

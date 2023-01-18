@@ -457,6 +457,10 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 		{
 			conserveElevation(XParam, XBlock, Xev, zb);
 		}
+		else if (XParam.wetdryprolongation)
+		{
+			WetDryRestriction(XParam, XBlock, Xev, zb);
+		}
 
 		RecalculateZs(XParam, XBlock, Xev, zb);
 
@@ -542,7 +546,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	}
 	else if (XParam.wetdryprolongation)
 	{
-		WetDryProlongationGPU(XParam, XBlock, Xev, zb);
+		WetDryRestrictionGPU(XParam, XBlock, Xev, zb);
 	}
 
 	RecalculateZsGPU << < gridDimfull, blockDimfull, 0 >> > (XParam, XBlock, Xev, zb);

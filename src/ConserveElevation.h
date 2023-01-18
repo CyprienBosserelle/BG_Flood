@@ -46,5 +46,10 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 
+template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+
+template <class T> __host__ __device__ void wetdryrestriction(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int i, int j, T* h, T* zs, T* zb);
+
 // End of global definition
 #endif
