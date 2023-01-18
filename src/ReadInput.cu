@@ -230,8 +230,8 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	parameterstr = { "wetdryfix","reminstab" };
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "wetdryfix","reminstab" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 
