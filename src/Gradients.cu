@@ -253,7 +253,7 @@ template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<
 		{
 			conserveElevationGPU(XParam, XBlock, XEv, zb);
 		}
-		else if (XParam.wetdryprolongation)
+		else if (XParam.wetdryfix)
 		{
 			WetDryProlongationGPU(XParam, XBlock, XEv, zb);
 		}
@@ -886,7 +886,7 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	{
 		conserveElevation(XParam, XBlock, XEv, zb);
 	}
-	else if (XParam.wetdryprolongation)
+	else if (XParam.wetdryfix)
 	{
 		WetDryProlongation(XParam, XBlock, XEv, zb);
 	}
