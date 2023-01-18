@@ -33,7 +33,7 @@ $$hgw_{t}=hgw_{t-1} + ha_{t}$$
 
 The following figure shows a representation of the initial loss - continuing loss model with $il = 10 mm$ and $cl = 1 mm/s$ :
 
-![Initial loss and continuing loss reprensentation during a cell-wetting event](./RainLosses.png)
+![Initial loss and continuing loss reprensentation during a cell-wetting event](./RainLosses2.png)
 
 *Initial loss and continuing loss reprensentation during a cell-wetting event*
 
@@ -43,6 +43,9 @@ The following figure shows a representation of the initial loss - continuing los
 ```diff
 -> This model is meant to be used with the rain on grid feature. The model is applied indistinctively to water from any source and can cause unexpected results if misused.
 ```
+## Testcase for the ILCL model
+The ILCL model is tested in the Westport (ANZ) area, on the Orowaiti river (with a uniform 5m grid). A 20mm/hr rain is uniformly applied on the domain during 30 minutes. An initial loss of 5mm and an continuous loss of 5mm/h are used to define infiltration uniformly on the domain. The results, compared to a reference case without infiltration, are presented in the following figure.
+![Model_test](./Ex_Merge.png)
 
 ## Reference values
 Some reference values for the $il$ and $cl$ coefficeint can be found in the literature. 
