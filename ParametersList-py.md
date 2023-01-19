@@ -85,6 +85,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |vtk_output_time_interval|vtk_output_time_interval| 1.0|Output time step for ParaView Catalyst|
 |vtk_outputfile_root|vtk_outputfile_root| "bg_out"|output file name for ParaView Catalyst|
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
+|rainbnd| rainbnd , rainonbnd | false|when false it force the rain foring on the bnd cells to be ==0. would be |
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
 ---
 
