@@ -663,6 +663,20 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.zsoffset = std::stod(parametervalue);
 	}
+	paramvec = {"rainbnd", "rainonbnd"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (case_insensitive_compare(parametervalue, truestr) == 0)
+		{
+			param.rainbnd = true;
+		}
+		if (case_insensitive_compare(parametervalue, falsestr) == 0)
+		{
+			param.rainbnd = false;
+		}
+	}
+		
 
 	parameterstr = "hotstartfile";
 	parametervalue = findparameter(parameterstr, line);
