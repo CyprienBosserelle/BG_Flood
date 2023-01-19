@@ -48,10 +48,27 @@ The ILCL model is tested in the Westport (ANZ) area, on the Orowaiti river (with
 ![Model_test](./Ex_Merge.png)
 
 ## Reference values
-Some reference values for the $il$ and $cl$ coefficeint can be found in the literature. 
-This is an example of compilation of some of these values from [https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model](https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model).
+Some reference values for the $il$ and $cl$ coefficients can be found in the literature.
 
-![ILCL-table](./ILCL-values.png)
+The Initial loss is usually defined based on the antecedent moisture conditions and the soil layer depth and range from 0 to 50mm.
+The [Australian Rainfall & Runoff project](http://book.arr.org.au.s3-website-ap-southeast-2.amazonaws.com/) concidere the il value at a catchemnt scale and observed a low initial loss in urban catchments with a mean value of 1.1mm;in rural catchment, the initinal loss is highly variable with a mean of 32mm and a standard deviation of 17mm.
+
+The Constant loss rate typically correspond to the saturated hydraulic conductivity. The following table as been produced by [Rawls, Brakensiek, and Miller (1983)](http://soilphysics.okstate.edu/teaching/soil-6583/references-folder/rawls%20et%20al%201983.pdf) using mesurements on soil samples from the USA.
+
+|Soil texture class|Hydraulic conductivity or continuous loss (mm/h)|
+|-------------------|---|
+|Sand|117.8|
+|Loamy sand|29.9|
+|Sandy loam|10.9|
+|Loam|3.4|
+|Silt loam|6.5|
+|Sandy clay loam|1.5|
+|Clay loam|1.0|
+|Silty clay loam|1.0|
+|Sandy clay|0.6|
+|Silty clay|0.5|
+|Clay|0.3|
+
 
 
 
