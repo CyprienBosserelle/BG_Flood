@@ -48,8 +48,17 @@ The ILCL model is tested in the Westport (ANZ) area, on the Orowaiti river (with
 ![Model_test](./Ex_Merge.png)
 
 ## Reference values
-Some reference values for the $il$ and $cl$ coefficeint can be found in the literature. 
-This is an example of compilation of some of these values from [https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model](https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model).
+Some reference values for the $il$ and $cl$ coefficient can be found in the literature. Some relate to entire subcatchment and are estimated from hydrology. Continuous loss can be related to the soil hydraulic conductivity, Whatever you select, be mindfull the model is likely yto be very sensitive to rainfall loss.
+
+Below is the ARR 2016 Rainfall Loss Parameters.
+| Urban Surface | Burst Initial loss (mm) | Continuing loss (mm/hr) |
+| :-------------: | ----------------------- | ----------------------- |
+| Effective Impervious Area | 0.4 | 0.0 |
+| Indirectly Connected Area | 16.1 | 1.6 |
+| Urban Pervious Area | 26.9 |1.6|
+
+
+Below is an example of compilation of some of these values from [https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model](https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model).
 
 ![ILCL-table](./ILCL-values.png)
 
