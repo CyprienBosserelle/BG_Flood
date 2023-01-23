@@ -18,6 +18,7 @@
 * Test 7 Mass conservation with rain fall on grid
 * Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
 * Test 9 Zoned output (test zoned outputs with adaptative grid)
+* Test 10 Initial Loss / Continuous Loss on a slope, under uniform rain
 
 * Test 99 Run all the test with test number < 99.
 
@@ -161,7 +162,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		if (mytest == 7)
 		{
 			bool testrainGPU, testrainCPU;
-			/* Test 7 is homogeneous rain on a uniform slope for cartesian mesh (GPU and CU version)
+			/* Test 7 is homogeneous rain on a uniform slope for cartesian mesh (GPU and CPU version)
 			 The input parameters are :
 					- the initial water level (zs)
 					- GPU option
@@ -212,6 +213,25 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			result = testzoneOutUser ? "successful" : "failed";
 			log("\n\nUser defined zones Outputs: " + result);
 			isfailed = (!testzoneOutDef || !testzoneOutUser || isfailed) ? true : false;
+		}
+		if (mytest == 10)
+		{
+			bool testrainlossesGPU, testrainlossesCPU;
+			/* Test 10 is to test the Initial / Continuous Losses of rain, on a uniform slope, under uniform rain
+			for cartesian mesh (GPU and CPU version)
+			 The input parameters are :
+					- the initial water level (zs)
+					- GPU option
+					- the slope (%)
+			*/
+			log("\t### IL-CL Rain losses test on GPU ###");
+			testrainlossesGPU = Rainlossestest(0.0, 0, 10);
+			result = testrainlossesGPU ? "successful" : "failed";
+			log("\n\n\t IL-CL Rain losses test GPU: " + result);
+			testrainlossesCPU = Rainlossestest(0.0, -1, 10);
+			result = testrainlossesCPU ? "successful" : "failed";
+			log("\n\n\t IL-CL Rain losses test CPU: " + result);
+			isfailed = (!testrainlossesCPU || !testrainlossesGPU || isfailed) ? true : false;
 		}
 		if (mytest == 998)
 		{
@@ -788,7 +808,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 
 	XParam.conserveElevation = false;
 
-	// Enforece GPU/CPU
+	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
 	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy" };
 
@@ -3480,6 +3500,233 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 template bool ZoneOutputTest<float>(int nzones, float zsinit);
 template bool ZoneOutputTest<double>(int nzones, double zsinit);
 
+
+/*! \fn bool Rainlossestest(T zsnit, int gpu, float alpha)
+*
+* This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain.
+*	The function creates its own model setup and mesh independantly to what the user inputs.
+*	This starts with a initial water level (zsinit=0.0 is dry) and runs for 1s comparing results
+*	every 0.1s (that is approx 20 steps)
+*/
+template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
+{
+	int NX = 21;
+	int NY = 21;
+	double* xLoss;
+	double* yLoss;
+	double* ilForcing;
+	double* clForcing;
+	
+	log("#####");
+	Param XParam;
+	T initVol, TheoryInput;
+	TheoryInput = T(0.0);
+	// initialise domain and required resolution
+	XParam.dx = 1.0 / ((1 << 6)); //1<<8  = 2^8
+	XParam.xo = -0.5;
+	XParam.yo = -0.5;
+	XParam.xmax = 0.5;
+	XParam.ymax = 0.5;
+
+	XParam.zsinit = zsinit;
+	//XParam.zsoffset = 0.0;
+
+	XParam.infiltration = true;
+
+	//Output times for comparisons
+	XParam.endtime = 1.0;
+	XParam.outputtimestep = 0.1;
+
+	XParam.smallnc = 0;
+
+	XParam.cf = 0.01;
+	XParam.frictionmodel = 0;
+
+	// Enforce GPU/CPU
+	XParam.GPUDEVICE = gpu;
+	XParam.rainbnd = true;
+	//output vars
+	std::string outvi[17] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv", "hgw" };
+	std::vector<std::string> outv;
+	for (int nv = 0; nv < 17; nv++)
+	{
+		outv.push_back(outvi[nv]);
+	}
+	XParam.outvars = outv;
+
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy[0].xo = -1.0;
+	XForcing.Bathy[0].yo = -1.0;
+	XForcing.Bathy[0].xmax = 1.0;
+	XForcing.Bathy[0].ymax = 1.0;
+	XForcing.Bathy[0].nx = 3;
+	XForcing.Bathy[0].ny = 3;
+
+	XForcing.Bathy[0].dx = 1.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(0.0);
+		}
+	}
+	
+
+	// Add wall boundary conditions
+	XForcing.right.type = 0;
+	XForcing.left.type = 0;
+	XForcing.top.type = 0;
+	XForcing.bot.type = 0;
+
+	//// Rain set-up
+	//Value definition for surface rain fall
+	T Q = 300; // mm/hr
+	std::cout << "# Theoretical volume of water input during the simulation in m3: " << TheoryInput << ", from a rain input of: " << Q << "mm/hr." << std::endl;
+	//Create a temporary file with rain fluxes
+	std::ofstream rain_file(
+		"testrain.tmp", std::ios_base::out | std::ios_base::trunc);
+	rain_file << "0.0 " + std::to_string(Q) << std::endl;
+	rain_file << "3600.0 " + std::to_string(Q) << std::endl;
+	rain_file.close(); //destructor implicitly does it
+
+	XForcing.Rain.inputfile = "testrain.tmp";
+	XForcing.Rain.uniform = true;
+
+	// Reading rain forcing from file for CPU and unifor rain
+	XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+
+	//// Initial and Continuous loss set-up
+	//Value definition for surface IL-CL
+	T IL = 0.02; // mm
+	T CL = 100; // mm/hr
+
+	//Create a uniform map of IL-CL forcing (nc file)
+	xLoss = (double*)malloc(sizeof(double) * NX);
+	yLoss = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xLoss[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yLoss[j] = -1.0 + 0.1 * j; }
+
+	ilForcing = (double*)malloc(sizeof(double) * NY * NX);
+	clForcing = (double*)malloc(sizeof(double) * NY * NX);
+
+	//Create the Losses forcing:
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			if (xLoss[i] < 0)
+			{
+				ilForcing[j * NX + i] = 0;
+				clForcing[j * NX + i] = 0;
+			}
+			else
+			{
+				ilForcing[j * NX + i] = IL;
+				clForcing[j * NX + i] = CL;
+			}
+		}
+	}
+	create2dnc("ilrainlossTempt.nc", NX, NY, xLoss, yLoss, ilForcing, "initialloss");
+	create2dnc("clrainlossTempt.nc", NX, NY, xLoss, yLoss, clForcing, "continuousloss");
+
+	//Reading non-unform forcing
+	bool gpgpu = 0;
+	if (XParam.GPUDEVICE != -1)
+	{
+		gpgpu = 1;
+	}
+
+	XForcing.il = readfileinfo("ilrainlossTempt.nc", XForcing.il);
+    XForcing.il.varname = "initialloss";
+	XForcing.cl = readfileinfo("clrainlossTempt.nc", XForcing.cl);
+	XForcing.cl.varname = "continuousloss";
+	readstaticforcing(XForcing.il);
+	readstaticforcing(XForcing.cl);
+
+	free(ilForcing);
+	free(clForcing);
+	free(xLoss);
+	free(yLoss);
+
+	//XParam.infiltration = false;
+
+    //// General code
+	checkparamsanity(XParam, XForcing);
+	//printf("h: %f \n", XModel.evolv.h[10]);
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+
+	InitialAdaptation(XParam, XForcing, XModel);
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	initVol = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				initVol = initVol + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	TheoryInput = Q / T(1000.0) / T(3600.0) * XParam.endtime;
+
+
+	T SimulatedVolume = T(0.0);
+	T Infiltration_model = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
+				Infiltration_model = Infiltration_model + XModel.hgw[i] * delta * delta;
+			}
+		}
+	}
+
+
+	SimulatedVolume = SimulatedVolume - initVol;
+
+	T error = abs(SimulatedVolume - TheoryInput + Infiltration_model);
+
+	T modelgood = error / abs(TheoryInput) < 0.05;
+
+	//printf("Simulatedvolume: %f , Theory input: %f , Calcultated loss: %f\n", SimulatedVolume, TheoryInput, Infiltration_model);
+
+	//log("#####");
+	return modelgood;
+}
 
 
 /*! \fn void alloc_init2Darray(float** arr, int NX, int NY)

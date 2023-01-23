@@ -259,6 +259,12 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
+	if (XParam.infiltration)
+	{
+		AddinfiltrationImplicitGPU << < gridDim, blockDim, 0 >> > (XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
 	if (XParam.VelThreshold > 0.0)
 	{
 		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);

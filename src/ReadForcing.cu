@@ -110,7 +110,23 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 
 		//log("...done");
 	}
-	
+
+	//==================
+	// Rain losses maps
+
+	if (!XForcing.il.inputfile.empty())
+	{
+		log("\nRead initial losses map (il) data...");
+		readstaticforcing(XForcing.il);
+		XParam.infiltration = true;
+	}
+	if (!XForcing.cl.inputfile.empty())
+	{
+		log("\nRead initial losses map (cl) data...");
+		readstaticforcing(XForcing.cl);
+		XParam.infiltration = true;
+	}
+	  
 	//=====================
 	// Deformation (tsunami generation)
 	if (XForcing.deform.size() > 0)

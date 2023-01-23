@@ -161,6 +161,18 @@ struct Forcing
 	Default: (see constant in parameters)
 	*/
 
+	StaticForcingP<T> il;
+	/*Initial Rain loss coefficient map (in mm)
+	Ex: il=rain_loss.nc?initial_loss;
+	Default: (see constant in parameters)
+	*/
+
+	StaticForcingP<T> cl;
+	/*Continuous Rain loss coefficient map (in mm/h)
+	Ex: cl=rain_loss.nc?continuous_loss;
+	Default: (see constant in parameters)
+	*/
+
 	std::vector<StaticForcingP<int>> targetadapt;
 
 	std::vector<deformmap<T>> deform;

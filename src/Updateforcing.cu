@@ -406,6 +406,90 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 template __host__ void AddrainforcingImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __host__ void AddrainforcingImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
+template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* hgw)
+{
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+	int p = 0;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T waterOut = XEv.h[i];
+				T infiltrationLoc = 0.0;
+				T availinitialinfiltration;
+
+				if (waterOut > 0)
+				{
+					//Computation of the initial loss
+					availinitialinfiltration = il[i] / T(1000.0) - hgw[i];
+					infiltrationLoc = min(waterOut, availinitialinfiltration);
+					waterOut -= infiltrationLoc;
+
+					//Computation of the continuous loss
+					T continuousloss = cl[i] / T(1000.0) / T(3600.0) * T(XLoop.dt); //convert from mm/hs to m/s
+					infiltrationLoc += min(continuousloss, waterOut);
+
+					hgw[i] += infiltrationLoc;
+
+				}
+
+				XEv.h[i] -= max(infiltrationLoc * XBlock.activeCell[i],T(0.0));
+				XEv.zs[i] -= max(infiltrationLoc * XBlock.activeCell[i],T(0.0));
+			}
+		}
+	}
+}
+template __host__ void AddinfiltrationImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, float* il, float* cl, EvolvingP<float> XEv, float* hgw);
+template __host__ void AddinfiltrationImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* hgw);
+
+template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* hgw)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T waterOut = XEv.h[i];
+	T infiltrationLoc = 0.0;
+	T availinitialinfiltration;
+
+	if (waterOut > 0)
+	{
+		//Computation of the initial loss
+		availinitialinfiltration = max(il[i] / T(1000.0) - hgw[i],T(0.0));
+		infiltrationLoc = min(waterOut, availinitialinfiltration);
+		waterOut -= infiltrationLoc;
+
+		//Computation of the continuous loss
+		T continuousloss = cl[i] / T(1000.0) / T(3600.0) * T(XLoop.dt); //convert from mm/hs to m
+		infiltrationLoc += min(continuousloss, waterOut);
+	}
+
+	hgw[i] += infiltrationLoc;
+
+	XEv.h[i] -= infiltrationLoc * XBlock.activeCell[i];
+	XEv.zs[i] -= infiltrationLoc * XBlock.activeCell[i];
+
+}
+template __global__ void AddinfiltrationImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, float* il, float* cl, EvolvingP<float> XEv, float* hgw);
+template __global__ void AddinfiltrationImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* hgw);
+
+
+
 template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
 {
 	unsigned int halowidth = XParam.halowidth;

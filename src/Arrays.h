@@ -159,6 +159,11 @@ struct Model
 	//external forcing
 	T* zb;
 	T* cf;
+	T* il;
+	T* cl;
+
+	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
+	T* hgw;
 	
 	// Used for external forcing too
 	// May need a better placeholder
