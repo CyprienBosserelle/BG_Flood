@@ -984,7 +984,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 * Check the Sanity of both Param and Forcing class
 * If required some parameter are infered 
 */
-void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
+void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 {
 	Param DefaultParams;
 
@@ -1020,21 +1020,21 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	//inputmap Bathymetry;
 	//Bathymetry.inputfile = XForcing.Bathy.inputfile;
 	//XForcing.Bathy = readforcinghead(XForcing.Bathy);
-	
+
 
 
 	if (std::isnan(XParam.xo))
-		XParam.xo = XForcing.Bathy[0].xo-(0.5* XForcing.Bathy[0].dx);
+		XParam.xo = XForcing.Bathy[0].xo - (0.5 * XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.xmax))
 		XParam.xmax = XForcing.Bathy[0].xmax + (0.5 * XForcing.Bathy[0].dx);
-	if(std::isnan(XParam.yo))
+	if (std::isnan(XParam.yo))
 		XParam.yo = XForcing.Bathy[0].yo - (0.5 * XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.ymax))
 		XParam.ymax = XForcing.Bathy[0].ymax + (0.5 * XForcing.Bathy[0].dx);
 
 	if (std::isnan(XParam.dx))
 		XParam.dx = XForcing.Bathy[0].dx;
-	
+
 	if (std::isnan(XParam.grdalpha))
 		XParam.grdalpha = XForcing.Bathy[0].grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
 
@@ -1070,25 +1070,25 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
 
 	log("\nAdjusted model domain (xo/xmax/yo/ymax): ");
-	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax) );
-	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx) );
+	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax));
+	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx));
 
 	if (XParam.spherical < 1)
 	{
 		XParam.delta = XParam.dx;
-		XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+		XParam.grdalpha = XParam.grdalpha * pi / 180.0; // grid rotation
 
 	}
 	else
 	{
 		//Geo grid
-		XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+		XParam.delta = XParam.dx * XParam.Radius * pi / 180.0;
 		//printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
 		log("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
 		if (XParam.grdalpha != 0.0)
 		{
 			//printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
-			log("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+			log("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha * 180.0 / pi));
 		}
 	}
 
@@ -1126,9 +1126,9 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	// Check whether endtime was specified by the user
 	//No; i.e. endtimne =0.0
 	//so the following conditions are useless
-	
-	
-	
+
+
+
 	if (abs(XParam.endtime - DefaultParams.endtime) <= tiny)
 	{
 		//No; i.e. endtimne =0.0
@@ -1136,11 +1136,11 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	}
 
 	XParam.endtime = setendtime(XParam, XForcing);
-	
-		
-	
-	
-	
+
+
+
+
+
 
 
 
@@ -1153,16 +1153,16 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		//otherwise there is really no point running the model
 	}
 
-	
+
 
 	if (XParam.outvars.empty() && XParam.outputtimestep > 0.0)
 	{
 		//a nc file was specified but no output variable were specified
-		std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h" }; 
+		std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h" };
 		for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 		{
 			XParam.outvars.push_back(SupportedVarNames[isup]);
-				
+
 		}
 
 	}
@@ -1187,7 +1187,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			
+
 			log("Using Device: " + std::string(prop.name));
 		}
 		else
@@ -1224,7 +1224,21 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		}
 	}
 
-	
+	//Check that the Initial Loss/ Continuing Loss model is used if il, cl or hgw output are asked by user.
+	if (XForcing.il.inputfile.empty() || XForcing.cl.inputfile.empty())
+	{
+		std::vector<std::string> namestr = { "il","cl","hgw"};
+		for (int ii = 0; ii < namestr.size(); ii++)
+		{
+			std::vector<std::string>::iterator itr = std::find(XParam.outvars.begin(), XParam.outvars.end(), namestr[ii]);
+			if (itr != XParam.outvars.end()) 
+			{
+				log("The output variable associated to the ILCL model \"" + namestr[ii] + "\" is requested but the model is not used. The variable is removed from the outputs.");
+				XParam.outvars.erase(itr);
+			}
+		}
+
+	}
 }
 
 /*! \fn double setendtime(Param XParam,Forcing<float> XForcing)

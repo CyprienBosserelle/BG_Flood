@@ -80,7 +80,7 @@ Below is the ARR 2016 Rainfall Loss Parameters for Urban area, depending of the 
 
 Below is an other example of compilation of some of these values from [https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model](https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model).
 
-[ILCL-table](./ILCL-values.png)
+![ILCL-table](./ILCL-values.png)
 
 
 
