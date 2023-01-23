@@ -1237,8 +1237,24 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 				XParam.outvars.erase(itr);
 			}
 		}
+	}
+
+	//Check that the atmospheric forcing is used if datmpdx, datmpdy output are asked by user.
+	if (XForcing.Atmp.inputfile.empty())
+	{
+		std::vector<std::string> namestr = { "datmpdx", "datmpdy" };
+		for (int ii = 0; ii < namestr.size(); ii++)
+		{
+			std::vector<std::string>::iterator itr = std::find(XParam.outvars.begin(), XParam.outvars.end(), namestr[ii]);
+			if (itr != XParam.outvars.end())
+			{
+				log("The output variable associated to the atmosheric forcing \"" + namestr[ii] + "\" is requested but the model is not used. The variable is removed from the outputs.");
+				XParam.outvars.erase(itr);
+			}
+		}
 
 	}
+
 }
 
 /*! \fn double setendtime(Param XParam,Forcing<float> XForcing)
