@@ -200,7 +200,7 @@ struct Loop
 	double dt;
 	double dtmax;
 	double totaltime;
-	double dtmin;
+	
 
 	// Needed to average mean varable for output
 	int nstep = 0;
