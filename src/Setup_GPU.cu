@@ -201,6 +201,13 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.RightTop, XModel_gpu.blocks.RightTop);
 	
 
+	if (XParam.infiltration)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.il, XModel_gpu.il);
+		CopytoGPU(nblk, blksize, XModel_cpu.cl, XModel_gpu.cl);
+		CopytoGPU(nblk, blksize, XModel_cpu.hgw, XModel_gpu.hgw);
+	}
+
 	if (XParam.outmax)
 	{
 		CopytoGPU(nblk, blksize, XModel_cpu.evmax, XModel_gpu.evmax);

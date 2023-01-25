@@ -25,6 +25,7 @@ public:
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
+	bool infiltration = false;
 
 	bool conserveElevation = false; //Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks
 	bool wetdryfix = true; // Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)
@@ -79,6 +80,7 @@ public:
 	double endtime = 0.0; // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
+	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
 
 	//* Initialisation
 	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
@@ -115,7 +117,7 @@ public:
 	std::string outfile = "Output.nc"; // netcdf output file name
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
-	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy";
+	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
 	Default: "zb", "zs", "u", "v", "h"
 	*/
 	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
@@ -192,7 +194,7 @@ public:
 	// deformation forcing for tsunami generation
 	//std::vector<deformmap> deform;
 	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be ==0. would be 
+	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be null.
 
 	// This here should be stored in a structure at a later stage
 	std::string AdaptCrit;

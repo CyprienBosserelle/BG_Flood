@@ -159,6 +159,11 @@ struct Model
 	//external forcing
 	T* zb;
 	T* cf;
+	T* il;
+	T* cl;
+
+	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
+	T* hgw;
 	
 	// Used for external forcing too
 	// May need a better placeholder
@@ -200,6 +205,8 @@ struct Loop
 	double dt;
 	double dtmax;
 	double totaltime;
+	
+
 	// Needed to average mean varable for output
 	int nstep = 0;
 	//useful for calculating avg timestep

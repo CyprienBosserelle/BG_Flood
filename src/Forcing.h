@@ -48,6 +48,7 @@ class deformmap : public inputmap
 public:
 	double startime = 0.0;
 	double duration = 0.0;
+	bool iscavity = false;
 	T* val;
 	
 	T clampedge = 0.0;
@@ -157,6 +158,18 @@ struct Forcing
 	/*Bottom friction coefficient map (associated to the chosen bottom friction model)
 	Ex: cf=0.001;
 	Ex: cf=bottom_friction.nc?bfc;
+	Default: (see constant in parameters)
+	*/
+
+	StaticForcingP<T> il;
+	/*Initial Rain loss coefficient map (in mm)
+	Ex: il=rain_loss.nc?initial_loss;
+	Default: (see constant in parameters)
+	*/
+
+	StaticForcingP<T> cl;
+	/*Continuous Rain loss coefficient map (in mm/h)
+	Ex: cl=rain_loss.nc?continuous_loss;
 	Default: (see constant in parameters)
 	*/
 

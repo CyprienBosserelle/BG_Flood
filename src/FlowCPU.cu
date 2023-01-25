@@ -28,6 +28,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 		
 	}
+
 	//============================================
 	//  Fill the halo for gradient reconstruction
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
@@ -35,7 +36,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Reset DTmax
 	InitArrayBUQ(XParam, XModel.blocks, XLoop.hugeposval, XModel.time.dtmax);
-	
+
 	//============================================
 	// Calculate gradient for evolving parameters
 	gradientCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
@@ -83,7 +84,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	XLoop.dt = double(CalctimestepCPU(XParam,XLoop, XModel.blocks, XModel.time));
 	XLoop.dtmax = XLoop.dt;
 	XModel.time.dt = T(XLoop.dt);
-	
+
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 
@@ -108,7 +109,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Update evolving variable by 1/2 time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	
-	
+
 	//============================================
 	// Corrector step in reimann solver
 	//============================================
@@ -186,7 +187,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Update evolving variable by 1 full time step
 	AdvkernelCPU(XParam, XModel.blocks, XModel.time.dt, XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	
-	
+
 
 	//============================================
 	// Add bottom friction
@@ -199,9 +200,16 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//Copy updated evolving variable back
 	cleanupCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 
+
+
 	if (!XForcing.Rain.inputfile.empty())
 	{
 		AddrainforcingImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+	}
+
+	if (XParam.infiltration)
+	{
+		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
 	}
 
 	if (XParam.VelThreshold > 0.0)
@@ -348,6 +356,11 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	{
 		AddrainforcingImplicitCPU(XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
 	}
+  if (XParam.infiltration)
+	{
+		AddinfiltrationImplicitCPU(XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
+	}
+
 
 	if (XParam.VelThreshold > 0.0)
 	{
@@ -361,6 +374,7 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	{
 		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	}
+
 
 }
 template void HalfStepCPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);

@@ -43,6 +43,9 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Set edges of friction map
 	setedges(XParam, XModel.blocks, XModel.cf);
 
+
+	
+
 	//=====================================
 	// Initial Condition
 	
@@ -66,6 +69,23 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Calculate Active cells
 	calcactiveCellCPU(XParam, XModel.blocks, XForcing, XModel.zb);
+
+	//=====================================
+	// Initialise the rain losses map
+
+	if (XParam.infiltration)
+	{
+		interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+		interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+		// Set edges of friction map
+		setedges(XParam, XModel.blocks, XModel.il);
+		setedges(XParam, XModel.blocks, XModel.cl);
+		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.hgw);
+
+		// Initialise infiltration to IL where h is already wet
+		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.hgw);
+
+	}
 
 
 	//=====================================
@@ -435,6 +455,10 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["dhv"] = XModel.adv.dhv;
 
 	XModel.OutputVarMap["cf"] = XModel.cf;
+
+	XModel.OutputVarMap["il"] = XModel.il;
+	XModel.OutputVarMap["cl"] = XModel.cl;
+	XModel.OutputVarMap["hgw"] = XModel.hgw;
 
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
@@ -960,5 +984,31 @@ template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBl
 	else
 	{
 		XBlock.activeCell[n] = 0;
+	}
+}
+
+template <class T>
+void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
+{
+//Initialisation to 0 (cold or hot start)
+
+	
+	int ib;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+
+				if (h[n] > XParam.eps)
+				{
+					initLoss[n]=T(0.0);
+				}
+				
+			}
+		}
 	}
 }
