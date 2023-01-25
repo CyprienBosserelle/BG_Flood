@@ -506,52 +506,59 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ibl = blockIdx.x;
-	int ix, iy;
-
-	int isright, istop;
-
-	T zsinside, zsnew, hnew, vnew, unew, zbnew;
-
-	bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
-
-	int ib = XBlock.mask.blks[ibl];
-	//
-	findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
-
-	//leftside
-	if (isleftbot | islefttop)//?
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
 	{
-		isright = -1;
-		istop = 0;
+		int ix, iy;
 
-		ix = -1;
-		iy = threadIdx.x;
-		int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
-		int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+		int isright, istop;
 
-		if(iy>=yst && iy<ynd)
+		T zsinside, zsnew, hnew, vnew, unew, zbnew;
+
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		//leftside
+		if (isleftbot | islefttop)//?
 		{
-			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-			int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+			isright = -1;
+			istop = 0;
 
-			zsinside = Xev.zs[inside];
-			unew = Xev.u[i];
-			vnew = Xev.v[i];
-			zsnew = Xev.zs[i];
-			hnew = Xev.h[i];
-			zbnew = zb[i];
+			ix = -1;
+			iy = threadIdx.x;
+			int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
+			int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
 
-			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+			if (iy >= yst && iy < ynd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-			Xev.u[i] = unew;
-			Xev.v[i] = vnew;
-			Xev.zs[i] = zsnew;
-			Xev.h[i] = hnew;
-			zb[i] = zbnew;
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.h[i];
+				zbnew = zb[i];
+
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.h[i] = hnew;
+				zb[i] = zbnew;
+
+
+			}
 
 		}
-
 	}
 
 }
@@ -563,52 +570,57 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ix, iy;
-
-	int isright, istop;
-
-	T zsinside, zsnew, hnew, vnew, unew, zbnew;
-
-	bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
-
-	int ib = XBlock.mask.blks[ibl];
-	//
-	findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
-
-	if (istopleft | istopright)//?
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
 	{
-		isright = 0;
-		istop = 1;
+		int ix, iy;
 
-		iy = XParam.blkwidth;
-		ix = threadIdx.x;
+		int isright, istop;
 
-		int xst = istopleft ? 0 : XParam.blkwidth * 0.5;
-		int xnd = istopright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+		T zsinside, zsnew, hnew, vnew, unew, zbnew;
 
-		if(ix>=xst && ix<xnd)
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		if (istopleft | istopright)//?
 		{
-			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-			int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+			isright = 0;
+			istop = 1;
 
-			zsinside = Xev.zs[inside];
-			unew = Xev.u[i];
-			vnew = Xev.v[i];
-			zsnew = Xev.zs[i];
-			hnew = Xev.h[i];
-			zbnew = zb[i];
+			iy = XParam.blkwidth;
+			ix = threadIdx.x;
 
-			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+			int xst = istopleft ? 0 : XParam.blkwidth * 0.5;
+			int xnd = istopright ? XParam.blkwidth : XParam.blkwidth * 0.5;
 
-			Xev.u[i] = unew;
-			Xev.v[i] = vnew;
-			Xev.zs[i] = zsnew;
-			Xev.h[i] = hnew;
-			zb[i] = zbnew;
+			if (ix >= xst && ix < xnd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.h[i];
+				zbnew = zb[i];
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.h[i] = hnew;
+				zb[i] = zbnew;
+
+
+			}
 		}
-
 	}
 }
 template __global__ void maskbndGPUtop<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
@@ -619,53 +631,58 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ix, iy;
-
-	int isright, istop;
-
-	T zsinside, zsnew, hnew, vnew, unew, zbnew;
-
-	bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
-
-	int ib = XBlock.mask.blks[ibl];
-	//
-	findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
-
-	if (isrighttop | isrightbot)//?
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
 	{
-		isright = 1;
-		istop = 0;
+		int ix, iy;
 
-		ix = XParam.blkwidth;
+		int isright, istop;
 
-		iy = threadIdx.x;
+		T zsinside, zsnew, hnew, vnew, unew, zbnew;
 
-		int yst = isrightbot ? 0 : XParam.blkwidth * 0.5;
-		int ynd = isrighttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
 
-		if(iy>=yst && iy<ynd)
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		if (isrighttop | isrightbot)//?
 		{
-			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-			int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+			isright = 1;
+			istop = 0;
 
-			zsinside = Xev.zs[inside];
-			unew = Xev.u[i];
-			vnew = Xev.v[i];
-			zsnew = Xev.zs[i];
-			hnew = Xev.h[i];
-			zbnew = zb[i];
+			ix = XParam.blkwidth;
 
-			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+			iy = threadIdx.x;
 
-			Xev.u[i] = unew;
-			Xev.v[i] = vnew;
-			Xev.zs[i] = zsnew;
-			Xev.h[i] = hnew;
-			zb[i] = zbnew;
+			int yst = isrightbot ? 0 : XParam.blkwidth * 0.5;
+			int ynd = isrighttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
 
+			if (iy >= yst && iy < ynd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.h[i];
+				zbnew = zb[i];
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.h[i] = hnew;
+				zb[i] = zbnew;
+
+
+			}
 		}
-
 	}
 }
 template __global__ void maskbndGPUright<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
@@ -676,53 +693,58 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ibl = blockIdx.x;
-	int ix, iy;
-
-	int isright, istop;
-
-	T zsinside, zsnew, hnew, vnew, unew, zbnew;
-
-	bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
-
-	int ib = XBlock.mask.blks[ibl];
-	//
-	findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
-	
-	if (isbotright | isbotleft)//?
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
 	{
-		isright = 0;
-		istop = -1;
+		int ix, iy;
 
-		iy = -1;
-		ix = threadIdx.x;
-		int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
-		int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+		int isright, istop;
 
-		if(ix>=xst && ix<xnd)
+		T zsinside, zsnew, hnew, vnew, unew, zbnew;
+
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		if (isbotright | isbotleft)//?
 		{
-			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-			int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+			isright = 0;
+			istop = -1;
 
-			zsinside = Xev.zs[inside];
-			unew = Xev.u[i];
-			vnew = Xev.v[i];
-			zsnew = Xev.zs[i];
-			hnew = Xev.h[i];
-			zbnew = zb[i];
 
-			halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+			iy = -1;
+			ix = threadIdx.x;
+			int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
+			int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
 
-			Xev.u[i] = unew;
-			Xev.v[i] = vnew;
-			Xev.zs[i] = zsnew;
-			Xev.h[i] = hnew;
-			zb[i] = zbnew;
+
+			if (ix >= xst && ix < xnd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+
+				zsinside = Xev.zs[inside];
+				unew = Xev.u[i];
+				vnew = Xev.v[i];
+				zsnew = Xev.zs[i];
+				hnew = Xev.h[i];
+				zbnew = zb[i];
+
+				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+				Xev.u[i] = unew;
+				Xev.v[i] = vnew;
+				Xev.zs[i] = zsnew;
+				Xev.h[i] = hnew;
+				zb[i] = zbnew;
+
+			}
 
 		}
-
 	}
-
 }
 template __global__ void maskbndGPUbot<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUbot<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);

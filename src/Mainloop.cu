@@ -21,9 +21,9 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	{
 		// Bnd stuff here
 		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
-		
 
-		// Calculate Forcing at this step
+
+		// Calculate dynamic forcing at this step
 		updateforcing(XParam, XLoop, XForcing);
 
 		// Core engine
@@ -40,6 +40,9 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 		//log("timestep = " + std::to_string(XLoop.totaltime));
 
+		// Detected if the model crashed
+		CrashDetection(XParam, XLoop, XModel, XModel_g);
+
 		// Apply tsunami deformation if any (this needs to happen after totaltime has been incremented)
 		deformstep(XParam, XLoop, XForcing.deform, XModel, XModel_g);
 
@@ -54,6 +57,9 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 
 		// Reset mean/Max if needed
 		resetmeanmax(XParam, XLoop, XModel, XModel_g);
+
+		
+
 
 		printstatus(XLoop.totaltime, XLoop.dt);
 	}
@@ -177,11 +183,11 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	}
 
 	// GPU stuff
-	if (XParam.GPUDEVICE >= 0)
-	{
+	//if (XParam.GPUDEVICE >= 0)
+	//{
 		//XLoop.blockDim = (16, 16, 1);
 		//XLoop.gridDim = (XParam.nblk, 1, 1);
-	}
+	//}
 
 	//XLoop.hugenegval = std::numeric_limits<T>::min();
 
@@ -191,6 +197,7 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 
 
 	XLoop.dtmax = initdt(XParam, XLoop, XModel);
+	//XLoop.dtmin = XLoop.dtmax;
 
 	return XLoop;
 
@@ -221,7 +228,7 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 {
 	XLoop.nstepout++;
 
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.5) && XParam.outputtimestep > 0.0)
 	{
 		char buffer[256];
 		sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
@@ -460,4 +467,77 @@ template <class T> void printstatus(T totaltime, T dt)
 	std::cout << "\rtotaltime = "<< std::to_string(totaltime) << "   dt = " << std::to_string(dt) << std::flush;
 	std::cout << "\r" << std::flush;
 	//std::cout << std::endl; // all done
+}
+
+template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XModel, Model<T> XModel_g)
+{
+	if ((XLoop.dt < XParam.dtmin) && (XLoop.totaltime < XParam.endtime))
+	{
+		// stop the model
+		XParam.endtime = XLoop.totaltime;
+		XLoop.nextoutputtime = XLoop.totaltime;
+
+		log(" \n ");
+		log("\t\tModel CRASHED: time steps (" + std::to_string(XLoop.dt) + ") inferior to " + std::to_string(XParam.dtmin) + "\n");
+
+		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho", "vo", "uo", "zso" };
+		std::vector<std::string> outvold = XParam.outvars;
+		if (XParam.GPUDEVICE >= 0)
+		{
+			for (int ivar = 0; ivar < outvi.size(); ivar++)
+			{
+				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[outvi[ivar]], XModel_g.OutputVarMap[outvi[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+			}
+		}
+		std::vector<std::string> extvec = split(XModel.blocks.outZone[0].outname, '.');
+		std::string newname, oldname;
+
+		oldname = XParam.outfile;
+
+		newname = extvec[0];
+		for (int nstin = 1; nstin < extvec.size() - 1; nstin++)
+		{
+			// This is in case there are "." in the file name that do not relate to the file extension"
+			newname = newname + "." + extvec[nstin];
+		}
+		newname = newname + "_CrashReport.nc";
+
+		//XParam.outfile = newname;
+		XParam.outvars = outvi;
+
+
+		outzoneB XzoneB;
+		std::vector<int> blksall;
+		//Define the full domain as a zone
+		XzoneB.outname = newname; //.assign(XParam.outfile);
+		XzoneB.xo = XParam.xo;
+		XzoneB.yo = XParam.yo;
+		XzoneB.xmax = XParam.xmax;
+		XzoneB.ymax = XParam.ymax;
+		XzoneB.nblk = XParam.nblk;
+		XzoneB.maxlevel = XParam.maxlevel;
+		XzoneB.minlevel = XParam.minlevel;
+		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
+		int I = 0;
+		for (int ib = 0; ib < XParam.nblk; ib++)
+		{
+			XzoneB.blk[ib] = XModel.blocks.active[ib];
+		}
+		//InitSave2Netcdf(XParam, XModel);
+		creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XzoneB);
+		writenctimestep(XzoneB.outname, XParam.totaltime);
+		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+		{
+			defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], 3, XModel.OutputVarMap[XParam.outvars[ivar]], XzoneB);
+		}
+		XParam.outvars = outvold;
+		//XParam.outfile = oldname;
+
+
+
+	}
+	//double weight = 0.25;
+	//log("\t\tdt=" + std::to_string(XLoop.dt) + ", dtmin=" + std::to_string(XLoop.dtmin) + "\n");
+	//XLoop.dtmin = weight * XLoop.dt + (1 - weight) * XLoop.dtmin;
+
 }

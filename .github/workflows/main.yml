@@ -23,7 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Runs a single command using the runners shell
       #- name: Launch of BG_Flood tests
@@ -82,3 +82,16 @@ jobs:
         run: |
           sed -i 's/test = 8/test = 9/' BG_param.txt
           ./BG_Flood
+      - name: running test 10, Test on infiltration
+        run: |
+          sed -i 's/test = 9/test = 10/' BG_param.txt
+          ./BG_Flood
+
+      - name: running test 11, Test on Wet/dry instability
+        run: |
+          sed -i 's/test = 10/test = 11/' BG_param.txt
+          ./BG_Flood
+          
+
+     
+

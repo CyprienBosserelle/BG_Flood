@@ -134,7 +134,8 @@ Param readparamstr(std::string line, Param param)
 	///////////////////////////////////////////////////////
 	// General parameters
 	//
-
+	std::vector<std::string> truestr = { "1","true","yes", "on" };
+	std::vector<std::string> falsestr = { "-1","false","no","off" };
 
 	parameterstr = "test";
 	parametervalue = findparameter(parameterstr, line);
@@ -216,14 +217,33 @@ Param readparamstr(std::string line, Param param)
 	{
 
 		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
-		if (case_insensitive_compare(parametervalue, std::string("True")) == 0)
+		if (case_insensitive_compare(parametervalue, truestr) == 0)
 		{
 			param.conserveElevation = true;
 		}
 		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
-		else if (case_insensitive_compare(parametervalue, std::string("false")) == 0)
+		else if (case_insensitive_compare(parametervalue, falsestr) == 0)
 		{
 			param.conserveElevation = false;
+		}
+
+
+	}
+
+	paramvec = { "wetdryfix","reminstab" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+
+		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
+		if (case_insensitive_compare(parametervalue, truestr) == 0)
+		{
+			param.wetdryfix = true;
+		}
+		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
+		else if (case_insensitive_compare(parametervalue, falsestr) == 0)
+		{
+			param.wetdryfix = false;
 		}
 
 
@@ -300,6 +320,14 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.dt = std::stod(parametervalue);
+
+	}
+
+	parameterstr = "dtmin";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.dtmin = std::stod(parametervalue);
 
 	}
 
@@ -400,7 +428,9 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy"};
+
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl", "hgw"};
+
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -643,6 +673,20 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.zsoffset = std::stod(parametervalue);
 	}
+	paramvec = {"rainbnd", "rainonbnd"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (case_insensitive_compare(parametervalue, truestr) == 0)
+		{
+			param.rainbnd = true;
+		}
+		if (case_insensitive_compare(parametervalue, falsestr) == 0)
+		{
+			param.rainbnd = false;
+		}
+	}
+		
 
 	parameterstr = "hotstartfile";
 	parametervalue = findparameter(parameterstr, line);
@@ -829,6 +873,34 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}
 
+	//Tsunami deformation input files
+	parameterstr = "cavity";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		deformmap<float> thisdeform;
+
+		thisdeform.iscavity = true;
+		std::vector<std::string> items = split(parametervalue, ',');
+		//Need sanity check here
+		thisdeform = readfileinfo(items[0], thisdeform);
+		//thisdeform.inputfile = items[0];
+		if (items.size() > 1)
+		{
+			thisdeform.startime = std::stod(items[1]);
+
+		}
+		if (items.size() > 2)
+		{
+			thisdeform.duration = std::stod(items[2]);
+
+		}
+
+		forcing.deform.push_back(thisdeform);
+
+	}
+
 	//River
 	paramvec = { "rivers","river" };
 	parametervalue = findparameter(paramvec, line);
@@ -857,7 +929,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// friction coefficient (mapped or constant)
-	// if it is a constant no-need to do anyjting below but if it is a file it overides any other values 
+	// if it is a constant no-need to do anything below but if it is a file it overwrites any other value
 	paramvec = { "cf","roughness","cfmap"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
@@ -865,6 +937,26 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		if (std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.cf = readfileinfo(parametervalue, forcing.cf);
+		}
+	}
+
+	// Rain losses, initial and continuous loss
+	paramvec = { "il","Rain_il","initialloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::isdigit(parametervalue[0]) == false)
+		{
+			forcing.il = readfileinfo(parametervalue, forcing.il);
+		}
+	}
+	paramvec = { "cl","Rain_cl","continuousloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::isdigit(parametervalue[0]) == false)
+		{
+			forcing.cl = readfileinfo(parametervalue, forcing.cl);
 		}
 	}
 
@@ -964,7 +1056,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 * Check the Sanity of both Param and Forcing class
 * If required some parameter are infered 
 */
-void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
+void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 {
 	Param DefaultParams;
 
@@ -1000,21 +1092,21 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	//inputmap Bathymetry;
 	//Bathymetry.inputfile = XForcing.Bathy.inputfile;
 	//XForcing.Bathy = readforcinghead(XForcing.Bathy);
-	
+
 
 
 	if (std::isnan(XParam.xo))
-		XParam.xo = XForcing.Bathy[0].xo-(0.5* XForcing.Bathy[0].dx);
+		XParam.xo = XForcing.Bathy[0].xo - (0.5 * XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.xmax))
 		XParam.xmax = XForcing.Bathy[0].xmax + (0.5 * XForcing.Bathy[0].dx);
-	if(std::isnan(XParam.yo))
+	if (std::isnan(XParam.yo))
 		XParam.yo = XForcing.Bathy[0].yo - (0.5 * XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.ymax))
 		XParam.ymax = XForcing.Bathy[0].ymax + (0.5 * XForcing.Bathy[0].dx);
 
 	if (std::isnan(XParam.dx))
 		XParam.dx = XForcing.Bathy[0].dx;
-	
+
 	if (std::isnan(XParam.grdalpha))
 		XParam.grdalpha = XForcing.Bathy[0].grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
 
@@ -1050,26 +1142,28 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
 
 	log("\nAdjusted model domain (xo/xmax/yo/ymax): ");
-	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax) );
-	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx) );
+	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax));
+	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx));
 
 	if (XParam.spherical < 1)
 	{
 		XParam.delta = XParam.dx;
-		XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+		XParam.grdalpha = XParam.grdalpha * pi / 180.0; // grid rotation
 
 	}
 	else
 	{
 		//Geo grid
-		XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+
+		XParam.delta = XParam.dx * XParam.Radius * pi / 180.0;
 		XParam.engine = 2;
+
 		//printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
 		log("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
 		if (XParam.grdalpha != 0.0)
 		{
 			//printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
-			log("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+			log("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha * 180.0 / pi));
 		}
 	}
 
@@ -1107,9 +1201,9 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	// Check whether endtime was specified by the user
 	//No; i.e. endtimne =0.0
 	//so the following conditions are useless
-	
-	
-	
+
+
+
 	if (abs(XParam.endtime - DefaultParams.endtime) <= tiny)
 	{
 		//No; i.e. endtimne =0.0
@@ -1117,11 +1211,11 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	}
 
 	XParam.endtime = setendtime(XParam, XForcing);
-	
-		
-	
-	
-	
+
+
+
+
+
 
 
 
@@ -1133,17 +1227,22 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 		XParam.outputtimestep = XParam.endtime;
 		//otherwise there is really no point running the model
 	}
+	if (XParam.outputtimestep > XParam.endtime)
+	{
+		XParam.outputtimestep = XParam.endtime;
+		//otherwise, no final output
+	}
 
-	
+
 
 	if (XParam.outvars.empty() && XParam.outputtimestep > 0.0)
 	{
 		//a nc file was specified but no output variable were specified
-		std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h" }; 
+		std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h" };
 		for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 		{
 			XParam.outvars.push_back(SupportedVarNames[isup]);
-				
+
 		}
 
 	}
@@ -1168,7 +1267,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			
+
 			log("Using Device: " + std::string(prop.name));
 		}
 		else
@@ -1188,7 +1287,54 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 			XParam.Adapt_arg2 = "h";
 		}
 	}
-	
+
+	//Check that we have both initial loss and continuous loss if one is given
+	if (!XForcing.il.inputfile.empty())
+	{
+		if (XForcing.cl.inputfile.empty())
+		{
+			log("Error: File identified for initial loss but no data entered for continuous loss.\n Please, enter a ");
+		}
+	}
+	if (!XForcing.cl.inputfile.empty())
+	{
+		if (XForcing.il.inputfile.empty())
+		{
+			log("Error: File identified for continuous loss but no data entered for initial loss");
+		}
+	}
+
+	//Check that the Initial Loss/ Continuing Loss model is used if il, cl or hgw output are asked by user.
+	if (XForcing.il.inputfile.empty() || XForcing.cl.inputfile.empty())
+	{
+		std::vector<std::string> namestr = { "il","cl","hgw"};
+		for (int ii = 0; ii < namestr.size(); ii++)
+		{
+			std::vector<std::string>::iterator itr = std::find(XParam.outvars.begin(), XParam.outvars.end(), namestr[ii]);
+			if (itr != XParam.outvars.end()) 
+			{
+				log("The output variable associated to the ILCL model \"" + namestr[ii] + "\" is requested but the model is not used. The variable is removed from the outputs.");
+				XParam.outvars.erase(itr);
+			}
+		}
+	}
+
+	//Check that the atmospheric forcing is used if datmpdx, datmpdy output are asked by user.
+	if (XForcing.Atmp.inputfile.empty())
+	{
+		std::vector<std::string> namestr = { "datmpdx", "datmpdy" };
+		for (int ii = 0; ii < namestr.size(); ii++)
+		{
+			std::vector<std::string>::iterator itr = std::find(XParam.outvars.begin(), XParam.outvars.end(), namestr[ii]);
+			if (itr != XParam.outvars.end())
+			{
+				log("The output variable associated to the atmosheric forcing \"" + namestr[ii] + "\" is requested but the model is not used. The variable is removed from the outputs.");
+				XParam.outvars.erase(itr);
+			}
+		}
+
+	}
+
 }
 
 /*! \fn double setendtime(Param XParam,Forcing<float> XForcing)
@@ -1197,7 +1343,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 */
 double setendtime(Param XParam,Forcing<float> XForcing)
 {
-	//endtime cannot be bigger thn the smallest time set in a boundary
+	//endtime cannot be bigger than the smallest time set in a boundary
 	SLTS tempSLTS;
 	double endtime = XParam.endtime;
 	if (XForcing.left.on)
@@ -1220,6 +1366,11 @@ double setendtime(Param XParam,Forcing<float> XForcing)
 	{
 		tempSLTS = XForcing.bot.data.back();
 		endtime = utils::min(endtime, tempSLTS.time);
+	}
+
+	if (endtime < XParam.endtime)
+	{
+		log("\nWARNING: Boundary definition too short, endtime of the simulation reduced to : " + std::to_string(endtime));
 	}
 
 	return endtime;
@@ -1329,6 +1480,21 @@ std::size_t case_insensitive_compare(std::string s1, std::string s2)
 	std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
 //if (s1.compare(s2) == 0)
 	return s1.compare(s2);
+}
+
+std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> vecstr)
+{
+	std::size_t found;
+	//Convert s1 and s2 to lower case strings
+	for (int ii = 0; ii < vecstr.size(); ii++)
+	{
+		found = case_insensitive_compare(s1, vecstr[ii]);// it needs to strictly compare
+		if (found == 0)
+		{
+			break;
+		}
+	}
+	return found;
 }
 
 bndparam readbndline(std::string parametervalue)

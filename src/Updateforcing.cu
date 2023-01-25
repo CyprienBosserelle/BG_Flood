@@ -406,6 +406,90 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 template __host__ void AddrainforcingImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __host__ void AddrainforcingImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
+template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* hgw)
+{
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+	int p = 0;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+				T waterOut = XEv.h[i];
+				T infiltrationLoc = 0.0;
+				T availinitialinfiltration;
+
+				if (waterOut > 0)
+				{
+					//Computation of the initial loss
+					availinitialinfiltration = il[i] / T(1000.0) - hgw[i];
+					infiltrationLoc = min(waterOut, availinitialinfiltration);
+					waterOut -= infiltrationLoc;
+
+					//Computation of the continuous loss
+					T continuousloss = cl[i] / T(1000.0) / T(3600.0) * T(XLoop.dt); //convert from mm/hs to m/s
+					infiltrationLoc += min(continuousloss, waterOut);
+
+					hgw[i] += infiltrationLoc;
+
+				}
+
+				XEv.h[i] -= max(infiltrationLoc * XBlock.activeCell[i],T(0.0));
+				XEv.zs[i] -= max(infiltrationLoc * XBlock.activeCell[i],T(0.0));
+			}
+		}
+	}
+}
+template __host__ void AddinfiltrationImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, float* il, float* cl, EvolvingP<float> XEv, float* hgw);
+template __host__ void AddinfiltrationImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* hgw);
+
+template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* hgw)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T waterOut = XEv.h[i];
+	T infiltrationLoc = 0.0;
+	T availinitialinfiltration;
+
+	if (waterOut > 0)
+	{
+		//Computation of the initial loss
+		availinitialinfiltration = max(il[i] / T(1000.0) - hgw[i],T(0.0));
+		infiltrationLoc = min(waterOut, availinitialinfiltration);
+		waterOut -= infiltrationLoc;
+
+		//Computation of the continuous loss
+		T continuousloss = cl[i] / T(1000.0) / T(3600.0) * T(XLoop.dt); //convert from mm/hs to m
+		infiltrationLoc += min(continuousloss, waterOut);
+	}
+
+	hgw[i] += infiltrationLoc;
+
+	XEv.h[i] -= infiltrationLoc * XBlock.activeCell[i];
+	XEv.zs[i] -= infiltrationLoc * XBlock.activeCell[i];
+
+}
+template __global__ void AddinfiltrationImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, float* il, float* cl, EvolvingP<float> XEv, float* hgw);
+template __global__ void AddinfiltrationImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* hgw);
+
+
+
 template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -643,14 +727,22 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 	for (int nd = 0; nd < deform.size(); nd++)
 	{
-		// This should be: st >= tt-dt && st < tt here tt is at the end of the flow step rather then at the start
-		// ((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime)
-		// how to account for round-off error? 
+		// if deformation happend in the last computational step
 		if (((deform[nd].startime + deform[nd].duration) >= (XLoop.totaltime - XLoop.dt)) && (deform[nd].startime < XLoop.totaltime))
 		{
+			
 			updatezbhalo = true;
 
-			T scale = (deform[nd].duration > 0.0) ? T(1.0 / deform[nd].duration * (XLoop.totaltime - deform[nd].startime)) : T(1.0);
+			T dtdef = min(XLoop.dt, XLoop.totaltime - deform[nd].startime);
+			if (XLoop.totaltime > deform[nd].startime + deform[nd].duration)
+			{
+				dtdef = min(XLoop.dt, XLoop.totaltime - (deform[nd].startime + deform[nd].duration));
+			}
+				
+
+			T scale = (deform[nd].duration > 0.0) ? T(1.0 / deform[nd].duration * dtdef) : T(1.0);
+
+			//log("Applying deform: " + std::to_string(scale));
 
 			if (XParam.GPUDEVICE < 0)
 			{
@@ -695,6 +787,7 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 	unsigned int ib = XBlock.active[ibl];
 	int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
 
+	T zss, zbb;
 	T def;
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
@@ -703,8 +796,26 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 
 	def= interpDyn2BUQ(x, y, defmap.GPU);
 
-	zs[i] = zs[i] + def * scale;
-	zb[i] = zb[i] + def * scale;
+	//if (x > 42000 && x < 43000 && y>7719000 && y < 7721000)
+	//{
+	//	printf("x=%f, y=%f, def=%f\n ", x, y, def);
+	//}
+
+	zss = zs[i] + def * scale;
+	if (defmap.iscavity == true)
+	{
+		zbb = min(zss, zb[i]);
+	}
+	else
+	{
+		zbb = zb[i] + def * scale;
+	}
+
+	zs[i] = zss;
+	zb[i] = zbb;
+
+	//zs[i] = zs[i] + def * scale;
+	//zb[i] = zb[i] + def * scale;
 
 
 
@@ -714,7 +825,7 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 {
 	int ib;
 	
-	
+	T zbb,zss;
 
 	T def;
 
@@ -735,8 +846,18 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 
 				def = interp2BUQ(x, y, defmap);
 
-				zs[i] = zs[i] + def * scale;
-				zb[i] = zb[i] + def * scale;
+				zss = zs[i] + def * scale;
+				if (defmap.iscavity == true)
+				{
+					zbb = min(zss, zb[i]);
+				}
+				else
+				{
+					zbb = zb[i] + def * scale;
+				}
+
+				zs[i] = zss;
+				zb[i] = zbb;
 			}
 		}
 	}

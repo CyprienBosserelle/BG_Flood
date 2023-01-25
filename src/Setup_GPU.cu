@@ -85,7 +85,9 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 
 		Initmaparray(XModel_g);
 
-		InitzbgradientGPU(XParam, XModel_g);
+		//InitzbgradientGPU(XParam, XModel_g);
+		
+
 	}
 }
 template void SetupGPU<float>(Param &XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);
@@ -174,8 +176,8 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	CopytoGPU(nblk, blksize, XModel_cpu.cf, XModel_gpu.cf);
 
-	CopytoGPU(nblk, blksize, XModel_cpu.zb, XModel_gpu.zb);
-
+	CopytoGPU(nblk, blksize, XModel_cpu.grad.dzbdx, XModel_gpu.grad.dzbdx);
+	CopytoGPU(nblk, blksize, XModel_cpu.grad.dzbdy, XModel_gpu.grad.dzbdy);
 	
 
 	//Block info
@@ -198,6 +200,13 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.RightBot, XModel_gpu.blocks.RightBot);
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.RightTop, XModel_gpu.blocks.RightTop);
 	
+
+	if (XParam.infiltration)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.il, XModel_gpu.il);
+		CopytoGPU(nblk, blksize, XModel_cpu.cl, XModel_gpu.cl);
+		CopytoGPU(nblk, blksize, XModel_cpu.hgw, XModel_gpu.hgw);
+	}
 
 	if (XParam.outmax)
 	{
