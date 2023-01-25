@@ -21,6 +21,7 @@ jobs:
       with:
           doxyfile-path: ./Doxygenfile
           working-directory: .
+          enable-latex: true
     
     # Deploy the HTML documentation to GitHub Pages
     - name: GH Pages Deployment
