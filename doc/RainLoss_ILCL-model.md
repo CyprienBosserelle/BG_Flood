@@ -33,7 +33,7 @@ $$hgw_{t}=hgw_{t-1} + ha_{t}$$
 
 The following figure shows a representation of the initial loss - continuing loss model with $il = 10 mm$ and $cl = 1 mm/s$ :
 
-![Initial loss and continuing loss reprensentation during a cell-wetting event](./RainLosses2.png)
+![Initial loss and continuing loss reprensentation during a cell-wetting event](RainLosses.png)
 
 *Initial loss and continuing loss reprensentation during a cell-wetting event*
 
@@ -45,7 +45,7 @@ The following figure shows a representation of the initial loss - continuing los
 ```
 ## Testcase for the ILCL model
 The ILCL model is tested in the Westport (ANZ) area, on the Orowaiti river (with a uniform 5m grid). A 20mm/hr rain is uniformly applied on the domain during 30 minutes. An initial loss of 5mm and an continuous loss of 5mm/h are used to define infiltration uniformly on the domain. The results, compared to a reference case without infiltration, are presented in the following figure.
-![Model_test](./Ex_Merge.png)
+![Model_test](Ex_Merge.png)
 
 ## Reference values
 Some reference values for the $il$ and $cl$ coefficients can be found in the literature. Some relate to entire subcatchment and are estimated from hydrology, other can be defined using local information (type of soil, rain antecedents, soil layer depth, ...). Whatever you select, be mindfull the model is likely to be very sensitive to rainfall loss.
@@ -80,7 +80,7 @@ Below is the ARR 2016 Rainfall Loss Parameters for Urban area, depending of the 
 
 Below is an other example of compilation of some of these values from [https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model](https://help.innovyze.com/display/xprafts/Initial+and+Continuing+Loss+Model).
 
-![ILCL-table](./ILCL-values.png)
+![ILCL-table](ILCL-values.png)
 
 
 
