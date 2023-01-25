@@ -426,6 +426,10 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["dzsdy"] = XModel.grad.dzsdy;
 
+	XModel.OutputVarMap["dzbdx"] = XModel.grad.dzbdx;
+
+	XModel.OutputVarMap["dzbdy"] = XModel.grad.dzbdy;
+
 	//Flux
 	XModel.OutputVarMap["Fhu"] = XModel.flux.Fhu;
 

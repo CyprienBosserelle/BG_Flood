@@ -86,3 +86,12 @@ jobs:
         run: |
           sed -i 's/test = 9/test = 10/' BG_param.txt
           ./BG_Flood
+
+      - name: running test 11, Test on Wet/dry instability
+        run: |
+          sed -i 's/test = 10/test = 11/' BG_param.txt
+          ./BG_Flood
+          
+
+     
+

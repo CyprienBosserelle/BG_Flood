@@ -134,7 +134,8 @@ Param readparamstr(std::string line, Param param)
 	///////////////////////////////////////////////////////
 	// General parameters
 	//
-
+	std::vector<std::string> truestr = { "1","true","yes", "on" };
+	std::vector<std::string> falsestr = { "-1","false","no","off" };
 
 	parameterstr = "test";
 	parametervalue = findparameter(parameterstr, line);
@@ -216,14 +217,33 @@ Param readparamstr(std::string line, Param param)
 	{
 
 		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
-		if (case_insensitive_compare(parametervalue, std::string("True")) == 0)
+		if (case_insensitive_compare(parametervalue, truestr) == 0)
 		{
 			param.conserveElevation = true;
 		}
 		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
-		else if (case_insensitive_compare(parametervalue, std::string("false")) == 0)
+		else if (case_insensitive_compare(parametervalue, falsestr) == 0)
 		{
 			param.conserveElevation = false;
+		}
+
+
+	}
+
+	paramvec = { "wetdryfix","reminstab" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+
+		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
+		if (case_insensitive_compare(parametervalue, truestr) == 0)
+		{
+			param.wetdryfix = true;
+		}
+		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
+		else if (case_insensitive_compare(parametervalue, falsestr) == 0)
+		{
+			param.wetdryfix = false;
 		}
 
 
@@ -408,7 +428,9 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl", "hgw"};
+
+			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl", "hgw"};
+
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
@@ -651,6 +673,20 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.zsoffset = std::stod(parametervalue);
 	}
+	paramvec = {"rainbnd", "rainonbnd"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (case_insensitive_compare(parametervalue, truestr) == 0)
+		{
+			param.rainbnd = true;
+		}
+		if (case_insensitive_compare(parametervalue, falsestr) == 0)
+		{
+			param.rainbnd = false;
+		}
+	}
+		
 
 	parameterstr = "hotstartfile";
 	parametervalue = findparameter(parameterstr, line);
@@ -1441,6 +1477,21 @@ std::size_t case_insensitive_compare(std::string s1, std::string s2)
 	std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
 //if (s1.compare(s2) == 0)
 	return s1.compare(s2);
+}
+
+std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> vecstr)
+{
+	std::size_t found;
+	//Convert s1 and s2 to lower case strings
+	for (int ii = 0; ii < vecstr.size(); ii++)
+	{
+		found = case_insensitive_compare(s1, vecstr[ii]);// it needs to strictly compare
+		if (found == 0)
+		{
+			break;
+		}
+	}
+	return found;
 }
 
 bndparam readbndline(std::string parametervalue)

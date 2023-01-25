@@ -27,7 +27,8 @@ public:
 	bool rainforcing = false;
 	bool infiltration = false;
 
-	bool conserveElevation = false; //Switch to force the conservation of h
+	bool conserveElevation = false; //Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks
+	bool wetdryfix = true; // Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)
 
 	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
