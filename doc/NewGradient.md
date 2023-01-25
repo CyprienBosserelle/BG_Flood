@@ -24,11 +24,12 @@ otherwise:
 ### Prolongation
 Prolongation is the action of extending a value from a coarse cell to a finer cell. Often this is done by using the gradient value. 
 e.g.:
-$$child = parent + Gradient*dx*0.5$$
+
+$$HaloB = A + Gradient(A) * dx * 0.5$$
 
 ### Restriction
 Restriction is where we calculate the value of a coarse cell from values of fine cells. This is usually done with cell average.
-$$parent = 0.25*(child1+child2+child3+child4)$$
+$$HaloA = 0.25*(B1+B2+B3+B4)$$
 
 
 ## Filling the Halo: The chicken and the egg.
