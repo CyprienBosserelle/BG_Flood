@@ -17,8 +17,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
-|conserveElevation|conserveElevation| false|Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks|
-|wetdryfix| wetdryfix , reminstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
+|conserveElevation|conserveElevation| false|Switch to force the conservation of h|
 |Pa2m|Pa2m| 0.00009916|Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)|
 |Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
@@ -86,7 +85,6 @@ BG_flood user interface consists in a text file, associating key words to user c
 |vtk_output_time_interval|vtk_output_time_interval| 1.0|Output time step for ParaView Catalyst|
 |vtk_outputfile_root|vtk_outputfile_root| "bg_out"|output file name for ParaView Catalyst|
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
-|rainbnd| rainbnd , rainonbnd | false|when false it force the rain foring on the bnd cells to be null.|
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
 ---
 
