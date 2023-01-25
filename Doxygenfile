@@ -1069,7 +1069,19 @@ HTML_EXTRA_STYLESHEET  =
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_EXTRA_FILES       = doc/css/doxygen-awesome.css \
-                         doc/css/doxygen-awesome-sidebar-only.css
+                         doc/css/doxygen-custom/custom.css \
+                         doc/css/doxygen-awesome-sidebar-only.css \
+                         doc/css/doxygen-awesome-sidebar-only-darkmode-toggle.css \
+                         doc/css/doxygen-custom/custom-alternative.css
+						 
+HTML_EXTRA_FILES       = doc/css/doxygen-awesome-darkmode-toggle.js \
+                         doc/css/doxygen-awesome-fragment-copy-button.js \
+                         doc/css/doxygen-awesome-paragraph-link.js \
+                         doc/css/doxygen-custom/toggle-alternative-theme.js \
+                         doc/css/doxygen-awesome-interactive-toc.js
+						 
+						 
+HTML_COLORSTYLE        = LIGHT
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the stylesheet and background images according to
@@ -1080,7 +1092,7 @@ HTML_EXTRA_FILES       = doc/css/doxygen-awesome.css \
 # Minimum value: 0, maximum value: 359, default value: 220.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_HUE    = 209
 
 # The HTML_COLORSTYLE_SAT tag controls the purity (or saturation) of the colors
 # in the HTML output. For a value of 0 the output will use grayscales only. A
@@ -1088,7 +1100,7 @@ HTML_COLORSTYLE_HUE    = 220
 # Minimum value: 0, maximum value: 255, default value: 100.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_SAT    = 255
 
 # The HTML_COLORSTYLE_GAMMA tag controls the gamma correction applied to the
 # luminance component of the colors in the HTML output. Values below 100
