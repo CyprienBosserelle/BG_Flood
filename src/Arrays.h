@@ -205,6 +205,8 @@ struct Loop
 	double dt;
 	double dtmax;
 	double totaltime;
+	
+
 	// Needed to average mean varable for output
 	int nstep = 0;
 	//useful for calculating avg timestep
