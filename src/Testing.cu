@@ -700,7 +700,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
-		delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+		delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -751,7 +751,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 			{
 				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 				int ib = XModel.blocks.active[ibl];
-				delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+				delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 				for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -969,7 +969,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
-		delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+		delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -1021,7 +1021,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 			{
 				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 				int ib = XModel.blocks.active[ibl];
-				delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+				delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 				for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -1225,15 +1225,15 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//GPU gradients
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
@@ -1780,7 +1780,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -1801,7 +1801,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2146,7 +2146,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2167,7 +2167,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2356,7 +2356,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 	int ileft = memloc(XParam.halowidth, XParam.blkmemwidth, ix - 1, iy, ib);
 
 	int lev = XModel.blocks.level[ib];
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
@@ -2504,7 +2504,7 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 	int ileft = memloc(XParam.halowidth, XParam.blkmemwidth, ix - 1, iy, ib);
 
 	int lev = XModel.blocks.level[ib];
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
@@ -2717,7 +2717,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2738,7 +2738,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2853,6 +2853,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XParam.yo = 0;
 	XParam.ymax = 0.196;
 	XParam.dx=(XParam.ymax - XParam.yo) / (1 << 1);
+	XParam.delta = XParam.dx;
 	double Xmax_exp = 28.0; //minimum Xmax position (adjust to have a "full blocks" config)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
@@ -3194,7 +3195,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 			//Calculation of the flux at the bottom of the slope (x=24m)
 			ib = XModel.blocks.active[bl];
-			delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+			delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 			for (int iy = 0; iy < XParam.blkwidth; iy++)
 			{

@@ -103,6 +103,7 @@ void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 	//write_text_to_log_file("nx = " + std::to_string(XParam.nx) + ";");
 	//write_text_to_log_file("ny = " + std::to_string(XParam.ny) + ";");
 	write_text_to_log_file("dx = " + std::to_string(XParam.dx) + ";");
+	write_text_to_log_file("delta = " + std::to_string(XParam.delta) + ";");
 	write_text_to_log_file("grdalpha = " + std::to_string(XParam.grdalpha*180.0 / pi) + ";");
 	write_text_to_log_file("xo = " + std::to_string(XParam.xo) + ";");
 	write_text_to_log_file("yo = " + std::to_string(XParam.yo) + ";");

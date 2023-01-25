@@ -41,7 +41,7 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
@@ -222,7 +222,7 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(T(XParam.dx), lev);
+		delta = calcres(T(XParam.delta), lev);
 
 		// neighbours for source term
 
@@ -420,7 +420,7 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
@@ -613,7 +613,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 		lev = XBlock.level[ib];
 
-		delta = calcres(T(XParam.dx), lev);
+		delta = calcres(T(XParam.delta), lev);
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{

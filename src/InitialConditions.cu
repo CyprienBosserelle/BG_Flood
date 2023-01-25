@@ -128,14 +128,14 @@ template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
 
 	cudaStreamDestroy(streams[0]);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
@@ -262,7 +262,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		//
 		double xl, yb, xr, yt ;
 		int ib;
-		double levdx;
+		double levdx, levdelta;
 		double dischargeArea;
 		log("\tInitializing rivers");
 		//For each rivers
@@ -275,6 +275,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			{
 				ib = XModel.blocks.active[ibl];
 				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+				levdelta = calcres(XParam.delta, XModel.blocks.level[ib]);
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
 					for (int i = 0; i < XParam.blkwidth; i++)
@@ -297,7 +298,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 							idis.push_back(i);
 							jdis.push_back(j);
 							blockdis.push_back(ib);
-							dischargeArea = dischargeArea + levdx * levdx;
+							dischargeArea = dischargeArea + levdelta * levdelta;
 						}
 					}
 				}

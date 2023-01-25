@@ -100,7 +100,7 @@ template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<
 		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
 		cudaStreamDestroy(XLoop.streams[0]);
 
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
@@ -397,7 +397,7 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 	{
 		// WARNING here we specify at least an initial time step if there was 10.0m of water at the highest resolution cell.
 		// The modle will recalculate the optimal dt in subsequent step;
-		XLoop.dtmax = calcres(XParam.dx, XParam.maxlevel) / (sqrt(XParam.g * 10.0));
+		XLoop.dtmax = calcres(XParam.delta, XParam.maxlevel) / (sqrt(XParam.g * 10.0));
 	}
 
 	//BlockP<T> XBlock = XModel.blocks;
@@ -430,7 +430,7 @@ template <class T> __host__ void CalcInitdtCPU(Param XParam, BlockP<T> XBlock, E
 	{
 		ib = XBlock.active[ibl];
 
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		delta = calcres(T(XParam.delta), XBlock.level[ib]);
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -455,7 +455,7 @@ template <class T> __global__ void CalcInitdtGPU(Param XParam, BlockP<T> XBlock,
 	unsigned int ib = XBlock.active[ibl];
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	T delta = calcres(XParam.dx, XBlock.level[ib]);
+	T delta = calcres(XParam.delta, XBlock.level[ib]);
 
 	dtmax[i] = delta / sqrt(XParam.g * max(XEvolv.h[i],T(XParam.eps)));
 }

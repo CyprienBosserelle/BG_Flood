@@ -142,14 +142,38 @@ template double BarycentricInterpolation(double q1, double x1, double y1, double
 
 
 template <class T>
-__host__ __device__ T calcres(T dx, int level)
+__host__ __device__ T calcresold(T dx, int level)
 {
 	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
 	//should be 1<< -level
 }
+template __host__ __device__ double calcresold<double>(double dx, int level);
+template __host__ __device__ float calcresold<float>(float dx, int level);
 
+template <class T>
+__host__ __device__ T calcres(T dx, int level)
+{
+	return  dx / (1 << level);
+	//should be 1<< -level
+}
 template __host__ __device__ double calcres<double>(double dx, int level);
 template __host__ __device__ float calcres<float>(float dx, int level);
+
+template <class T>
+__host__ __device__ T calcres(Param XParam, T dx, int level)
+{
+	T ddx = dx * (1 << level); // here use dx as the cue for the compiler to use the float or double version of this function
+	
+	if (XParam.spherical)
+	{
+		ddx = ddx * XParam.Radius * pi / T(180.0);
+	}
+		
+	return ddx;
+	//should be 1<< -level
+}
+template __host__ __device__ double calcres<double>(Param XParam, double dx, int level);
+template __host__ __device__ float calcres<float>(Param XParam, float dx, int level);
 
 template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2)
 {
