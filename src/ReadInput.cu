@@ -303,6 +303,14 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	parameterstr = "dtmin";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.dtmin = std::stod(parametervalue);
+
+	}
+
 	parameterstr = "CFL";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
