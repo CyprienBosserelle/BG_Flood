@@ -3722,7 +3722,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startA, NULL);
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3745,7 +3745,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startB, NULL);
-	gradientSM << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientSM << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3768,7 +3768,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startC, NULL);
-	gradientSMC << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientSMC << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
