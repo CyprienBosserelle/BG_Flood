@@ -2,7 +2,7 @@ Test MAIN PAGE:
 
 ### Test MD
 
-Test Latex: $$toot$$
+Test Latex: \f{$$toot$$}
 
 Test picture:
 
