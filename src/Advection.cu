@@ -116,14 +116,7 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 	XAdv.dhu[i] += hi * (ga * hi * dmdl + fG * vvi);// This term is == 0 so should be commented here
 	XAdv.dhv[i] += hi * (ga * hi * dmdt - fG * uui);// Need double checking before doing that
 
-	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
-	{
-		if (iy == XParam.blkwidth - 1)
-		{
-			printf("XAdv.dh[i]=%e, XAdv.dhv[i]=%e, XAdv.dhv[i]=%e, dmdt=%e \n", XAdv.dh[i], XAdv.dhv[i], XAdv.dhu[i], dmdt);
-		}
-
-	}
+	
 	
 }
 template __global__ void updateEVGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, FluxP<float> XFlux, AdvanceP<float> XAdv);
