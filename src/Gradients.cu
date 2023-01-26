@@ -3110,7 +3110,7 @@ template <class T> __global__ void gradientHaloLeftGPUnew(Param XParam, BlockP<T
 
 
 
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		delta = calcres(T(XParam.delta), XBlock.level[ib]);
 
 
 		if (XBlock.LeftBot[ib] == ib)//The lower half is a boundary 
@@ -3387,7 +3387,7 @@ template <class T> __global__ void gradientHaloRightGPUnew(Param XParam, BlockP<
 
 
 
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		delta = calcres(T(XParam.delta), XBlock.level[ib]);
 
 
 		if (XBlock.RightBot[ib] == ib)//The lower half is a boundary 
@@ -3672,7 +3672,7 @@ template <class T> __global__ void gradientHaloBotGPUnew(Param XParam, BlockP<T>
 
 
 
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		delta = calcres(T(XParam.delta), XBlock.level[ib]);
 
 
 		if (XBlock.BotLeft[ib] == ib)//The lower half is a boundary 
@@ -3963,7 +3963,7 @@ template <class T> __global__ void gradientHaloTopGPUnew(Param XParam, BlockP<T>
 
 
 
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		delta = calcres(T(XParam.delta), XBlock.level[ib]);
 
 
 		if (XBlock.TopLeft[ib] == ib)//The lower half is a boundary 
