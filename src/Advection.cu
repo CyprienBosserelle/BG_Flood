@@ -67,6 +67,7 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 	itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
 	T yup = T(iy) + T(1.0);
+	T ydwn = T(iy);
 
 	if (iy == XParam.blkwidth - 1)
 	{
@@ -74,17 +75,28 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 		{
 			yup = iy + 0.75;
 		}
-		if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
-		{
-			yup = iy + 1.000;
-		}
+		//if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
+		//{
+		//	yup = iy + 1.000;
+		//}
 	}
+
+	if (iy == 0)
+	{
+		if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+			ydwn = iy - 0.25 ;
+		}
+		
+	}
+
+
 
 
 
 	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
-	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
 	T fmup = T(1.0);
 	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
 
@@ -161,24 +173,30 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 
 
 				T yup = T(iy) + T(1.0);
+				T ydwn = T(iy);
 
 				if (iy == XParam.blkwidth - 1)
 				{
 					if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
 					{
-						yup = iy + 0.75;
+						yup = iy + T(0.75);
 					}
-					if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
+					
+				}
+				if (iy == 0)
+				{
+					if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
 					{
-						yup = iy + 1.5;
+						ydwn = iy - T(0.25);
 					}
+
 				}
 
 
 
 				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 				T fmu = T(1.0);
-				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
 				T fmup = T(1.0);
 				T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
 
