@@ -8,6 +8,8 @@ Test picture:
 
 ![ILCL-table](ILCL-values.png)
 
+\image html ILCL-values.png
+
 
 Test biblio:
 paper from Vacondo: \cite{Vacondio2017}
