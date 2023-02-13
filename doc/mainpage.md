@@ -2,7 +2,11 @@ Test MAIN PAGE:
 
 ### Test MD
 
-Test Latex: \f[ $$toot$$ \f]
+Test Latex: \f[ toot=\; 50m \f]
+Test Latex: $toot=\; 50m $
+Test Latex: ![equ](https://latex.codecogs.com/gif.latex?log(y)=\beta_0&space;&plus;&space;\beta_1&space;x&space;&plus;&space;u)
+Test Latex: \f[ toot=\; 50m \f]
+
 
 Test picture:
 
