@@ -21,7 +21,7 @@ jobs:
     - name: Update Input table
       uses: test-room-7/action-update-file@v1
       with:
-        file-path: ParametersList-py.md
+        file-path: ./doc/ParametersList-py.md
         commit-msg: Automatic update of Input parameter list
         github-token: ${{ secrets.GITHUB_TOKEN }}
     #    python-version: ${{ matrix.python-version }}
