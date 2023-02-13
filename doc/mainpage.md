@@ -8,14 +8,6 @@ Test picture:
 
 ![ILCL-table](ILCL-values.png)
 
-\image html ILCL-values.png
-
-
-Test biblio:
-paper from Vacondo: \cite{Vacondio2017}
-Biblography:
-\bibliographystyle{unsrt}
-\bibliography{reference}
 
 
 Test table of content:
@@ -37,3 +29,9 @@ int main()
 ## Add the parameterList
 
 @ref ParameterList "See the paramter list"
+
+Test biblio:
+paper from Vacondo: \cite{Vacondio2017}
+Biblography:
+\bibliographystyle{unsrt}
+\bibliography{reference}
