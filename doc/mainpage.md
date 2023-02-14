@@ -34,6 +34,8 @@ int main()
 
 
 ## Add the parameterList
+[Go to parameter list1:](@ref md_ParameterList-py)
+[Go to parameter list1:](@ref ParameterList)
 
 @ref ParameterList "See the paramter list: "
 
