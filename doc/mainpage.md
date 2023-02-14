@@ -5,7 +5,8 @@ Test MAIN PAGE:
 Test Latex: \f[ toot=\; 50m \f]
 Test Latex: $toot=\; 50m $
 Test Latex: ![equ](https://latex.codecogs.com/gif.latex?log(y)=\beta_0&space;&plus;&space;\beta_1&space;x&space;&plus;&space;u)
-Test Latex: \f[ toot=\; 50m \f]
+Test Latex: \f$ x=2 \f$
+
 
 
 Test picture:
