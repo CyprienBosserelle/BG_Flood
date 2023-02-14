@@ -13,7 +13,6 @@ Test picture:
 ![ILCL-table](ILCL-values.png)
 
 
-
 Test table of content:
 
 \tableofcontent
@@ -34,10 +33,16 @@ int main()
 
 ## Add the parameterList
 
-@ref ParameterList "See the paramter list"
+@ref ParameterList "See the paramter list: "
 
 Test biblio:
+
+@smith04 says blah.
+
 paper from Vacondo: \cite{Vacondio2017}
 Biblography:
 \bibliographystyle{unsrt}
 \bibliography{reference}
+
+# Reference
+
