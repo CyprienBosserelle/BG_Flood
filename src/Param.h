@@ -118,6 +118,7 @@ public:
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
 	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
+	Example: "outvars = zs,h,u,v,zb,hmax,Umax;"
 	Default: "zb", "zs", "u", "v", "h"
 	*/
 	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
