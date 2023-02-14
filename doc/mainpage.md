@@ -15,12 +15,14 @@ Test picture:
 
 Test table of content:
 
-\tableofcontent
+\tableofcontents
 
 ## My section2 {#Section2}
 ## Section3 {#Section3}
 
-\tableofcontent
+\tableofcontents
+
+[TOC]
 
 ## test code
 ```{cpp}
@@ -38,6 +40,8 @@ int main()
 Test biblio:
 
 @smith04 says blah.
+@Vacondio2017 says.....
+
 
 paper from Vacondo: \cite{Vacondio2017}
 Biblography:
