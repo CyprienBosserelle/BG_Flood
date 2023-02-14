@@ -18,8 +18,10 @@ Test table of content:
 
 \tableofcontent
 
-## My section2 {Section2}
-## Section3 {Section3}
+## My section2 {#Section2}
+## Section3 {#Section3}
+
+\tableofcontent
 
 ## test code
 ```{cpp}
