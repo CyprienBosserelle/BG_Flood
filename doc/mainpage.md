@@ -1,5 +1,8 @@
 Test MAIN PAGE:
 
+\tableofcontents
+
+
 ### Test MD
 
 Test Latex: \f[ toot=\; 50m \f]
@@ -16,14 +19,10 @@ Test picture:
 
 Test table of content:
 
-\tableofcontents
 
 ## My section2 {#Section2}
 ## Section3 {#Section3}
 
-\tableofcontents
-
-[TOC]
 
 ## test code
 ```{cpp}
