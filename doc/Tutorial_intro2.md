@@ -1,4 +1,13 @@
-# Tutorials {#Tutorials}
+\defgroup GrpTutorial The tutorials
+@{
+    ## Al si ok
+    ===================
+    
+    ## tototo
+    =========================
+
+    - \subpage Tutorial_jet_Julia2
+@}
 
 
 Thing Architecture {#thingarch}

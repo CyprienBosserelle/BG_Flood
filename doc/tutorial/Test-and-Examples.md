@@ -1,3 +1,4 @@
+# Verification
 ## Gaussian wave verification
 ### Intro
 This is a basic but common test to verify the integrity of the model equations. This test is also good to show different type of boundaries reflect waves. 

@@ -1,6 +1,3 @@
-Documentation {#mainpage}
-=================
-
 
 Welcome to the BG-Flood documentation !
 # Introduction
@@ -9,6 +6,8 @@ BG-Flood is a Shallow Water Equation (SWE) model based on the St Venant formulat
 The model is designed to simulate [flood/inundation](https://english.stackexchange.com/questions/131195/difference-between-flooding-and-inundation) caused by tsunami, river, rain, tide or storm surge (from wind stress or atm pressure differential) or any combination of these. The model does not (yet) include the effect of wind waves. The model is not restricted to simulating inundation hazard and can also be used for depth averaged circulation simulation. 
 
 This wiki is to help users getting started on using the model. This is work in progress... If you have any issue/question post it on the issue board. While the model is fairly user friendly, it was designed for users with a basic understanding of hydrodynamics and some experience in modelling. The wiki (and the model) expect that users have some experience in basic file manipulations and are comfortable with handling NetCDF files for input and output.
+
+=======================
 
 # Model development stage
 BG-Flood is still in early development stage but is already useful for real inundation simulation.       
@@ -26,10 +25,13 @@ The master branch is at stage 4 of development with 5 stage planned as below
 
 
 **Testing**
-CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flood/actions/workflows//main.yml/badge.svg?branch=development)
+CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flood/actions/workflows//main.yml/badge.svg?branch=development) 
+
+=======================
+
+# How to install {#Installation}
 
 
-# How to install
 ## From precompiled binaries (Win10 only)
 1. download the zip from any release
 2. unzip into preferred path
@@ -38,23 +40,19 @@ CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flo
 
 ## On Linux machine or super-computer:
 
-- @subpage Linux compilation
-@defgroup Library
-@addtogroup Library
-@copydoc Library
-@{
-    toto
-}
+* \subpage Compile-under-linux
+* \subpage Use-On-SuperComputer
 
+=======================
 
-* [On Linux](doc/Compile-under-linux)
-* [On Super-computer](doc/Use-On-SuperComputer)
- 
-# How to use the model
-* [Manual](doc/Manual)
-* [Tutorial](doc/Tutorial_intro)
-* [Examples](doc/Test-and-Examples)
+# How to use the model {#User}
 
-# How to use/change the code
-* Code map
+* \subpage Manual 
+* \subpage Tutorials 
+* \subpage Test-and-Examples 
+
+===========================================
+
+# How to use/change the code {#Developer}
+* \subpage Code-map
 
