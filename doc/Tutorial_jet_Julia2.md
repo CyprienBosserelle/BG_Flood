@@ -1,8 +1,6 @@
-\defgroup GrpJetJ Jet tutorial
-@{
-    \ingroup GrpTutorial
+@page TutorialJetJulia Jet tutorial with Julia
 
-# Jet
+
 This is a very simple example that shows the model stability in transitional flows.
 
 ## Make a bathymetry
@@ -276,6 +274,3 @@ In the previous tutorial you have seen how different boundary type let's wave th
   
 # River + Rain = Waikanae example
 Here we setup a model of the Waikanae Catchment (on the Kapiti Coast in New Zealand) force the tide on one of the open boundary 
-
-
-@}

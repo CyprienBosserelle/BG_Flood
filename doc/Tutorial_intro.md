@@ -1,27 +1,6 @@
-# Tutorials {#Tutorials}
+@page Tutorials Tutorials
 
 
-Thing Architecture {#thingarch}
-=====================
+Here is a list of all the available tutorials:
 
-Notes about a thing.
-
-## Heading A
-
-Text before list:
-* One.
-* Two.
-  spans multiple
-  lines.
-
-## Heading B
-
-More text.
-
-
-=================
-
-Here is a list of all the tutorials:
-
-- \subpage tutorial-md-Tutorial_jet_Julia
-- @subpage [Jet tut](doc/tutorial/Test-and-Examples.md)
+@subpage TutorialJetJulia

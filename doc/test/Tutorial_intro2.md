@@ -1,14 +1,4 @@
-\defgroup GrpTutorial The tutorials
-@{
-    ## Al si ok
-    ===================
-    
-    ## tototo
-    =========================
-
-    - \subpage Tutorial_jet_Julia2
-@}
-
+Tutorial
 
 Thing Architecture {#thingarch}
 =====================
@@ -31,6 +21,8 @@ More text.
 =================
 
 Here is a list of all the tutorials:
+\subpage md_tutorial_TutorialJetJulia
+\subpage [Jet Julia](doc/tutorial/TutorialJetJulia.md)
 
 - \subpage tutorial-md-Tutorial_jet_Julia
 - @subpage [Jet tut](doc/tutorial/Test-and-Examples.md)

@@ -1,7 +1,5 @@
-@ingroup Modules
+@page ILCL Infiltration Model: Initial Loss - Continuous Loss
 
-
-# Infiltration Model: Initial Loss - Continuous Loss
 
 Rainfall is often absorbed in soil and leaf litter before joining surface flow.The default behaviour of BG_Flood is to assume the rainfall given as input is actually [runoff](https://en.wikipedia.org/wiki/Surface_runoff) (i.e. rainfall exess that will make the surface flows). Instead a basic initial - continuous loss model can be apply to approximate runoff. 
 

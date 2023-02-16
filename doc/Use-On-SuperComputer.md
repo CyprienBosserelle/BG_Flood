@@ -1,4 +1,4 @@
-# Use on Super-Computer {#Use-On-SuperComputer}
+# Use on SuperComputer {#Use-On-SuperComputer}
 
 The code can be run on local machines with NVIDIA GPU but it will get better performance by running on large GPU.
 

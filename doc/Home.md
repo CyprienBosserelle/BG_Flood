@@ -1,3 +1,4 @@
+@mainpage
 
 Welcome to the BG-Flood documentation !
 # Introduction
@@ -9,7 +10,7 @@ This wiki is to help users getting started on using the model. This is work in p
 
 =======================
 
-# Model development stage
+## Model development stage
 BG-Flood is still in early development stage but is already useful for real inundation simulation.       
 
 The master branch is at stage 4 of development with 5 stage planned as below
@@ -29,30 +30,30 @@ CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flo
 
 =======================
 
-# How to install {#Installation}
+## How to install
 
-
-## From precompiled binaries (Win10 only)
+### From precompiled binaries (Win10 only)
 1. download the zip from any release
 2. unzip into preferred path
 3. Add path to "Path" in environment variables (search for "Edit environment variables for your account")
 4. When updating/upgrading BG_Flood simply repeat 1 and 2
 
-## On Linux machine or super-computer:
+### On Linux machines
 
-* \subpage Compile-under-linux
-* \subpage Use-On-SuperComputer
+* @ref Compile-under-linux
+* @ref Use-On-SuperComputer
 
 =======================
 
-# How to use the model {#User}
+## How to use the model {#User}
 
-* \subpage Manual 
-* \subpage Tutorials 
-* \subpage Test-and-Examples 
+* @ref Manual
+* @ref Modules
+* @ref Tutorials 
+* @ref Test-and-Examples 
 
 ===========================================
 
-# How to use/change the code {#Developer}
-* \subpage Code-map
+## How to use/change the code {#Developer}
+* @ref Code-map
 

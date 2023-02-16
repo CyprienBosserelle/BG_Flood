@@ -1,4 +1,6 @@
-# Jet
+@page TutorialJetJulia Jet tutorial with Julia
+
+
 This is a very simple example that shows the model stability in transitional flows.
 
 ## Make a bathymetry
