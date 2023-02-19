@@ -14,14 +14,14 @@ The water absorbed in the ground will be tracked using the ground water elevatio
 
 On each cell, at each simulation step, we can express the quantity of water absorbed in the ground \f$ha_{t}\f$ using:
 
-\f[
+\f{eqnarray*}{
   ha_{t} =
     \begin{cases}
-      h_{t} & \text{if} \;\; hgw_{t-1} + h_{t} < il\\
-      cl & \text{if}\;\; hgw_{t-1} > il\\
-      \min(il - hgw_{t-1} + cl\,,\, h_{t}) & \text{otherwise}
+      &h_{t} & \text{if} \;\; hgw_{t-1} + h_{t} < il\\
+      &cl & \text{if}\;\; hgw_{t-1} > il\\
+      &\min(il - hgw_{t-1} + cl\,,\, h_{t}) & \text{otherwise}
     \end{cases}       
-\f]
+\f}
 
 where \f$il\f$ and \f$cl\f$ are respectively the initial loss and continuous loss coefficient at a given cell location, and \f$hgw_{t}\f$ is the accumulated ground water at this cell location since the begining of the simulation.
 
