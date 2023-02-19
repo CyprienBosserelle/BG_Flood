@@ -17,9 +17,9 @@ On each cell, at each simulation step, we can express the quantity of water abso
 \f{eqnarray*}{
   ha_{t} =
     \begin{cases}
-      &h_{t} & \text{if} \;\; hgw_{t-1} + h_{t} < il\\
-      &cl & \text{if}\;\; hgw_{t-1} > il\\
-      &\min(il - hgw_{t-1} + cl\,,\, h_{t}) & \text{otherwise}
+      h_{t} & \text{if} \;\; hgw_{t-1} + h_{t} < il\\
+      cl & \text{if}\;\; hgw_{t-1} > il\\
+      \min(il - hgw_{t-1} + cl\,,\, h_{t}) & \text{otherwise}
     \end{cases}       
 \f}
 
