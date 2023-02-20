@@ -56,8 +56,23 @@ where the four final numbers are: \f$ x_1, x_2, y_1, y_2 \f$, to define the area
 ![riverfile](./figure/river_discharge.png)
 This file is from an observed hydrograph, with data save every 5min.
 
-## Time parameters
+## Timekeeping parameters
 In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
+
+The end of the simulation is prescribed in second as :
+```{txt} 
+endtime = 21600;
+```
+
+The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, \f$ CFL=0.5000 \f$ by default.
+
+The simulation begin, by default at \f$ t=0 (s)\f$, but this can modify using "totaltime": 
+```{txt} 
+totaltime = 3600;
+```
+to begin one hour after the reference time ( used in the forcings for example).
+
+## Outputs
 
 
 ## Resolution
