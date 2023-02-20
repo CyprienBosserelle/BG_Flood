@@ -1,4 +1,4 @@
-# Paramters and Forcings list for BG_Flood {#ParameterList}
+# Paramters and Forcings list {#ParameterList}
 
 BG_flood user interface consists in a text file, associating key words to user chosen parameters and forcings.
 ## List of the Parameters' input

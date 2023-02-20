@@ -1,4 +1,5 @@
-# Compilation on Linux {#Compile-under-linux}
+@page Compile-under-linux Compilation on Linux
+
 
 Make sure you have latest cuda, g++ and netcdf libraries installed.
 
