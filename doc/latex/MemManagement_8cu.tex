@@ -1,0 +1,463 @@
+\hypertarget{MemManagement_8cu}{}\doxysection{src/\+Mem\+Management.cu File Reference}
+\label{MemManagement_8cu}\index{src/MemManagement.cu@{src/MemManagement.cu}}
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+Include dependency graph for Mem\+Management.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ int \mbox{\hyperlink{MemManagement_8cu_ad0ad7b983948a031a40f89c1369a91bf}{memloc}} (\mbox{\hyperlink{classParam}{Param}} XParam, int i, int j, int ib)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ int \mbox{\hyperlink{MemManagement_8cu_a07fddb78af39693b50b36905f15b18ef}{memloc}} (int halowidth, int blkmemwidth, int i, int j, int ib)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{MemManagement_8cu_af5b2613b6a0140cdb9295b7dd5dabc4e}{Allocate\+CPU}} (int nx, int ny, T $\ast$\&zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{MemManagement_8cu_ac2e88d8dc0428143936352be4b6b4938}{Allocate\+CPU}} (int nx, int ny, T $\ast$\&zs, T $\ast$\&h, T $\ast$\&u, T $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a352e04081955373bd4c3ed601ef79c45}{Allocate\+CPU$<$ double $>$}} (int nx, int ny, double $\ast$\&zs, double $\ast$\&h, double $\ast$\&u, double $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a69cb09051107c87e07b275059c228d9e}{Allocate\+CPU$<$ float $>$}} (int nx, int ny, float $\ast$\&zs, float $\ast$\&h, float $\ast$\&u, float $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a77e9b89d79a6d6bdbba334185c96d502}{Allocate\+CPU$<$ int $>$}} (int nx, int ny, int $\ast$\&zs, int $\ast$\&h, int $\ast$\&u, int $\ast$\&v)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{MemManagement_8cu_acaf675c8510f56ca0a0ec182d7d8078e}{Allocate\+CPU}} (int nx, int ny, T $\ast$\&zs, T $\ast$\&h, T $\ast$\&u, T $\ast$\&v, T $\ast$\&U, T $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_abfac5f8234d4e1b7d199d94203727201}{Allocate\+CPU$<$ double $>$}} (int nx, int ny, double $\ast$\&zs, double $\ast$\&h, double $\ast$\&u, double $\ast$\&v, double $\ast$\&U, double $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a733a1ca747a2f4a7228e2b4917c5e9ee}{Allocate\+CPU$<$ float $>$}} (int nx, int ny, float $\ast$\&zs, float $\ast$\&h, float $\ast$\&u, float $\ast$\&v, float $\ast$\&U, float $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a02dbbc82f655f221e72475c6cf1e390d}{Allocate\+CPU$<$ int $>$}} (int nx, int ny, int $\ast$\&zs, int $\ast$\&h, int $\ast$\&u, int $\ast$\&v, int $\ast$\&U, int $\ast$\&hU)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{MemManagement_8cu_a7010e5aa17261e9870004edb76cfdcbe}{Allocate\+CPU}} (int nx, int ny, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ \&Grad)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a401df8b4c66c17d4c8c56f198b19d782}{Allocate\+CPU$<$ float $>$}} (int nx, int ny, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$ \&Grad)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a63c604e6004eab2becdb17c1ce0bd667}{Allocate\+CPU$<$ double $>$}} (int nx, int ny, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$ \&Grad)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_ac85c44d5aefda185f362a5f3ec194df6}{Allocate\+CPU}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&Ev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a58be5513939539084669853273eb9def}{Allocate\+CPU}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&Ev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a15da82c8b27a77ea6f17478bd7726ebd}{Allocate\+CPU$<$ float $>$}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_add77fedf788a5ba8d5b661153d01ebb6}{Allocate\+CPU$<$ double $>$}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a42387bf4dc214f200e618abf2542ed90}{Realloc\+Array}} (int nblk, int blksize, T $\ast$\&zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a02612d8f9186262bde4a69ed1f586963}{Realloc\+Array}} (int nblk, int blksize, T $\ast$\&zs, T $\ast$\&h, T $\ast$\&u, T $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a0881ea86f25dac1fb2fc7d0c8e0be183}{Realloc\+Array$<$ int $>$}} (int nblk, int blksize, int $\ast$\&zs, int $\ast$\&h, int $\ast$\&u, int $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_acfb4665995c045eab40fa9c09864550c}{Realloc\+Array$<$ float $>$}} (int nblk, int blksize, float $\ast$\&zs, float $\ast$\&h, float $\ast$\&u, float $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_afda059ee7347595e61259d31544bfe58}{Realloc\+Array$<$ double $>$}} (int nblk, int blksize, double $\ast$\&zs, double $\ast$\&h, double $\ast$\&u, double $\ast$\&v)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a5bd52e113bb24418a42ad21549985d63}{Realloc\+Array}} (int nblk, int blksize, T $\ast$\&zs, T $\ast$\&h, T $\ast$\&u, T $\ast$\&v, T $\ast$\&U, T $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a1c6a633736d1d2ba98385c30d163b47e}{Realloc\+Array$<$ int $>$}} (int nblk, int blksize, int $\ast$\&zs, int $\ast$\&h, int $\ast$\&u, int $\ast$\&v, int $\ast$\&U, int $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a544805f099555a16cf703c2080ebccff}{Realloc\+Array$<$ float $>$}} (int nblk, int blksize, float $\ast$\&zs, float $\ast$\&h, float $\ast$\&u, float $\ast$\&v, float $\ast$\&U, float $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a71228cdb3d54e8cb29fe50a6096e4fe5}{Realloc\+Array$<$ double $>$}} (int nblk, int blksize, double $\ast$\&zs, double $\ast$\&h, double $\ast$\&u, double $\ast$\&v, double $\ast$\&U, double $\ast$\&hU)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_ac9a048abacc33fe4e0926f6370233caa}{Realloc\+Array}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&Ev)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_ace6ee12d8209bfcff4c0e589f75d4952}{Realloc\+Array$<$ float $>$}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&Ev)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a95375fb61921e8d64f40b1bae9797664}{Realloc\+Array$<$ double $>$}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&Ev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a73eb44c43e30372a501dad94a875d133}{Realloc\+Array}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&Ev)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a214ab6ce5950e298dc62986d3fad0732}{Realloc\+Array$<$ float $>$}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ float $>$ \&Ev)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a4671c48bb76cc3baa962e93b6da63445}{Realloc\+Array$<$ double $>$}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ double $>$ \&Ev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a632f700b36214e83801e7fa1b9d79f6d}{Realloc\+Array$<$ float $>$}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a6788d01685d9924661db11af337221ac}{Realloc\+Array$<$ double $>$}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}} (int nx, int ny, T $\ast$\&z\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_ac5e02cbe057b525f6391584b1c872d6f}{Allocate\+GPU}} (int nx, int ny, T $\ast$\&zs, T $\ast$\&h, T $\ast$\&u, T $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a89ef098960c1cc56758ccd2fc66fb03c}{Allocate\+GPU$<$ double $>$}} (int nx, int ny, double $\ast$\&zs, double $\ast$\&h, double $\ast$\&u, double $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_ab07deb44856919c56491411897bec884}{Allocate\+GPU$<$ float $>$}} (int nx, int ny, float $\ast$\&zs, float $\ast$\&h, float $\ast$\&u, float $\ast$\&v)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_aabc75bd0cfa63217cb0ff09aca541890}{Allocate\+GPU$<$ int $>$}} (int nx, int ny, int $\ast$\&zs, int $\ast$\&h, int $\ast$\&u, int $\ast$\&v)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a49c8e68073ccf46f281d2a5ad2d8f559}{Allocate\+GPU}} (int nx, int ny, T $\ast$\&zs, T $\ast$\&h, T $\ast$\&u, T $\ast$\&v, T $\ast$\&U, T $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a7f58f9d4e0675f2a4c819ff21c4a8c35}{Allocate\+GPU$<$ double $>$}} (int nx, int ny, double $\ast$\&zs, double $\ast$\&h, double $\ast$\&u, double $\ast$\&v, double $\ast$\&U, double $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_adc5bb0f73c1f06526935f5841384699f}{Allocate\+GPU$<$ float $>$}} (int nx, int ny, float $\ast$\&zs, float $\ast$\&h, float $\ast$\&u, float $\ast$\&v, float $\ast$\&U, float $\ast$\&hU)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a81970a4261f5b802af12ad6221af39f3}{Allocate\+GPU$<$ int $>$}} (int nx, int ny, int $\ast$\&zs, int $\ast$\&h, int $\ast$\&u, int $\ast$\&v, int $\ast$\&U, int $\ast$\&hU)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a3b155931d83c61e6efd1251676e0eef2}{Allocate\+GPU}} (int nx, int ny, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ \&Grad)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_afc3be24b3ea5958d4655e6218a872a77}{Allocate\+GPU$<$ float $>$}} (int nx, int ny, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$ \&Grad)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a585cc996b2f2abb336f0255455194861}{Allocate\+GPU$<$ double $>$}} (int nx, int ny, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$ \&Grad)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_ae06a8f257b052110ee151c57a2a02159}{Allocate\+GPU}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&Ev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a1b1733cd92265b7d9a9b85cdfc6e5482}{Allocate\+GPU}} (int nblk, int blksize, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&Ev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8cu_a7760a58fb55d0e75f1b56e99d68c024c}{Allocate\+GPU}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_a9a49ffaf6477103a6d192e5ae36ebafe}{Allocate\+GPU$<$ float $>$}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{MemManagement_8cu_affc8bab4b4aae4e524cd18567e47a1b7}{Allocate\+GPU$<$ double $>$}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{MemManagement_8cu_ac85c44d5aefda185f362a5f3ec194df6}\label{MemManagement_8cu_ac85c44d5aefda185f362a5f3ec194df6}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU@{AllocateCPU}}
+\index{AllocateCPU@{AllocateCPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU()}{AllocateCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+CPU (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a58be5513939539084669853273eb9def}\label{MemManagement_8cu_a58be5513939539084669853273eb9def}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU@{AllocateCPU}}
+\index{AllocateCPU@{AllocateCPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU()}{AllocateCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+CPU (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a25e1e86c95fd2a1f1834ded75f108d40}\label{MemManagement_8cu_a25e1e86c95fd2a1f1834ded75f108d40}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU@{AllocateCPU}}
+\index{AllocateCPU@{AllocateCPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU()}{AllocateCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+CPU (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a7010e5aa17261e9870004edb76cfdcbe}\label{MemManagement_8cu_a7010e5aa17261e9870004edb76cfdcbe}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU@{AllocateCPU}}
+\index{AllocateCPU@{AllocateCPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU()}{AllocateCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Allocate\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ \&}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_af5b2613b6a0140cdb9295b7dd5dabc4e}\label{MemManagement_8cu_af5b2613b6a0140cdb9295b7dd5dabc4e}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU@{AllocateCPU}}
+\index{AllocateCPU@{AllocateCPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU()}{AllocateCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Allocate\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ac2e88d8dc0428143936352be4b6b4938}\label{MemManagement_8cu_ac2e88d8dc0428143936352be4b6b4938}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU@{AllocateCPU}}
+\index{AllocateCPU@{AllocateCPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU()}{AllocateCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Allocate\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$\&}]{zs,  }\item[{T $\ast$\&}]{h,  }\item[{T $\ast$\&}]{u,  }\item[{T $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_acaf675c8510f56ca0a0ec182d7d8078e}\label{MemManagement_8cu_acaf675c8510f56ca0a0ec182d7d8078e}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU@{AllocateCPU}}
+\index{AllocateCPU@{AllocateCPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU()}{AllocateCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Allocate\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$\&}]{zs,  }\item[{T $\ast$\&}]{h,  }\item[{T $\ast$\&}]{u,  }\item[{T $\ast$\&}]{v,  }\item[{T $\ast$\&}]{U,  }\item[{T $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_add77fedf788a5ba8d5b661153d01ebb6}\label{MemManagement_8cu_add77fedf788a5ba8d5b661153d01ebb6}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}}
+\index{AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ double $>$()}{AllocateCPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a352e04081955373bd4c3ed601ef79c45}\label{MemManagement_8cu_a352e04081955373bd4c3ed601ef79c45}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}}
+\index{AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ double $>$()}{AllocateCPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double $\ast$\&}]{zs,  }\item[{double $\ast$\&}]{h,  }\item[{double $\ast$\&}]{u,  }\item[{double $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_abfac5f8234d4e1b7d199d94203727201}\label{MemManagement_8cu_abfac5f8234d4e1b7d199d94203727201}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}}
+\index{AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ double $>$()}{AllocateCPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double $\ast$\&}]{zs,  }\item[{double $\ast$\&}]{h,  }\item[{double $\ast$\&}]{u,  }\item[{double $\ast$\&}]{v,  }\item[{double $\ast$\&}]{U,  }\item[{double $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a63c604e6004eab2becdb17c1ce0bd667}\label{MemManagement_8cu_a63c604e6004eab2becdb17c1ce0bd667}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}}
+\index{AllocateCPU$<$ double $>$@{AllocateCPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ double $>$()}{AllocateCPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$ \&}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a15da82c8b27a77ea6f17478bd7726ebd}\label{MemManagement_8cu_a15da82c8b27a77ea6f17478bd7726ebd}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}}
+\index{AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ float $>$()}{AllocateCPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a69cb09051107c87e07b275059c228d9e}\label{MemManagement_8cu_a69cb09051107c87e07b275059c228d9e}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}}
+\index{AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ float $>$()}{AllocateCPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float $\ast$\&}]{zs,  }\item[{float $\ast$\&}]{h,  }\item[{float $\ast$\&}]{u,  }\item[{float $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a733a1ca747a2f4a7228e2b4917c5e9ee}\label{MemManagement_8cu_a733a1ca747a2f4a7228e2b4917c5e9ee}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}}
+\index{AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ float $>$()}{AllocateCPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float $\ast$\&}]{zs,  }\item[{float $\ast$\&}]{h,  }\item[{float $\ast$\&}]{u,  }\item[{float $\ast$\&}]{v,  }\item[{float $\ast$\&}]{U,  }\item[{float $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a401df8b4c66c17d4c8c56f198b19d782}\label{MemManagement_8cu_a401df8b4c66c17d4c8c56f198b19d782}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}}
+\index{AllocateCPU$<$ float $>$@{AllocateCPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ float $>$()}{AllocateCPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$ \&}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a77e9b89d79a6d6bdbba334185c96d502}\label{MemManagement_8cu_a77e9b89d79a6d6bdbba334185c96d502}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ int $>$@{AllocateCPU$<$ int $>$}}
+\index{AllocateCPU$<$ int $>$@{AllocateCPU$<$ int $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ int $>$()}{AllocateCPU< int >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int $\ast$\&}]{zs,  }\item[{int $\ast$\&}]{h,  }\item[{int $\ast$\&}]{u,  }\item[{int $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a02dbbc82f655f221e72475c6cf1e390d}\label{MemManagement_8cu_a02dbbc82f655f221e72475c6cf1e390d}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateCPU$<$ int $>$@{AllocateCPU$<$ int $>$}}
+\index{AllocateCPU$<$ int $>$@{AllocateCPU$<$ int $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateCPU$<$ int $>$()}{AllocateCPU< int >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a25e1e86c95fd2a1f1834ded75f108d40}{Allocate\+CPU}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int $\ast$\&}]{zs,  }\item[{int $\ast$\&}]{h,  }\item[{int $\ast$\&}]{u,  }\item[{int $\ast$\&}]{v,  }\item[{int $\ast$\&}]{U,  }\item[{int $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ae06a8f257b052110ee151c57a2a02159}\label{MemManagement_8cu_ae06a8f257b052110ee151c57a2a02159}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU@{AllocateGPU}}
+\index{AllocateGPU@{AllocateGPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a1b1733cd92265b7d9a9b85cdfc6e5482}\label{MemManagement_8cu_a1b1733cd92265b7d9a9b85cdfc6e5482}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU@{AllocateGPU}}
+\index{AllocateGPU@{AllocateGPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a7760a58fb55d0e75f1b56e99d68c024c}\label{MemManagement_8cu_a7760a58fb55d0e75f1b56e99d68c024c}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU@{AllocateGPU}}
+\index{AllocateGPU@{AllocateGPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a3b155931d83c61e6efd1251676e0eef2}\label{MemManagement_8cu_a3b155931d83c61e6efd1251676e0eef2}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU@{AllocateGPU}}
+\index{AllocateGPU@{AllocateGPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ \&}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a1e573ee5a85dfe633828db07d46440fb}\label{MemManagement_8cu_a1e573ee5a85dfe633828db07d46440fb}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU@{AllocateGPU}}
+\index{AllocateGPU@{AllocateGPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$\&}]{z\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ac5e02cbe057b525f6391584b1c872d6f}\label{MemManagement_8cu_ac5e02cbe057b525f6391584b1c872d6f}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU@{AllocateGPU}}
+\index{AllocateGPU@{AllocateGPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$\&}]{zs,  }\item[{T $\ast$\&}]{h,  }\item[{T $\ast$\&}]{u,  }\item[{T $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a49c8e68073ccf46f281d2a5ad2d8f559}\label{MemManagement_8cu_a49c8e68073ccf46f281d2a5ad2d8f559}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU@{AllocateGPU}}
+\index{AllocateGPU@{AllocateGPU}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$\&}]{zs,  }\item[{T $\ast$\&}]{h,  }\item[{T $\ast$\&}]{u,  }\item[{T $\ast$\&}]{v,  }\item[{T $\ast$\&}]{U,  }\item[{T $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_affc8bab4b4aae4e524cd18567e47a1b7}\label{MemManagement_8cu_affc8bab4b4aae4e524cd18567e47a1b7}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}}
+\index{AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ double $>$()}{AllocateGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a89ef098960c1cc56758ccd2fc66fb03c}\label{MemManagement_8cu_a89ef098960c1cc56758ccd2fc66fb03c}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}}
+\index{AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ double $>$()}{AllocateGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double $\ast$\&}]{zs,  }\item[{double $\ast$\&}]{h,  }\item[{double $\ast$\&}]{u,  }\item[{double $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a7f58f9d4e0675f2a4c819ff21c4a8c35}\label{MemManagement_8cu_a7f58f9d4e0675f2a4c819ff21c4a8c35}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}}
+\index{AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ double $>$()}{AllocateGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double $\ast$\&}]{zs,  }\item[{double $\ast$\&}]{h,  }\item[{double $\ast$\&}]{u,  }\item[{double $\ast$\&}]{v,  }\item[{double $\ast$\&}]{U,  }\item[{double $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a585cc996b2f2abb336f0255455194861}\label{MemManagement_8cu_a585cc996b2f2abb336f0255455194861}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}}
+\index{AllocateGPU$<$ double $>$@{AllocateGPU$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ double $>$()}{AllocateGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$ \&}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a9a49ffaf6477103a6d192e5ae36ebafe}\label{MemManagement_8cu_a9a49ffaf6477103a6d192e5ae36ebafe}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}}
+\index{AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ float $>$()}{AllocateGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ab07deb44856919c56491411897bec884}\label{MemManagement_8cu_ab07deb44856919c56491411897bec884}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}}
+\index{AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ float $>$()}{AllocateGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float $\ast$\&}]{zs,  }\item[{float $\ast$\&}]{h,  }\item[{float $\ast$\&}]{u,  }\item[{float $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_adc5bb0f73c1f06526935f5841384699f}\label{MemManagement_8cu_adc5bb0f73c1f06526935f5841384699f}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}}
+\index{AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ float $>$()}{AllocateGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float $\ast$\&}]{zs,  }\item[{float $\ast$\&}]{h,  }\item[{float $\ast$\&}]{u,  }\item[{float $\ast$\&}]{v,  }\item[{float $\ast$\&}]{U,  }\item[{float $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_afc3be24b3ea5958d4655e6218a872a77}\label{MemManagement_8cu_afc3be24b3ea5958d4655e6218a872a77}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}}
+\index{AllocateGPU$<$ float $>$@{AllocateGPU$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ float $>$()}{AllocateGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$ \&}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_aabc75bd0cfa63217cb0ff09aca541890}\label{MemManagement_8cu_aabc75bd0cfa63217cb0ff09aca541890}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ int $>$@{AllocateGPU$<$ int $>$}}
+\index{AllocateGPU$<$ int $>$@{AllocateGPU$<$ int $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ int $>$()}{AllocateGPU< int >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int $\ast$\&}]{zs,  }\item[{int $\ast$\&}]{h,  }\item[{int $\ast$\&}]{u,  }\item[{int $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a81970a4261f5b802af12ad6221af39f3}\label{MemManagement_8cu_a81970a4261f5b802af12ad6221af39f3}} 
+\index{MemManagement.cu@{MemManagement.cu}!AllocateGPU$<$ int $>$@{AllocateGPU$<$ int $>$}}
+\index{AllocateGPU$<$ int $>$@{AllocateGPU$<$ int $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{AllocateGPU$<$ int $>$()}{AllocateGPU< int >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int $\ast$\&}]{zs,  }\item[{int $\ast$\&}]{h,  }\item[{int $\ast$\&}]{u,  }\item[{int $\ast$\&}]{v,  }\item[{int $\ast$\&}]{U,  }\item[{int $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a07fddb78af39693b50b36905f15b18ef}\label{MemManagement_8cu_a07fddb78af39693b50b36905f15b18ef}} 
+\index{MemManagement.cu@{MemManagement.cu}!memloc@{memloc}}
+\index{memloc@{memloc}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{memloc()}{memloc()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ int memloc (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{blkmemwidth,  }\item[{int}]{i,  }\item[{int}]{j,  }\item[{int}]{ib }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ad0ad7b983948a031a40f89c1369a91bf}\label{MemManagement_8cu_ad0ad7b983948a031a40f89c1369a91bf}} 
+\index{MemManagement.cu@{MemManagement.cu}!memloc@{memloc}}
+\index{memloc@{memloc}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{memloc()}{memloc()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ int memloc (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{i,  }\item[{int}]{j,  }\item[{int}]{ib }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ac9a048abacc33fe4e0926f6370233caa}\label{MemManagement_8cu_ac9a048abacc33fe4e0926f6370233caa}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray@{ReallocArray}}
+\index{ReallocArray@{ReallocArray}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray()}{ReallocArray()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Realloc\+Array (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a73eb44c43e30372a501dad94a875d133}\label{MemManagement_8cu_a73eb44c43e30372a501dad94a875d133}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray@{ReallocArray}}
+\index{ReallocArray@{ReallocArray}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray()}{ReallocArray()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Realloc\+Array (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ad1f3c3382ef4419a772a92a0721b7d72}\label{MemManagement_8cu_ad1f3c3382ef4419a772a92a0721b7d72}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray@{ReallocArray}}
+\index{ReallocArray@{ReallocArray}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray()}{ReallocArray()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Realloc\+Array (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a42387bf4dc214f200e618abf2542ed90}\label{MemManagement_8cu_a42387bf4dc214f200e618abf2542ed90}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray@{ReallocArray}}
+\index{ReallocArray@{ReallocArray}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray()}{ReallocArray()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Realloc\+Array (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a02612d8f9186262bde4a69ed1f586963}\label{MemManagement_8cu_a02612d8f9186262bde4a69ed1f586963}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray@{ReallocArray}}
+\index{ReallocArray@{ReallocArray}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray()}{ReallocArray()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Realloc\+Array (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{T $\ast$\&}]{zs,  }\item[{T $\ast$\&}]{h,  }\item[{T $\ast$\&}]{u,  }\item[{T $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a5bd52e113bb24418a42ad21549985d63}\label{MemManagement_8cu_a5bd52e113bb24418a42ad21549985d63}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray@{ReallocArray}}
+\index{ReallocArray@{ReallocArray}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray()}{ReallocArray()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Realloc\+Array (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{T $\ast$\&}]{zs,  }\item[{T $\ast$\&}]{h,  }\item[{T $\ast$\&}]{u,  }\item[{T $\ast$\&}]{v,  }\item[{T $\ast$\&}]{U,  }\item[{T $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_afda059ee7347595e61259d31544bfe58}\label{MemManagement_8cu_afda059ee7347595e61259d31544bfe58}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}}
+\index{ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ double $>$()}{ReallocArray< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{double $\ast$\&}]{zs,  }\item[{double $\ast$\&}]{h,  }\item[{double $\ast$\&}]{u,  }\item[{double $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a71228cdb3d54e8cb29fe50a6096e4fe5}\label{MemManagement_8cu_a71228cdb3d54e8cb29fe50a6096e4fe5}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}}
+\index{ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ double $>$()}{ReallocArray< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{double $\ast$\&}]{zs,  }\item[{double $\ast$\&}]{h,  }\item[{double $\ast$\&}]{u,  }\item[{double $\ast$\&}]{v,  }\item[{double $\ast$\&}]{U,  }\item[{double $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a95375fb61921e8d64f40b1bae9797664}\label{MemManagement_8cu_a95375fb61921e8d64f40b1bae9797664}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}}
+\index{ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ double $>$()}{ReallocArray< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a4671c48bb76cc3baa962e93b6da63445}\label{MemManagement_8cu_a4671c48bb76cc3baa962e93b6da63445}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}}
+\index{ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ double $>$()}{ReallocArray< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ double $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a6788d01685d9924661db11af337221ac}\label{MemManagement_8cu_a6788d01685d9924661db11af337221ac}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}}
+\index{ReallocArray$<$ double $>$@{ReallocArray$<$ double $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ double $>$()}{ReallocArray< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_ace6ee12d8209bfcff4c0e589f75d4952}\label{MemManagement_8cu_ace6ee12d8209bfcff4c0e589f75d4952}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}}
+\index{ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ float $>$()}{ReallocArray< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a214ab6ce5950e298dc62986d3fad0732}\label{MemManagement_8cu_a214ab6ce5950e298dc62986d3fad0732}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}}
+\index{ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ float $>$()}{ReallocArray< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ float $>$ \&}]{Ev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_acfb4665995c045eab40fa9c09864550c}\label{MemManagement_8cu_acfb4665995c045eab40fa9c09864550c}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}}
+\index{ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ float $>$()}{ReallocArray< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{float $\ast$\&}]{zs,  }\item[{float $\ast$\&}]{h,  }\item[{float $\ast$\&}]{u,  }\item[{float $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a544805f099555a16cf703c2080ebccff}\label{MemManagement_8cu_a544805f099555a16cf703c2080ebccff}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}}
+\index{ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ float $>$()}{ReallocArray< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{float $\ast$\&}]{zs,  }\item[{float $\ast$\&}]{h,  }\item[{float $\ast$\&}]{u,  }\item[{float $\ast$\&}]{v,  }\item[{float $\ast$\&}]{U,  }\item[{float $\ast$\&}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a632f700b36214e83801e7fa1b9d79f6d}\label{MemManagement_8cu_a632f700b36214e83801e7fa1b9d79f6d}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}}
+\index{ReallocArray$<$ float $>$@{ReallocArray$<$ float $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ float $>$()}{ReallocArray< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a0881ea86f25dac1fb2fc7d0c8e0be183}\label{MemManagement_8cu_a0881ea86f25dac1fb2fc7d0c8e0be183}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ int $>$@{ReallocArray$<$ int $>$}}
+\index{ReallocArray$<$ int $>$@{ReallocArray$<$ int $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ int $>$()}{ReallocArray< int >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{int $\ast$\&}]{zs,  }\item[{int $\ast$\&}]{h,  }\item[{int $\ast$\&}]{u,  }\item[{int $\ast$\&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8cu_a1c6a633736d1d2ba98385c30d163b47e}\label{MemManagement_8cu_a1c6a633736d1d2ba98385c30d163b47e}} 
+\index{MemManagement.cu@{MemManagement.cu}!ReallocArray$<$ int $>$@{ReallocArray$<$ int $>$}}
+\index{ReallocArray$<$ int $>$@{ReallocArray$<$ int $>$}!MemManagement.cu@{MemManagement.cu}}
+\doxysubsubsection{\texorpdfstring{ReallocArray$<$ int $>$()}{ReallocArray< int >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{blksize,  }\item[{int $\ast$\&}]{zs,  }\item[{int $\ast$\&}]{h,  }\item[{int $\ast$\&}]{u,  }\item[{int $\ast$\&}]{v,  }\item[{int $\ast$\&}]{U,  }\item[{int $\ast$\&}]{hU }\end{DoxyParamCaption})}
+

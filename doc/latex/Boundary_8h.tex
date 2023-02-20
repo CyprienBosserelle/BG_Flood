@@ -1,0 +1,138 @@
+\hypertarget{Boundary_8h}{}\doxysection{src/\+Boundary.h File Reference}
+\label{Boundary_8h}\index{src/Boundary.h@{src/Boundary.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+Include dependency graph for Boundary.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Boundary_8h_ac17e657eb1ba981e7b5661c3997692ed}{Flowbnd}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ int \mbox{\hyperlink{Boundary_8h_a59cbed77b10dbaf2fa1c4261631b78c5}{Inside}} (int halowidth, int blkmemwidth, int isright, int istop, int ix, int iy, int ib)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ bool \mbox{\hyperlink{Boundary_8h_a099d9eb334ae46f6467552a50596a196}{isbnd}} (int isright, int istop, int blkwidth, int ix, int iy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_aa023b0e53092dd1d34728511f1f93005}{maskbnd}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_acdef573f7f2d65d3fe3f215342377a8b}{maskbnd\+GPUleft}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_aec86c8b6389e6f9ca2e81ab733e58487}{maskbnd\+GPUtop}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ac1a6983a856cbc02072948f3d3fad1ea}{maskbnd\+GPUright}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a91a99b6f920543db1cdd58ed166eab2c}{maskbnd\+GPUbot}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a5da9c2cb6774461d8f6de7cafd105ed6}{bnd\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, float itime, T $\ast$zs, T $\ast$h, T $\ast$un, T $\ast$ut)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ad433f7b7fe383758a05a3788eeddf488}{findmaskside}} (int side, bool \&isleftbot, bool \&islefttop, bool \&istopleft, bool \&istopright, bool \&isrighttop, bool \&isrightbot, bool \&isbotright, bool \&isbotleft)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ac7033b2e3bb1ce6a37421d932dc2c9f6}{halowall}} (T zsinside, T \&un, T \&ut, T \&zs, T \&h, T \&zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ac038c08cc0c028bbd1495d23e5f9a1f2}{noslipbnd}} (T zsinside, T hinside, T \&un, T \&ut, T \&zs, T \&h)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a526a85506746cc9877baaea4ee1f84ae}{ABS1D}} (T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd, T unbnd, T \&un, T \&ut, T \&zs, T \&h)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a6cb790e8b942d8f4f32cefb163df9ffd}{Dirichlet1D}} (T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T \&un, T \&ut, T \&zs, T \&h)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Boundary_8h_a526a85506746cc9877baaea4ee1f84ae}\label{Boundary_8h_a526a85506746cc9877baaea4ee1f84ae}} 
+\index{Boundary.h@{Boundary.h}!ABS1D@{ABS1D}}
+\index{ABS1D@{ABS1D}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{ABS1D()}{ABS1D()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void ABS1D (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{sign,  }\item[{T}]{zsbnd,  }\item[{T}]{zsinside,  }\item[{T}]{hinside,  }\item[{T}]{utbnd,  }\item[{T}]{unbnd,  }\item[{T \&}]{un,  }\item[{T \&}]{ut,  }\item[{T \&}]{zs,  }\item[{T \&}]{h }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a5da9c2cb6774461d8f6de7cafd105ed6}\label{Boundary_8h_a5da9c2cb6774461d8f6de7cafd105ed6}} 
+\index{Boundary.h@{Boundary.h}!bndGPU@{bndGPU}}
+\index{bndGPU@{bndGPU}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{bndGPU()}{bndGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void bnd\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{float}]{itime,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{un,  }\item[{T $\ast$}]{ut }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a6cb790e8b942d8f4f32cefb163df9ffd}\label{Boundary_8h_a6cb790e8b942d8f4f32cefb163df9ffd}} 
+\index{Boundary.h@{Boundary.h}!Dirichlet1D@{Dirichlet1D}}
+\index{Dirichlet1D@{Dirichlet1D}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{Dirichlet1D()}{Dirichlet1D()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void Dirichlet1D (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{sign,  }\item[{T}]{zsbnd,  }\item[{T}]{zsinside,  }\item[{T}]{hinside,  }\item[{T}]{uninside,  }\item[{T \&}]{un,  }\item[{T \&}]{ut,  }\item[{T \&}]{zs,  }\item[{T \&}]{h }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ad433f7b7fe383758a05a3788eeddf488}\label{Boundary_8h_ad433f7b7fe383758a05a3788eeddf488}} 
+\index{Boundary.h@{Boundary.h}!findmaskside@{findmaskside}}
+\index{findmaskside@{findmaskside}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{findmaskside()}{findmaskside()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void findmaskside (\begin{DoxyParamCaption}\item[{int}]{side,  }\item[{bool \&}]{isleftbot,  }\item[{bool \&}]{islefttop,  }\item[{bool \&}]{istopleft,  }\item[{bool \&}]{istopright,  }\item[{bool \&}]{isrighttop,  }\item[{bool \&}]{isrightbot,  }\item[{bool \&}]{isbotright,  }\item[{bool \&}]{isbotleft }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ac17e657eb1ba981e7b5661c3997692ed}\label{Boundary_8h_ac17e657eb1ba981e7b5661c3997692ed}} 
+\index{Boundary.h@{Boundary.h}!Flowbnd@{Flowbnd}}
+\index{Flowbnd@{Flowbnd}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{Flowbnd()}{Flowbnd()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Flowbnd (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ac7033b2e3bb1ce6a37421d932dc2c9f6}\label{Boundary_8h_ac7033b2e3bb1ce6a37421d932dc2c9f6}} 
+\index{Boundary.h@{Boundary.h}!halowall@{halowall}}
+\index{halowall@{halowall}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{halowall()}{halowall()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void halowall (\begin{DoxyParamCaption}\item[{T}]{zsinside,  }\item[{T \&}]{un,  }\item[{T \&}]{ut,  }\item[{T \&}]{zs,  }\item[{T \&}]{h,  }\item[{T \&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a59cbed77b10dbaf2fa1c4261631b78c5}\label{Boundary_8h_a59cbed77b10dbaf2fa1c4261631b78c5}} 
+\index{Boundary.h@{Boundary.h}!Inside@{Inside}}
+\index{Inside@{Inside}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{Inside()}{Inside()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ int Inside (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{blkmemwidth,  }\item[{int}]{isright,  }\item[{int}]{istop,  }\item[{int}]{ix,  }\item[{int}]{iy,  }\item[{int}]{ib }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a099d9eb334ae46f6467552a50596a196}\label{Boundary_8h_a099d9eb334ae46f6467552a50596a196}} 
+\index{Boundary.h@{Boundary.h}!isbnd@{isbnd}}
+\index{isbnd@{isbnd}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{isbnd()}{isbnd()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ bool isbnd (\begin{DoxyParamCaption}\item[{int}]{isright,  }\item[{int}]{istop,  }\item[{int}]{blkwidth,  }\item[{int}]{ix,  }\item[{int}]{iy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_aa023b0e53092dd1d34728511f1f93005}\label{Boundary_8h_aa023b0e53092dd1d34728511f1f93005}} 
+\index{Boundary.h@{Boundary.h}!maskbnd@{maskbnd}}
+\index{maskbnd@{maskbnd}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbnd()}{maskbnd()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void maskbnd (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a91a99b6f920543db1cdd58ed166eab2c}\label{Boundary_8h_a91a99b6f920543db1cdd58ed166eab2c}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUbot@{maskbndGPUbot}}
+\index{maskbndGPUbot@{maskbndGPUbot}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUbot()}{maskbndGPUbot()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUbot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_acdef573f7f2d65d3fe3f215342377a8b}\label{Boundary_8h_acdef573f7f2d65d3fe3f215342377a8b}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUleft@{maskbndGPUleft}}
+\index{maskbndGPUleft@{maskbndGPUleft}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUleft()}{maskbndGPUleft()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUleft (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ac1a6983a856cbc02072948f3d3fad1ea}\label{Boundary_8h_ac1a6983a856cbc02072948f3d3fad1ea}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUright@{maskbndGPUright}}
+\index{maskbndGPUright@{maskbndGPUright}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUright()}{maskbndGPUright()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUright (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_aec86c8b6389e6f9ca2e81ab733e58487}\label{Boundary_8h_aec86c8b6389e6f9ca2e81ab733e58487}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUtop@{maskbndGPUtop}}
+\index{maskbndGPUtop@{maskbndGPUtop}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUtop()}{maskbndGPUtop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUtop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ac038c08cc0c028bbd1495d23e5f9a1f2}\label{Boundary_8h_ac038c08cc0c028bbd1495d23e5f9a1f2}} 
+\index{Boundary.h@{Boundary.h}!noslipbnd@{noslipbnd}}
+\index{noslipbnd@{noslipbnd}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{noslipbnd()}{noslipbnd()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void noslipbnd (\begin{DoxyParamCaption}\item[{T}]{zsinside,  }\item[{T}]{hinside,  }\item[{T \&}]{un,  }\item[{T \&}]{ut,  }\item[{T \&}]{zs,  }\item[{T \&}]{h }\end{DoxyParamCaption})}
+

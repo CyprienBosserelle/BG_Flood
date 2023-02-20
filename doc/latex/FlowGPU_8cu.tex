@@ -1,0 +1,86 @@
+\hypertarget{FlowGPU_8cu}{}\doxysection{src/\+Flow\+GPU.cu File Reference}
+\label{FlowGPU_8cu}\index{src/FlowGPU.cu@{src/FlowGPU.cu}}
+{\ttfamily \#include \char`\"{}Flow\+GPU.\+h\char`\"{}}\newline
+Include dependency graph for Flow\+GPU.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{FlowGPU_8cu_a7651ec12d9de9eb8b3b5709582d19c76}{Flow\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template void \mbox{\hyperlink{FlowGPU_8cu_af1522f8964684615512ee173a57b0ca3}{Flow\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template void \mbox{\hyperlink{FlowGPU_8cu_a400dbc79a252fce72ee0207978f7b2da}{Flow\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{FlowGPU_8cu_a2ce0f188d21f6d0845597f2fea727cd8}{Half\+Step\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template void \mbox{\hyperlink{FlowGPU_8cu_a0ac62e7fdacfa7c62527acaf23a99e1e}{Half\+Step\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template void \mbox{\hyperlink{FlowGPU_8cu_a937dcdbeedc14db4b1978b2a48c295dc}{Half\+Step\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{FlowGPU_8cu_ae0cc27dc9f8f783ab833ed41e885152f}{reset\+\_\+var}} (int halowidth, int $\ast$active, T resetval, T $\ast$Var)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{FlowGPU_8cu_ad8e33b9bd998958e0fb26acbc1aa579e}{reset\+\_\+var$<$ float $>$}} (int halowidth, int $\ast$active, float resetval, float $\ast$Var)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{FlowGPU_8cu_af6df004b65fd61c723696c6d9b935b3f}{reset\+\_\+var$<$ double $>$}} (int halowidth, int $\ast$active, double resetval, double $\ast$Var)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{FlowGPU_8cu_a7651ec12d9de9eb8b3b5709582d19c76}\label{FlowGPU_8cu_a7651ec12d9de9eb8b3b5709582d19c76}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!FlowGPU@{FlowGPU}}
+\index{FlowGPU@{FlowGPU}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{FlowGPU()}{FlowGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Flow\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_a400dbc79a252fce72ee0207978f7b2da}\label{FlowGPU_8cu_a400dbc79a252fce72ee0207978f7b2da}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!FlowGPU$<$ double $>$@{FlowGPU$<$ double $>$}}
+\index{FlowGPU$<$ double $>$@{FlowGPU$<$ double $>$}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{FlowGPU$<$ double $>$()}{FlowGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{FlowGPU_8h_a7651ec12d9de9eb8b3b5709582d19c76}{Flow\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_af1522f8964684615512ee173a57b0ca3}\label{FlowGPU_8cu_af1522f8964684615512ee173a57b0ca3}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!FlowGPU$<$ float $>$@{FlowGPU$<$ float $>$}}
+\index{FlowGPU$<$ float $>$@{FlowGPU$<$ float $>$}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{FlowGPU$<$ float $>$()}{FlowGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{FlowGPU_8h_a7651ec12d9de9eb8b3b5709582d19c76}{Flow\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_a2ce0f188d21f6d0845597f2fea727cd8}\label{FlowGPU_8cu_a2ce0f188d21f6d0845597f2fea727cd8}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!HalfStepGPU@{HalfStepGPU}}
+\index{HalfStepGPU@{HalfStepGPU}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{HalfStepGPU()}{HalfStepGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Half\+Step\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_a937dcdbeedc14db4b1978b2a48c295dc}\label{FlowGPU_8cu_a937dcdbeedc14db4b1978b2a48c295dc}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!HalfStepGPU$<$ double $>$@{HalfStepGPU$<$ double $>$}}
+\index{HalfStepGPU$<$ double $>$@{HalfStepGPU$<$ double $>$}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{HalfStepGPU$<$ double $>$()}{HalfStepGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{FlowGPU_8h_a2ce0f188d21f6d0845597f2fea727cd8}{Half\+Step\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_a0ac62e7fdacfa7c62527acaf23a99e1e}\label{FlowGPU_8cu_a0ac62e7fdacfa7c62527acaf23a99e1e}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!HalfStepGPU$<$ float $>$@{HalfStepGPU$<$ float $>$}}
+\index{HalfStepGPU$<$ float $>$@{HalfStepGPU$<$ float $>$}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{HalfStepGPU$<$ float $>$()}{HalfStepGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{FlowGPU_8h_a2ce0f188d21f6d0845597f2fea727cd8}{Half\+Step\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_ae0cc27dc9f8f783ab833ed41e885152f}\label{FlowGPU_8cu_ae0cc27dc9f8f783ab833ed41e885152f}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!reset\_var@{reset\_var}}
+\index{reset\_var@{reset\_var}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{reset\_var()}{reset\_var()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void reset\+\_\+var (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{T}]{resetval,  }\item[{T $\ast$}]{Var }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_af6df004b65fd61c723696c6d9b935b3f}\label{FlowGPU_8cu_af6df004b65fd61c723696c6d9b935b3f}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!reset\_var$<$ double $>$@{reset\_var$<$ double $>$}}
+\index{reset\_var$<$ double $>$@{reset\_var$<$ double $>$}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{reset\_var$<$ double $>$()}{reset\_var< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{FlowGPU_8h_ae0cc27dc9f8f783ab833ed41e885152f}{reset\+\_\+var}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{double}]{resetval,  }\item[{double $\ast$}]{Var }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowGPU_8cu_ad8e33b9bd998958e0fb26acbc1aa579e}\label{FlowGPU_8cu_ad8e33b9bd998958e0fb26acbc1aa579e}} 
+\index{FlowGPU.cu@{FlowGPU.cu}!reset\_var$<$ float $>$@{reset\_var$<$ float $>$}}
+\index{reset\_var$<$ float $>$@{reset\_var$<$ float $>$}!FlowGPU.cu@{FlowGPU.cu}}
+\doxysubsubsection{\texorpdfstring{reset\_var$<$ float $>$()}{reset\_var< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{FlowGPU_8h_ae0cc27dc9f8f783ab833ed41e885152f}{reset\+\_\+var}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{float}]{resetval,  }\item[{float $\ast$}]{Var }\end{DoxyParamCaption})}
+

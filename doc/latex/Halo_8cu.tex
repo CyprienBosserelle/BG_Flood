@@ -1,0 +1,1379 @@
+\hypertarget{Halo_8cu}{}\doxysection{src/\+Halo.cu File Reference}
+\label{Halo_8cu}\index{src/Halo.cu@{src/Halo.cu}}
+{\ttfamily \#include \char`\"{}Halo.\+h\char`\"{}}\newline
+Include dependency graph for Halo.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a33d2233b52ae274a668055c9075a3901}{fill\+HaloD}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\begin{DoxyCompactList}\small\item\em Wrapping function for calculating halos on CPU on every side of a block of a single variable. \end{DoxyCompactList}\item 
+template void \mbox{\hyperlink{Halo_8cu_a6e2403c1c105317070a7ac8516c5621f}{fill\+Halo\+D$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a8c6debda6b888b35798dcaaf5ec95d3f}{fill\+Halo\+D$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_ab0197d939bcfd09fdc7c5807453d9dfc}{fill\+HaloC}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\begin{DoxyCompactList}\small\item\em Wrapping function for calculating halos for each block of a single variable on CPU. \end{DoxyCompactList}\item 
+template void \mbox{\hyperlink{Halo_8cu_a62c3c8912f171794c2aedd471025e4c7}{fill\+Halo\+C$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a8940bc0632378da915f25ee31de2ed0b}{fill\+Halo\+C$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_af0f36c2211a044c4891c7fafc9d1b02f}{Recalculate\+Zs}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\begin{DoxyCompactList}\small\item\em Recalculate water surface after recalculating the values on the halo on the CPU. \end{DoxyCompactList}\item 
+template void \mbox{\hyperlink{Halo_8cu_a4a179168b1b6ca6d431895fa50ddbc5e}{Recalculate\+Zs$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ Xev, float $\ast$zb)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a4346cbc367125486b54412319cca8521}{Recalculate\+Zs$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ Xev, double $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a9fd24940e7422244beb1290eee7e01d2}{Recalculatehh}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a86f7fbcf268c15b06de92d94a86676d4}{Recalculatehh$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ Xev, float $\ast$zb)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a57466ad6cd9816401644ed33654265f7}{Recalculatehh$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ Xev, double $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a5ffb16dded1af0f0b9243601ee29db92}{Recalculate\+Zs\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a1375cf89754b41163abe692f5a52f1aa}{Recalculate\+Zs\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ Xev, float $\ast$zb)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a2530753f4e0a860edcdde8a4600d575e}{Recalculate\+Zs\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ Xev, double $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a96005943eb8cc55515edf93a438bdc15}{fill\+HaloF}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\begin{DoxyCompactList}\small\item\em Wrapping function for calculating flux in the halos for a block and a single variable on CPU. \end{DoxyCompactList}\item 
+template void \mbox{\hyperlink{Halo_8cu_af14f6761d43141eba363350b5f7ad48d}{fill\+Halo\+F$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ae033bec7214b1e041fbde2fc784da5ec}{fill\+Halo\+F$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a2ee84ac3de37b97bf6c4a3919f8a355b}{fill\+Halo\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, cuda\+Stream\+\_\+t stream, T $\ast$z)
+\begin{DoxyCompactList}\small\item\em Wrapping function for calculating halos for each block of a single variable on GPU. \end{DoxyCompactList}\item 
+template void \mbox{\hyperlink{Halo_8cu_a805c1dabf839953debffe2799c61cae0}{fill\+Halo\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, cuda\+Stream\+\_\+t stream, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a20176600a52e8881aa78213c15e1ac4b}{fill\+Halo\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, cuda\+Stream\+\_\+t stream, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a29a79939f743cb813160e5cd771480b9}{fill\+Halo\+GPUnew}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, cuda\+Stream\+\_\+t stream, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a824b0c7405c55a3c7add16fb2dbddd7b}{fill\+Halo\+GPUnew$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, cuda\+Stream\+\_\+t stream, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ad8b7fdfb110e1c442c9c46434ea55a8c}{fill\+Halo\+GPUnew$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, cuda\+Stream\+\_\+t stream, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_ae3adb7ce2fbe32053675857784affbe1}{fill\+Halo\+Top\+RightC}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\begin{DoxyCompactList}\small\item\em Wrapping function for calculating flux for halos for each block of a single variable on GPU. \end{DoxyCompactList}\item 
+template void \mbox{\hyperlink{Halo_8cu_a3c209f200fa3e85dfdf772a4e2904049}{fill\+Halo\+Top\+Right\+C$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ac87d50a1edb09efac22b75440d8a67ff}{fill\+Halo\+Top\+Right\+C$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_ae5c54a05d63827832b83be828802753f}{fill\+Halo\+LRFluxC}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ad2c3611f0b1922bbf5f31517f9f6e491}{fill\+Halo\+LRFlux\+C$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ab72d57c0f58a2aba8386523e4c311279}{fill\+Halo\+LRFlux\+C$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a0170ca89e35d08a9bd76139bfdd6ff37}{fill\+Halo\+BTFluxC}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a5b5769495221a888c7c842adb908b5b9}{fill\+Halo\+BTFlux\+C$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_accd66463b0299c74894d64c1bb1b202a}{fill\+Halo\+BTFlux\+C$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a1933020a5783e090d0c44fffb283e563}{fill\+Halo\+Top\+Right\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, cuda\+Stream\+\_\+t stream, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a84c9dcd8f96a68563a6ed9f41fddeb9b}{fill\+Halo\+Top\+Right\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, cuda\+Stream\+\_\+t stream, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ac7dd171c00746b296b85d607c2630b32}{fill\+Halo\+Top\+Right\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, cuda\+Stream\+\_\+t stream, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_af347bef69b66f3cc31cfc0e1e61ea971}{fill\+Halo\+Left\+Right\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, cuda\+Stream\+\_\+t stream, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_af618df69f5fab841b5c52471a217b3ea}{fill\+Halo\+Left\+Right\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, cuda\+Stream\+\_\+t stream, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ace2d807ee7ac57add88bb337cebaada3}{fill\+Halo\+Left\+Right\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, cuda\+Stream\+\_\+t stream, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a6da328def689854bc8f7f54af1d40dcb}{fill\+Halo\+Left\+Right\+GPUnew}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, cuda\+Stream\+\_\+t stream, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a9c68f2c332f01be941bbc9e6dd04e5e5}{fill\+Halo\+Left\+Right\+GPUnew$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, cuda\+Stream\+\_\+t stream, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ab1b44678d54793b59734f97b88c2a623}{fill\+Halo\+Left\+Right\+GPUnew$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, cuda\+Stream\+\_\+t stream, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a645550ebdc0b4a03a0d47e31e0814d31}{fill\+Halo\+Bot\+Top\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, cuda\+Stream\+\_\+t stream, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ad922091a4b843c143f4897d9446fe846}{fill\+Halo\+Bot\+Top\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, cuda\+Stream\+\_\+t stream, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a718dfed8a35b43d0e476d15fa60cf99e}{fill\+Halo\+Bot\+Top\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, cuda\+Stream\+\_\+t stream, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a243e3434cdc9990c9911ee1c00052348}{fill\+Halo\+Bot\+Top\+GPUnew}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, cuda\+Stream\+\_\+t stream, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a9ed5180f00aa1fc13391a3618e6caba9}{fill\+Halo\+Bot\+Top\+GPUnew$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, cuda\+Stream\+\_\+t stream, double $\ast$z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a7a80e2f0e348af6c37f5550554eb1fec}{fill\+Halo\+Bot\+Top\+GPUnew$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, cuda\+Stream\+\_\+t stream, float $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a4a31e12451e1336defc379f47d6aab9e}{fill\+Halo}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_afa4cf32960744be7d6afbd861b4af55e}{fill\+Halo$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ Xev, float $\ast$zb)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a3631ffea6e7d5766b04de6082182813e}{fill\+Halo$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ Xev, double $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a571ac7ff2cf8b31f5d026b7e909e5271}{fill\+Halo}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_aa8f68738d43b4ea348c964349d07fd21}{fill\+Halo$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ Xev)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a22fa619b12cb821e01c0611bf0774f70}{fill\+Halo$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ Xev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a2a355feb696605ad555fe018395bcac2}{fill\+Halo\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a9b8d1661f255b3e8e41a8ec6a2a98260}{fill\+Halo\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ Xev)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a87f6da23bb80f5c2a138bad34e576e5b}{fill\+Halo\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ Xev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a8bcac8c7fda9dd6edcfb34f40543ceef}{fill\+Halo\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ae9d035a7e3954d9b2801a74cf2ba87f2}{fill\+Halo\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ Xev, float $\ast$zb)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ac253f2bf76324a678d0f34a9a9b1c631}{fill\+Halo\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ Xev, double $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a335ca91325da154b12cc3f3ee6dabba3}{fill\+Halo}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ Grad)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a1537aa80051775c77097a9bb3b82725c}{fill\+Halo$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$ Grad)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a0884370506c63c157bcca090e1dc9034}{fill\+Halo$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$ Grad)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a8d8f335f2691b865597b01f0e6c2e210}{fill\+Halo\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ Grad)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a18a815a1959a39e7ab80e94b759a15f7}{fill\+Halo\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$ Grad)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a0c4feec6db1f401b3409302c41843524}{fill\+Halo\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$ Grad)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ Flux)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_aa43f5a8602659f6210dd902089ccf013}{fill\+Halo$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$ Flux)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a950a805927a040a251910383f8a0917c}{fill\+Halo$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$ Flux)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ Flux)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_acac7f5cbebdc9598fe00696f6708068f}{fill\+Halo\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$ Flux)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ae4dfd3f7c7752f689ea4aa1cd17b378c}{fill\+Halo\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$ Flux)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a660ab474d664c8622e1f0768eef59342}{refine\+\_\+linear\+\_\+\+Left}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a4e7dbd71c089a0e3dc219c1eb5d9d13e}{refine\+\_\+linear\+\_\+\+Left$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_aaa405d4b273e7eba82cccef28661a4cf}{refine\+\_\+linear\+\_\+\+Left$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a0dfd1652d58d54f5d3fd66d6d30ed2dd}{refine\+\_\+linear\+\_\+\+Left\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_ae21004698b731ba1e88d8199e1bf5839}{refine\+\_\+linear\+\_\+\+Left\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a387ff243908f0957e13f8f5eb4e6c4ea}{refine\+\_\+linear\+\_\+\+Left\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a41de2d4fe883bf1e375fd44877584b14}{refine\+\_\+linear\+\_\+\+Right}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a1fa1834cc4aa84cb7738a0adc45a4dc2}{refine\+\_\+linear\+\_\+\+Right$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a80b97b76fe856b41292e4700327b4829}{refine\+\_\+linear\+\_\+\+Right$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a66adad329d72cd96c0a4fc0fefd62cfe}{refine\+\_\+linear\+\_\+\+Right\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_abf05d4e326bc8001570eb7c0e2078780}{refine\+\_\+linear\+\_\+\+Right\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a7ba5681c7d996dca7b951aba4dd80aa9}{refine\+\_\+linear\+\_\+\+Right\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a86539114f4682e0cfd5ae397978c569a}{refine\+\_\+linear\+\_\+\+Bot}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a7a09d610716c25c2c4cb45dde7ffdd53}{refine\+\_\+linear\+\_\+\+Bot$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a5895d32dd2bfb9aa26fb9653a767882a}{refine\+\_\+linear\+\_\+\+Bot$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a5748f4fb9632d8308fa235004d5f6b12}{refine\+\_\+linear\+\_\+\+Bot\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_ace3bee45c02ffdf7c1848ee910bf97be}{refine\+\_\+linear\+\_\+\+Bot\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a179fecb6df5a3276383654db31c3b213}{refine\+\_\+linear\+\_\+\+Bot\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a7b4fb01de4f8fdd9daafc221db1a959f}{refine\+\_\+linear\+\_\+\+Top}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_afc2a5bb2abceee1a853c771cefbf5a2b}{refine\+\_\+linear\+\_\+\+Top$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_ab1f2fb4f0d584a9b42bcfbd80c018cf8}{refine\+\_\+linear\+\_\+\+Top$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a525a7162ec9037c8b16cf7417f3926b2}{refine\+\_\+linear\+\_\+\+Top\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a9ad60860791cc1d9816671a7daf3f9ff}{refine\+\_\+linear\+\_\+\+Top\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_ae915fa866b3f0fe4136aadc5dbd58135}{refine\+\_\+linear\+\_\+\+Top\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_aa3159218d597d5dec3caa8686a223081}{refine\+\_\+linear}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a535cb1b12608ac724cc113d84302cc7e}{refine\+\_\+linear$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_aff8eecab036938a6f0516958e7a6666e}{refine\+\_\+linear$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a090d7ddeba077e9ef3b06ec9e4f8851a}{refine\+\_\+linear\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z, T $\ast$dzdx, T $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_aba3b8bc4676eb67b3ba5af23fd082a03}{refine\+\_\+linear\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z, float $\ast$dzdx, float $\ast$dzdy)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a2dbaeb9cbd6aba5e1a875ff4f81befb0}{refine\+\_\+linear\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z, double $\ast$dzdx, double $\ast$dzdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a9127f7d09d9a110da1cb7fae1786c389}{Halo\+Flux\+CPULR}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a82e672706036bc5b4e87cd2b739f9609}{Halo\+Flux\+GPULR}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a9178199ff5e46ef9a5fee4241b8e235e}{Halo\+Flux\+GPULRnew}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a5497979187df8771242d5c3d66922615}{Halo\+Flux\+CPUBT}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a0c0b81d1c956a11c4025491946f90010}{Halo\+Flux\+GPUBT}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a5ddd71e988ae7200bfd409d5d9d81921}{Halo\+Flux\+GPUBTnew}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_ad7bdbf10e6e7309983c7143644f18268}{fill\+Left}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_af1855d1f517b150637f7ebba2b7c98d3}{fill\+Left}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$leftbot, int $\ast$lefttop, int $\ast$rightbot, int $\ast$botright, int $\ast$topright, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a3b14beb454331728755e5f8a6f251e13}{fill\+Left$<$ float $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$leftbot, int $\ast$lefttop, int $\ast$rightbot, int $\ast$botright, int $\ast$topright, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_aedd2d63dd1706ae7d29be62692da6f38}{fill\+Left$<$ double $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$leftbot, int $\ast$lefttop, int $\ast$rightbot, int $\ast$botright, int $\ast$topright, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_aeca99a935bccb5897113cf8f57dcc877}{fill\+Leftnew}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$leftbot, int $\ast$lefttop, int $\ast$rightbot, int $\ast$botright, int $\ast$topright, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a98fac6187460306e6a2d90611cf5f7b6}{fill\+Leftnew$<$ float $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$leftbot, int $\ast$lefttop, int $\ast$rightbot, int $\ast$botright, int $\ast$topright, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_ae6479ede9a0c3e1cfacc2e53355ebccb}{fill\+Leftnew$<$ double $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$leftbot, int $\ast$lefttop, int $\ast$rightbot, int $\ast$botright, int $\ast$topright, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a5d9d65fbd4acba2dc766568a77bfaffd}{fill\+Left\+Flux}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a2345005d54233720f2cae1e1b443a36f}{fill\+Right}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_af71504ac800a61627ac5cef75d003bfd}{fill\+Right}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a72e57bc7f4ba67769042bff28273c9e7}{fill\+Right$<$ float $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a1ded4426a80fbcf290981dc537f320d4}{fill\+Right$<$ double $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_ab2b0d44b1bb0c826f764f7b84b8bed23}{fill\+Rightnew}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a81fe82b12b6eecfaab656454daa1c2d1}{fill\+Rightnew$<$ float $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_ab5a4a9f0e151d12e559ac3581e855908}{fill\+Rightnew$<$ double $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a2f03036ffa47f139c5eba848de62ce1a}{fill\+Right\+Flux}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a1f1c910e13ec59b239e54f5b9974785b}{fill\+Right\+Flux$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a04f5e436751e34f565037dc24a22a155}{fill\+Right\+Flux$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_afaa07f3e06bd6f302d97aa9954188afb}{fill\+Right\+Flux}} (int halowidth, bool do\+Prolongation, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a56941d739afb1ee3215e82cd06678e96}{fill\+Right\+Flux$<$ float $>$}} (int halowidth, bool do\+Prolongation, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a87e192a85f48bf6a5706ac9fde71b3e9}{fill\+Right\+Flux$<$ double $>$}} (int halowidth, bool do\+Prolongation, int $\ast$active, int $\ast$level, int $\ast$rightbot, int $\ast$righttop, int $\ast$leftbot, int $\ast$botleft, int $\ast$topleft, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a671352fcb2eaaa2d4207ff07c9e8f852}{fill\+Bot}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_af9678ea06bf2f69ed3152b64f8deffca}{fill\+Bot}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$botleft, int $\ast$botright, int $\ast$topleft, int $\ast$lefttop, int $\ast$righttop, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a7020b0ebbbedc2f4dcb4f34e1007273f}{fill\+Bot$<$ float $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$botleft, int $\ast$botright, int $\ast$topleft, int $\ast$lefttop, int $\ast$righttop, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a55031de0d78e78dfc24cef8c29bc7017}{fill\+Bot$<$ double $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$botleft, int $\ast$botright, int $\ast$topleft, int $\ast$lefttop, int $\ast$righttop, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a2fc4bb8d813f6515dea868a5d2d36f68}{fill\+Botnew}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$botleft, int $\ast$botright, int $\ast$topleft, int $\ast$lefttop, int $\ast$righttop, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_acb3d52e6ce9ff6c556e2d0743ea6844f}{fill\+Botnew$<$ float $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$botleft, int $\ast$botright, int $\ast$topleft, int $\ast$lefttop, int $\ast$righttop, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a701b145ee386048b5066d978de26a8a4}{fill\+Botnew$<$ double $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$botleft, int $\ast$botright, int $\ast$topleft, int $\ast$lefttop, int $\ast$righttop, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_ada9520990635cb340db8cf913cc6e356}{fill\+Bot\+Flux}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_aefe78bd2478a704e63205de5fee4f5ac}{fill\+Top}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a77acf80e6591f424cb6b99331eb3764a}{fill\+Top}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_ab3744247f8d4622ba1f0e52a738148f7}{fill\+Top$<$ float $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a89b6a37e2b440932b8c4beea68e0a13a}{fill\+Top$<$ double $>$}} (int halowidth, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a67e1c95744d12c9baf5767e34767d4d4}{fill\+Topnew}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a65828cacc2417f824d4e96d696749531}{fill\+Topnew$<$ float $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a5fa720fa5a16910d38c34480f2f1b72b}{fill\+Topnew$<$ double $>$}} (int halowidth, int nblk, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a9af9c1a41440ff037441b0cea28bcbaf}{fill\+Top\+Flux}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_af00c6ce01842ac1e06289207021a7793}{fill\+Top\+Flux$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a7d2e054c42e7de0e660d4eb7d42171ad}{fill\+Top\+Flux$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, bool do\+Prolongation, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_aaeae9c3ca26a884c76d4d429c60dead6}{fill\+Top\+Flux}} (int halowidth, bool do\+Prolongation, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, T $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a266e09515f6b6f7f560ccc120e806957}{fill\+Top\+Flux$<$ float $>$}} (int halowidth, bool do\+Prolongation, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, float $\ast$a)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a6f91cf2e90ac2d1db440820c5ba5518c}{fill\+Top\+Flux$<$ double $>$}} (int halowidth, bool do\+Prolongation, int $\ast$active, int $\ast$level, int $\ast$topleft, int $\ast$topright, int $\ast$botleft, int $\ast$leftbot, int $\ast$rightbot, double $\ast$a)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_a1797b1932cfb1952397c7618a84da179}{fill\+Corners}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a0da557498682b82b0ffcc76249624dca}{fill\+Corners$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a66442f2a4308a4f7973c13eadfd0ccd4}{fill\+Corners$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_ae6a37fef4c306b5218742df8872f03dc}{fill\+Corners}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&Xev)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_acf6d62f01f062c58a9c0133a3e931b28}{fill\+Corners$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&Xev)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_aa2d6ea0e98dca434a8fe613239142688}{fill\+Corners$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&Xev)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Halo_8cu_aad3c5276e55ffe7f76f312de463a6353}{fill\+Corners}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_af52340141ab4f4e3f665ec44134720b1}{fill\+Corners$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{Halo_8cu_a3b201dc5498462f5fc345114b3633541}{fill\+Corners$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$\&z)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Halo_8cu_af9678ea06bf2f69ed3152b64f8deffca}\label{Halo_8cu_af9678ea06bf2f69ed3152b64f8deffca}} 
+\index{Halo.cu@{Halo.cu}!fillBot@{fillBot}}
+\index{fillBot@{fillBot}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBot()}{fillBot()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Bot (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{righttop,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a671352fcb2eaaa2d4207ff07c9e8f852}\label{Halo_8cu_a671352fcb2eaaa2d4207ff07c9e8f852}} 
+\index{Halo.cu@{Halo.cu}!fillBot@{fillBot}}
+\index{fillBot@{fillBot}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBot()}{fillBot()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Bot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a55031de0d78e78dfc24cef8c29bc7017}\label{Halo_8cu_a55031de0d78e78dfc24cef8c29bc7017}} 
+\index{Halo.cu@{Halo.cu}!fillBot$<$ double $>$@{fillBot$<$ double $>$}}
+\index{fillBot$<$ double $>$@{fillBot$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBot$<$ double $>$()}{fillBot< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_af9678ea06bf2f69ed3152b64f8deffca}{fill\+Bot}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{righttop,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a7020b0ebbbedc2f4dcb4f34e1007273f}\label{Halo_8cu_a7020b0ebbbedc2f4dcb4f34e1007273f}} 
+\index{Halo.cu@{Halo.cu}!fillBot$<$ float $>$@{fillBot$<$ float $>$}}
+\index{fillBot$<$ float $>$@{fillBot$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBot$<$ float $>$()}{fillBot< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_af9678ea06bf2f69ed3152b64f8deffca}{fill\+Bot}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{righttop,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ada9520990635cb340db8cf913cc6e356}\label{Halo_8cu_ada9520990635cb340db8cf913cc6e356}} 
+\index{Halo.cu@{Halo.cu}!fillBotFlux@{fillBotFlux}}
+\index{fillBotFlux@{fillBotFlux}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBotFlux()}{fillBotFlux()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Bot\+Flux (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a2fc4bb8d813f6515dea868a5d2d36f68}\label{Halo_8cu_a2fc4bb8d813f6515dea868a5d2d36f68}} 
+\index{Halo.cu@{Halo.cu}!fillBotnew@{fillBotnew}}
+\index{fillBotnew@{fillBotnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBotnew()}{fillBotnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Botnew (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{righttop,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a701b145ee386048b5066d978de26a8a4}\label{Halo_8cu_a701b145ee386048b5066d978de26a8a4}} 
+\index{Halo.cu@{Halo.cu}!fillBotnew$<$ double $>$@{fillBotnew$<$ double $>$}}
+\index{fillBotnew$<$ double $>$@{fillBotnew$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBotnew$<$ double $>$()}{fillBotnew< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a2fc4bb8d813f6515dea868a5d2d36f68}{fill\+Botnew}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{righttop,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_acb3d52e6ce9ff6c556e2d0743ea6844f}\label{Halo_8cu_acb3d52e6ce9ff6c556e2d0743ea6844f}} 
+\index{Halo.cu@{Halo.cu}!fillBotnew$<$ float $>$@{fillBotnew$<$ float $>$}}
+\index{fillBotnew$<$ float $>$@{fillBotnew$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillBotnew$<$ float $>$()}{fillBotnew< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a2fc4bb8d813f6515dea868a5d2d36f68}{fill\+Botnew}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{righttop,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae6a37fef4c306b5218742df8872f03dc}\label{Halo_8cu_ae6a37fef4c306b5218742df8872f03dc}} 
+\index{Halo.cu@{Halo.cu}!fillCorners@{fillCorners}}
+\index{fillCorners@{fillCorners}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners()}{fillCorners()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Corners (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a1797b1932cfb1952397c7618a84da179}\label{Halo_8cu_a1797b1932cfb1952397c7618a84da179}} 
+\index{Halo.cu@{Halo.cu}!fillCorners@{fillCorners}}
+\index{fillCorners@{fillCorners}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners()}{fillCorners()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Corners (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aad3c5276e55ffe7f76f312de463a6353}\label{Halo_8cu_aad3c5276e55ffe7f76f312de463a6353}} 
+\index{Halo.cu@{Halo.cu}!fillCorners@{fillCorners}}
+\index{fillCorners@{fillCorners}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners()}{fillCorners()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Corners (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a66442f2a4308a4f7973c13eadfd0ccd4}\label{Halo_8cu_a66442f2a4308a4f7973c13eadfd0ccd4}} 
+\index{Halo.cu@{Halo.cu}!fillCorners$<$ double $>$@{fillCorners$<$ double $>$}}
+\index{fillCorners$<$ double $>$@{fillCorners$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners$<$ double $>$()}{fillCorners< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae6a37fef4c306b5218742df8872f03dc}{fill\+Corners}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aa2d6ea0e98dca434a8fe613239142688}\label{Halo_8cu_aa2d6ea0e98dca434a8fe613239142688}} 
+\index{Halo.cu@{Halo.cu}!fillCorners$<$ double $>$@{fillCorners$<$ double $>$}}
+\index{fillCorners$<$ double $>$@{fillCorners$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners$<$ double $>$()}{fillCorners< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae6a37fef4c306b5218742df8872f03dc}{fill\+Corners}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a3b201dc5498462f5fc345114b3633541}\label{Halo_8cu_a3b201dc5498462f5fc345114b3633541}} 
+\index{Halo.cu@{Halo.cu}!fillCorners$<$ double $>$@{fillCorners$<$ double $>$}}
+\index{fillCorners$<$ double $>$@{fillCorners$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners$<$ double $>$()}{fillCorners< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae6a37fef4c306b5218742df8872f03dc}{fill\+Corners}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_acf6d62f01f062c58a9c0133a3e931b28}\label{Halo_8cu_acf6d62f01f062c58a9c0133a3e931b28}} 
+\index{Halo.cu@{Halo.cu}!fillCorners$<$ float $>$@{fillCorners$<$ float $>$}}
+\index{fillCorners$<$ float $>$@{fillCorners$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners$<$ float $>$()}{fillCorners< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae6a37fef4c306b5218742df8872f03dc}{fill\+Corners}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a0da557498682b82b0ffcc76249624dca}\label{Halo_8cu_a0da557498682b82b0ffcc76249624dca}} 
+\index{Halo.cu@{Halo.cu}!fillCorners$<$ float $>$@{fillCorners$<$ float $>$}}
+\index{fillCorners$<$ float $>$@{fillCorners$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners$<$ float $>$()}{fillCorners< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae6a37fef4c306b5218742df8872f03dc}{fill\+Corners}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af52340141ab4f4e3f665ec44134720b1}\label{Halo_8cu_af52340141ab4f4e3f665ec44134720b1}} 
+\index{Halo.cu@{Halo.cu}!fillCorners$<$ float $>$@{fillCorners$<$ float $>$}}
+\index{fillCorners$<$ float $>$@{fillCorners$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillCorners$<$ float $>$()}{fillCorners< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae6a37fef4c306b5218742df8872f03dc}{fill\+Corners}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a571ac7ff2cf8b31f5d026b7e909e5271}\label{Halo_8cu_a571ac7ff2cf8b31f5d026b7e909e5271}} 
+\index{Halo.cu@{Halo.cu}!fillHalo@{fillHalo}}
+\index{fillHalo@{fillHalo}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo()}{fillHalo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a4a31e12451e1336defc379f47d6aab9e}\label{Halo_8cu_a4a31e12451e1336defc379f47d6aab9e}} 
+\index{Halo.cu@{Halo.cu}!fillHalo@{fillHalo}}
+\index{fillHalo@{fillHalo}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo()}{fillHalo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a657a661d3469befc6894213c9512fb3d}\label{Halo_8cu_a657a661d3469befc6894213c9512fb3d}} 
+\index{Halo.cu@{Halo.cu}!fillHalo@{fillHalo}}
+\index{fillHalo@{fillHalo}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo()}{fillHalo()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a335ca91325da154b12cc3f3ee6dabba3}\label{Halo_8cu_a335ca91325da154b12cc3f3ee6dabba3}} 
+\index{Halo.cu@{Halo.cu}!fillHalo@{fillHalo}}
+\index{fillHalo@{fillHalo}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo()}{fillHalo()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a22fa619b12cb821e01c0611bf0774f70}\label{Halo_8cu_a22fa619b12cb821e01c0611bf0774f70}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ double $>$@{fillHalo$<$ double $>$}}
+\index{fillHalo$<$ double $>$@{fillHalo$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ double $>$()}{fillHalo< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a3631ffea6e7d5766b04de6082182813e}\label{Halo_8cu_a3631ffea6e7d5766b04de6082182813e}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ double $>$@{fillHalo$<$ double $>$}}
+\index{fillHalo$<$ double $>$@{fillHalo$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ double $>$()}{fillHalo< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{Xev,  }\item[{double $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a950a805927a040a251910383f8a0917c}\label{Halo_8cu_a950a805927a040a251910383f8a0917c}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ double $>$@{fillHalo$<$ double $>$}}
+\index{fillHalo$<$ double $>$@{fillHalo$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ double $>$()}{fillHalo< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a0884370506c63c157bcca090e1dc9034}\label{Halo_8cu_a0884370506c63c157bcca090e1dc9034}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ double $>$@{fillHalo$<$ double $>$}}
+\index{fillHalo$<$ double $>$@{fillHalo$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ double $>$()}{fillHalo< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aa8f68738d43b4ea348c964349d07fd21}\label{Halo_8cu_aa8f68738d43b4ea348c964349d07fd21}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ float $>$@{fillHalo$<$ float $>$}}
+\index{fillHalo$<$ float $>$@{fillHalo$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ float $>$()}{fillHalo< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_afa4cf32960744be7d6afbd861b4af55e}\label{Halo_8cu_afa4cf32960744be7d6afbd861b4af55e}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ float $>$@{fillHalo$<$ float $>$}}
+\index{fillHalo$<$ float $>$@{fillHalo$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ float $>$()}{fillHalo< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{Xev,  }\item[{float $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aa43f5a8602659f6210dd902089ccf013}\label{Halo_8cu_aa43f5a8602659f6210dd902089ccf013}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ float $>$@{fillHalo$<$ float $>$}}
+\index{fillHalo$<$ float $>$@{fillHalo$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ float $>$()}{fillHalo< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a1537aa80051775c77097a9bb3b82725c}\label{Halo_8cu_a1537aa80051775c77097a9bb3b82725c}} 
+\index{Halo.cu@{Halo.cu}!fillHalo$<$ float $>$@{fillHalo$<$ float $>$}}
+\index{fillHalo$<$ float $>$@{fillHalo$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHalo$<$ float $>$()}{fillHalo< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a657a661d3469befc6894213c9512fb3d}{fill\+Halo}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a645550ebdc0b4a03a0d47e31e0814d31}\label{Halo_8cu_a645550ebdc0b4a03a0d47e31e0814d31}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBotTopGPU@{fillHaloBotTopGPU}}
+\index{fillHaloBotTopGPU@{fillHaloBotTopGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBotTopGPU()}{fillHaloBotTopGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+Bot\+Top\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ad922091a4b843c143f4897d9446fe846}\label{Halo_8cu_ad922091a4b843c143f4897d9446fe846}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBotTopGPU$<$ double $>$@{fillHaloBotTopGPU$<$ double $>$}}
+\index{fillHaloBotTopGPU$<$ double $>$@{fillHaloBotTopGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBotTopGPU$<$ double $>$()}{fillHaloBotTopGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a645550ebdc0b4a03a0d47e31e0814d31}{fill\+Halo\+Bot\+Top\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a718dfed8a35b43d0e476d15fa60cf99e}\label{Halo_8cu_a718dfed8a35b43d0e476d15fa60cf99e}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBotTopGPU$<$ float $>$@{fillHaloBotTopGPU$<$ float $>$}}
+\index{fillHaloBotTopGPU$<$ float $>$@{fillHaloBotTopGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBotTopGPU$<$ float $>$()}{fillHaloBotTopGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a645550ebdc0b4a03a0d47e31e0814d31}{fill\+Halo\+Bot\+Top\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a243e3434cdc9990c9911ee1c00052348}\label{Halo_8cu_a243e3434cdc9990c9911ee1c00052348}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBotTopGPUnew@{fillHaloBotTopGPUnew}}
+\index{fillHaloBotTopGPUnew@{fillHaloBotTopGPUnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBotTopGPUnew()}{fillHaloBotTopGPUnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+Bot\+Top\+GPUnew (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9ed5180f00aa1fc13391a3618e6caba9}\label{Halo_8cu_a9ed5180f00aa1fc13391a3618e6caba9}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBotTopGPUnew$<$ double $>$@{fillHaloBotTopGPUnew$<$ double $>$}}
+\index{fillHaloBotTopGPUnew$<$ double $>$@{fillHaloBotTopGPUnew$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBotTopGPUnew$<$ double $>$()}{fillHaloBotTopGPUnew< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a243e3434cdc9990c9911ee1c00052348}{fill\+Halo\+Bot\+Top\+GPUnew}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a7a80e2f0e348af6c37f5550554eb1fec}\label{Halo_8cu_a7a80e2f0e348af6c37f5550554eb1fec}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBotTopGPUnew$<$ float $>$@{fillHaloBotTopGPUnew$<$ float $>$}}
+\index{fillHaloBotTopGPUnew$<$ float $>$@{fillHaloBotTopGPUnew$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBotTopGPUnew$<$ float $>$()}{fillHaloBotTopGPUnew< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a243e3434cdc9990c9911ee1c00052348}{fill\+Halo\+Bot\+Top\+GPUnew}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a0170ca89e35d08a9bd76139bfdd6ff37}\label{Halo_8cu_a0170ca89e35d08a9bd76139bfdd6ff37}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBTFluxC@{fillHaloBTFluxC}}
+\index{fillHaloBTFluxC@{fillHaloBTFluxC}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBTFluxC()}{fillHaloBTFluxC()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+BTFluxC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5b5769495221a888c7c842adb908b5b9}\label{Halo_8cu_a5b5769495221a888c7c842adb908b5b9}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBTFluxC$<$ double $>$@{fillHaloBTFluxC$<$ double $>$}}
+\index{fillHaloBTFluxC$<$ double $>$@{fillHaloBTFluxC$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBTFluxC$<$ double $>$()}{fillHaloBTFluxC< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a0170ca89e35d08a9bd76139bfdd6ff37}{fill\+Halo\+BTFluxC}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_accd66463b0299c74894d64c1bb1b202a}\label{Halo_8cu_accd66463b0299c74894d64c1bb1b202a}} 
+\index{Halo.cu@{Halo.cu}!fillHaloBTFluxC$<$ float $>$@{fillHaloBTFluxC$<$ float $>$}}
+\index{fillHaloBTFluxC$<$ float $>$@{fillHaloBTFluxC$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloBTFluxC$<$ float $>$()}{fillHaloBTFluxC< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a0170ca89e35d08a9bd76139bfdd6ff37}{fill\+Halo\+BTFluxC}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ab0197d939bcfd09fdc7c5807453d9dfc}\label{Halo_8cu_ab0197d939bcfd09fdc7c5807453d9dfc}} 
+\index{Halo.cu@{Halo.cu}!fillHaloC@{fillHaloC}}
+\index{fillHaloC@{fillHaloC}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloC()}{fillHaloC()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+HaloC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+
+
+Wrapping function for calculating halos for each block of a single variable on CPU. 
+
+\hypertarget{Halo_8h_autotoc_md137}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md137}
+This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo CPU function. This is layer 2 of 3 wrap so the candy doesn\textquotesingle{}t stick too much. \mbox{\Hypertarget{Halo_8cu_a8940bc0632378da915f25ee31de2ed0b}\label{Halo_8cu_a8940bc0632378da915f25ee31de2ed0b}} 
+\index{Halo.cu@{Halo.cu}!fillHaloC$<$ double $>$@{fillHaloC$<$ double $>$}}
+\index{fillHaloC$<$ double $>$@{fillHaloC$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloC$<$ double $>$()}{fillHaloC< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ab0197d939bcfd09fdc7c5807453d9dfc}{fill\+HaloC}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a62c3c8912f171794c2aedd471025e4c7}\label{Halo_8cu_a62c3c8912f171794c2aedd471025e4c7}} 
+\index{Halo.cu@{Halo.cu}!fillHaloC$<$ float $>$@{fillHaloC$<$ float $>$}}
+\index{fillHaloC$<$ float $>$@{fillHaloC$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloC$<$ float $>$()}{fillHaloC< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ab0197d939bcfd09fdc7c5807453d9dfc}{fill\+HaloC}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a33d2233b52ae274a668055c9075a3901}\label{Halo_8cu_a33d2233b52ae274a668055c9075a3901}} 
+\index{Halo.cu@{Halo.cu}!fillHaloD@{fillHaloD}}
+\index{fillHaloD@{fillHaloD}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloD()}{fillHaloD()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void void fill\+HaloD (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+
+
+Wrapping function for calculating halos on CPU on every side of a block of a single variable. 
+
+\hypertarget{Halo_8cu_autotoc_md136}{}\doxysubsubsection{Description}\label{Halo_8cu_autotoc_md136}
+This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean. In a sense this is the third (and last) layer of wrapping \mbox{\Hypertarget{Halo_8cu_a6e2403c1c105317070a7ac8516c5621f}\label{Halo_8cu_a6e2403c1c105317070a7ac8516c5621f}} 
+\index{Halo.cu@{Halo.cu}!fillHaloD$<$ double $>$@{fillHaloD$<$ double $>$}}
+\index{fillHaloD$<$ double $>$@{fillHaloD$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloD$<$ double $>$()}{fillHaloD< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a33d2233b52ae274a668055c9075a3901}{fill\+HaloD}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a8c6debda6b888b35798dcaaf5ec95d3f}\label{Halo_8cu_a8c6debda6b888b35798dcaaf5ec95d3f}} 
+\index{Halo.cu@{Halo.cu}!fillHaloD$<$ float $>$@{fillHaloD$<$ float $>$}}
+\index{fillHaloD$<$ float $>$@{fillHaloD$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloD$<$ float $>$()}{fillHaloD< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a33d2233b52ae274a668055c9075a3901}{fill\+HaloD}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a96005943eb8cc55515edf93a438bdc15}\label{Halo_8cu_a96005943eb8cc55515edf93a438bdc15}} 
+\index{Halo.cu@{Halo.cu}!fillHaloF@{fillHaloF}}
+\index{fillHaloF@{fillHaloF}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloF()}{fillHaloF()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+HaloF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+
+
+Wrapping function for calculating flux in the halos for a block and a single variable on CPU. 
+
+\hypertarget{Halo_8h_autotoc_md142}{}\doxysubsubsection{Depreciated}\label{Halo_8h_autotoc_md142}
+This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn\textquotesingle{}t preserve the balance of fluxes on the restiction interface It should be deleted soon \hypertarget{Halo_8h_autotoc_md143}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md143}
+\mbox{\Hypertarget{Halo_8cu_ae033bec7214b1e041fbde2fc784da5ec}\label{Halo_8cu_ae033bec7214b1e041fbde2fc784da5ec}} 
+\index{Halo.cu@{Halo.cu}!fillHaloF$<$ double $>$@{fillHaloF$<$ double $>$}}
+\index{fillHaloF$<$ double $>$@{fillHaloF$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloF$<$ double $>$()}{fillHaloF< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a96005943eb8cc55515edf93a438bdc15}{fill\+HaloF}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af14f6761d43141eba363350b5f7ad48d}\label{Halo_8cu_af14f6761d43141eba363350b5f7ad48d}} 
+\index{Halo.cu@{Halo.cu}!fillHaloF$<$ float $>$@{fillHaloF$<$ float $>$}}
+\index{fillHaloF$<$ float $>$@{fillHaloF$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloF$<$ float $>$()}{fillHaloF< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a96005943eb8cc55515edf93a438bdc15}{fill\+HaloF}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a2ee84ac3de37b97bf6c4a3919f8a355b}\label{Halo_8cu_a2ee84ac3de37b97bf6c4a3919f8a355b}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU@{fillHaloGPU}}
+\index{fillHaloGPU@{fillHaloGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU()}{fillHaloGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+
+
+Wrapping function for calculating halos for each block of a single variable on GPU. 
+
+\hypertarget{Halo_8h_autotoc_md144}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md144}
+This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fill\+Left type functions \mbox{\Hypertarget{Halo_8cu_a2a355feb696605ad555fe018395bcac2}\label{Halo_8cu_a2a355feb696605ad555fe018395bcac2}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU@{fillHaloGPU}}
+\index{fillHaloGPU@{fillHaloGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU()}{fillHaloGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a8bcac8c7fda9dd6edcfb34f40543ceef}\label{Halo_8cu_a8bcac8c7fda9dd6edcfb34f40543ceef}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU@{fillHaloGPU}}
+\index{fillHaloGPU@{fillHaloGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU()}{fillHaloGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a3f01819995937c8bbce5ac05c18f71b4}\label{Halo_8cu_a3f01819995937c8bbce5ac05c18f71b4}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU@{fillHaloGPU}}
+\index{fillHaloGPU@{fillHaloGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU()}{fillHaloGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a8d8f335f2691b865597b01f0e6c2e210}\label{Halo_8cu_a8d8f335f2691b865597b01f0e6c2e210}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU@{fillHaloGPU}}
+\index{fillHaloGPU@{fillHaloGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU()}{fillHaloGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a805c1dabf839953debffe2799c61cae0}\label{Halo_8cu_a805c1dabf839953debffe2799c61cae0}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}}
+\index{fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ double $>$()}{fillHaloGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a87f6da23bb80f5c2a138bad34e576e5b}\label{Halo_8cu_a87f6da23bb80f5c2a138bad34e576e5b}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}}
+\index{fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ double $>$()}{fillHaloGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ac253f2bf76324a678d0f34a9a9b1c631}\label{Halo_8cu_ac253f2bf76324a678d0f34a9a9b1c631}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}}
+\index{fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ double $>$()}{fillHaloGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{Xev,  }\item[{double $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae4dfd3f7c7752f689ea4aa1cd17b378c}\label{Halo_8cu_ae4dfd3f7c7752f689ea4aa1cd17b378c}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}}
+\index{fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ double $>$()}{fillHaloGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a0c4feec6db1f401b3409302c41843524}\label{Halo_8cu_a0c4feec6db1f401b3409302c41843524}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}}
+\index{fillHaloGPU$<$ double $>$@{fillHaloGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ double $>$()}{fillHaloGPU< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ double $>$}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a20176600a52e8881aa78213c15e1ac4b}\label{Halo_8cu_a20176600a52e8881aa78213c15e1ac4b}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}}
+\index{fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ float $>$()}{fillHaloGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9b8d1661f255b3e8e41a8ec6a2a98260}\label{Halo_8cu_a9b8d1661f255b3e8e41a8ec6a2a98260}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}}
+\index{fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ float $>$()}{fillHaloGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{Xev }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae9d035a7e3954d9b2801a74cf2ba87f2}\label{Halo_8cu_ae9d035a7e3954d9b2801a74cf2ba87f2}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}}
+\index{fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ float $>$()}{fillHaloGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{Xev,  }\item[{float $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_acac7f5cbebdc9598fe00696f6708068f}\label{Halo_8cu_acac7f5cbebdc9598fe00696f6708068f}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}}
+\index{fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ float $>$()}{fillHaloGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a18a815a1959a39e7ab80e94b759a15f7}\label{Halo_8cu_a18a815a1959a39e7ab80e94b759a15f7}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}}
+\index{fillHaloGPU$<$ float $>$@{fillHaloGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPU$<$ float $>$()}{fillHaloGPU< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a3f01819995937c8bbce5ac05c18f71b4}{fill\+Halo\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ float $>$}]{Grad }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a29a79939f743cb813160e5cd771480b9}\label{Halo_8cu_a29a79939f743cb813160e5cd771480b9}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPUnew@{fillHaloGPUnew}}
+\index{fillHaloGPUnew@{fillHaloGPUnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPUnew()}{fillHaloGPUnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+GPUnew (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a824b0c7405c55a3c7add16fb2dbddd7b}\label{Halo_8cu_a824b0c7405c55a3c7add16fb2dbddd7b}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPUnew$<$ double $>$@{fillHaloGPUnew$<$ double $>$}}
+\index{fillHaloGPUnew$<$ double $>$@{fillHaloGPUnew$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPUnew$<$ double $>$()}{fillHaloGPUnew< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a29a79939f743cb813160e5cd771480b9}{fill\+Halo\+GPUnew}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ad8b7fdfb110e1c442c9c46434ea55a8c}\label{Halo_8cu_ad8b7fdfb110e1c442c9c46434ea55a8c}} 
+\index{Halo.cu@{Halo.cu}!fillHaloGPUnew$<$ float $>$@{fillHaloGPUnew$<$ float $>$}}
+\index{fillHaloGPUnew$<$ float $>$@{fillHaloGPUnew$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloGPUnew$<$ float $>$()}{fillHaloGPUnew< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a29a79939f743cb813160e5cd771480b9}{fill\+Halo\+GPUnew}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af347bef69b66f3cc31cfc0e1e61ea971}\label{Halo_8cu_af347bef69b66f3cc31cfc0e1e61ea971}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLeftRightGPU@{fillHaloLeftRightGPU}}
+\index{fillHaloLeftRightGPU@{fillHaloLeftRightGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLeftRightGPU()}{fillHaloLeftRightGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+Left\+Right\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af618df69f5fab841b5c52471a217b3ea}\label{Halo_8cu_af618df69f5fab841b5c52471a217b3ea}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLeftRightGPU$<$ double $>$@{fillHaloLeftRightGPU$<$ double $>$}}
+\index{fillHaloLeftRightGPU$<$ double $>$@{fillHaloLeftRightGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLeftRightGPU$<$ double $>$()}{fillHaloLeftRightGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_af347bef69b66f3cc31cfc0e1e61ea971}{fill\+Halo\+Left\+Right\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ace2d807ee7ac57add88bb337cebaada3}\label{Halo_8cu_ace2d807ee7ac57add88bb337cebaada3}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLeftRightGPU$<$ float $>$@{fillHaloLeftRightGPU$<$ float $>$}}
+\index{fillHaloLeftRightGPU$<$ float $>$@{fillHaloLeftRightGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLeftRightGPU$<$ float $>$()}{fillHaloLeftRightGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_af347bef69b66f3cc31cfc0e1e61ea971}{fill\+Halo\+Left\+Right\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a6da328def689854bc8f7f54af1d40dcb}\label{Halo_8cu_a6da328def689854bc8f7f54af1d40dcb}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLeftRightGPUnew@{fillHaloLeftRightGPUnew}}
+\index{fillHaloLeftRightGPUnew@{fillHaloLeftRightGPUnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLeftRightGPUnew()}{fillHaloLeftRightGPUnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+Left\+Right\+GPUnew (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9c68f2c332f01be941bbc9e6dd04e5e5}\label{Halo_8cu_a9c68f2c332f01be941bbc9e6dd04e5e5}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLeftRightGPUnew$<$ double $>$@{fillHaloLeftRightGPUnew$<$ double $>$}}
+\index{fillHaloLeftRightGPUnew$<$ double $>$@{fillHaloLeftRightGPUnew$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLeftRightGPUnew$<$ double $>$()}{fillHaloLeftRightGPUnew< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a6da328def689854bc8f7f54af1d40dcb}{fill\+Halo\+Left\+Right\+GPUnew}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ab1b44678d54793b59734f97b88c2a623}\label{Halo_8cu_ab1b44678d54793b59734f97b88c2a623}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLeftRightGPUnew$<$ float $>$@{fillHaloLeftRightGPUnew$<$ float $>$}}
+\index{fillHaloLeftRightGPUnew$<$ float $>$@{fillHaloLeftRightGPUnew$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLeftRightGPUnew$<$ float $>$()}{fillHaloLeftRightGPUnew< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_a6da328def689854bc8f7f54af1d40dcb}{fill\+Halo\+Left\+Right\+GPUnew}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae5c54a05d63827832b83be828802753f}\label{Halo_8cu_ae5c54a05d63827832b83be828802753f}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLRFluxC@{fillHaloLRFluxC}}
+\index{fillHaloLRFluxC@{fillHaloLRFluxC}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLRFluxC()}{fillHaloLRFluxC()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+LRFluxC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ad2c3611f0b1922bbf5f31517f9f6e491}\label{Halo_8cu_ad2c3611f0b1922bbf5f31517f9f6e491}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLRFluxC$<$ double $>$@{fillHaloLRFluxC$<$ double $>$}}
+\index{fillHaloLRFluxC$<$ double $>$@{fillHaloLRFluxC$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLRFluxC$<$ double $>$()}{fillHaloLRFluxC< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_ae5c54a05d63827832b83be828802753f}{fill\+Halo\+LRFluxC}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ab72d57c0f58a2aba8386523e4c311279}\label{Halo_8cu_ab72d57c0f58a2aba8386523e4c311279}} 
+\index{Halo.cu@{Halo.cu}!fillHaloLRFluxC$<$ float $>$@{fillHaloLRFluxC$<$ float $>$}}
+\index{fillHaloLRFluxC$<$ float $>$@{fillHaloLRFluxC$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloLRFluxC$<$ float $>$()}{fillHaloLRFluxC< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8cu_ae5c54a05d63827832b83be828802753f}{fill\+Halo\+LRFluxC}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae3adb7ce2fbe32053675857784affbe1}\label{Halo_8cu_ae3adb7ce2fbe32053675857784affbe1}} 
+\index{Halo.cu@{Halo.cu}!fillHaloTopRightC@{fillHaloTopRightC}}
+\index{fillHaloTopRightC@{fillHaloTopRightC}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloTopRightC()}{fillHaloTopRightC()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+Top\+RightC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+
+
+Wrapping function for calculating flux for halos for each block of a single variable on GPU. 
+
+\hypertarget{Halo_8h_autotoc_md145}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md145}
+This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fill\+Left type functions \mbox{\Hypertarget{Halo_8cu_a3c209f200fa3e85dfdf772a4e2904049}\label{Halo_8cu_a3c209f200fa3e85dfdf772a4e2904049}} 
+\index{Halo.cu@{Halo.cu}!fillHaloTopRightC$<$ double $>$@{fillHaloTopRightC$<$ double $>$}}
+\index{fillHaloTopRightC$<$ double $>$@{fillHaloTopRightC$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloTopRightC$<$ double $>$()}{fillHaloTopRightC< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae3adb7ce2fbe32053675857784affbe1}{fill\+Halo\+Top\+RightC}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ac87d50a1edb09efac22b75440d8a67ff}\label{Halo_8cu_ac87d50a1edb09efac22b75440d8a67ff}} 
+\index{Halo.cu@{Halo.cu}!fillHaloTopRightC$<$ float $>$@{fillHaloTopRightC$<$ float $>$}}
+\index{fillHaloTopRightC$<$ float $>$@{fillHaloTopRightC$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloTopRightC$<$ float $>$()}{fillHaloTopRightC< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ae3adb7ce2fbe32053675857784affbe1}{fill\+Halo\+Top\+RightC}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a1933020a5783e090d0c44fffb283e563}\label{Halo_8cu_a1933020a5783e090d0c44fffb283e563}} 
+\index{Halo.cu@{Halo.cu}!fillHaloTopRightGPU@{fillHaloTopRightGPU}}
+\index{fillHaloTopRightGPU@{fillHaloTopRightGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloTopRightGPU()}{fillHaloTopRightGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Halo\+Top\+Right\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a84c9dcd8f96a68563a6ed9f41fddeb9b}\label{Halo_8cu_a84c9dcd8f96a68563a6ed9f41fddeb9b}} 
+\index{Halo.cu@{Halo.cu}!fillHaloTopRightGPU$<$ double $>$@{fillHaloTopRightGPU$<$ double $>$}}
+\index{fillHaloTopRightGPU$<$ double $>$@{fillHaloTopRightGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloTopRightGPU$<$ double $>$()}{fillHaloTopRightGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_aa2ee5621453ee3e33a49b920693879c6}{fill\+Halo\+Top\+Right\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ac7dd171c00746b296b85d607c2630b32}\label{Halo_8cu_ac7dd171c00746b296b85d607c2630b32}} 
+\index{Halo.cu@{Halo.cu}!fillHaloTopRightGPU$<$ float $>$@{fillHaloTopRightGPU$<$ float $>$}}
+\index{fillHaloTopRightGPU$<$ float $>$@{fillHaloTopRightGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillHaloTopRightGPU$<$ float $>$()}{fillHaloTopRightGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_aa2ee5621453ee3e33a49b920693879c6}{fill\+Halo\+Top\+Right\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{cuda\+Stream\+\_\+t}]{stream,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af1855d1f517b150637f7ebba2b7c98d3}\label{Halo_8cu_af1855d1f517b150637f7ebba2b7c98d3}} 
+\index{Halo.cu@{Halo.cu}!fillLeft@{fillLeft}}
+\index{fillLeft@{fillLeft}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeft()}{fillLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Left (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topright,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ad7bdbf10e6e7309983c7143644f18268}\label{Halo_8cu_ad7bdbf10e6e7309983c7143644f18268}} 
+\index{Halo.cu@{Halo.cu}!fillLeft@{fillLeft}}
+\index{fillLeft@{fillLeft}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeft()}{fillLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Left (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aedd2d63dd1706ae7d29be62692da6f38}\label{Halo_8cu_aedd2d63dd1706ae7d29be62692da6f38}} 
+\index{Halo.cu@{Halo.cu}!fillLeft$<$ double $>$@{fillLeft$<$ double $>$}}
+\index{fillLeft$<$ double $>$@{fillLeft$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeft$<$ double $>$()}{fillLeft< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_af1855d1f517b150637f7ebba2b7c98d3}{fill\+Left}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topright,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a3b14beb454331728755e5f8a6f251e13}\label{Halo_8cu_a3b14beb454331728755e5f8a6f251e13}} 
+\index{Halo.cu@{Halo.cu}!fillLeft$<$ float $>$@{fillLeft$<$ float $>$}}
+\index{fillLeft$<$ float $>$@{fillLeft$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeft$<$ float $>$()}{fillLeft< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_af1855d1f517b150637f7ebba2b7c98d3}{fill\+Left}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topright,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5d9d65fbd4acba2dc766568a77bfaffd}\label{Halo_8cu_a5d9d65fbd4acba2dc766568a77bfaffd}} 
+\index{Halo.cu@{Halo.cu}!fillLeftFlux@{fillLeftFlux}}
+\index{fillLeftFlux@{fillLeftFlux}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeftFlux()}{fillLeftFlux()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Left\+Flux (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aeca99a935bccb5897113cf8f57dcc877}\label{Halo_8cu_aeca99a935bccb5897113cf8f57dcc877}} 
+\index{Halo.cu@{Halo.cu}!fillLeftnew@{fillLeftnew}}
+\index{fillLeftnew@{fillLeftnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeftnew()}{fillLeftnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Leftnew (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topright,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae6479ede9a0c3e1cfacc2e53355ebccb}\label{Halo_8cu_ae6479ede9a0c3e1cfacc2e53355ebccb}} 
+\index{Halo.cu@{Halo.cu}!fillLeftnew$<$ double $>$@{fillLeftnew$<$ double $>$}}
+\index{fillLeftnew$<$ double $>$@{fillLeftnew$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeftnew$<$ double $>$()}{fillLeftnew< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_aeca99a935bccb5897113cf8f57dcc877}{fill\+Leftnew}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topright,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a98fac6187460306e6a2d90611cf5f7b6}\label{Halo_8cu_a98fac6187460306e6a2d90611cf5f7b6}} 
+\index{Halo.cu@{Halo.cu}!fillLeftnew$<$ float $>$@{fillLeftnew$<$ float $>$}}
+\index{fillLeftnew$<$ float $>$@{fillLeftnew$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillLeftnew$<$ float $>$()}{fillLeftnew< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_aeca99a935bccb5897113cf8f57dcc877}{fill\+Leftnew}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{lefttop,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{botright,  }\item[{int $\ast$}]{topright,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af71504ac800a61627ac5cef75d003bfd}\label{Halo_8cu_af71504ac800a61627ac5cef75d003bfd}} 
+\index{Halo.cu@{Halo.cu}!fillRight@{fillRight}}
+\index{fillRight@{fillRight}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRight()}{fillRight()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Right (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a2345005d54233720f2cae1e1b443a36f}\label{Halo_8cu_a2345005d54233720f2cae1e1b443a36f}} 
+\index{Halo.cu@{Halo.cu}!fillRight@{fillRight}}
+\index{fillRight@{fillRight}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRight()}{fillRight()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Right (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a1ded4426a80fbcf290981dc537f320d4}\label{Halo_8cu_a1ded4426a80fbcf290981dc537f320d4}} 
+\index{Halo.cu@{Halo.cu}!fillRight$<$ double $>$@{fillRight$<$ double $>$}}
+\index{fillRight$<$ double $>$@{fillRight$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRight$<$ double $>$()}{fillRight< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_af71504ac800a61627ac5cef75d003bfd}{fill\+Right}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a72e57bc7f4ba67769042bff28273c9e7}\label{Halo_8cu_a72e57bc7f4ba67769042bff28273c9e7}} 
+\index{Halo.cu@{Halo.cu}!fillRight$<$ float $>$@{fillRight$<$ float $>$}}
+\index{fillRight$<$ float $>$@{fillRight$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRight$<$ float $>$()}{fillRight< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_af71504ac800a61627ac5cef75d003bfd}{fill\+Right}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_afaa07f3e06bd6f302d97aa9954188afb}\label{Halo_8cu_afaa07f3e06bd6f302d97aa9954188afb}} 
+\index{Halo.cu@{Halo.cu}!fillRightFlux@{fillRightFlux}}
+\index{fillRightFlux@{fillRightFlux}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightFlux()}{fillRightFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Right\+Flux (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{bool}]{do\+Prolongation,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a2f03036ffa47f139c5eba848de62ce1a}\label{Halo_8cu_a2f03036ffa47f139c5eba848de62ce1a}} 
+\index{Halo.cu@{Halo.cu}!fillRightFlux@{fillRightFlux}}
+\index{fillRightFlux@{fillRightFlux}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightFlux()}{fillRightFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Right\+Flux (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a87e192a85f48bf6a5706ac9fde71b3e9}\label{Halo_8cu_a87e192a85f48bf6a5706ac9fde71b3e9}} 
+\index{Halo.cu@{Halo.cu}!fillRightFlux$<$ double $>$@{fillRightFlux$<$ double $>$}}
+\index{fillRightFlux$<$ double $>$@{fillRightFlux$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightFlux$<$ double $>$()}{fillRightFlux< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_afaa07f3e06bd6f302d97aa9954188afb}{fill\+Right\+Flux}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{bool}]{do\+Prolongation,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a04f5e436751e34f565037dc24a22a155}\label{Halo_8cu_a04f5e436751e34f565037dc24a22a155}} 
+\index{Halo.cu@{Halo.cu}!fillRightFlux$<$ double $>$@{fillRightFlux$<$ double $>$}}
+\index{fillRightFlux$<$ double $>$@{fillRightFlux$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightFlux$<$ double $>$()}{fillRightFlux< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_afaa07f3e06bd6f302d97aa9954188afb}{fill\+Right\+Flux}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a56941d739afb1ee3215e82cd06678e96}\label{Halo_8cu_a56941d739afb1ee3215e82cd06678e96}} 
+\index{Halo.cu@{Halo.cu}!fillRightFlux$<$ float $>$@{fillRightFlux$<$ float $>$}}
+\index{fillRightFlux$<$ float $>$@{fillRightFlux$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightFlux$<$ float $>$()}{fillRightFlux< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_afaa07f3e06bd6f302d97aa9954188afb}{fill\+Right\+Flux}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{bool}]{do\+Prolongation,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a1f1c910e13ec59b239e54f5b9974785b}\label{Halo_8cu_a1f1c910e13ec59b239e54f5b9974785b}} 
+\index{Halo.cu@{Halo.cu}!fillRightFlux$<$ float $>$@{fillRightFlux$<$ float $>$}}
+\index{fillRightFlux$<$ float $>$@{fillRightFlux$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightFlux$<$ float $>$()}{fillRightFlux< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_afaa07f3e06bd6f302d97aa9954188afb}{fill\+Right\+Flux}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ab2b0d44b1bb0c826f764f7b84b8bed23}\label{Halo_8cu_ab2b0d44b1bb0c826f764f7b84b8bed23}} 
+\index{Halo.cu@{Halo.cu}!fillRightnew@{fillRightnew}}
+\index{fillRightnew@{fillRightnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightnew()}{fillRightnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Rightnew (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ab5a4a9f0e151d12e559ac3581e855908}\label{Halo_8cu_ab5a4a9f0e151d12e559ac3581e855908}} 
+\index{Halo.cu@{Halo.cu}!fillRightnew$<$ double $>$@{fillRightnew$<$ double $>$}}
+\index{fillRightnew$<$ double $>$@{fillRightnew$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightnew$<$ double $>$()}{fillRightnew< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_ab2b0d44b1bb0c826f764f7b84b8bed23}{fill\+Rightnew}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a81fe82b12b6eecfaab656454daa1c2d1}\label{Halo_8cu_a81fe82b12b6eecfaab656454daa1c2d1}} 
+\index{Halo.cu@{Halo.cu}!fillRightnew$<$ float $>$@{fillRightnew$<$ float $>$}}
+\index{fillRightnew$<$ float $>$@{fillRightnew$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillRightnew$<$ float $>$()}{fillRightnew< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_ab2b0d44b1bb0c826f764f7b84b8bed23}{fill\+Rightnew}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{rightbot,  }\item[{int $\ast$}]{righttop,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{topleft,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a77acf80e6591f424cb6b99331eb3764a}\label{Halo_8cu_a77acf80e6591f424cb6b99331eb3764a}} 
+\index{Halo.cu@{Halo.cu}!fillTop@{fillTop}}
+\index{fillTop@{fillTop}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTop()}{fillTop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Top (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aefe78bd2478a704e63205de5fee4f5ac}\label{Halo_8cu_aefe78bd2478a704e63205de5fee4f5ac}} 
+\index{Halo.cu@{Halo.cu}!fillTop@{fillTop}}
+\index{fillTop@{fillTop}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTop()}{fillTop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Top (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a89b6a37e2b440932b8c4beea68e0a13a}\label{Halo_8cu_a89b6a37e2b440932b8c4beea68e0a13a}} 
+\index{Halo.cu@{Halo.cu}!fillTop$<$ double $>$@{fillTop$<$ double $>$}}
+\index{fillTop$<$ double $>$@{fillTop$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTop$<$ double $>$()}{fillTop< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a77acf80e6591f424cb6b99331eb3764a}{fill\+Top}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ab3744247f8d4622ba1f0e52a738148f7}\label{Halo_8cu_ab3744247f8d4622ba1f0e52a738148f7}} 
+\index{Halo.cu@{Halo.cu}!fillTop$<$ float $>$@{fillTop$<$ float $>$}}
+\index{fillTop$<$ float $>$@{fillTop$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTop$<$ float $>$()}{fillTop< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a77acf80e6591f424cb6b99331eb3764a}{fill\+Top}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aaeae9c3ca26a884c76d4d429c60dead6}\label{Halo_8cu_aaeae9c3ca26a884c76d4d429c60dead6}} 
+\index{Halo.cu@{Halo.cu}!fillTopFlux@{fillTopFlux}}
+\index{fillTopFlux@{fillTopFlux}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopFlux()}{fillTopFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Top\+Flux (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{bool}]{do\+Prolongation,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9af9c1a41440ff037441b0cea28bcbaf}\label{Halo_8cu_a9af9c1a41440ff037441b0cea28bcbaf}} 
+\index{Halo.cu@{Halo.cu}!fillTopFlux@{fillTopFlux}}
+\index{fillTopFlux@{fillTopFlux}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopFlux()}{fillTopFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fill\+Top\+Flux (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a6f91cf2e90ac2d1db440820c5ba5518c}\label{Halo_8cu_a6f91cf2e90ac2d1db440820c5ba5518c}} 
+\index{Halo.cu@{Halo.cu}!fillTopFlux$<$ double $>$@{fillTopFlux$<$ double $>$}}
+\index{fillTopFlux$<$ double $>$@{fillTopFlux$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopFlux$<$ double $>$()}{fillTopFlux< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_aaeae9c3ca26a884c76d4d429c60dead6}{fill\+Top\+Flux}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{bool}]{do\+Prolongation,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a7d2e054c42e7de0e660d4eb7d42171ad}\label{Halo_8cu_a7d2e054c42e7de0e660d4eb7d42171ad}} 
+\index{Halo.cu@{Halo.cu}!fillTopFlux$<$ double $>$@{fillTopFlux$<$ double $>$}}
+\index{fillTopFlux$<$ double $>$@{fillTopFlux$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopFlux$<$ double $>$()}{fillTopFlux< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_aaeae9c3ca26a884c76d4d429c60dead6}{fill\+Top\+Flux}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a266e09515f6b6f7f560ccc120e806957}\label{Halo_8cu_a266e09515f6b6f7f560ccc120e806957}} 
+\index{Halo.cu@{Halo.cu}!fillTopFlux$<$ float $>$@{fillTopFlux$<$ float $>$}}
+\index{fillTopFlux$<$ float $>$@{fillTopFlux$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopFlux$<$ float $>$()}{fillTopFlux< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_aaeae9c3ca26a884c76d4d429c60dead6}{fill\+Top\+Flux}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{bool}]{do\+Prolongation,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af00c6ce01842ac1e06289207021a7793}\label{Halo_8cu_af00c6ce01842ac1e06289207021a7793}} 
+\index{Halo.cu@{Halo.cu}!fillTopFlux$<$ float $>$@{fillTopFlux$<$ float $>$}}
+\index{fillTopFlux$<$ float $>$@{fillTopFlux$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopFlux$<$ float $>$()}{fillTopFlux< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_aaeae9c3ca26a884c76d4d429c60dead6}{fill\+Top\+Flux}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{bool}]{do\+Prolongation,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a67e1c95744d12c9baf5767e34767d4d4}\label{Halo_8cu_a67e1c95744d12c9baf5767e34767d4d4}} 
+\index{Halo.cu@{Halo.cu}!fillTopnew@{fillTopnew}}
+\index{fillTopnew@{fillTopnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopnew()}{fillTopnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void fill\+Topnew (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{T $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5fa720fa5a16910d38c34480f2f1b72b}\label{Halo_8cu_a5fa720fa5a16910d38c34480f2f1b72b}} 
+\index{Halo.cu@{Halo.cu}!fillTopnew$<$ double $>$@{fillTopnew$<$ double $>$}}
+\index{fillTopnew$<$ double $>$@{fillTopnew$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopnew$<$ double $>$()}{fillTopnew< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a67e1c95744d12c9baf5767e34767d4d4}{fill\+Topnew}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{double $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a65828cacc2417f824d4e96d696749531}\label{Halo_8cu_a65828cacc2417f824d4e96d696749531}} 
+\index{Halo.cu@{Halo.cu}!fillTopnew$<$ float $>$@{fillTopnew$<$ float $>$}}
+\index{fillTopnew$<$ float $>$@{fillTopnew$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{fillTopnew$<$ float $>$()}{fillTopnew< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a67e1c95744d12c9baf5767e34767d4d4}{fill\+Topnew}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{nblk,  }\item[{int $\ast$}]{active,  }\item[{int $\ast$}]{level,  }\item[{int $\ast$}]{topleft,  }\item[{int $\ast$}]{topright,  }\item[{int $\ast$}]{botleft,  }\item[{int $\ast$}]{leftbot,  }\item[{int $\ast$}]{rightbot,  }\item[{float $\ast$}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5497979187df8771242d5c3d66922615}\label{Halo_8cu_a5497979187df8771242d5c3d66922615}} 
+\index{Halo.cu@{Halo.cu}!HaloFluxCPUBT@{HaloFluxCPUBT}}
+\index{HaloFluxCPUBT@{HaloFluxCPUBT}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{HaloFluxCPUBT()}{HaloFluxCPUBT()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Halo\+Flux\+CPUBT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9127f7d09d9a110da1cb7fae1786c389}\label{Halo_8cu_a9127f7d09d9a110da1cb7fae1786c389}} 
+\index{Halo.cu@{Halo.cu}!HaloFluxCPULR@{HaloFluxCPULR}}
+\index{HaloFluxCPULR@{HaloFluxCPULR}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{HaloFluxCPULR()}{HaloFluxCPULR()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Halo\+Flux\+CPULR (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a0c0b81d1c956a11c4025491946f90010}\label{Halo_8cu_a0c0b81d1c956a11c4025491946f90010}} 
+\index{Halo.cu@{Halo.cu}!HaloFluxGPUBT@{HaloFluxGPUBT}}
+\index{HaloFluxGPUBT@{HaloFluxGPUBT}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{HaloFluxGPUBT()}{HaloFluxGPUBT()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Halo\+Flux\+GPUBT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5ddd71e988ae7200bfd409d5d9d81921}\label{Halo_8cu_a5ddd71e988ae7200bfd409d5d9d81921}} 
+\index{Halo.cu@{Halo.cu}!HaloFluxGPUBTnew@{HaloFluxGPUBTnew}}
+\index{HaloFluxGPUBTnew@{HaloFluxGPUBTnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{HaloFluxGPUBTnew()}{HaloFluxGPUBTnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Halo\+Flux\+GPUBTnew (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a82e672706036bc5b4e87cd2b739f9609}\label{Halo_8cu_a82e672706036bc5b4e87cd2b739f9609}} 
+\index{Halo.cu@{Halo.cu}!HaloFluxGPULR@{HaloFluxGPULR}}
+\index{HaloFluxGPULR@{HaloFluxGPULR}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{HaloFluxGPULR()}{HaloFluxGPULR()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Halo\+Flux\+GPULR (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9178199ff5e46ef9a5fee4241b8e235e}\label{Halo_8cu_a9178199ff5e46ef9a5fee4241b8e235e}} 
+\index{Halo.cu@{Halo.cu}!HaloFluxGPULRnew@{HaloFluxGPULRnew}}
+\index{HaloFluxGPULRnew@{HaloFluxGPULRnew}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{HaloFluxGPULRnew()}{HaloFluxGPULRnew()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Halo\+Flux\+GPULRnew (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9fd24940e7422244beb1290eee7e01d2}\label{Halo_8cu_a9fd24940e7422244beb1290eee7e01d2}} 
+\index{Halo.cu@{Halo.cu}!Recalculatehh@{Recalculatehh}}
+\index{Recalculatehh@{Recalculatehh}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{Recalculatehh()}{Recalculatehh()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Recalculatehh (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a57466ad6cd9816401644ed33654265f7}\label{Halo_8cu_a57466ad6cd9816401644ed33654265f7}} 
+\index{Halo.cu@{Halo.cu}!Recalculatehh$<$ double $>$@{Recalculatehh$<$ double $>$}}
+\index{Recalculatehh$<$ double $>$@{Recalculatehh$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{Recalculatehh$<$ double $>$()}{Recalculatehh< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a9fd24940e7422244beb1290eee7e01d2}{Recalculatehh}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{Xev,  }\item[{double $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a86f7fbcf268c15b06de92d94a86676d4}\label{Halo_8cu_a86f7fbcf268c15b06de92d94a86676d4}} 
+\index{Halo.cu@{Halo.cu}!Recalculatehh$<$ float $>$@{Recalculatehh$<$ float $>$}}
+\index{Recalculatehh$<$ float $>$@{Recalculatehh$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{Recalculatehh$<$ float $>$()}{Recalculatehh< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a9fd24940e7422244beb1290eee7e01d2}{Recalculatehh}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{Xev,  }\item[{float $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_af0f36c2211a044c4891c7fafc9d1b02f}\label{Halo_8cu_af0f36c2211a044c4891c7fafc9d1b02f}} 
+\index{Halo.cu@{Halo.cu}!RecalculateZs@{RecalculateZs}}
+\index{RecalculateZs@{RecalculateZs}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{RecalculateZs()}{RecalculateZs()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Recalculate\+Zs (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+
+
+Recalculate water surface after recalculating the values on the halo on the CPU. 
+
+Recalculate water surface after recalculating the values on the halo on the GPU.\hypertarget{Halo_8h_autotoc_md138}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md138}
+Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-\/elevation is not required, only h is recalculated on the halo at ever 1/2 steps. ~\newline
+ zs then needs to be recalculated to obtain a mass-\/conservative solution (if zs is conserved then mass conservation is not garanteed)\hypertarget{Halo_8h_autotoc_md139}{}\doxysubsubsection{Warning}\label{Halo_8h_autotoc_md139}
+This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction\hypertarget{Halo_8h_autotoc_md140}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md140}
+Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-\/elevation is not required, only h is recalculated on the halo at ever 1/2 steps. zs then needs to be recalculated to obtain a mass-\/conservative solution (if zs is conserved then mass conservation is not garanteed)\hypertarget{Halo_8h_autotoc_md141}{}\doxysubsubsection{Warning}\label{Halo_8h_autotoc_md141}
+This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction \mbox{\Hypertarget{Halo_8cu_a4346cbc367125486b54412319cca8521}\label{Halo_8cu_a4346cbc367125486b54412319cca8521}} 
+\index{Halo.cu@{Halo.cu}!RecalculateZs$<$ double $>$@{RecalculateZs$<$ double $>$}}
+\index{RecalculateZs$<$ double $>$@{RecalculateZs$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{RecalculateZs$<$ double $>$()}{RecalculateZs< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_af0f36c2211a044c4891c7fafc9d1b02f}{Recalculate\+Zs}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{Xev,  }\item[{double $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a4a179168b1b6ca6d431895fa50ddbc5e}\label{Halo_8cu_a4a179168b1b6ca6d431895fa50ddbc5e}} 
+\index{Halo.cu@{Halo.cu}!RecalculateZs$<$ float $>$@{RecalculateZs$<$ float $>$}}
+\index{RecalculateZs$<$ float $>$@{RecalculateZs$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{RecalculateZs$<$ float $>$()}{RecalculateZs< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_af0f36c2211a044c4891c7fafc9d1b02f}{Recalculate\+Zs}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{Xev,  }\item[{float $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5ffb16dded1af0f0b9243601ee29db92}\label{Halo_8cu_a5ffb16dded1af0f0b9243601ee29db92}} 
+\index{Halo.cu@{Halo.cu}!RecalculateZsGPU@{RecalculateZsGPU}}
+\index{RecalculateZsGPU@{RecalculateZsGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{RecalculateZsGPU()}{RecalculateZsGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Recalculate\+Zs\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a2530753f4e0a860edcdde8a4600d575e}\label{Halo_8cu_a2530753f4e0a860edcdde8a4600d575e}} 
+\index{Halo.cu@{Halo.cu}!RecalculateZsGPU$<$ double $>$@{RecalculateZsGPU$<$ double $>$}}
+\index{RecalculateZsGPU$<$ double $>$@{RecalculateZsGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{RecalculateZsGPU$<$ double $>$()}{RecalculateZsGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a5ffb16dded1af0f0b9243601ee29db92}{Recalculate\+Zs\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{Xev,  }\item[{double $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a1375cf89754b41163abe692f5a52f1aa}\label{Halo_8cu_a1375cf89754b41163abe692f5a52f1aa}} 
+\index{Halo.cu@{Halo.cu}!RecalculateZsGPU$<$ float $>$@{RecalculateZsGPU$<$ float $>$}}
+\index{RecalculateZsGPU$<$ float $>$@{RecalculateZsGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{RecalculateZsGPU$<$ float $>$()}{RecalculateZsGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8h_a5ffb16dded1af0f0b9243601ee29db92}{Recalculate\+Zs\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{Xev,  }\item[{float $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aa3159218d597d5dec3caa8686a223081}\label{Halo_8cu_aa3159218d597d5dec3caa8686a223081}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear@{refine\_linear}}
+\index{refine\_linear@{refine\_linear}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear()}{refine\_linear()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void refine\+\_\+linear (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aff8eecab036938a6f0516958e7a6666e}\label{Halo_8cu_aff8eecab036938a6f0516958e7a6666e}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear$<$ double $>$@{refine\_linear$<$ double $>$}}
+\index{refine\_linear$<$ double $>$@{refine\_linear$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear$<$ double $>$()}{refine\_linear< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_aa3159218d597d5dec3caa8686a223081}{refine\+\_\+linear}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a535cb1b12608ac724cc113d84302cc7e}\label{Halo_8cu_a535cb1b12608ac724cc113d84302cc7e}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear$<$ float $>$@{refine\_linear$<$ float $>$}}
+\index{refine\_linear$<$ float $>$@{refine\_linear$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear$<$ float $>$()}{refine\_linear< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_aa3159218d597d5dec3caa8686a223081}{refine\+\_\+linear}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a86539114f4682e0cfd5ae397978c569a}\label{Halo_8cu_a86539114f4682e0cfd5ae397978c569a}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Bot@{refine\_linear\_Bot}}
+\index{refine\_linear\_Bot@{refine\_linear\_Bot}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Bot()}{refine\_linear\_Bot()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void refine\+\_\+linear\+\_\+\+Bot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5895d32dd2bfb9aa26fb9653a767882a}\label{Halo_8cu_a5895d32dd2bfb9aa26fb9653a767882a}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Bot$<$ double $>$@{refine\_linear\_Bot$<$ double $>$}}
+\index{refine\_linear\_Bot$<$ double $>$@{refine\_linear\_Bot$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Bot$<$ double $>$()}{refine\_linear\_Bot< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a4b52dc94d7c129aad7a3009a9627c1d8}{refine\+\_\+linear\+\_\+\+Bot}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a7a09d610716c25c2c4cb45dde7ffdd53}\label{Halo_8cu_a7a09d610716c25c2c4cb45dde7ffdd53}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Bot$<$ float $>$@{refine\_linear\_Bot$<$ float $>$}}
+\index{refine\_linear\_Bot$<$ float $>$@{refine\_linear\_Bot$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Bot$<$ float $>$()}{refine\_linear\_Bot< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a4b52dc94d7c129aad7a3009a9627c1d8}{refine\+\_\+linear\+\_\+\+Bot}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a5748f4fb9632d8308fa235004d5f6b12}\label{Halo_8cu_a5748f4fb9632d8308fa235004d5f6b12}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_BotGPU@{refine\_linear\_BotGPU}}
+\index{refine\_linear\_BotGPU@{refine\_linear\_BotGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_BotGPU()}{refine\_linear\_BotGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void refine\+\_\+linear\+\_\+\+Bot\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a179fecb6df5a3276383654db31c3b213}\label{Halo_8cu_a179fecb6df5a3276383654db31c3b213}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_BotGPU$<$ double $>$@{refine\_linear\_BotGPU$<$ double $>$}}
+\index{refine\_linear\_BotGPU$<$ double $>$@{refine\_linear\_BotGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_BotGPU$<$ double $>$()}{refine\_linear\_BotGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a5748f4fb9632d8308fa235004d5f6b12}{refine\+\_\+linear\+\_\+\+Bot\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ace3bee45c02ffdf7c1848ee910bf97be}\label{Halo_8cu_ace3bee45c02ffdf7c1848ee910bf97be}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_BotGPU$<$ float $>$@{refine\_linear\_BotGPU$<$ float $>$}}
+\index{refine\_linear\_BotGPU$<$ float $>$@{refine\_linear\_BotGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_BotGPU$<$ float $>$()}{refine\_linear\_BotGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a5748f4fb9632d8308fa235004d5f6b12}{refine\+\_\+linear\+\_\+\+Bot\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a660ab474d664c8622e1f0768eef59342}\label{Halo_8cu_a660ab474d664c8622e1f0768eef59342}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Left@{refine\_linear\_Left}}
+\index{refine\_linear\_Left@{refine\_linear\_Left}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Left()}{refine\_linear\_Left()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void refine\+\_\+linear\+\_\+\+Left (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aaa405d4b273e7eba82cccef28661a4cf}\label{Halo_8cu_aaa405d4b273e7eba82cccef28661a4cf}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Left$<$ double $>$@{refine\_linear\_Left$<$ double $>$}}
+\index{refine\_linear\_Left$<$ double $>$@{refine\_linear\_Left$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Left$<$ double $>$()}{refine\_linear\_Left< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a660ab474d664c8622e1f0768eef59342}{refine\+\_\+linear\+\_\+\+Left}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a4e7dbd71c089a0e3dc219c1eb5d9d13e}\label{Halo_8cu_a4e7dbd71c089a0e3dc219c1eb5d9d13e}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Left$<$ float $>$@{refine\_linear\_Left$<$ float $>$}}
+\index{refine\_linear\_Left$<$ float $>$@{refine\_linear\_Left$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Left$<$ float $>$()}{refine\_linear\_Left< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a660ab474d664c8622e1f0768eef59342}{refine\+\_\+linear\+\_\+\+Left}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a0dfd1652d58d54f5d3fd66d6d30ed2dd}\label{Halo_8cu_a0dfd1652d58d54f5d3fd66d6d30ed2dd}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_LeftGPU@{refine\_linear\_LeftGPU}}
+\index{refine\_linear\_LeftGPU@{refine\_linear\_LeftGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_LeftGPU()}{refine\_linear\_LeftGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void refine\+\_\+linear\+\_\+\+Left\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a387ff243908f0957e13f8f5eb4e6c4ea}\label{Halo_8cu_a387ff243908f0957e13f8f5eb4e6c4ea}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_LeftGPU$<$ double $>$@{refine\_linear\_LeftGPU$<$ double $>$}}
+\index{refine\_linear\_LeftGPU$<$ double $>$@{refine\_linear\_LeftGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_LeftGPU$<$ double $>$()}{refine\_linear\_LeftGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a0dfd1652d58d54f5d3fd66d6d30ed2dd}{refine\+\_\+linear\+\_\+\+Left\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae21004698b731ba1e88d8199e1bf5839}\label{Halo_8cu_ae21004698b731ba1e88d8199e1bf5839}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_LeftGPU$<$ float $>$@{refine\_linear\_LeftGPU$<$ float $>$}}
+\index{refine\_linear\_LeftGPU$<$ float $>$@{refine\_linear\_LeftGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_LeftGPU$<$ float $>$()}{refine\_linear\_LeftGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a0dfd1652d58d54f5d3fd66d6d30ed2dd}{refine\+\_\+linear\+\_\+\+Left\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a41de2d4fe883bf1e375fd44877584b14}\label{Halo_8cu_a41de2d4fe883bf1e375fd44877584b14}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Right@{refine\_linear\_Right}}
+\index{refine\_linear\_Right@{refine\_linear\_Right}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Right()}{refine\_linear\_Right()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void refine\+\_\+linear\+\_\+\+Right (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a80b97b76fe856b41292e4700327b4829}\label{Halo_8cu_a80b97b76fe856b41292e4700327b4829}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Right$<$ double $>$@{refine\_linear\_Right$<$ double $>$}}
+\index{refine\_linear\_Right$<$ double $>$@{refine\_linear\_Right$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Right$<$ double $>$()}{refine\_linear\_Right< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a0aee89e2a55b0f6b6a534467115e2400}{refine\+\_\+linear\+\_\+\+Right}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a1fa1834cc4aa84cb7738a0adc45a4dc2}\label{Halo_8cu_a1fa1834cc4aa84cb7738a0adc45a4dc2}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Right$<$ float $>$@{refine\_linear\_Right$<$ float $>$}}
+\index{refine\_linear\_Right$<$ float $>$@{refine\_linear\_Right$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Right$<$ float $>$()}{refine\_linear\_Right< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a0aee89e2a55b0f6b6a534467115e2400}{refine\+\_\+linear\+\_\+\+Right}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a66adad329d72cd96c0a4fc0fefd62cfe}\label{Halo_8cu_a66adad329d72cd96c0a4fc0fefd62cfe}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_RightGPU@{refine\_linear\_RightGPU}}
+\index{refine\_linear\_RightGPU@{refine\_linear\_RightGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_RightGPU()}{refine\_linear\_RightGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void refine\+\_\+linear\+\_\+\+Right\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a7ba5681c7d996dca7b951aba4dd80aa9}\label{Halo_8cu_a7ba5681c7d996dca7b951aba4dd80aa9}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_RightGPU$<$ double $>$@{refine\_linear\_RightGPU$<$ double $>$}}
+\index{refine\_linear\_RightGPU$<$ double $>$@{refine\_linear\_RightGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_RightGPU$<$ double $>$()}{refine\_linear\_RightGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a66adad329d72cd96c0a4fc0fefd62cfe}{refine\+\_\+linear\+\_\+\+Right\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_abf05d4e326bc8001570eb7c0e2078780}\label{Halo_8cu_abf05d4e326bc8001570eb7c0e2078780}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_RightGPU$<$ float $>$@{refine\_linear\_RightGPU$<$ float $>$}}
+\index{refine\_linear\_RightGPU$<$ float $>$@{refine\_linear\_RightGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_RightGPU$<$ float $>$()}{refine\_linear\_RightGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a66adad329d72cd96c0a4fc0fefd62cfe}{refine\+\_\+linear\+\_\+\+Right\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a7b4fb01de4f8fdd9daafc221db1a959f}\label{Halo_8cu_a7b4fb01de4f8fdd9daafc221db1a959f}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Top@{refine\_linear\_Top}}
+\index{refine\_linear\_Top@{refine\_linear\_Top}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Top()}{refine\_linear\_Top()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void refine\+\_\+linear\+\_\+\+Top (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ab1f2fb4f0d584a9b42bcfbd80c018cf8}\label{Halo_8cu_ab1f2fb4f0d584a9b42bcfbd80c018cf8}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Top$<$ double $>$@{refine\_linear\_Top$<$ double $>$}}
+\index{refine\_linear\_Top$<$ double $>$@{refine\_linear\_Top$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Top$<$ double $>$()}{refine\_linear\_Top< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ac82e4ede24a4417a368c7fa104600d9c}{refine\+\_\+linear\+\_\+\+Top}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_afc2a5bb2abceee1a853c771cefbf5a2b}\label{Halo_8cu_afc2a5bb2abceee1a853c771cefbf5a2b}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_Top$<$ float $>$@{refine\_linear\_Top$<$ float $>$}}
+\index{refine\_linear\_Top$<$ float $>$@{refine\_linear\_Top$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_Top$<$ float $>$()}{refine\_linear\_Top< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_ac82e4ede24a4417a368c7fa104600d9c}{refine\+\_\+linear\+\_\+\+Top}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a525a7162ec9037c8b16cf7417f3926b2}\label{Halo_8cu_a525a7162ec9037c8b16cf7417f3926b2}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_TopGPU@{refine\_linear\_TopGPU}}
+\index{refine\_linear\_TopGPU@{refine\_linear\_TopGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_TopGPU()}{refine\_linear\_TopGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void refine\+\_\+linear\+\_\+\+Top\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_ae915fa866b3f0fe4136aadc5dbd58135}\label{Halo_8cu_ae915fa866b3f0fe4136aadc5dbd58135}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_TopGPU$<$ double $>$@{refine\_linear\_TopGPU$<$ double $>$}}
+\index{refine\_linear\_TopGPU$<$ double $>$@{refine\_linear\_TopGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_TopGPU$<$ double $>$()}{refine\_linear\_TopGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a525a7162ec9037c8b16cf7417f3926b2}{refine\+\_\+linear\+\_\+\+Top\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a9ad60860791cc1d9816671a7daf3f9ff}\label{Halo_8cu_a9ad60860791cc1d9816671a7daf3f9ff}} 
+\index{Halo.cu@{Halo.cu}!refine\_linear\_TopGPU$<$ float $>$@{refine\_linear\_TopGPU$<$ float $>$}}
+\index{refine\_linear\_TopGPU$<$ float $>$@{refine\_linear\_TopGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linear\_TopGPU$<$ float $>$()}{refine\_linear\_TopGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Halo_8cu_a525a7162ec9037c8b16cf7417f3926b2}{refine\+\_\+linear\+\_\+\+Top\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a090d7ddeba077e9ef3b06ec9e4f8851a}\label{Halo_8cu_a090d7ddeba077e9ef3b06ec9e4f8851a}} 
+\index{Halo.cu@{Halo.cu}!refine\_linearGPU@{refine\_linearGPU}}
+\index{refine\_linearGPU@{refine\_linearGPU}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linearGPU()}{refine\_linearGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void refine\+\_\+linear\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z,  }\item[{T $\ast$}]{dzdx,  }\item[{T $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_a2dbaeb9cbd6aba5e1a875ff4f81befb0}\label{Halo_8cu_a2dbaeb9cbd6aba5e1a875ff4f81befb0}} 
+\index{Halo.cu@{Halo.cu}!refine\_linearGPU$<$ double $>$@{refine\_linearGPU$<$ double $>$}}
+\index{refine\_linearGPU$<$ double $>$@{refine\_linearGPU$<$ double $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linearGPU$<$ double $>$()}{refine\_linearGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a090d7ddeba077e9ef3b06ec9e4f8851a}{refine\+\_\+linear\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z,  }\item[{double $\ast$}]{dzdx,  }\item[{double $\ast$}]{dzdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Halo_8cu_aba3b8bc4676eb67b3ba5af23fd082a03}\label{Halo_8cu_aba3b8bc4676eb67b3ba5af23fd082a03}} 
+\index{Halo.cu@{Halo.cu}!refine\_linearGPU$<$ float $>$@{refine\_linearGPU$<$ float $>$}}
+\index{refine\_linearGPU$<$ float $>$@{refine\_linearGPU$<$ float $>$}!Halo.cu@{Halo.cu}}
+\doxysubsubsection{\texorpdfstring{refine\_linearGPU$<$ float $>$()}{refine\_linearGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Halo_8h_a090d7ddeba077e9ef3b06ec9e4f8851a}{refine\+\_\+linear\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z,  }\item[{float $\ast$}]{dzdx,  }\item[{float $\ast$}]{dzdy }\end{DoxyParamCaption})}
+

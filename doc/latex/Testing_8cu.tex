@@ -1,0 +1,614 @@
+\hypertarget{Testing_8cu}{}\doxysection{src/\+Testing.cu File Reference}
+\label{Testing_8cu}\index{src/Testing.cu@{src/Testing.cu}}
+{\ttfamily \#include \char`\"{}Testing.\+h\char`\"{}}\newline
+Include dependency graph for Testing.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a1803abe24ad2daba8d11e5e46c783762}{Testing}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a0e4dc3171209811b6374274fa2c612d1}{Testing$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel\+\_\+g)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_ad67958f394bbd08c8782f376fffcac21}{Testing$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_ae86d66a5e761a12f3957ee5927c690bd}{Gaussian\+Humptest}} (T zsnit, int gpu, bool compare)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a0d0789c633d015e65e01afef05a5e1fb}{Gaussian\+Humptest$<$ float $>$}} (float zsnit, int gpu, bool compare)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a229963ffd901c799501206de5431f6bb}{Gaussian\+Humptest$<$ double $>$}} (double zsnit, int gpu, bool compare)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a80d8f8532ece9c965802d60aa031d46d}{Rivertest}} (T zsnit, int gpu)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a11e18a2e6852e7e150c6130709f3bd44}{Rivertest$<$ float $>$}} (float zsnit, int gpu)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a7b29b74b9c2c3f734f7c16633593f5f7}{Rivertest$<$ double $>$}} (double zsnit, int gpu)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a7b6329079d1c7902af71dd17677dae15}{Mass\+Conserve\+Steep\+Slope}} (T zsnit, int gpu)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a4e49cf520a5bb2d07834fcdee685d027}{Mass\+Conserve\+Steep\+Slope$<$ float $>$}} (float zsnit, int gpu)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_ad0926ed025ca9b0545a86c9357a3de3c}{Mass\+Conserve\+Steep\+Slope$<$ double $>$}} (double zsnit, int gpu)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_ab745b759b52751f7bf75276b74fd658d}{reductiontest}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a3b9fa3d91b633d85d2008066642c1c14}{reductiontest$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel\+\_\+g)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_ad9d00c5af2db773ce3d66325e64cf917}{reductiontest$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a4eeb0564db7786844d7a71ca36d463ff}{CPUGPUtest}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\T \mbox{\hyperlink{Testing_8cu_a8a8622ffcab39fee02cae7640afdb939}{Valley\+Bathy}} (T x, T y, T slope, T center)
+\begin{DoxyCompactList}\small\item\em create V shape Valley basin \end{DoxyCompactList}\item 
+{\footnotesize template$<$class T $>$ }\\T \mbox{\hyperlink{Testing_8cu_a104edf84a62f0b9fe895a48abbc1d3bc}{Thacker\+Bathy}} (T x, T y, T L, T D)
+\begin{DoxyCompactList}\small\item\em create a parabolic bassin \end{DoxyCompactList}\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a8f16cda74bcdd1db8fd67423f999572c}{Thacker\+Lake\+At\+Rest}} (\mbox{\hyperlink{classParam}{Param}} XParam, T zsinit)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a0a3b7ab6b78d6ef9743bbca6f98890ae}{Thacker\+Lake\+At\+Rest$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, float zsinit)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a8df291a6309f0ebe605531e03761b531}{Thacker\+Lake\+At\+Rest$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, double zsinit)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a19c6eaf6d9833758df860bd56d1dce2b}{River\+Volume\+Adapt}} (\mbox{\hyperlink{classParam}{Param}} XParam, T maxslope)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a1d4da6a9e01a348c4ef9ea90e45c6f53}{River\+Volume\+Adapt}} (\mbox{\hyperlink{classParam}{Param}} XParam, T slope, bool bottop, bool flip)
+\begin{DoxyCompactList}\small\item\em Simulate a river flowing in a steep valley and heck the Volume conservation. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a1f58fd96fa0d9473ed0c863d5b789485}{testboundaries}} (\mbox{\hyperlink{classParam}{Param}} XParam, T maxslope)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a8d27dff394b9c80aca43b4ca0ee56fcd}{River\+On\+Boundary}} (\mbox{\hyperlink{classParam}{Param}} XParam, T slope, int Dir, int Bound\+\_\+type)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_aec021291bf8c54e8632e09db926d5abb}{Lake\+At\+Rest}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a984ce53c1331a99e98ad625f552f02d8}{test\+ButtingerX}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ix, int iy, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a5f1ffa1a9b2e46bf2f4babc5c4f9c4fe}{testkurganovX}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ix, int iy, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a5b588f22d9b47f00af2a94804ac2b7f1}{Raintest}} (T zsnit, int gpu, float alpha)
+\item 
+bool \mbox{\hyperlink{Testing_8cu_a6a029027bd2060a3ecad9f8d09807962}{Raintestinput}} (int gpu)
+\item 
+{\footnotesize template$<$class T $>$ }\\std\+::vector$<$ float $>$ \mbox{\hyperlink{Testing_8cu_acc6f019daa444fd2d639ba48ff173d15}{Raintestmap}} (int gpu, int dimf, T zinit)
+\item 
+template std\+::vector$<$ float $>$ \mbox{\hyperlink{Testing_8cu_a80c7d906f3c5f95c31f858ea85869f33}{Raintestmap$<$ float $>$}} (int gpu, int dimf, float Zsinit)
+\item 
+template std\+::vector$<$ float $>$ \mbox{\hyperlink{Testing_8cu_a3c9e942a6a73d701305e4bb1cd4df5c0}{Raintestmap$<$ double $>$}} (int gpu, int dimf, double Zsinit)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a2a54f4be23d52aeb3bdc626953d95c7b}{Zone\+Output\+Test}} (int nzones, T zsinit)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a2cd383fdb7b4673dedd9695094a1c050}{Zone\+Output\+Test$<$ float $>$}} (int nzones, float zsinit)
+\item 
+template bool \mbox{\hyperlink{Testing_8cu_a1b748ece19a6093b97227fd127659619}{Zone\+Output\+Test$<$ double $>$}} (int nzones, double zsinit)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a1db3e11d21ac6d41e328ec46be538a41}{Rainlossestest}} (T zsinit, int gpu, float alpha)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Testing_8cu_ac00b715422e6178892c08f88324a3310}{Test\+Gradient\+Speed}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8cu_a6ce4c15e1755fc3b537e6dc7ef7401c2}{Test\+Halo\+Speed}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Testing_8cu_a4777c15ad455f8f7360c0bcb6d04fdeb}{Test\+Instability}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Testing_8cu_ae435322535a91559637e33e6f95c8d33}{Test\+Firsthalfstep}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Testing_8cu_a175c84b2bc51deb4d9e1c24f1dfd3bf5}{Testzbinit}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \mbox{\hyperlink{Testing_8cu_a775e1e1ee71eb299da2ae9689e024d8e}{Mak\+Valley\+Bathy}} (\mbox{\hyperlink{classParam}{Param}} XParam, T slope, bool bottop, bool flip)
+\item 
+void \mbox{\hyperlink{Testing_8cu_a6a20315559d37a26b66581ccf2775088}{alloc\+\_\+init2\+Darray}} (float $\ast$$\ast$arr, int NX, int NY)
+\item 
+void \mbox{\hyperlink{Testing_8cu_a62ff3fe0c904942bbc562e96f549f1f4}{init3\+Darray}} (float $\ast$$\ast$$\ast$arr, int rows, int cols, int depths)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a4f4af3539c25a954be5e18275af01495}{fillrandom}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_aa5453e29f3a42d52ec798a7b1f537fc3}{fillrandom$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_aa7353f97649eb1cb43bfd59c9deea82e}{fillrandom$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_ada85bb3d08073d952f4185783524f838}{fillgauss}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T amp, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_a24a966f156fd1a3163af2896c68031be}{fillgauss$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float amp, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_ae405b5742f6ff972fb5a9aa3c16ba2be}{fillgauss$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double amp, double $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_ab97fd4fa60261817f7bfbf7926949fa6}{Testing\+Output}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_ac6df86154644ba8b544ee5ee0ec3e8c7}{Testing\+Output$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_ac636a9919d64f7b2360a5e21361c5975}{Testing\+Output$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_ad37a8675a32dfb60da77c258b0b7306c}{copy\+ID2var}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_ac7a2c658af1538fa8f4137921adaefb8}{copy\+ID2var$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_aff4b92c626cc4dad937777da126bccf2}{copy\+ID2var$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a1b34ab7d726ca571f42f637756cd8120}{copy\+Blockinfo2var}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, int $\ast$blkinfo, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_aa3c701ece8de935a4819fa75c51c78d5}{copy\+Blockinfo2var$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, int $\ast$blkinfo, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_a85e49756501fdf5049eb48149c2e61a9}{copy\+Blockinfo2var$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, int $\ast$blkinfo, double $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a4974ca541eb0c671b0b437f594b63aba}{Compare\+CPUvs\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g, std\+::vector$<$ std\+::string $>$ varlist, bool checkhalo)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_abfe562ecdbcc07087a4a9a10b5a4c028}{Compare\+CPUvs\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel\+\_\+g, std\+::vector$<$ std\+::string $>$ varlist, bool checkhalo)
+\item 
+template void \mbox{\hyperlink{Testing_8cu_aa59700378744a6475b3f5c528cdb6f42}{Compare\+CPUvs\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel\+\_\+g, std\+::vector$<$ std\+::string $>$ varlist, bool checkhalo)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a15a6fa061ccab60ed2d5687e13ea513c}{diffdh}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$input, T $\ast$output, T $\ast$shuffle)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a2558c74b47281e7a4e9e2c7be1dbdc15}{diff\+Source}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$Fqux, T $\ast$Su, T $\ast$output)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8cu_a7a1f9500eec67a188d5fa533ad1a1463}{diff\+Array}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, std\+::string varname, bool checkhalo, T $\ast$cpu, T $\ast$gpu, T $\ast$dummy, T $\ast$out)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Testing_8cu_a6a20315559d37a26b66581ccf2775088}\label{Testing_8cu_a6a20315559d37a26b66581ccf2775088}} 
+\index{Testing.cu@{Testing.cu}!alloc\_init2Darray@{alloc\_init2Darray}}
+\index{alloc\_init2Darray@{alloc\_init2Darray}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{alloc\_init2Darray()}{alloc\_init2Darray()}}
+{\footnotesize\ttfamily void alloc\+\_\+init2\+Darray (\begin{DoxyParamCaption}\item[{float $\ast$$\ast$}]{arr,  }\item[{int}]{NX,  }\item[{int}]{NY }\end{DoxyParamCaption})}
+
+This function allocates and fills a 2D array with zero values \mbox{\Hypertarget{Testing_8cu_a4974ca541eb0c671b0b437f594b63aba}\label{Testing_8cu_a4974ca541eb0c671b0b437f594b63aba}} 
+\index{Testing.cu@{Testing.cu}!CompareCPUvsGPU@{CompareCPUvsGPU}}
+\index{CompareCPUvsGPU@{CompareCPUvsGPU}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{CompareCPUvsGPU()}{CompareCPUvsGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Compare\+CPUvs\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g,  }\item[{std\+::vector$<$ std\+::string $>$}]{varlist,  }\item[{bool}]{checkhalo }\end{DoxyParamCaption})}
+
+This function compares the Valiables in a CPU model and a GPU models This function is quite useful when checking both are identical enough one needs to provide a list (vector$<$string$>$) of variable to check \mbox{\Hypertarget{Testing_8cu_aa59700378744a6475b3f5c528cdb6f42}\label{Testing_8cu_aa59700378744a6475b3f5c528cdb6f42}} 
+\index{Testing.cu@{Testing.cu}!CompareCPUvsGPU$<$ double $>$@{CompareCPUvsGPU$<$ double $>$}}
+\index{CompareCPUvsGPU$<$ double $>$@{CompareCPUvsGPU$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{CompareCPUvsGPU$<$ double $>$()}{CompareCPUvsGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_a4974ca541eb0c671b0b437f594b63aba}{Compare\+CPUvs\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel\+\_\+g,  }\item[{std\+::vector$<$ std\+::string $>$}]{varlist,  }\item[{bool}]{checkhalo }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_abfe562ecdbcc07087a4a9a10b5a4c028}\label{Testing_8cu_abfe562ecdbcc07087a4a9a10b5a4c028}} 
+\index{Testing.cu@{Testing.cu}!CompareCPUvsGPU$<$ float $>$@{CompareCPUvsGPU$<$ float $>$}}
+\index{CompareCPUvsGPU$<$ float $>$@{CompareCPUvsGPU$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{CompareCPUvsGPU$<$ float $>$()}{CompareCPUvsGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_a4974ca541eb0c671b0b437f594b63aba}{Compare\+CPUvs\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel\+\_\+g,  }\item[{std\+::vector$<$ std\+::string $>$}]{varlist,  }\item[{bool}]{checkhalo }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a1b34ab7d726ca571f42f637756cd8120}\label{Testing_8cu_a1b34ab7d726ca571f42f637756cd8120}} 
+\index{Testing.cu@{Testing.cu}!copyBlockinfo2var@{copyBlockinfo2var}}
+\index{copyBlockinfo2var@{copyBlockinfo2var}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{copyBlockinfo2var()}{copyBlockinfo2var()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void copy\+Blockinfo2var (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{int $\ast$}]{blkinfo,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+This function copies blick info to an output variable This function is somewhat useful when checking bugs in the mesh refinement or coarsening one needs to provide a pointer(z) allocated on the CPU to store the clockinfo This fonction only works on CPU \mbox{\Hypertarget{Testing_8cu_a85e49756501fdf5049eb48149c2e61a9}\label{Testing_8cu_a85e49756501fdf5049eb48149c2e61a9}} 
+\index{Testing.cu@{Testing.cu}!copyBlockinfo2var$<$ double $>$@{copyBlockinfo2var$<$ double $>$}}
+\index{copyBlockinfo2var$<$ double $>$@{copyBlockinfo2var$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{copyBlockinfo2var$<$ double $>$()}{copyBlockinfo2var< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_a1b34ab7d726ca571f42f637756cd8120}{copy\+Blockinfo2var}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{int $\ast$}]{blkinfo,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_aa3c701ece8de935a4819fa75c51c78d5}\label{Testing_8cu_aa3c701ece8de935a4819fa75c51c78d5}} 
+\index{Testing.cu@{Testing.cu}!copyBlockinfo2var$<$ float $>$@{copyBlockinfo2var$<$ float $>$}}
+\index{copyBlockinfo2var$<$ float $>$@{copyBlockinfo2var$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{copyBlockinfo2var$<$ float $>$()}{copyBlockinfo2var< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_a1b34ab7d726ca571f42f637756cd8120}{copy\+Blockinfo2var}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{int $\ast$}]{blkinfo,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ad37a8675a32dfb60da77c258b0b7306c}\label{Testing_8cu_ad37a8675a32dfb60da77c258b0b7306c}} 
+\index{Testing.cu@{Testing.cu}!copyID2var@{copyID2var}}
+\index{copyID2var@{copyID2var}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{copyID2var()}{copyID2var()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void copy\+ID2var (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+This function copies block info to an output variable This function is somewhat useful when checking bugs in the mesh refinement or coarsening one needs to provide a pointer(z) allocated on the CPU to store the clockinfo This fonction only works on CPU \mbox{\Hypertarget{Testing_8cu_aff4b92c626cc4dad937777da126bccf2}\label{Testing_8cu_aff4b92c626cc4dad937777da126bccf2}} 
+\index{Testing.cu@{Testing.cu}!copyID2var$<$ double $>$@{copyID2var$<$ double $>$}}
+\index{copyID2var$<$ double $>$@{copyID2var$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{copyID2var$<$ double $>$()}{copyID2var< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_ad37a8675a32dfb60da77c258b0b7306c}{copy\+ID2var}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ac7a2c658af1538fa8f4137921adaefb8}\label{Testing_8cu_ac7a2c658af1538fa8f4137921adaefb8}} 
+\index{Testing.cu@{Testing.cu}!copyID2var$<$ float $>$@{copyID2var$<$ float $>$}}
+\index{copyID2var$<$ float $>$@{copyID2var$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{copyID2var$<$ float $>$()}{copyID2var< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_ad37a8675a32dfb60da77c258b0b7306c}{copy\+ID2var}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a4eeb0564db7786844d7a71ca36d463ff}\label{Testing_8cu_a4eeb0564db7786844d7a71ca36d463ff}} 
+\index{Testing.cu@{Testing.cu}!CPUGPUtest@{CPUGPUtest}}
+\index{CPUGPUtest@{CPUGPUtest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{CPUGPUtest()}{CPUGPUtest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool CPUGPUtest (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a7a1f9500eec67a188d5fa533ad1a1463}\label{Testing_8cu_a7a1f9500eec67a188d5fa533ad1a1463}} 
+\index{Testing.cu@{Testing.cu}!diffArray@{diffArray}}
+\index{diffArray@{diffArray}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{diffArray()}{diffArray()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void diff\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{std\+::string}]{varname,  }\item[{bool}]{checkhalo,  }\item[{T $\ast$}]{cpu,  }\item[{T $\ast$}]{gpu,  }\item[{T $\ast$}]{dummy,  }\item[{T $\ast$}]{out }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a15a6fa061ccab60ed2d5687e13ea513c}\label{Testing_8cu_a15a6fa061ccab60ed2d5687e13ea513c}} 
+\index{Testing.cu@{Testing.cu}!diffdh@{diffdh}}
+\index{diffdh@{diffdh}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{diffdh()}{diffdh()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void diffdh (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{input,  }\item[{T $\ast$}]{output,  }\item[{T $\ast$}]{shuffle }\end{DoxyParamCaption})}
+
+This function Calculates The difference in left and right flux terms. This function is quite useful when checking for Lake-\/at-\/\+Rest states This function requires a preallocated output and a shuffle (right side term) CPU pointers to save the result of teh calculation \mbox{\Hypertarget{Testing_8cu_a2558c74b47281e7a4e9e2c7be1dbdc15}\label{Testing_8cu_a2558c74b47281e7a4e9e2c7be1dbdc15}} 
+\index{Testing.cu@{Testing.cu}!diffSource@{diffSource}}
+\index{diffSource@{diffSource}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{diffSource()}{diffSource()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void diff\+Source (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{Fqux,  }\item[{T $\ast$}]{Su,  }\item[{T $\ast$}]{output }\end{DoxyParamCaption})}
+
+This function Calculate The source term of the equation. This function is quite useful when checking for Lake-\/at-\/\+Rest states This function requires an output\+CPU pointers to save the result of teh calculation \mbox{\Hypertarget{Testing_8cu_ada85bb3d08073d952f4185783524f838}\label{Testing_8cu_ada85bb3d08073d952f4185783524f838}} 
+\index{Testing.cu@{Testing.cu}!fillgauss@{fillgauss}}
+\index{fillgauss@{fillgauss}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{fillgauss()}{fillgauss()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fillgauss (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{amp,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+This function fill an array with a gaussian bump
+
+borrowed/adapted from Basilisk test (?) \mbox{\Hypertarget{Testing_8cu_ae405b5742f6ff972fb5a9aa3c16ba2be}\label{Testing_8cu_ae405b5742f6ff972fb5a9aa3c16ba2be}} 
+\index{Testing.cu@{Testing.cu}!fillgauss$<$ double $>$@{fillgauss$<$ double $>$}}
+\index{fillgauss$<$ double $>$@{fillgauss$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{fillgauss$<$ double $>$()}{fillgauss< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8cu_ada85bb3d08073d952f4185783524f838}{fillgauss}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{amp,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a24a966f156fd1a3163af2896c68031be}\label{Testing_8cu_a24a966f156fd1a3163af2896c68031be}} 
+\index{Testing.cu@{Testing.cu}!fillgauss$<$ float $>$@{fillgauss$<$ float $>$}}
+\index{fillgauss$<$ float $>$@{fillgauss$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{fillgauss$<$ float $>$()}{fillgauss< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8cu_ada85bb3d08073d952f4185783524f838}{fillgauss}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{amp,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a4f4af3539c25a954be5e18275af01495}\label{Testing_8cu_a4f4af3539c25a954be5e18275af01495}} 
+\index{Testing.cu@{Testing.cu}!fillrandom@{fillrandom}}
+\index{fillrandom@{fillrandom}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{fillrandom()}{fillrandom()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void fillrandom (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+This function fill an array with random values (0 -\/ 1) \mbox{\Hypertarget{Testing_8cu_aa7353f97649eb1cb43bfd59c9deea82e}\label{Testing_8cu_aa7353f97649eb1cb43bfd59c9deea82e}} 
+\index{Testing.cu@{Testing.cu}!fillrandom$<$ double $>$@{fillrandom$<$ double $>$}}
+\index{fillrandom$<$ double $>$@{fillrandom$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{fillrandom$<$ double $>$()}{fillrandom< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8cu_a4f4af3539c25a954be5e18275af01495}{fillrandom}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_aa5453e29f3a42d52ec798a7b1f537fc3}\label{Testing_8cu_aa5453e29f3a42d52ec798a7b1f537fc3}} 
+\index{Testing.cu@{Testing.cu}!fillrandom$<$ float $>$@{fillrandom$<$ float $>$}}
+\index{fillrandom$<$ float $>$@{fillrandom$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{fillrandom$<$ float $>$()}{fillrandom< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8cu_a4f4af3539c25a954be5e18275af01495}{fillrandom}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ae86d66a5e761a12f3957ee5927c690bd}\label{Testing_8cu_ae86d66a5e761a12f3957ee5927c690bd}} 
+\index{Testing.cu@{Testing.cu}!GaussianHumptest@{GaussianHumptest}}
+\index{GaussianHumptest@{GaussianHumptest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{GaussianHumptest()}{GaussianHumptest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Gaussian\+Humptest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu,  }\item[{bool}]{compare }\end{DoxyParamCaption})}
+
+This function tests the full hydrodynamics model and compares the results with pre-\/conmputed (Hard wired) values The function creates it own model setup and mesh independantly to what the user might want to do The setup consist of a centrally located gaussian hump radiating away The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk This function also compares the result of the GPU and CPU code (until they diverge) \mbox{\Hypertarget{Testing_8cu_a229963ffd901c799501206de5431f6bb}\label{Testing_8cu_a229963ffd901c799501206de5431f6bb}} 
+\index{Testing.cu@{Testing.cu}!GaussianHumptest$<$ double $>$@{GaussianHumptest$<$ double $>$}}
+\index{GaussianHumptest$<$ double $>$@{GaussianHumptest$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{GaussianHumptest$<$ double $>$()}{GaussianHumptest< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_ae86d66a5e761a12f3957ee5927c690bd}{Gaussian\+Humptest}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{double}]{zsnit,  }\item[{int}]{gpu,  }\item[{bool}]{compare }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a0d0789c633d015e65e01afef05a5e1fb}\label{Testing_8cu_a0d0789c633d015e65e01afef05a5e1fb}} 
+\index{Testing.cu@{Testing.cu}!GaussianHumptest$<$ float $>$@{GaussianHumptest$<$ float $>$}}
+\index{GaussianHumptest$<$ float $>$@{GaussianHumptest$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{GaussianHumptest$<$ float $>$()}{GaussianHumptest< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_ae86d66a5e761a12f3957ee5927c690bd}{Gaussian\+Humptest}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{float}]{zsnit,  }\item[{int}]{gpu,  }\item[{bool}]{compare }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a62ff3fe0c904942bbc562e96f549f1f4}\label{Testing_8cu_a62ff3fe0c904942bbc562e96f549f1f4}} 
+\index{Testing.cu@{Testing.cu}!init3Darray@{init3Darray}}
+\index{init3Darray@{init3Darray}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{init3Darray()}{init3Darray()}}
+{\footnotesize\ttfamily void init3\+Darray (\begin{DoxyParamCaption}\item[{float $\ast$$\ast$$\ast$}]{arr,  }\item[{int}]{rows,  }\item[{int}]{cols,  }\item[{int}]{depths }\end{DoxyParamCaption})}
+
+This function fill a 3D array with zero values \mbox{\Hypertarget{Testing_8cu_aec021291bf8c54e8632e09db926d5abb}\label{Testing_8cu_aec021291bf8c54e8632e09db926d5abb}} 
+\index{Testing.cu@{Testing.cu}!LakeAtRest@{LakeAtRest}}
+\index{LakeAtRest@{LakeAtRest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{LakeAtRest()}{LakeAtRest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Lake\+At\+Rest (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+This function simulates the first predictive step and check whether the lake at rest is preserved otherwise it prints out to screen the cells (and neighbour) where the test fails \mbox{\Hypertarget{Testing_8cu_a775e1e1ee71eb299da2ae9689e024d8e}\label{Testing_8cu_a775e1e1ee71eb299da2ae9689e024d8e}} 
+\index{Testing.cu@{Testing.cu}!MakValleyBathy@{MakValleyBathy}}
+\index{MakValleyBathy@{MakValleyBathy}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{MakValleyBathy()}{MakValleyBathy()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\mbox{\hyperlink{structForcing}{Forcing}}$<$float$>$ Mak\+Valley\+Bathy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{slope,  }\item[{bool}]{bottop,  }\item[{bool}]{flip }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a7b6329079d1c7902af71dd17677dae15}\label{Testing_8cu_a7b6329079d1c7902af71dd17677dae15}} 
+\index{Testing.cu@{Testing.cu}!MassConserveSteepSlope@{MassConserveSteepSlope}}
+\index{MassConserveSteepSlope@{MassConserveSteepSlope}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{MassConserveSteepSlope()}{MassConserveSteepSlope()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Mass\+Conserve\+Steep\+Slope (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+This function tests the mass conservation of the vertical injection (used for rivers) The function creates it own model setup and mesh independantly to what the user might want to do This starts with a initial water level (zsnit=0 is dry) and runs for 0.\+1s before comparing results with zsnit=0.\+1 that is approx 20 steps \mbox{\Hypertarget{Testing_8cu_ad0926ed025ca9b0545a86c9357a3de3c}\label{Testing_8cu_ad0926ed025ca9b0545a86c9357a3de3c}} 
+\index{Testing.cu@{Testing.cu}!MassConserveSteepSlope$<$ double $>$@{MassConserveSteepSlope$<$ double $>$}}
+\index{MassConserveSteepSlope$<$ double $>$@{MassConserveSteepSlope$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{MassConserveSteepSlope$<$ double $>$()}{MassConserveSteepSlope< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a7b6329079d1c7902af71dd17677dae15}{Mass\+Conserve\+Steep\+Slope}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{double}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a4e49cf520a5bb2d07834fcdee685d027}\label{Testing_8cu_a4e49cf520a5bb2d07834fcdee685d027}} 
+\index{Testing.cu@{Testing.cu}!MassConserveSteepSlope$<$ float $>$@{MassConserveSteepSlope$<$ float $>$}}
+\index{MassConserveSteepSlope$<$ float $>$@{MassConserveSteepSlope$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{MassConserveSteepSlope$<$ float $>$()}{MassConserveSteepSlope< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a7b6329079d1c7902af71dd17677dae15}{Mass\+Conserve\+Steep\+Slope}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{float}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a1db3e11d21ac6d41e328ec46be538a41}\label{Testing_8cu_a1db3e11d21ac6d41e328ec46be538a41}} 
+\index{Testing.cu@{Testing.cu}!Rainlossestest@{Rainlossestest}}
+\index{Rainlossestest@{Rainlossestest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Rainlossestest()}{Rainlossestest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Rainlossestest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu,  }\item[{float}]{alpha }\end{DoxyParamCaption})}
+
+This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain. The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsinit=0.\+0 is dry) and runs for 1s comparing results every 0.\+1s (that is approx 20 steps) \mbox{\Hypertarget{Testing_8cu_a5b588f22d9b47f00af2a94804ac2b7f1}\label{Testing_8cu_a5b588f22d9b47f00af2a94804ac2b7f1}} 
+\index{Testing.cu@{Testing.cu}!Raintest@{Raintest}}
+\index{Raintest@{Raintest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Raintest()}{Raintest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Raintest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu,  }\item[{float}]{alpha }\end{DoxyParamCaption})}
+
+This function tests the mass conservation of the spacial injection (used to model rain on grid) The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsnit=0.\+0 is dry) and runs for 0.\+1s before comparing results with zsnit=0.\+1 that is approx 20 steps \mbox{\Hypertarget{Testing_8cu_a6a029027bd2060a3ecad9f8d09807962}\label{Testing_8cu_a6a029027bd2060a3ecad9f8d09807962}} 
+\index{Testing.cu@{Testing.cu}!Raintestinput@{Raintestinput}}
+\index{Raintestinput@{Raintestinput}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Raintestinput()}{Raintestinput()}}
+{\footnotesize\ttfamily bool Raintestinput (\begin{DoxyParamCaption}\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+This function tests the different inputs for rain forcing. This test is based on the paper Aureli2020, the 3 slopes test with regional rain. The experiment has been presented in Iwagaki1955. The first test compares a time varying rain input using a uniform time serie forcing and a time varying 2D field (with same value). The second test check the 3D rain forcing (comparing it to expected values). \mbox{\Hypertarget{Testing_8cu_acc6f019daa444fd2d639ba48ff173d15}\label{Testing_8cu_acc6f019daa444fd2d639ba48ff173d15}} 
+\index{Testing.cu@{Testing.cu}!Raintestmap@{Raintestmap}}
+\index{Raintestmap@{Raintestmap}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Raintestmap()}{Raintestmap()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+std\+::vector$<$float$>$ Raintestmap (\begin{DoxyParamCaption}\item[{int}]{gpu,  }\item[{int}]{dimf,  }\item[{T}]{zinit }\end{DoxyParamCaption})}
+
+\textbackslash{}fnstd\+::vector$<$float$>$ \mbox{\hyperlink{Testing_8cu_acc6f019daa444fd2d639ba48ff173d15}{Raintestmap(int gpu, int dimf, T zinit)}}
+
+This function return the flux at the bottom of the 3 part slope for different types of rain forcings using the test case based on Iwagaki1955 \mbox{\Hypertarget{Testing_8cu_a3c9e942a6a73d701305e4bb1cd4df5c0}\label{Testing_8cu_a3c9e942a6a73d701305e4bb1cd4df5c0}} 
+\index{Testing.cu@{Testing.cu}!Raintestmap$<$ double $>$@{Raintestmap$<$ double $>$}}
+\index{Raintestmap$<$ double $>$@{Raintestmap$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Raintestmap$<$ double $>$()}{Raintestmap< double >()}}
+{\footnotesize\ttfamily template std\+::vector$<$float$>$ \mbox{\hyperlink{Testing_8h_acc6f019daa444fd2d639ba48ff173d15}{Raintestmap}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{gpu,  }\item[{int}]{dimf,  }\item[{double}]{Zsinit }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a80c7d906f3c5f95c31f858ea85869f33}\label{Testing_8cu_a80c7d906f3c5f95c31f858ea85869f33}} 
+\index{Testing.cu@{Testing.cu}!Raintestmap$<$ float $>$@{Raintestmap$<$ float $>$}}
+\index{Raintestmap$<$ float $>$@{Raintestmap$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Raintestmap$<$ float $>$()}{Raintestmap< float >()}}
+{\footnotesize\ttfamily template std\+::vector$<$float$>$ \mbox{\hyperlink{Testing_8h_acc6f019daa444fd2d639ba48ff173d15}{Raintestmap}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{gpu,  }\item[{int}]{dimf,  }\item[{float}]{Zsinit }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ab745b759b52751f7bf75276b74fd658d}\label{Testing_8cu_ab745b759b52751f7bf75276b74fd658d}} 
+\index{Testing.cu@{Testing.cu}!reductiontest@{reductiontest}}
+\index{reductiontest@{reductiontest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{reductiontest()}{reductiontest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T reductiontest (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+Test the algorithm for reducing the global time step on the user grid layout \mbox{\Hypertarget{Testing_8cu_ad9d00c5af2db773ce3d66325e64cf917}\label{Testing_8cu_ad9d00c5af2db773ce3d66325e64cf917}} 
+\index{Testing.cu@{Testing.cu}!reductiontest$<$ double $>$@{reductiontest$<$ double $>$}}
+\index{reductiontest$<$ double $>$@{reductiontest$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{reductiontest$<$ double $>$()}{reductiontest< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8cu_ab745b759b52751f7bf75276b74fd658d}{reductiontest}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a3b9fa3d91b633d85d2008066642c1c14}\label{Testing_8cu_a3b9fa3d91b633d85d2008066642c1c14}} 
+\index{Testing.cu@{Testing.cu}!reductiontest$<$ float $>$@{reductiontest$<$ float $>$}}
+\index{reductiontest$<$ float $>$@{reductiontest$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{reductiontest$<$ float $>$()}{reductiontest< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8cu_ab745b759b52751f7bf75276b74fd658d}{reductiontest}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a8d27dff394b9c80aca43b4ca0ee56fcd}\label{Testing_8cu_a8d27dff394b9c80aca43b4ca0ee56fcd}} 
+\index{Testing.cu@{Testing.cu}!RiverOnBoundary@{RiverOnBoundary}}
+\index{RiverOnBoundary@{RiverOnBoundary}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{RiverOnBoundary()}{RiverOnBoundary()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool River\+On\+Boundary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{slope,  }\item[{int}]{Dir,  }\item[{int}]{Bound\+\_\+type }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a80d8f8532ece9c965802d60aa031d46d}\label{Testing_8cu_a80d8f8532ece9c965802d60aa031d46d}} 
+\index{Testing.cu@{Testing.cu}!Rivertest@{Rivertest}}
+\index{Rivertest@{Rivertest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Rivertest()}{Rivertest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Rivertest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+This function tests the mass conservation of the vertical injection (used for rivers) The function creates it own model setup and mesh independantly to what the user might want to do This starts with a initial water level (zsnit=0 is dry) and runs for 0.\+1s before comparing results with zsnit=0.\+1 that is approx 20 steps \mbox{\Hypertarget{Testing_8cu_a7b29b74b9c2c3f734f7c16633593f5f7}\label{Testing_8cu_a7b29b74b9c2c3f734f7c16633593f5f7}} 
+\index{Testing.cu@{Testing.cu}!Rivertest$<$ double $>$@{Rivertest$<$ double $>$}}
+\index{Rivertest$<$ double $>$@{Rivertest$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Rivertest$<$ double $>$()}{Rivertest< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a80d8f8532ece9c965802d60aa031d46d}{Rivertest}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{double}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a11e18a2e6852e7e150c6130709f3bd44}\label{Testing_8cu_a11e18a2e6852e7e150c6130709f3bd44}} 
+\index{Testing.cu@{Testing.cu}!Rivertest$<$ float $>$@{Rivertest$<$ float $>$}}
+\index{Rivertest$<$ float $>$@{Rivertest$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Rivertest$<$ float $>$()}{Rivertest< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a80d8f8532ece9c965802d60aa031d46d}{Rivertest}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{float}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a19c6eaf6d9833758df860bd56d1dce2b}\label{Testing_8cu_a19c6eaf6d9833758df860bd56d1dce2b}} 
+\index{Testing.cu@{Testing.cu}!RiverVolumeAdapt@{RiverVolumeAdapt}}
+\index{RiverVolumeAdapt@{RiverVolumeAdapt}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{RiverVolumeAdapt()}{RiverVolumeAdapt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool River\+Volume\+Adapt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{maxslope }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a1d4da6a9e01a348c4ef9ea90e45c6f53}\label{Testing_8cu_a1d4da6a9e01a348c4ef9ea90e45c6f53}} 
+\index{Testing.cu@{Testing.cu}!RiverVolumeAdapt@{RiverVolumeAdapt}}
+\index{RiverVolumeAdapt@{RiverVolumeAdapt}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{RiverVolumeAdapt()}{RiverVolumeAdapt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool River\+Volume\+Adapt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{slope,  }\item[{bool}]{bottop,  }\item[{bool}]{flip }\end{DoxyParamCaption})}
+
+
+
+Simulate a river flowing in a steep valley and heck the Volume conservation. 
+
+This function creates a dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
+
+The function can test the water volume for 4 scenario each time\+:
+\begin{DoxyItemize}
+\item left to right\+: bottop=false \& flip=true;
+\item right to left\+: bottop=false \& flip=false;
+\item bottom to top\+: bottop=true \& flip=true;
+\item top to bottom\+: bottop=true \& flip=false;
+\end{DoxyItemize}
+
+The function inherits the adaptation set in XParam so needs to be rerun to accnout for the different scenarios\+:
+\begin{DoxyItemize}
+\item uniform level
+\item flow from coasrse to fine
+\item flow from fine to coarse This is done in the higher level wrapping function 
+\end{DoxyItemize}\mbox{\Hypertarget{Testing_8cu_a1f58fd96fa0d9473ed0c863d5b789485}\label{Testing_8cu_a1f58fd96fa0d9473ed0c863d5b789485}} 
+\index{Testing.cu@{Testing.cu}!testboundaries@{testboundaries}}
+\index{testboundaries@{testboundaries}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{testboundaries()}{testboundaries()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool testboundaries (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{maxslope }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a984ce53c1331a99e98ad625f552f02d8}\label{Testing_8cu_a984ce53c1331a99e98ad625f552f02d8}} 
+\index{Testing.cu@{Testing.cu}!testButtingerX@{testButtingerX}}
+\index{testButtingerX@{testButtingerX}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{testButtingerX()}{testButtingerX()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void test\+ButtingerX (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ix,  }\item[{int}]{iy,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+This function goes through the Buttinger scheme but instead of the normal output just prints all teh usefull values This function is/was used in the lake-\/at-\/rest verification
+
+See also\+: void \mbox{\hyperlink{Testing_8cu_a5f1ffa1a9b2e46bf2f4babc5c4f9c4fe}{testkurganov\+X(\+Param XParam, int ib, int ix, int iy, Model$<$\+T$>$ XModel)}} \mbox{\Hypertarget{Testing_8cu_ae435322535a91559637e33e6f95c8d33}\label{Testing_8cu_ae435322535a91559637e33e6f95c8d33}} 
+\index{Testing.cu@{Testing.cu}!TestFirsthalfstep@{TestFirsthalfstep}}
+\index{TestFirsthalfstep@{TestFirsthalfstep}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{TestFirsthalfstep()}{TestFirsthalfstep()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int Test\+Firsthalfstep (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ac00b715422e6178892c08f88324a3310}\label{Testing_8cu_ac00b715422e6178892c08f88324a3310}} 
+\index{Testing.cu@{Testing.cu}!TestGradientSpeed@{TestGradientSpeed}}
+\index{TestGradientSpeed@{TestGradientSpeed}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{TestGradientSpeed()}{TestGradientSpeed()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Test\+Gradient\+Speed (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+This function fill an array with random values (0 -\/ 1)
+
+This function test the spped and accuracy of a new gradient function gradient are only calculated for zb but assigned to different gradient variable for storage \mbox{\Hypertarget{Testing_8cu_a6ce4c15e1755fc3b537e6dc7ef7401c2}\label{Testing_8cu_a6ce4c15e1755fc3b537e6dc7ef7401c2}} 
+\index{Testing.cu@{Testing.cu}!TestHaloSpeed@{TestHaloSpeed}}
+\index{TestHaloSpeed@{TestHaloSpeed}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{TestHaloSpeed()}{TestHaloSpeed()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Test\+Halo\+Speed (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a1803abe24ad2daba8d11e5e46c783762}\label{Testing_8cu_a1803abe24ad2daba8d11e5e46c783762}} 
+\index{Testing.cu@{Testing.cu}!Testing@{Testing}}
+\index{Testing@{Testing}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Testing()}{Testing()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Testing (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ad67958f394bbd08c8782f376fffcac21}\label{Testing_8cu_ad67958f394bbd08c8782f376fffcac21}} 
+\index{Testing.cu@{Testing.cu}!Testing$<$ double $>$@{Testing$<$ double $>$}}
+\index{Testing$<$ double $>$@{Testing$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Testing$<$ double $>$()}{Testing< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a1803abe24ad2daba8d11e5e46c783762}{Testing}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a0e4dc3171209811b6374274fa2c612d1}\label{Testing_8cu_a0e4dc3171209811b6374274fa2c612d1}} 
+\index{Testing.cu@{Testing.cu}!Testing$<$ float $>$@{Testing$<$ float $>$}}
+\index{Testing$<$ float $>$@{Testing$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Testing$<$ float $>$()}{Testing< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a1803abe24ad2daba8d11e5e46c783762}{Testing}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ab97fd4fa60261817f7bfbf7926949fa6}\label{Testing_8cu_ab97fd4fa60261817f7bfbf7926949fa6}} 
+\index{Testing.cu@{Testing.cu}!TestingOutput@{TestingOutput}}
+\index{TestingOutput@{TestingOutput}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{TestingOutput()}{TestingOutput()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+Testing\+Output (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+OUTDATED? \mbox{\Hypertarget{Testing_8cu_ac636a9919d64f7b2360a5e21361c5975}\label{Testing_8cu_ac636a9919d64f7b2360a5e21361c5975}} 
+\index{Testing.cu@{Testing.cu}!TestingOutput$<$ double $>$@{TestingOutput$<$ double $>$}}
+\index{TestingOutput$<$ double $>$@{TestingOutput$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{TestingOutput$<$ double $>$()}{TestingOutput< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_ac72746cb1a6853204ce8c741857f9804}{Testing\+Output}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_ac6df86154644ba8b544ee5ee0ec3e8c7}\label{Testing_8cu_ac6df86154644ba8b544ee5ee0ec3e8c7}} 
+\index{Testing.cu@{Testing.cu}!TestingOutput$<$ float $>$@{TestingOutput$<$ float $>$}}
+\index{TestingOutput$<$ float $>$@{TestingOutput$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{TestingOutput$<$ float $>$()}{TestingOutput< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Testing_8h_ac72746cb1a6853204ce8c741857f9804}{Testing\+Output}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a4777c15ad455f8f7360c0bcb6d04fdeb}\label{Testing_8cu_a4777c15ad455f8f7360c0bcb6d04fdeb}} 
+\index{Testing.cu@{Testing.cu}!TestInstability@{TestInstability}}
+\index{TestInstability@{TestInstability}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{TestInstability()}{TestInstability()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int Test\+Instability (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a5f1ffa1a9b2e46bf2f4babc5c4f9c4fe}\label{Testing_8cu_a5f1ffa1a9b2e46bf2f4babc5c4f9c4fe}} 
+\index{Testing.cu@{Testing.cu}!testkurganovX@{testkurganovX}}
+\index{testkurganovX@{testkurganovX}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{testkurganovX()}{testkurganovX()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void testkurganovX (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ix,  }\item[{int}]{iy,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+This function goes through the Kurganov scheme but instead of the normal output just prints all teh usefull values This function is/was used in the lake-\/at-\/rest verification \mbox{\Hypertarget{Testing_8cu_a175c84b2bc51deb4d9e1c24f1dfd3bf5}\label{Testing_8cu_a175c84b2bc51deb4d9e1c24f1dfd3bf5}} 
+\index{Testing.cu@{Testing.cu}!Testzbinit@{Testzbinit}}
+\index{Testzbinit@{Testzbinit}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{Testzbinit()}{Testzbinit()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int Testzbinit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a104edf84a62f0b9fe895a48abbc1d3bc}\label{Testing_8cu_a104edf84a62f0b9fe895a48abbc1d3bc}} 
+\index{Testing.cu@{Testing.cu}!ThackerBathy@{ThackerBathy}}
+\index{ThackerBathy@{ThackerBathy}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ThackerBathy()}{ThackerBathy()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T Thacker\+Bathy (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{T}]{L,  }\item[{T}]{D }\end{DoxyParamCaption})}
+
+
+
+create a parabolic bassin 
+
+This function creates a parabolic bassin. The function returns a single value of the bassin
+
+Borrowed from Buttinger et al. 2019.\hypertarget{Testing_8cu_autotoc_md179}{}\doxyparagraph{Reference}\label{Testing_8cu_autotoc_md179}
+Buttinger-\/\+Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.\+: A fast second-\/order shallow water scheme on two-\/dimensional structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019. \mbox{\Hypertarget{Testing_8cu_a8f16cda74bcdd1db8fd67423f999572c}\label{Testing_8cu_a8f16cda74bcdd1db8fd67423f999572c}} 
+\index{Testing.cu@{Testing.cu}!ThackerLakeAtRest@{ThackerLakeAtRest}}
+\index{ThackerLakeAtRest@{ThackerLakeAtRest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ThackerLakeAtRest()}{ThackerLakeAtRest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Thacker\+Lake\+At\+Rest (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{zsinit }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a8df291a6309f0ebe605531e03761b531}\label{Testing_8cu_a8df291a6309f0ebe605531e03761b531}} 
+\index{Testing.cu@{Testing.cu}!ThackerLakeAtRest$<$ double $>$@{ThackerLakeAtRest$<$ double $>$}}
+\index{ThackerLakeAtRest$<$ double $>$@{ThackerLakeAtRest$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ThackerLakeAtRest$<$ double $>$()}{ThackerLakeAtRest< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8cu_a8f16cda74bcdd1db8fd67423f999572c}{Thacker\+Lake\+At\+Rest}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{double}]{zsinit }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a0a3b7ab6b78d6ef9743bbca6f98890ae}\label{Testing_8cu_a0a3b7ab6b78d6ef9743bbca6f98890ae}} 
+\index{Testing.cu@{Testing.cu}!ThackerLakeAtRest$<$ float $>$@{ThackerLakeAtRest$<$ float $>$}}
+\index{ThackerLakeAtRest$<$ float $>$@{ThackerLakeAtRest$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ThackerLakeAtRest$<$ float $>$()}{ThackerLakeAtRest< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8cu_a8f16cda74bcdd1db8fd67423f999572c}{Thacker\+Lake\+At\+Rest}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{float}]{zsinit }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a8a8622ffcab39fee02cae7640afdb939}\label{Testing_8cu_a8a8622ffcab39fee02cae7640afdb939}} 
+\index{Testing.cu@{Testing.cu}!ValleyBathy@{ValleyBathy}}
+\index{ValleyBathy@{ValleyBathy}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ValleyBathy()}{ValleyBathy()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T Valley\+Bathy (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{T}]{slope,  }\item[{T}]{center }\end{DoxyParamCaption})}
+
+
+
+create V shape Valley basin 
+
+This function creates a simple V shape Valley basin \mbox{\Hypertarget{Testing_8cu_a2a54f4be23d52aeb3bdc626953d95c7b}\label{Testing_8cu_a2a54f4be23d52aeb3bdc626953d95c7b}} 
+\index{Testing.cu@{Testing.cu}!ZoneOutputTest@{ZoneOutputTest}}
+\index{ZoneOutputTest@{ZoneOutputTest}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ZoneOutputTest()}{ZoneOutputTest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool testzone\+Out\+Def Zone\+Output\+Test (\begin{DoxyParamCaption}\item[{int}]{nzones,  }\item[{T}]{zsinit }\end{DoxyParamCaption})}
+
+This function test the zoned output for a basic configuration
+
+This function test the spped and accuracy of a new gradient function gradient are only calculated for zb but assigned to different gradient variable for storage \mbox{\Hypertarget{Testing_8cu_a1b748ece19a6093b97227fd127659619}\label{Testing_8cu_a1b748ece19a6093b97227fd127659619}} 
+\index{Testing.cu@{Testing.cu}!ZoneOutputTest$<$ double $>$@{ZoneOutputTest$<$ double $>$}}
+\index{ZoneOutputTest$<$ double $>$@{ZoneOutputTest$<$ double $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ZoneOutputTest$<$ double $>$()}{ZoneOutputTest< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a0755c7670bec1082029464abce5504ad}{Zone\+Output\+Test}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nzones,  }\item[{double}]{zsinit }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8cu_a2cd383fdb7b4673dedd9695094a1c050}\label{Testing_8cu_a2cd383fdb7b4673dedd9695094a1c050}} 
+\index{Testing.cu@{Testing.cu}!ZoneOutputTest$<$ float $>$@{ZoneOutputTest$<$ float $>$}}
+\index{ZoneOutputTest$<$ float $>$@{ZoneOutputTest$<$ float $>$}!Testing.cu@{Testing.cu}}
+\doxysubsubsection{\texorpdfstring{ZoneOutputTest$<$ float $>$()}{ZoneOutputTest< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Testing_8h_a0755c7670bec1082029464abce5504ad}{Zone\+Output\+Test}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nzones,  }\item[{float}]{zsinit }\end{DoxyParamCaption})}
+

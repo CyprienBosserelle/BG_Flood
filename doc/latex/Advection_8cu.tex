@@ -1,0 +1,261 @@
+\hypertarget{Advection_8cu}{}\doxysection{src/\+Advection.cu File Reference}
+\label{Advection_8cu}\index{src/Advection.cu@{src/Advection.cu}}
+{\ttfamily \#include \char`\"{}Advection.\+h\char`\"{}}\newline
+Include dependency graph for Advection.\+cu\+:
+% FIG 0
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structSharedMemory}{Shared\+Memory$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structSharedMemory_3_01double_01_4}{Shared\+Memory$<$ double $>$}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_ab3f5933801a01465b05b309ebf5cce1f}{update\+EVGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_acb17d8f849376d3bf5ba4aec4b26525b}{update\+EVGPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$ XFlux, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a5dbae9a203919206715e12418e988763}{update\+EVGPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$ XFlux, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_af94d0f7643a2981eb091f218a38f9330}{update\+EVCPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a3231349a042559c6a9c931515977f14d}{update\+EVCPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$ XFlux, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a858feea1cc2b754aaf11337d32ce1ce6}{update\+EVCPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$ XFlux, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a35a491ab99f8054a48f2037d4cff523e}{Advkernel\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T dt, T $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a1be464118beb94a48d6dba93591ce900}{Advkernel\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float dt, float $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a2c6befe07e206ff341720fe0e7869fef}{Advkernel\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double dt, double $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv\+\_\+o)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a40eadb17a2e249d0b09d29294eb2ee9a}{Advkernel\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T dt, T $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a2ba941612a2d1ea6b8e3039235c635f4}{Advkernel\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float dt, float $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a4e9e1c5c75c28ce13322e0529ad57675}{Advkernel\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double dt, double $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv\+\_\+o)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a941d4899cc65d8391e9f63677594cb17}{cleanup\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a0a2fdd671cd2e0e8ace552dd4d891f54}{cleanup\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a5d5e6204612e2b15e213b1831e7b2f2a}{cleanup\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv\+\_\+o)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a9be3aa5a2118186d643ef7fb1a5537ef}{cleanup\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_ab52c6ea1f923ca4fad7c954424b40e7f}{cleanup\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv\+\_\+o)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a689e3fa4b61a33d8e773662531a43050}{cleanup\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv\+\_\+o)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ T \mbox{\hyperlink{Advection_8cu_a094a2783163d213283e849a5eb7c0b2a}{timestepreduction\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ T $>$ XTime)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ float \mbox{\hyperlink{Advection_8cu_a1a934fdecc16c359ae63482d4439f884}{timestepreduction\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ float $>$ XTime)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Advection_8cu_a710607174aa9f8148641cd24974dbbfb}{timestepreduction\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ double $>$ XTime)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ T \mbox{\hyperlink{Advection_8cu_a32eadd6556a7c386bb1fd0b4c3e5f052}{Calctimestep\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ T $>$ XTime)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ float \mbox{\hyperlink{Advection_8cu_aaf84f33151aa591dde87aad67f410ff9}{Calctimestep\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ float $>$ XTime)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Advection_8cu_ab9af7ddd7c50990cf75b11dbdd3c19e3}{Calctimestep\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ double $>$ XTime)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ T \mbox{\hyperlink{Advection_8cu_af94423a9d309433e84aa894ee85e86c2}{Calctimestep\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ T $>$ XTime)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ float \mbox{\hyperlink{Advection_8cu_ac4caf95bcf0421f51e3a02c281743730}{Calctimestep\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ float $>$ XTime)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Advection_8cu_ad11ad087e2c7396d9d397241fa594a84}{Calctimestep\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structTimeP}{TimeP}}$<$ double $>$ XTime)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a34f48c0c647ff01bc2ac28f9cbf8787e}{reducemin3}} (T $\ast$g\+\_\+idata, T $\ast$g\+\_\+odata, unsigned int n)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8cu_a7b3bcb5c26053d498c17d560a167f358}{densify}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$g\+\_\+idata, T $\ast$g\+\_\+odata)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Advection_8cu_a40eadb17a2e249d0b09d29294eb2ee9a}\label{Advection_8cu_a40eadb17a2e249d0b09d29294eb2ee9a}} 
+\index{Advection.cu@{Advection.cu}!AdvkernelCPU@{AdvkernelCPU}}
+\index{AdvkernelCPU@{AdvkernelCPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{AdvkernelCPU()}{AdvkernelCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Advkernel\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{dt,  }\item[{T $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a4e9e1c5c75c28ce13322e0529ad57675}\label{Advection_8cu_a4e9e1c5c75c28ce13322e0529ad57675}} 
+\index{Advection.cu@{Advection.cu}!AdvkernelCPU$<$ double $>$@{AdvkernelCPU$<$ double $>$}}
+\index{AdvkernelCPU$<$ double $>$@{AdvkernelCPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{AdvkernelCPU$<$ double $>$()}{AdvkernelCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a40eadb17a2e249d0b09d29294eb2ee9a}{Advkernel\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{dt,  }\item[{double $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a2ba941612a2d1ea6b8e3039235c635f4}\label{Advection_8cu_a2ba941612a2d1ea6b8e3039235c635f4}} 
+\index{Advection.cu@{Advection.cu}!AdvkernelCPU$<$ float $>$@{AdvkernelCPU$<$ float $>$}}
+\index{AdvkernelCPU$<$ float $>$@{AdvkernelCPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{AdvkernelCPU$<$ float $>$()}{AdvkernelCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a40eadb17a2e249d0b09d29294eb2ee9a}{Advkernel\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{dt,  }\item[{float $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a35a491ab99f8054a48f2037d4cff523e}\label{Advection_8cu_a35a491ab99f8054a48f2037d4cff523e}} 
+\index{Advection.cu@{Advection.cu}!AdvkernelGPU@{AdvkernelGPU}}
+\index{AdvkernelGPU@{AdvkernelGPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{AdvkernelGPU()}{AdvkernelGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Advkernel\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{dt,  }\item[{T $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a2c6befe07e206ff341720fe0e7869fef}\label{Advection_8cu_a2c6befe07e206ff341720fe0e7869fef}} 
+\index{Advection.cu@{Advection.cu}!AdvkernelGPU$<$ double $>$@{AdvkernelGPU$<$ double $>$}}
+\index{AdvkernelGPU$<$ double $>$@{AdvkernelGPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{AdvkernelGPU$<$ double $>$()}{AdvkernelGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a35a491ab99f8054a48f2037d4cff523e}{Advkernel\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{dt,  }\item[{double $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a1be464118beb94a48d6dba93591ce900}\label{Advection_8cu_a1be464118beb94a48d6dba93591ce900}} 
+\index{Advection.cu@{Advection.cu}!AdvkernelGPU$<$ float $>$@{AdvkernelGPU$<$ float $>$}}
+\index{AdvkernelGPU$<$ float $>$@{AdvkernelGPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{AdvkernelGPU$<$ float $>$()}{AdvkernelGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a35a491ab99f8054a48f2037d4cff523e}{Advkernel\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{dt,  }\item[{float $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a32eadd6556a7c386bb1fd0b4c3e5f052}\label{Advection_8cu_a32eadd6556a7c386bb1fd0b4c3e5f052}} 
+\index{Advection.cu@{Advection.cu}!CalctimestepCPU@{CalctimestepCPU}}
+\index{CalctimestepCPU@{CalctimestepCPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{CalctimestepCPU()}{CalctimestepCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ T Calctimestep\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ T $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_ab9af7ddd7c50990cf75b11dbdd3c19e3}\label{Advection_8cu_ab9af7ddd7c50990cf75b11dbdd3c19e3}} 
+\index{Advection.cu@{Advection.cu}!CalctimestepCPU$<$ double $>$@{CalctimestepCPU$<$ double $>$}}
+\index{CalctimestepCPU$<$ double $>$@{CalctimestepCPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{CalctimestepCPU$<$ double $>$()}{CalctimestepCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Advection_8h_a32eadd6556a7c386bb1fd0b4c3e5f052}{Calctimestep\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ double $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_aaf84f33151aa591dde87aad67f410ff9}\label{Advection_8cu_aaf84f33151aa591dde87aad67f410ff9}} 
+\index{Advection.cu@{Advection.cu}!CalctimestepCPU$<$ float $>$@{CalctimestepCPU$<$ float $>$}}
+\index{CalctimestepCPU$<$ float $>$@{CalctimestepCPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{CalctimestepCPU$<$ float $>$()}{CalctimestepCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ float \mbox{\hyperlink{Advection_8h_a32eadd6556a7c386bb1fd0b4c3e5f052}{Calctimestep\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ float $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_af94423a9d309433e84aa894ee85e86c2}\label{Advection_8cu_af94423a9d309433e84aa894ee85e86c2}} 
+\index{Advection.cu@{Advection.cu}!CalctimestepGPU@{CalctimestepGPU}}
+\index{CalctimestepGPU@{CalctimestepGPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{CalctimestepGPU()}{CalctimestepGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ T Calctimestep\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ T $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_ad11ad087e2c7396d9d397241fa594a84}\label{Advection_8cu_ad11ad087e2c7396d9d397241fa594a84}} 
+\index{Advection.cu@{Advection.cu}!CalctimestepGPU$<$ double $>$@{CalctimestepGPU$<$ double $>$}}
+\index{CalctimestepGPU$<$ double $>$@{CalctimestepGPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{CalctimestepGPU$<$ double $>$()}{CalctimestepGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Advection_8h_af94423a9d309433e84aa894ee85e86c2}{Calctimestep\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ double $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_ac4caf95bcf0421f51e3a02c281743730}\label{Advection_8cu_ac4caf95bcf0421f51e3a02c281743730}} 
+\index{Advection.cu@{Advection.cu}!CalctimestepGPU$<$ float $>$@{CalctimestepGPU$<$ float $>$}}
+\index{CalctimestepGPU$<$ float $>$@{CalctimestepGPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{CalctimestepGPU$<$ float $>$()}{CalctimestepGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ float \mbox{\hyperlink{Advection_8h_af94423a9d309433e84aa894ee85e86c2}{Calctimestep\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ float $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a9be3aa5a2118186d643ef7fb1a5537ef}\label{Advection_8cu_a9be3aa5a2118186d643ef7fb1a5537ef}} 
+\index{Advection.cu@{Advection.cu}!cleanupCPU@{cleanupCPU}}
+\index{cleanupCPU@{cleanupCPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{cleanupCPU()}{cleanupCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void cleanup\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a689e3fa4b61a33d8e773662531a43050}\label{Advection_8cu_a689e3fa4b61a33d8e773662531a43050}} 
+\index{Advection.cu@{Advection.cu}!cleanupCPU$<$ double $>$@{cleanupCPU$<$ double $>$}}
+\index{cleanupCPU$<$ double $>$@{cleanupCPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{cleanupCPU$<$ double $>$()}{cleanupCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a9be3aa5a2118186d643ef7fb1a5537ef}{cleanup\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_ab52c6ea1f923ca4fad7c954424b40e7f}\label{Advection_8cu_ab52c6ea1f923ca4fad7c954424b40e7f}} 
+\index{Advection.cu@{Advection.cu}!cleanupCPU$<$ float $>$@{cleanupCPU$<$ float $>$}}
+\index{cleanupCPU$<$ float $>$@{cleanupCPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{cleanupCPU$<$ float $>$()}{cleanupCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a9be3aa5a2118186d643ef7fb1a5537ef}{cleanup\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a941d4899cc65d8391e9f63677594cb17}\label{Advection_8cu_a941d4899cc65d8391e9f63677594cb17}} 
+\index{Advection.cu@{Advection.cu}!cleanupGPU@{cleanupGPU}}
+\index{cleanupGPU@{cleanupGPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{cleanupGPU()}{cleanupGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void cleanup\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a5d5e6204612e2b15e213b1831e7b2f2a}\label{Advection_8cu_a5d5e6204612e2b15e213b1831e7b2f2a}} 
+\index{Advection.cu@{Advection.cu}!cleanupGPU$<$ double $>$@{cleanupGPU$<$ double $>$}}
+\index{cleanupGPU$<$ double $>$@{cleanupGPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{cleanupGPU$<$ double $>$()}{cleanupGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a941d4899cc65d8391e9f63677594cb17}{cleanup\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a0a2fdd671cd2e0e8ace552dd4d891f54}\label{Advection_8cu_a0a2fdd671cd2e0e8ace552dd4d891f54}} 
+\index{Advection.cu@{Advection.cu}!cleanupGPU$<$ float $>$@{cleanupGPU$<$ float $>$}}
+\index{cleanupGPU$<$ float $>$@{cleanupGPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{cleanupGPU$<$ float $>$()}{cleanupGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_a941d4899cc65d8391e9f63677594cb17}{cleanup\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a7b3bcb5c26053d498c17d560a167f358}\label{Advection_8cu_a7b3bcb5c26053d498c17d560a167f358}} 
+\index{Advection.cu@{Advection.cu}!densify@{densify}}
+\index{densify@{densify}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{densify()}{densify()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void densify (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{g\+\_\+idata,  }\item[{T $\ast$}]{g\+\_\+odata }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a34f48c0c647ff01bc2ac28f9cbf8787e}\label{Advection_8cu_a34f48c0c647ff01bc2ac28f9cbf8787e}} 
+\index{Advection.cu@{Advection.cu}!reducemin3@{reducemin3}}
+\index{reducemin3@{reducemin3}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{reducemin3()}{reducemin3()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void reducemin3 (\begin{DoxyParamCaption}\item[{T $\ast$}]{g\+\_\+idata,  }\item[{T $\ast$}]{g\+\_\+odata,  }\item[{unsigned int}]{n }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a710607174aa9f8148641cd24974dbbfb}\label{Advection_8cu_a710607174aa9f8148641cd24974dbbfb}} 
+\index{Advection.cu@{Advection.cu}!timestepreductionCPU@{timestepreductionCPU}}
+\index{timestepreductionCPU@{timestepreductionCPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{timestepreductionCPU()}{timestepreductionCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ double timestepreduction\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ double $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a1a934fdecc16c359ae63482d4439f884}\label{Advection_8cu_a1a934fdecc16c359ae63482d4439f884}} 
+\index{Advection.cu@{Advection.cu}!timestepreductionCPU@{timestepreductionCPU}}
+\index{timestepreductionCPU@{timestepreductionCPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{timestepreductionCPU()}{timestepreductionCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ float timestepreduction\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ float $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a094a2783163d213283e849a5eb7c0b2a}\label{Advection_8cu_a094a2783163d213283e849a5eb7c0b2a}} 
+\index{Advection.cu@{Advection.cu}!timestepreductionCPU@{timestepreductionCPU}}
+\index{timestepreductionCPU@{timestepreductionCPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{timestepreductionCPU()}{timestepreductionCPU()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ T timestepreduction\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structTimeP}{TimeP}}$<$ T $>$}]{XTime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_af94d0f7643a2981eb091f218a38f9330}\label{Advection_8cu_af94d0f7643a2981eb091f218a38f9330}} 
+\index{Advection.cu@{Advection.cu}!updateEVCPU@{updateEVCPU}}
+\index{updateEVCPU@{updateEVCPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{updateEVCPU()}{updateEVCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void update\+EVCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a858feea1cc2b754aaf11337d32ce1ce6}\label{Advection_8cu_a858feea1cc2b754aaf11337d32ce1ce6}} 
+\index{Advection.cu@{Advection.cu}!updateEVCPU$<$ double $>$@{updateEVCPU$<$ double $>$}}
+\index{updateEVCPU$<$ double $>$@{updateEVCPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{updateEVCPU$<$ double $>$()}{updateEVCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_af94d0f7643a2981eb091f218a38f9330}{update\+EVCPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$}]{XFlux,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a3231349a042559c6a9c931515977f14d}\label{Advection_8cu_a3231349a042559c6a9c931515977f14d}} 
+\index{Advection.cu@{Advection.cu}!updateEVCPU$<$ float $>$@{updateEVCPU$<$ float $>$}}
+\index{updateEVCPU$<$ float $>$@{updateEVCPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{updateEVCPU$<$ float $>$()}{updateEVCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_af94d0f7643a2981eb091f218a38f9330}{update\+EVCPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$}]{XFlux,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_ab3f5933801a01465b05b309ebf5cce1f}\label{Advection_8cu_ab3f5933801a01465b05b309ebf5cce1f}} 
+\index{Advection.cu@{Advection.cu}!updateEVGPU@{updateEVGPU}}
+\index{updateEVGPU@{updateEVGPU}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{updateEVGPU()}{updateEVGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void update\+EVGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_a5dbae9a203919206715e12418e988763}\label{Advection_8cu_a5dbae9a203919206715e12418e988763}} 
+\index{Advection.cu@{Advection.cu}!updateEVGPU$<$ double $>$@{updateEVGPU$<$ double $>$}}
+\index{updateEVGPU$<$ double $>$@{updateEVGPU$<$ double $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{updateEVGPU$<$ double $>$()}{updateEVGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_ab3f5933801a01465b05b309ebf5cce1f}{update\+EVGPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ double $>$}]{XFlux,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Advection_8cu_acb17d8f849376d3bf5ba4aec4b26525b}\label{Advection_8cu_acb17d8f849376d3bf5ba4aec4b26525b}} 
+\index{Advection.cu@{Advection.cu}!updateEVGPU$<$ float $>$@{updateEVGPU$<$ float $>$}}
+\index{updateEVGPU$<$ float $>$@{updateEVGPU$<$ float $>$}!Advection.cu@{Advection.cu}}
+\doxysubsubsection{\texorpdfstring{updateEVGPU$<$ float $>$()}{updateEVGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Advection_8h_ab3f5933801a01465b05b309ebf5cce1f}{update\+EVGPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ float $>$}]{XFlux,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+

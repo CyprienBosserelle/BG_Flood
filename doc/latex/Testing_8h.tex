@@ -1,0 +1,156 @@
+\hypertarget{Testing_8h}{}\doxysection{src/\+Testing.h File Reference}
+\label{Testing_8h}\index{src/Testing.h@{src/Testing.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Write\+\_\+txtlog.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Read\+Input.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Read\+Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mesh.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Setup\+\_\+\+GPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mainloop.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Flow\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Flow\+GPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Adaptation.\+h\char`\"{}}\newline
+Include dependency graph for Testing.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a1803abe24ad2daba8d11e5e46c783762}{Testing}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_ae86d66a5e761a12f3957ee5927c690bd}{Gaussian\+Humptest}} (T zsnit, int gpu, bool compare)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8h_ac72746cb1a6853204ce8c741857f9804}{Testing\+Output}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8h_ad37a8675a32dfb60da77c258b0b7306c}{copy\+ID2var}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8h_a1b34ab7d726ca571f42f637756cd8120}{copy\+Blockinfo2var}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, int $\ast$blkinfo, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Testing_8h_a4974ca541eb0c671b0b437f594b63aba}{Compare\+CPUvs\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g, std\+::vector$<$ std\+::string $>$ varlist, bool checkhalo)
+\item 
+{\footnotesize template$<$class T $>$ }\\std\+::vector$<$ float $>$ \mbox{\hyperlink{Testing_8h_acc6f019daa444fd2d639ba48ff173d15}{Raintestmap}} (int gpu, int dimf, T zinit)
+\item 
+bool \mbox{\hyperlink{Testing_8h_a6a029027bd2060a3ecad9f8d09807962}{Raintestinput}} (int gpu)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a80d8f8532ece9c965802d60aa031d46d}{Rivertest}} (T zsnit, int gpu)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a7b6329079d1c7902af71dd17677dae15}{Mass\+Conserve\+Steep\+Slope}} (T zsnit, int gpu)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a5b588f22d9b47f00af2a94804ac2b7f1}{Raintest}} (T zsnit, int gpu, float alpha)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a1f58fd96fa0d9473ed0c863d5b789485}{testboundaries}} (\mbox{\hyperlink{classParam}{Param}} XParam, T maxslope)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a0755c7670bec1082029464abce5504ad}{Zone\+Output\+Test}} (int nzones, T zsinit)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a6645fef2658aa8f5bb8f72823d17019c}{Rainlossestest}} (T zsnit, int gpu, float alpha)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Testing_8h_a4974ca541eb0c671b0b437f594b63aba}\label{Testing_8h_a4974ca541eb0c671b0b437f594b63aba}} 
+\index{Testing.h@{Testing.h}!CompareCPUvsGPU@{CompareCPUvsGPU}}
+\index{CompareCPUvsGPU@{CompareCPUvsGPU}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{CompareCPUvsGPU()}{CompareCPUvsGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Compare\+CPUvs\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g,  }\item[{std\+::vector$<$ std\+::string $>$}]{varlist,  }\item[{bool}]{checkhalo }\end{DoxyParamCaption})}
+
+This function compares the Valiables in a CPU model and a GPU models This function is quite useful when checking both are identical enough one needs to provide a list (vector$<$string$>$) of variable to check \mbox{\Hypertarget{Testing_8h_a1b34ab7d726ca571f42f637756cd8120}\label{Testing_8h_a1b34ab7d726ca571f42f637756cd8120}} 
+\index{Testing.h@{Testing.h}!copyBlockinfo2var@{copyBlockinfo2var}}
+\index{copyBlockinfo2var@{copyBlockinfo2var}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{copyBlockinfo2var()}{copyBlockinfo2var()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void copy\+Blockinfo2var (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{int $\ast$}]{blkinfo,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+This function copies blick info to an output variable This function is somewhat useful when checking bugs in the mesh refinement or coarsening one needs to provide a pointer(z) allocated on the CPU to store the clockinfo This fonction only works on CPU \mbox{\Hypertarget{Testing_8h_ad37a8675a32dfb60da77c258b0b7306c}\label{Testing_8h_ad37a8675a32dfb60da77c258b0b7306c}} 
+\index{Testing.h@{Testing.h}!copyID2var@{copyID2var}}
+\index{copyID2var@{copyID2var}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{copyID2var()}{copyID2var()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void copy\+ID2var (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+This function copies block info to an output variable This function is somewhat useful when checking bugs in the mesh refinement or coarsening one needs to provide a pointer(z) allocated on the CPU to store the clockinfo This fonction only works on CPU \mbox{\Hypertarget{Testing_8h_ae86d66a5e761a12f3957ee5927c690bd}\label{Testing_8h_ae86d66a5e761a12f3957ee5927c690bd}} 
+\index{Testing.h@{Testing.h}!GaussianHumptest@{GaussianHumptest}}
+\index{GaussianHumptest@{GaussianHumptest}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{GaussianHumptest()}{GaussianHumptest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Gaussian\+Humptest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu,  }\item[{bool}]{compare }\end{DoxyParamCaption})}
+
+This function tests the full hydrodynamics model and compares the results with pre-\/conmputed (Hard wired) values The function creates it own model setup and mesh independantly to what the user might want to do The setup consist of a centrally located gaussian hump radiating away The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk This function also compares the result of the GPU and CPU code (until they diverge) \mbox{\Hypertarget{Testing_8h_a7b6329079d1c7902af71dd17677dae15}\label{Testing_8h_a7b6329079d1c7902af71dd17677dae15}} 
+\index{Testing.h@{Testing.h}!MassConserveSteepSlope@{MassConserveSteepSlope}}
+\index{MassConserveSteepSlope@{MassConserveSteepSlope}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{MassConserveSteepSlope()}{MassConserveSteepSlope()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Mass\+Conserve\+Steep\+Slope (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+This function tests the mass conservation of the vertical injection (used for rivers) The function creates it own model setup and mesh independantly to what the user might want to do This starts with a initial water level (zsnit=0 is dry) and runs for 0.\+1s before comparing results with zsnit=0.\+1 that is approx 20 steps \mbox{\Hypertarget{Testing_8h_a6645fef2658aa8f5bb8f72823d17019c}\label{Testing_8h_a6645fef2658aa8f5bb8f72823d17019c}} 
+\index{Testing.h@{Testing.h}!Rainlossestest@{Rainlossestest}}
+\index{Rainlossestest@{Rainlossestest}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{Rainlossestest()}{Rainlossestest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Rainlossestest (\begin{DoxyParamCaption}\item[{T}]{zsinit,  }\item[{int}]{gpu,  }\item[{float}]{alpha }\end{DoxyParamCaption})}
+
+This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain. The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsinit=0.\+0 is dry) and runs for 1s comparing results every 0.\+1s (that is approx 20 steps) \mbox{\Hypertarget{Testing_8h_a5b588f22d9b47f00af2a94804ac2b7f1}\label{Testing_8h_a5b588f22d9b47f00af2a94804ac2b7f1}} 
+\index{Testing.h@{Testing.h}!Raintest@{Raintest}}
+\index{Raintest@{Raintest}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{Raintest()}{Raintest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Raintest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu,  }\item[{float}]{alpha }\end{DoxyParamCaption})}
+
+This function tests the mass conservation of the spacial injection (used to model rain on grid) The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsnit=0.\+0 is dry) and runs for 0.\+1s before comparing results with zsnit=0.\+1 that is approx 20 steps \mbox{\Hypertarget{Testing_8h_a6a029027bd2060a3ecad9f8d09807962}\label{Testing_8h_a6a029027bd2060a3ecad9f8d09807962}} 
+\index{Testing.h@{Testing.h}!Raintestinput@{Raintestinput}}
+\index{Raintestinput@{Raintestinput}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{Raintestinput()}{Raintestinput()}}
+{\footnotesize\ttfamily bool Raintestinput (\begin{DoxyParamCaption}\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+This function tests the different inputs for rain forcing. This test is based on the paper Aureli2020, the 3 slopes test with regional rain. The experiment has been presented in Iwagaki1955. The first test compares a time varying rain input using a uniform time serie forcing and a time varying 2D field (with same value). The second test check the 3D rain forcing (comparing it to expected values). \mbox{\Hypertarget{Testing_8h_acc6f019daa444fd2d639ba48ff173d15}\label{Testing_8h_acc6f019daa444fd2d639ba48ff173d15}} 
+\index{Testing.h@{Testing.h}!Raintestmap@{Raintestmap}}
+\index{Raintestmap@{Raintestmap}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{Raintestmap()}{Raintestmap()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+std\+::vector$<$float$>$ Raintestmap (\begin{DoxyParamCaption}\item[{int}]{gpu,  }\item[{int}]{dimf,  }\item[{T}]{zinit }\end{DoxyParamCaption})}
+
+\textbackslash{}fnstd\+::vector$<$float$>$ \mbox{\hyperlink{Testing_8cu_acc6f019daa444fd2d639ba48ff173d15}{Raintestmap(int gpu, int dimf, T zinit)}}
+
+This function return the flux at the bottom of the 3 part slope for different types of rain forcings using the test case based on Iwagaki1955 \mbox{\Hypertarget{Testing_8h_a80d8f8532ece9c965802d60aa031d46d}\label{Testing_8h_a80d8f8532ece9c965802d60aa031d46d}} 
+\index{Testing.h@{Testing.h}!Rivertest@{Rivertest}}
+\index{Rivertest@{Rivertest}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{Rivertest()}{Rivertest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Rivertest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu }\end{DoxyParamCaption})}
+
+This function tests the mass conservation of the vertical injection (used for rivers) The function creates it own model setup and mesh independantly to what the user might want to do This starts with a initial water level (zsnit=0 is dry) and runs for 0.\+1s before comparing results with zsnit=0.\+1 that is approx 20 steps \mbox{\Hypertarget{Testing_8h_a1f58fd96fa0d9473ed0c863d5b789485}\label{Testing_8h_a1f58fd96fa0d9473ed0c863d5b789485}} 
+\index{Testing.h@{Testing.h}!testboundaries@{testboundaries}}
+\index{testboundaries@{testboundaries}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{testboundaries()}{testboundaries()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool testboundaries (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{maxslope }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8h_a1803abe24ad2daba8d11e5e46c783762}\label{Testing_8h_a1803abe24ad2daba8d11e5e46c783762}} 
+\index{Testing.h@{Testing.h}!Testing@{Testing}}
+\index{Testing@{Testing}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{Testing()}{Testing()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Testing (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8h_ac72746cb1a6853204ce8c741857f9804}\label{Testing_8h_ac72746cb1a6853204ce8c741857f9804}} 
+\index{Testing.h@{Testing.h}!TestingOutput@{TestingOutput}}
+\index{TestingOutput@{TestingOutput}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{TestingOutput()}{TestingOutput()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Testing\+Output (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+OUTDATED? \mbox{\Hypertarget{Testing_8h_a0755c7670bec1082029464abce5504ad}\label{Testing_8h_a0755c7670bec1082029464abce5504ad}} 
+\index{Testing.h@{Testing.h}!ZoneOutputTest@{ZoneOutputTest}}
+\index{ZoneOutputTest@{ZoneOutputTest}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{ZoneOutputTest()}{ZoneOutputTest()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Zone\+Output\+Test (\begin{DoxyParamCaption}\item[{int}]{nzones,  }\item[{T}]{zsinit }\end{DoxyParamCaption})}
+
+This function test the zoned output for a basic configuration
+
+This function test the spped and accuracy of a new gradient function gradient are only calculated for zb but assigned to different gradient variable for storage 

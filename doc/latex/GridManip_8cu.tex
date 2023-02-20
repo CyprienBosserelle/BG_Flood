@@ -1,0 +1,621 @@
+\hypertarget{GridManip_8cu}{}\doxysection{src/\+Grid\+Manip.cu File Reference}
+\label{GridManip_8cu}\index{src/GridManip.cu@{src/GridManip.cu}}
+{\ttfamily \#include \char`\"{}Grid\+Manip.\+h\char`\"{}}\newline
+Include dependency graph for Grid\+Manip.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\void \mbox{\hyperlink{GridManip_8cu_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ F $>$ XBlock, T initval, T $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aee5d7058754f94ac04fe3bab492a920d}{Init\+Array\+BUQ$<$ float, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float initval, float $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a6f9e138c54b4130a9f587ccb47b86f52}{Init\+Array\+BUQ$<$ double, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, double initval, double $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a4583ba08f6606fdc9ad6eba712d80b87}{Init\+Array\+BUQ$<$ int, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, int initval, int $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a5b8934b83ca631473d140700a32650a2}{Init\+Array\+BUQ$<$ bool, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, bool initval, bool $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ab9fe084b621a6361e7275a032cce2253}{Init\+Array\+BUQ$<$ float, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, float initval, float $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_adfc5d8cf92eb17e1c9242f67e3b1ffce}{Init\+Array\+BUQ$<$ double, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double initval, double $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a7cfb9f6f2e9261dbd76c7c16286d1021}{Init\+Array\+BUQ$<$ int, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, int initval, int $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a34f1dd305861e9b7ca2ab14758096dec}{Init\+Array\+BUQ$<$ bool, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, bool initval, bool $\ast$\&Arr)
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\void \mbox{\hyperlink{GridManip_8cu_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ F $>$ XBlock, T initval, T $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a38256618f048ef2cc10c8dab1558abc9}{Init\+Blk\+BUQ$<$ bool, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, bool initval, bool $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a29b36b07ef13050e8d8545b93a81cdd6}{Init\+Blk\+BUQ$<$ int, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, int initval, int $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ab615934e2a0e853d2985b8c3072b82cc}{Init\+Blk\+BUQ$<$ float, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float initval, float $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ab87d447640108881dc39243e54279fca}{Init\+Blk\+BUQ$<$ double, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, double initval, double $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ad4320b5ecfbe78ff868f81c65de13360}{Init\+Blk\+BUQ$<$ bool, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, bool initval, bool $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a85deb30447fa2d2c654bf942c6d971ee}{Init\+Blk\+BUQ$<$ int, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, int initval, int $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ab64edc381e501ae7f3d1b49fcf2651b6}{Init\+Blk\+BUQ$<$ float, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, float initval, float $\ast$\&Arr)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a88305d647c2fccdae01525e6aa6bf92e}{Init\+Blk\+BUQ$<$ double, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double initval, double $\ast$\&Arr)
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a401030b3e187ee3c25536445ed9274e5}{Copy\+Array\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ F $>$ XBlock, T $\ast$source, T $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aafcf0ecdd35e6be6071375292078e032}{Copy\+Array\+BUQ$<$ bool, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, bool $\ast$source, bool $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a168e3313e01727f7fbbe4c0559348743}{Copy\+Array\+BUQ$<$ int, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, int $\ast$source, int $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a95cd400f124b8a15c686c6b3e54c7b1c}{Copy\+Array\+BUQ$<$ float, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$source, float $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a3882059aabb5284c389c121af53f5906}{Copy\+Array\+BUQ$<$ double, float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, double $\ast$source, double $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ab6a1951cbc91a2ea38939c96c9128c79}{Copy\+Array\+BUQ$<$ bool, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, bool $\ast$source, bool $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a8bf584343ba4113bd5553bb9ac93bfe9}{Copy\+Array\+BUQ$<$ int, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, int $\ast$source, int $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aa2b908a74e90cfef81a773a986830e77}{Copy\+Array\+BUQ$<$ float, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, float $\ast$source, float $\ast$\&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a67d082532bea641d7493b7118380d342}{Copy\+Array\+BUQ$<$ double, double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$source, double $\ast$\&dest)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_ad209e9ddcf81ccf9f732db5e8bb8428e}{Copy\+Array\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ source, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a6afc4e6ad8c61355e22f59d996e04d9b}{Copy\+Array\+BUQ$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ source, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ac02a95e02468b3060efa3a23c5531ae3}{Copy\+Array\+BUQ$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ source, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&dest)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ source, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aa44f1ca914c0cb6dcc464148c66c029b}{Copy\+Array\+BUQ$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ source, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ float $>$ \&dest)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a897202f0823f24146e9e585485562daa}{Copy\+Array\+BUQ$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ source, \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ double $>$ \&dest)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a2c53af2a95f3a86427f93b440f40ddd2}{setedges}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&zb)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a5e95fd52a623afa68a876c4ec01f7e37}{setedges$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$\&zb)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_afcf85cfa2468be7605f70398d3601de9}{setedges$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$\&zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a32731b207471202aefce52a8635323f9}{setedgesside\+LR}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int blkA, int blkB, int iread, int iwrite, T $\ast$\&zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a551ad361823a970ae5f445bb50d1df8b}{setedgesside\+BT}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int blkA, int blkB, int jread, int jwrite, T $\ast$\&zb)
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a1a76ee388dcb58bf18462c45c9e81dc6}{interp2\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, F forcing, T $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a8d2dacf98e015e7da85be9ac986e1203}{interp2\+BUQ$<$ float, Static\+Forcing\+P$<$ float $>$ $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ forcing, float $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_acadf72e0c0fd5fd563de5f27392a4040}{interp2\+BUQ$<$ double, Static\+Forcing\+P$<$ float $>$ $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ forcing, double $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aac738694eaf1f159c757da905e7d8680}{interp2\+BUQ$<$ float, deformmap$<$ float $>$ $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ forcing, float $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a6764051c3179e8fbcf76c1a0c064d6bd}{interp2\+BUQ$<$ double, deformmap$<$ float $>$ $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ forcing, double $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a5af92e5b530e995f2aaa81ab1504cbeb}{interp2\+BUQ$<$ float, Dyn\+Forcing\+P$<$ float $>$ $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ forcing, float $\ast$\&z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aa5109365275057062e925800b58042b7}{interp2\+BUQ$<$ double, Dyn\+Forcing\+P$<$ float $>$ $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ forcing, double $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_abcded9e02be072d19261d96f9d86e11e}{interp2\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, std\+::vector$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$$>$ forcing, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aa49964830fc5b5f01d839e9873fa9355}{interp2\+BUQ$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, std\+::vector$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$$>$ forcing, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ab8eebde8a8ed00f468d3a38677692756}{interp2\+BUQ$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, std\+::vector$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$$>$ forcing, double $\ast$z)
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\T \mbox{\hyperlink{GridManip_8cu_a21e34043eba5a823525041e78302851b}{interp2\+BUQ}} (T x, T y, T dx, F forcing)
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\T \mbox{\hyperlink{GridManip_8cu_aac3c88d5ba2164dbfcd61e5693840ee4}{blockmean}} (T x, T y, T dx, F forcing)
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\T \mbox{\hyperlink{GridManip_8cu_a6ef807f08f9ab5df6f2fed0ca99649a5}{interp2\+BUQ}} (T x, T y, F forcing)
+\item 
+template float \mbox{\hyperlink{GridManip_8cu_a9af35b24257991d3b9becd4bf89ceef7}{interp2\+BUQ$<$ float, Static\+Forcing\+P$<$ float $>$ $>$}} (float x, float y, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ forcing)
+\item 
+template double \mbox{\hyperlink{GridManip_8cu_a1518210d8cee4b196ff97020d221ef95}{interp2\+BUQ$<$ double, Static\+Forcing\+P$<$ float $>$ $>$}} (double x, double y, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ forcing)
+\item 
+template float \mbox{\hyperlink{GridManip_8cu_a0a53b08d2c7eeeca73ee61a72cd463ac}{interp2\+BUQ$<$ float, Static\+Forcing\+P$<$ int $>$ $>$}} (float x, float y, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ forcing)
+\item 
+template double \mbox{\hyperlink{GridManip_8cu_acac0c46146dc9ffc8caaa87254001431}{interp2\+BUQ$<$ double, Static\+Forcing\+P$<$ int $>$ $>$}} (double x, double y, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ forcing)
+\item 
+template float \mbox{\hyperlink{GridManip_8cu_a39685c584601da569fe13be079d13303}{interp2\+BUQ$<$ float, deformmap$<$ float $>$ $>$}} (float x, float y, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ forcing)
+\item 
+template double \mbox{\hyperlink{GridManip_8cu_a503dab5a950e1eef4cba9efc3aa6412d}{interp2\+BUQ$<$ double, deformmap$<$ float $>$ $>$}} (double x, double y, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ forcing)
+\item 
+template float \mbox{\hyperlink{GridManip_8cu_a17a442b7eb731cfd6082c2a843470a14}{interp2\+BUQ$<$ float, Dyn\+Forcing\+P$<$ float $>$ $>$}} (float x, float y, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ forcing)
+\item 
+template double \mbox{\hyperlink{GridManip_8cu_aaa2a7b76d839660e4701290cc7100999}{interp2\+BUQ$<$ double, Dyn\+Forcing\+P$<$ float $>$ $>$}} (double x, double y, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ forcing)
+\item 
+{\footnotesize template$<$class T , class F $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a242cf7787fb7c176e5a784ddfb3aea7e}{Interpstep\+CPU}} (int nx, int ny, int hdstep, F totaltime, F hddt, T $\ast$\&Ux, T $\ast$Uo, T $\ast$Un)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a2a8222b4fcc052f038fab40fe1e92062}{Interpstep\+CPU$<$ int, float $>$}} (int nx, int ny, int hdstep, float totaltime, float hddt, int $\ast$\&Ux, int $\ast$Uo, int $\ast$Un)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_aaae11994614eb607faca714261a7a90b}{Interpstep\+CPU$<$ float, float $>$}} (int nx, int ny, int hdstep, float totaltime, float hddt, float $\ast$\&Ux, float $\ast$Uo, float $\ast$Un)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a2dac09cd3db0009c5e2232a6101fc745}{Interpstep\+CPU$<$ double, float $>$}} (int nx, int ny, int hdstep, float totaltime, float hddt, double $\ast$\&Ux, double $\ast$Uo, double $\ast$Un)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ae59509f989aae400a8399fa19f7cc0b5}{Interpstep\+CPU$<$ int, double $>$}} (int nx, int ny, int hdstep, double totaltime, double hddt, int $\ast$\&Ux, int $\ast$Uo, int $\ast$Un)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a04d05e14653fded15c21215c9d70819f}{Interpstep\+CPU$<$ float, double $>$}} (int nx, int ny, int hdstep, double totaltime, double hddt, float $\ast$\&Ux, float $\ast$Uo, float $\ast$Un)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a023f8b0a1c8bfd5949d1383da480b437}{Interpstep\+CPU$<$ double, double $>$}} (int nx, int ny, int hdstep, double totaltime, double hddt, double $\ast$\&Ux, double $\ast$Uo, double $\ast$Un)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a0ab029799189d93997384b3de4edf592}{Interpstep\+GPU}} (int nx, int ny, int hdstp, T totaltime, T hddt, T $\ast$Ux, T $\ast$Uo, T $\ast$Un)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a779e956073de6ebb5590cca5f3135e79}{Interpstep\+GPU$<$ float $>$}} (int nx, int ny, int hdstp, float totaltime, float hddt, float $\ast$Ux, float $\ast$Uo, float $\ast$Un)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a0d7b84bd9ad6ca588aadf4b7ab4c86bb}{Interpstep\+GPU$<$ double $>$}} (int nx, int ny, int hdstp, double totaltime, double hddt, double $\ast$Ux, double $\ast$Uo, double $\ast$Un)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a152ff9652c67512fa8d890a539ffc4ec}{Copy2\+Cart\+CPU}} (int nx, int ny, T $\ast$dest, T $\ast$src)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ac999f982b339b3045e912eeac4e287e3}{Copy2\+Cart\+CPU$<$ int $>$}} (int nx, int ny, int $\ast$dest, int $\ast$src)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ac51f55e5e2f0af7df3940c47db8489f1}{Copy2\+Cart\+CPU$<$ bool $>$}} (int nx, int ny, bool $\ast$dest, bool $\ast$src)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_a9df51c3a35aa64ca463a29bd3503eb12}{Copy2\+Cart\+CPU$<$ float $>$}} (int nx, int ny, float $\ast$dest, float $\ast$src)
+\item 
+template void \mbox{\hyperlink{GridManip_8cu_ae49d36f64bd6ad0e2ca7ca8d88d19692}{Copy2\+Cart\+CPU$<$ double $>$}} (int nx, int ny, double $\ast$dest, double $\ast$src)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{GridManip_8cu_aac3c88d5ba2164dbfcd61e5693840ee4}\label{GridManip_8cu_aac3c88d5ba2164dbfcd61e5693840ee4}} 
+\index{GridManip.cu@{GridManip.cu}!blockmean@{blockmean}}
+\index{blockmean@{blockmean}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{blockmean()}{blockmean()}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+T blockmean (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{T}]{dx,  }\item[{F}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a152ff9652c67512fa8d890a539ffc4ec}\label{GridManip_8cu_a152ff9652c67512fa8d890a539ffc4ec}} 
+\index{GridManip.cu@{GridManip.cu}!Copy2CartCPU@{Copy2CartCPU}}
+\index{Copy2CartCPU@{Copy2CartCPU}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{Copy2CartCPU()}{Copy2CartCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Copy2\+Cart\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$}]{dest,  }\item[{T $\ast$}]{src }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ac51f55e5e2f0af7df3940c47db8489f1}\label{GridManip_8cu_ac51f55e5e2f0af7df3940c47db8489f1}} 
+\index{GridManip.cu@{GridManip.cu}!Copy2CartCPU$<$ bool $>$@{Copy2CartCPU$<$ bool $>$}}
+\index{Copy2CartCPU$<$ bool $>$@{Copy2CartCPU$<$ bool $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{Copy2CartCPU$<$ bool $>$()}{Copy2CartCPU< bool >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_a152ff9652c67512fa8d890a539ffc4ec}{Copy2\+Cart\+CPU}}$<$ bool $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{bool $\ast$}]{dest,  }\item[{bool $\ast$}]{src }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ae49d36f64bd6ad0e2ca7ca8d88d19692}\label{GridManip_8cu_ae49d36f64bd6ad0e2ca7ca8d88d19692}} 
+\index{GridManip.cu@{GridManip.cu}!Copy2CartCPU$<$ double $>$@{Copy2CartCPU$<$ double $>$}}
+\index{Copy2CartCPU$<$ double $>$@{Copy2CartCPU$<$ double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{Copy2CartCPU$<$ double $>$()}{Copy2CartCPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_a152ff9652c67512fa8d890a539ffc4ec}{Copy2\+Cart\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double $\ast$}]{dest,  }\item[{double $\ast$}]{src }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a9df51c3a35aa64ca463a29bd3503eb12}\label{GridManip_8cu_a9df51c3a35aa64ca463a29bd3503eb12}} 
+\index{GridManip.cu@{GridManip.cu}!Copy2CartCPU$<$ float $>$@{Copy2CartCPU$<$ float $>$}}
+\index{Copy2CartCPU$<$ float $>$@{Copy2CartCPU$<$ float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{Copy2CartCPU$<$ float $>$()}{Copy2CartCPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_a152ff9652c67512fa8d890a539ffc4ec}{Copy2\+Cart\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float $\ast$}]{dest,  }\item[{float $\ast$}]{src }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ac999f982b339b3045e912eeac4e287e3}\label{GridManip_8cu_ac999f982b339b3045e912eeac4e287e3}} 
+\index{GridManip.cu@{GridManip.cu}!Copy2CartCPU$<$ int $>$@{Copy2CartCPU$<$ int $>$}}
+\index{Copy2CartCPU$<$ int $>$@{Copy2CartCPU$<$ int $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{Copy2CartCPU$<$ int $>$()}{Copy2CartCPU< int >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_a152ff9652c67512fa8d890a539ffc4ec}{Copy2\+Cart\+CPU}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int $\ast$}]{dest,  }\item[{int $\ast$}]{src }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a401030b3e187ee3c25536445ed9274e5}\label{GridManip_8cu_a401030b3e187ee3c25536445ed9274e5}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ@{CopyArrayBUQ}}
+\index{CopyArrayBUQ@{CopyArrayBUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ()}{CopyArrayBUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+void Copy\+Array\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ F $>$}]{XBlock,  }\item[{T $\ast$}]{source,  }\item[{T $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ad209e9ddcf81ccf9f732db5e8bb8428e}\label{GridManip_8cu_ad209e9ddcf81ccf9f732db5e8bb8428e}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ@{CopyArrayBUQ}}
+\index{CopyArrayBUQ@{CopyArrayBUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ()}{CopyArrayBUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Copy\+Array\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{source,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ac823ba38d576d0d82917f2a7680153da}\label{GridManip_8cu_ac823ba38d576d0d82917f2a7680153da}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ@{CopyArrayBUQ}}
+\index{CopyArrayBUQ@{CopyArrayBUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ()}{CopyArrayBUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Copy\+Array\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{source,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ab6a1951cbc91a2ea38939c96c9128c79}\label{GridManip_8cu_ab6a1951cbc91a2ea38939c96c9128c79}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ bool, double $>$@{CopyArrayBUQ$<$ bool, double $>$}}
+\index{CopyArrayBUQ$<$ bool, double $>$@{CopyArrayBUQ$<$ bool, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ bool, double $>$()}{CopyArrayBUQ< bool, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ bool, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{bool $\ast$}]{source,  }\item[{bool $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aafcf0ecdd35e6be6071375292078e032}\label{GridManip_8cu_aafcf0ecdd35e6be6071375292078e032}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ bool, float $>$@{CopyArrayBUQ$<$ bool, float $>$}}
+\index{CopyArrayBUQ$<$ bool, float $>$@{CopyArrayBUQ$<$ bool, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ bool, float $>$()}{CopyArrayBUQ< bool, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ bool, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{bool $\ast$}]{source,  }\item[{bool $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ac02a95e02468b3060efa3a23c5531ae3}\label{GridManip_8cu_ac02a95e02468b3060efa3a23c5531ae3}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ double $>$@{CopyArrayBUQ$<$ double $>$}}
+\index{CopyArrayBUQ$<$ double $>$@{CopyArrayBUQ$<$ double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ double $>$()}{CopyArrayBUQ< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{source,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a897202f0823f24146e9e585485562daa}\label{GridManip_8cu_a897202f0823f24146e9e585485562daa}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ double $>$@{CopyArrayBUQ$<$ double $>$}}
+\index{CopyArrayBUQ$<$ double $>$@{CopyArrayBUQ$<$ double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ double $>$()}{CopyArrayBUQ< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{source,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ double $>$ \&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a67d082532bea641d7493b7118380d342}\label{GridManip_8cu_a67d082532bea641d7493b7118380d342}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ double, double $>$@{CopyArrayBUQ$<$ double, double $>$}}
+\index{CopyArrayBUQ$<$ double, double $>$@{CopyArrayBUQ$<$ double, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ double, double $>$()}{CopyArrayBUQ< double, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ double, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{source,  }\item[{double $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a3882059aabb5284c389c121af53f5906}\label{GridManip_8cu_a3882059aabb5284c389c121af53f5906}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ double, float $>$@{CopyArrayBUQ$<$ double, float $>$}}
+\index{CopyArrayBUQ$<$ double, float $>$@{CopyArrayBUQ$<$ double, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ double, float $>$()}{CopyArrayBUQ< double, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ double, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{double $\ast$}]{source,  }\item[{double $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a6afc4e6ad8c61355e22f59d996e04d9b}\label{GridManip_8cu_a6afc4e6ad8c61355e22f59d996e04d9b}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ float $>$@{CopyArrayBUQ$<$ float $>$}}
+\index{CopyArrayBUQ$<$ float $>$@{CopyArrayBUQ$<$ float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ float $>$()}{CopyArrayBUQ< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{source,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aa44f1ca914c0cb6dcc464148c66c029b}\label{GridManip_8cu_aa44f1ca914c0cb6dcc464148c66c029b}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ float $>$@{CopyArrayBUQ$<$ float $>$}}
+\index{CopyArrayBUQ$<$ float $>$@{CopyArrayBUQ$<$ float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ float $>$()}{CopyArrayBUQ< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{source,  }\item[{\mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ float $>$ \&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aa2b908a74e90cfef81a773a986830e77}\label{GridManip_8cu_aa2b908a74e90cfef81a773a986830e77}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ float, double $>$@{CopyArrayBUQ$<$ float, double $>$}}
+\index{CopyArrayBUQ$<$ float, double $>$@{CopyArrayBUQ$<$ float, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ float, double $>$()}{CopyArrayBUQ< float, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ float, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{float $\ast$}]{source,  }\item[{float $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a95cd400f124b8a15c686c6b3e54c7b1c}\label{GridManip_8cu_a95cd400f124b8a15c686c6b3e54c7b1c}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ float, float $>$@{CopyArrayBUQ$<$ float, float $>$}}
+\index{CopyArrayBUQ$<$ float, float $>$@{CopyArrayBUQ$<$ float, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ float, float $>$()}{CopyArrayBUQ< float, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ float, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{source,  }\item[{float $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a8bf584343ba4113bd5553bb9ac93bfe9}\label{GridManip_8cu_a8bf584343ba4113bd5553bb9ac93bfe9}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ int, double $>$@{CopyArrayBUQ$<$ int, double $>$}}
+\index{CopyArrayBUQ$<$ int, double $>$@{CopyArrayBUQ$<$ int, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ int, double $>$()}{CopyArrayBUQ< int, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ int, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{int $\ast$}]{source,  }\item[{int $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a168e3313e01727f7fbbe4c0559348743}\label{GridManip_8cu_a168e3313e01727f7fbbe4c0559348743}} 
+\index{GridManip.cu@{GridManip.cu}!CopyArrayBUQ$<$ int, float $>$@{CopyArrayBUQ$<$ int, float $>$}}
+\index{CopyArrayBUQ$<$ int, float $>$@{CopyArrayBUQ$<$ int, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{CopyArrayBUQ$<$ int, float $>$()}{CopyArrayBUQ< int, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ac823ba38d576d0d82917f2a7680153da}{Copy\+Array\+BUQ}}$<$ int, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{int $\ast$}]{source,  }\item[{int $\ast$\&}]{dest }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aae52a483f7b7909be19d40bd3ac4fa6a}\label{GridManip_8cu_aae52a483f7b7909be19d40bd3ac4fa6a}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ@{InitArrayBUQ}}
+\index{InitArrayBUQ@{InitArrayBUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ()}{InitArrayBUQ()}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+void Init\+Array\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ F $>$}]{XBlock,  }\item[{T}]{initval,  }\item[{T $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a34f1dd305861e9b7ca2ab14758096dec}\label{GridManip_8cu_a34f1dd305861e9b7ca2ab14758096dec}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ bool, double $>$@{InitArrayBUQ$<$ bool, double $>$}}
+\index{InitArrayBUQ$<$ bool, double $>$@{InitArrayBUQ$<$ bool, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ bool, double $>$()}{InitArrayBUQ< bool, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ bool, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{bool}]{initval,  }\item[{bool $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a5b8934b83ca631473d140700a32650a2}\label{GridManip_8cu_a5b8934b83ca631473d140700a32650a2}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ bool, float $>$@{InitArrayBUQ$<$ bool, float $>$}}
+\index{InitArrayBUQ$<$ bool, float $>$@{InitArrayBUQ$<$ bool, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ bool, float $>$()}{InitArrayBUQ< bool, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ bool, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{bool}]{initval,  }\item[{bool $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_adfc5d8cf92eb17e1c9242f67e3b1ffce}\label{GridManip_8cu_adfc5d8cf92eb17e1c9242f67e3b1ffce}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ double, double $>$@{InitArrayBUQ$<$ double, double $>$}}
+\index{InitArrayBUQ$<$ double, double $>$@{InitArrayBUQ$<$ double, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ double, double $>$()}{InitArrayBUQ< double, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ double, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{initval,  }\item[{double $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a6f9e138c54b4130a9f587ccb47b86f52}\label{GridManip_8cu_a6f9e138c54b4130a9f587ccb47b86f52}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ double, float $>$@{InitArrayBUQ$<$ double, float $>$}}
+\index{InitArrayBUQ$<$ double, float $>$@{InitArrayBUQ$<$ double, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ double, float $>$()}{InitArrayBUQ< double, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ double, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{double}]{initval,  }\item[{double $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ab9fe084b621a6361e7275a032cce2253}\label{GridManip_8cu_ab9fe084b621a6361e7275a032cce2253}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ float, double $>$@{InitArrayBUQ$<$ float, double $>$}}
+\index{InitArrayBUQ$<$ float, double $>$@{InitArrayBUQ$<$ float, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ float, double $>$()}{InitArrayBUQ< float, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ float, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{float}]{initval,  }\item[{float $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aee5d7058754f94ac04fe3bab492a920d}\label{GridManip_8cu_aee5d7058754f94ac04fe3bab492a920d}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ float, float $>$@{InitArrayBUQ$<$ float, float $>$}}
+\index{InitArrayBUQ$<$ float, float $>$@{InitArrayBUQ$<$ float, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ float, float $>$()}{InitArrayBUQ< float, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ float, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{initval,  }\item[{float $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a7cfb9f6f2e9261dbd76c7c16286d1021}\label{GridManip_8cu_a7cfb9f6f2e9261dbd76c7c16286d1021}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ int, double $>$@{InitArrayBUQ$<$ int, double $>$}}
+\index{InitArrayBUQ$<$ int, double $>$@{InitArrayBUQ$<$ int, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ int, double $>$()}{InitArrayBUQ< int, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ int, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{int}]{initval,  }\item[{int $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a4583ba08f6606fdc9ad6eba712d80b87}\label{GridManip_8cu_a4583ba08f6606fdc9ad6eba712d80b87}} 
+\index{GridManip.cu@{GridManip.cu}!InitArrayBUQ$<$ int, float $>$@{InitArrayBUQ$<$ int, float $>$}}
+\index{InitArrayBUQ$<$ int, float $>$@{InitArrayBUQ$<$ int, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitArrayBUQ$<$ int, float $>$()}{InitArrayBUQ< int, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_aae52a483f7b7909be19d40bd3ac4fa6a}{Init\+Array\+BUQ}}$<$ int, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{int}]{initval,  }\item[{int $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ab2b99ebfa98d229b030f7e7e6a5cc48f}\label{GridManip_8cu_ab2b99ebfa98d229b030f7e7e6a5cc48f}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ@{InitBlkBUQ}}
+\index{InitBlkBUQ@{InitBlkBUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ()}{InitBlkBUQ()}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+void Init\+Blk\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ F $>$}]{XBlock,  }\item[{T}]{initval,  }\item[{T $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ad4320b5ecfbe78ff868f81c65de13360}\label{GridManip_8cu_ad4320b5ecfbe78ff868f81c65de13360}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ bool, double $>$@{InitBlkBUQ$<$ bool, double $>$}}
+\index{InitBlkBUQ$<$ bool, double $>$@{InitBlkBUQ$<$ bool, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ bool, double $>$()}{InitBlkBUQ< bool, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ bool, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{bool}]{initval,  }\item[{bool $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a38256618f048ef2cc10c8dab1558abc9}\label{GridManip_8cu_a38256618f048ef2cc10c8dab1558abc9}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ bool, float $>$@{InitBlkBUQ$<$ bool, float $>$}}
+\index{InitBlkBUQ$<$ bool, float $>$@{InitBlkBUQ$<$ bool, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ bool, float $>$()}{InitBlkBUQ< bool, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ bool, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{bool}]{initval,  }\item[{bool $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a88305d647c2fccdae01525e6aa6bf92e}\label{GridManip_8cu_a88305d647c2fccdae01525e6aa6bf92e}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ double, double $>$@{InitBlkBUQ$<$ double, double $>$}}
+\index{InitBlkBUQ$<$ double, double $>$@{InitBlkBUQ$<$ double, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ double, double $>$()}{InitBlkBUQ< double, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ double, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{initval,  }\item[{double $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ab87d447640108881dc39243e54279fca}\label{GridManip_8cu_ab87d447640108881dc39243e54279fca}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ double, float $>$@{InitBlkBUQ$<$ double, float $>$}}
+\index{InitBlkBUQ$<$ double, float $>$@{InitBlkBUQ$<$ double, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ double, float $>$()}{InitBlkBUQ< double, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ double, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{double}]{initval,  }\item[{double $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ab64edc381e501ae7f3d1b49fcf2651b6}\label{GridManip_8cu_ab64edc381e501ae7f3d1b49fcf2651b6}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ float, double $>$@{InitBlkBUQ$<$ float, double $>$}}
+\index{InitBlkBUQ$<$ float, double $>$@{InitBlkBUQ$<$ float, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ float, double $>$()}{InitBlkBUQ< float, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ float, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{float}]{initval,  }\item[{float $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ab615934e2a0e853d2985b8c3072b82cc}\label{GridManip_8cu_ab615934e2a0e853d2985b8c3072b82cc}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ float, float $>$@{InitBlkBUQ$<$ float, float $>$}}
+\index{InitBlkBUQ$<$ float, float $>$@{InitBlkBUQ$<$ float, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ float, float $>$()}{InitBlkBUQ< float, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ float, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{initval,  }\item[{float $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a85deb30447fa2d2c654bf942c6d971ee}\label{GridManip_8cu_a85deb30447fa2d2c654bf942c6d971ee}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ int, double $>$@{InitBlkBUQ$<$ int, double $>$}}
+\index{InitBlkBUQ$<$ int, double $>$@{InitBlkBUQ$<$ int, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ int, double $>$()}{InitBlkBUQ< int, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ int, double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{int}]{initval,  }\item[{int $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a29b36b07ef13050e8d8545b93a81cdd6}\label{GridManip_8cu_a29b36b07ef13050e8d8545b93a81cdd6}} 
+\index{GridManip.cu@{GridManip.cu}!InitBlkBUQ$<$ int, float $>$@{InitBlkBUQ$<$ int, float $>$}}
+\index{InitBlkBUQ$<$ int, float $>$@{InitBlkBUQ$<$ int, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InitBlkBUQ$<$ int, float $>$()}{InitBlkBUQ< int, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_ab2b99ebfa98d229b030f7e7e6a5cc48f}{Init\+Blk\+BUQ}}$<$ int, float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{int}]{initval,  }\item[{int $\ast$\&}]{Arr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a1a76ee388dcb58bf18462c45c9e81dc6}\label{GridManip_8cu_a1a76ee388dcb58bf18462c45c9e81dc6}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ@{interp2BUQ}}
+\index{interp2BUQ@{interp2BUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ()}{interp2BUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+void interp2\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{F}]{forcing,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_abcded9e02be072d19261d96f9d86e11e}\label{GridManip_8cu_abcded9e02be072d19261d96f9d86e11e}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ@{interp2BUQ}}
+\index{interp2BUQ@{interp2BUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ()}{interp2BUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void interp2\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{std\+::vector$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$$>$}]{forcing,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a6ef807f08f9ab5df6f2fed0ca99649a5}\label{GridManip_8cu_a6ef807f08f9ab5df6f2fed0ca99649a5}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ@{interp2BUQ}}
+\index{interp2BUQ@{interp2BUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ()}{interp2BUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+T interp2\+BUQ (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{F}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a21e34043eba5a823525041e78302851b}\label{GridManip_8cu_a21e34043eba5a823525041e78302851b}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ@{interp2BUQ}}
+\index{interp2BUQ@{interp2BUQ}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ()}{interp2BUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+T interp2\+BUQ (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{T}]{dx,  }\item[{F}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ab8eebde8a8ed00f468d3a38677692756}\label{GridManip_8cu_ab8eebde8a8ed00f468d3a38677692756}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double $>$@{interp2BUQ$<$ double $>$}}
+\index{interp2BUQ$<$ double $>$@{interp2BUQ$<$ double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double $>$()}{interp2BUQ< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{std\+::vector$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$$>$}]{forcing,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a503dab5a950e1eef4cba9efc3aa6412d}\label{GridManip_8cu_a503dab5a950e1eef4cba9efc3aa6412d}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$()}{interp2BUQ< double, deformmap< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template double \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{double}]{x,  }\item[{double}]{y,  }\item[{\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a6764051c3179e8fbcf76c1a0c064d6bd}\label{GridManip_8cu_a6764051c3179e8fbcf76c1a0c064d6bd}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double, deformmap$<$ float $>$ $>$()}{interp2BUQ< double, deformmap< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$}]{forcing,  }\item[{double $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aaa2a7b76d839660e4701290cc7100999}\label{GridManip_8cu_aaa2a7b76d839660e4701290cc7100999}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$()}{interp2BUQ< double, DynForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template double \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{double}]{x,  }\item[{double}]{y,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aa5109365275057062e925800b58042b7}\label{GridManip_8cu_aa5109365275057062e925800b58042b7}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double, DynForcingP$<$ float $>$ $>$()}{interp2BUQ< double, DynForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{forcing,  }\item[{double $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a1518210d8cee4b196ff97020d221ef95}\label{GridManip_8cu_a1518210d8cee4b196ff97020d221ef95}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$()}{interp2BUQ< double, StaticForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template double \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{double}]{x,  }\item[{double}]{y,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_acadf72e0c0fd5fd563de5f27392a4040}\label{GridManip_8cu_acadf72e0c0fd5fd563de5f27392a4040}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double, StaticForcingP$<$ float $>$ $>$()}{interp2BUQ< double, StaticForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$}]{forcing,  }\item[{double $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_acac0c46146dc9ffc8caaa87254001431}\label{GridManip_8cu_acac0c46146dc9ffc8caaa87254001431}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ double, StaticForcingP$<$ int $>$ $>$@{interp2BUQ$<$ double, StaticForcingP$<$ int $>$ $>$}}
+\index{interp2BUQ$<$ double, StaticForcingP$<$ int $>$ $>$@{interp2BUQ$<$ double, StaticForcingP$<$ int $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double, StaticForcingP$<$ int $>$ $>$()}{interp2BUQ< double, StaticForcingP< int > >()}}
+{\footnotesize\ttfamily template double \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ $>$ (\begin{DoxyParamCaption}\item[{double}]{x,  }\item[{double}]{y,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aa49964830fc5b5f01d839e9873fa9355}\label{GridManip_8cu_aa49964830fc5b5f01d839e9873fa9355}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float $>$@{interp2BUQ$<$ float $>$}}
+\index{interp2BUQ$<$ float $>$@{interp2BUQ$<$ float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float $>$()}{interp2BUQ< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{std\+::vector$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$$>$}]{forcing,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a39685c584601da569fe13be079d13303}\label{GridManip_8cu_a39685c584601da569fe13be079d13303}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$()}{interp2BUQ< float, deformmap< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template float \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{float}]{x,  }\item[{float}]{y,  }\item[{\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aac738694eaf1f159c757da905e7d8680}\label{GridManip_8cu_aac738694eaf1f159c757da905e7d8680}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$@{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float, deformmap$<$ float $>$ $>$()}{interp2BUQ< float, deformmap< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$}]{forcing,  }\item[{float $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a17a442b7eb731cfd6082c2a843470a14}\label{GridManip_8cu_a17a442b7eb731cfd6082c2a843470a14}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$()}{interp2BUQ< float, DynForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template float \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{float}]{x,  }\item[{float}]{y,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a5af92e5b530e995f2aaa81ab1504cbeb}\label{GridManip_8cu_a5af92e5b530e995f2aaa81ab1504cbeb}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float, DynForcingP$<$ float $>$ $>$()}{interp2BUQ< float, DynForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{forcing,  }\item[{float $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a9af35b24257991d3b9becd4bf89ceef7}\label{GridManip_8cu_a9af35b24257991d3b9becd4bf89ceef7}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$()}{interp2BUQ< float, StaticForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template float \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{float}]{x,  }\item[{float}]{y,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a8d2dacf98e015e7da85be9ac986e1203}\label{GridManip_8cu_a8d2dacf98e015e7da85be9ac986e1203}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$}}
+\index{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$@{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float, StaticForcingP$<$ float $>$ $>$()}{interp2BUQ< float, StaticForcingP< float > >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$}]{forcing,  }\item[{float $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a0a53b08d2c7eeeca73ee61a72cd463ac}\label{GridManip_8cu_a0a53b08d2c7eeeca73ee61a72cd463ac}} 
+\index{GridManip.cu@{GridManip.cu}!interp2BUQ$<$ float, StaticForcingP$<$ int $>$ $>$@{interp2BUQ$<$ float, StaticForcingP$<$ int $>$ $>$}}
+\index{interp2BUQ$<$ float, StaticForcingP$<$ int $>$ $>$@{interp2BUQ$<$ float, StaticForcingP$<$ int $>$ $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float, StaticForcingP$<$ int $>$ $>$()}{interp2BUQ< float, StaticForcingP< int > >()}}
+{\footnotesize\ttfamily template float \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ $>$ (\begin{DoxyParamCaption}\item[{float}]{x,  }\item[{float}]{y,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$}]{forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a242cf7787fb7c176e5a784ddfb3aea7e}\label{GridManip_8cu_a242cf7787fb7c176e5a784ddfb3aea7e}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepCPU@{InterpstepCPU}}
+\index{InterpstepCPU@{InterpstepCPU}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepCPU()}{InterpstepCPU()}}
+{\footnotesize\ttfamily template$<$class T , class F $>$ \\
+void Interpstep\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{F}]{totaltime,  }\item[{F}]{hddt,  }\item[{T $\ast$\&}]{Ux,  }\item[{T $\ast$}]{Uo,  }\item[{T $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a023f8b0a1c8bfd5949d1383da480b437}\label{GridManip_8cu_a023f8b0a1c8bfd5949d1383da480b437}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepCPU$<$ double, double $>$@{InterpstepCPU$<$ double, double $>$}}
+\index{InterpstepCPU$<$ double, double $>$@{InterpstepCPU$<$ double, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepCPU$<$ double, double $>$()}{InterpstepCPU< double, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d7b8d36675c4fb7f9e8ab773c10b3ec}{Interpstep\+CPU}}$<$ double, double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{double}]{totaltime,  }\item[{double}]{hddt,  }\item[{double $\ast$\&}]{Ux,  }\item[{double $\ast$}]{Uo,  }\item[{double $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a2dac09cd3db0009c5e2232a6101fc745}\label{GridManip_8cu_a2dac09cd3db0009c5e2232a6101fc745}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepCPU$<$ double, float $>$@{InterpstepCPU$<$ double, float $>$}}
+\index{InterpstepCPU$<$ double, float $>$@{InterpstepCPU$<$ double, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepCPU$<$ double, float $>$()}{InterpstepCPU< double, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d7b8d36675c4fb7f9e8ab773c10b3ec}{Interpstep\+CPU}}$<$ double, float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{float}]{totaltime,  }\item[{float}]{hddt,  }\item[{double $\ast$\&}]{Ux,  }\item[{double $\ast$}]{Uo,  }\item[{double $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a04d05e14653fded15c21215c9d70819f}\label{GridManip_8cu_a04d05e14653fded15c21215c9d70819f}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepCPU$<$ float, double $>$@{InterpstepCPU$<$ float, double $>$}}
+\index{InterpstepCPU$<$ float, double $>$@{InterpstepCPU$<$ float, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepCPU$<$ float, double $>$()}{InterpstepCPU< float, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d7b8d36675c4fb7f9e8ab773c10b3ec}{Interpstep\+CPU}}$<$ float, double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{double}]{totaltime,  }\item[{double}]{hddt,  }\item[{float $\ast$\&}]{Ux,  }\item[{float $\ast$}]{Uo,  }\item[{float $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_aaae11994614eb607faca714261a7a90b}\label{GridManip_8cu_aaae11994614eb607faca714261a7a90b}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepCPU$<$ float, float $>$@{InterpstepCPU$<$ float, float $>$}}
+\index{InterpstepCPU$<$ float, float $>$@{InterpstepCPU$<$ float, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepCPU$<$ float, float $>$()}{InterpstepCPU< float, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d7b8d36675c4fb7f9e8ab773c10b3ec}{Interpstep\+CPU}}$<$ float, float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{float}]{totaltime,  }\item[{float}]{hddt,  }\item[{float $\ast$\&}]{Ux,  }\item[{float $\ast$}]{Uo,  }\item[{float $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_ae59509f989aae400a8399fa19f7cc0b5}\label{GridManip_8cu_ae59509f989aae400a8399fa19f7cc0b5}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepCPU$<$ int, double $>$@{InterpstepCPU$<$ int, double $>$}}
+\index{InterpstepCPU$<$ int, double $>$@{InterpstepCPU$<$ int, double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepCPU$<$ int, double $>$()}{InterpstepCPU< int, double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d7b8d36675c4fb7f9e8ab773c10b3ec}{Interpstep\+CPU}}$<$ int, double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{double}]{totaltime,  }\item[{double}]{hddt,  }\item[{int $\ast$\&}]{Ux,  }\item[{int $\ast$}]{Uo,  }\item[{int $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a2a8222b4fcc052f038fab40fe1e92062}\label{GridManip_8cu_a2a8222b4fcc052f038fab40fe1e92062}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepCPU$<$ int, float $>$@{InterpstepCPU$<$ int, float $>$}}
+\index{InterpstepCPU$<$ int, float $>$@{InterpstepCPU$<$ int, float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepCPU$<$ int, float $>$()}{InterpstepCPU< int, float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d7b8d36675c4fb7f9e8ab773c10b3ec}{Interpstep\+CPU}}$<$ int, float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{float}]{totaltime,  }\item[{float}]{hddt,  }\item[{int $\ast$\&}]{Ux,  }\item[{int $\ast$}]{Uo,  }\item[{int $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a0ab029799189d93997384b3de4edf592}\label{GridManip_8cu_a0ab029799189d93997384b3de4edf592}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepGPU@{InterpstepGPU}}
+\index{InterpstepGPU@{InterpstepGPU}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepGPU()}{InterpstepGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Interpstep\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstp,  }\item[{T}]{totaltime,  }\item[{T}]{hddt,  }\item[{T $\ast$}]{Ux,  }\item[{T $\ast$}]{Uo,  }\item[{T $\ast$}]{Un }\end{DoxyParamCaption})}
+
+Ums\mbox{[}tx\mbox{]}
+
+Ums\mbox{[}tx\mbox{]}\mbox{\Hypertarget{GridManip_8cu_a0d7b84bd9ad6ca588aadf4b7ab4c86bb}\label{GridManip_8cu_a0d7b84bd9ad6ca588aadf4b7ab4c86bb}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepGPU$<$ double $>$@{InterpstepGPU$<$ double $>$}}
+\index{InterpstepGPU$<$ double $>$@{InterpstepGPU$<$ double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepGPU$<$ double $>$()}{InterpstepGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_a0ab029799189d93997384b3de4edf592}{Interpstep\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstp,  }\item[{double}]{totaltime,  }\item[{double}]{hddt,  }\item[{double $\ast$}]{Ux,  }\item[{double $\ast$}]{Uo,  }\item[{double $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a779e956073de6ebb5590cca5f3135e79}\label{GridManip_8cu_a779e956073de6ebb5590cca5f3135e79}} 
+\index{GridManip.cu@{GridManip.cu}!InterpstepGPU$<$ float $>$@{InterpstepGPU$<$ float $>$}}
+\index{InterpstepGPU$<$ float $>$@{InterpstepGPU$<$ float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{InterpstepGPU$<$ float $>$()}{InterpstepGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_a0ab029799189d93997384b3de4edf592}{Interpstep\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstp,  }\item[{float}]{totaltime,  }\item[{float}]{hddt,  }\item[{float $\ast$}]{Ux,  }\item[{float $\ast$}]{Uo,  }\item[{float $\ast$}]{Un }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a2c53af2a95f3a86427f93b440f40ddd2}\label{GridManip_8cu_a2c53af2a95f3a86427f93b440f40ddd2}} 
+\index{GridManip.cu@{GridManip.cu}!setedges@{setedges}}
+\index{setedges@{setedges}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{setedges()}{setedges()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void setedges (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_afcf85cfa2468be7605f70398d3601de9}\label{GridManip_8cu_afcf85cfa2468be7605f70398d3601de9}} 
+\index{GridManip.cu@{GridManip.cu}!setedges$<$ double $>$@{setedges$<$ double $>$}}
+\index{setedges$<$ double $>$@{setedges$<$ double $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{setedges$<$ double $>$()}{setedges< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_a2c53af2a95f3a86427f93b440f40ddd2}{setedges}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a5e95fd52a623afa68a876c4ec01f7e37}\label{GridManip_8cu_a5e95fd52a623afa68a876c4ec01f7e37}} 
+\index{GridManip.cu@{GridManip.cu}!setedges$<$ float $>$@{setedges$<$ float $>$}}
+\index{setedges$<$ float $>$@{setedges$<$ float $>$}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{setedges$<$ float $>$()}{setedges< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{GridManip_8h_a2c53af2a95f3a86427f93b440f40ddd2}{setedges}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a551ad361823a970ae5f445bb50d1df8b}\label{GridManip_8cu_a551ad361823a970ae5f445bb50d1df8b}} 
+\index{GridManip.cu@{GridManip.cu}!setedgessideBT@{setedgessideBT}}
+\index{setedgessideBT@{setedgessideBT}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{setedgessideBT()}{setedgessideBT()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void setedgesside\+BT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{blkA,  }\item[{int}]{blkB,  }\item[{int}]{jread,  }\item[{int}]{jwrite,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{GridManip_8cu_a32731b207471202aefce52a8635323f9}\label{GridManip_8cu_a32731b207471202aefce52a8635323f9}} 
+\index{GridManip.cu@{GridManip.cu}!setedgessideLR@{setedgessideLR}}
+\index{setedgessideLR@{setedgessideLR}!GridManip.cu@{GridManip.cu}}
+\doxysubsubsection{\texorpdfstring{setedgessideLR()}{setedgessideLR()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void setedgesside\+LR (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{blkA,  }\item[{int}]{blkB,  }\item[{int}]{iread,  }\item[{int}]{iwrite,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
