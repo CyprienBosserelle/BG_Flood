@@ -15,6 +15,6 @@ jobs:
       - uses: DenverCoder1/doxygen-github-pages-action@v1.2.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
+          branch: documentation
           folder: docs/html
           config_file: Doxygenfile
