@@ -24,22 +24,41 @@ The DEM, topography or bathymetry file is the only necessary file to be added to
 DEM = Wesport_DEM_8m.nc?z;
  ``` 
 
+![bathy](./figure/Westport_topo.png)
+
 Different formats can be used for this file ( ASCII: .asc or NetCDF .nc principally).
 As Netcdf files can contain different variables, the "?" follows by the name of the variable is needed.
 
 Without further information, the code will run will default values for physical parameters and initialisation, Neumann boundaries and no external forcing:
 
+![shell](./figure/Shell_output.png)
 
 
-=> Without further information, the model will run with the default values.
+A result files: "output.nc" is created (here opened with the PyNcView) 
 
-=>results
+![outputs](./figure/outputs.png)
+
+It contains 2D fields saved regularly in time.
+It details the blocs information, the time 1D variable, the xx and yy axis and the basic outputs (h,u,v,zb,zs) for a shallow water model (see manual for further description of the variables).
+
+A log file: BG_log.txt (very similaire to the shell outputs) is also created:
+![logfile](./figure/log_file.png)
 
 # Basic fluvial flooding set-up
 
+
 ## River discharge
+The river are, at this stage, forced by a vertical discharge on a user defined rectagular area:
+```{txt} 
+river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
+```
+where the four final numbers are: \f$ x_1, x_2, y_1, y_2 \f$, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time (\f$s\f$) from reference time, second column: river discharge in \f$m^3s^{-1}\f$).
+![riverfile](./figure/river_discharge.png)
+This file is from an observed hydrograph, with data save every 5min.
 
 ## Time parameters
+In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
+
 
 ## Resolution
 
