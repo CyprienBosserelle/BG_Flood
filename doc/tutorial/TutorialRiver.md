@@ -54,7 +54,10 @@ river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
 ```
 where the four final numbers are: \f$ x_1, x_2, y_1, y_2 \f$, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time (\f$s\f$) from reference time, second column: river discharge in \f$m^3s^{-1}\f$).
 ![riverfile](./figure/river_discharge.png)
-This file is from an observed hydrograph, with data save every 5min.
+This file is from an observed hydrograph, with data saved every 5min:
+![logfile](./figure/TE_Kuha_hydrograph.png)
+
+For each new river, just add the a similar river input line in the parameter file.
 
 ## Timekeeping parameters
 In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
@@ -73,21 +76,88 @@ totaltime = 3600;
 to begin one hour after the reference time ( used in the forcings for example).
 
 ## Outputs
+There is two types of outputs:
+ - map outputs of 2D variables regularly through time
+ - time-series output of basic values, at a chosen position, at each time step.
 
+### Map outputs
+ By default, there is only a map output at the begining and end of the simulation.
+
+ The map output can be modify by:
+ - defining a timestep (in s) for these outputs:
+```{txt} 
+outputtimestep = 3600.0;
+```
+- changing the set of variables in the output file (from the list given in the manual)
+```{txt} 
+outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
+```
+The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.
+- changing the name of the output file:
+```{txt} 
+outfile = Results_tuto_basicRun.nc;
+```
+- saving the output as float (variables are saved as short integer by default.):
+```{txt} 
+smallnc = 0;
+```
+
+### Time-Serie outputs
+For each TS output needed, a line with the destination file and the postition is needed:
+
+```{txt} 
+TSnodesout=Offshore.txt,1482120,53814890;
+```
+The file contains 5 colums \f$(t, zs, h, u,v)\f$ with the value at the nearest grid point (to the position defined by the user).
 
 ## Resolution
+For a first test, we will modify the resolution and set it to 40m to decrease the computational time:
+```{txt} 
+dx=40;
+```
 
-=>results
+## Basic fluvial innundation results
+This the shell output:
+![shell](./figure/Shell_output2.png)
+It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).
+
+
+
 
 # Completing the set-up
 ## Adding boundary conditions
+
+
 Presentation
 ### Tidal forcing
 
 ## Bottom friction
+Different models from bottom friction are available.
+You can choose the model using the keyword:
+```{txt} 
+frictionmodel=1;
+```
+frictionmodel=1;
+cfmap=z0_100423_rec3.asc;
+#cf=0.01;
+
 Attention: Extrapolation outside of the map
 
 ## Initialisation
+By default, the model is initialised by a plane water surface located at \f$z=0.0\f$.
+
+This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using:
+```{txt} 
+zsinit=-1.39; #in metre
+```
+The model can also be initialised using a restart/hot start.
+A file containing a least the files zb, h or zs, u and v must be provided, with the steps (and no the time value) to use for the restart.
+```{txt} 
+hotstartfile = output_4.nc;
+hotstep=5;
+```
+
+## Model controls
 
 ## Outputs
 
