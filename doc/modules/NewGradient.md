@@ -1,4 +1,5 @@
-# Halo and gradient
+@page HaloGradient Halo and gradient
+
 Using multi-resolution in BG_Flood, we need to keep track of how blocks with different resolutions talk to each other. This page tries to explain how this is done.
 
 ## Why halo
