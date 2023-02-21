@@ -96,6 +96,7 @@ outputtimestep = 3600.0;
 outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
 ```
 The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.
+There is also special variables for risk assesment after inundation (Umax, hmax, hUmax, twet)
 - changing the name of the output file:
 ```{txt} 
 outfile = Results_tuto_basicRun.nc;
@@ -125,7 +126,7 @@ This the shell output:
 It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).
 
 In the outputs, we get the different fields requested, for 6 different times.
-![output2](./figure/outputs2.png)
+![output2](./figure/outputs_v2.png)
 
 The Time-Serie output is:
 ![TS2](./figure/offshore.png)
@@ -211,7 +212,7 @@ eps = 0.00010000; #default=0.0001
 The model allows rain on grid forcing to model pluvial inundations.
 
 ## Rain forcing
-A rain intensity in \f$ mm\h \f$, time and space varying can be forced in the model.
+A rain intensity in \f$ mm.h^{-1} \f$, time and space varying can be forced in the model.
 
 The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:
 - Time serie forcing:
@@ -229,12 +230,16 @@ If the data is given in "rain height", a post-processing to turn it in rain inte
 
 Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. 
 Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:
+ - using the x0 / xmax / y0 / ymax keyword to restrain the extend of the computational domain (but still rectangular)
+  ```{txt} 
+x0=1475000; #m
+```
  - a manual mask with values 999 in the bathymetry will be read by the code as "non-active" area
  - masking all the bloc with all cells having an elevation superior to some value:
  ```{txt} 
 mask=250; #m
 ```
-- using a shape file to define a "area of interest" (**Method advised**):
+ - using a shape file to define a "area of interest" (**Method advised**):
  ```{txt} 
 AOI=Domain_buffered-sea2.gmt;
 ```
@@ -276,21 +281,34 @@ Here, the bathymetry map resolution is a 10m resolution (\f$ 𝑑𝑥_0=10𝑚\f
 
 ![meshrefine](./figure/test_1.png)
 
+To use it, the following options need to be added to the param file:
+```{txt} 
+initlevel = -3 ;
+maxlevel = 2 ;
+minlevel = -3 ;
+Adaptation = Targetlevel,refin_mask.nc?z ;
+```
 
 
-
-
-**Note**: In order to optimise the refinement, different bathymetry files can be provided. A higher resolution one with smaller extend can be provided as a second DEM and will be use by the code when refining the grid (the code will use the last entered, having the info available):
+**Note_1**: In order to optimise the refinement, different bathymetry files can be provided. A higher resolution one with smaller extend can be provided as a second DEM and will be use by the code when refining the grid (the code will use the last entered, having the info available):
  ```{text}
 DEM = Wesport_DEM_8m.nc?z;
 DEM = Wesport_DEM_2m_zoomed.nc?z;
  ``` 
 
 
-=> results
+**Note_2**: The code also allows for zone outputs: the output of different zones defined by the user (outputname,x1,x2,y1,y2):
+ ```{text}
+outzone=zoomed.nc,5.3,5.4,0.5,0.8;
+ ``` 
+
 
 ## Ground infiltration losses (Basic ILCL model)
-
+An Initial Loss, Continuous Loss model has been implemented in the code. To use it, provide maps for the two coefficient as follow:
+ ```{text}
+initialloss=InitialLoss.asc;
+continuousloss=ContinuousLoss.asc;
+ ``` 
 
 # Refining the grid in area of interest
 
@@ -299,9 +317,6 @@ DEM = Wesport_DEM_2m_zoomed.nc?z;
 ## Adding the variable resolution in the code
 Show adding a second high reso DEM (ALSO add mention of possibility to use path (relative or absolute))
 
-=> quick look at shell outputs
-
-=> results
 
 
 #

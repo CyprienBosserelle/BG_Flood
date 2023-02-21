@@ -10,7 +10,7 @@ The adaptive version of the model is currently under heavy development. Makefile
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8d871cf493e94a6eb474eaa30f573583)](https://www.codacy.com/project/CyprienBosserelle/Basil_Cart_StV/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=CyprienBosserelle/Basil_Cart_StV&amp;utm_campaign=Badge_Grade_Dashboard)
 [![Documentation](https://img.shields.io/badge/doc-Doxygen-blue)](https://cyprienbosserelle.github.io/BG_Flood/)
-
+[![Documentation](https://img.shields.io/badge/doc-Doxygen-blue)](https://aliceharang.github.io/)
 
 ## Build status
 Last developments are in the "development" branch: [![Build Status](https://travis-ci.com/CyprienBosserelle/BG_Flood.svg?branch=development)](https://travis-ci.com/CyprienBosserelle/BG_Flood)
