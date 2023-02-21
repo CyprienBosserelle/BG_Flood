@@ -53,9 +53,12 @@ The river are, at this stage, forced by a vertical discharge on a user defined r
 river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
 ```
 where the four final numbers are: \f$ x_1, x_2, y_1, y_2 \f$, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time (\f$s\f$) from reference time, second column: river discharge in \f$m^3s^{-1}\f$).
+
 ![riverfile](./figure/river_discharge.png)
+
 This file is from an observed hydrograph, with data saved every 5min:
-![logfile](./figure/TE_Kuha_hydrograph.png)
+
+![riverF](./figure/TE_Kuha_hydrograph.png)
 
 For each new river, just add the a similar river input line in the parameter file.
 
@@ -81,10 +84,10 @@ There is two types of outputs:
  - time-series output of basic values, at a chosen position, at each time step.
 
 ### Map outputs
- By default, there is only a map output at the begining and end of the simulation.
+By default, there is only a map output at the begining and end of the simulation.
 
- The map output can be modify by:
- - defining a timestep (in s) for these outputs:
+The map output can be modify by:
+- defining a timestep (in s) for these outputs:
 ```{txt} 
 outputtimestep = 3600.0;
 ```
@@ -118,30 +121,52 @@ dx=40;
 
 ## Basic fluvial innundation results
 This the shell output:
-![shell](./figure/Shell_output2.png)
+![shell2](./figure/Shell_output2.png)
 It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).
 
+In the outputs, we get the different fields requested, for 6 different times.
+![output2](./figure/outputs2.png)
 
+The Time-Serie output is:
+![TS2](./figure/offshore.png)
 
 
 # Completing the set-up
 ## Adding boundary conditions
+Boundaries condition Boundaries are refered by their position, using "top/bottom/right/left" keywords. They are associated to a boundary type ( 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d) and possibly a file containing a time serie. In this case, the file name is placed before the type, coma-separated. 
 
+In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.e. for the top, left and right boundaries.
+At the bottom, we will conserve the default value: 1.
+```{txt} 
+left = tide_westport.txt,2; 
+right = tide_westport.txt,2; 
+top = tide_westport.txt,2; 
+```
 
-Presentation
-### Tidal forcing
+In this case, as the boundaries are relatively small compared to the time wave length, we will used the same value along all the boundaries. We will then have only two columns in the file: Time and one elevation.
+tide_file
+![tide_file](./figure/tide_file.png)
+
+They correspond to a classic time Serie observed offshore of the river mouth.
+
+![Tide](./figure/tide_westport.png)
+
+(If more values, they will be regularly spread along the boundary and the forcing will be the linear interpolation of these values). 
+
 
 ## Bottom friction
 Different models from bottom friction are available.
-You can choose the model using the keyword:
+By default, the model used is -1 corresponding to a Manning model.
+Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models).
+The associated field (ASC or netCDF) or value must be enter with the key word
 ```{txt} 
 frictionmodel=1;
+cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
 ```
-frictionmodel=1;
-cfmap=z0_100423_rec3.asc;
-#cf=0.01;
 
-Attention: Extrapolation outside of the map
+![Friction](./figure/Bottom_friction_zo.png)
+
+**Warning**: The model allows a roughness heigh / manning number map smaller than the computational domain and will extrapolate outside of the map.
 
 ## Initialisation
 By default, the model is initialised by a plane water surface located at \f$z=0.0\f$.
@@ -158,19 +183,67 @@ hotstep=5;
 ```
 
 ## Model controls
+Some variables can be used to adjust the model (see Manual for more details):
+- run on CPU (or choose a GPU to run on):
+```{txt} 
+gpudevice=0;
+```
+By default, the code will detect if there is a suitable GPU on the machine.
+- Double precision instead of a float precision during the computation:
+```{txt} 
+doubleprecision = 1;
+```
+- Minmod limiter parameter (to tune momentum dissipation \f$\in [1,2]\f$)
+```{txt} 
+theta=1.3; #default value=1.3
+```
+- Minimum heigh to concidere a cell wet (m)
+```{txt} 
+eps = 0.00010000; #default=0.0001
+```
 
 ## Outputs
 
+
+
 # ... Adding the rain
 
-## Rain forcing
-=> through TS or Time-varying maps (nc files)
-=> Rain only on the part of the domain we are interested in
-=> AOI or rain maps with masked area
+The model allows rain on grid forcing to model pluvial inundations.
 
+## Rain forcing
+A rain intensity in \f$ mm\h \f$, time and space varying can be forced in the model.
+
+The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:
+- Time serie forcing:
+```{txt} 
+rainfall=rain_westport.txt
+```
+- Spacial file forcing:
+```{txt} 
+rainfile=VCSN_buller_202107_dailynzcsmcov_disaggdaily_500m_nztm_clipped.nc?depth;
+```
+Here, we will use a time serie:
+![RainTS](./figure/rain_westport.png)
+
+If the data is given in rain height, a post-processing to turn it in rain intensity will be needed (at least at this stage of development).
+
+Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. 
+Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:
+ - a manual mask with values 999 in the bathymetry will be read by the code as "non-active" area
+ - masking all the bloc with all cells having an elevation superior to some value:
+ ```{txt} 
+mask=250; #m
+```
+- using a shape file to define a "area of interest" (**Method advised**):
+ ```{txt} 
+AOI=Domain_buffered-sea2.gmt;
+```
+
+
+# Refining the grid in area of interest
+The code is based on a quadtree mesh
 
 => results
-
 
 ## Ground infiltration losses (Basic ILCL model)
 
