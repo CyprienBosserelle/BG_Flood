@@ -1,0 +1,233 @@
+#################################
+Basilisk-like Cartesian GPU v0.0
+#################################
+model started at 14-11-2018 21:57:26
+bathy: topo.asc
+bathy extension: asc
+Reading bathy asc file
+For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)
+Bathymetry grid info: nx=208 ny=256 dx=0.010000 grdalpha=0.000000 xo=0.000000 yo=0.000000
+Reading and preparing Boundaries
+Done Reading and preparing Boundaries
+Read Bathy data
+Allocate CPU memory...
+Done
+There are 1GPU devices on this machine
+Using Device: Quadro K620
+Allocating GPU memory
+Done
+Copy bathy to BUQ array...
+Done
+Initial condition:
+Cold start
+Cold start
+Done
+Init data on GPU 
+Done 
+Create netCDF output file 
+Done 
+
+
+###################################
+### Summary of model parameters ###
+###################################
+# Bathymetry file
+bathy = topo.asc;
+posdown = 0;
+nx = 207;
+ny = 256;
+dx = 0.010000;
+grdalpha = 0.000000;
+xo = 0.000000;
+yo = 0.000000;
+
+
+gpudevice = 0;
+
+
+# Flow parameters
+eps = 0.000001;
+cf = 0.000004;
+theta = 1.140000;
+Cd = 0.002000;
+
+
+# Timekeeping parameters
+CFL = 0.500000;
+totaltime = 0.000000; # Start time
+endtime = 150.000000;
+outputtimestep = 1.000000;
+outvars = zs, hh, uu, vv, zb, hhmax, zsmax;
+
+
+# Files
+outfile = Test3_rain.nc;
+smallnc = 0; #if smallnc==1 all Output are scaled and saved as a short int
+
+
+# Boundaries
+# 0:wall; 1:Dirichlet (zs); 2: Neumann (Default)
+right = 1;
+left = 1;
+top = 1;
+bot = 1;
+
+
+# Others
+g = 9.810000;
+rho = 1025.000000;
+
+
+Starting Model. 
+Writing outputs, totaltime: 1.000000, Mean dt= 1.000000
+Writing outputs, totaltime: 2.000000, Mean dt= 0.023256
+Writing outputs, totaltime: 3.000000, Mean dt= 0.020833
+Writing outputs, totaltime: 4.000000, Mean dt= 0.014925
+Writing outputs, totaltime: 5.000000, Mean dt= 0.011905
+Writing outputs, totaltime: 6.000000, Mean dt= 0.009615
+Writing outputs, totaltime: 7.000000, Mean dt= 0.008850
+Writing outputs, totaltime: 8.000000, Mean dt= 0.008772
+Writing outputs, totaltime: 9.000000, Mean dt= 0.009091
+Writing outputs, totaltime: 10.000000, Mean dt= 0.008929
+Writing outputs, totaltime: 11.000000, Mean dt= 0.008621
+Writing outputs, totaltime: 12.000000, Mean dt= 0.008547
+Writing outputs, totaltime: 13.000000, Mean dt= 0.008403
+Writing outputs, totaltime: 14.000000, Mean dt= 0.008130
+Writing outputs, totaltime: 15.000000, Mean dt= 0.007937
+Writing outputs, totaltime: 16.000000, Mean dt= 0.007813
+Writing outputs, totaltime: 17.000000, Mean dt= 0.007813
+Writing outputs, totaltime: 18.000000, Mean dt= 0.007519
+Writing outputs, totaltime: 19.000000, Mean dt= 0.007407
+Writing outputs, totaltime: 20.000000, Mean dt= 0.007407
+Writing outputs, totaltime: 21.000000, Mean dt= 0.007463
+Writing outputs, totaltime: 22.000000, Mean dt= 0.007407
+Writing outputs, totaltime: 23.000000, Mean dt= 0.007299
+Writing outputs, totaltime: 24.000000, Mean dt= 0.007246
+Writing outputs, totaltime: 25.000000, Mean dt= 0.007299
+Writing outputs, totaltime: 26.000000, Mean dt= 0.007246
+Writing outputs, totaltime: 27.000000, Mean dt= 0.007194
+Writing outputs, totaltime: 28.000000, Mean dt= 0.007194
+Writing outputs, totaltime: 29.000000, Mean dt= 0.007092
+Writing outputs, totaltime: 30.000000, Mean dt= 0.007143
+Writing outputs, totaltime: 31.000000, Mean dt= 0.007143
+Writing outputs, totaltime: 32.000000, Mean dt= 0.007092
+Writing outputs, totaltime: 33.000000, Mean dt= 0.007092
+Writing outputs, totaltime: 34.000000, Mean dt= 0.007042
+Writing outputs, totaltime: 35.000000, Mean dt= 0.007042
+Writing outputs, totaltime: 36.000000, Mean dt= 0.006993
+Writing outputs, totaltime: 37.000000, Mean dt= 0.006993
+Writing outputs, totaltime: 38.000000, Mean dt= 0.006944
+Writing outputs, totaltime: 39.000000, Mean dt= 0.006944
+Writing outputs, totaltime: 40.000000, Mean dt= 0.006993
+Writing outputs, totaltime: 41.000000, Mean dt= 0.006993
+Writing outputs, totaltime: 42.000000, Mean dt= 0.006944
+Writing outputs, totaltime: 43.000000, Mean dt= 0.006897
+Writing outputs, totaltime: 44.000000, Mean dt= 0.006803
+Writing outputs, totaltime: 45.000000, Mean dt= 0.006849
+Writing outputs, totaltime: 46.000000, Mean dt= 0.006944
+Writing outputs, totaltime: 47.000000, Mean dt= 0.006944
+Writing outputs, totaltime: 48.000000, Mean dt= 0.006993
+Writing outputs, totaltime: 49.000000, Mean dt= 0.006993
+Writing outputs, totaltime: 50.000000, Mean dt= 0.007042
+Writing outputs, totaltime: 51.000000, Mean dt= 0.007042
+Writing outputs, totaltime: 52.000000, Mean dt= 0.007042
+Writing outputs, totaltime: 53.000000, Mean dt= 0.007246
+Writing outputs, totaltime: 54.000000, Mean dt= 0.007407
+Writing outputs, totaltime: 55.000000, Mean dt= 0.007519
+Writing outputs, totaltime: 56.000000, Mean dt= 0.007634
+Writing outputs, totaltime: 57.000000, Mean dt= 0.007692
+Writing outputs, totaltime: 58.000000, Mean dt= 0.007813
+Writing outputs, totaltime: 59.000000, Mean dt= 0.007937
+Writing outputs, totaltime: 60.000000, Mean dt= 0.008065
+Writing outputs, totaltime: 61.000000, Mean dt= 0.008197
+Writing outputs, totaltime: 62.000000, Mean dt= 0.008333
+Writing outputs, totaltime: 63.000000, Mean dt= 0.008403
+Writing outputs, totaltime: 64.000000, Mean dt= 0.008547
+Writing outputs, totaltime: 65.000000, Mean dt= 0.008621
+Writing outputs, totaltime: 66.000000, Mean dt= 0.008696
+Writing outputs, totaltime: 67.000000, Mean dt= 0.008772
+Writing outputs, totaltime: 68.000000, Mean dt= 0.008929
+Writing outputs, totaltime: 69.000000, Mean dt= 0.009009
+Writing outputs, totaltime: 70.000000, Mean dt= 0.009174
+Writing outputs, totaltime: 71.000000, Mean dt= 0.009259
+Writing outputs, totaltime: 72.000000, Mean dt= 0.009434
+Writing outputs, totaltime: 73.000000, Mean dt= 0.009524
+Writing outputs, totaltime: 74.000000, Mean dt= 0.009615
+Writing outputs, totaltime: 75.000000, Mean dt= 0.009709
+Writing outputs, totaltime: 76.000000, Mean dt= 0.009901
+Writing outputs, totaltime: 77.000000, Mean dt= 0.010000
+Writing outputs, totaltime: 78.000000, Mean dt= 0.010101
+Writing outputs, totaltime: 79.000000, Mean dt= 0.010204
+Writing outputs, totaltime: 80.000000, Mean dt= 0.010309
+Writing outputs, totaltime: 81.000000, Mean dt= 0.010417
+Writing outputs, totaltime: 82.000000, Mean dt= 0.010526
+Writing outputs, totaltime: 83.000000, Mean dt= 0.010638
+Writing outputs, totaltime: 84.000000, Mean dt= 0.010753
+Writing outputs, totaltime: 85.000000, Mean dt= 0.010870
+Writing outputs, totaltime: 86.000000, Mean dt= 0.010989
+Writing outputs, totaltime: 87.000000, Mean dt= 0.011111
+Writing outputs, totaltime: 88.000000, Mean dt= 0.011236
+Writing outputs, totaltime: 89.000000, Mean dt= 0.011364
+Writing outputs, totaltime: 90.000000, Mean dt= 0.011494
+Writing outputs, totaltime: 91.000000, Mean dt= 0.011628
+Writing outputs, totaltime: 92.000000, Mean dt= 0.011765
+Writing outputs, totaltime: 93.000000, Mean dt= 0.011765
+Writing outputs, totaltime: 94.000000, Mean dt= 0.011905
+Writing outputs, totaltime: 95.000000, Mean dt= 0.012048
+Writing outputs, totaltime: 96.000000, Mean dt= 0.012195
+Writing outputs, totaltime: 97.000000, Mean dt= 0.012346
+Writing outputs, totaltime: 98.000000, Mean dt= 0.012346
+Writing outputs, totaltime: 99.000000, Mean dt= 0.012500
+Writing outputs, totaltime: 100.000000, Mean dt= 0.012658
+Writing outputs, totaltime: 101.000000, Mean dt= 0.012821
+Writing outputs, totaltime: 102.000000, Mean dt= 0.012821
+Writing outputs, totaltime: 103.000000, Mean dt= 0.012987
+Writing outputs, totaltime: 104.000000, Mean dt= 0.013158
+Writing outputs, totaltime: 105.000000, Mean dt= 0.013158
+Writing outputs, totaltime: 106.000000, Mean dt= 0.013333
+Writing outputs, totaltime: 107.000000, Mean dt= 0.013514
+Writing outputs, totaltime: 108.000000, Mean dt= 0.013514
+Writing outputs, totaltime: 109.000000, Mean dt= 0.013699
+Writing outputs, totaltime: 110.000000, Mean dt= 0.013889
+Writing outputs, totaltime: 111.000000, Mean dt= 0.013889
+Writing outputs, totaltime: 112.000000, Mean dt= 0.014085
+Writing outputs, totaltime: 113.000000, Mean dt= 0.014085
+Writing outputs, totaltime: 114.000000, Mean dt= 0.014286
+Writing outputs, totaltime: 115.000000, Mean dt= 0.014493
+Writing outputs, totaltime: 116.000000, Mean dt= 0.014493
+Writing outputs, totaltime: 117.000000, Mean dt= 0.014706
+Writing outputs, totaltime: 118.000000, Mean dt= 0.014706
+Writing outputs, totaltime: 119.000000, Mean dt= 0.014925
+Writing outputs, totaltime: 120.000000, Mean dt= 0.014925
+Writing outputs, totaltime: 121.000000, Mean dt= 0.015152
+Writing outputs, totaltime: 122.000000, Mean dt= 0.015152
+Writing outputs, totaltime: 123.000000, Mean dt= 0.015385
+Writing outputs, totaltime: 124.000000, Mean dt= 0.015385
+Writing outputs, totaltime: 125.000000, Mean dt= 0.015625
+Writing outputs, totaltime: 126.000000, Mean dt= 0.015625
+Writing outputs, totaltime: 127.000000, Mean dt= 0.015873
+Writing outputs, totaltime: 128.000000, Mean dt= 0.015873
+Writing outputs, totaltime: 129.000000, Mean dt= 0.016129
+Writing outputs, totaltime: 130.000000, Mean dt= 0.016129
+Writing outputs, totaltime: 131.000000, Mean dt= 0.016393
+Writing outputs, totaltime: 132.000000, Mean dt= 0.016393
+Writing outputs, totaltime: 133.000000, Mean dt= 0.016393
+Writing outputs, totaltime: 134.000000, Mean dt= 0.016667
+Writing outputs, totaltime: 135.000000, Mean dt= 0.016667
+Writing outputs, totaltime: 136.000000, Mean dt= 0.016667
+Writing outputs, totaltime: 137.000000, Mean dt= 0.016949
+Writing outputs, totaltime: 138.000000, Mean dt= 0.016949
+Writing outputs, totaltime: 139.000000, Mean dt= 0.016949
+Writing outputs, totaltime: 140.000000, Mean dt= 0.017241
+Writing outputs, totaltime: 141.000000, Mean dt= 0.017241
+Writing outputs, totaltime: 142.000000, Mean dt= 0.017241
+Writing outputs, totaltime: 143.000000, Mean dt= 0.017544
+Writing outputs, totaltime: 144.000000, Mean dt= 0.017544
+Writing outputs, totaltime: 145.000000, Mean dt= 0.017544
+Writing outputs, totaltime: 146.000000, Mean dt= 0.017544
+Writing outputs, totaltime: 147.000000, Mean dt= 0.017857
+Writing outputs, totaltime: 148.000000, Mean dt= 0.017857
+Writing outputs, totaltime: 149.000000, Mean dt= 0.017857
+Writing outputs, totaltime: 150.000000, Mean dt= 0.017857
+End Computation
+Total runtime= 119  seconds

@@ -54,6 +54,7 @@ river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
 ```
 where the four final numbers are: \f$ x_1, x_2, y_1, y_2 \f$, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time (\f$s\f$) from reference time, second column: river discharge in \f$m^3s^{-1}\f$).
 ![riverfile](./figure/river_discharge.png)
+<<<<<<< HEAD
 This file is from an observed hydrograph, with data saved every 5min:
 ![logfile](./figure/TE_Kuha_hydrograph.png)
 
@@ -128,10 +129,25 @@ It shows that 1 river has been added to the model, and also the time progression
 ## Adding boundary conditions
 
 
+=======
+This file is from an observed hydrograph, with data save every 5min.
+
+## Time parameters
+In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
+
+
+## Resolution
+
+=>results
+
+# Completing the set-up
+## Adding boundary conditions
+>>>>>>> parent of 6090636 (Deploying to documentation from @ CyprienBosserelle/BG_Flood@d07614fdd99ebcc32971ab29f8ec24b61711383e 🚀)
 Presentation
 ### Tidal forcing
 
 ## Bottom friction
+<<<<<<< HEAD
 Different models from bottom friction are available.
 You can choose the model using the keyword:
 ```{txt} 
@@ -158,6 +174,11 @@ hotstep=5;
 ```
 
 ## Model controls
+=======
+Attention: Extrapolation outside of the map
+
+## Initialisation
+>>>>>>> parent of 6090636 (Deploying to documentation from @ CyprienBosserelle/BG_Flood@d07614fdd99ebcc32971ab29f8ec24b61711383e 🚀)
 
 ## Outputs
 
