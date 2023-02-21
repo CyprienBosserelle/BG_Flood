@@ -225,7 +225,7 @@ rainfile=VCSN_buller_202107_dailynzcsmcov_disaggdaily_500m_nztm_clipped.nc?depth
 Here, we will use a time serie:
 ![RainTS](./figure/rain_westport.png)
 
-If the data is given in rain height, a post-processing to turn it in rain intensity will be needed (at least at this stage of development).
+If the data is given in "rain height", a post-processing to turn it in rain intensity will be needed (at least at this stage of development).
 
 Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. 
 Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:
@@ -241,7 +241,51 @@ AOI=Domain_buffered-sea2.gmt;
 
 
 # Refining the grid in area of interest
-The code is based on a quadtree mesh
+The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
+These blocks can have different resolutions (but resolution does not change during the computation at this stage).
+
+The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  \f$𝑛\f$ , the resolution  \f$𝑑𝑥_𝑛\f$
+  will be:
+$$𝑑𝑥_𝑛=\frac{𝑑𝑥_0}{2^𝑛}$$
+ 
+with  \f$𝑑𝑥_0\f$ the resolution at level 0. 
+
+When refinning using the level implementation, different key words are expected:
+
+- Initlevel: level used to create the first mesh created by the code
+- Maxlevel: maximim level of refinement (over-ruling other commands)
+- Minlevel: minimum level of refinement (over-ruling other commands)
+
+The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
+
+The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:
+
+- 'Threshold': impose a threshold for a different level of resolution
+- 'Inrange': impose a range for a different level of resolutuion or it can be defined using a map of target levels for refinement:
+- 'Targetlevel': the levels of resolution will be targeted but will be overruled by the maxlevel, minlevel entrance.
+
+To refine the grid for this case, we will use the *former coarse simulation* and create a map for values where hmax is strictly positive (and/or umax,vmax different from zero), after removing the sea area. 
+
+Here, the bathymetry map resolution is a 10m resolution (\f$ 𝑑𝑥_0=10𝑚\f$). We will impose:
+- a level -3 resolution ( \f$𝑑𝑥_{−3}=80𝑚\f$) in the background domain, 
+- a level 1 resolution ( \f$𝑑𝑥_1=5𝑚\f$) in the flooded area
+- a level 2 resolution ( \f$𝑑𝑥_2=2.5𝑚\f$)  in the main river bed area. 
+
+![coarseRun](./figure/coarse.png)
+![refine](./figure/refine.png)
+
+![meshrefine](./figure/test_1.png)
+
+
+
+
+
+**Note**: In order to optimise the refinement, different bathymetry files can be provided. A higher resolution one with smaller extend can be provided as a second DEM and will be use by the code when refining the grid (the code will use the last entered, having the info available):
+ ```{text}
+DEM = Wesport_DEM_8m.nc?z;
+DEM = Wesport_DEM_2m_zoomed.nc?z;
+ ``` 
+
 
 => results
 
