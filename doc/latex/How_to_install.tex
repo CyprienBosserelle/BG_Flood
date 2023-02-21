@@ -1,0 +1,123 @@
+\hypertarget{How_to_install_autotoc_md9}{}\doxysubsection{From precompiled binaries (\+Win10 only)}\label{How_to_install_autotoc_md9}
+
+\begin{DoxyEnumerate}
+\item download the zip from any release
+\item unzip into preferred path
+\item Add path to \char`\"{}\+Path\char`\"{} in environment variables (search for \char`\"{}\+Edit environment variables for your account\char`\"{})
+\item When updating/upgrading BG\+\_\+\+Flood simply repeat 1 and 2
+\end{DoxyEnumerate}
+
+\mbox{\hyperlink{Compile-under-linux}{Compilation on Linux}}
+
+\mbox{\hyperlink{Use-On-SuperComputer}{Use on Super\+Computer}} \hypertarget{Compile-under-linux}{}\doxysection{Compilation on Linux}\label{Compile-under-linux}
+Make sure you have latest cuda, g++ and netcdf libraries installed.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install nvidia-\/cuda-\/dev}
+\DoxyCodeLine{sudo apt-\/get install g++}
+\DoxyCodeLine{sudo apt-\/get install libnetcdf-\/dev}
+
+\end{DoxyCode}
+
+
+Also make sure the GPU driver being used is the NVidia driver!
+
+Do a quick comand line test to see if nvcc (cuda compiler) is available from here If not, You may need to modify the cuda path in the makefile (line 155) 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{NVCC          := nvcc -\/ccbin \$(HOST\_COMPILER)}
+
+\end{DoxyCode}
+
+
+The code can compile for multiple GPU architecture but later compiler do not support old GPU (2.\+0 is no longer supported) Remove unsupported architecture in line 213 of the makefile
+
+Then just type 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make}
+
+\end{DoxyCode}
+
+
+Many warning will show up but that is OK. \hypertarget{Use-On-SuperComputer}{}\doxysection{Use on Super\+Computer}\label{Use-On-SuperComputer}
+The code can be run on local machines with NVIDIA GPU but it will get better performance by running on large GPU.
+
+The code is actually running on \href{https://www.nesi.org.nz}{\texttt{ New Zealand e\+Science Infrastructure (Ne\+SI)}}.\hypertarget{Use-On-SuperComputer_autotoc_md105}{}\doxysubsubsection{Compiling the code}\label{Use-On-SuperComputer_autotoc_md105}
+The Code needs to be compile on the machine, using the sources grom the github repository. Due to the code dependency to CUDA and net\+CDF, two modules need to be loaded\+:
+\begin{DoxyItemize}
+\item On Maui\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{module load CUDA\(\backslash\)11.4.1}
+\DoxyCodeLine{module load netCDF-\/C++4/4.3.0-\/GCC-\/7.1.0}
+
+\end{DoxyCode}
+
+\item On Mahuika\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{module load CUDA/11.4.1}
+\DoxyCodeLine{module load netCDF-\/C++4/4.3.1-\/gimpi-\/2020a}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{Use-On-SuperComputer_autotoc_md106}{}\doxysubsubsection{Running the code}\label{Use-On-SuperComputer_autotoc_md106}
+
+\begin{DoxyItemize}
+\item Example of a slurm file on Maui\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#!/bin/bash}
+\DoxyCodeLine{\#SBATCH -\/-\/job-\/name=MY-\/TEST-\/NAME}
+\DoxyCodeLine{\#SBATCH -\/-\/time=8:00:00}
+\DoxyCodeLine{\#SBATCH -\/-\/account=MY-\/NESI-\/ACCOUNT}
+\DoxyCodeLine{\#SBATCH -\/-\/partition=nesi\_gpu}
+\DoxyCodeLine{\#SBATCH -\/-\/gres=gpu}
+\DoxyCodeLine{\#SBATCH -\/-\/ntasks=1}
+\DoxyCodeLine{\#SBATCH -\/-\/cpus-\/per-\/task=2}
+\DoxyCodeLine{\#SBATCH -\/-\/mem=5GB}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#Running directory (to be completed)}
+\DoxyCodeLine{BGFLOOD=/nesi/project/XXXXXXXXXXXXXXX}
+\DoxyCodeLine{}
+\DoxyCodeLine{cd \$\{BGFLOOD\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{module load CUDA/11.4.1}
+\DoxyCodeLine{module load netCDF-\/C++4/4.3.0-\/GCC-\/7.1.0}
+\DoxyCodeLine{}
+\DoxyCodeLine{\# Launching the executable}
+\DoxyCodeLine{srun ./BG\_Flood\_Maui}
+\DoxyCodeLine{}
+\DoxyCodeLine{echo "{}output\_file = Output/\$\{testname\}/BGoutput-\/\$\{reftime\}.nc"{}}
+\DoxyCodeLine{}
+\DoxyCodeLine{echo "{}end of setup\_run\_BG.sh"{}}
+
+\end{DoxyCode}
+
+\item Example of a slurm file on Mahuika\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#!/bin/bash}
+\DoxyCodeLine{\#SBATCH -\/-\/job-\/name=MY-\/TEST-\/NAME}
+\DoxyCodeLine{\#SBATCH -\/-\/time=05:00:00}
+\DoxyCodeLine{\#SBATCH -\/-\/account=MY-\/NESI-\/ACCOUNT}
+\DoxyCodeLine{\#SBATCH -\/-\/gpus-\/per-\/node=1}
+\DoxyCodeLine{\#SBATCH -\/-\/ntasks=1}
+\DoxyCodeLine{\#SBATCH -\/-\/cpus-\/per-\/task=1}
+\DoxyCodeLine{\#SBATCH -\/-\/mem=1GB}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#Running directory (to be completed)}
+\DoxyCodeLine{BGFLOOD=/nesi/project/XXXXXXXXXXXXXXX}
+\DoxyCodeLine{}
+\DoxyCodeLine{cd \$\{BGFLOOD\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\#module load netCDF-\/C++4/4.3.0-\/gimkl-\/2017a}
+\DoxyCodeLine{module load netCDF-\/C++4/4.3.1-\/gimpi-\/2020a}
+\DoxyCodeLine{module load CUDA/11.4.1}
+\DoxyCodeLine{}
+\DoxyCodeLine{\# Launching the executable}
+\DoxyCodeLine{srun ./BG\_Flood\_Mahuika}
+\DoxyCodeLine{}
+\DoxyCodeLine{echo "{}output\_file = Output/\$\{testname\}/BGoutput-\/\$\{reftime\}.nc"{}}
+\DoxyCodeLine{}
+\DoxyCodeLine{echo "{}end of setup\_run\_BG.sh"{}}
+
+\end{DoxyCode}
+ 
+\end{DoxyItemize}

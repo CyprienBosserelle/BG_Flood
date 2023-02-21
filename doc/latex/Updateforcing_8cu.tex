@@ -1,0 +1,472 @@
+\hypertarget{Updateforcing_8cu}{}\doxysection{src/\+Updateforcing.cu File Reference}
+\label{Updateforcing_8cu}\index{src/Updateforcing.cu@{src/Updateforcing.cu}}
+{\ttfamily \#include \char`\"{}Updateforcing.\+h\char`\"{}}\newline
+Include dependency graph for Updateforcing.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Updateforcing_8cu_a0705de14eb2d66a5da26fd5894f8985f}{updateforcing}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing)
+\item 
+template void \mbox{\hyperlink{Updateforcing_8cu_aced8d302d8a53a4bd40dbd9131c204aa}{updateforcing$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing)
+\item 
+template void \mbox{\hyperlink{Updateforcing_8cu_af72d2ea58938eb1250ab16651003d111}{updateforcing$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Updateforcing_8cu_acc3a8335e222afc5a35dfe3075cb79cb}{Forcingthisstep}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \&XDyn\+Forcing)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a33601f4b4569c59bde52d4ca112ede89}{Add\+River\+Forcing}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, std\+::vector$<$ \mbox{\hyperlink{classRiver}{River}} $>$ XRivers, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_adc51f6a6d13e1a2c57fa8205f2b95ec5}{Add\+River\+Forcing$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, std\+::vector$<$ \mbox{\hyperlink{classRiver}{River}} $>$ XRivers, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ad0e132f30cf84266f153d9440de092e3}{Add\+River\+Forcing$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, std\+::vector$<$ \mbox{\hyperlink{classRiver}{River}} $>$ XRivers, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ab32cde3ea8a907b071d24402886019d3}{Inject\+River\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classRiver}{River}} XRiver, T qnow, int $\ast$Riverblks, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a044e409c1b9d0d99611df800cc756389}{Inject\+River\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classRiver}{River}} XRiver, float qnow, int $\ast$Riverblks, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_aa8f9deab6ba5f33426ce03657cad1eff}{Inject\+River\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classRiver}{River}} XRiver, double qnow, int $\ast$Riverblks, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a9ea906ec1361134319212670574ba18c}{Inject\+River\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classRiver}{River}} XRiver, T qnow, int nblkriver, int $\ast$Riverblks, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a0756780865a0176e5a5f95c89d415c48}{Inject\+River\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classRiver}{River}} XRiver, float qnow, int nblkriver, int $\ast$Riverblks, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ad86e6061c902d45cec22f62942d2ea33}{Inject\+River\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classRiver}{River}} XRiver, double qnow, int nblkriver, int $\ast$Riverblks, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a2b0c1b79bd69bf944a0134425ec3871a}{Addrainforcing\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a4adf68bdebd257cc9fbed59b1d35f449}{Addrainforcing\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a842f9883c15590d82da4623d8b091862}{Addrainforcing\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a060cf5195bfe4c31b1a889b80ddee658}{Addrainforcing\+Implicit\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ab4510493768beaaa9ce961ed560ae769}{Addrainforcing\+Implicit\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_aa6f1cef28ded28caa3e417145cd349b6}{Addrainforcing\+Implicit\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a4714a6b865498ee74a816b360f86b760}{Addrainforcing\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_af1ac78ee8b78fe91c11b06a63585f965}{Addrainforcing\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a408ba56e1042bf85044ece5c7e68ec6d}{Addrainforcing\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ad230d34875656856d2f06cf295ea0a8c}{Addrainforcing\+Implicit\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_aaae791c4077bf679f6c830a255038fd1}{Addrainforcing\+Implicit\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a7c285ae5b600f32b05d90f0c1d5d55ec}{Addrainforcing\+Implicit\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Rain, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ad13e319a421a8ddb774a162050b0c1d1}{Addinfiltration\+Implicit\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$il, T $\ast$cl, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$hgw)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_aacdd085344c119ee3b29278ae5dc6c87}{Addinfiltration\+Implicit\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$il, float $\ast$cl, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, float $\ast$hgw)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a68de01b6ced158bbbf77084b9241dbfd}{Addinfiltration\+Implicit\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$il, double $\ast$cl, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, double $\ast$hgw)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a1fea5c7b910bcdd8356cab6576fc9f86}{Addinfiltration\+Implicit\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$il, T $\ast$cl, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$hgw)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ac10e92286ae39d63abd4874ca0e82dc3}{Addinfiltration\+Implicit\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float $\ast$il, float $\ast$cl, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEv, float $\ast$hgw)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a88a997a40ecb78ab962320703c6ab236}{Addinfiltration\+Implicit\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double $\ast$il, double $\ast$cl, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEv, double $\ast$hgw)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a2e20aa963e644b76928293bf72fa9bbf}{Addwindforcing\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Uwind, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Vwind, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a678db72707dcf01f9e3b899337ca3676}{Addwindforcing\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Uwind, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Vwind, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a272c5c4de3a72dc88fa5c1767d630d05}{Addwindforcing\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Uwind, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Vwind, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_acf937003de037aec20b2b23b1f7a8b5b}{Add\+Patmforcing\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ PAtm, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a9b62718e7ddd59255c75501c696de111}{Add\+Patmforcing\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ PAtm, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a8b91945462eecb0f756563cf347e5f5d}{Add\+Patmforcing\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ PAtm, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ae983e63add8e6fddb8e05657c8c1e5bc}{Addwindforcing\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Uwind, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Vwind, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_ab547842f83fc425a210dae2a308f2e19}{Addwindforcing\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Uwind, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Vwind, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$ XAdv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a8d6d67b78ffea84a0ffe5a062c48ad05}{Addwindforcing\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Uwind, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Vwind, \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$ XAdv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a84e00f06851cebb36d1a639e73172dd9}{Add\+Patmforcing\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ PAtm, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_af375ae41ff0c42138e951eb3ec8cb302}{Add\+Patmforcing\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ PAtm, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a13ac9b9a1db8e18dc054e9a09c0986ef}{Add\+Patmforcing\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ PAtm, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Updateforcing_8cu_a599e215dbff69667f7542b4d6489a8ac}{interp\+Dyn2\+BUQ}} (T x, T y, \mbox{\hyperlink{structTexSetP}{Tex\+SetP}} \mbox{\hyperlink{structForcing}{Forcing}})
+\item 
+template \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Updateforcing_8cu_a51ce7b3b7e9c49c91c39dfdd893ec650}{interp\+Dyn2\+BUQ$<$ float $>$}} (float x, float y, \mbox{\hyperlink{structTexSetP}{Tex\+SetP}} \mbox{\hyperlink{structForcing}{Forcing}})
+\item 
+template \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Updateforcing_8cu_a3292574c12637423d8207ede0701bdc0}{interp\+Dyn2\+BUQ$<$ double $>$}} (double x, double y, \mbox{\hyperlink{structTexSetP}{Tex\+SetP}} \mbox{\hyperlink{structForcing}{Forcing}})
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}} (T x, T y, \mbox{\hyperlink{structTexSetP}{Tex\+SetP}} \mbox{\hyperlink{structForcing}{Forcing}})
+\item 
+template \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Updateforcing_8cu_ad37645c35507ab01bd507945e54c292d}{interp2\+BUQ$<$ float $>$}} (float x, float y, \mbox{\hyperlink{structTexSetP}{Tex\+SetP}} \mbox{\hyperlink{structForcing}{Forcing}})
+\item 
+template \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Updateforcing_8cu_a99c6f851efe86bf7269b7548a2c654e2}{interp2\+BUQ$<$ double $>$}} (double x, double y, \mbox{\hyperlink{structTexSetP}{Tex\+SetP}} \mbox{\hyperlink{structForcing}{Forcing}})
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Updateforcing_8cu_af4611c0475dad4b01cfc5dba1ad82c82}{deformstep}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$ deform, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+template void \mbox{\hyperlink{Updateforcing_8cu_ab31beccb5921ab182ac24d65128e5c04}{deformstep$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$ deform, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel\+\_\+g)
+\item 
+template void \mbox{\hyperlink{Updateforcing_8cu_a91774c40fbff21eb06f6cdad0523f7f3}{deformstep$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$ deform, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Updateforcing_8cu_a524c082c522ed561263e6138f36c69c3}{deformstep}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$ deform, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_af459e9fbf88eca601d6305ba672ab07c}{Add\+Deform\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ defmap, T scale, T $\ast$zs, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a097cc7899b0e1a9625fe181f28b04a4a}{Add\+Deform\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ defmap, T scale, T $\ast$zs, T $\ast$zb)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Updateforcing_8cu_a097cc7899b0e1a9625fe181f28b04a4a}\label{Updateforcing_8cu_a097cc7899b0e1a9625fe181f28b04a4a}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddDeformCPU@{AddDeformCPU}}
+\index{AddDeformCPU@{AddDeformCPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddDeformCPU()}{AddDeformCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Add\+Deform\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$}]{defmap,  }\item[{T}]{scale,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_af459e9fbf88eca601d6305ba672ab07c}\label{Updateforcing_8cu_af459e9fbf88eca601d6305ba672ab07c}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddDeformGPU@{AddDeformGPU}}
+\index{AddDeformGPU@{AddDeformGPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddDeformGPU()}{AddDeformGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Add\+Deform\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$}]{defmap,  }\item[{T}]{scale,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ad13e319a421a8ddb774a162050b0c1d1}\label{Updateforcing_8cu_ad13e319a421a8ddb774a162050b0c1d1}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddinfiltrationImplicitCPU@{AddinfiltrationImplicitCPU}}
+\index{AddinfiltrationImplicitCPU@{AddinfiltrationImplicitCPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddinfiltrationImplicitCPU()}{AddinfiltrationImplicitCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Addinfiltration\+Implicit\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{il,  }\item[{T $\ast$}]{cl,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{hgw }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a68de01b6ced158bbbf77084b9241dbfd}\label{Updateforcing_8cu_a68de01b6ced158bbbf77084b9241dbfd}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddinfiltrationImplicitCPU$<$ double $>$@{AddinfiltrationImplicitCPU$<$ double $>$}}
+\index{AddinfiltrationImplicitCPU$<$ double $>$@{AddinfiltrationImplicitCPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddinfiltrationImplicitCPU$<$ double $>$()}{AddinfiltrationImplicitCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ad13e319a421a8ddb774a162050b0c1d1}{Addinfiltration\+Implicit\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{il,  }\item[{double $\ast$}]{cl,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{double $\ast$}]{hgw }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_aacdd085344c119ee3b29278ae5dc6c87}\label{Updateforcing_8cu_aacdd085344c119ee3b29278ae5dc6c87}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddinfiltrationImplicitCPU$<$ float $>$@{AddinfiltrationImplicitCPU$<$ float $>$}}
+\index{AddinfiltrationImplicitCPU$<$ float $>$@{AddinfiltrationImplicitCPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddinfiltrationImplicitCPU$<$ float $>$()}{AddinfiltrationImplicitCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ad13e319a421a8ddb774a162050b0c1d1}{Addinfiltration\+Implicit\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{il,  }\item[{float $\ast$}]{cl,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{float $\ast$}]{hgw }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a1fea5c7b910bcdd8356cab6576fc9f86}\label{Updateforcing_8cu_a1fea5c7b910bcdd8356cab6576fc9f86}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddinfiltrationImplicitGPU@{AddinfiltrationImplicitGPU}}
+\index{AddinfiltrationImplicitGPU@{AddinfiltrationImplicitGPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddinfiltrationImplicitGPU()}{AddinfiltrationImplicitGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Addinfiltration\+Implicit\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{il,  }\item[{T $\ast$}]{cl,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{hgw }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a88a997a40ecb78ab962320703c6ab236}\label{Updateforcing_8cu_a88a997a40ecb78ab962320703c6ab236}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddinfiltrationImplicitGPU$<$ double $>$@{AddinfiltrationImplicitGPU$<$ double $>$}}
+\index{AddinfiltrationImplicitGPU$<$ double $>$@{AddinfiltrationImplicitGPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddinfiltrationImplicitGPU$<$ double $>$()}{AddinfiltrationImplicitGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a1fea5c7b910bcdd8356cab6576fc9f86}{Addinfiltration\+Implicit\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double $\ast$}]{il,  }\item[{double $\ast$}]{cl,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv,  }\item[{double $\ast$}]{hgw }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ac10e92286ae39d63abd4874ca0e82dc3}\label{Updateforcing_8cu_ac10e92286ae39d63abd4874ca0e82dc3}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddinfiltrationImplicitGPU$<$ float $>$@{AddinfiltrationImplicitGPU$<$ float $>$}}
+\index{AddinfiltrationImplicitGPU$<$ float $>$@{AddinfiltrationImplicitGPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddinfiltrationImplicitGPU$<$ float $>$()}{AddinfiltrationImplicitGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a1fea5c7b910bcdd8356cab6576fc9f86}{Addinfiltration\+Implicit\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float $\ast$}]{il,  }\item[{float $\ast$}]{cl,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv,  }\item[{float $\ast$}]{hgw }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a84e00f06851cebb36d1a639e73172dd9}\label{Updateforcing_8cu_a84e00f06851cebb36d1a639e73172dd9}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddPatmforcingCPU@{AddPatmforcingCPU}}
+\index{AddPatmforcingCPU@{AddPatmforcingCPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddPatmforcingCPU()}{AddPatmforcingCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Add\+Patmforcing\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{PAtm,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a13ac9b9a1db8e18dc054e9a09c0986ef}\label{Updateforcing_8cu_a13ac9b9a1db8e18dc054e9a09c0986ef}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddPatmforcingCPU$<$ double $>$@{AddPatmforcingCPU$<$ double $>$}}
+\index{AddPatmforcingCPU$<$ double $>$@{AddPatmforcingCPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddPatmforcingCPU$<$ double $>$()}{AddPatmforcingCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a84e00f06851cebb36d1a639e73172dd9}{Add\+Patmforcing\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{PAtm,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_af375ae41ff0c42138e951eb3ec8cb302}\label{Updateforcing_8cu_af375ae41ff0c42138e951eb3ec8cb302}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddPatmforcingCPU$<$ float $>$@{AddPatmforcingCPU$<$ float $>$}}
+\index{AddPatmforcingCPU$<$ float $>$@{AddPatmforcingCPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddPatmforcingCPU$<$ float $>$()}{AddPatmforcingCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a84e00f06851cebb36d1a639e73172dd9}{Add\+Patmforcing\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{PAtm,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_acf937003de037aec20b2b23b1f7a8b5b}\label{Updateforcing_8cu_acf937003de037aec20b2b23b1f7a8b5b}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddPatmforcingGPU@{AddPatmforcingGPU}}
+\index{AddPatmforcingGPU@{AddPatmforcingGPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddPatmforcingGPU()}{AddPatmforcingGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Add\+Patmforcing\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{PAtm,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a8b91945462eecb0f756563cf347e5f5d}\label{Updateforcing_8cu_a8b91945462eecb0f756563cf347e5f5d}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddPatmforcingGPU$<$ double $>$@{AddPatmforcingGPU$<$ double $>$}}
+\index{AddPatmforcingGPU$<$ double $>$@{AddPatmforcingGPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddPatmforcingGPU$<$ double $>$()}{AddPatmforcingGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_acf937003de037aec20b2b23b1f7a8b5b}{Add\+Patmforcing\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{PAtm,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a9b62718e7ddd59255c75501c696de111}\label{Updateforcing_8cu_a9b62718e7ddd59255c75501c696de111}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddPatmforcingGPU$<$ float $>$@{AddPatmforcingGPU$<$ float $>$}}
+\index{AddPatmforcingGPU$<$ float $>$@{AddPatmforcingGPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddPatmforcingGPU$<$ float $>$()}{AddPatmforcingGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_acf937003de037aec20b2b23b1f7a8b5b}{Add\+Patmforcing\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{PAtm,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a4714a6b865498ee74a816b360f86b760}\label{Updateforcing_8cu_a4714a6b865498ee74a816b360f86b760}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingCPU@{AddrainforcingCPU}}
+\index{AddrainforcingCPU@{AddrainforcingCPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingCPU()}{AddrainforcingCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Addrainforcing\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a408ba56e1042bf85044ece5c7e68ec6d}\label{Updateforcing_8cu_a408ba56e1042bf85044ece5c7e68ec6d}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingCPU$<$ double $>$@{AddrainforcingCPU$<$ double $>$}}
+\index{AddrainforcingCPU$<$ double $>$@{AddrainforcingCPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingCPU$<$ double $>$()}{AddrainforcingCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a4714a6b865498ee74a816b360f86b760}{Addrainforcing\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_af1ac78ee8b78fe91c11b06a63585f965}\label{Updateforcing_8cu_af1ac78ee8b78fe91c11b06a63585f965}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingCPU$<$ float $>$@{AddrainforcingCPU$<$ float $>$}}
+\index{AddrainforcingCPU$<$ float $>$@{AddrainforcingCPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingCPU$<$ float $>$()}{AddrainforcingCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a4714a6b865498ee74a816b360f86b760}{Addrainforcing\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a2b0c1b79bd69bf944a0134425ec3871a}\label{Updateforcing_8cu_a2b0c1b79bd69bf944a0134425ec3871a}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingGPU@{AddrainforcingGPU}}
+\index{AddrainforcingGPU@{AddrainforcingGPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingGPU()}{AddrainforcingGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Addrainforcing\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a842f9883c15590d82da4623d8b091862}\label{Updateforcing_8cu_a842f9883c15590d82da4623d8b091862}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingGPU$<$ double $>$@{AddrainforcingGPU$<$ double $>$}}
+\index{AddrainforcingGPU$<$ double $>$@{AddrainforcingGPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingGPU$<$ double $>$()}{AddrainforcingGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a2b0c1b79bd69bf944a0134425ec3871a}{Addrainforcing\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a4adf68bdebd257cc9fbed59b1d35f449}\label{Updateforcing_8cu_a4adf68bdebd257cc9fbed59b1d35f449}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingGPU$<$ float $>$@{AddrainforcingGPU$<$ float $>$}}
+\index{AddrainforcingGPU$<$ float $>$@{AddrainforcingGPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingGPU$<$ float $>$()}{AddrainforcingGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a2b0c1b79bd69bf944a0134425ec3871a}{Addrainforcing\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ad230d34875656856d2f06cf295ea0a8c}\label{Updateforcing_8cu_ad230d34875656856d2f06cf295ea0a8c}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingImplicitCPU@{AddrainforcingImplicitCPU}}
+\index{AddrainforcingImplicitCPU@{AddrainforcingImplicitCPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingImplicitCPU()}{AddrainforcingImplicitCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Addrainforcing\+Implicit\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a7c285ae5b600f32b05d90f0c1d5d55ec}\label{Updateforcing_8cu_a7c285ae5b600f32b05d90f0c1d5d55ec}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingImplicitCPU$<$ double $>$@{AddrainforcingImplicitCPU$<$ double $>$}}
+\index{AddrainforcingImplicitCPU$<$ double $>$@{AddrainforcingImplicitCPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingImplicitCPU$<$ double $>$()}{AddrainforcingImplicitCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ad230d34875656856d2f06cf295ea0a8c}{Addrainforcing\+Implicit\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_aaae791c4077bf679f6c830a255038fd1}\label{Updateforcing_8cu_aaae791c4077bf679f6c830a255038fd1}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingImplicitCPU$<$ float $>$@{AddrainforcingImplicitCPU$<$ float $>$}}
+\index{AddrainforcingImplicitCPU$<$ float $>$@{AddrainforcingImplicitCPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingImplicitCPU$<$ float $>$()}{AddrainforcingImplicitCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ad230d34875656856d2f06cf295ea0a8c}{Addrainforcing\+Implicit\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a060cf5195bfe4c31b1a889b80ddee658}\label{Updateforcing_8cu_a060cf5195bfe4c31b1a889b80ddee658}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingImplicitGPU@{AddrainforcingImplicitGPU}}
+\index{AddrainforcingImplicitGPU@{AddrainforcingImplicitGPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingImplicitGPU()}{AddrainforcingImplicitGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Addrainforcing\+Implicit\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_aa6f1cef28ded28caa3e417145cd349b6}\label{Updateforcing_8cu_aa6f1cef28ded28caa3e417145cd349b6}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingImplicitGPU$<$ double $>$@{AddrainforcingImplicitGPU$<$ double $>$}}
+\index{AddrainforcingImplicitGPU$<$ double $>$@{AddrainforcingImplicitGPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingImplicitGPU$<$ double $>$()}{AddrainforcingImplicitGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a060cf5195bfe4c31b1a889b80ddee658}{Addrainforcing\+Implicit\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ab4510493768beaaa9ce961ed560ae769}\label{Updateforcing_8cu_ab4510493768beaaa9ce961ed560ae769}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddrainforcingImplicitGPU$<$ float $>$@{AddrainforcingImplicitGPU$<$ float $>$}}
+\index{AddrainforcingImplicitGPU$<$ float $>$@{AddrainforcingImplicitGPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddrainforcingImplicitGPU$<$ float $>$()}{AddrainforcingImplicitGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a060cf5195bfe4c31b1a889b80ddee658}{Addrainforcing\+Implicit\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Rain,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a33601f4b4569c59bde52d4ca112ede89}\label{Updateforcing_8cu_a33601f4b4569c59bde52d4ca112ede89}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddRiverForcing@{AddRiverForcing}}
+\index{AddRiverForcing@{AddRiverForcing}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddRiverForcing()}{AddRiverForcing()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Add\+River\+Forcing (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{std\+::vector$<$ \mbox{\hyperlink{classRiver}{River}} $>$}]{XRivers,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ad0e132f30cf84266f153d9440de092e3}\label{Updateforcing_8cu_ad0e132f30cf84266f153d9440de092e3}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddRiverForcing$<$ double $>$@{AddRiverForcing$<$ double $>$}}
+\index{AddRiverForcing$<$ double $>$@{AddRiverForcing$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddRiverForcing$<$ double $>$()}{AddRiverForcing< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a33601f4b4569c59bde52d4ca112ede89}{Add\+River\+Forcing}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{std\+::vector$<$ \mbox{\hyperlink{classRiver}{River}} $>$}]{XRivers,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_adc51f6a6d13e1a2c57fa8205f2b95ec5}\label{Updateforcing_8cu_adc51f6a6d13e1a2c57fa8205f2b95ec5}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddRiverForcing$<$ float $>$@{AddRiverForcing$<$ float $>$}}
+\index{AddRiverForcing$<$ float $>$@{AddRiverForcing$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddRiverForcing$<$ float $>$()}{AddRiverForcing< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a33601f4b4569c59bde52d4ca112ede89}{Add\+River\+Forcing}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{std\+::vector$<$ \mbox{\hyperlink{classRiver}{River}} $>$}]{XRivers,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ae983e63add8e6fddb8e05657c8c1e5bc}\label{Updateforcing_8cu_ae983e63add8e6fddb8e05657c8c1e5bc}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddwindforcingCPU@{AddwindforcingCPU}}
+\index{AddwindforcingCPU@{AddwindforcingCPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddwindforcingCPU()}{AddwindforcingCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Addwindforcing\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Uwind,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Vwind,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a8d6d67b78ffea84a0ffe5a062c48ad05}\label{Updateforcing_8cu_a8d6d67b78ffea84a0ffe5a062c48ad05}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddwindforcingCPU$<$ double $>$@{AddwindforcingCPU$<$ double $>$}}
+\index{AddwindforcingCPU$<$ double $>$@{AddwindforcingCPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddwindforcingCPU$<$ double $>$()}{AddwindforcingCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ae983e63add8e6fddb8e05657c8c1e5bc}{Addwindforcing\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Uwind,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Vwind,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ab547842f83fc425a210dae2a308f2e19}\label{Updateforcing_8cu_ab547842f83fc425a210dae2a308f2e19}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddwindforcingCPU$<$ float $>$@{AddwindforcingCPU$<$ float $>$}}
+\index{AddwindforcingCPU$<$ float $>$@{AddwindforcingCPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddwindforcingCPU$<$ float $>$()}{AddwindforcingCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ae983e63add8e6fddb8e05657c8c1e5bc}{Addwindforcing\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Uwind,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Vwind,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a2e20aa963e644b76928293bf72fa9bbf}\label{Updateforcing_8cu_a2e20aa963e644b76928293bf72fa9bbf}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddwindforcingGPU@{AddwindforcingGPU}}
+\index{AddwindforcingGPU@{AddwindforcingGPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddwindforcingGPU()}{AddwindforcingGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Addwindforcing\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Uwind,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Vwind,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a272c5c4de3a72dc88fa5c1767d630d05}\label{Updateforcing_8cu_a272c5c4de3a72dc88fa5c1767d630d05}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddwindforcingGPU$<$ double $>$@{AddwindforcingGPU$<$ double $>$}}
+\index{AddwindforcingGPU$<$ double $>$@{AddwindforcingGPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddwindforcingGPU$<$ double $>$()}{AddwindforcingGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a2e20aa963e644b76928293bf72fa9bbf}{Addwindforcing\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Uwind,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Vwind,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a678db72707dcf01f9e3b899337ca3676}\label{Updateforcing_8cu_a678db72707dcf01f9e3b899337ca3676}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!AddwindforcingGPU$<$ float $>$@{AddwindforcingGPU$<$ float $>$}}
+\index{AddwindforcingGPU$<$ float $>$@{AddwindforcingGPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{AddwindforcingGPU$<$ float $>$()}{AddwindforcingGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_a2e20aa963e644b76928293bf72fa9bbf}{Addwindforcing\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Uwind,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Vwind,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a524c082c522ed561263e6138f36c69c3}\label{Updateforcing_8cu_a524c082c522ed561263e6138f36c69c3}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!deformstep@{deformstep}}
+\index{deformstep@{deformstep}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{deformstep()}{deformstep()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void deformstep (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$}]{deform,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_af4611c0475dad4b01cfc5dba1ad82c82}\label{Updateforcing_8cu_af4611c0475dad4b01cfc5dba1ad82c82}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!deformstep@{deformstep}}
+\index{deformstep@{deformstep}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{deformstep()}{deformstep()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void deformstep (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$}]{deform,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a91774c40fbff21eb06f6cdad0523f7f3}\label{Updateforcing_8cu_a91774c40fbff21eb06f6cdad0523f7f3}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!deformstep$<$ double $>$@{deformstep$<$ double $>$}}
+\index{deformstep$<$ double $>$@{deformstep$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{deformstep$<$ double $>$()}{deformstep< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8h_af4611c0475dad4b01cfc5dba1ad82c82}{deformstep}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$}]{deform,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ab31beccb5921ab182ac24d65128e5c04}\label{Updateforcing_8cu_ab31beccb5921ab182ac24d65128e5c04}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!deformstep$<$ float $>$@{deformstep$<$ float $>$}}
+\index{deformstep$<$ float $>$@{deformstep$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{deformstep$<$ float $>$()}{deformstep< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8h_af4611c0475dad4b01cfc5dba1ad82c82}{deformstep}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{std\+::vector$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$$>$}]{deform,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_acc3a8335e222afc5a35dfe3075cb79cb}\label{Updateforcing_8cu_acc3a8335e222afc5a35dfe3075cb79cb}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!Forcingthisstep@{Forcingthisstep}}
+\index{Forcingthisstep@{Forcingthisstep}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{Forcingthisstep()}{Forcingthisstep()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Forcingthisstep (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \&}]{XDyn\+Forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a9ea906ec1361134319212670574ba18c}\label{Updateforcing_8cu_a9ea906ec1361134319212670574ba18c}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!InjectRiverCPU@{InjectRiverCPU}}
+\index{InjectRiverCPU@{InjectRiverCPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{InjectRiverCPU()}{InjectRiverCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Inject\+River\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classRiver}{River}}}]{XRiver,  }\item[{T}]{qnow,  }\item[{int}]{nblkriver,  }\item[{int $\ast$}]{Riverblks,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ad86e6061c902d45cec22f62942d2ea33}\label{Updateforcing_8cu_ad86e6061c902d45cec22f62942d2ea33}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!InjectRiverCPU$<$ double $>$@{InjectRiverCPU$<$ double $>$}}
+\index{InjectRiverCPU$<$ double $>$@{InjectRiverCPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{InjectRiverCPU$<$ double $>$()}{InjectRiverCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a9ea906ec1361134319212670574ba18c}{Inject\+River\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classRiver}{River}}}]{XRiver,  }\item[{double}]{qnow,  }\item[{int}]{nblkriver,  }\item[{int $\ast$}]{Riverblks,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a0756780865a0176e5a5f95c89d415c48}\label{Updateforcing_8cu_a0756780865a0176e5a5f95c89d415c48}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!InjectRiverCPU$<$ float $>$@{InjectRiverCPU$<$ float $>$}}
+\index{InjectRiverCPU$<$ float $>$@{InjectRiverCPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{InjectRiverCPU$<$ float $>$()}{InjectRiverCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8cu_a9ea906ec1361134319212670574ba18c}{Inject\+River\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classRiver}{River}}}]{XRiver,  }\item[{float}]{qnow,  }\item[{int}]{nblkriver,  }\item[{int $\ast$}]{Riverblks,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ab32cde3ea8a907b071d24402886019d3}\label{Updateforcing_8cu_ab32cde3ea8a907b071d24402886019d3}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!InjectRiverGPU@{InjectRiverGPU}}
+\index{InjectRiverGPU@{InjectRiverGPU}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{InjectRiverGPU()}{InjectRiverGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Inject\+River\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classRiver}{River}}}]{XRiver,  }\item[{T}]{qnow,  }\item[{int $\ast$}]{Riverblks,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_aa8f9deab6ba5f33426ce03657cad1eff}\label{Updateforcing_8cu_aa8f9deab6ba5f33426ce03657cad1eff}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!InjectRiverGPU$<$ double $>$@{InjectRiverGPU$<$ double $>$}}
+\index{InjectRiverGPU$<$ double $>$@{InjectRiverGPU$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{InjectRiverGPU$<$ double $>$()}{InjectRiverGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ab32cde3ea8a907b071d24402886019d3}{Inject\+River\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classRiver}{River}}}]{XRiver,  }\item[{double}]{qnow,  }\item[{int $\ast$}]{Riverblks,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ double $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a044e409c1b9d0d99611df800cc756389}\label{Updateforcing_8cu_a044e409c1b9d0d99611df800cc756389}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!InjectRiverGPU$<$ float $>$@{InjectRiverGPU$<$ float $>$}}
+\index{InjectRiverGPU$<$ float $>$@{InjectRiverGPU$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{InjectRiverGPU$<$ float $>$()}{InjectRiverGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Updateforcing_8h_ab32cde3ea8a907b071d24402886019d3}{Inject\+River\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classRiver}{River}}}]{XRiver,  }\item[{float}]{qnow,  }\item[{int $\ast$}]{Riverblks,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ float $>$}]{XAdv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}\label{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!interp2BUQ@{interp2BUQ}}
+\index{interp2BUQ@{interp2BUQ}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ()}{interp2BUQ()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ T interp2\+BUQ (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{\mbox{\hyperlink{structTexSetP}{Tex\+SetP}}}]{Forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a99c6f851efe86bf7269b7548a2c654e2}\label{Updateforcing_8cu_a99c6f851efe86bf7269b7548a2c654e2}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!interp2BUQ$<$ double $>$@{interp2BUQ$<$ double $>$}}
+\index{interp2BUQ$<$ double $>$@{interp2BUQ$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ double $>$()}{interp2BUQ< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{double}]{x,  }\item[{double}]{y,  }\item[{\mbox{\hyperlink{structTexSetP}{Tex\+SetP}}}]{Forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_ad37645c35507ab01bd507945e54c292d}\label{Updateforcing_8cu_ad37645c35507ab01bd507945e54c292d}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!interp2BUQ$<$ float $>$@{interp2BUQ$<$ float $>$}}
+\index{interp2BUQ$<$ float $>$@{interp2BUQ$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{interp2BUQ$<$ float $>$()}{interp2BUQ< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Updateforcing_8cu_a1b7a4a2942854b28194d0de9e30fbbd4}{interp2\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{float}]{x,  }\item[{float}]{y,  }\item[{\mbox{\hyperlink{structTexSetP}{Tex\+SetP}}}]{Forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a599e215dbff69667f7542b4d6489a8ac}\label{Updateforcing_8cu_a599e215dbff69667f7542b4d6489a8ac}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!interpDyn2BUQ@{interpDyn2BUQ}}
+\index{interpDyn2BUQ@{interpDyn2BUQ}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{interpDyn2BUQ()}{interpDyn2BUQ()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ T interp\+Dyn2\+BUQ (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{\mbox{\hyperlink{structTexSetP}{Tex\+SetP}}}]{Forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a3292574c12637423d8207ede0701bdc0}\label{Updateforcing_8cu_a3292574c12637423d8207ede0701bdc0}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!interpDyn2BUQ$<$ double $>$@{interpDyn2BUQ$<$ double $>$}}
+\index{interpDyn2BUQ$<$ double $>$@{interpDyn2BUQ$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{interpDyn2BUQ$<$ double $>$()}{interpDyn2BUQ< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Updateforcing_8h_a599e215dbff69667f7542b4d6489a8ac}{interp\+Dyn2\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{double}]{x,  }\item[{double}]{y,  }\item[{\mbox{\hyperlink{structTexSetP}{Tex\+SetP}}}]{Forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a51ce7b3b7e9c49c91c39dfdd893ec650}\label{Updateforcing_8cu_a51ce7b3b7e9c49c91c39dfdd893ec650}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!interpDyn2BUQ$<$ float $>$@{interpDyn2BUQ$<$ float $>$}}
+\index{interpDyn2BUQ$<$ float $>$@{interpDyn2BUQ$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{interpDyn2BUQ$<$ float $>$()}{interpDyn2BUQ< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Updateforcing_8h_a599e215dbff69667f7542b4d6489a8ac}{interp\+Dyn2\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{float}]{x,  }\item[{float}]{y,  }\item[{\mbox{\hyperlink{structTexSetP}{Tex\+SetP}}}]{Forcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_a0705de14eb2d66a5da26fd5894f8985f}\label{Updateforcing_8cu_a0705de14eb2d66a5da26fd5894f8985f}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!updateforcing@{updateforcing}}
+\index{updateforcing@{updateforcing}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{updateforcing()}{updateforcing()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void updateforcing (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_af72d2ea58938eb1250ab16651003d111}\label{Updateforcing_8cu_af72d2ea58938eb1250ab16651003d111}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!updateforcing$<$ double $>$@{updateforcing$<$ double $>$}}
+\index{updateforcing$<$ double $>$@{updateforcing$<$ double $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{updateforcing$<$ double $>$()}{updateforcing< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8h_a0705de14eb2d66a5da26fd5894f8985f}{updateforcing}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Updateforcing_8cu_aced8d302d8a53a4bd40dbd9131c204aa}\label{Updateforcing_8cu_aced8d302d8a53a4bd40dbd9131c204aa}} 
+\index{Updateforcing.cu@{Updateforcing.cu}!updateforcing$<$ float $>$@{updateforcing$<$ float $>$}}
+\index{updateforcing$<$ float $>$@{updateforcing$<$ float $>$}!Updateforcing.cu@{Updateforcing.cu}}
+\doxysubsubsection{\texorpdfstring{updateforcing$<$ float $>$()}{updateforcing< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Updateforcing_8h_a0705de14eb2d66a5da26fd5894f8985f}{updateforcing}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing }\end{DoxyParamCaption})}
+

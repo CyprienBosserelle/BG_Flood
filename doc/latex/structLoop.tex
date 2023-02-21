@@ -1,0 +1,242 @@
+\hypertarget{structLoop}{}\doxysection{Loop$<$ T $>$ Struct Template Reference}
+\label{structLoop}\index{Loop$<$ T $>$@{Loop$<$ T $>$}}
+
+
+{\ttfamily \#include $<$Arrays.\+h$>$}
+
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+double \mbox{\hyperlink{structLoop_ac91b2b218fc8bdf6c736627084f3adfc}{nextoutputtime}}
+\item 
+double \mbox{\hyperlink{structLoop_ac0c824d5c4752e9d273052879f516196}{dt}}
+\item 
+double \mbox{\hyperlink{structLoop_a2450b9f51147e5b489ffabb358382edf}{dtmax}}
+\item 
+double \mbox{\hyperlink{structLoop_a9a526d0edf22bbfba6121acdd7eb585b}{totaltime}}
+\item 
+int \mbox{\hyperlink{structLoop_a83d5311ba65215aa0d66aecc90bfd3b1}{nstep}} = 0
+\item 
+int \mbox{\hyperlink{structLoop_a5f4b6a2a12188e1aefde0fe49979b5dc}{nstepout}} = 0
+\item 
+int \mbox{\hyperlink{structLoop_adb71998a04e94f8771c19f81d1157ca6}{n\+TSsteps}} = 0
+\item 
+std\+::vector$<$ std\+::vector$<$ \mbox{\hyperlink{classPointout}{Pointout}} $>$ $>$ \mbox{\hyperlink{structLoop_aec82658bbe1e6aa12dc62648b7c8f71f}{TSAllout}}
+\item 
+int \mbox{\hyperlink{structLoop_aedc47e5afc03119d884ef9e557b9dff9}{windstep}} = 1
+\item 
+int \mbox{\hyperlink{structLoop_af0f56c1060a30f5e3a336f7104b6ecf1}{atmpstep}} = 1
+\item 
+int \mbox{\hyperlink{structLoop_aa05506805cd0f3bac5cf5685d9c0fdaa}{rainstep}} = 1
+\item 
+bool \mbox{\hyperlink{structLoop_a9b2d264be27b75bf914c708dd79e8527}{winduniform}}
+\item 
+bool \mbox{\hyperlink{structLoop_aa27720775868f01f2274224b2b21d38e}{rainuniform}}
+\item 
+bool \mbox{\hyperlink{structLoop_a49bcc692450e05b0bd04bc60bca18047}{atmpuniform}}
+\item 
+T \mbox{\hyperlink{structLoop_ac75c92e103d160837c449ff730521902}{uwinduni}} = T(0.\+0)
+\item 
+T \mbox{\hyperlink{structLoop_ac50cfd6c56a5bc1fec2ce06664388091}{vwinduni}} = T(0.\+0)
+\item 
+T \mbox{\hyperlink{structLoop_a06049126383ba4d25a35d860f0a643c7}{atmpuni}}
+\item 
+T \mbox{\hyperlink{structLoop_adcd4e074aa287a9e0f726897acc83449}{rainuni}} = T(0.\+0)
+\item 
+dim3 \mbox{\hyperlink{structLoop_ab17d60e0e287e4cee5aea17a2ef41bdd}{block\+Dim}}
+\item 
+dim3 \mbox{\hyperlink{structLoop_a93929edda1b29e1230cf44fb08f8791d}{grid\+Dim}}
+\item 
+const int \mbox{\hyperlink{structLoop_aef744b50597ad9f604ef70c7012e81d7}{num\+\_\+streams}} = 4
+\item 
+cuda\+Stream\+\_\+t \mbox{\hyperlink{structLoop_ad216698448a4842ab0ba783c67ab3301}{streams}} \mbox{[}4\mbox{]}
+\item 
+T \mbox{\hyperlink{structLoop_aeb1af056bf9bff528a186d443b8c8e1c}{epsilon}}
+\item 
+T \mbox{\hyperlink{structLoop_a324fbf87aacab45d22f4ad92cb2a2ffa}{hugeposval}}
+\item 
+T \mbox{\hyperlink{structLoop_a4f456faf0de9b08f099e0dd44c790388}{hugenegval}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{structLoop_af0f56c1060a30f5e3a336f7104b6ecf1}\label{structLoop_af0f56c1060a30f5e3a336f7104b6ecf1}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!atmpstep@{atmpstep}}
+\index{atmpstep@{atmpstep}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{atmpstep}{atmpstep}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::atmpstep = 1}
+
+\mbox{\Hypertarget{structLoop_a06049126383ba4d25a35d860f0a643c7}\label{structLoop_a06049126383ba4d25a35d860f0a643c7}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!atmpuni@{atmpuni}}
+\index{atmpuni@{atmpuni}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{atmpuni}{atmpuni}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::atmpuni}
+
+\mbox{\Hypertarget{structLoop_a49bcc692450e05b0bd04bc60bca18047}\label{structLoop_a49bcc692450e05b0bd04bc60bca18047}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!atmpuniform@{atmpuniform}}
+\index{atmpuniform@{atmpuniform}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{atmpuniform}{atmpuniform}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::atmpuniform}
+
+\mbox{\Hypertarget{structLoop_ab17d60e0e287e4cee5aea17a2ef41bdd}\label{structLoop_ab17d60e0e287e4cee5aea17a2ef41bdd}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!blockDim@{blockDim}}
+\index{blockDim@{blockDim}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{blockDim}{blockDim}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+dim3 \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::block\+Dim}
+
+\mbox{\Hypertarget{structLoop_ac0c824d5c4752e9d273052879f516196}\label{structLoop_ac0c824d5c4752e9d273052879f516196}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!dt@{dt}}
+\index{dt@{dt}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{dt}{dt}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+double \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::dt}
+
+\mbox{\Hypertarget{structLoop_a2450b9f51147e5b489ffabb358382edf}\label{structLoop_a2450b9f51147e5b489ffabb358382edf}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!dtmax@{dtmax}}
+\index{dtmax@{dtmax}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{dtmax}{dtmax}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+double \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::dtmax}
+
+\mbox{\Hypertarget{structLoop_aeb1af056bf9bff528a186d443b8c8e1c}\label{structLoop_aeb1af056bf9bff528a186d443b8c8e1c}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!epsilon@{epsilon}}
+\index{epsilon@{epsilon}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{epsilon}{epsilon}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::epsilon}
+
+\mbox{\Hypertarget{structLoop_a93929edda1b29e1230cf44fb08f8791d}\label{structLoop_a93929edda1b29e1230cf44fb08f8791d}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!gridDim@{gridDim}}
+\index{gridDim@{gridDim}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{gridDim}{gridDim}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+dim3 \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::grid\+Dim}
+
+\mbox{\Hypertarget{structLoop_a4f456faf0de9b08f099e0dd44c790388}\label{structLoop_a4f456faf0de9b08f099e0dd44c790388}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!hugenegval@{hugenegval}}
+\index{hugenegval@{hugenegval}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{hugenegval}{hugenegval}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::hugenegval}
+
+\mbox{\Hypertarget{structLoop_a324fbf87aacab45d22f4ad92cb2a2ffa}\label{structLoop_a324fbf87aacab45d22f4ad92cb2a2ffa}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!hugeposval@{hugeposval}}
+\index{hugeposval@{hugeposval}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{hugeposval}{hugeposval}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::hugeposval}
+
+\mbox{\Hypertarget{structLoop_ac91b2b218fc8bdf6c736627084f3adfc}\label{structLoop_ac91b2b218fc8bdf6c736627084f3adfc}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!nextoutputtime@{nextoutputtime}}
+\index{nextoutputtime@{nextoutputtime}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{nextoutputtime}{nextoutputtime}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+double \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::nextoutputtime}
+
+\mbox{\Hypertarget{structLoop_a83d5311ba65215aa0d66aecc90bfd3b1}\label{structLoop_a83d5311ba65215aa0d66aecc90bfd3b1}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!nstep@{nstep}}
+\index{nstep@{nstep}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{nstep}{nstep}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::nstep = 0}
+
+\mbox{\Hypertarget{structLoop_a5f4b6a2a12188e1aefde0fe49979b5dc}\label{structLoop_a5f4b6a2a12188e1aefde0fe49979b5dc}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!nstepout@{nstepout}}
+\index{nstepout@{nstepout}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{nstepout}{nstepout}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::nstepout = 0}
+
+\mbox{\Hypertarget{structLoop_adb71998a04e94f8771c19f81d1157ca6}\label{structLoop_adb71998a04e94f8771c19f81d1157ca6}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!nTSsteps@{nTSsteps}}
+\index{nTSsteps@{nTSsteps}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{nTSsteps}{nTSsteps}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::n\+TSsteps = 0}
+
+\mbox{\Hypertarget{structLoop_aef744b50597ad9f604ef70c7012e81d7}\label{structLoop_aef744b50597ad9f604ef70c7012e81d7}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!num\_streams@{num\_streams}}
+\index{num\_streams@{num\_streams}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{num\_streams}{num\_streams}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+const int \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::num\+\_\+streams = 4}
+
+\mbox{\Hypertarget{structLoop_aa05506805cd0f3bac5cf5685d9c0fdaa}\label{structLoop_aa05506805cd0f3bac5cf5685d9c0fdaa}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!rainstep@{rainstep}}
+\index{rainstep@{rainstep}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{rainstep}{rainstep}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::rainstep = 1}
+
+\mbox{\Hypertarget{structLoop_adcd4e074aa287a9e0f726897acc83449}\label{structLoop_adcd4e074aa287a9e0f726897acc83449}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!rainuni@{rainuni}}
+\index{rainuni@{rainuni}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{rainuni}{rainuni}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::rainuni = T(0.\+0)}
+
+\mbox{\Hypertarget{structLoop_aa27720775868f01f2274224b2b21d38e}\label{structLoop_aa27720775868f01f2274224b2b21d38e}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!rainuniform@{rainuniform}}
+\index{rainuniform@{rainuniform}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{rainuniform}{rainuniform}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::rainuniform}
+
+\mbox{\Hypertarget{structLoop_ad216698448a4842ab0ba783c67ab3301}\label{structLoop_ad216698448a4842ab0ba783c67ab3301}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!streams@{streams}}
+\index{streams@{streams}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{streams}{streams}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+cuda\+Stream\+\_\+t \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::streams\mbox{[}4\mbox{]}}
+
+\mbox{\Hypertarget{structLoop_a9a526d0edf22bbfba6121acdd7eb585b}\label{structLoop_a9a526d0edf22bbfba6121acdd7eb585b}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!totaltime@{totaltime}}
+\index{totaltime@{totaltime}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{totaltime}{totaltime}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+double \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::totaltime}
+
+\mbox{\Hypertarget{structLoop_aec82658bbe1e6aa12dc62648b7c8f71f}\label{structLoop_aec82658bbe1e6aa12dc62648b7c8f71f}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!TSAllout@{TSAllout}}
+\index{TSAllout@{TSAllout}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{TSAllout}{TSAllout}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+std\+::vector$<$ std\+::vector$<$ \mbox{\hyperlink{classPointout}{Pointout}} $>$ $>$ \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::TSAllout}
+
+\mbox{\Hypertarget{structLoop_ac75c92e103d160837c449ff730521902}\label{structLoop_ac75c92e103d160837c449ff730521902}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!uwinduni@{uwinduni}}
+\index{uwinduni@{uwinduni}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{uwinduni}{uwinduni}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::uwinduni = T(0.\+0)}
+
+\mbox{\Hypertarget{structLoop_ac50cfd6c56a5bc1fec2ce06664388091}\label{structLoop_ac50cfd6c56a5bc1fec2ce06664388091}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!vwinduni@{vwinduni}}
+\index{vwinduni@{vwinduni}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{vwinduni}{vwinduni}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::vwinduni = T(0.\+0)}
+
+\mbox{\Hypertarget{structLoop_aedc47e5afc03119d884ef9e557b9dff9}\label{structLoop_aedc47e5afc03119d884ef9e557b9dff9}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!windstep@{windstep}}
+\index{windstep@{windstep}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{windstep}{windstep}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::windstep = 1}
+
+\mbox{\Hypertarget{structLoop_a9b2d264be27b75bf914c708dd79e8527}\label{structLoop_a9b2d264be27b75bf914c708dd79e8527}} 
+\index{Loop$<$ T $>$@{Loop$<$ T $>$}!winduniform@{winduniform}}
+\index{winduniform@{winduniform}!Loop$<$ T $>$@{Loop$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{winduniform}{winduniform}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$\+::winduniform}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{Arrays_8h}{Arrays.\+h}}\end{DoxyCompactItemize}

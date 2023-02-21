@@ -1,0 +1,481 @@
+Here is a list of all the available tutorials\+:
+
+\mbox{\hyperlink{tutorialRiver}{River flooding tutorial}}
+
+\mbox{\hyperlink{TutorialJetJulia}{Jet tutorial with Julia}} \hypertarget{tutorialRiver}{}\doxysection{River flooding tutorial}\label{tutorialRiver}
+The objectif of this tutorial is to explain how to use the code BG\+\_\+\+Flood to model river flooding. As the code allows rain on grid, we will look at pluvial and fluvial flooding.
+
+This testcase aims to reproduce the flooding event that occured from the 16 to the 18 of July 2021 (a 1 in 50 years flood event). During this event, the Buller river, passing through the town of Westport, on the West Coast of the South Island of Aotearoa New Zealand, get out of its primary bed and flooded the Westport area.
+
+Before begining this tutoral, the user is expected to have downloaded the windows executable or compiled the sources (version $>$ 0.\+8).\hypertarget{tutorialRiver_autotoc_md32}{}\doxysubsection{Param file}\label{tutorialRiver_autotoc_md32}
+The interface with BG\+\_\+flood software is done using only a text file\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BG\_param.txt}
+
+\end{DoxyCode}
+ (This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG\+\_\+\+Flood.)
+
+This file consists in a list of key words and inputs, separated by a \char`\"{}=\char`\"{} sign. For a full list of the available key words and a further description of this file, please refere to the \mbox{[}manual\mbox{]}\{\#\+Manual\}.\hypertarget{tutorialRiver_autotoc_md33}{}\doxysubsection{Preparation of the topography/bathymetry (\+DEM\+: Digital Elevation Model)}\label{tutorialRiver_autotoc_md33}
+The DEM, topography or bathymetry file is the only necessary file to be added to BG\+\_\+param file to run the model. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{DEM = Wesport\_DEM\_8m.nc?z;}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{Westport_topo.png}%bathy
+\end{DoxyInlineImage}
+
+
+Different formats can be used for this file ( ASCII\+: .asc or Net\+CDF .nc principally). As Netcdf files can contain different variables, the \char`\"{}?\char`\"{} follows by the name of the variable is needed.
+
+Without further information, the code will run will default values for physical parameters and initialisation, Neumann boundaries and no external forcing\+:
+
+
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{Shell_output.png}%shell
+\end{DoxyInlineImage}
+
+
+A result files\+: \char`\"{}output.\+nc\char`\"{} is created (here opened with the Py\+Nc\+View)
+
+
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{outputs.png}%outputs
+\end{DoxyInlineImage}
+
+
+It contains 2D fields saved regularly in time. It details the blocs information, the time 1D variable, the xx and yy axis and the basic outputs (h,u,v,zb,zs) for a shallow water model (see manual for further description of the variables).
+
+A log file\+: BG\+\_\+log.\+txt (very similaire to the shell outputs) is also created\+: 
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{log_file.png}%logfile
+\end{DoxyInlineImage}
+\hypertarget{tutorialRiver_autotoc_md34}{}\doxysubsection{Basic fluvial flooding set-\/up}\label{tutorialRiver_autotoc_md34}
+\hypertarget{tutorialRiver_autotoc_md35}{}\doxysubsubsection{River discharge}\label{tutorialRiver_autotoc_md35}
+The river are, at this stage, forced by a vertical discharge on a user defined rectagular area\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{river = river\_discharge\_TeKuha2.txt,1490249,1490427,5367640,5367805;}
+
+\end{DoxyCode}
+ where the four final numbers are\+: $ x_1, x_2, y_1, y_2 $, to define the area for the vertical discharge and a text file containing the time-\/serie of the discharge (first column\+: time ( $s$) from reference time, second column\+: river discharge in $m^3s^{-1}$).
+
+
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{river_discharge.png}%riverfile
+\end{DoxyInlineImage}
+
+
+This file is from an observed hydrograph, with data saved every 5min\+:
+
+
+
+For each new river, just add the a similar river input line in the parameter file.\hypertarget{tutorialRiver_autotoc_md36}{}\doxysubsubsection{Timekeeping parameters}\label{tutorialRiver_autotoc_md36}
+In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
+
+The end of the simulation is prescribed in second as \+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{endtime = 21600;}
+
+\end{DoxyCode}
+
+
+The time steps can\textquotesingle{}t be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, $ CFL=0.5000 $ by default.
+
+The simulation begin, by default at $ t=0 (s)$, but this can modify using \char`\"{}totaltime\char`\"{}\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{totaltime = 3600;}
+
+\end{DoxyCode}
+ to begin one hour after the reference time ( used in the forcings for example).\hypertarget{tutorialRiver_autotoc_md37}{}\doxysubsubsection{Outputs}\label{tutorialRiver_autotoc_md37}
+There is two types of outputs\+:
+\begin{DoxyItemize}
+\item map outputs of 2D variables regularly through time
+\item time-\/series output of basic values, at a chosen position, at each time step.
+\end{DoxyItemize}\hypertarget{tutorialRiver_autotoc_md38}{}\doxyparagraph{Map outputs}\label{tutorialRiver_autotoc_md38}
+By default, there is only a map output at the begining and end of the simulation.
+
+The map output can be modify by\+:
+\begin{DoxyItemize}
+\item defining a timestep (in s) for these outputs\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{outputtimestep = 3600.0;}
+
+\end{DoxyCode}
+
+\item changing the set of variables in the output file (from the list given in the manual) 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;}
+
+\end{DoxyCode}
+ The \char`\"{}max\char`\"{} variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.
+\item changing the name of the output file\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{outfile = Results\_tuto\_basicRun.nc;}
+
+\end{DoxyCode}
+
+\item saving the output as float (variables are saved as short integer by default.)\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{smallnc = 0;}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{tutorialRiver_autotoc_md39}{}\doxyparagraph{Time-\/\+Serie outputs}\label{tutorialRiver_autotoc_md39}
+For each TS output needed, a line with the destination file and the postition is needed\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{TSnodesout=Offshore.txt,1482120,53814890;}
+
+\end{DoxyCode}
+ The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).\hypertarget{tutorialRiver_autotoc_md40}{}\doxysubsubsection{Resolution}\label{tutorialRiver_autotoc_md40}
+For a first test, we will modify the resolution and set it to 40m to decrease the computational time\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{dx=40;}
+
+\end{DoxyCode}
+\hypertarget{tutorialRiver_autotoc_md41}{}\doxysubsubsection{Basic fluvial innundation results}\label{tutorialRiver_autotoc_md41}
+This the shell output\+: 
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{Shell_output2.png}%shell2
+\end{DoxyInlineImage}
+ It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).
+
+In the outputs, we get the different fields requested, for 6 different times. 
+
+The Time-\/\+Serie output is\+: \hypertarget{tutorialRiver_autotoc_md42}{}\doxysubsection{Completing the set-\/up}\label{tutorialRiver_autotoc_md42}
+\hypertarget{tutorialRiver_autotoc_md43}{}\doxysubsubsection{Adding boundary conditions}\label{tutorialRiver_autotoc_md43}
+Boundaries condition Boundaries are refered by their position, using \char`\"{}top/bottom/right/left\char`\"{} keywords. They are associated to a boundary type ( 0\+:wall; 1\+: Neumann (Default); 2\+:Dirichlet (zs); 3\+: abs1d) and possibly a file containing a time serie. In this case, the file name is placed before the type, coma-\/separated.
+
+In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.\+e. for the top, left and right boundaries. At the bottom, we will conserve the default value\+: 1. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{left = tide\_westport.txt,2; }
+\DoxyCodeLine{right = tide\_westport.txt,2; }
+\DoxyCodeLine{top = tide\_westport.txt,2; }
+
+\end{DoxyCode}
+
+
+In this case, as the boundaries are relatively small compared to the time wave length, we will used the same value along all the boundaries. We will then have only two columns in the file\+: Time and one elevation. tide\+\_\+file 
+
+They correspond to a classic time Serie observed offshore of the river mouth.
+
+
+
+(If more values, they will be regularly spread along the boundary and the forcing will be the linear interpolation of these values).\hypertarget{tutorialRiver_autotoc_md44}{}\doxysubsubsection{Bottom friction}\label{tutorialRiver_autotoc_md44}
+Different models from bottom friction are available. By default, the model used is -\/1 corresponding to a Manning model. Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models). The associated field (ASC or net\+CDF) or value must be enter with the key word 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{frictionmodel=1;}
+\DoxyCodeLine{cf=z0\_100423\_rec3.asc; \#cf=0.01;  \#If \textcolor{keyword}{using} a uniform value}
+
+\end{DoxyCode}
+
+
+
+
+{\bfseries{Warning}}\+: The model allows a roughness heigh / manning number map smaller than the computational domain and will extrapolate outside of the map.\hypertarget{tutorialRiver_autotoc_md45}{}\doxysubsubsection{Initialisation}\label{tutorialRiver_autotoc_md45}
+By default, the model is initialised by a plane water surface located at $z=0.0$.
+
+This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{zsinit=-\/1.39; \#in metre}
+
+\end{DoxyCode}
+ The model can also be initialised using a restart/hot start. A file containing a least the files zb, h or zs, u and v must be provided, with the steps (and no the time value) to use for the restart. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{hotstartfile = output\_4.nc;}
+\DoxyCodeLine{hotstep=5;}
+
+\end{DoxyCode}
+\hypertarget{tutorialRiver_autotoc_md46}{}\doxysubsubsection{Model controls}\label{tutorialRiver_autotoc_md46}
+Some variables can be used to adjust the model (see Manual for more details)\+:
+\begin{DoxyItemize}
+\item run on CPU (or choose a GPU to run on)\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{gpudevice=0;}
+
+\end{DoxyCode}
+ By default, the code will detect if there is a suitable GPU on the machine.
+\item Double precision instead of a float precision during the computation\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{doubleprecision = 1;}
+
+\end{DoxyCode}
+
+\item Minmod limiter parameter (to tune momentum dissipation $\in [1,2]$) 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{theta=1.3; \#\textcolor{keywordflow}{default} value=1.3}
+
+\end{DoxyCode}
+
+\item Minimum heigh to concidere a cell wet (m) 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{eps = 0.00010000; \#\textcolor{keywordflow}{default}=0.0001}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{tutorialRiver_autotoc_md47}{}\doxysubsubsection{Outputs}\label{tutorialRiver_autotoc_md47}
+\hypertarget{tutorialRiver_autotoc_md48}{}\doxysubsection{... Adding the rain}\label{tutorialRiver_autotoc_md48}
+The model allows rain on grid forcing to model pluvial inundations.\hypertarget{tutorialRiver_autotoc_md49}{}\doxysubsubsection{Rain forcing}\label{tutorialRiver_autotoc_md49}
+A rain intensity in $ mm\h $, time and space varying can be forced in the model.
+
+The rain can be forced with a time serie (with uniform values on the domain) or a net\+CDF file if a spacial file is available\+:
+\begin{DoxyItemize}
+\item Time serie forcing\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{rainfall=rain\_westport.txt}
+
+\end{DoxyCode}
+
+\item Spacial file forcing\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{rainfile=VCSN\_buller\_202107\_dailynzcsmcov\_disaggdaily\_500m\_nztm\_clipped.nc?depth;}
+
+\end{DoxyCode}
+ Here, we will use a time serie\+: 
+\end{DoxyItemize}
+
+If the data is given in rain height, a post-\/processing to turn it in rain intensity will be needed (at least at this stage of development).
+
+Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. Part of the domain can be \char`\"{}de-\/activate\char`\"{} (the blocs memory will not be allocated for this area) using different methods\+:
+\begin{DoxyItemize}
+\item a manual mask with values 999 in the bathymetry will be read by the code as \char`\"{}non-\/active\char`\"{} area
+\item masking all the bloc with all cells having an elevation superior to some value\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mask=250; \#m}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}
+
+using a shape file to define a \char`\"{}area of interest\char`\"{} ({\bfseries{Method advised}})\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{AOI=Domain\_buffered-\/sea2.gmt;}
+
+\end{DoxyCode}
+\hypertarget{tutorialRiver_autotoc_md50}{}\doxysubsection{Refining the grid in area of interest}\label{tutorialRiver_autotoc_md50}
+The code is based on a quadtree mesh
+
+=$>$ results\hypertarget{tutorialRiver_autotoc_md51}{}\doxysubsubsection{Ground infiltration losses (\+Basic ILCL model)}\label{tutorialRiver_autotoc_md51}
+\hypertarget{tutorialRiver_autotoc_md52}{}\doxysubsection{Refining the grid in area of interest}\label{tutorialRiver_autotoc_md52}
+\hypertarget{tutorialRiver_autotoc_md53}{}\doxysubsubsection{More DEMS}\label{tutorialRiver_autotoc_md53}
+\hypertarget{tutorialRiver_autotoc_md54}{}\doxysubsubsection{Map of levels of resolution}\label{tutorialRiver_autotoc_md54}
+\hypertarget{tutorialRiver_autotoc_md55}{}\doxysubsubsection{Adding the variable resolution in the code}\label{tutorialRiver_autotoc_md55}
+Show adding a second high reso DEM (ALSO add mention of possibility to use path (relative or absolute))
+
+=$>$ quick look at shell outputs
+
+=$>$ results
+
+\# \hypertarget{TutorialJetJulia}{}\doxysection{Jet tutorial with Julia}\label{TutorialJetJulia}
+This is a very simple example that shows the model stability in transitional flows.\hypertarget{TutorialJetJulia_autotoc_md10}{}\doxysubsubsection{Make a bathymetry}\label{TutorialJetJulia_autotoc_md10}
+Below is a Julia script to make the bathymetry. \begin{DoxyVerb}using GMT
+
+ny=16*16;
+nx=16*32;
+
+dx=5.0;
+
+xmin=0;
+xmax=nx*dx;
+
+ymin=0;
+ymax=ny*dx;
+
+Bathy=zeros(nx,ny);
+
+Bathy.=-5.0;
+
+Bathy[170:172,:].=5.0;
+Bathy[170:172,127:129].=-5.0;
+
+Bathy[:,1:2].=5.0;
+Bathy[:,(end-1):end].=5.0;
+
+G = mat2grid(transpose(Bathy), 1,[xmin xmax ymin ymax -5.0 5.0 1 dx dx])
+cmap = grd2cpt(G);      # Compute a colormap with the grid's data range
+grdimage(G, lw=:thinnest, color=cmap, fmt=:png, show=true)
+
+gmtwrite("bathy.asc", G; id="ef");
+\end{DoxyVerb}
+ The result is a grid domain looking like this\+:  You can also use the bathy.\+asc file in the example folder.\hypertarget{TutorialJetJulia_autotoc_md11}{}\doxysubsubsection{Make Bnd files}\label{TutorialJetJulia_autotoc_md11}
+We are going to set the water level to 0.\+0m on the right and 1.\+0 on the left and keep it constant. To dio that we create 2 files {\ttfamily right.\+txt} and {\ttfamily left.\+bnd}\hypertarget{TutorialJetJulia_autotoc_md12}{}\doxyparagraph{$<$tt$>$right.\+bnd$<$/tt$>$}\label{TutorialJetJulia_autotoc_md12}
+\begin{DoxyVerb}# This is the right boundary
+0.0 0.0
+3600.0 0.0
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md13}{}\doxyparagraph{$<$tt$>$left.\+bnd$<$/tt$>$}\label{TutorialJetJulia_autotoc_md13}
+\begin{DoxyVerb}# This is the right boundary
+0.0 1.0
+3600.0 1.0
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md14}{}\doxysubsubsection{Set up the $<$tt$>$\+BG\+\_\+param.\+txt$<$/tt$>$ file}\label{TutorialJetJulia_autotoc_md14}
+First it is good practice to document your parameter file\+: \begin{DoxyVerb}##############################
+## Jet demo
+# CB 04/05/2019
+\end{DoxyVerb}
+ Then specify the bathymetry file to use. We will use the entire domain and resolution of the file so no need for other parameter for specifying the domain. \begin{DoxyVerb}bathy=bathy.asc
+\end{DoxyVerb}
+ Specify the parameter theta to control the numerical diffusion of the model. but first let\textquotesingle{}s leave it to the default. \begin{DoxyVerb}theta=1.3;
+\end{DoxyVerb}
+ This is a relatively small model so we can force the netcdf variable to be saved as floats. \begin{DoxyVerb}smallnc=0
+\end{DoxyVerb}
+ Sepcify the model duration, output timestep and output file name and variables \begin{DoxyVerb}endtime=1800
+outtimestep=10
+outfile=Jet_demo.nc
+outvars=zb,uu,vv,zs,vort;
+\end{DoxyVerb}
+ Specify absorbing boundaries for left and right (There is a wal at the top and bottom so no need to specify any boundary there). \begin{DoxyVerb}right = 3; # Absorbing bnd
+rightbndfile = right.bnd
+
+left=3; # Absorbing bnd
+leftbndfile = left.txt
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md15}{}\doxysubsubsection{Run the model}\label{TutorialJetJulia_autotoc_md15}
+If you are on windows simply double-\/click on the executable and in linux launch the binary.
+
+Vorticity output should look like this\+:
+
+$<$video src=\char`\"{}https\+://github.\+com/\+Cyprien\+Bosserelle/\+BG/blob/development/\+Examples/\+Jet/anim\+\_\+01.\+mp4\char`\"{} width=\char`\"{}320\char`\"{} height=\char`\"{}200\char`\"{} controls preload$>$$<$/video$>$ \href{https://youtu.be/f1A7EeeMlls}{\texttt{ Video}}\hypertarget{TutorialJetJulia_autotoc_md16}{}\doxysubsubsection{Things to try}\label{TutorialJetJulia_autotoc_md16}
+
+\begin{DoxyItemize}
+\item What happens when using a different value for theta (1-\/2.\+0)
+\item What happens when specifying a different type of boundary on the right
+\item What happens when you bring the boundary close to the jet
+\item Why is the jet so unstable/asymmetrical? (what are the initial condition like?)
+\end{DoxyItemize}\hypertarget{TutorialJetJulia_autotoc_md17}{}\doxysubsection{Gaussian Wave}\label{TutorialJetJulia_autotoc_md17}
+This is a great example to test whether there are bugs in the model and how the boundary work.\hypertarget{TutorialJetJulia_autotoc_md18}{}\doxysubsubsection{Bathymetry}\label{TutorialJetJulia_autotoc_md18}
+We start with a flat bathymetry with 0.\+0 everywhere. You still need a file for that!
+
+Here a couple of suggestion on making the file\+: Using GMT\+: {\ttfamily grdmath -\/R-\/5/5/-\/5/5 -\/\+I0.\+03921 0 MUL = bathy.\+nc}
+
+Using Julia\+: See section below with the hotstart file.
+
+In any case you can pick up the file in the example folder.\hypertarget{TutorialJetJulia_autotoc_md19}{}\doxysubsubsection{Hortstart}\label{TutorialJetJulia_autotoc_md19}
+We want to setup a bump in the water level centered in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.
+
+\begin{DoxyVerb}using GMT
+
+xo=-5;
+yo=-5;
+
+nx=16*16;
+ny=16*16;
+
+len=10.0;
+
+dx=len/(nx-1);
+
+xx=collect(xo:len/(nx-1):(len+xo));
+yy=collect(yo:len/(ny-1):(len+yo));
+
+# Make a bathy file
+zb=zeros(nx,ny);
+G = mat2grid(transpose(zb), 1,[xx[1] xx[end] yy[1] yy[end] minimum(zb) maximum(zb) 1 dx dx])
+gmtwrite("bathy.asc", G; id="ef");
+
+#make the hotstart file
+hh=zeros(nx,ny);
+for i=1:nx
+    for j=1:ny
+        hh[i,j] = 1.0.+ 1.0.*exp.(-1.0*(xx[i].*xx[i] .+ yy[j].*yy[j]));
+        #hh[i,j] =
+    end
+end
+
+G = mat2grid(transpose(hh), 1,[xx[1] xx[end] yy[1] yy[end] minimum(hh) maximum(hh) 1 dx dx])
+cmap = grd2cpt(G);      # Compute a colormap with the grid's data range
+grdimage(G, lw=:thinnest, color=cmap, fmt=:png, show=true)
+
+gmtwrite("gauss.asc", G; id="ef");
+gmtwrite("gauss.nc", G);
+# GMT netcdf variable is "z" by default but the hotstart file needs "zs" for water surface
+gmt("grdmath gauss.nc 1.0 MUL = gauss_zs.nc?zs");
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md20}{}\doxysubsubsection{Make Bnd files}\label{TutorialJetJulia_autotoc_md20}
+We are going to set the water level to 0.\+0m on all 4 sides and keep it constant. To do that we create 1 files {\ttfamily zero.\+txt}\+: \begin{DoxyVerb}# This is the a boundary
+0.0 0.0
+3600.0 0.0
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md21}{}\doxysubsubsection{Set up the $<$tt$>$\+BG\+\_\+param.\+txt$<$/tt$>$ file}\label{TutorialJetJulia_autotoc_md21}
+First it is good practice to document your parameter file\+: \begin{DoxyVerb}##############################
+## Gaussian bump demo
+# CB 04/05/2019
+\end{DoxyVerb}
+ Then specify the bathymetry file to use. We will use the entire domain and resolution of the file so no need for other parameter for specifying the domain. \begin{DoxyVerb}bathy=bathy.asc
+\end{DoxyVerb}
+ This is a relatively small model so we can force the netcdf variable to be saved as floats. \begin{DoxyVerb}smallnc=0
+\end{DoxyVerb}
+ Specify the hotstart file\+: \begin{DoxyVerb}hotstartfile=gauss_zs.nc;
+\end{DoxyVerb}
+ Boundary conditions are all the same \+: \begin{DoxyVerb}right = 3; # Absorbing bnd
+rightbndfile = zeros.txt
+
+top = 3; # Absorbing bnd
+topbndfile = zeros.txt
+
+bot = 3; # Absorbing bnd
+botbndfile = zeros.txt
+
+left=3; # Absorbing bnd
+leftbndfile=zeros.txt
+\end{DoxyVerb}
+ Time keeping\+: \begin{DoxyVerb}endtime=20;
+outtimestep=1;
+\end{DoxyVerb}
+ Output parameters\+: \begin{DoxyVerb}# Netcdf file for snapshot of the model domain
+outfile=Gauss_demo.nc
+outvars=zb,uu,vv,zs,vort;
+
+# Outpout a single txt file with all the model steps at the nearest node to location x=0.0, y=-4.0
+# This file will contain 5 column: time,zs,hh,uu,vv
+TSOfile=Southside.txt;
+TSnode=0.0,-4.0;
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md22}{}\doxysubsubsection{Run the model}\label{TutorialJetJulia_autotoc_md22}
+Plot Southside.\+txt in your favorite tool.\hypertarget{TutorialJetJulia_autotoc_md23}{}\doxysubsubsection{Things to try\+:}\label{TutorialJetJulia_autotoc_md23}
+
+\begin{DoxyItemize}
+\item What happens with different boundary types
+\item Try running with double precision. What is the difference?
+\end{DoxyItemize}\hypertarget{TutorialJetJulia_autotoc_md24}{}\doxysubsection{Transpacific tsunami}\label{TutorialJetJulia_autotoc_md24}
+This tutorial is the next stat from the Gaussian wave. Here we produce a realistic tsunami and let it propagate across the Pacific.\hypertarget{TutorialJetJulia_autotoc_md25}{}\doxysubsubsection{Bathy and domain definition}\label{TutorialJetJulia_autotoc_md25}
+The bathymetry file we are using was extracted from the GEBCO gobal bathymetry using GMT command grdcut / grdsample. This section needs a tutorial of its own. Here in the {\ttfamily BG\+\_\+param.\+txt} we specify the file name and that it is a spherical model domain. \begin{DoxyVerb}# Bathymetry file
+bathy = Tpac_big.asc;
+spherical = 1;
+\end{DoxyVerb}
+ The file covers a bigger area than we want to use for the simulation so we restict the domain\+: \begin{DoxyVerb}ymin=-78.0
+ymax=14.32
+
+dx=0.08;
+\end{DoxyVerb}
+ Also we do not want to simulate Blocks that are entirely covered in land where the elevation is bigger than say 30.\+0m above the datum \begin{DoxyVerb}mask = 30.0;
+\end{DoxyVerb}
+\hypertarget{TutorialJetJulia_autotoc_md26}{}\doxysubsubsection{Initial tsunami wave}\label{TutorialJetJulia_autotoc_md26}
+See matlab file in the folder or simply use\+: \begin{DoxyVerb}hotstartfile=Maule_zs_init_simpleflt.nc;
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md27}{}\doxysubsubsection{Boundary}\label{TutorialJetJulia_autotoc_md27}
+In the previous tutorial you have seen how different boundary type let\textquotesingle{}s wave through with minimal reflection. You choose.\hypertarget{TutorialJetJulia_autotoc_md28}{}\doxysubsubsection{Time Keeping}\label{TutorialJetJulia_autotoc_md28}
+\begin{DoxyVerb}totaltime = 0.000000; # Start time
+endtime = 54000.000000;
+outputtimestep = 600.000000;
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md29}{}\doxysubsubsection{Outputs}\label{TutorialJetJulia_autotoc_md29}
+\begin{DoxyVerb}outvars = hh,zs,zsmax;
+# Files
+outfile = Output_simple_fault.nc;
+smallnc = 0; #if smallnc==1 all Output are scaled and saved as a short int
+
+TSnode = -86.374,-17.984
+TSOfile = SW_Lima.txt
+\end{DoxyVerb}
+ \hypertarget{TutorialJetJulia_autotoc_md30}{}\doxysubsubsection{Things to try}\label{TutorialJetJulia_autotoc_md30}
+
+\begin{DoxyItemize}
+\item Try changing the model domain and resolution. What happens if part of the domain is outside of the area covered by the bathymetry?
+\item Try outputing a time series near Christchurch
+\end{DoxyItemize}\hypertarget{TutorialJetJulia_autotoc_md31}{}\doxysubsection{River + Rain = Waikanae example}\label{TutorialJetJulia_autotoc_md31}
+Here we setup a model of the Waikanae Catchment (on the Kapiti Coast in New Zealand) force the tide on one of the open boundary 
