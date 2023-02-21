@@ -177,8 +177,5 @@ var NAVTREEINDEX8 =
 "tutorialRiver.html#autotoc_md49":[5,0,4,0],
 "tutorialRiver.html#autotoc_md50":[5,0,5],
 "tutorialRiver.html#autotoc_md51":[5,0,5,0],
-"tutorialRiver.html#autotoc_md52":[5,0,6],
-"tutorialRiver.html#autotoc_md53":[5,0,6,0],
-"tutorialRiver.html#autotoc_md54":[5,0,6,1],
-"tutorialRiver.html#autotoc_md55":[5,0,6,2]
+"tutorialRiver.html#autotoc_md52":[5,0,5,1]
 };

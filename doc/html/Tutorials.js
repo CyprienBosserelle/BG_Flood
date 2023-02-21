@@ -4,25 +4,25 @@ var Tutorials =
       [ "Param file", "tutorialRiver.html#autotoc_md32", null ],
       [ "Preparation of the topography/bathymetry (DEM: Digital Elevation Model)", "tutorialRiver.html#autotoc_md33", null ],
       [ "Basic fluvial flooding set-up", "tutorialRiver.html#autotoc_md34", [
-        [ "Why halo", "HaloGradient.html#autotoc_md77", null ],
-        [ "Restriction and prolongation", "HaloGradient.html#autotoc_md78", [
-          [ "Prolongation", "HaloGradient.html#autotoc_md79", null ],
-          [ "Restriction", "HaloGradient.html#autotoc_md80", null ]
+        [ "Why halo", "HaloGradient.html#autotoc_md74", null ],
+        [ "Restriction and prolongation", "HaloGradient.html#autotoc_md75", [
+          [ "Prolongation", "HaloGradient.html#autotoc_md76", null ],
+          [ "Restriction", "HaloGradient.html#autotoc_md77", null ]
         ] ],
-        [ "Filling the Halo: The chicken and the egg.", "HaloGradient.html#autotoc_md81", null ],
-        [ "Conserving elevation", "HaloGradient.html#autotoc_md82", null ],
-        [ "Fluxes halo are a bit different", "HaloGradient.html#autotoc_md83", null ],
-        [ "Model implemented", "ILCL.html#autotoc_md84", [
-          [ "<strong>Important notes</strong>:", "ILCL.html#autotoc_md85", null ]
+        [ "Filling the Halo: The chicken and the egg.", "HaloGradient.html#autotoc_md78", null ],
+        [ "Conserving elevation", "HaloGradient.html#autotoc_md79", null ],
+        [ "Fluxes halo are a bit different", "HaloGradient.html#autotoc_md80", null ],
+        [ "Model implemented", "ILCL.html#autotoc_md81", [
+          [ "<strong>Important notes</strong>:", "ILCL.html#autotoc_md82", null ]
         ] ],
-        [ "Testcase for the ILCL model", "ILCL.html#autotoc_md86", null ],
-        [ "Reference values", "ILCL.html#autotoc_md87", null ],
-        [ "Mass conservation implication", "WetdryfixConservelevation.html#autotoc_md88", null ],
-        [ "Tsumani test results", "WetdryfixConservelevation.html#autotoc_md89", [
-          [ "No wetdryfix", "WetdryfixConservelevation.html#autotoc_md90", null ],
-          [ "Wetdryfix", "WetdryfixConservelevation.html#autotoc_md91", null ],
-          [ "Comparison Wetdryfix vs no Wetdryfix", "WetdryfixConservelevation.html#autotoc_md92", null ],
-          [ "Conserve Elevation", "WetdryfixConservelevation.html#autotoc_md93", null ]
+        [ "Testcase for the ILCL model", "ILCL.html#autotoc_md83", null ],
+        [ "Reference values", "ILCL.html#autotoc_md84", null ],
+        [ "Mass conservation implication", "WetdryfixConservelevation.html#autotoc_md85", null ],
+        [ "Tsumani test results", "WetdryfixConservelevation.html#autotoc_md86", [
+          [ "No wetdryfix", "WetdryfixConservelevation.html#autotoc_md87", null ],
+          [ "Wetdryfix", "WetdryfixConservelevation.html#autotoc_md88", null ],
+          [ "Comparison Wetdryfix vs no Wetdryfix", "WetdryfixConservelevation.html#autotoc_md89", null ],
+          [ "Conserve Elevation", "WetdryfixConservelevation.html#autotoc_md90", null ]
         ] ],
         [ "River discharge", "tutorialRiver.html#autotoc_md35", null ],
         [ "Timekeeping parameters", "tutorialRiver.html#autotoc_md36", null ],
@@ -44,12 +44,8 @@ var Tutorials =
         [ "Rain forcing", "tutorialRiver.html#autotoc_md49", null ]
       ] ],
       [ "Refining the grid in area of interest", "tutorialRiver.html#autotoc_md50", [
-        [ "Ground infiltration losses (Basic ILCL model)", "tutorialRiver.html#autotoc_md51", null ]
-      ] ],
-      [ "Refining the grid in area of interest", "tutorialRiver.html#autotoc_md52", [
-        [ "More DEMS", "tutorialRiver.html#autotoc_md53", null ],
-        [ "Map of levels of resolution", "tutorialRiver.html#autotoc_md54", null ],
-        [ "Adding the variable resolution in the code", "tutorialRiver.html#autotoc_md55", null ]
+        [ "Results:", "tutorialRiver.html#autotoc_md51", null ],
+        [ "Ground infiltration losses (Basic ILCL model)", "tutorialRiver.html#autotoc_md52", null ]
       ] ]
     ] ],
     [ "Jet tutorial with Julia", "TutorialJetJulia.html", [

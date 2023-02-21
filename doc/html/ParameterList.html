@@ -98,9 +98,9 @@ $(document).ready(function(){initNavTree('ParameterList.html',''); initResizable
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_doc_ParametersList_py"></a> BG_flood user interface consists in a text file, associating key words to user chosen parameters and forcings. </p>
-<h1><a class="anchor" id="autotoc_md94"></a>
+<h1><a class="anchor" id="autotoc_md91"></a>
 List of the Parameters' input</h1>
-<h2><a class="anchor" id="autotoc_md95"></a>
+<h2><a class="anchor" id="autotoc_md92"></a>
 General parameters</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -141,7 +141,7 @@ Can be used to tune the momentum dissipation (theta=1 gives minmod the most diss
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">engine   </td><td class="markdownTableBodyNone">engine   </td><td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">1: Buttinger, 2: Kurganov, 3: KurganovATMP   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md96"></a>
+<h2><a class="anchor" id="autotoc_md93"></a>
 Grid parameters</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -171,7 +171,7 @@ Grid parameters</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">mask   </td><td class="markdownTableBodyNone">mask   </td><td class="markdownTableBodyNone">9999.0   </td><td class="markdownTableBodyNone">Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md97"></a>
+<h2><a class="anchor" id="autotoc_md94"></a>
 Adaptation</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -185,7 +185,7 @@ Adaptation</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">membuffer   </td><td class="markdownTableBodyNone">membuffer   </td><td class="markdownTableBodyNone">1.05   </td><td class="markdownTableBodyNone">Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md98"></a>
+<h2><a class="anchor" id="autotoc_md95"></a>
 Timekeeping</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -199,7 +199,7 @@ Timekeeping</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">dtinit   </td><td class="markdownTableBodyNone">dtinit   </td><td class="markdownTableBodyNone">-1   </td><td class="markdownTableBodyNone">Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md99"></a>
+<h2><a class="anchor" id="autotoc_md96"></a>
 Initialisation</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -215,7 +215,7 @@ Initialisation</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">hotstep   </td><td class="markdownTableBodyNone">hotstep   </td><td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone">Step to read if hotstart file has multiple steps (step and not (computation) time)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md100"></a>
+<h2><a class="anchor" id="autotoc_md97"></a>
 Outputs</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -243,7 +243,7 @@ Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vm
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">outjshift   </td><td class="markdownTableBodyNone">outjshift   </td><td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone">DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md101"></a>
+<h2><a class="anchor" id="autotoc_md98"></a>
 Netcdf parameters</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -255,7 +255,7 @@ Netcdf parameters</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">addoffset   </td><td class="markdownTableBodyNone">addoffset   </td><td class="markdownTableBodyNone">0.0f   </td><td class="markdownTableBodyNone">Offset add during the short integer conversion for netcdf outputs   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md102"></a>
+<h2><a class="anchor" id="autotoc_md99"></a>
 ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -274,7 +274,7 @@ ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)</h2>
 <td class="markdownTableBodyNone">python_pipeline   </td><td class="markdownTableBodyNone">python_pipeline   </td><td class="markdownTableBodyNone">"coproc.py"   </td><td class="markdownTableBodyNone">python pipeline for ParaView Catalyst   </td></tr>
 </table>
 <hr  />
-<h1><a class="anchor" id="autotoc_md103"></a>
+<h1><a class="anchor" id="autotoc_md100"></a>
 List of the Forcings' inputs</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -327,7 +327,7 @@ Spacially varrying (rain map), a netcdf file is expected (with the variable asso
 Spacially uniform: the rain is forced using a time serie using a 2 column values table containing time (not necessary unformly distributed) and rain.   </td></tr>
 </table>
 <hr  />
-<h1><a class="anchor" id="autotoc_md104"></a>
+<h1><a class="anchor" id="autotoc_md101"></a>
 List of the non-identified inputs</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -343,7 +343,7 @@ List of the non-identified inputs</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Feb 21 2023 16:14:12 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Feb 21 2023 22:00:23 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

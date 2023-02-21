@@ -235,10 +235,10 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Calculate the Harten-Lax-van Leer-contact (HLLC) flux. </p>
-<h2><a class="anchor" id="autotoc_md181"></a>
+<h2><a class="anchor" id="autotoc_md178"></a>
 Description</h2>
 <p>This an implementation of the HLLC solver.</p>
-<h2><a class="anchor" id="autotoc_md182"></a>
+<h2><a class="anchor" id="autotoc_md179"></a>
 Where does this come from:</h2>
 <p>This scheme was adapted/modified from the Basilisk source code. <a href="http://basilisk.fr/src/riemann.h">http://basilisk.fr/src/riemann.h</a></p>
 <p>Reference: (Basilisk reference the scheme from Kurganov reference below) Kurganov, A., &amp; Levy, D. (2002). Central-upwind schemes for the Saint-Venant system. Mathematical Modelling and Numerical Analysis, 36(3), 397-425. </p>
@@ -420,11 +420,11 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>"Adaptive" second-order hydrostatic reconstruction. CPU version for the X-axis </p>
-<h2><a class="anchor" id="autotoc_md175"></a>
+<h2><a class="anchor" id="autotoc_md172"></a>
 Description</h2>
 <p>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-balanced meaning that it conserve the "lake-at-rest" states.</p>
 <p>For optimising the code on CPU and GPU there are 4 versions of this function: X or Y and CPU or GPU</p>
-<h2><a class="anchor" id="autotoc_md176"></a>
+<h2><a class="anchor" id="autotoc_md173"></a>
 Where does this come from:</h2>
 <p>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <a href="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</a></p>
 <p>Reference: Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <a class="el" href="structModel.html">Model</a> Dev. Discuss. [preprint], <a href="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</a>, in review, 2021.* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019. </p>
@@ -606,11 +606,11 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>"Adaptive" second-order hydrostatic reconstruction. GPU version for t X-axis </p>
-<h2><a class="anchor" id="autotoc_md173"></a>
+<h2><a class="anchor" id="autotoc_md170"></a>
 Description</h2>
 <p>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-balanced meaning that it conserve the "lake-at-rest" states.</p>
 <p>For optimising the code on CPU and GPU there are 4 versions of this function: X or Y and CPU or GPU</p>
-<h2><a class="anchor" id="autotoc_md174"></a>
+<h2><a class="anchor" id="autotoc_md171"></a>
 Where does this come from:</h2>
 <p>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <a href="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</a></p>
 <p>Reference: Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <a class="el" href="structModel.html">Model</a> Dev. Discuss. [preprint], <a href="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</a>, in review, 2021.* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019. </p>
@@ -792,11 +792,11 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>"Adaptive" second-order hydrostatic reconstruction. CPU version for the Y-axis </p>
-<h2><a class="anchor" id="autotoc_md179"></a>
+<h2><a class="anchor" id="autotoc_md176"></a>
 Description</h2>
 <p>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-balanced meaning that it conserve the "lake-at-rest" states.</p>
 <p>For optimising the code on CPU and GPU there are 4 versions of this function: X or Y and CPU or GPU</p>
-<h2><a class="anchor" id="autotoc_md180"></a>
+<h2><a class="anchor" id="autotoc_md177"></a>
 Where does this come from:</h2>
 <p>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <a href="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</a></p>
 <p>Reference: Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <a class="el" href="structModel.html">Model</a> Dev. Discuss. [preprint], <a href="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</a>, in review, 2021.* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019. </p>
@@ -978,11 +978,11 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>"Adaptive" second-order hydrostatic reconstruction. GPU version for the Y-axis </p>
-<h2><a class="anchor" id="autotoc_md177"></a>
+<h2><a class="anchor" id="autotoc_md174"></a>
 Description</h2>
 <p>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-balanced meaning that it conserve the "lake-at-rest" states.</p>
 <p>For optimising the code on CPU and GPU there are 4 versions of this function: X or Y and CPU or GPU</p>
-<h2><a class="anchor" id="autotoc_md178"></a>
+<h2><a class="anchor" id="autotoc_md175"></a>
 Where does this come from:</h2>
 <p>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <a href="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</a></p>
 <p>Reference: Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <a class="el" href="structModel.html">Model</a> Dev. Discuss. [preprint], <a href="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</a>, in review, 2021.* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019. </p>
@@ -995,7 +995,7 @@ Where does this come from:</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Reimann_8cu.html">Reimann.cu</a></li>
-    <li class="footer">Generated on Tue Feb 21 2023 16:14:12 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Feb 21 2023 22:00:22 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

@@ -302,20 +302,96 @@ DEM = Wesport_DEM_2m_zoomed.nc?z;
 outzone=zoomed.nc,5.3,5.4,0.5,0.8;
  ``` 
 
+## Results:
+This is the logfile:
+```{txt}
+#################################
+BG_Flood v0.8
+#################################
+#################################
+#
+model started at 21-02-2023 21:22:53
+
+Reading parameter file: BG_param.txt ...
+
+Reading bathymetry grid data...
+Reading forcing metadata. file: Westport_DEM_8m.nc extension: nc
+Forcing grid info: nx=2604 ny=3137 dx=8.000000 grdalpha=0.000000 xo=1474101.125000 xmax=1494925.125000 yo=5364343.000000 ymax=5389431.000000
+
+Reading boundary data...
+
+Read Roughness map (cf) data...
+Reading forcing metadata. file: z0_100423_rec3.asc extension: asc
+For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)
+Forcing grid info: nx=1724 ny=2420 dx=4.800000 grdalpha=0.000000 xo=1480847.600000 xmax=1489118.000000 yo=5369291.600000 ymax=5380902.800000
+
+Read Target level data...
+Reading forcing metadata. file: refin_mask.nc extension: nc
+Forcing grid info: nx=624 ny=400 dx=50.000000 grdalpha=0.000000 xo=1469074.407363 xmax=1500224.407363 yo=5364597.770576 ymax=5384547.770576
+
+Preparing rivers (1 rivers)
+
+Preparing Rain forcing
+
+Adjusted model domain (xo/xmax/yo/ymax): 
+	1474097.125000/1495057.125000/5364339.000000/5389459.000000
+	 Initial resolution (level 2) = 10.000000
+There are 1 GPU devices on this machine
+Using Device: NVIDIA T500
+
+Initializing mesh
+	Initial number of blocks: 20567; Will be allocating 21596 in memory.
+
+Initial condition:
+	Warm start
+	Initializing rivers
+Adapting mesh
+	 Iteration 1
+		There are 20567 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 4723 blocks to be coarsen (with neighbour); 1675 blocks untouched; 14169 blocks to be freed (1029 are already available) 0 new blocks will be created
+	 Iteration 2
+		There are 6398 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1023 blocks to be coarsen (with neighbour); 2306 blocks untouched; 3069 blocks to be freed (15198 are already available) 0 new blocks will be created
+	 Iteration 3
+		There are 3329 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 179 blocks to be coarsen (with neighbour); 2613 blocks untouched; 537 blocks to be freed (18267 are already available) 0 new blocks will be created
+	 Iteration 4
+		There are 2792 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 18 blocks to be coarsen (with neighbour); 2720 blocks untouched; 54 blocks to be freed (18804 are already available) 0 new blocks will be created
+	 Iteration 5
+		There are 2738 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1 blocks to be coarsen (with neighbour); 2734 blocks untouched; 3 blocks to be freed (18858 are already available) 0 new blocks will be created
+	 Iteration 6
+		There are 2735 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 0 blocks to be coarsen (with neighbour); 2735 blocks untouched; 0 blocks to be freed (18861 are already available) 0 new blocks will be created
+
+Initial condition:
+	Warm start
+	Initializing rivers
+Setting up GPU
+
+Model setup complete
+#################################
+Initialising model main loop
+Create netCDF output file...
+Warning! Output file name already exist   
+New file name: Results_tuto_basicRun_2.nc
+		Completed
+Model Running...
+Output to map. Totaltime = 7200.000000 s; Mean dt = 2.230207e-01 s
+
+```
+In the model output, each resolution is store independently. 
+When open with pyncview, we can visualise each layer. QGIS can merge all these layer togather or a postratement steps will be needed.
+
+![output_v3](./figure/outputs_v3.png)
+
 
 ## Ground infiltration losses (Basic ILCL model)
-An Initial Loss, Continuous Loss model has been implemented in the code. To use it, provide maps for the two coefficient as follow:
+An Initial Loss, Continuous Loss model has been implemented in the code (see ILCL page). 
+![ILCL_tuto](./figure/Ex_Merge.png)
+
+
+To use it, provide maps for the two coefficient as follow:
  ```{text}
 initialloss=InitialLoss.asc;
 continuousloss=ContinuousLoss.asc;
  ``` 
 
-# Refining the grid in area of interest
-
-## More DEMS
-## Map of levels of resolution
-## Adding the variable resolution in the code
-Show adding a second high reso DEM (ALSO add mention of possibility to use path (relative or absolute))
 
 
 

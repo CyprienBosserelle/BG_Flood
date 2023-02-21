@@ -124,7 +124,7 @@ River discharge</h2>
 </div><!-- fragment --><p> where the four final numbers are: \( x_1, x_2, y_1, y_2 \), to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time ( \(s\)) from reference time, second column: river discharge in \(m^3s^{-1}\)).</p>
 <p><img src="river_discharge.png" alt="" class="inline" title="riverfile"/></p>
 <p>This file is from an observed hydrograph, with data saved every 5min:</p>
-<p><img src="./figure/TE_Kuha_hydrograph.png" alt="riverF" class="inline"/></p>
+<p><img src="TE_Kuha_hydrograph.png" alt="" class="inline" title="riverF"/></p>
 <p>For each new river, just add the a similar river input line in the parameter file.</p>
 <h2><a class="anchor" id="autotoc_md36"></a>
 Timekeeping parameters</h2>
@@ -146,7 +146,7 @@ Map outputs</h3>
 <li>defining a timestep (in s) for these outputs: <div class="fragment"><div class="line">outputtimestep = 3600.0;</div>
 </div><!-- fragment --></li>
 <li>changing the set of variables in the output file (from the list given in the manual) <div class="fragment"><div class="line">outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;</div>
-</div><!-- fragment --> The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.</li>
+</div><!-- fragment --> The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable. There is also special variables for risk assesment after inundation (Umax, hmax, hUmax, twet)</li>
 <li>changing the name of the output file: <div class="fragment"><div class="line">outfile = Results_tuto_basicRun.nc;</div>
 </div><!-- fragment --></li>
 <li>saving the output as float (variables are saved as short integer by default.): <div class="fragment"><div class="line">smallnc = 0;</div>
@@ -163,8 +163,8 @@ Resolution</h2>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md41"></a>
 Basic fluvial innundation results</h2>
 <p>This the shell output: <img src="Shell_output2.png" alt="" class="inline" title="shell2"/> It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).</p>
-<p>In the outputs, we get the different fields requested, for 6 different times. <img src="./figure/outputs2.png" alt="output2" class="inline"/></p>
-<p>The Time-Serie output is: <img src="./figure/offshore.png" alt="TS2" class="inline"/></p>
+<p>In the outputs, we get the different fields requested, for 6 different times. <img src="outputs_v2.png" alt="" class="inline" title="output2"/></p>
+<p>The Time-Serie output is: <img src="offshore.png" alt="" class="inline" title="TS2"/></p>
 <h1><a class="anchor" id="autotoc_md42"></a>
 Completing the set-up</h1>
 <h2><a class="anchor" id="autotoc_md43"></a>
@@ -175,13 +175,13 @@ Adding boundary conditions</h2>
 <div class="line">top = tide_westport.txt,2; </div>
 </div><!-- fragment --><p>In this case, as the boundaries are relatively small compared to the time wave length, we will used the same value along all the boundaries. We will then have only two columns in the file: Time and one elevation. tide_file <img src="./figure/tide_file.png" alt="tide_file" class="inline"/></p>
 <p>They correspond to a classic time Serie observed offshore of the river mouth.</p>
-<p><img src="./figure/tide_westport.png" alt="Tide" class="inline"/></p>
+<p><img src="tide_westport.png" alt="" class="inline" title="Tide"/></p>
 <p>(If more values, they will be regularly spread along the boundary and the forcing will be the linear interpolation of these values).</p>
 <h2><a class="anchor" id="autotoc_md44"></a>
 Bottom friction</h2>
 <p>Different models from bottom friction are available. By default, the model used is -1 corresponding to a Manning model. Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models). The associated field (ASC or netCDF) or value must be enter with the key word </p><div class="fragment"><div class="line">frictionmodel=1;</div>
 <div class="line">cf=z0_100423_rec3.asc; #cf=0.01;  #If <span class="keyword">using</span> a uniform value</div>
-</div><!-- fragment --><p><img src="./figure/Bottom_friction_zo.png" alt="Friction" class="inline"/></p>
+</div><!-- fragment --><p><img src="Bottom_friction_zo.png" alt="" class="inline" title="Friction"/></p>
 <p><b>Warning</b>: The model allows a roughness heigh / manning number map smaller than the computational domain and will extrapolate outside of the map.</p>
 <h2><a class="anchor" id="autotoc_md45"></a>
 Initialisation</h2>
@@ -208,38 +208,139 @@ Outputs</h2>
 <p>The model allows rain on grid forcing to model pluvial inundations.</p>
 <h2><a class="anchor" id="autotoc_md49"></a>
 Rain forcing</h2>
-<p>A rain intensity in \( mm\h \), time and space varying can be forced in the model.</p>
+<p>A rain intensity in \( mm.h^{-1} \), time and space varying can be forced in the model.</p>
 <p>The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:</p><ul>
 <li>Time serie forcing: <div class="fragment"><div class="line">rainfall=rain_westport.txt</div>
 </div><!-- fragment --></li>
 <li>Spacial file forcing: <div class="fragment"><div class="line">rainfile=VCSN_buller_202107_dailynzcsmcov_disaggdaily_500m_nztm_clipped.nc?depth;</div>
-</div><!-- fragment --> Here, we will use a time serie: <img src="./figure/rain_westport.png" alt="RainTS" class="inline"/></li>
+</div><!-- fragment --> Here, we will use a time serie: <img src="rain_westport.png" alt="" class="inline" title="RainTS"/></li>
 </ul>
-<p>If the data is given in rain height, a post-processing to turn it in rain intensity will be needed (at least at this stage of development).</p>
+<p>If the data is given in "rain height", a post-processing to turn it in rain intensity will be needed (at least at this stage of development).</p>
 <p>Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:</p><ul>
+<li>using the x0 / xmax / y0 / ymax keyword to restrain the extend of the computational domain (but still rectangular) <div class="fragment"><div class="line">x0=1475000; #m</div>
+</div><!-- fragment --></li>
 <li>a manual mask with values 999 in the bathymetry will be read by the code as "non-active" area</li>
 <li>masking all the bloc with all cells having an elevation superior to some value: <div class="fragment"><div class="line">mask=250; #m</div>
 </div><!-- fragment --></li>
+<li>using a shape file to define a "area of interest" (<b>Method advised</b>): <div class="fragment"><div class="line">AOI=Domain_buffered-sea2.gmt;</div>
+</div><!-- fragment --></li>
 </ul>
-<p>using a shape file to define a "area of interest" (<b>Method advised</b>): </p><div class="fragment"><div class="line">AOI=Domain_buffered-sea2.gmt;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md50"></a>
+<h1><a class="anchor" id="autotoc_md50"></a>
 Refining the grid in area of interest</h1>
-<p>The code is based on a quadtree mesh</p>
-<p>=&gt; results</p>
-<h2><a class="anchor" id="autotoc_md51"></a>
+<p>The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU. These blocks can have different resolutions (but resolution does not change during the computation at this stage).</p>
+<p>The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level \(𝑛\) , the resolution \(𝑑𝑥_𝑛\) will be: $$𝑑𝑥_𝑛=\frac{𝑑𝑥_0}{2^𝑛}$$</p>
+<p>with \(𝑑𝑥_0\) the resolution at level 0.</p>
+<p>When refinning using the level implementation, different key words are expected:</p>
+<ul>
+<li>Initlevel: level used to create the first mesh created by the code</li>
+<li>Maxlevel: maximim level of refinement (over-ruling other commands)</li>
+<li>Minlevel: minimum level of refinement (over-ruling other commands)</li>
+</ul>
+<p>The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)</p>
+<p>The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:</p>
+<ul>
+<li>'Threshold': impose a threshold for a different level of resolution</li>
+<li>'Inrange': impose a range for a different level of resolutuion or it can be defined using a map of target levels for refinement:</li>
+<li>'Targetlevel': the levels of resolution will be targeted but will be overruled by the maxlevel, minlevel entrance.</li>
+</ul>
+<p>To refine the grid for this case, we will use the <em>former coarse simulation</em> and create a map for values where hmax is strictly positive (and/or umax,vmax different from zero), after removing the sea area.</p>
+<p>Here, the bathymetry map resolution is a 10m resolution ( \( 𝑑𝑥_0=10𝑚\)). We will impose:</p><ul>
+<li>a level -3 resolution ( \(𝑑𝑥_{−3}=80𝑚\)) in the background domain,</li>
+<li>a level 1 resolution ( \(𝑑𝑥_1=5𝑚\)) in the flooded area</li>
+<li>a level 2 resolution ( \(𝑑𝑥_2=2.5𝑚\)) in the main river bed area.</li>
+</ul>
+<p><img src="coarse.png" alt="" class="inline" title="coarseRun"/> <img src="refine.png" alt="" class="inline" title="refine"/></p>
+<p><img src="test_1.png" alt="" class="inline" title="meshrefine"/></p>
+<p>To use it, the following options need to be added to the param file: </p><div class="fragment"><div class="line">initlevel = -3 ;</div>
+<div class="line">maxlevel = 2 ;</div>
+<div class="line">minlevel = -3 ;</div>
+<div class="line"><a class="code" href="Adaptation_8cu.html#a185d47978609c5d1cfbd6ce1c9cdbbce">Adaptation</a> = Targetlevel,refin_mask.nc?z ;</div>
+<div class="ttc" id="aAdaptation_8cu_html_a185d47978609c5d1cfbd6ce1c9cdbbce"><div class="ttname"><a href="Adaptation_8cu.html#a185d47978609c5d1cfbd6ce1c9cdbbce">Adaptation</a></div><div class="ttdeci">void Adaptation(Param &amp;XParam, Forcing&lt; float &gt; XForcing, Model&lt; T &gt; &amp;XModel)</div><div class="ttdef"><b>Definition:</b> Adaptation.cu:8</div></div>
+</div><!-- fragment --><p><b>Note_1</b>: In order to optimise the refinement, different bathymetry files can be provided. A higher resolution one with smaller extend can be provided as a second DEM and will be use by the code when refining the grid (the code will use the last entered, having the info available): </p><div class="fragment"><div class="line">DEM = Wesport_DEM_8m.nc?z;</div>
+<div class="line">DEM = Wesport_DEM_2m_zoomed.nc?z;</div>
+</div><!-- fragment --><p><b>Note_2</b>: The code also allows for zone outputs: the output of different zones defined by the user (outputname,x1,x2,y1,y2): </p><div class="fragment"><div class="line">outzone=zoomed.nc,5.3,5.4,0.5,0.8;</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md51"></a>
+Results:</h2>
+<p>This is the logfile: </p><div class="fragment"><div class="line"><span class="preprocessor">#################################</span></div>
+<div class="line">BG_Flood v0.8</div>
+<div class="line"><span class="preprocessor">#################################</span></div>
+<div class="line"><span class="preprocessor">#################################</span></div>
+<div class="line"><span class="preprocessor">#</span></div>
+<div class="line">model started at 21-02-2023 21:22:53</div>
+<div class="line"> </div>
+<div class="line">Reading parameter file: BG_param.txt ...</div>
+<div class="line"> </div>
+<div class="line">Reading bathymetry grid data...</div>
+<div class="line">Reading forcing metadata. file: Westport_DEM_8m.nc extension: nc</div>
+<div class="line"><a class="code" href="structForcing.html">Forcing</a> grid info: nx=2604 ny=3137 dx=8.000000 grdalpha=0.000000 xo=1474101.125000 xmax=1494925.125000 yo=5364343.000000 ymax=5389431.000000</div>
+<div class="line"> </div>
+<div class="line">Reading boundary data...</div>
+<div class="line"> </div>
+<div class="line">Read Roughness map (cf) data...</div>
+<div class="line">Reading forcing metadata. file: z0_100423_rec3.asc extension: asc</div>
+<div class="line">For asc of bathy file please specify grdalpha in the BG_param.txt (<span class="keywordflow">default</span> 0)</div>
+<div class="line"><a class="code" href="structForcing.html">Forcing</a> grid info: nx=1724 ny=2420 dx=4.800000 grdalpha=0.000000 xo=1480847.600000 xmax=1489118.000000 yo=5369291.600000 ymax=5380902.800000</div>
+<div class="line"> </div>
+<div class="line">Read Target level data...</div>
+<div class="line">Reading forcing metadata. file: refin_mask.nc extension: nc</div>
+<div class="line"><a class="code" href="structForcing.html">Forcing</a> grid info: nx=624 ny=400 dx=50.000000 grdalpha=0.000000 xo=1469074.407363 xmax=1500224.407363 yo=5364597.770576 ymax=5384547.770576</div>
+<div class="line"> </div>
+<div class="line">Preparing rivers (1 rivers)</div>
+<div class="line"> </div>
+<div class="line">Preparing Rain forcing</div>
+<div class="line"> </div>
+<div class="line">Adjusted model domain (xo/xmax/yo/ymax): </div>
+<div class="line">    1474097.125000/1495057.125000/5364339.000000/5389459.000000</div>
+<div class="line">     Initial resolution (level 2) = 10.000000</div>
+<div class="line">There are 1 GPU devices on this machine</div>
+<div class="line">Using Device: NVIDIA T500</div>
+<div class="line"> </div>
+<div class="line">Initializing mesh</div>
+<div class="line">    Initial number of blocks: 20567; Will be allocating 21596 in memory.</div>
+<div class="line"> </div>
+<div class="line">Initial condition:</div>
+<div class="line">    Warm start</div>
+<div class="line">    Initializing rivers</div>
+<div class="line">Adapting mesh</div>
+<div class="line">     Iteration 1</div>
+<div class="line">        There are 20567 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 4723 blocks to be <a class="code" href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a> (with neighbour); 1675 blocks untouched; 14169 blocks to be freed (1029 are already available) 0 <span class="keyword">new</span> blocks will be created</div>
+<div class="line">     Iteration 2</div>
+<div class="line">        There are 6398 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1023 blocks to be <a class="code" href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a> (with neighbour); 2306 blocks untouched; 3069 blocks to be freed (15198 are already available) 0 <span class="keyword">new</span> blocks will be created</div>
+<div class="line">     Iteration 3</div>
+<div class="line">        There are 3329 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 179 blocks to be <a class="code" href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a> (with neighbour); 2613 blocks untouched; 537 blocks to be freed (18267 are already available) 0 <span class="keyword">new</span> blocks will be created</div>
+<div class="line">     Iteration 4</div>
+<div class="line">        There are 2792 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 18 blocks to be <a class="code" href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a> (with neighbour); 2720 blocks untouched; 54 blocks to be freed (18804 are already available) 0 <span class="keyword">new</span> blocks will be created</div>
+<div class="line">     Iteration 5</div>
+<div class="line">        There are 2738 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1 blocks to be <a class="code" href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a> (with neighbour); 2734 blocks untouched; 3 blocks to be freed (18858 are already available) 0 <span class="keyword">new</span> blocks will be created</div>
+<div class="line">     Iteration 6</div>
+<div class="line">        There are 2735 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 0 blocks to be <a class="code" href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a> (with neighbour); 2735 blocks untouched; 0 blocks to be freed (18861 are already available) 0 <span class="keyword">new</span> blocks will be created</div>
+<div class="line"> </div>
+<div class="line">Initial condition:</div>
+<div class="line">    Warm start</div>
+<div class="line">    Initializing rivers</div>
+<div class="line">Setting up GPU</div>
+<div class="line"> </div>
+<div class="line"><a class="code" href="structModel.html">Model</a> setup complete</div>
+<div class="line"><span class="preprocessor">#################################</span></div>
+<div class="line">Initialising model <a class="code" href="BG__Flood_8cu.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> loop</div>
+<div class="line">Create netCDF output file...</div>
+<div class="line">Warning! Output file name already exist   </div>
+<div class="line">New file name: Results_tuto_basicRun_2.nc</div>
+<div class="line">        Completed</div>
+<div class="line"><a class="code" href="structModel.html">Model</a> Running...</div>
+<div class="line">Output to map. Totaltime = 7200.000000 s; Mean dt = 2.230207e-01 s</div>
+<div class="ttc" id="aAdaptation_8cu_html_a05519ab2f26cb6f0735c4a46949a12c8"><div class="ttname"><a href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a></div><div class="ttdeci">void coarsen(Param XParam, BlockP&lt; T &gt; &amp;XBlock, AdaptP &amp;XAdapt, EvolvingP&lt; T &gt; XEvo, EvolvingP&lt; T &gt; &amp;XEv)</div><div class="ttdef"><b>Definition:</b> Adaptation.cu:592</div></div>
+<div class="ttc" id="aBG__Flood_8cu_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="BG__Flood_8cu.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> BG_Flood.cu:49</div></div>
+<div class="ttc" id="astructForcing_html"><div class="ttname"><a href="structForcing.html">Forcing</a></div><div class="ttdef"><b>Definition:</b> Forcing.h:115</div></div>
+<div class="ttc" id="astructModel_html"><div class="ttname"><a href="structModel.html">Model</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:151</div></div>
+</div><!-- fragment --><p> In the model output, each resolution is store independently. When open with pyncview, we can visualise each layer. QGIS can merge all these layer togather or a postratement steps will be needed.</p>
+<p><img src="outputs_v3.png" alt="" class="inline" title="output_v3"/></p>
+<h2><a class="anchor" id="autotoc_md52"></a>
 Ground infiltration losses (Basic ILCL model)</h2>
-<h1><a class="anchor" id="autotoc_md52"></a>
-Refining the grid in area of interest</h1>
-<h2><a class="anchor" id="autotoc_md53"></a>
-More DEMS</h2>
-<h2><a class="anchor" id="autotoc_md54"></a>
-Map of levels of resolution</h2>
-<h2><a class="anchor" id="autotoc_md55"></a>
-Adding the variable resolution in the code</h2>
-<p>Show adding a second high reso DEM (ALSO add mention of possibility to use path (relative or absolute))</p>
-<p>=&gt; quick look at shell outputs</p>
-<p>=&gt; results</p>
-<p># </p>
+<p>An Initial Loss, Continuous Loss model has been implemented in the code (see ILCL page). <img src="Ex_Merge.png" alt="" class="inline" title="ILCL_tuto"/></p>
+<p>To use it, provide maps for the two coefficient as follow: </p><div class="fragment"><div class="line">initialloss=InitialLoss.asc;</div>
+<div class="line">continuousloss=ContinuousLoss.asc;</div>
+</div><!-- fragment --><p># </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
@@ -247,7 +348,7 @@ Adding the variable resolution in the code</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="Tutorials.html">Tutorials</a></li>
-    <li class="footer">Generated on Tue Feb 21 2023 16:14:12 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Feb 21 2023 22:00:23 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>
