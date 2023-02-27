@@ -249,15 +249,15 @@ AOI=Domain_buffered-sea2.gmt;
 The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
 These blocks can have different resolutions (but resolution does not change during the computation at this stage).
 
-The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  \f$𝑛\f$ , the resolution  \f$𝑑𝑥_𝑛\f$
+The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  \f$n\f$ , the resolution  \f$dx_n\f$
   will be:
-$$𝑑𝑥_𝑛=\frac{𝑑𝑥_0}{2^𝑛}$$
+$$dx_n=\frac{dx_0}{2^n}$$
  
-with  \f$𝑑𝑥_0\f$ the resolution at level 0. 
+with  \f$dx_0\f$ the resolution at level 0. 
 
 When refinning using the level implementation, different key words are expected:
 
-- Initlevel: level used to create the first mesh created by the code
+- Initlevel: level used to create the first mesh created by the code in the mesh refinement process
 - Maxlevel: maximim level of refinement (over-ruling other commands)
 - Minlevel: minimum level of refinement (over-ruling other commands)
 
@@ -271,10 +271,10 @@ The different methods of refinement available in the code are called using the k
 
 To refine the grid for this case, we will use the *former coarse simulation* and create a map for values where hmax is strictly positive (and/or umax,vmax different from zero), after removing the sea area. 
 
-Here, the bathymetry map resolution is a 10m resolution (\f$ 𝑑𝑥_0=10𝑚\f$). We will impose:
-- a level -3 resolution ( \f$𝑑𝑥_{−3}=80𝑚\f$) in the background domain, 
-- a level 1 resolution ( \f$𝑑𝑥_1=5𝑚\f$) in the flooded area
-- a level 2 resolution ( \f$𝑑𝑥_2=2.5𝑚\f$)  in the main river bed area. 
+Here, the bathymetry map resolution is a 10m resolution (\f$ dx_8=10m\f$). We will impose:
+- a level -3 resolution ( \f$dx_{-3}=80m\f$) in the background domain, 
+- a level 1 resolution ( \f$dx_1=5m\f$) in the flooded area
+- a level 2 resolution ( \f$dx_2=2.5m\f$)  in the main river bed area. 
 
 ![coarseRun](./figure/coarse.png)
 ![refine](./figure/refine.png)

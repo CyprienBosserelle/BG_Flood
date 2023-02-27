@@ -288,15 +288,15 @@ Using the rain on grid forcing will activate all the cells of the domain and wil
 \end{DoxyItemize}\hypertarget{tutorialRiver_autotoc_md50}{}\doxysubsection{Refining the grid in area of interest}\label{tutorialRiver_autotoc_md50}
 The code is based on a Block-\/uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU. These blocks can have different resolutions (but resolution does not change during the computation at this stage).
 
-The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the \char`\"{}dx\char`\"{} key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level $𝑛$ , the resolution $𝑑𝑥_𝑛$ will be\+: \$\$𝑑𝑥\+\_\+𝑛=\textbackslash{}frac\{𝑑𝑥\+\_\+0\}\{2$^\wedge$𝑛\}\$\$
+The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the \char`\"{}dx\char`\"{} key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level $n$ , the resolution $dx_n$ will be\+: \$\$dx\+\_\+n=\textbackslash{}frac\{dx\+\_\+0\}\{2$^\wedge$n\}\$\$
 
-with $𝑑𝑥_0$ the resolution at level 0.
+with $dx_0$ the resolution at level 0.
 
 When refinning using the level implementation, different key words are expected\+:
 
 
 \begin{DoxyItemize}
-\item Initlevel\+: level used to create the first mesh created by the code
+\item Initlevel\+: level used to create the first mesh created by the code in the mesh refinement process
 \item Maxlevel\+: maximim level of refinement (over-\/ruling other commands)
 \item Minlevel\+: minimum level of refinement (over-\/ruling other commands)
 \end{DoxyItemize}
@@ -314,11 +314,11 @@ The different methods of refinement available in the code are called using the k
 
 To refine the grid for this case, we will use the {\itshape former coarse simulation} and create a map for values where hmax is strictly positive (and/or umax,vmax different from zero), after removing the sea area.
 
-Here, the bathymetry map resolution is a 10m resolution ( $ 𝑑𝑥_0=10𝑚$). We will impose\+:
+Here, the bathymetry map resolution is a 10m resolution ( $ dx_8=10m$). We will impose\+:
 \begin{DoxyItemize}
-\item a level -\/3 resolution ( $𝑑𝑥_{−3}=80𝑚$) in the background domain,
-\item a level 1 resolution ( $𝑑𝑥_1=5𝑚$) in the flooded area
-\item a level 2 resolution ( $𝑑𝑥_2=2.5𝑚$) in the main river bed area.
+\item a level -\/3 resolution ( $dx_{-3}=80m$) in the background domain,
+\item a level 1 resolution ( $dx_1=5m$) in the flooded area
+\item a level 2 resolution ( $dx_2=2.5m$) in the main river bed area.
 \end{DoxyItemize}
 
 
