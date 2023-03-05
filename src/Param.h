@@ -12,15 +12,15 @@ public:
 
 	//*General parameters
 	int test = -1; //-1: no test, 99: run all independent tests, X: run test X
-	double g = 9.81; // Gravity in m.s-2
+	double g = 9.81; // Acceleration of gravity in m.s-2
 	double rho = 1025.0; // Fluid density in kg.m-3
 	double eps = 0.0001; // Drying height in m (if h<eps, the surface is concidered dry)
 	double dt = 0.0; // Model time step in s.
-	double CFL = 0.5; // Current Freidrich Limiter
+	double CFL = 0.5; // Current Freidrich Limiter criterium (between 0 and 1. Higher values may make the model unstable)
 	double theta = 1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
 	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
-	int frictionmodel = 0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)
-	double cf = 0.0001; // Bottom friction coefficient for flow model (if constant)
+	int frictionmodel = 0; // Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart model)
+	double cf = 0.0001; // Bottom friction coefficient for the model (if constant)
 	double Cd = 0.002; // Wind drag coefficient
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
@@ -40,29 +40,29 @@ public:
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE = 0; // 0: first available GPU, -1: CPU single core, 2+: other GPU
 
-	int doubleprecision = 0; // 0: float precision, 1: double precision
+	int doubleprecision = 0; // 0: float precision, 1: double precision (for the solver and math)
 
 	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
 
 	//*Grid parameters
-	double dx = nan(""); // Grid resolution in the coordinate system unit in m.
+	double dx = nan(""); // Grid resolution, in m for a metric grid or in decimal degree for a sperical grid.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
-	int nx = 0; // Initial grid size in x direction
-	int ny = 0; //Initial grid size in y direction
+	int nx = 0; // Initial/input grid size (number of nodes) in x direction
+	int ny = 0; //Initial/input grid size (number of nodes) in y direction
 	int nblk = 0; // Number of compute blocks
 	int blkwidth = 16; //Block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
 	int halowidth = 1; // Use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
 
-	double xo = nan(""); // Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
-	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
+	double xo = nan(""); // Grid x origin in m or decimal degree (if not alter by the user, will be defined based on the topography/bathymetry input map)
+	double yo = nan(""); // Grid y origin im m or decimal degree (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double ymax = nan(""); // Grid ymax (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
-	double grdalpha = nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
+	double grdalpha = nan(""); // Grid rotation on Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
-	int spherical = 0; // Flag for sperical coordinate (still in development)
-	double Radius = 6371220.; //Earth radius [m]
+	int spherical = 0; // Flag to switch the model in sperical (geographical) coordinates. This implies that the computation will occur in double precision.
+	double Radius = 6371220.; //Earth radius used to calculate sherical grid corrections in m.
 	double mask = 9999.0; //Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory
 
 	//*Adaptation
@@ -76,9 +76,9 @@ public:
 
 
 	//*Timekeeping
-	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for none
-	double endtime = 0.0; // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
-	double totaltime = 0.0; // Total simulation time in s
+	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for no outputs
+	double endtime = 0.0; // Total runtime in s. It sould be smaller than any time dependant forcing and will be reduce to accomodate the time dependent boundaries conditions.
+	double totaltime = 0.0; // Time at the start of the simulation in s.
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
 
@@ -114,7 +114,7 @@ public:
 	Default: None
 	*/
 
-	std::string outfile = "Output.nc"; // netcdf output file name
+	std::string outfile = "Output.nc"; // Netcdf output file name (if it exists, a number will be happened to the file name to not overwrite it)
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
 	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
@@ -137,7 +137,7 @@ public:
 
 
 	// Output switch controls
-	bool resetmax = false; //Switch to reset the "max" outputs after each output
+	bool resetmax = false; //Switch to reset the "max" outputs after each output (reset if 1, no reset if 0)
 	bool outmax = false;
 	bool outmean = false;
 	//bool outvort = false;
@@ -168,8 +168,8 @@ public:
 
 	//*Netcdf parameters
 	int smallnc = 1; //Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float
-	float scalefactor = 0.01f; //Scale factor used for the short integer conversion for netcdf outputs
-	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs
+	float scalefactor = 0.01f; //Scale factor used for the short integer conversion for netcdf outputs. This follow the COARDS convention.
+	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs (follow the COARDS convention)
 
 #ifdef USE_CATALYST
         //* ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)

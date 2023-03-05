@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('WetdryfixConservelevation.html',''); i
 <div class="contents">
 <div class="textblock"><p>At the interface of coarse and fine blocks we often cannot <b>strictly</b> conserve both mass (h) and water elevation. The difference in most cases is relatively small but near the wet/dry interface, trying to conserve mass leads to instabilities. Since these instabilities are a bit annoying by default BG_Flood enforces the conservation of elevation at the interface between coarse and fine blocks where wet and dry cells are present. This might lead to a mismatch between the expected volume and actual volume when simulating rain or river flooding. Similarly, ignoring the conserve elevation requirement when simulating a tsunami can lead to a underestimate of the tsunami. The impact of these switch is small and we can show how small they are below.</p>
 <p>Below are two examples of basic flood model to test the impact of the wet/dry instability fix (hereafter wetdryfix) on mass conservation. Further below is to test the impact of the wetdryfix and conserve elevation routimne (hereafter conserveElevation) on a tsunami wave propagating on a real steep bathymetry (Samoa).</p>
-<h2><a class="anchor" id="autotoc_md85"></a>
+<h2><a class="anchor" id="autotoc_md86"></a>
 Mass conservation implication</h2>
 <p>Using the Waikanae topo with cst rain at 50mm/h for 1 hour. using the rainbnd option and wall bnd on all side. Results are undestinguishable from each other and after 1 hr the model has <b>100.48%</b> of the theoretical volume of water in both with and without the wetdryfix. <br  />
 </p>
@@ -112,22 +112,22 @@ Mass conservation implication</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>NO</b> Wetdryfix   </td><td class="markdownTableBodyNone">100.48%   </td><td class="markdownTableBodyNone">96s   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md86"></a>
+<h2><a class="anchor" id="autotoc_md87"></a>
 Tsumani test results</h2>
 <p>The impact of the wet/dry fix should be much more obvious in tsunami simulation but here conserve elevation should be used in most tsunami cases.</p>
-<h3><a class="anchor" id="autotoc_md87"></a>
+<h3><a class="anchor" id="autotoc_md88"></a>
 No wetdryfix</h3>
 <p>switching off the wetdryfix causes instability that really have an impact on tsunami wave. Here the instability are clearly visible in the map and in the comparison are seen as 0.01 m waves before the tsunami wave arrive.</p>
 <p><img src="https://user-images.githubusercontent.com/3713631/213352941-31b5ff25-ca1e-4b80-b0d4-cba7d1aa5496.png" alt="image" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md88"></a>
+<h3><a class="anchor" id="autotoc_md89"></a>
 Wetdryfix</h3>
 <p>When using the wetdryfix the instabilities disappear and the solution is smoother.</p>
 <p><img src="https://user-images.githubusercontent.com/3713631/213353179-2d7c133b-057d-4fe9-9abc-d0a02fb64dcb.png" alt="image" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md89"></a>
+<h3><a class="anchor" id="autotoc_md90"></a>
 Comparison Wetdryfix vs no Wetdryfix</h3>
 <p>The instabilities are more obvious when we look at a transect diagonally from the plot above. These instabilities have a notable affect the height of the tsunami wave... a lot! This justifies that we should have the wetdryfix switched on by default.</p>
 <p><img src="https://user-images.githubusercontent.com/3713631/213353988-e17c1dac-4f68-485b-a9c3-aa8f3baee954.png" alt="image" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md90"></a>
+<h3><a class="anchor" id="autotoc_md91"></a>
 Conserve Elevation</h3>
 <p>When running tsunami/storm surge simulation without rivers or rain then the conserve elevation should be switched on. This doesn't make a considerable impact on the tsunami wave (see transect above the red and blue line are indistinguishable) I'm not sure why the difference is so small but there is a difference. Below is the difference between the wetdryfix and conservelevation routine. it produces a difference of O(10-5).</p>
 <p><img src="https://user-images.githubusercontent.com/3713631/213354080-d71a6e49-7085-41ed-93d6-2afb724cac10.png" alt="image" class="inline"/> </p>
@@ -138,7 +138,7 @@ Conserve Elevation</h3>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="Modules.html">Modules</a></li>
-    <li class="footer">Generated on Tue Feb 28 2023 12:43:23 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Mon Mar 6 2023 10:04:31 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

@@ -35,61 +35,62 @@ var NAVTREE =
       [ "How to use/change the code", "index.html#Developer", null ]
     ] ],
     [ "Installation", "How_to_install.html", "How_to_install" ],
+    [ "How to create continuous losses for NZ", "md_doc_modules_NZ_Conductivity.html", null ],
     [ "Paramters and Forcings list", "ParameterList.html", [
-      [ "List of the Parameters' input", "ParameterList.html#autotoc_md91", [
-        [ "General parameters", "ParameterList.html#autotoc_md92", null ],
-        [ "Grid parameters", "ParameterList.html#autotoc_md93", null ],
-        [ "Adaptation", "ParameterList.html#autotoc_md94", null ],
-        [ "Timekeeping", "ParameterList.html#autotoc_md95", null ],
-        [ "Initialisation", "ParameterList.html#autotoc_md96", null ],
-        [ "Outputs", "ParameterList.html#autotoc_md97", null ],
-        [ "Netcdf parameters", "ParameterList.html#autotoc_md98", null ],
-        [ "ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)", "ParameterList.html#autotoc_md99", null ]
+      [ "List of the Parameters' input", "ParameterList.html#autotoc_md92", [
+        [ "General parameters", "ParameterList.html#autotoc_md93", null ],
+        [ "Grid parameters", "ParameterList.html#autotoc_md94", null ],
+        [ "Adaptation", "ParameterList.html#autotoc_md95", null ],
+        [ "Timekeeping", "ParameterList.html#autotoc_md96", null ],
+        [ "Initialisation", "ParameterList.html#autotoc_md97", null ],
+        [ "Outputs", "ParameterList.html#autotoc_md98", null ],
+        [ "Netcdf parameters", "ParameterList.html#autotoc_md99", null ],
+        [ "ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)", "ParameterList.html#autotoc_md100", null ]
       ] ],
-      [ "List of the Forcings' inputs", "ParameterList.html#autotoc_md100", null ],
-      [ "List of the non-identified inputs", "ParameterList.html#autotoc_md101", null ]
+      [ "List of the Forcings' inputs", "ParameterList.html#autotoc_md101", null ],
+      [ "List of the non-identified inputs", "ParameterList.html#autotoc_md102", null ]
     ] ],
     [ "Manual", "Manual.html", [
-      [ "Input Parameters", "Manual.html#autotoc_md104", [
-        [ "<tt>BG_param.txt</tt>", "Manual.html#autotoc_md105", [
-          [ "How to use the <tt>BG_param.txt</tt> file", "Manual.html#autotoc_md106", null ],
-          [ "General comment about input files", "Manual.html#autotoc_md107", null ]
+      [ "Input Parameters", "Manual.html#autotoc_md105", [
+        [ "<tt>BG_param.txt</tt>", "Manual.html#autotoc_md106", [
+          [ "How to use the <tt>BG_param.txt</tt> file", "Manual.html#autotoc_md107", null ],
+          [ "General comment about input files", "Manual.html#autotoc_md108", null ]
         ] ],
-        [ "List of Parameters", "Manual.html#autotoc_md108", [
-          [ "Input", "Manual.html#autotoc_md109", null ],
-          [ "Forcing/Boundary", "Manual.html#autotoc_md110", null ],
-          [ "Hydrodynamics", "Manual.html#autotoc_md111", null ],
-          [ "Time keeping", "Manual.html#autotoc_md112", null ],
-          [ "Output", "Manual.html#autotoc_md113", null ],
-          [ "Miscelanious", "Manual.html#autotoc_md114", null ]
+        [ "List of Parameters", "Manual.html#autotoc_md109", [
+          [ "Input", "Manual.html#autotoc_md110", null ],
+          [ "Forcing/Boundary", "Manual.html#autotoc_md111", null ],
+          [ "Hydrodynamics", "Manual.html#autotoc_md112", null ],
+          [ "Time keeping", "Manual.html#autotoc_md113", null ],
+          [ "Output", "Manual.html#autotoc_md114", null ],
+          [ "Miscelanious", "Manual.html#autotoc_md115", null ]
         ] ],
-        [ "Bathymetry/topography files", "Manual.html#autotoc_md115", null ],
-        [ "Conputational mesh", "Manual.html#autotoc_md116", [
-          [ "Adaptative mesh", "Manual.html#autotoc_md117", null ],
-          [ "Masking", "Manual.html#autotoc_md118", null ]
+        [ "Bathymetry/topography files", "Manual.html#autotoc_md116", null ],
+        [ "Conputational mesh", "Manual.html#autotoc_md117", [
+          [ "Adaptative mesh", "Manual.html#autotoc_md118", null ],
+          [ "Masking", "Manual.html#autotoc_md119", null ]
         ] ],
-        [ "Boundaries", "Manual.html#autotoc_md119", [
-          [ "Boundary file (for type 2 or 3)", "Manual.html#autotoc_md120", [
-            [ "Uniform boundary file", "Manual.html#autotoc_md121", null ],
-            [ "Variable boundary file", "Manual.html#autotoc_md122", null ]
+        [ "Boundaries", "Manual.html#autotoc_md120", [
+          [ "Boundary file (for type 2 or 3)", "Manual.html#autotoc_md121", [
+            [ "Uniform boundary file", "Manual.html#autotoc_md122", null ],
+            [ "Variable boundary file", "Manual.html#autotoc_md123", null ]
           ] ]
         ] ],
-        [ "Bottom friction", "Manual.html#autotoc_md123", null ],
-        [ "Rivers and Area discharge", "Manual.html#autotoc_md124", null ],
-        [ "Wind atm pressure forcing", "Manual.html#autotoc_md125", [
-          [ "Wind forcing (may contain bugs)", "Manual.html#autotoc_md126", [
-            [ "spatially uniform txt file: <tt>windfiles=mywind.txt</tt>", "Manual.html#autotoc_md127", null ],
-            [ "Spatially and time varying input <tt>windfiles=mywind.nc?uw,mywind.nc?vw</tt>", "Manual.html#autotoc_md128", null ]
+        [ "Bottom friction", "Manual.html#autotoc_md124", null ],
+        [ "Rivers and Area discharge", "Manual.html#autotoc_md125", null ],
+        [ "Wind atm pressure forcing", "Manual.html#autotoc_md126", [
+          [ "Wind forcing (may contain bugs)", "Manual.html#autotoc_md127", [
+            [ "spatially uniform txt file: <tt>windfiles=mywind.txt</tt>", "Manual.html#autotoc_md128", null ],
+            [ "Spatially and time varying input <tt>windfiles=mywind.nc?uw,mywind.nc?vw</tt>", "Manual.html#autotoc_md129", null ]
           ] ],
-          [ "Atmospheric pressure forcing", "Manual.html#autotoc_md129", null ]
+          [ "Atmospheric pressure forcing", "Manual.html#autotoc_md130", null ]
         ] ],
-        [ "Output variables (Not up to date!!!)", "Manual.html#autotoc_md130", [
-          [ "Snapshot outputs", "Manual.html#autotoc_md131", null ],
-          [ "Mean/averaged output between output steps", "Manual.html#autotoc_md132", null ],
-          [ "Max output", "Manual.html#autotoc_md133", null ],
-          [ "Risk assesment related output", "Manual.html#autotoc_md134", null ],
-          [ "Infiltration outputs", "Manual.html#autotoc_md135", null ],
-          [ "Other gradients and intermediate terms of the equations", "Manual.html#autotoc_md136", null ]
+        [ "Output variables (Not up to date!!!)", "Manual.html#autotoc_md131", [
+          [ "Snapshot outputs", "Manual.html#autotoc_md132", null ],
+          [ "Mean/averaged output between output steps", "Manual.html#autotoc_md133", null ],
+          [ "Max output", "Manual.html#autotoc_md134", null ],
+          [ "Risk assesment related output", "Manual.html#autotoc_md135", null ],
+          [ "Infiltration outputs", "Manual.html#autotoc_md136", null ],
+          [ "Other gradients and intermediate terms of the equations", "Manual.html#autotoc_md137", null ]
         ] ]
       ] ]
     ] ],
@@ -134,7 +135,7 @@ var NAVTREEINDEX =
 "Read__netcdf_8h.html#a709e031ea8e9e656b958e7c984e7704a",
 "Updateforcing_8h.html#ad13e319a421a8ddb774a162050b0c1d1",
 "classRiver.html#a423c8984c0fb44357a2c3a9c9b36f5dc",
-"structBndblockP.html#a54a44e72ce5535b7b8b2a69e07673156"
+"structBndblockP.html#a19378d34bff2a9e54b3f3567848d5ea1"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

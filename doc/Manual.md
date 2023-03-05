@@ -1,5 +1,8 @@
 # Manual {#Manual}
 
+*This file is not uptodate with the last version of the Code:
+Please, use the Parameters and Forcings list as a reference*
+
 - [Input Parameters](#input-parameters)
   * [`BG_param.txt`](#-bg-paramtxt-)
     + [How to use the `BG_param.txt` file](#how-to-use-the--bg-paramtxt--file)

@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('ILCL.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Rainfall is often absorbed in soil and leaf litter before joining surface flow.The default behaviour of BG_Flood is to assume the rainfall given as input is actually <a href="https://en.wikipedia.org/wiki/Surface_runoff">runoff</a> (i.e. rainfall exess that will make the surface flows). Instead a basic initial - continuous loss model can be apply to approximate runoff.</p>
-<h2><a class="anchor" id="autotoc_md81"></a>
+<h2><a class="anchor" id="autotoc_md82"></a>
 Model implemented</h2>
 <p>The Initial Loss - Continuous Loss (ILCL) is a very basic model for infiltration of surface water in the soil. It requires the input of two maps, based on the soil properties: one containing an initial loss coefficient \(il\) in mm, the second containing a continuous loss coefficient \(cl\) in mm/hr.</p>
 <p>In this model, the initial and continuous losses are applied directly on the water elevation computed on each cell (and not by modifying the rain input). The value of the initial loss \(il\) is estimated to be the total of water infiltrating in the ground before the beginning of the surface runoff, whereas the continuous loss \(cl\) is the loss that occurs, on wet cells, from the begining of the surface runoff to the end of the simulation. The water absorbed in the ground will be tracked using the ground water elevation variable \(hgw\) but wont be reintroduced to the surface flow through the computation process.</p>
@@ -109,14 +109,14 @@ Model implemented</h2>
 <p>The following figure shows a representation of the initial loss - continuing loss model with \(il = 10 mm\) and \(cl = 1 mm/s\) :</p>
 <p><img src="RainLosses.png" alt="" class="inline" title="Initial loss and continuing loss reprensentation during a cell-wetting event"/></p>
 <p><em>Initial loss and continuing loss reprensentation during a cell-wetting event</em></p>
-<h3><a class="anchor" id="autotoc_md82"></a>
+<h3><a class="anchor" id="autotoc_md83"></a>
 &lt;strong&gt;Important notes&lt;/strong&gt;:</h3>
 <p>-&gt; All cells that are initially wet at the begining of the simulation ( \(h &gt; XParam.eps\)) will have their initial loss ( \(il\)) set to 0.0, in order to be consistent with the physic of the model.</p>
 <div class="fragment"><div class="line">-&gt; This model is meant to be used with the rain on grid feature. The model is applied indistinctively to water from any source and can cause unexpected results if misused.</div>
-</div><!-- fragment --> <h2><a class="anchor" id="autotoc_md83"></a>
+</div><!-- fragment --> <h2><a class="anchor" id="autotoc_md84"></a>
 Testcase for the ILCL model</h2>
 <p>The ILCL model is tested in the Westport (ANZ) area, on the Orowaiti river (with a uniform 5m grid). A 20mm/hr rain is uniformly applied on the domain during 30 minutes. An initial loss of 5mm and an continuous loss of 5mm/h are used to define infiltration uniformly on the domain. The results, compared to a reference case without infiltration, are presented in the following figure. <img src="Ex_Merge.png" alt="" class="inline" title="Model_test"/></p>
-<h2><a class="anchor" id="autotoc_md84"></a>
+<h2><a class="anchor" id="autotoc_md85"></a>
 Reference values</h2>
 <p>Some reference values for the \(il\) and \(cl\) coefficients can be found in the literature. Some relate to entire subcatchment and are estimated from hydrology, other can be defined using local information (type of soil, rain antecedents, soil layer depth, ...). Whatever you select, be mindfull the model is likely to be very sensitive to rainfall loss.</p>
 <p>The Initial loss is usually defined based on the antecedent moisture conditions and the soil layer depth and range from 0 to 50mm. The <a href="http://book.arr.org.au.s3-website-ap-southeast-2.amazonaws.com/">Australian Rainfall &amp; Runoff project</a> concidere the initial loss value at a catchemnt scale and observed a low mean value of 1.1mm in urban catchments; in rural catchment, the initial loss is highly variable with a mean of 32mm and a standard deviation of 17mm.</p>
@@ -166,7 +166,7 @@ Reference values</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="Modules.html">Modules</a></li>
-    <li class="footer">Generated on Tue Feb 28 2023 12:43:23 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Mon Mar 6 2023 10:04:31 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

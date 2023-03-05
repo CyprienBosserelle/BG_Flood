@@ -45,7 +45,7 @@ The naive way of doing this is to first do restiction, calculate a gradient (eve
 Instead we first fill the halo for straight copy cells and restriction cells. Then calculate gradient (everywhere) and then do the prolongation where needed and then recalculating the gradient on cells near halo only.\hypertarget{HaloGradient_autotoc_md79}{}\doxysubsubsection{Conserving elevation}\label{HaloGradient_autotoc_md79}
 Using prolongation at the wet/dry interface can lead to inconsistencies between h and zs. To limit the inconsistency zs is calculated from h after a prolongation calculation (see refine\+\_\+linear). While this conserves mass, it, however, leads to a violation of the lake-\/at-\/rest resulting in (small) spurious velocity at that interface. To remove the instability and preserve the elevation of the water (rather than its mass) we use a conserve elevation option (conserveelevation = true). This gets rid of the instability and preserves the elevation of the water level but then violates the mass conservation.\hypertarget{HaloGradient_autotoc_md80}{}\doxysubsubsection{Fluxes halo are a bit different}\label{HaloGradient_autotoc_md80}
 \hypertarget{ILCL}{}\doxysection{Ground infiltration\+: Initial Loss -\/ Continuous Loss}\label{ILCL}
-Rainfall is often absorbed in soil and leaf litter before joining surface flow.\+The default behaviour of BG\+\_\+\+Flood is to assume the rainfall given as input is actually \href{https://en.wikipedia.org/wiki/Surface_runoff}{\texttt{ runoff}} (i.\+e. rainfall exess that will make the surface flows). Instead a basic initial -\/ continuous loss model can be apply to approximate runoff.\hypertarget{ILCL_autotoc_md81}{}\doxysubsubsection{Model implemented}\label{ILCL_autotoc_md81}
+Rainfall is often absorbed in soil and leaf litter before joining surface flow.\+The default behaviour of BG\+\_\+\+Flood is to assume the rainfall given as input is actually \href{https://en.wikipedia.org/wiki/Surface_runoff}{\texttt{ runoff}} (i.\+e. rainfall exess that will make the surface flows). Instead a basic initial -\/ continuous loss model can be apply to approximate runoff.\hypertarget{ILCL_autotoc_md82}{}\doxysubsubsection{Model implemented}\label{ILCL_autotoc_md82}
 The Initial Loss -\/ Continuous Loss (ILCL) is a very basic model for infiltration of surface water in the soil. It requires the input of two maps, based on the soil properties\+: one containing an initial loss coefficient $il$ in mm, the second containing a continuous loss coefficient $cl$ in mm/hr.
 
 In this model, the initial and continuous losses are applied directly on the water elevation computed on each cell (and not by modifying the rain input). The value of the initial loss $il$ is estimated to be the total of water infiltrating in the ground before the beginning of the surface runoff, whereas the continuous loss $cl$ is the loss that occurs, on wet cells, from the begining of the surface runoff to the end of the simulation. The water absorbed in the ground will be tracked using the ground water elevation variable $hgw$ but wont be reintroduced to the surface flow through the computation process.
@@ -66,7 +66,7 @@ The following figure shows a representation of the initial loss -\/ continuing l
 \end{DoxyInlineImage}
 
 
-{\itshape Initial loss and continuing loss reprensentation during a cell-\/wetting event}\hypertarget{ILCL_autotoc_md82}{}\doxyparagraph{$<$strong$>$\+Important notes$<$/strong$>$\+:}\label{ILCL_autotoc_md82}
+{\itshape Initial loss and continuing loss reprensentation during a cell-\/wetting event}\hypertarget{ILCL_autotoc_md83}{}\doxyparagraph{$<$strong$>$\+Important notes$<$/strong$>$\+:}\label{ILCL_autotoc_md83}
 -\/$>$ All cells that are initially wet at the begining of the simulation ( $h > XParam.eps$) will have their initial loss ( $il$) set to 0.\+0, in order to be consistent with the physic of the model.
 
 
@@ -74,12 +74,12 @@ The following figure shows a representation of the initial loss -\/ continuing l
 \DoxyCodeLine{-\/> This model is meant to be used with the rain on grid feature. The model is applied indistinctively to water from any source and can cause unexpected results if misused.}
 
 \end{DoxyCode}
- \hypertarget{ILCL_autotoc_md83}{}\doxysubsubsection{Testcase for the ILCL model}\label{ILCL_autotoc_md83}
+ \hypertarget{ILCL_autotoc_md84}{}\doxysubsubsection{Testcase for the ILCL model}\label{ILCL_autotoc_md84}
 The ILCL model is tested in the Westport (ANZ) area, on the Orowaiti river (with a uniform 5m grid). A 20mm/hr rain is uniformly applied on the domain during 30 minutes. An initial loss of 5mm and an continuous loss of 5mm/h are used to define infiltration uniformly on the domain. The results, compared to a reference case without infiltration, are presented in the following figure. 
 \begin{DoxyInlineImage}
 \includegraphics[height=\baselineskip,keepaspectratio=true]{Ex_Merge.png}%Model\+\_\+test
 \end{DoxyInlineImage}
-\hypertarget{ILCL_autotoc_md84}{}\doxysubsubsection{Reference values}\label{ILCL_autotoc_md84}
+\hypertarget{ILCL_autotoc_md85}{}\doxysubsubsection{Reference values}\label{ILCL_autotoc_md85}
 Some reference values for the $il$ and $cl$ coefficients can be found in the literature. Some relate to entire subcatchment and are estimated from hydrology, other can be defined using local information (type of soil, rain antecedents, soil layer depth, ...). Whatever you select, be mindfull the model is likely to be very sensitive to rainfall loss.
 
 The Initial loss is usually defined based on the antecedent moisture conditions and the soil layer depth and range from 0 to 50mm. The \href{http://book.arr.org.au.s3-website-ap-southeast-2.amazonaws.com/}{\texttt{ Australian Rainfall \& Runoff project}} concidere the initial loss value at a catchemnt scale and observed a low mean value of 1.\+1mm in urban catchments; in rural catchment, the initial loss is highly variable with a mean of 32mm and a standard deviation of 17mm.
@@ -135,7 +135,7 @@ Below is an other example of compilation of some of these values from \href{http
  \hypertarget{WetdryfixConservelevation}{}\doxysection{Conserve Elevation}\label{WetdryfixConservelevation}
 At the interface of coarse and fine blocks we often cannot {\bfseries{strictly}} conserve both mass (h) and water elevation. The difference in most cases is relatively small but near the wet/dry interface, trying to conserve mass leads to instabilities. Since these instabilities are a bit annoying by default BG\+\_\+\+Flood enforces the conservation of elevation at the interface between coarse and fine blocks where wet and dry cells are present. This might lead to a mismatch between the expected volume and actual volume when simulating rain or river flooding. Similarly, ignoring the conserve elevation requirement when simulating a tsunami can lead to a underestimate of the tsunami. The impact of these switch is small and we can show how small they are below.
 
-Below are two examples of basic flood model to test the impact of the wet/dry instability fix (hereafter wetdryfix) on mass conservation. Further below is to test the impact of the wetdryfix and conserve elevation routimne (hereafter conserve\+Elevation) on a tsunami wave propagating on a real steep bathymetry (Samoa).\hypertarget{WetdryfixConservelevation_autotoc_md85}{}\doxysubsubsection{Mass conservation implication}\label{WetdryfixConservelevation_autotoc_md85}
+Below are two examples of basic flood model to test the impact of the wet/dry instability fix (hereafter wetdryfix) on mass conservation. Further below is to test the impact of the wetdryfix and conserve elevation routimne (hereafter conserve\+Elevation) on a tsunami wave propagating on a real steep bathymetry (Samoa).\hypertarget{WetdryfixConservelevation_autotoc_md86}{}\doxysubsubsection{Mass conservation implication}\label{WetdryfixConservelevation_autotoc_md86}
 Using the Waikanae topo with cst rain at 50mm/h for 1 hour. using the rainbnd option and wall bnd on all side. Results are undestinguishable from each other and after 1 hr the model has {\bfseries{100.\+48\%}} of the theoretical volume of water in both with and without the wetdryfix. ~\newline
 
 
@@ -154,17 +154,17 @@ results \tabulinesep=1mm
 Wetdry fix   &100.\+48\%   &97s    \\\cline{1-3}
 {\bfseries{NO}} Wetdryfix   &100.\+48\%   &96s   \\\cline{1-3}
 \end{longtabu}
-\hypertarget{WetdryfixConservelevation_autotoc_md86}{}\doxysubsubsection{Tsumani test results}\label{WetdryfixConservelevation_autotoc_md86}
-The impact of the wet/dry fix should be much more obvious in tsunami simulation but here conserve elevation should be used in most tsunami cases.\hypertarget{WetdryfixConservelevation_autotoc_md87}{}\doxyparagraph{No wetdryfix}\label{WetdryfixConservelevation_autotoc_md87}
+\hypertarget{WetdryfixConservelevation_autotoc_md87}{}\doxysubsubsection{Tsumani test results}\label{WetdryfixConservelevation_autotoc_md87}
+The impact of the wet/dry fix should be much more obvious in tsunami simulation but here conserve elevation should be used in most tsunami cases.\hypertarget{WetdryfixConservelevation_autotoc_md88}{}\doxyparagraph{No wetdryfix}\label{WetdryfixConservelevation_autotoc_md88}
 switching off the wetdryfix causes instability that really have an impact on tsunami wave. Here the instability are clearly visible in the map and in the comparison are seen as 0.\+01 m waves before the tsunami wave arrive.
 
-\hypertarget{WetdryfixConservelevation_autotoc_md88}{}\doxyparagraph{Wetdryfix}\label{WetdryfixConservelevation_autotoc_md88}
+\hypertarget{WetdryfixConservelevation_autotoc_md89}{}\doxyparagraph{Wetdryfix}\label{WetdryfixConservelevation_autotoc_md89}
 When using the wetdryfix the instabilities disappear and the solution is smoother.
 
-\hypertarget{WetdryfixConservelevation_autotoc_md89}{}\doxyparagraph{Comparison Wetdryfix vs no Wetdryfix}\label{WetdryfixConservelevation_autotoc_md89}
+\hypertarget{WetdryfixConservelevation_autotoc_md90}{}\doxyparagraph{Comparison Wetdryfix vs no Wetdryfix}\label{WetdryfixConservelevation_autotoc_md90}
 The instabilities are more obvious when we look at a transect diagonally from the plot above. These instabilities have a notable affect the height of the tsunami wave... a lot! This justifies that we should have the wetdryfix switched on by default.
 
-\hypertarget{WetdryfixConservelevation_autotoc_md90}{}\doxyparagraph{Conserve Elevation}\label{WetdryfixConservelevation_autotoc_md90}
+\hypertarget{WetdryfixConservelevation_autotoc_md91}{}\doxyparagraph{Conserve Elevation}\label{WetdryfixConservelevation_autotoc_md91}
 When running tsunami/storm surge simulation without rivers or rain then the conserve elevation should be switched on. This doesn\textquotesingle{}t make a considerable impact on the tsunami wave (see transect above the red and blue line are indistinguishable) I\textquotesingle{}m not sure why the difference is so small but there is a difference. Below is the difference between the wetdryfix and conservelevation routine. it produces a difference of O(10-\/5).
 
  
