@@ -23,7 +23,7 @@ var searchData=
   ['maskbndgpuleft_735',['maskbndGPUleft',['../Boundary_8cu.html#acdef573f7f2d65d3fe3f215342377a8b',1,'maskbndGPUleft(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu'],['../Boundary_8h.html#acdef573f7f2d65d3fe3f215342377a8b',1,'maskbndGPUleft(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu']]],
   ['maskbndgpuleft_3c_20double_20_3e_736',['maskbndGPUleft&lt; double &gt;',['../Boundary_8cu.html#a30fa9b8072b094f3576b6bcafc521327',1,'Boundary.cu']]],
   ['maskbndgpuleft_3c_20float_20_3e_737',['maskbndGPUleft&lt; float &gt;',['../Boundary_8cu.html#a4330c40dbbb5c8f8eb11a7f86f7912fc',1,'Boundary.cu']]],
-  ['maskbndgpuright_738',['maskbndGPUright',['../Boundary_8cu.html#ac1a6983a856cbc02072948f3d3fad1ea',1,'maskbndGPUright(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu'],['../Boundary_8h.html#ac1a6983a856cbc02072948f3d3fad1ea',1,'maskbndGPUright(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu']]],
+  ['maskbndgpuright_738',['maskbndGPUright',['../Boundary_8h.html#ac1a6983a856cbc02072948f3d3fad1ea',1,'maskbndGPUright(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu'],['../Boundary_8cu.html#ac1a6983a856cbc02072948f3d3fad1ea',1,'maskbndGPUright(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu']]],
   ['maskbndgpuright_3c_20double_20_3e_739',['maskbndGPUright&lt; double &gt;',['../Boundary_8cu.html#a6dcf7291e136c1fc8decef3795084aee',1,'Boundary.cu']]],
   ['maskbndgpuright_3c_20float_20_3e_740',['maskbndGPUright&lt; float &gt;',['../Boundary_8cu.html#aca2c46fb2d6e2704b7ed53535fdf44c6',1,'Boundary.cu']]],
   ['maskbndgputop_741',['maskbndGPUtop',['../Boundary_8cu.html#aec86c8b6389e6f9ca2e81ab733e58487',1,'maskbndGPUtop(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu'],['../Boundary_8h.html#aec86c8b6389e6f9ca2e81ab733e58487',1,'maskbndGPUtop(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; Xev, T *zb):&#160;Boundary.cu']]],
@@ -63,5 +63,6 @@ var searchData=
   ['modules_775',['Modules',['../Modules.html',1,'']]],
   ['modules_2emd_776',['Modules.md',['../Modules_8md.html',1,'']]],
   ['monai_20test_20case_777',['Monai test Case',['../Monai.html',1,'Test-and-Examples']]],
-  ['monai_2emd_778',['Monai.md',['../Monai_8md.html',1,'']]]
+  ['monai_20tutorial_20with_20julia_778',['Monai tutorial with Julia',['../TutorialMonaiJulia.html',1,'Tutorials']]],
+  ['monai_2emd_779',['Monai.md',['../Monai_8md.html',1,'']]]
 ];

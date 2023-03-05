@@ -180,6 +180,7 @@ var NAVTREEINDEX5 =
 "TutorialJetJulia.html#autotoc_md29":[5,1,1,4],
 "TutorialJetJulia.html#autotoc_md30":[5,1,1,5],
 "TutorialJetJulia.html#autotoc_md31":[5,1,2],
+"TutorialMonaiJulia.html":[5,2],
 "Tutorials.html":[5],
 "Updateforcing_8cu.html":[9,0,1,57],
 "Updateforcing_8cu.html#a044e409c1b9d0d99611df800cc756389":[9,0,1,57,45],
@@ -248,6 +249,5 @@ var NAVTREEINDEX5 =
 "Updateforcing_8h.html#a599e215dbff69667f7542b4d6489a8ac":[9,0,1,58,14],
 "Updateforcing_8h.html#a84e00f06851cebb36d1a639e73172dd9":[9,0,1,58,3],
 "Updateforcing_8h.html#ab32cde3ea8a907b071d24402886019d3":[9,0,1,58,13],
-"Updateforcing_8h.html#acf937003de037aec20b2b23b1f7a8b5b":[9,0,1,58,4],
-"Updateforcing_8h.html#ad13e319a421a8ddb774a162050b0c1d1":[9,0,1,58,1]
+"Updateforcing_8h.html#acf937003de037aec20b2b23b1f7a8b5b":[9,0,1,58,4]
 };

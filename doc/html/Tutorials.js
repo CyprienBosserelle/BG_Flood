@@ -74,5 +74,6 @@ var Tutorials =
         [ "Things to try", "TutorialJetJulia.html#autotoc_md30", null ]
       ] ],
       [ "River + Rain = Waikanae example", "TutorialJetJulia.html#autotoc_md31", null ]
-    ] ]
+    ] ],
+    [ "Monai tutorial with Julia", "TutorialMonaiJulia.html", null ]
 ];
