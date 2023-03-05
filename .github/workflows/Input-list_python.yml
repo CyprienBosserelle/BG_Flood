@@ -6,7 +6,7 @@ name: Input-Keys, Python script
 
 on:
   push:
-    branches: [ development ]
+    branches: [ development,documentation2 ]
   pull_request:
     branches: [ development ]
 
