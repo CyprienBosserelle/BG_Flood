@@ -12,16 +12,14 @@
 \end{DoxyItemize}
 \item \href{\#list-of-parameters}{\texttt{ List of Parameters}}
 \item \href{\#bathymetrytopography-files}{\texttt{ Bathymetry/topography files}}
-\begin{DoxyItemize}
-\item \href{\#masking}{\texttt{ Masking}}
-\end{DoxyItemize}
+\item \href{\#masking}{\texttt{ Computational mesh}}
 \item \href{\#boundaries}{\texttt{ Boundaries}}
 \item \href{\#bottom-friction}{\texttt{ Bottom friction}}
 \item \href{\#rivers-and-area-discharge}{\texttt{ Rivers and Area discharge}}
-\item \href{\#wind-atm-pressure-forcing}{\texttt{ Wind atm pressure forcing}}
-\item \href{\#output-variables}{\texttt{ Output variables}}
+\item \href{\#wind-atm-pressure-forcing}{\texttt{ Wind and atmospheric pressure forcing}}
+\item \href{\#output-variables}{\texttt{ Outputs}}
 \end{DoxyItemize}
-\end{DoxyItemize}\hypertarget{Manual_autotoc_md104}{}\doxysection{Input Parameters}\label{Manual_autotoc_md104}
+\end{DoxyItemize}\hypertarget{Manual_autotoc_md104}{}\doxysection{Input Parameters \{\#ref input-\/parameters\}}\label{Manual_autotoc_md104}
 \hypertarget{Manual_autotoc_md105}{}\doxysubsection{BG\+\_\+param.\+txt}\label{Manual_autotoc_md105}
 All the model inputs are controlled by the BG\+\_\+param.\+txt file. It is a simple text file that contains the parameters of the model that the user wishes to change.\hypertarget{Manual_autotoc_md106}{}\doxysubsubsection{How to use the BG\+\_\+param.\+txt file}\label{Manual_autotoc_md106}
 \mbox{\hyperlink{structModel}{Model}} parameters can be modified in the file by specifying the parameter name, the equal sign, the desired value(s) for the parameter and optionally a semi-\/column ; 
@@ -64,20 +62,20 @@ The correct way of reading the file will be dedicated by the file extension. For
 This input file is critical as it defines the extent of the model grid and the base resolution in the model.
 
 {\itshape Note}\+: Different files can be provided to the code (using the instruction line multiple times). The code will use the last one having information at a given location when interpolating the data to create the bottom elevation (zb) variable.\hypertarget{Manual_autotoc_md110}{}\doxysubsection{Conputational mesh}\label{Manual_autotoc_md110}
-{\bfseries{BG-\/\+Flood generates its own mesh.}} By default, it is a quad regular mesh based on the DEM (Digital Elevation \mbox{\hyperlink{structModel}{Model}}) extend and resolution. The extend of the mesh and resolution of the mesh can be modify by the user. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.\hypertarget{Manual_autotoc_md111}{}\doxysubsubsection{Adaptative mesh}\label{Manual_autotoc_md111}
-\hypertarget{Manual_autotoc_md112}{}\doxysubsubsection{Masking}\label{Manual_autotoc_md112}
+{\bfseries{BG-\/\+Flood generates its own mesh.}} By default, it is a quad regular mesh based on the DEM (Digital Elevation \mbox{\hyperlink{structModel}{Model}}) extend and resolution. The extend of the mesh and resolution of the mesh can be modify by the user. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.\hypertarget{Manual_autotoc_md111}{}\doxysubsubsection{Masking}\label{Manual_autotoc_md111}
 Parts of the input bathymetry can be masked and excluded from the computation. The model extent (and locations of side boundaries) will remain the same but entire blocks can be removed from the computational memory. These area will appear as NaN in the output file. The input grid is first devided in blocks of 16x16. If all the value within a block exceed the mask value (9999 as default) then that block is excluded from memory and no computation will occur there. An \char`\"{}area of interest\char`\"{} (AOI) can also be used to select a part of the domain. If none of the cells of a block is located in this area, that block will be excluded from memory. The AOI is prefered other the mask method as the later can create waterfalls on the borders of the domain, specially if the rain-\/on-\/grid method is used.
 
-There are no fancy treatment of the boundaries of masked blocks so it is safer to select a mask threshold ({\ttfamily mask}) to keep most of the masked are dry. If water tries to cross to a masked block, The boundary of blocks are treated as Neumann (no gradient) boundaries so the bathymetry of the 2 cells adjacent to a masked block are set to the same value (the value of the second cell removed from the masked block).\hypertarget{Manual_autotoc_md113}{}\doxysubsection{Boundaries}\label{Manual_autotoc_md113}
+There are no fancy treatment of the boundaries of masked blocks so it is safer to select a mask threshold ({\ttfamily mask}) to keep most of the masked are dry. If water tries to cross to a masked block, The boundary of blocks are treated as Neumann (no gradient) boundaries so the bathymetry of the 2 cells adjacent to a masked block are set to the same value (the value of the second cell removed from the masked block).\hypertarget{Manual_autotoc_md112}{}\doxysubsection{Boundaries}\label{Manual_autotoc_md112}
 Four type of boundaries can be applied at the edge of the model. By default neumann (no perpendicular gradient) is applied.
 
-0. No slip (wall)
-\begin{DoxyEnumerate}
-\item Neumann
-\item dirichlets (water level )
-\item Absorbing (only 1D/perpendicular absorbion is implemented)
-\item $\sim$$\sim$ 2D Absorbing$\sim$$\sim$ (Not implemented yet)
-\end{DoxyEnumerate}
+
+\begin{DoxyItemize}
+\item 0\+: No slip (wall)
+\item 1\+: Neumann
+\item 2\+: dirichlets (water level )
+\item 3\+: Absorbing (only 1D/perpendicular absorbion is implemented)
+\item (4\+: $\sim$$\sim$ 2D Absorbing$\sim$$\sim$ (Not implemented yet))
+\end{DoxyItemize}
 
 For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary level is imposed from a file so a file needs to be sepcified\+: 
 \begin{DoxyCode}{0}
@@ -86,8 +84,8 @@ For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary le
 \DoxyCodeLine{top = mybndfile.txt,3;}
 
 \end{DoxyCode}
-\hypertarget{Manual_autotoc_md114}{}\doxysubsubsection{Boundary file (for type 2 or 3)}\label{Manual_autotoc_md114}
-Water level boundary file are needed to type 2 and 3 boundaries. The files are 2 (or more) columns, one with time in the first column and water level is the other(s). Note that the time step in the file doesn\textquotesingle{}t need to be constant. The model will linearly interpolated between steps in the file. The file can be either comma separated or tab separated. This is automatically detected.\hypertarget{Manual_autotoc_md115}{}\doxyparagraph{Uniform boundary file}\label{Manual_autotoc_md115}
+\hypertarget{Manual_autotoc_md113}{}\doxysubsubsection{Boundary file (for type 2 or 3)}\label{Manual_autotoc_md113}
+Water level boundary file are needed to type 2 and 3 boundaries. The files are 2 (or more) columns, one with time in the first column and water level is the other(s). Note that the time step in the file doesn\textquotesingle{}t need to be constant. The model will linearly interpolated between steps in the file. The file can be either comma separated or tab separated. This is automatically detected.\hypertarget{Manual_autotoc_md114}{}\doxyparagraph{Uniform boundary file}\label{Manual_autotoc_md114}
 For uniform boundary condition (along the boundary axis) the files needs to be 2 column\+: 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{preprocessor}{\# Water level boundary}}
@@ -98,7 +96,7 @@ For uniform boundary condition (along the boundary axis) the files needs to be 2
 \DoxyCodeLine{36120.0  1.24}
 
 \end{DoxyCode}
-\hypertarget{Manual_autotoc_md116}{}\doxyparagraph{Variable boundary file}\label{Manual_autotoc_md116}
+\hypertarget{Manual_autotoc_md115}{}\doxyparagraph{Variable boundary file}\label{Manual_autotoc_md115}
 For Variable boundary condition (along the boundary axis) the files needs to be 3+ columns. The boundary axis is then divided by the number of boundary column and the water level is interpolated between location. for example\+: 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{preprocessor}{\# Water level boundary}}
@@ -127,7 +125,7 @@ Here is an example with 3 water level column\+:
 
 In this case both near and far end of the boundary axis will remain zero and the center of the boundary axis will be 1.\+2m.
 
-There is no restriction in the number of columns. These values from each column will be forced uniformly spaced on the boundary and forcing in between will be linearly interpolated.\hypertarget{Manual_autotoc_md117}{}\doxysubsection{Bottom friction}\label{Manual_autotoc_md117}
+There is no restriction in the number of columns. These values from each column will be forced uniformly spaced on the boundary and forcing in between will be linearly interpolated.\hypertarget{Manual_autotoc_md116}{}\doxysubsection{Bottom friction}\label{Manual_autotoc_md116}
 Bottom friction is applied implicitly in the model (applied to velocities after momentum and continuity equations are solved). There are 3 friction equations implemented defined in {\ttfamily BG\+\_\+param.\+txt} as {\ttfamily frictionmodel =}\+:
 
 
@@ -143,39 +141,39 @@ Bottom friction is applied implicitly in the model (applied to velocities after 
  If a uniform friction is required add {\ttfamily cf=} to your {\ttfamily BG\+\_\+param.\+txt} with the desired value. {\ttfamily cf} keyword is also used for the $z0$ of Smart formulation and $n$ of the Manning formulation.
 \end{DoxyItemize}
 
-For non-\/uniform friction parameter use the keyword {\ttfamily cfmap} or {\ttfamily roughnessmap} and assign an {\ttfamily .asc} or {\ttfamily .nc} file. For nc files you may need to supply the netcdf variable name\+: e.\+g. {\ttfamily cfmap=final\+\_\+rough.\+nc?zo}. The roughness grid does not need to match the model grid dimension and coarser friction grid will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).\hypertarget{Manual_autotoc_md118}{}\doxysubsection{Rivers and Area discharge}\label{Manual_autotoc_md118}
+For non-\/uniform friction parameter use the keyword {\ttfamily cfmap} or {\ttfamily roughnessmap} and assign an {\ttfamily .asc} or {\ttfamily .nc} file. For nc files you may need to supply the netcdf variable name\+: e.\+g. {\ttfamily cfmap=final\+\_\+rough.\+nc?zo}. The roughness grid does not need to match the model grid dimension and coarser friction grid will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).\hypertarget{Manual_autotoc_md117}{}\doxysubsection{Rivers and Area discharge}\label{Manual_autotoc_md117}
 At this stage river can only be added to the model as a vertical discharge where the water is added to a rectangle on the model with no velocity. To add rivers add a line per river with the parameters\+: {\ttfamily river = Fluxfile,xstart,xend,ystart,yend;} where {\ttfamily Fluxfile} is a 2 column text file containing time and dicharge in m3/s; {\ttfamily xstart} is the left coordinate of the square where the vertical discharge is applied, {\ttfamily xend} is the right coordinate of the square, {\ttfamily ystart} is the bottom coordinate of the square and {\ttfamily yend} is the top coordinate of the square. Example\+: 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{river = Votualevu\_R.txt,1867430,1867455,3914065,3914090;}
 \DoxyCodeLine{river = Mulomulo\_R.txt,1867052,1867072,3911853,3911873;}
 
 \end{DoxyCode}
-\hypertarget{Manual_autotoc_md119}{}\doxysubsection{Wind atm pressure forcing}\label{Manual_autotoc_md119}
-\hypertarget{Manual_autotoc_md120}{}\doxysubsubsection{Wind forcing (may contain bugs)}\label{Manual_autotoc_md120}
-The hydrodynamics can be forced using a linear wind drag. the linear drag can be influenced with the keyword {\ttfamily Cd}. Wind input is defined with the keyword {\ttfamily windfiles=}. There are several ways to use the keyword. \hypertarget{Manual_autotoc_md121}{}\doxyparagraph{spatially uniform txt file\+:}\label{Manual_autotoc_md121}
+\hypertarget{Manual_autotoc_md118}{}\doxysubsection{Wind atm pressure forcing}\label{Manual_autotoc_md118}
+\hypertarget{Manual_autotoc_md119}{}\doxysubsubsection{Wind forcing (may contain bugs)}\label{Manual_autotoc_md119}
+The hydrodynamics can be forced using a linear wind drag. the linear drag can be influenced with the keyword {\ttfamily Cd}. Wind input is defined with the keyword {\ttfamily windfiles=}. There are several ways to use the keyword. \hypertarget{Manual_autotoc_md120}{}\doxyparagraph{spatially uniform txt file\+:}\label{Manual_autotoc_md120}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{windfiles=mywind.txt}
 
 \end{DoxyCode}
- where {\ttfamily mywind.\+txt} is a text file with 3 column (time (in s), wind speed (m/s) and wind direction(degree North)). If the grid is in acoordinate system rotated from the north and a {\ttfamily grdalpha} is specified, the wind will be automatically rotated to the grid orientation.\hypertarget{Manual_autotoc_md122}{}\doxyparagraph{Spatially and time varying input}\label{Manual_autotoc_md122}
+ where {\ttfamily mywind.\+txt} is a text file with 3 column (time (in s), wind speed (m/s) and wind direction(degree North)). If the grid is in acoordinate system rotated from the north and a {\ttfamily grdalpha} is specified, the wind will be automatically rotated to the grid orientation.\hypertarget{Manual_autotoc_md121}{}\doxyparagraph{Spatially and time varying input}\label{Manual_autotoc_md121}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{windfiles=mywind.nc?uw,mywind.nc?vw}
 
 \end{DoxyCode}
- Here two arguments separated with a comma are expected. The first argument is the netcdf file and variable name containing the U component of the wind (along the X axis) and the second argument is the netcdf file and variable name containing the V component of the wind (along the Y axis). Both can be in the same netcdf file as in the example or in separate netcdf files (add the variable name with a {\ttfamily ?} similarly to other netcdf input options). The dimension of the wind forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).\hypertarget{Manual_autotoc_md123}{}\doxysubsubsection{Atmospheric pressure forcing}\label{Manual_autotoc_md123}
+ Here two arguments separated with a comma are expected. The first argument is the netcdf file and variable name containing the U component of the wind (along the X axis) and the second argument is the netcdf file and variable name containing the V component of the wind (along the Y axis). Both can be in the same netcdf file as in the example or in separate netcdf files (add the variable name with a {\ttfamily ?} similarly to other netcdf input options). The dimension of the wind forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).\hypertarget{Manual_autotoc_md122}{}\doxysubsubsection{Atmospheric pressure forcing}\label{Manual_autotoc_md122}
 Spatially constant atmospheric pressure forcing is not relevant so only spatially varying forcing is feasable. Like for the wind this is done through a netcdf file\+: 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{atmpfile=myncfile.nc?atmpres}
 
 \end{DoxyCode}
- The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure {\ttfamily Paref=101300.\+0} converted to a height using {\ttfamily Pa2m=0.\+00009916}. If using h\+Pa your will need to also change the reference pressure to {\ttfamily Paref=1013.\+0} and the conversion parameter to {\ttfamily Pa2m=0.\+009916}. As with the wind forcing, the forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).\hypertarget{Manual_autotoc_md124}{}\doxysubsection{Outputs}\label{Manual_autotoc_md124}
+ The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure {\ttfamily Paref=101300.\+0} converted to a height using {\ttfamily Pa2m=0.\+00009916}. If using h\+Pa your will need to also change the reference pressure to {\ttfamily Paref=1013.\+0} and the conversion parameter to {\ttfamily Pa2m=0.\+009916}. As with the wind forcing, the forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).\hypertarget{Manual_autotoc_md123}{}\doxysubsection{Outputs}\label{Manual_autotoc_md123}
 There is two types of outputs\+:
 \begin{DoxyItemize}
 \item map outputs of 2D variables regularly through time.
 \item time-\/series output of basic values, at a chosen position, at each time step.
-\end{DoxyItemize}\hypertarget{Manual_autotoc_md125}{}\doxysubsubsection{Map outputs}\label{Manual_autotoc_md125}
+\end{DoxyItemize}\hypertarget{Manual_autotoc_md124}{}\doxysubsubsection{Map outputs}\label{Manual_autotoc_md124}
 These maps are output as a nc file, with information on coordinates and blocks.
 
 The map output can be modify by\+:
@@ -213,7 +211,7 @@ The map output can be modify by\+:
 
 \end{DoxyItemize}
 
-By default, the variables outputs are the one listed in the following paragraph\+: Default snapshot outputs. \hypertarget{Manual_autotoc_md126}{}\doxyparagraph{Default snapshot outputs}\label{Manual_autotoc_md126}
+By default, the variables outputs are the one listed in the following paragraph\+: Default snapshot outputs. \hypertarget{Manual_autotoc_md125}{}\doxyparagraph{Default snapshot outputs}\label{Manual_autotoc_md125}
 \tabulinesep=1mm
 \begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
 \hline
@@ -230,7 +228,7 @@ h   &\PBS\centering water depth at cell center   &\PBS\raggedleft \mbox{[}m\mbox
 zs   &\PBS\centering Water level elevation above datum   &\PBS\raggedleft \mbox{[}m\mbox{]}    \\\cline{1-3}
 zb   &\PBS\centering Topography elevation above datum   &\PBS\raggedleft \mbox{[}m\mbox{]}   \\\cline{1-3}
 \end{longtabu}
-\hypertarget{Manual_autotoc_md127}{}\doxyparagraph{Complementary variables}\label{Manual_autotoc_md127}
+\hypertarget{Manual_autotoc_md126}{}\doxyparagraph{Complementary variables}\label{Manual_autotoc_md126}
 \tabulinesep=1mm
 \begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
 \hline
@@ -244,7 +242,7 @@ zb   &\PBS\centering Topography elevation above datum   &\PBS\raggedleft \mbox{[
 vort   &\PBS\centering Vorticity   &\PBS\raggedleft \mbox{[}rotation/s\mbox{]}    \\\cline{1-3}
 cf   &\PBS\centering Bottom friction coefficient (Manning n or z0)   &\PBS\raggedleft varies with model used   \\\cline{1-3}
 \end{longtabu}
-\hypertarget{Manual_autotoc_md128}{}\doxyparagraph{Mean/averaged output between output steps}\label{Manual_autotoc_md128}
+\hypertarget{Manual_autotoc_md127}{}\doxyparagraph{Mean/averaged output between output steps}\label{Manual_autotoc_md127}
 This is for averaging variables in between output steps, useful for mean tidal flow calculation that averages out vortices. The average time is {\ttfamily outtimestep}.
 
 \tabulinesep=1mm
@@ -262,7 +260,7 @@ vmean   &\PBS\centering Averaged v velocity (at cell center) meridional velocity
 hmean   &\PBS\centering Averaged water depth at cell center   &\PBS\raggedleft \mbox{[}m\mbox{]}    \\\cline{1-3}
 zsmean   &\PBS\centering Averaged Water level elevation above datum   &\PBS\raggedleft \mbox{[}m\mbox{]}   \\\cline{1-3}
 \end{longtabu}
-\hypertarget{Manual_autotoc_md129}{}\doxyparagraph{Max output}\label{Manual_autotoc_md129}
+\hypertarget{Manual_autotoc_md128}{}\doxyparagraph{Max output}\label{Manual_autotoc_md128}
 The max can be calculated for the overall simulation (default) or between output steps ( if {\ttfamily resetmax = 1;})
 
 \tabulinesep=1mm
@@ -280,7 +278,7 @@ vmax   &\PBS\centering Maximum v velocity (at cell center) meridional velocity p
 hmax   &\PBS\centering Maximum water depth at cell center   &\PBS\raggedleft \mbox{[}m\mbox{]}    \\\cline{1-3}
 zsmax   &\PBS\centering Maximum Water level elevation above datum   &\PBS\raggedleft \mbox{[}m\mbox{]}   \\\cline{1-3}
 \end{longtabu}
-\hypertarget{Manual_autotoc_md130}{}\doxyparagraph{Risk assesment related output}\label{Manual_autotoc_md130}
+\hypertarget{Manual_autotoc_md129}{}\doxyparagraph{Risk assesment related output}\label{Manual_autotoc_md129}
 These variables are used to evaluate the damage resulting from the innundation (as a complement to hmax for example).
 
 \tabulinesep=1mm
@@ -297,7 +295,7 @@ h\+Umax   &\PBS\centering Maximum of h time the velocity (U for amplitude of (u,
 Umax   &\PBS\centering Maximum of the velocity (U for amplitude of (u,v))   &\PBS\raggedleft \mbox{[}m/s\mbox{]}    \\\cline{1-3}
 twet   &\PBS\centering Duration innundation of the cell in s (h$>$0.\+1m)   &\PBS\raggedleft \mbox{[}s\mbox{]}   \\\cline{1-3}
 \end{longtabu}
-\hypertarget{Manual_autotoc_md131}{}\doxyparagraph{Model related outputs}\label{Manual_autotoc_md131}
+\hypertarget{Manual_autotoc_md130}{}\doxyparagraph{Model related outputs}\label{Manual_autotoc_md130}
 These outputs will be produce only if the associated model/forcing is used.
 
 If an atmospheric forcing is used\+: \tabulinesep=1mm
@@ -331,7 +329,7 @@ il   &\PBS\centering Initial loss coefficient   &\PBS\raggedleft \mbox{[}mm\mbox
 cl   &\PBS\centering Continuous loss coefficient   &\PBS\raggedleft \mbox{[}mm/hr\mbox{]}    \\\cline{1-3}
 hgw   &\PBS\centering Cumulated height of infiltrated water in the ground   &\PBS\raggedleft \mbox{[}m\mbox{]}   \\\cline{1-3}
 \end{longtabu}
-\hypertarget{Manual_autotoc_md132}{}\doxyparagraph{Other gradients and intermediate terms of the equations}\label{Manual_autotoc_md132}
+\hypertarget{Manual_autotoc_md131}{}\doxyparagraph{Other gradients and intermediate terms of the equations}\label{Manual_autotoc_md131}
 Terms of the equation can also been output such as the gradients (for error tracking mainly)\+: \tabulinesep=1mm
 \begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
 \hline
@@ -347,14 +345,12 @@ dzsdx / dzsdy   &\PBS\centering Gradient of the water surface (zs) in the x and 
 dudx / dudy   &\PBS\centering Gradient of x-\/velocity (u) in the x and y direction respectively   &\PBS\raggedleft \mbox{[}s-\/1\mbox{]}    \\\cline{1-3}
 dvdx / dvdy   &\PBS\centering Gradient of y-\/velocity (v) in the x and y direction respectively   &\PBS\raggedleft \mbox{[}s-\/1\mbox{]}    \\\cline{1-3}
 Fhu / Fhv   &\PBS\centering Flux of h time u in the x and y direction respectively   &\PBS\raggedleft \mbox{[}m2/s2\mbox{]}    \\\cline{1-3}
-Fqux / Fqvx   &\PBS\centering XXXXXXXXXXXX   &\PBS\raggedleft \mbox{[}m2/s2\mbox{]}    \\\cline{1-3}
-Su / Sv   &\PBS\centering XXXXXXXXXXXX   &\PBS\raggedleft \mbox{[}m2/s2\mbox{]}    \\\cline{1-3}
+Fqux / Fqvx   &\PBS\centering XXXXXXXXXXXX   &\PBS\raggedleft \mbox{[}XXX\mbox{]}    \\\cline{1-3}
+Su / Sv   &\PBS\centering Topographic source term   &\PBS\raggedleft \mbox{[}XXX\mbox{]}    \\\cline{1-3}
 dh   &\PBS\centering Variation in elevation   &\PBS\raggedleft \mbox{[}m\mbox{]}    \\\cline{1-3}
 du / dv   &\PBS\centering Variation of the x-\/ and y-\/velocity respectively   &\PBS\raggedleft \mbox{[}m/s\mbox{]}   \\\cline{1-3}
 \end{longtabu}
-
-
-\char`\"{}vort\char`\"{},\char`\"{}dzsdx\char`\"{},\char`\"{}dzsdy\char`\"{},\char`\"{}dudx\char`\"{},\char`\"{}dudy\char`\"{},\char`\"{}dvdx\char`\"{},\char`\"{}dvdy\char`\"{},\char`\"{}\+Fhu\char`\"{},\char`\"{}\+Fhv\char`\"{},\char`\"{}\+Fqux\char`\"{},\char`\"{}\+Fqvy\char`\"{},\char`\"{}\+Fquy\char`\"{},\char`\"{}\+Fqvx\char`\"{},\char`\"{}\+Su\char`\"{},\char`\"{}\+Sv\char`\"{},\char`\"{}dh\char`\"{},\char`\"{}dhu\char`\"{},\char`\"{}dhv\char`\"{},\char`\"{}cf\char`\"{}\hypertarget{Manual_autotoc_md133}{}\doxysubsubsection{Point or Time-\/\+Serie output}\label{Manual_autotoc_md133}
+\hypertarget{Manual_autotoc_md132}{}\doxysubsubsection{Point or Time-\/\+Serie output}\label{Manual_autotoc_md132}
 For each Time-\/\+Serie output needed, a line with the destination file and the postition is needed\+:
 
 
@@ -362,7 +358,7 @@ For each Time-\/\+Serie output needed, a line with the destination file and the 
 \DoxyCodeLine{TSnodesout=Offshore.txt,xloc,yloc;}
 
 \end{DoxyCode}
- The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).\hypertarget{Manual_autotoc_md134}{}\doxysubsection{Adaptative grid}\label{Manual_autotoc_md134}
+ The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).\hypertarget{Manual_autotoc_md133}{}\doxysubsection{Adaptative grid}\label{Manual_autotoc_md133}
 At the stage of development, the code will adapt the grid only before the computation but not along the calcul.
 
 The code is based on a Block-\/uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU. These blocks can have different resolutions (but the resolution does not change during the computation at this stage).

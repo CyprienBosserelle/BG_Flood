@@ -105,20 +105,18 @@ $(document).ready(function(){initNavTree('Manual.html',''); initResizable(); });
 </ul>
 </li>
 <li><a href="#list-of-parameters">List of Parameters</a></li>
-<li><a href="#bathymetrytopography-files">Bathymetry/topography files</a><ul>
-<li><a href="#masking">Masking</a></li>
-</ul>
-</li>
+<li><a href="#bathymetrytopography-files">Bathymetry/topography files</a></li>
+<li><a href="#masking">Computational mesh</a></li>
 <li><a href="#boundaries">Boundaries</a></li>
 <li><a href="#bottom-friction">Bottom friction</a></li>
 <li><a href="#rivers-and-area-discharge">Rivers and Area discharge</a></li>
-<li><a href="#wind-atm-pressure-forcing">Wind atm pressure forcing</a></li>
-<li><a href="#output-variables">Output variables</a></li>
+<li><a href="#wind-atm-pressure-forcing">Wind and atmospheric pressure forcing</a></li>
+<li><a href="#output-variables">Outputs</a></li>
 </ul>
 </li>
 </ul>
 <h1><a class="anchor" id="autotoc_md104"></a>
-Input Parameters</h1>
+Input Parameters {#ref input-parameters}</h1>
 <h2><a class="anchor" id="autotoc_md105"></a>
 BG_param.txt</h2>
 <p>All the model inputs are controlled by the BG_param.txt file. It is a simple text file that contains the parameters of the model that the user wishes to change.</p>
@@ -162,27 +160,26 @@ Bathymetry/topography files</h2>
 Conputational mesh</h2>
 <p><b>BG-Flood generates its own mesh.</b> By default, it is a quad regular mesh based on the DEM (Digital Elevation <a class="el" href="structModel.html">Model</a>) extend and resolution. The extend of the mesh and resolution of the mesh can be modify by the user. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.</p>
 <h3><a class="anchor" id="autotoc_md111"></a>
-Adaptative mesh</h3>
-<h3><a class="anchor" id="autotoc_md112"></a>
 Masking</h3>
 <p>Parts of the input bathymetry can be masked and excluded from the computation. The model extent (and locations of side boundaries) will remain the same but entire blocks can be removed from the computational memory. These area will appear as NaN in the output file. The input grid is first devided in blocks of 16x16. If all the value within a block exceed the mask value (9999 as default) then that block is excluded from memory and no computation will occur there. An "area of interest" (AOI) can also be used to select a part of the domain. If none of the cells of a block is located in this area, that block will be excluded from memory. The AOI is prefered other the mask method as the later can create waterfalls on the borders of the domain, specially if the rain-on-grid method is used.</p>
 <p>There are no fancy treatment of the boundaries of masked blocks so it is safer to select a mask threshold (<code>mask</code>) to keep most of the masked are dry. If water tries to cross to a masked block, The boundary of blocks are treated as Neumann (no gradient) boundaries so the bathymetry of the 2 cells adjacent to a masked block are set to the same value (the value of the second cell removed from the masked block).</p>
-<h2><a class="anchor" id="autotoc_md113"></a>
+<h2><a class="anchor" id="autotoc_md112"></a>
 Boundaries</h2>
 <p>Four type of boundaries can be applied at the edge of the model. By default neumann (no perpendicular gradient) is applied.</p>
-<p>0. No slip (wall)</p><ol type="1">
-<li>Neumann</li>
-<li>dirichlets (water level )</li>
-<li>Absorbing (only 1D/perpendicular absorbion is implemented)</li>
-<li>~~ 2D Absorbing~~ (Not implemented yet)</li>
-</ol>
+<ul>
+<li>0: No slip (wall)</li>
+<li>1: Neumann</li>
+<li>2: dirichlets (water level )</li>
+<li>3: Absorbing (only 1D/perpendicular absorbion is implemented)</li>
+<li>(4: ~~ 2D Absorbing~~ (Not implemented yet))</li>
+</ul>
 <p>For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary level is imposed from a file so a file needs to be sepcified: </p><div class="fragment"><div class="line">left = 1;</div>
 <div class="line">right = mybndfile.txt,3;</div>
 <div class="line">top = mybndfile.txt,3;</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md114"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md113"></a>
 Boundary file (for type 2 or 3)</h3>
 <p>Water level boundary file are needed to type 2 and 3 boundaries. The files are 2 (or more) columns, one with time in the first column and water level is the other(s). Note that the time step in the file doesn't need to be constant. The model will linearly interpolated between steps in the file. The file can be either comma separated or tab separated. This is automatically detected.</p>
-<h4><a class="anchor" id="autotoc_md115"></a>
+<h4><a class="anchor" id="autotoc_md114"></a>
 Uniform boundary file</h4>
 <p>For uniform boundary condition (along the boundary axis) the files needs to be 2 column: </p><div class="fragment"><div class="line"><span class="preprocessor"># Water level boundary</span></div>
 <div class="line">0.0  1.2</div>
@@ -190,7 +187,7 @@ Uniform boundary file</h4>
 <div class="line">36000.0  1.22</div>
 <div class="line">36060.0  1.25</div>
 <div class="line">36120.0  1.24</div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md116"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md115"></a>
 Variable boundary file</h4>
 <p>For Variable boundary condition (along the boundary axis) the files needs to be 3+ columns. The boundary axis is then divided by the number of boundary column and the water level is interpolated between location. for example: </p><div class="fragment"><div class="line"><span class="preprocessor"># Water level boundary</span></div>
 <div class="line">0.0  1.2 0.0</div>
@@ -207,7 +204,7 @@ Variable boundary file</h4>
 <div class="line">36120.0 0.0 1.2 0.0 </div>
 </div><!-- fragment --><p>In this case both near and far end of the boundary axis will remain zero and the center of the boundary axis will be 1.2m.</p>
 <p>There is no restriction in the number of columns. These values from each column will be forced uniformly spaced on the boundary and forcing in between will be linearly interpolated.</p>
-<h2><a class="anchor" id="autotoc_md117"></a>
+<h2><a class="anchor" id="autotoc_md116"></a>
 Bottom friction</h2>
 <p>Bottom friction is applied implicitly in the model (applied to velocities after momentum and continuity equations are solved). There are 3 friction equations implemented defined in <code>BG_param.txt</code> as <code>frictionmodel =</code>:</p>
 <ul>
@@ -218,34 +215,34 @@ Bottom friction</h2>
 </div><!-- fragment --> If a uniform friction is required add <code>cf=</code> to your <code>BG_param.txt</code> with the desired value. <code>cf</code> keyword is also used for the \(z0\) of Smart formulation and \(n\) of the Manning formulation.</li>
 </ul>
 <p>For non-uniform friction parameter use the keyword <code>cfmap</code> or <code>roughnessmap</code> and assign an <code>.asc</code> or <code>.nc</code> file. For nc files you may need to supply the netcdf variable name: e.g. <code>cfmap=final_rough.nc?zo</code>. The roughness grid does not need to match the model grid dimension and coarser friction grid will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).</p>
-<h2><a class="anchor" id="autotoc_md118"></a>
+<h2><a class="anchor" id="autotoc_md117"></a>
 Rivers and Area discharge</h2>
 <p>At this stage river can only be added to the model as a vertical discharge where the water is added to a rectangle on the model with no velocity. To add rivers add a line per river with the parameters: <code>river = Fluxfile,xstart,xend,ystart,yend;</code> where <code>Fluxfile</code> is a 2 column text file containing time and dicharge in m3/s; <code>xstart</code> is the left coordinate of the square where the vertical discharge is applied, <code>xend</code> is the right coordinate of the square, <code>ystart</code> is the bottom coordinate of the square and <code>yend</code> is the top coordinate of the square. Example: </p><div class="fragment"><div class="line">river = Votualevu_R.txt,1867430,1867455,3914065,3914090;</div>
 <div class="line">river = Mulomulo_R.txt,1867052,1867072,3911853,3911873;</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md119"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md118"></a>
 Wind atm pressure forcing</h2>
-<h3><a class="anchor" id="autotoc_md120"></a>
+<h3><a class="anchor" id="autotoc_md119"></a>
 Wind forcing (may contain bugs)</h3>
 <p>The hydrodynamics can be forced using a linear wind drag. the linear drag can be influenced with the keyword <code>Cd</code>. Wind input is defined with the keyword <code>windfiles=</code>. There are several ways to use the keyword. </p>
-<h4><a class="anchor" id="autotoc_md121"></a>
+<h4><a class="anchor" id="autotoc_md120"></a>
 spatially uniform txt file:</h4>
 <div class="fragment"><div class="line">windfiles=mywind.txt</div>
 </div><!-- fragment --><p> where <code>mywind.txt</code> is a text file with 3 column (time (in s), wind speed (m/s) and wind direction(degree North)). If the grid is in acoordinate system rotated from the north and a <code>grdalpha</code> is specified, the wind will be automatically rotated to the grid orientation.</p>
-<h4><a class="anchor" id="autotoc_md122"></a>
+<h4><a class="anchor" id="autotoc_md121"></a>
 Spatially and time varying input</h4>
 <div class="fragment"><div class="line">windfiles=mywind.nc?uw,mywind.nc?vw</div>
 </div><!-- fragment --><p> Here two arguments separated with a comma are expected. The first argument is the netcdf file and variable name containing the U component of the wind (along the X axis) and the second argument is the netcdf file and variable name containing the V component of the wind (along the Y axis). Both can be in the same netcdf file as in the example or in separate netcdf files (add the variable name with a <code>?</code> similarly to other netcdf input options). The dimension of the wind forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).</p>
-<h3><a class="anchor" id="autotoc_md123"></a>
+<h3><a class="anchor" id="autotoc_md122"></a>
 Atmospheric pressure forcing</h3>
 <p>Spatially constant atmospheric pressure forcing is not relevant so only spatially varying forcing is feasable. Like for the wind this is done through a netcdf file: </p><div class="fragment"><div class="line">atmpfile=myncfile.nc?atmpres</div>
 </div><!-- fragment --><p> The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure <code>Paref=101300.0</code> converted to a height using <code>Pa2m=0.00009916</code>. If using hPa your will need to also change the reference pressure to <code>Paref=1013.0</code> and the conversion parameter to <code>Pa2m=0.009916</code>. As with the wind forcing, the forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).</p>
-<h2><a class="anchor" id="autotoc_md124"></a>
+<h2><a class="anchor" id="autotoc_md123"></a>
 Outputs</h2>
 <p>There is two types of outputs:</p><ul>
 <li>map outputs of 2D variables regularly through time.</li>
 <li>time-series output of basic values, at a chosen position, at each time step.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md125"></a>
+<h3><a class="anchor" id="autotoc_md124"></a>
 Map outputs</h3>
 <p>These maps are output as a nc file, with information on coordinates and blocks.</p>
 <p>The map output can be modify by:</p><ul>
@@ -262,7 +259,7 @@ Map outputs</h3>
 </div><!-- fragment --></li>
 </ul>
 <p>By default, the variables outputs are the one listed in the following paragraph: Default snapshot outputs. </p>
-<h4><a class="anchor" id="autotoc_md126"></a>
+<h4><a class="anchor" id="autotoc_md125"></a>
 Default snapshot outputs</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -278,7 +275,7 @@ Default snapshot outputs</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">zb   </td><td class="markdownTableBodyCenter">Topography elevation above datum   </td><td class="markdownTableBodyRight">[m]   </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md127"></a>
+<h4><a class="anchor" id="autotoc_md126"></a>
 Complementary variables</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -288,7 +285,7 @@ Complementary variables</h4>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">cf   </td><td class="markdownTableBodyCenter">Bottom friction coefficient (Manning n or z0)   </td><td class="markdownTableBodyRight">varies with model used   </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md128"></a>
+<h4><a class="anchor" id="autotoc_md127"></a>
 Mean/averaged output between output steps</h4>
 <p>This is for averaging variables in between output steps, useful for mean tidal flow calculation that averages out vortices. The average time is <code>outtimestep</code>.</p>
 <table class="markdownTable">
@@ -303,7 +300,7 @@ Mean/averaged output between output steps</h4>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">zsmean   </td><td class="markdownTableBodyCenter">Averaged Water level elevation above datum   </td><td class="markdownTableBodyRight">[m]   </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md129"></a>
+<h4><a class="anchor" id="autotoc_md128"></a>
 Max output</h4>
 <p>The max can be calculated for the overall simulation (default) or between output steps ( if <code>resetmax = 1;</code>)</p>
 <table class="markdownTable">
@@ -318,7 +315,7 @@ Max output</h4>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">zsmax   </td><td class="markdownTableBodyCenter">Maximum Water level elevation above datum   </td><td class="markdownTableBodyRight">[m]   </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md130"></a>
+<h4><a class="anchor" id="autotoc_md129"></a>
 Risk assesment related output</h4>
 <p>These variables are used to evaluate the damage resulting from the innundation (as a complement to hmax for example).</p>
 <table class="markdownTable">
@@ -331,7 +328,7 @@ Risk assesment related output</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">twet   </td><td class="markdownTableBodyCenter">Duration innundation of the cell in s (h&gt;0.1m)   </td><td class="markdownTableBodyRight">[s]   </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md131"></a>
+<h4><a class="anchor" id="autotoc_md130"></a>
 Model related outputs</h4>
 <p>These outputs will be produce only if the associated model/forcing is used.</p>
 <p>If an atmospheric forcing is used: </p><table class="markdownTable">
@@ -353,7 +350,7 @@ Model related outputs</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">hgw   </td><td class="markdownTableBodyCenter">Cumulated height of infiltrated water in the ground   </td><td class="markdownTableBodyRight">[m]   </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md132"></a>
+<h4><a class="anchor" id="autotoc_md131"></a>
 Other gradients and intermediate terms of the equations</h4>
 <p>Terms of the equation can also been output such as the gradients (for error tracking mainly): </p><table class="markdownTable">
 <tr class="markdownTableHead">
@@ -369,21 +366,20 @@ Other gradients and intermediate terms of the equations</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Fhu / Fhv   </td><td class="markdownTableBodyCenter">Flux of h time u in the x and y direction respectively   </td><td class="markdownTableBodyRight">[m2/s2]    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Fqux / Fqvx   </td><td class="markdownTableBodyCenter">XXXXXXXXXXXX   </td><td class="markdownTableBodyRight">[m2/s2]    </td></tr>
+<td class="markdownTableBodyNone">Fqux / Fqvx   </td><td class="markdownTableBodyCenter">XXXXXXXXXXXX   </td><td class="markdownTableBodyRight">[XXX]    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Su / Sv   </td><td class="markdownTableBodyCenter">XXXXXXXXXXXX   </td><td class="markdownTableBodyRight">[m2/s2]    </td></tr>
+<td class="markdownTableBodyNone">Su / Sv   </td><td class="markdownTableBodyCenter">Topographic source term   </td><td class="markdownTableBodyRight">[XXX]    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">dh   </td><td class="markdownTableBodyCenter">Variation in elevation   </td><td class="markdownTableBodyRight">[m]    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">du / dv   </td><td class="markdownTableBodyCenter">Variation of the x- and y-velocity respectively   </td><td class="markdownTableBodyRight">[m/s]   </td></tr>
 </table>
-<p>"vort","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"</p>
-<h3><a class="anchor" id="autotoc_md133"></a>
+<h3><a class="anchor" id="autotoc_md132"></a>
 Point or Time-Serie output</h3>
 <p>For each Time-Serie output needed, a line with the destination file and the postition is needed:</p>
 <div class="fragment"><div class="line">TSnodesout=Offshore.txt,xloc,yloc;</div>
 </div><!-- fragment --><p> The file contains 5 colums \((t, zs, h, u,v)\) with the value at the nearest grid point (to the position defined by the user).</p>
-<h2><a class="anchor" id="autotoc_md134"></a>
+<h2><a class="anchor" id="autotoc_md133"></a>
 Adaptative grid</h2>
 <p>At the stage of development, the code will adapt the grid only before the computation but not along the calcul.</p>
 <p>The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU. These blocks can have different resolutions (but the resolution does not change during the computation at this stage).</p>
@@ -417,7 +413,7 @@ Adaptative grid</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Mar 7 2023 15:15:50 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Mar 7 2023 15:34:05 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

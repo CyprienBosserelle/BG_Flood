@@ -8,12 +8,12 @@ Please, use the Parameters and Forcings list as a reference*
     + [How to use the `BG_param.txt` file](#how-to-use-the--bg-paramtxt--file)
   * [List of Parameters](#list-of-parameters)
   * [Bathymetry/topography files](#bathymetrytopography-files)
-    + [Masking](#masking)
+  * [Computational mesh](#masking)
   * [Boundaries](#boundaries)
   * [Bottom friction](#bottom-friction)
   * [Rivers and Area discharge](#rivers-and-area-discharge)
-  * [Wind atm pressure forcing](#wind-atm-pressure-forcing)
-  * [Output variables](#output-variables)
+  * [Wind and atmospheric pressure forcing](#wind-atm-pressure-forcing)
+  * [Outputs](#output-variables)
 
 
 # Input Parameters
@@ -70,7 +70,6 @@ This input file is critical as it defines the extent of the model grid and the b
 **BG-Flood generates its own mesh.** By default, it is a quad regular mesh based on the DEM (Digital Elevation Model) extend and resolution. 
 The extend of the mesh and resolution of the mesh can be modify by the user. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.
 
-### Adaptative mesh
 
 ### Masking
 Parts of the input bathymetry can be masked and excluded from the computation. The model extent (and locations of side boundaries) will remain the same but entire blocks can be removed from the computational memory. These area will appear as NaN in the output file. The input grid is first devided in blocks of 16x16. If all the value within a block exceed the mask value (9999 as default) then that block is excluded from memory and no computation will occur there. An "area of interest" (AOI) can also be used to select a part of the domain. If none of the cells of a block is located in this area, that block will be excluded from memory.
@@ -82,11 +81,11 @@ There are no fancy treatment of the boundaries of masked blocks so it is safer t
 Four type of boundaries can be applied at the edge of the model. By default neumann (no perpendicular gradient) is applied. 
 
 
-0. No slip (wall)
-1. Neumann
-2. dirichlets (water level )
-3. Absorbing (only 1D/perpendicular absorbion is implemented)
-4. ~~ 2D Absorbing~~ (Not implemented yet)
+- 0: No slip (wall)
+- 1: Neumann
+- 2: dirichlets (water level )
+- 3: Absorbing (only 1D/perpendicular absorbion is implemented)
+- (4: ~~ 2D Absorbing~~ (Not implemented yet))
 
 For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary level is imposed from a file so a file needs to be sepcified:
 ```{txt}
@@ -291,12 +290,10 @@ Terms of the equation can also been output such as the gradients (for error trac
 | dudx / dudy       | Gradient of x-velocity (u) in the x and y direction respectively  | [s-1] |
 | dvdx / dvdy       | Gradient of y-velocity (v) in the x and y direction respectively  | [s-1] |
 | Fhu / Fhv       | Flux of h time u in the x and y direction respectively  | [m2/s2] |
-| Fqux / Fqvx       |  XXXXXXXXXXXX | [m2/s2] |
-| Su / Sv       | XXXXXXXXXXXX  | [m2/s2] |
+| Fqux / Fqvx       |  XXXXXXXXXXXX | [XXX] |
+| Su / Sv       | Topographic source term  | [XXX] |
 | dh       | Variation in elevation  | [m] |
 | du / dv       | Variation of the x- and y-velocity respectively  | [m/s] |
-
- "vort","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
 
 
 ### Point or Time-Serie output

@@ -50,7 +50,7 @@ var NAVTREE =
       [ "List of the non-identified inputs", "ParameterList.html#autotoc_md101", null ]
     ] ],
     [ "Manual", "Manual.html", [
-      [ "Input Parameters", "Manual.html#autotoc_md104", [
+      [ "Input Parameters {#ref input-parameters}", "Manual.html#autotoc_md104", [
         [ "BG_param.txt", "Manual.html#autotoc_md105", [
           [ "How to use the BG_param.txt file", "Manual.html#autotoc_md106", null ],
           [ "General comment about input files", "Manual.html#autotoc_md107", null ]
@@ -58,37 +58,36 @@ var NAVTREE =
         [ "List of Parameters", "Manual.html#autotoc_md108", null ],
         [ "Bathymetry/topography files", "Manual.html#autotoc_md109", null ],
         [ "Conputational mesh", "Manual.html#autotoc_md110", [
-          [ "Adaptative mesh", "Manual.html#autotoc_md111", null ],
-          [ "Masking", "Manual.html#autotoc_md112", null ]
+          [ "Masking", "Manual.html#autotoc_md111", null ]
         ] ],
-        [ "Boundaries", "Manual.html#autotoc_md113", [
-          [ "Boundary file (for type 2 or 3)", "Manual.html#autotoc_md114", [
-            [ "Uniform boundary file", "Manual.html#autotoc_md115", null ],
-            [ "Variable boundary file", "Manual.html#autotoc_md116", null ]
+        [ "Boundaries", "Manual.html#autotoc_md112", [
+          [ "Boundary file (for type 2 or 3)", "Manual.html#autotoc_md113", [
+            [ "Uniform boundary file", "Manual.html#autotoc_md114", null ],
+            [ "Variable boundary file", "Manual.html#autotoc_md115", null ]
           ] ]
         ] ],
-        [ "Bottom friction", "Manual.html#autotoc_md117", null ],
-        [ "Rivers and Area discharge", "Manual.html#autotoc_md118", null ],
-        [ "Wind atm pressure forcing", "Manual.html#autotoc_md119", [
-          [ "Wind forcing (may contain bugs)", "Manual.html#autotoc_md120", [
-            [ "spatially uniform txt file:", "Manual.html#autotoc_md121", null ],
-            [ "Spatially and time varying input", "Manual.html#autotoc_md122", null ]
+        [ "Bottom friction", "Manual.html#autotoc_md116", null ],
+        [ "Rivers and Area discharge", "Manual.html#autotoc_md117", null ],
+        [ "Wind atm pressure forcing", "Manual.html#autotoc_md118", [
+          [ "Wind forcing (may contain bugs)", "Manual.html#autotoc_md119", [
+            [ "spatially uniform txt file:", "Manual.html#autotoc_md120", null ],
+            [ "Spatially and time varying input", "Manual.html#autotoc_md121", null ]
           ] ],
-          [ "Atmospheric pressure forcing", "Manual.html#autotoc_md123", null ]
+          [ "Atmospheric pressure forcing", "Manual.html#autotoc_md122", null ]
         ] ],
-        [ "Outputs", "Manual.html#autotoc_md124", [
-          [ "Map outputs", "Manual.html#autotoc_md125", [
-            [ "Default snapshot outputs", "Manual.html#autotoc_md126", null ],
-            [ "Complementary variables", "Manual.html#autotoc_md127", null ],
-            [ "Mean/averaged output between output steps", "Manual.html#autotoc_md128", null ],
-            [ "Max output", "Manual.html#autotoc_md129", null ],
-            [ "Risk assesment related output", "Manual.html#autotoc_md130", null ],
-            [ "Model related outputs", "Manual.html#autotoc_md131", null ],
-            [ "Other gradients and intermediate terms of the equations", "Manual.html#autotoc_md132", null ]
+        [ "Outputs", "Manual.html#autotoc_md123", [
+          [ "Map outputs", "Manual.html#autotoc_md124", [
+            [ "Default snapshot outputs", "Manual.html#autotoc_md125", null ],
+            [ "Complementary variables", "Manual.html#autotoc_md126", null ],
+            [ "Mean/averaged output between output steps", "Manual.html#autotoc_md127", null ],
+            [ "Max output", "Manual.html#autotoc_md128", null ],
+            [ "Risk assesment related output", "Manual.html#autotoc_md129", null ],
+            [ "Model related outputs", "Manual.html#autotoc_md130", null ],
+            [ "Other gradients and intermediate terms of the equations", "Manual.html#autotoc_md131", null ]
           ] ],
-          [ "Point or Time-Serie output", "Manual.html#autotoc_md133", null ]
+          [ "Point or Time-Serie output", "Manual.html#autotoc_md132", null ]
         ] ],
-        [ "Adaptative grid", "Manual.html#autotoc_md134", null ]
+        [ "Adaptative grid", "Manual.html#autotoc_md133", null ]
       ] ]
     ] ],
     [ "Modules", "Modules.html", "Modules" ],
@@ -128,11 +127,11 @@ var NAVTREEINDEX =
 "ConserveElevation_8h.html#afc1cff5d5122df41b6b03e393ac7d8fa",
 "GridManip_8h_source.html",
 "InitialConditions_8cu.html#a263be1815f9718565688c7df2e501586",
-"MemManagement_8cu.html#add77fedf788a5ba8d5b661153d01ebb6",
-"Read__netcdf_8h.html#a7b63115d8ad7293e06307282b73b74ab",
-"Updateforcing_8h.html#ae983e63add8e6fddb8e05657c8c1e5bc",
-"classRiver.html#a8dabaeb0865462540aaaa835bb009cce",
-"structBndblockP.html#a797288096462abef393b6bc65d1a1807"
+"MemManagement_8cu.html#ae06a8f257b052110ee151c57a2a02159",
+"Read__netcdf_8h.html#aa51602301123c9a4ee87e30b68c5695b",
+"Updateforcing_8h.html#af459e9fbf88eca601d6305ba672ab07c",
+"classRiver.html#a9cdc0bb319caa1c9755599698371ed32",
+"structBndblockP.html#a7b880703815f83cde0910c10c523dbdf"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
