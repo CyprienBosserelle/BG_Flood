@@ -8,7 +8,7 @@ The adaptive version of the model is currently under heavy developement. Makefil
 
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](https://bg-flood.docsforge.com/)
+[![Documentation (Work in progress)](https://img.shields.io/badge/doc-Doxygen-blue)](https://aliceharang.github.io/)
 
 ## Build status
 development: [![Build Status](https://travis-ci.com/CyprienBosserelle/BG_Flood.svg?branch=development)](https://travis-ci.com/CyprienBosserelle/BG_Flood)
