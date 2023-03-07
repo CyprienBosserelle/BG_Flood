@@ -58,7 +58,7 @@ bool blockinpoly (\begin{DoxyParamCaption}\item[{T}]{xo,  }\item[{T}]{yo,  }\ite
 
 check whether a block is inside or intersectin a polygon 
 
-\hypertarget{Poly_8h_autotoc_md170}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md170}
+\hypertarget{Poly_8h_autotoc_md167}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md167}
 Check whether a block is inside or intersectin a polygon \mbox{\Hypertarget{Poly_8cu_a6e001238d21d7804ebc3822143054639}\label{Poly_8cu_a6e001238d21d7804ebc3822143054639}} 
 \index{Poly.cu@{Poly.cu}!blockinpoly$<$ double $>$@{blockinpoly$<$ double $>$}}
 \index{blockinpoly$<$ double $>$@{blockinpoly$<$ double $>$}!Poly.cu@{Poly.cu}}
@@ -82,9 +82,9 @@ int cn\+\_\+\+Pn\+Poly (\begin{DoxyParamCaption}\item[{T}]{Px,  }\item[{T}]{Py, 
 
 \mbox{\hyperlink{Poly_8cu_ac33dfb106e791cf74e166cde5a52e876}{cn\+\_\+\+Pn\+Poly()}}\+: crossing number test for a point in a polygon 
 
-\hypertarget{Poly_8cu_autotoc_md157}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md157}
-\mbox{\hyperlink{Poly_8cu_ac33dfb106e791cf74e166cde5a52e876}{cn\+\_\+\+Pn\+Poly()}}\+: crossing number test for a point in a polygon Input\+: P = a point, V\mbox{[}\mbox{]} = vertex points of a polygon V\mbox{[}n+1\mbox{]} with V\mbox{[}n\mbox{]}=V\mbox{[}0\mbox{]} Return\+: 0 = outside, 1 = inside\hypertarget{Poly_8cu_autotoc_md158}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md158}
-Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8cu_autotoc_md159}{}\doxyparagraph{Original Licence}\label{Poly_8cu_autotoc_md159}
+\hypertarget{Poly_8cu_autotoc_md154}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md154}
+\mbox{\hyperlink{Poly_8cu_ac33dfb106e791cf74e166cde5a52e876}{cn\+\_\+\+Pn\+Poly()}}\+: crossing number test for a point in a polygon Input\+: P = a point, V\mbox{[}\mbox{]} = vertex points of a polygon V\mbox{[}n+1\mbox{]} with V\mbox{[}n\mbox{]}=V\mbox{[}0\mbox{]} Return\+: 0 = outside, 1 = inside\hypertarget{Poly_8cu_autotoc_md155}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md155}
+Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8cu_autotoc_md156}{}\doxyparagraph{Original Licence}\label{Poly_8cu_autotoc_md156}
 This code may be freely used and modified for any purpose providing that this copyright notice is included with it. Soft\+Surfer makes no warranty for this code, and cannot be held liable for any real or imagined damage resulting from its use. Users of this code must verify correctness for their application. Code modified to fit the use in Disper\+GPU
 
 This code is patterned after \mbox{[}Franklin, 2000\mbox{]} \mbox{\Hypertarget{Poly_8cu_a0b6b1c685a658f30a3b9b9324116e472}\label{Poly_8cu_a0b6b1c685a658f30a3b9b9324116e472}} 
@@ -97,7 +97,7 @@ This code is patterned after \mbox{[}Franklin, 2000\mbox{]} \mbox{\Hypertarget{P
 
 check polygon handedness and reverse if necessary. 
 
-\hypertarget{Poly_8h_autotoc_md166}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md166}
+\hypertarget{Poly_8h_autotoc_md163}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md163}
 check polygon handedness and enforce left-\/handesness (Counter-\/clockwise). This function is used to ensure the right polygon handedness for the winding number inpoly (using the isleft()) \mbox{\Hypertarget{Poly_8cu_a677760e0b4ff2efcf26e1e73b969409d}\label{Poly_8cu_a677760e0b4ff2efcf26e1e73b969409d}} 
 \index{Poly.cu@{Poly.cu}!dotprod@{dotprod}}
 \index{dotprod@{dotprod}!Poly.cu@{Poly.cu}}
@@ -119,10 +119,10 @@ int is\+Left (\begin{DoxyParamCaption}\item[{T}]{P0x,  }\item[{T}]{P0y,  }\item[
 
 \mbox{\hyperlink{Poly_8cu_a01ace063b76167aa01c3bf0db94bbe1d}{is\+Left()}}\+: tests if a point is Left$\vert$\+On$\vert$\+Right of an infinite line. 
 
-\hypertarget{Poly_8cu_autotoc_md153}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md153}
-\hypertarget{Poly_8cu_autotoc_md154}{}\doxysubsection{a Point is defined by its coordinates \{int x, y;\}}\label{Poly_8cu_autotoc_md154}
-\mbox{\hyperlink{Poly_8cu_a01ace063b76167aa01c3bf0db94bbe1d}{is\+Left()}}\+: tests if a point is Left$\vert$\+On$\vert$\+Right of an infinite line. Input\+: three points P0, P1, and P2 Return\+: $>$0 for P2 left of the line through P0 and P1 =0 for P2 on the line $<$0 for P2 right of the line See\+: Algorithm 1 \char`\"{}\+Area of Triangles and Polygons\char`\"{}\hypertarget{Poly_8cu_autotoc_md155}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md155}
-Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8cu_autotoc_md156}{}\doxyparagraph{Original Licence}\label{Poly_8cu_autotoc_md156}
+\hypertarget{Poly_8cu_autotoc_md150}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md150}
+\hypertarget{Poly_8cu_autotoc_md151}{}\doxysubsection{a Point is defined by its coordinates \{int x, y;\}}\label{Poly_8cu_autotoc_md151}
+\mbox{\hyperlink{Poly_8cu_a01ace063b76167aa01c3bf0db94bbe1d}{is\+Left()}}\+: tests if a point is Left$\vert$\+On$\vert$\+Right of an infinite line. Input\+: three points P0, P1, and P2 Return\+: $>$0 for P2 left of the line through P0 and P1 =0 for P2 on the line $<$0 for P2 right of the line See\+: Algorithm 1 \char`\"{}\+Area of Triangles and Polygons\char`\"{}\hypertarget{Poly_8cu_autotoc_md152}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md152}
+Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8cu_autotoc_md153}{}\doxyparagraph{Original Licence}\label{Poly_8cu_autotoc_md153}
 This code may be freely used and modified for any purpose providing that this copyright notice is included with it. Soft\+Surfer makes no warranty for this code, and cannot be held liable for any real or imagined damage resulting from its use. Users of this code must verify correctness for their application. Code modified to fit the use in Disper\+GPU \mbox{\Hypertarget{Poly_8cu_a5b7e685d5640969e9748c0f9c6a7c9b2}\label{Poly_8cu_a5b7e685d5640969e9748c0f9c6a7c9b2}} 
 \index{Poly.cu@{Poly.cu}!PolygonIntersect@{PolygonIntersect}}
 \index{PolygonIntersect@{PolygonIntersect}!Poly.cu@{Poly.cu}}
@@ -133,7 +133,7 @@ This code may be freely used and modified for any purpose providing that this co
 
 Intersection between 2 polygons. 
 
-\hypertarget{Poly_8cu_autotoc_md169}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md169}
+\hypertarget{Poly_8cu_autotoc_md166}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md166}
 Check whether 2 polygons intersect. The function checks whether each segment of \mbox{\hyperlink{classPolygon}{Polygon}} P intersect any segment of Poly Q. if an intersect is detected theh loops are broken and true is returned. \mbox{\Hypertarget{Poly_8cu_af2897c454c4a1d01e410ec44b17286d1}\label{Poly_8cu_af2897c454c4a1d01e410ec44b17286d1}} 
 \index{Poly.cu@{Poly.cu}!SegmentIntersect@{SegmentIntersect}}
 \index{SegmentIntersect@{SegmentIntersect}!Poly.cu@{Poly.cu}}
@@ -144,8 +144,8 @@ Check whether 2 polygons intersect. The function checks whether each segment of 
 
 Intersection between segments. 
 
-\hypertarget{Poly_8cu_autotoc_md167}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md167}
-Check whether 2 polygon segment intersect. \mbox{\hyperlink{classPolygon}{Polygon}} P and Q are only 2 vertex long each. i.\+e. they represent a segment each.\hypertarget{Poly_8cu_autotoc_md168}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md168}
+\hypertarget{Poly_8cu_autotoc_md164}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md164}
+Check whether 2 polygon segment intersect. \mbox{\hyperlink{classPolygon}{Polygon}} P and Q are only 2 vertex long each. i.\+e. they represent a segment each.\hypertarget{Poly_8cu_autotoc_md165}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md165}
 \href{https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect}{\texttt{ https\+://stackoverflow.\+com/questions/563198/how-\/do-\/you-\/detect-\/where-\/two-\/line-\/segments-\/intersect}} Best answer from Gareth Rees \mbox{\Hypertarget{Poly_8cu_a3bfe65ae13eadc49bd2efead046f9cb0}\label{Poly_8cu_a3bfe65ae13eadc49bd2efead046f9cb0}} 
 \index{Poly.cu@{Poly.cu}!test\_intersectpoly@{test\_intersectpoly}}
 \index{test\_intersectpoly@{test\_intersectpoly}!Poly.cu@{Poly.cu}}
@@ -207,9 +207,9 @@ int wn\+\_\+\+Pn\+Poly (\begin{DoxyParamCaption}\item[{T}]{Px,  }\item[{T}]{Py, 
 
 winding number test for a point in a polygon 
 
-\hypertarget{Poly_8h_autotoc_md163}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md163}
-\mbox{\hyperlink{Poly_8cu_a26344a138da1b14b78397ad09d6b0024}{wn\+\_\+\+Pn\+Poly()}}\+: winding number test for a point in a polygon Input\+: P = a point, V\mbox{[}\mbox{]} = vertex points of a polygon V\mbox{[}n+1\mbox{]} with V\mbox{[}n\mbox{]}=V\mbox{[}0\mbox{]} Return\+: wn = the winding number (=0 only when P is outside)\hypertarget{Poly_8h_autotoc_md164}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8h_autotoc_md164}
-Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8h_autotoc_md165}{}\doxyparagraph{Original Licence}\label{Poly_8h_autotoc_md165}
+\hypertarget{Poly_8h_autotoc_md160}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md160}
+\mbox{\hyperlink{Poly_8cu_a26344a138da1b14b78397ad09d6b0024}{wn\+\_\+\+Pn\+Poly()}}\+: winding number test for a point in a polygon Input\+: P = a point, V\mbox{[}\mbox{]} = vertex points of a polygon V\mbox{[}n+1\mbox{]} with V\mbox{[}n\mbox{]}=V\mbox{[}0\mbox{]} Return\+: wn = the winding number (=0 only when P is outside)\hypertarget{Poly_8h_autotoc_md161}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8h_autotoc_md161}
+Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8h_autotoc_md162}{}\doxyparagraph{Original Licence}\label{Poly_8h_autotoc_md162}
 This code may be freely used and modified for any purpose providing that this copyright notice is included with it. Soft\+Surfer makes no warranty for this code, and cannot be held liable for any real or imagined damage resulting from its use. Users of this code must verify correctness for their application. Code modified to fit the use in Disper\+GPU \mbox{\Hypertarget{Poly_8cu_a26344a138da1b14b78397ad09d6b0024}\label{Poly_8cu_a26344a138da1b14b78397ad09d6b0024}} 
 \index{Poly.cu@{Poly.cu}!wn\_PnPoly@{wn\_PnPoly}}
 \index{wn\_PnPoly@{wn\_PnPoly}!Poly.cu@{Poly.cu}}
@@ -221,9 +221,9 @@ int wn\+\_\+\+Pn\+Poly (\begin{DoxyParamCaption}\item[{T}]{Px,  }\item[{T}]{Py, 
 
 winding number test for a point in a polygon 
 
-\hypertarget{Poly_8cu_autotoc_md160}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md160}
-\mbox{\hyperlink{Poly_8cu_a26344a138da1b14b78397ad09d6b0024}{wn\+\_\+\+Pn\+Poly()}}\+: winding number test for a point in a polygon Input\+: P = a point, V\mbox{[}\mbox{]} = vertex points of a polygon V\mbox{[}n+1\mbox{]} with V\mbox{[}n\mbox{]}=V\mbox{[}0\mbox{]} Return\+: wn = the winding number (=0 only when P is outside)\hypertarget{Poly_8cu_autotoc_md161}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md161}
-Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8cu_autotoc_md162}{}\doxyparagraph{Original Licence}\label{Poly_8cu_autotoc_md162}
+\hypertarget{Poly_8cu_autotoc_md157}{}\doxysubsubsection{Description}\label{Poly_8cu_autotoc_md157}
+\mbox{\hyperlink{Poly_8cu_a26344a138da1b14b78397ad09d6b0024}{wn\+\_\+\+Pn\+Poly()}}\+: winding number test for a point in a polygon Input\+: P = a point, V\mbox{[}\mbox{]} = vertex points of a polygon V\mbox{[}n+1\mbox{]} with V\mbox{[}n\mbox{]}=V\mbox{[}0\mbox{]} Return\+: wn = the winding number (=0 only when P is outside)\hypertarget{Poly_8cu_autotoc_md158}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8cu_autotoc_md158}
+Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8cu_autotoc_md159}{}\doxyparagraph{Original Licence}\label{Poly_8cu_autotoc_md159}
 This code may be freely used and modified for any purpose providing that this copyright notice is included with it. Soft\+Surfer makes no warranty for this code, and cannot be held liable for any real or imagined damage resulting from its use. Users of this code must verify correctness for their application. Code modified to fit the use in Disper\+GPU \mbox{\Hypertarget{Poly_8cu_ade4caf6d4accbbbf36963f248a3890c1}\label{Poly_8cu_ade4caf6d4accbbbf36963f248a3890c1}} 
 \index{Poly.cu@{Poly.cu}!wn\_PnPoly$<$ double $>$@{wn\_PnPoly$<$ double $>$}}
 \index{wn\_PnPoly$<$ double $>$@{wn\_PnPoly$<$ double $>$}!Poly.cu@{Poly.cu}}

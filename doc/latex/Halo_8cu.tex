@@ -580,7 +580,7 @@ void fill\+HaloC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Pa
 
 Wrapping function for calculating halos for each block of a single variable on CPU. 
 
-\hypertarget{Halo_8h_autotoc_md139}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md139}
+\hypertarget{Halo_8h_autotoc_md136}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md136}
 This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo CPU function. This is layer 2 of 3 wrap so the candy doesn\textquotesingle{}t stick too much. \mbox{\Hypertarget{Halo_8cu_a8940bc0632378da915f25ee31de2ed0b}\label{Halo_8cu_a8940bc0632378da915f25ee31de2ed0b}} 
 \index{Halo.cu@{Halo.cu}!fillHaloC$<$ double $>$@{fillHaloC$<$ double $>$}}
 \index{fillHaloC$<$ double $>$@{fillHaloC$<$ double $>$}!Halo.cu@{Halo.cu}}
@@ -604,7 +604,7 @@ void void fill\+HaloD (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classPara
 
 Wrapping function for calculating halos on CPU on every side of a block of a single variable. 
 
-\hypertarget{Halo_8cu_autotoc_md138}{}\doxysubsubsection{Description}\label{Halo_8cu_autotoc_md138}
+\hypertarget{Halo_8cu_autotoc_md135}{}\doxysubsubsection{Description}\label{Halo_8cu_autotoc_md135}
 This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean. In a sense this is the third (and last) layer of wrapping \mbox{\Hypertarget{Halo_8cu_a6e2403c1c105317070a7ac8516c5621f}\label{Halo_8cu_a6e2403c1c105317070a7ac8516c5621f}} 
 \index{Halo.cu@{Halo.cu}!fillHaloD$<$ double $>$@{fillHaloD$<$ double $>$}}
 \index{fillHaloD$<$ double $>$@{fillHaloD$<$ double $>$}!Halo.cu@{Halo.cu}}
@@ -628,8 +628,8 @@ void fill\+HaloF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Pa
 
 Wrapping function for calculating flux in the halos for a block and a single variable on CPU. 
 
-\hypertarget{Halo_8h_autotoc_md144}{}\doxysubsubsection{Depreciated}\label{Halo_8h_autotoc_md144}
-This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn\textquotesingle{}t preserve the balance of fluxes on the restiction interface It should be deleted soon \hypertarget{Halo_8h_autotoc_md145}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md145}
+\hypertarget{Halo_8h_autotoc_md141}{}\doxysubsubsection{Depreciated}\label{Halo_8h_autotoc_md141}
+This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn\textquotesingle{}t preserve the balance of fluxes on the restiction interface It should be deleted soon \hypertarget{Halo_8h_autotoc_md142}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md142}
 \mbox{\Hypertarget{Halo_8cu_ae033bec7214b1e041fbde2fc784da5ec}\label{Halo_8cu_ae033bec7214b1e041fbde2fc784da5ec}} 
 \index{Halo.cu@{Halo.cu}!fillHaloF$<$ double $>$@{fillHaloF$<$ double $>$}}
 \index{fillHaloF$<$ double $>$@{fillHaloF$<$ double $>$}!Halo.cu@{Halo.cu}}
@@ -653,7 +653,7 @@ void fill\+Halo\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam
 
 Wrapping function for calculating halos for each block of a single variable on GPU. 
 
-\hypertarget{Halo_8h_autotoc_md146}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md146}
+\hypertarget{Halo_8h_autotoc_md143}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md143}
 This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fill\+Left type functions \mbox{\Hypertarget{Halo_8cu_a2a355feb696605ad555fe018395bcac2}\label{Halo_8cu_a2a355feb696605ad555fe018395bcac2}} 
 \index{Halo.cu@{Halo.cu}!fillHaloGPU@{fillHaloGPU}}
 \index{fillHaloGPU@{fillHaloGPU}!Halo.cu@{Halo.cu}}
@@ -829,7 +829,7 @@ void fill\+Halo\+Top\+RightC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cl
 
 Wrapping function for calculating flux for halos for each block of a single variable on GPU. 
 
-\hypertarget{Halo_8h_autotoc_md147}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md147}
+\hypertarget{Halo_8h_autotoc_md144}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md144}
 This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fill\+Left type functions \mbox{\Hypertarget{Halo_8cu_a3c209f200fa3e85dfdf772a4e2904049}\label{Halo_8cu_a3c209f200fa3e85dfdf772a4e2904049}} 
 \index{Halo.cu@{Halo.cu}!fillHaloTopRightC$<$ double $>$@{fillHaloTopRightC$<$ double $>$}}
 \index{fillHaloTopRightC$<$ double $>$@{fillHaloTopRightC$<$ double $>$}!Halo.cu@{Halo.cu}}
@@ -1151,11 +1151,11 @@ void Recalculate\+Zs (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam
 
 Recalculate water surface after recalculating the values on the halo on the CPU. 
 
-Recalculate water surface after recalculating the values on the halo on the GPU.\hypertarget{Halo_8h_autotoc_md140}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md140}
+Recalculate water surface after recalculating the values on the halo on the GPU.\hypertarget{Halo_8h_autotoc_md137}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md137}
 Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-\/elevation is not required, only h is recalculated on the halo at ever 1/2 steps. ~\newline
- zs then needs to be recalculated to obtain a mass-\/conservative solution (if zs is conserved then mass conservation is not garanteed)\hypertarget{Halo_8h_autotoc_md141}{}\doxysubsubsection{Warning}\label{Halo_8h_autotoc_md141}
-This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction\hypertarget{Halo_8h_autotoc_md142}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md142}
-Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-\/elevation is not required, only h is recalculated on the halo at ever 1/2 steps. zs then needs to be recalculated to obtain a mass-\/conservative solution (if zs is conserved then mass conservation is not garanteed)\hypertarget{Halo_8h_autotoc_md143}{}\doxysubsubsection{Warning}\label{Halo_8h_autotoc_md143}
+ zs then needs to be recalculated to obtain a mass-\/conservative solution (if zs is conserved then mass conservation is not garanteed)\hypertarget{Halo_8h_autotoc_md138}{}\doxysubsubsection{Warning}\label{Halo_8h_autotoc_md138}
+This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction\hypertarget{Halo_8h_autotoc_md139}{}\doxysubsubsection{Description}\label{Halo_8h_autotoc_md139}
+Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-\/elevation is not required, only h is recalculated on the halo at ever 1/2 steps. zs then needs to be recalculated to obtain a mass-\/conservative solution (if zs is conserved then mass conservation is not garanteed)\hypertarget{Halo_8h_autotoc_md140}{}\doxysubsubsection{Warning}\label{Halo_8h_autotoc_md140}
 This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction \mbox{\Hypertarget{Halo_8cu_a4346cbc367125486b54412319cca8521}\label{Halo_8cu_a4346cbc367125486b54412319cca8521}} 
 \index{Halo.cu@{Halo.cu}!RecalculateZs$<$ double $>$@{RecalculateZs$<$ double $>$}}
 \index{RecalculateZs$<$ double $>$@{RecalculateZs$<$ double $>$}!Halo.cu@{Halo.cu}}

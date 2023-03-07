@@ -46,8 +46,8 @@ T hllc (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{delta,  }\item[{T}]{e
 
 Calculate the Harten-\/\+Lax-\/van Leer-\/contact (HLLC) flux. 
 
-\hypertarget{Reimann_8h_autotoc_md179}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md179}
-This an implementation of the HLLC solver.\hypertarget{Reimann_8h_autotoc_md180}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md180}
+\hypertarget{Reimann_8h_autotoc_md176}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md176}
+This an implementation of the HLLC solver.\hypertarget{Reimann_8h_autotoc_md177}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md177}
 This scheme was adapted/modified from the Basilisk source code. \href{http://basilisk.fr/src/riemann.h}{\texttt{ http\+://basilisk.\+fr/src/riemann.\+h}}
 
 Reference\+: (Basilisk reference the scheme from Kurganov reference below) Kurganov, A., \& Levy, D. (2002). Central-\/upwind schemes for the Saint-\/\+Venant system. Mathematical Modelling and Numerical Analysis, 36(3), 397-\/425. \mbox{\Hypertarget{Reimann_8cu_a76c7ff126a9bb767505ac4861b6d7ba2}\label{Reimann_8cu_a76c7ff126a9bb767505ac4861b6d7ba2}} 
@@ -73,10 +73,10 @@ void Update\+Buttinger\+XCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cl
 
 \char`\"{}\+Adaptive\char`\"{} second-\/order hydrostatic reconstruction. CPU version for the X-\/axis 
 
-\hypertarget{Reimann_8h_autotoc_md173}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md173}
+\hypertarget{Reimann_8h_autotoc_md170}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md170}
 This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-\/balanced meaning that it conserve the \char`\"{}lake-\/at-\/rest\char`\"{} states.
 
-For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md174}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md174}
+For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md171}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md171}
 This scheme was adapted/modified from the Basilisk / B-\/\+Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction \href{http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h}{\texttt{ http\+://basilisk.\+fr/sandbox/b-\/flood/saint-\/venant-\/topo.\+h}}
 
 Reference\+: Kirstetter, G., Delestre, O., Lagree, P.-\/Y., Popinet, S., and Josserand, C.\+: B-\/flood 1.\+0\+: an open-\/source Saint-\/\+Venant model for flash flood simulation using adaptive refinement, Geosci. \mbox{\hyperlink{structModel}{Model}} Dev. Discuss. \mbox{[}preprint\mbox{]}, \href{https://doi.org/10.5194/gmd-2021-15}{\texttt{ https\+://doi.\+org/10.\+5194/gmd-\/2021-\/15}}, in review, 2021.$\ast$ Buttinger-\/\+Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.\+: A fast second-\/order shallow water scheme on two-\/dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-\/108, 2019. \mbox{\Hypertarget{Reimann_8cu_ac73231851279bd3d155883eb7ff2844f}\label{Reimann_8cu_ac73231851279bd3d155883eb7ff2844f}} 
@@ -102,10 +102,10 @@ void Update\+Buttinger\+XGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cl
 
 \char`\"{}\+Adaptive\char`\"{} second-\/order hydrostatic reconstruction. GPU version for t X-\/axis 
 
-\hypertarget{Reimann_8h_autotoc_md171}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md171}
+\hypertarget{Reimann_8h_autotoc_md168}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md168}
 This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-\/balanced meaning that it conserve the \char`\"{}lake-\/at-\/rest\char`\"{} states.
 
-For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md172}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md172}
+For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md169}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md169}
 This scheme was adapted/modified from the Basilisk / B-\/\+Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction \href{http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h}{\texttt{ http\+://basilisk.\+fr/sandbox/b-\/flood/saint-\/venant-\/topo.\+h}}
 
 Reference\+: Kirstetter, G., Delestre, O., Lagree, P.-\/Y., Popinet, S., and Josserand, C.\+: B-\/flood 1.\+0\+: an open-\/source Saint-\/\+Venant model for flash flood simulation using adaptive refinement, Geosci. \mbox{\hyperlink{structModel}{Model}} Dev. Discuss. \mbox{[}preprint\mbox{]}, \href{https://doi.org/10.5194/gmd-2021-15}{\texttt{ https\+://doi.\+org/10.\+5194/gmd-\/2021-\/15}}, in review, 2021.$\ast$ Buttinger-\/\+Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.\+: A fast second-\/order shallow water scheme on two-\/dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-\/108, 2019. \mbox{\Hypertarget{Reimann_8cu_a5acda7e5802c7b23fbb709afcf42e66c}\label{Reimann_8cu_a5acda7e5802c7b23fbb709afcf42e66c}} 
@@ -131,10 +131,10 @@ void Update\+Buttinger\+YCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cl
 
 \char`\"{}\+Adaptive\char`\"{} second-\/order hydrostatic reconstruction. CPU version for the Y-\/axis 
 
-\hypertarget{Reimann_8h_autotoc_md177}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md177}
+\hypertarget{Reimann_8h_autotoc_md174}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md174}
 This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-\/balanced meaning that it conserve the \char`\"{}lake-\/at-\/rest\char`\"{} states.
 
-For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md178}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md178}
+For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md175}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md175}
 This scheme was adapted/modified from the Basilisk / B-\/\+Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction \href{http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h}{\texttt{ http\+://basilisk.\+fr/sandbox/b-\/flood/saint-\/venant-\/topo.\+h}}
 
 Reference\+: Kirstetter, G., Delestre, O., Lagree, P.-\/Y., Popinet, S., and Josserand, C.\+: B-\/flood 1.\+0\+: an open-\/source Saint-\/\+Venant model for flash flood simulation using adaptive refinement, Geosci. \mbox{\hyperlink{structModel}{Model}} Dev. Discuss. \mbox{[}preprint\mbox{]}, \href{https://doi.org/10.5194/gmd-2021-15}{\texttt{ https\+://doi.\+org/10.\+5194/gmd-\/2021-\/15}}, in review, 2021.$\ast$ Buttinger-\/\+Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.\+: A fast second-\/order shallow water scheme on two-\/dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-\/108, 2019. \mbox{\Hypertarget{Reimann_8cu_a34b2d1e844292cace3b72df9297ae3c9}\label{Reimann_8cu_a34b2d1e844292cace3b72df9297ae3c9}} 
@@ -160,10 +160,10 @@ void Update\+Buttinger\+YGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cl
 
 \char`\"{}\+Adaptive\char`\"{} second-\/order hydrostatic reconstruction. GPU version for the Y-\/axis 
 
-\hypertarget{Reimann_8h_autotoc_md175}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md175}
+\hypertarget{Reimann_8h_autotoc_md172}{}\doxysubsubsection{Description}\label{Reimann_8h_autotoc_md172}
 This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-\/balanced meaning that it conserve the \char`\"{}lake-\/at-\/rest\char`\"{} states.
 
-For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md176}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md176}
+For optimising the code on CPU and GPU there are 4 versions of this function\+: X or Y and CPU or GPU\hypertarget{Reimann_8h_autotoc_md173}{}\doxysubsubsection{Where does this come from\+:}\label{Reimann_8h_autotoc_md173}
 This scheme was adapted/modified from the Basilisk / B-\/\+Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction \href{http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h}{\texttt{ http\+://basilisk.\+fr/sandbox/b-\/flood/saint-\/venant-\/topo.\+h}}
 
 Reference\+: Kirstetter, G., Delestre, O., Lagree, P.-\/Y., Popinet, S., and Josserand, C.\+: B-\/flood 1.\+0\+: an open-\/source Saint-\/\+Venant model for flash flood simulation using adaptive refinement, Geosci. \mbox{\hyperlink{structModel}{Model}} Dev. Discuss. \mbox{[}preprint\mbox{]}, \href{https://doi.org/10.5194/gmd-2021-15}{\texttt{ https\+://doi.\+org/10.\+5194/gmd-\/2021-\/15}}, in review, 2021.$\ast$ Buttinger-\/\+Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.\+: A fast second-\/order shallow water scheme on two-\/dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-\/108, 2019. 

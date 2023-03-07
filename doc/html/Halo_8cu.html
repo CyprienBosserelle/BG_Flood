@@ -2174,7 +2174,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating halos for each block of a single variable on CPU. </p>
-<h2><a class="anchor" id="autotoc_md139"></a>
+<h2><a class="anchor" id="autotoc_md136"></a>
 Description</h2>
 <p>This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo CPU function. This is layer 2 of 3 wrap so the candy doesn't stick too much. </p>
 
@@ -2289,7 +2289,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating halos on CPU on every side of a block of a single variable. </p>
-<h2><a class="anchor" id="autotoc_md138"></a>
+<h2><a class="anchor" id="autotoc_md135"></a>
 Description</h2>
 <p>This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean. In a sense this is the third (and last) layer of wrapping </p>
 
@@ -2416,10 +2416,10 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating flux in the halos for a block and a single variable on CPU. </p>
-<h2><a class="anchor" id="autotoc_md144"></a>
+<h2><a class="anchor" id="autotoc_md141"></a>
 Depreciated</h2>
 <p>This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn't preserve the balance of fluxes on the restiction interface It should be deleted soon </p>
-<h2><a class="anchor" id="autotoc_md145"></a>
+<h2><a class="anchor" id="autotoc_md142"></a>
 Description</h2>
 
 </div>
@@ -2545,7 +2545,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating halos for each block of a single variable on GPU. </p>
-<h2><a class="anchor" id="autotoc_md146"></a>
+<h2><a class="anchor" id="autotoc_md143"></a>
 Description</h2>
 <p>This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions </p>
 
@@ -3570,7 +3570,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating flux for halos for each block of a single variable on GPU. </p>
-<h2><a class="anchor" id="autotoc_md147"></a>
+<h2><a class="anchor" id="autotoc_md144"></a>
 Description</h2>
 <p>This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions </p>
 
@@ -6398,17 +6398,17 @@ template&lt;class T &gt; </div>
 
 <p>Recalculate water surface after recalculating the values on the halo on the CPU. </p>
 <p>Recalculate water surface after recalculating the values on the halo on the GPU.</p>
-<h2><a class="anchor" id="autotoc_md140"></a>
+<h2><a class="anchor" id="autotoc_md137"></a>
 Description</h2>
 <p>Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps. <br  />
  zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)</p>
-<h2><a class="anchor" id="autotoc_md141"></a>
+<h2><a class="anchor" id="autotoc_md138"></a>
 Warning</h2>
 <p>This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction</p>
-<h2><a class="anchor" id="autotoc_md142"></a>
+<h2><a class="anchor" id="autotoc_md139"></a>
 Description</h2>
 <p>Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps. zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)</p>
-<h2><a class="anchor" id="autotoc_md143"></a>
+<h2><a class="anchor" id="autotoc_md140"></a>
 Warning</h2>
 <p>This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction </p>
 
@@ -8094,7 +8094,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Halo_8cu.html">Halo.cu</a></li>
-    <li class="footer">Generated on Mon Mar 6 2023 10:04:31 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Mar 7 2023 15:15:50 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

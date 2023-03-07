@@ -17,10 +17,10 @@ Please, use the Parameters and Forcings list as a reference*
 
 
 # Input Parameters
-## `BG_param.txt`
+## BG_param.txt
 All the model inputs are controlled by the BG_param.txt file. It is a simple text file that contains the parameters of the model that the user wishes to change.
 
-### How to use the `BG_param.txt` file
+### How to use the BG_param.txt file
 Model parameters can be modified in the file by specifying the parameter name, the equal sign, the desired value(s) for the parameter and optionally a semi-column ;
 ```{txt}
 #My Dummy BG_param files
@@ -52,95 +52,29 @@ Where the file input is a timeserie (e.g. boundary forcing), then the file exten
 ## List of Parameters
 Remember that the only required parameter to run the model is the bathymetry file. But if you want to run something fun you will need to specify boundary conditions, initial conditions and/or some forcings.
 
-### Input
-| Parameter (synonyms)                       | Definition          | Default Value  |
-| ------------------------ |:---------------------------------------:| -------------------:|
-| bathy (or depfile)       | Bathy file name. See below for details  | _No Default values_ |
-| gpudevice (or GPUDEVICE) | Define which GPU device to use (use -1 for CPU)     |   0 (default GPU)     |
-| doubleprecision    |  if == 1 use double precision solver and math otherwise use float (much faster)  |    0  |
-| mask    |  remove blocks from computation where the bathy/topo is larger than mask value (default no area are masked). see below for more details  |    9999.0  |
-| nx    | Initial/input grid size (number of nodes) in x direction |  0  |
-| ny    | Initial/input grid size (number of nodes) in y direction |  1  |
-| dx    | Initial/input grid resolution ([m] for metric grid  or [decimal degree] for spherical grids) |  0.0  |
-| grdalpha    | grid rotation [degrees clockwise of North for Y axis] |  0.0  |
-| xo    | grid origin in x direction [m] or [decimal degree] if spherical ==1 |  0.0  |
-| yo    | grid origin in y direction [m] or [decimal degree] if spherical ==1 |  0.0  |
-
-### Forcing/Boundary
-| Parameter (synonyms)                       | Definition          | Default Value  |
-| ------------------------ |:---------------------------------------:| -------------------:|
-| left    | Specify left boundary type (see below for details) |  1  |
-| right    | Specify right boundary type (see below for details) |  1  |
-| bot    | Specify bottom boundary type (see below for details) |  1  |
-| top    | Specify top boundary type (see below for details) |  1  |
-| initzs (or zsinit)    | Initial water level. The initial water level is calculated as a inverse distance to the value at the boundary use this parameter to define the initial water level if no boundaries or hotstart file are specified (e.g. for a lake) |  -999  |
-| hotstartfile    | Netcdf file containing initial conditions either or a combination of u ,v ,zs ,hh and/or zb |  no file  |
-| deformfile    | Netcdf file containing initial deformation from a tsunami. this deformation is applied to both the topography and water levels (Not Yet Implemented)  |  no file  |
-| hotstep    | Step (in the time dimension?) to read hotstart condition in hotstart file. |  0 (i.e. first)  |
-| frictionmodel    | Flag to tell the model which friction model is used. 1: Quadratic (is cf is fixed); 2: Smart 2017 manning style bottom friction safe for very shallow water (in this case the parameter cf is actually z0) |  0  |
-| cfmap or roughnessmap    | Input grid of  either cf or z0 values (the same dimension as the input bathymetry) |  default value  |
-| windfiles   | Wind forcing files containing wind speed in u and v direction. See below for details |  no files  |
-| atmpfile    | Atmospheric forcing file (in netcdf format) containing atmospheric pressure in Pa.  |  no file  |
-| Pa2m    | Conversion between atmospheric pressure changes to water level changes  |  0.00009916  |
-| Paref    | Reference atmospheric pressure in Pa.  |  10130.0  |
-
-### Hydrodynamics
-| Parameter (synonyms)                       | Definition          | Default Value  |
-| ------------------------ |:---------------------------------------:| -------------------:|
-| eps    |  model drying height [m]  |    0.0001  |
-| cf    |  model bottom friction (see below for details)  |    0.0001  |
-| Cd    |  Wind drag coefficient  |    0.002  |
-| CFL    |  CFL criterium between 0 and 1. Higher values may make the model unstable  |    0.5  |
-| river |  5 parameters (comma separated) to define Point/area discharge in  the model see below for details |No rivers  |
-
-### Time keeping
-| Parameter (synonyms)                       | Definition          | Default Value  |
-| ------------------------ |:---------------------------------------:| -------------------:|
-| CFL    |  CFL criterium between 0 and 1. Higher values may make the model unstable  |    0.5  |
-| outputtimestep (or  outtimestep)  |  time step between model output in s  |    0.0 (no output)  |
-| endtime    |  time when the model stops s  |    0.0 (model will initialise but not run)  |
-| totaltime    |  time at the start of the model s  |    0.0  |
-
-
-### Output
-| Parameter (synonyms)                       | Definition          | Default Value  |
-| ------------------------ |:---------------------------------------:| -------------------:|
-| outfile    |  netcdf output file name (if the file already exist a number will be appended to the filename and no file will be overwritten)  |    Output.nc  |
-| outvars   |  List (comma separated) of variable to output to the netcdf file See below for details |    no variable  |
-| TSOfile    |  Filename for timeseries output  |    no output  |
-| resetmax    | if ==1 reset max variables after each output  |  0  |
-| smallnc    | Flag for saving output as short integer. This reduces the size of output file (see scalefactor and addoffset below) |  1  |
-| scalefactor    | Scale factor applied to output before saving as short integer. This follows the COARDS convention: `packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)`  |  0.01  |
-| addoffset    | Offset applied to output before saving as short integer. This follows the COARDS convention: `packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)` |  0.0  |
-| posdown    | switch to tell the modle that input grid is positive down. if podown==1 the input grid will be multiplied by -1.0 to transform to positive up |  0  |
-
-### Miscelanious
-| Parameter (synonyms)                       | Definition          | Default Value  |
-| ------------------------ |:---------------------------------------:| -------------------:|
-| g    | acceleration of gravity [m/s2]|  9.81  |
-| rho    | fluid density [kg/m3] |  1025.0  |
-| spherical    | switch to run the model in spherical (geographical) coordinates. This implies that the computation will occur in double precision  |  0  |
-| Radius    | Earth radius used to calculate spherical grid corrections [m] |  6371220.0  |
-
+[Full list of the parameters](@ref ParameterList)
 
 
 ## Bathymetry/topography files
-Input bathymetry data as a regular grid using `.asc`, `.nc`, `.md`. This is a required parameter that ultimately also defines the extend of the model domain and model resolution.
+Input bathymetry data as a regular grid using `.asc`, `.nc`, `.md`. This is a required parameter that ultimately also defines the extend of the model domain and model resolution (if not defined by the user).
 
 `bathy = My_bathy_file.asc`
 
-the correct way of reading the file will be dedicated by the file extension. For `.nc` (netcdf) files you can specify the name of the variable in the file as: `mybathyfile.nc?myvar` (will look for `zb` if none are specified). 
+The correct way of reading the file will be dedicated by the file extension. For `.nc` (netcdf) files you can specify the name of the variable in the file as: `mybathyfile.nc?myvar` (will look for `zb` if none are specified). 
 
-This input file is critical as it defines the extent of the model grid and the base resolution in the model. (The model is not adaptive yet but this is still relevant for the extent of the model.)
+This input file is critical as it defines the extent of the model grid and the base resolution in the model.
+
+*Note*: Different files can be provided to the code (using the instruction line multiple times). The code will use the last one having information at a given location when interpolating the data to create the bottom elevation (zb) variable.
 
 ## Conputational mesh
-BG-Flood generates its own mesh. By default, it is a quad regular mesh based on the DEM (Digital Elevation Model) extend and resolution. 
+**BG-Flood generates its own mesh.** By default, it is a quad regular mesh based on the DEM (Digital Elevation Model) extend and resolution. 
 The extend of the mesh and resolution of the mesh can be modify by the user. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.
 
 ### Adaptative mesh
 
 ### Masking
-Parts of the input bathymetry can be masked and excluded from the computation. The model extent (and locations of side boundaries) will remain the same but entire blocks can be removed from the computational memory. These area will appear as NaN in the output file. The input grid is first devided in blocks of 16x16. If all the value within a block exceed the mask value (9999 as default) then that block is excluded from memory and no computation will occur there.
+Parts of the input bathymetry can be masked and excluded from the computation. The model extent (and locations of side boundaries) will remain the same but entire blocks can be removed from the computational memory. These area will appear as NaN in the output file. The input grid is first devided in blocks of 16x16. If all the value within a block exceed the mask value (9999 as default) then that block is excluded from memory and no computation will occur there. An "area of interest" (AOI) can also be used to select a part of the domain. If none of the cells of a block is located in this area, that block will be excluded from memory.
+The AOI is prefered other the mask method as the later can create waterfalls on the borders of the domain, specially if the rain-on-grid method is used.
 
 There are no fancy treatment of the boundaries of masked blocks so it is safer to select a mask threshold (`mask`) to keep most of the masked are dry. If water tries to cross to a masked block, The boundary of blocks are treated as Neumann (no gradient) boundaries so the bathymetry of the 2 cells adjacent to a masked block are set to the same value (the value of the second cell removed from the masked block). 
 
@@ -157,14 +91,12 @@ Four type of boundaries can be applied at the edge of the model. By default neum
 For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary level is imposed from a file so a file needs to be sepcified:
 ```{txt}
     left = 1;
-    right = 3;
-    rightbndfile = mybndfile.txt
-    top = 3;
-    topbndfile = mybndfile.txt
+    right = mybndfile.txt,3;
+    top = mybndfile.txt,3;
 ```
 
 ### Boundary file (for type 2 or 3)
-Water level boundary file are needed to type 2 nd 3 boundaries. The files are 2 (or more) column one with time in the first column and water level is the other(s). Note that the time step in the file doesn't need to be constant. The model will linearly interpolated between steps in the file. The file can be either comma separated or tab separated. This is automatically detected.
+Water level boundary file are needed to type 2 and 3 boundaries. The files are 2 (or more) columns, one with time in the first column and water level is the other(s). Note that the time step in the file doesn't need to be constant. The model will linearly interpolated between steps in the file. The file can be either comma separated or tab separated. This is automatically detected.
 
 #### Uniform boundary file
 For uniform boundary condition (along the boundary axis) the files needs to be 2 column:
@@ -202,20 +134,29 @@ Here is an example with 3 water level column:
 
 In this case both near and far end of the boundary axis will remain zero and the center of the boundary axis will be 1.2m. 
 
+There is no restriction in the number of columns. These values from each column will be forced uniformly spaced on the boundary and forcing in between will be linearly interpolated.
+
+
 ## Bottom friction
-Bottom friction is applied implicitly in the model (applied to velocities after momentum and continuity equations are solved). There are 3 friction equations implemented defined in `BG_param.txt` as `frictionmodel = `:
+Bottom friction is applied implicitly in the model (applied to velocities after momentum and continuity equations are solved). 
+There are 3 friction equations implemented defined in `BG_param.txt` as `frictionmodel = `:
 
 * 0 Quadratic
 * 1 Smart
 * -1 Mannings
+Quadratic friction is the default, with a uniform friction coefficient:
+```{txt}
+  frictionmodel = 0
+  cf = 0.001
+``` 
+If a uniform friction is required add `cf=` to your `BG_param.txt` with the desired value. `cf` keyword is also used for the \f$z0\f$ of Smart formulation and \f$n\f$ of the Manning formulation. 
 
-`frictionmodel = 0` (i.e. Quadratic friction is the default with a uniform friction coefficient `cf = 0.001`. If a uniform friction is required add `cf=` to your `BG_param.txt` with the desired value. `cf` keyword is also used for the z0 of Smart formulation and n of the manning formulation. 
-
-For non-uniform friction parameter use the keyword  `cfmap` or `roughnessmap` and assign an `.asc` or `.nc` file. for nc files you may need to supply the netcdf variable name. e.g. `cfmap=final_rough.nc?zo`. The roughness grid does not need to match the model grid dimension and coarser friction grid will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).
+For non-uniform friction parameter use the keyword  `cfmap` or `roughnessmap` and assign an `.asc` or `.nc` file. For nc files you may need to supply the netcdf variable name: e.g. `cfmap=final_rough.nc?zo`. The roughness grid does not need to match the model grid dimension and coarser friction grid will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).
 
 ## Rivers and Area discharge
 At this stage river can only be added to the model as a vertical discharge where the water is added to a rectangle on the model with no velocity.
-To add rivers add a line per river with the parameters: `river = Fluxfile,xstart,xend,ystart,yend;` where `Fluxfile` is a 2 column text file containing time and dicharge in m3/s; `xstart` is the left coordinate of the square where the vertical discharge is applied, `xend` is the right coordinate of the square, `ystart` is the bottom coordinate of the square and `yend` is the top coordinate of the square. Example:
+To add rivers add a line per river with the parameters: `river = Fluxfile,xstart,xend,ystart,yend;` where `Fluxfile` is a 2 column text file containing time and dicharge in m3/s; `xstart` is the left coordinate of the square where the vertical discharge is applied, `xend` is the right coordinate of the square, `ystart` is the bottom coordinate of the square and `yend` is the top coordinate of the square. 
+Example:
 ```{txt}
     river = Votualevu_R.txt,1867430,1867455,3914065,3914090;
     river = Mulomulo_R.txt,1867052,1867072,3911853,3911873;
@@ -223,78 +164,186 @@ To add rivers add a line per river with the parameters: `river = Fluxfile,xstart
 
 ## Wind atm pressure forcing
 ### Wind forcing (may contain bugs)
-The hydrodynamics can be forced using a linear wind drag. the linear drag can be influenced with the keyword `Cd`. wind input is defined with the keyword `windfiles=`. There are several ways to use the keyword.
-#### spatially uniform txt file: `windfiles=mywind.txt`
-where `mywind.txt` is a text file with 3 column (time (in s), wind speed (m/s) and wind direction(degree North)). If the gris is in acoordinate system rotated from the north and a `grdalpha` is specified, the wind will be automatically rotated to the grid orientation. 
+The hydrodynamics can be forced using a linear wind drag. the linear drag can be influenced with the keyword `Cd`. Wind input is defined with the keyword `windfiles=`. There are several ways to use the keyword.
+#### spatially uniform txt file: 
+```{txt}
+windfiles=mywind.txt
+```
+where `mywind.txt` is a text file with 3 column (time (in s), wind speed (m/s) and wind direction(degree North)). If the grid is in acoordinate system rotated from the north and a `grdalpha` is specified, the wind will be automatically rotated to the grid orientation. 
 
-#### Spatially and time varying input `windfiles=mywind.nc?uw,mywind.nc?vw`
-Here two arguments separated with a comma are expected. The first argument is the netcdf file and variable name containing the U component of the wind (Along the X axis) and the second argument is the netcdf file and variable name containing the V component of the wind (Along the Y axis). Both can be in the same netcdf file as in the example. Separate netcdf file name and variable name with a `?` similarly to other netcdf input option. The dimension of the wind forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value). 
+#### Spatially and time varying input
+```{txt}
+windfiles=mywind.nc?uw,mywind.nc?vw
+```
+Here two arguments separated with a comma are expected. The first argument is the netcdf file and variable name containing the U component of the wind (along the X axis) and the second argument is the netcdf file and variable name containing the V component of the wind (along the Y axis). Both can be in the same netcdf file as in the example or in separate netcdf files (add the variable name with a `?` similarly to other netcdf input options). The dimension of the wind forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value). 
 
 
 ### Atmospheric pressure forcing
-Spatially constant atmospheric pressure forcing is not relevant so only spatially varying forcing is feasable. like for the wind this is done through a netcdf file:
+Spatially constant atmospheric pressure forcing is not relevant so only spatially varying forcing is feasable. Like for the wind this is done through a netcdf file:
 ```{txt}
 atmpfile=myncfile.nc?atmpres
 ```
-The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure `Paref=101300.0` converted to a height using `Pa2m=0..00009916`. If using hPa your will need to also change the reference pressure to `Paref=1013.0` and the conversion parameter to `Pa2m=0.009916`. As with the  wind forcing, the forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value). 
+The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure `Paref=101300.0` converted to a height using `Pa2m=0.00009916`. If using hPa your will need to also change the reference pressure to `Paref=1013.0` and the conversion parameter to `Pa2m=0.009916`. As with the  wind forcing, the forcing grid does not need to match the model grid dimension and coarser forcing will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value). 
  
-## Output variables (Not up to date!!!)
+## Outputs
+There is two types of outputs:
+ - map outputs of 2D variables regularly through time.
+ - time-series output of basic values, at a chosen position, at each time step.
 
-### Snapshot outputs
+### Map outputs
+These maps are output as a nc file, with information on coordinates and blocks.
+
+The map output can be modify by:
+- defining a timestep (in s) for these outputs:
+```{txt} 
+outputtimestep = 3600.0;
+```
+- changing the set of variables in the output file (from the list given in the manual)
+```{txt} 
+outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
+```
+- changing the name of the output file:
+```{txt} 
+outfile = Results_tuto_basicRun.nc;
+```
+
+- choosing one or more zones to outputs (by default, the full domain is output):
+ ```{text}
+outzone=MyZoneName.nc,x1,x2,y1,y2;
+outzone=MyZoneNameb.nc,x1b,x2b,y1b,y2b;
+ ``` 
+- saving the output as float (variables are saved as short integer by default.):
+```{txt} 
+smallnc = 0;
+```
+
+
+By default, the variables outputs are the one listed in the following paragraph: Default snapshot outputs.
+#### Default snapshot outputs
 | Parameter                 | Definition          |     Unit         |
 | ------------------------ |:----------------:|---------------------:|
 | u       | U  velocity (at cell center) zonal velocity positive right | [m/s] |
 | v       | V  velocity (at cell center) meridional velocity positive right | [m/s] |
-| vort       | Vorticity | [rotation/s] |
 | h       | water depth at cell center | [m] |
 | zs       | Water level elevation above datum | [m] |
 | zb       | Topography elevation above datum  | [m] |
 
-### Mean/averaged output between output steps
-This is for averaging variables in between output steps, useful for mean tidal flow calculation that averages out vortices. The average time is `outtimestep`
+#### Complementary variables
+| Parameter                 | Definition          |     Unit         |
+| ------------------------ |:----------------:|---------------------:|
+| vort    | Vorticity | [rotation/s] |
+| cf    | Bottom friction coefficient (Manning n or z0) | varies with model used |
+
+
+
+#### Mean/averaged output between output steps
+This is for averaging variables in between output steps, useful for mean tidal flow calculation that averages out vortices. The average time is `outtimestep`.
 
 | Parameter                 | Definition          |     Unit         |
 | ------------------------ |:----------------:|---------------------:|
-| umean       | Averaged U  velocity (at cell center) zonal velocity positive right | [m/s] |
-| vmean       | Averaged V  velocity (at cell center) meridional velocity positive right | [m/s] |
+| umean       | Averaged u  velocity (at cell center) zonal velocity positive right | [m/s] |
+| vmean       | Averaged v  velocity (at cell center) meridional velocity positive right | [m/s] |
 | hmean       | Averaged water depth at cell center | [m] |
 | zsmean       | Averaged Water level elevation above datum | [m] |
 
-### Max output
-The max can be calculated for the overall simulation (default) or between output steps (`resetmax = 1;`)
+#### Max output
+The max can be calculated for the overall simulation (default) or between output steps ( if `resetmax = 1;`)
 
 | Parameter                 | Definition          |     Unit         |
 | ------------------------ |:----------------:|---------------------:|
-| umax       | Maximum U  velocity (at cell center) zonal velocity positive right | [m/s] |
-| vmax       | Maximum V  velocity (at cell center) meridional velocity positive right | [m/s] |
+| umax       | Maximum u  velocity (at cell center) zonal velocity positive right | [m/s] |
+| vmax       | Maximum v  velocity (at cell center) meridional velocity positive right | [m/s] |
 | hmax       | Maximum water depth at cell center | [m] |
 | zsmax     | Maximum Water level elevation above datum | [m] |
 
-### Risk assesment related output
-These variable are used to evaluate the damage resulting from the innundation.
-
-put Udh / twet / ...
+#### Risk assesment related output
+These variables are used to evaluate the damage resulting from the innundation (as a complement to hmax for example).
 
 | Parameter                 | Definition          |     Unit         |
 | ------------------------ |:----------------:|---------------------:|
-| umax       | Maximum U  velocity (at cell center) zonal velocity positive right | [m/s] |
-| vmax       | Maximum V  velocity (at cell center) meridional velocity positive right | [m/s] |
-| hmax       | Maximum water depth at cell center | [m] |
-| zsmax     | Maximum Water level elevation above datum | [m] |
+| hUmax       | Maximum of h time the velocity (U for amplitude of (u,v)) | [m2/s] |
+| Umax       | Maximum of the velocity (U for amplitude of (u,v)) | [m/s] |
+| twet       | Duration innundation of the cell in s (h>0.1m)  | [s] |
 
-### Infiltration outputs
-The quatity of water that infiltrate in the ground using the ILCL model is saved, as a cumulated variable in:
+#### Model related outputs
+These outputs  will be produce only if the associated model/forcing is used.
 
-put Udh / twet / ...
+If an atmospheric forcing is used:
+| Parameter                 | Definition          |     Unit         |
+| ------------------------ |:----------------:|---------------------:|
+| Patm       | Atmospheric pressure | [Pa] |
+| datmpdx/datmpdy       | Gradients of atmospheric pressure | [Pa/m] |
+
+If the infiltration model (ILCL) is used, the quantity of water that infiltrate in the ground is saved, as a cumulated value in hgw.
 
 | Parameter                 | Definition          |     Unit         |
 | ------------------------ |:----------------:|---------------------:|
-| umax       | Maximum U  velocity (at cell center) zonal velocity positive right | [m/s] |
-| vmax       | Maximum V  velocity (at cell center) meridional velocity positive right | [m/s] |
-| hmax       | Maximum water depth at cell center | [m] |
-| zsmax     | Maximum Water level elevation above datum | [m] |
+| il       | Initial loss coefficient | [mm] |
+| cl       | Continuous loss coefficient | [mm/hr] |
+| hgw      | Cumulated height of infiltrated water in the ground | [m] |
 
-### Other gradients and intermediate terms of the equations
+#### Other gradients and intermediate terms of the equations
+Terms of the equation can also been output such as the gradients (for error tracking mainly):
+| Parameter                 | Definition          |     Unit         |
+| ------------------------ |:----------------:|---------------------:|
+| dhdx / dhdy       | Gradient of water elevation (h) in the x and y direction respectively  | [] |
+| dzsdx / dzsdy       | Gradient of the water surface (zs) in the x and y direction respectively  | [] |
+| dudx / dudy       | Gradient of x-velocity (u) in the x and y direction respectively  | [s-1] |
+| dvdx / dvdy       | Gradient of y-velocity (v) in the x and y direction respectively  | [s-1] |
+| Fhu / Fhv       | Flux of h time u in the x and y direction respectively  | [m2/s2] |
+| Fqux / Fqvx       |  XXXXXXXXXXXX | [m2/s2] |
+| Su / Sv       | XXXXXXXXXXXX  | [m2/s2] |
+| dh       | Variation in elevation  | [m] |
+| du / dv       | Variation of the x- and y-velocity respectively  | [m/s] |
 
- "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"<br>|
+ "vort","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"
+
+
+### Point or Time-Serie output
+
+For each Time-Serie output needed, a line with the destination file and the postition is needed:
+
+```{txt} 
+TSnodesout=Offshore.txt,xloc,yloc;
+```
+The file contains 5 colums \f$(t, zs, h, u,v)\f$ with the value at the nearest grid point (to the position defined by the user).
+
+## Adaptative grid
+At the stage of development, the code will adapt the grid only before the computation but not along the calcul.
+
+The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
+These blocks can have different resolutions (but the resolution does not change during the computation at this stage).
+
+By default, the initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use different levels of resolution. 
+The reference level, correponding to the bathymetry resolution or "dx" if defined by the user, will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  \f$n\f$ , the resolution  \f$dx_n\f$
+  will be:
+$$dx_n=\frac{dx_0}{2^n}$$
+ 
+with  \f$dx_0\f$ the resolution at level 0. 
+
+When refinning using the level implementation, different key words are expected:
+
+- Initlevel: level used to create the first mesh created by the code in the mesh refinement process (only a technical information)
+- Maxlevel: maximim level of refinement (over-ruling other commands)
+- Minlevel: minimum level of refinement (over-ruling other commands)
+
+The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
+
+The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:
+
+- 'Threshold': impose a threshold for a different level of resolution
+- 'Inrange': impose a range for a different level of resolution
+- 'Targetlevel': the levels of resolution will be targeted but will be overruled by the maxlevel, minlevel entrance.
+
+For example, for the adaptation with targeted levels:
+```{txt} 
+initlevel = init ;
+maxlevel =  max ;
+minlevel = min ;
+Adaptation = Targetlevel,MyLevelMap.nc?levels ;
+```
+Where max and min represent the range of level expected, and init is a number in this range (it is advice to use the min level). MyLevelMap is a netcdf 2D map of levels, that can have a different resolution and dimension from the computational grid. The amplitude of the levels on the map can also be larger than than min/max. All these levels are positive or negative integer.
+
+
+For a bathymetry map of 10m resolution ( or \f$ dx=10m\f$), we can use \f$min=-3\f$, \f$max=2\f$ and \f$init=-3\f$ to create a grid where coarser cell will be \f$10/2^-3=80m\f$ and the thinner \f$10/2=2.5m\f$. The level file would contains a 2D map with integer values from -3 to 2.
 

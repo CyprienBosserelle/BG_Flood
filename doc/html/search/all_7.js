@@ -12,7 +12,7 @@ var searchData=
   ['halo_2eh_558',['Halo.h',['../Halo_8h.html',1,'']]],
   ['halofluxcpubt_559',['HaloFluxCPUBT',['../Halo_8cu.html#a5497979187df8771242d5c3d66922615',1,'Halo.cu']]],
   ['halofluxcpulr_560',['HaloFluxCPULR',['../Halo_8cu.html#a9127f7d09d9a110da1cb7fae1786c389',1,'Halo.cu']]],
-  ['halofluxgpubt_561',['HaloFluxGPUBT',['../Halo_8h.html#a0c0b81d1c956a11c4025491946f90010',1,'HaloFluxGPUBT(Param XParam, BlockP&lt; T &gt; XBlock, T *z):&#160;Halo.cu'],['../Halo_8cu.html#a0c0b81d1c956a11c4025491946f90010',1,'HaloFluxGPUBT(Param XParam, BlockP&lt; T &gt; XBlock, T *z):&#160;Halo.cu']]],
+  ['halofluxgpubt_561',['HaloFluxGPUBT',['../Halo_8cu.html#a0c0b81d1c956a11c4025491946f90010',1,'HaloFluxGPUBT(Param XParam, BlockP&lt; T &gt; XBlock, T *z):&#160;Halo.cu'],['../Halo_8h.html#a0c0b81d1c956a11c4025491946f90010',1,'HaloFluxGPUBT(Param XParam, BlockP&lt; T &gt; XBlock, T *z):&#160;Halo.cu']]],
   ['halofluxgpubtnew_562',['HaloFluxGPUBTnew',['../Halo_8cu.html#a5ddd71e988ae7200bfd409d5d9d81921',1,'Halo.cu']]],
   ['halofluxgpulr_563',['HaloFluxGPULR',['../Halo_8cu.html#a82e672706036bc5b4e87cd2b739f9609',1,'HaloFluxGPULR(Param XParam, BlockP&lt; T &gt; XBlock, T *z):&#160;Halo.cu'],['../Halo_8h.html#a82e672706036bc5b4e87cd2b739f9609',1,'HaloFluxGPULR(Param XParam, BlockP&lt; T &gt; XBlock, T *z):&#160;Halo.cu']]],
   ['halofluxgpulrnew_564',['HaloFluxGPULRnew',['../Halo_8cu.html#a9178199ff5e46ef9a5fee4241b8e235e',1,'Halo.cu']]],
@@ -24,9 +24,8 @@ var searchData=
   ['home_2emd_570',['Home.md',['../Home_8md.html',1,'']]],
   ['hotstartfile_571',['hotstartfile',['../classParam.html#af885609128acc8bb3ddb29c58c0a53ba',1,'Param']]],
   ['hotstep_572',['hotstep',['../classParam.html#a6800bcfe3bbe46d0fcfe61c868d8efb3',1,'Param']]],
-  ['how_20to_20create_20continuous_20losses_20for_20nz_573',['How to create continuous losses for NZ',['../md_doc_modules_NZ_Conductivity.html',1,'']]],
-  ['how_5fto_5finstall_2emd_574',['How_to_install.md',['../How__to__install_8md.html',1,'']]],
-  ['hu_575',['hU',['../structEvolvingP__M.html#a80e2af7b2832148bcda71cb72c239945',1,'EvolvingP_M']]],
-  ['hugenegval_576',['hugenegval',['../structLoop.html#a4f456faf0de9b08f099e0dd44c790388',1,'Loop']]],
-  ['hugeposval_577',['hugeposval',['../structLoop.html#a324fbf87aacab45d22f4ad92cb2a2ffa',1,'Loop']]]
+  ['how_5fto_5finstall_2emd_573',['How_to_install.md',['../How__to__install_8md.html',1,'']]],
+  ['hu_574',['hU',['../structEvolvingP__M.html#a80e2af7b2832148bcda71cb72c239945',1,'EvolvingP_M']]],
+  ['hugenegval_575',['hugenegval',['../structLoop.html#a4f456faf0de9b08f099e0dd44c790388',1,'Loop']]],
+  ['hugeposval_576',['hugeposval',['../structLoop.html#a324fbf87aacab45d22f4ad92cb2a2ffa',1,'Loop']]]
 ];
