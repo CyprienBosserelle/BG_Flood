@@ -181,6 +181,11 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_ncerror(status);
 
+	static char txtname[] = "time";;
+	status = nc_put_att_text(ncid, time_id, "standard_name", strlen(txtname), txtname );
+	//status = nc_put_att_string(ncid, time_id, "standard_name", 1, "time");
+	if (status != NC_NOERR) handle_ncerror(status);
+
 	// Define dimensions and variables to store block id, status, level xo, yo
 
 	status = nc_def_dim(ncid, "blockid", nblk, &blockid_dim);
