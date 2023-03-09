@@ -2,9 +2,9 @@
 
 
 ## From precompiled binaries (Win10 only)
-1. download the zip from any release
-2. unzip into preferred path
-3. Add path to "Path" in environment variables (search for "Edit environment variables for your account")
+1. download the zip from any release ([see tags](https://github.com/CyprienBosserelle/BG_Flood/tags))
+2. unzip into preferred ```path```
+3. Add ```path``` to "Path" in environment variables (search for "Edit environment variables for your account")
 4. When updating/upgrading BG_Flood simply repeat 1 and 2
 
 
