@@ -1,6 +1,8 @@
 # Manual {#Manual}
 
-*This file is not uptodate with the last version of the Code:
+BG_Flood is a hydrodynamics model for simulating 2D depth-averaged flow. The following manual describes how to use the model but does not go into details about the model equations.
+
+*This manual is under revision and not up-to-date with the last version of the code.
 Please, use the Parameters and Forcings list as a reference*
 
 - [Input Parameters](#input-parameters)
@@ -16,9 +18,13 @@ Please, use the Parameters and Forcings list as a reference*
   * [Outputs](#output-variables)
 
 
-# Input Parameters
+# Model controls
+BG_Flood model reads an instruction file (or *param* file) that tells the model what to do and what forcing files to read. when instructions are not explicitely given the model will use the default value. How to use the param file is important for making BG_Flood do what you want it to do.
+
+By default this instruction file is called ```BG_param.txt```.
+
 ## BG_param.txt
-All the model inputs are controlled by the BG_param.txt file. It is a simple text file that contains the parameters of the model that the user wishes to change.
+All the model inputs are controlled by the ```BG_param.txt``` file. It is a simple text file that contains the parameters of the model that the user wishes to change. While it is easy to build such file manually but also it is easy to use script and/or programming language to generate and modify text file to automatically to build and run many simulations.
 
 ### How to use the BG_param.txt file
 Model parameters can be modified in the file by specifying the parameter name, the equal sign, the desired value(s) for the parameter and optionally a semi-column ;
