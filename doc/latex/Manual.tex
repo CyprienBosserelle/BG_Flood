@@ -1,6 +1,8 @@
 \label{Manual_md_doc_Manual}%
 \Hypertarget{Manual_md_doc_Manual}%
- {\itshape This file is not uptodate with the last version of the Code\+: Please, use the Parameters and Forcings list as a reference}
+ BG\+\_\+\+Flood is a hydrodynamics model for simulating 2D depth-\/averaged flow. The following manual describes how to use the model but does not go into details about the model equations.
+
+{\itshape This manual is under revision and not up-\/to-\/date with the last version of the code. Please, use the Parameters and Forcings list as a reference}
 
 
 \begin{DoxyItemize}
@@ -19,9 +21,11 @@
 \item \href{\#wind-atm-pressure-forcing}{\texttt{ Wind and atmospheric pressure forcing}}
 \item \href{\#output-variables}{\texttt{ Outputs}}
 \end{DoxyItemize}
-\end{DoxyItemize}\hypertarget{Manual_autotoc_md104}{}\doxysection{Input Parameters}\label{Manual_autotoc_md104}
-\hypertarget{Manual_autotoc_md105}{}\doxysubsection{BG\+\_\+param.\+txt}\label{Manual_autotoc_md105}
-All the model inputs are controlled by the BG\+\_\+param.\+txt file. It is a simple text file that contains the parameters of the model that the user wishes to change.\hypertarget{Manual_autotoc_md106}{}\doxysubsubsection{How to use the BG\+\_\+param.\+txt file}\label{Manual_autotoc_md106}
+\end{DoxyItemize}\hypertarget{Manual_autotoc_md104}{}\doxysection{Model controls}\label{Manual_autotoc_md104}
+BG\+\_\+\+Flood model reads an instruction file (or {\itshape param} file) that tells the model what to do and what forcing files to read. when instructions are not explicitely given the model will use the default value. How to use the param file is important for making BG\+\_\+\+Flood do what you want it to do.
+
+By default this instruction file is called {\ttfamily BG\+\_\+param.\+txt}.\hypertarget{Manual_autotoc_md105}{}\doxysubsection{BG\+\_\+param.\+txt}\label{Manual_autotoc_md105}
+All the model inputs are controlled by the {\ttfamily BG\+\_\+param.\+txt} file. It is a simple text file that contains the parameters of the model that the user wishes to change. While it is easy to build such file manually but also it is easy to use script and/or programming language to generate and modify text file to automatically to build and run many simulations.\hypertarget{Manual_autotoc_md106}{}\doxysubsubsection{How to use the BG\+\_\+param.\+txt file}\label{Manual_autotoc_md106}
 \mbox{\hyperlink{structModel}{Model}} parameters can be modified in the file by specifying the parameter name, the equal sign, the desired value(s) for the parameter and optionally a semi-\/column ; 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{preprocessor}{\#My Dummy BG\_param files}}

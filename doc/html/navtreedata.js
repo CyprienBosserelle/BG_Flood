@@ -50,7 +50,7 @@ var NAVTREE =
       [ "List of the non-identified inputs", "ParameterList.html#autotoc_md101", null ]
     ] ],
     [ "Manual", "Manual.html", [
-      [ "Input Parameters", "Manual.html#autotoc_md104", [
+      [ "Model controls", "Manual.html#autotoc_md104", [
         [ "BG_param.txt", "Manual.html#autotoc_md105", [
           [ "How to use the BG_param.txt file", "Manual.html#autotoc_md106", null ],
           [ "General comment about input files", "Manual.html#autotoc_md107", null ]

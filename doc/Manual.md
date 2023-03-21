@@ -146,9 +146,9 @@ There is no restriction in the number of columns. These values from each column 
 Bottom friction is applied implicitly in the model (applied to velocities after momentum and continuity equations are solved). 
 There are 3 friction equations implemented defined in `BG_param.txt` as `frictionmodel = `:
 
-* 0 Quadratic
-* 1 Smart
-* -1 Mannings
+* 0: Basic Quadratic friction law (expecting the non-dimensional friction coefficient 'cf' )
+* 1: Roughtness length model from Smart (expecting a \f$z_0\f$ parameter in 'cf')
+* -1 Manning's friction model (expecting a Manning n parameter 'cf')
 Quadratic friction is the default, with a uniform friction coefficient:
 ```{txt}
   frictionmodel = 0
