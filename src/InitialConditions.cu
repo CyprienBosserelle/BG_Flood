@@ -260,7 +260,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 	if (XForcing.rivers.size() > 0)
 	{
 		//
-		double xl, yb, xr, yt ;
+		double xl, yb, xr, yt, xi,yi ;
 		int ib;
 		double levdx, levdelta;
 		double dischargeArea;
@@ -281,13 +281,16 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 					for (int i = 0; i < XParam.blkwidth; i++)
 					{
 						//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-						
-						
-						xl = XParam.xo + XModel.blocks.xo[ib] + i * levdx - 0.5 * levdx;
-						yb = XParam.yo + XModel.blocks.yo[ib] + j * levdx - 0.5 * levdx;
+						xi = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
+						yi = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
 
-						xr = XParam.xo + XModel.blocks.xo[ib] + i * levdx + 0.5 * levdx;
-						yt = XParam.yo + XModel.blocks.yo[ib] + j * levdx + 0.5 * levdx;
+
+						
+						xl = xi - 0.5 * levdx;
+						yb = yi - 0.5 * levdx;
+
+						xr = xi + 0.5 * levdx;
+						yt = yi + 0.5 * levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
 						//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
@@ -298,7 +301,14 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 							idis.push_back(i);
 							jdis.push_back(j);
 							blockdis.push_back(ib);
-							dischargeArea = dischargeArea + levdelta * levdelta;
+							if (XParam.spherical)
+							{
+								dischargeArea = dischargeArea + spharea(XParam.Radius, xi, yi, levdx);
+							}
+							else
+							{
+								dischargeArea = dischargeArea + levdelta * levdelta;
+							}
 						}
 					}
 				}

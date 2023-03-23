@@ -2,7 +2,10 @@
 
 
 
-
+/*! \fn T calcCM(T Radius, T delta, T yo, int iy)
+* Scale factor for y face length (x face lengh scale is always 1 in spherical model assuming that lat long are entered)
+* 
+*/
 template <class T> 
 __host__ __device__ T calcCM(T Radius, T delta, T yo, int iy)
 {
@@ -40,5 +43,51 @@ __host__ __device__  T calcFM(T Radius, T delta, T yo, T iy)
 template __host__ __device__ double calcFM(double Radius, double delta, double yo, double iy);
 template __host__ __device__ float calcFM(float Radius, float delta, float yo, float iy);
 
+/*! \fn  T haversin(T Radius, T lon1, T lat1, T lon2, T lat2)
+* Classic haversin function 
+* The function is too slow to use directly in BG_flood engine but is more usable (i.e. naive) for model setup
+* 
+*/
+template <class T>
+__host__ __device__  T haversin(T Radius, T lon1, T lat1, T lon2, T lat2)
+{
+	T phi1, phi2, dphi, dlbda, a, c;
+	dphi = (lat2 - lat1) * T(pi / 180.0);
+	dlbda = (lon2 -lon1) * T(pi / 180.0);
 
+	phi1 = lat1 * T(pi / 180.0);
+	phi2 = lat2 * T(pi / 180.0);
+
+	T sindphid2 = sin(dphi / 2.0);
+	T sindlbdad2 = sin(dlbda / 2.0);
+	
+	a = sindphid2 * sindphid2 + cos(phi1) * cos(phi2) * sindlbdad2 * sindlbdad2;
+
+	c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+
+	return Radius*c
+
+}
+
+template <class T>
+__host__ __device__  T spharea(T Radius, T lon, T lat, T dx)
+{
+	T lon1, lon2, lat1, lat2;
+	lon1 = lon - T(0.5) * dx;
+	lon2 = lon + T(0.5) * dx;
+
+	lat1 = lat - T(0.5) * dx;
+	lat2 = lat + T(0.5) * dx;
+
+	T a, b, c;
+
+	a = haversin(Radius, lon1, lat1, lon2, lat1);
+	c = haversin(Radius, lon1, lat2, lon2, lat2);
+	b = haversin(Radius, lon1, lat1, lon1, lat2);
+
+	T Area = T(0.5) * (a * b + c * b);
+
+	return Area
+
+}
 
