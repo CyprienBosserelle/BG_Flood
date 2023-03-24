@@ -65,7 +65,7 @@ __host__ __device__  T haversin(T Radius, T lon1, T lat1, T lon2, T lat2)
 
 	c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
 
-	return Radius*c
+	return Radius * c;
 
 }
 
@@ -87,7 +87,8 @@ __host__ __device__  T spharea(T Radius, T lon, T lat, T dx)
 
 	T Area = T(0.5) * (a * b + c * b);
 
-	return Area
+	return Area;
 
 }
-
+template __host__ __device__  double spharea(double Radius, double lon, double lat, double dx);
+template __host__ __device__  float spharea(float Radius, float lon, float lat, float dx);

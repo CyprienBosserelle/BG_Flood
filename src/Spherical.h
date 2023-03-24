@@ -11,6 +11,7 @@
 
 template <class T> __host__ __device__ T calcCM(T Radius, T delta, T yo, int iy);
 template <class T> __host__ __device__  T calcFM(T Radius, T delta, T yo, T iy);
+template <class T> __host__ __device__  T spharea(T Radius, T lon, T lat, T dx);
 
 
 #endif

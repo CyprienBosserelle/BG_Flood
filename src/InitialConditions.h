@@ -12,6 +12,7 @@
 #include "GridManip.h"
 #include "InitEvolv.h"
 #include "Gradients.h"
+#include "Spherical.h"
 
 
 template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel);
