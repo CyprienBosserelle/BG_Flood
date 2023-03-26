@@ -140,6 +140,8 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 		{
 			coarsen[ib] = false;
 		}
+
+		coarsen[ib] = false;
 	}
 
 
