@@ -36,7 +36,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |xmax|xmax| nan("")|Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)|
 |grdalpha|grdalpha| nan("")|Grid rotation Y axis from the North input in degrees but later converted to rad|
 |posdown|posdown| 0|Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f|
-|spherical| spherical , geo | 0|Flag for sperical coordinate (still in development)|
+|spherical|spherical| 0|Flag for sperical coordinate (still in development)|
 |Radius|Radius| 6371220.|Earth radius [m]|
 |mask|mask| 9999.0|Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory|
 ### Adaptation
