@@ -140,7 +140,8 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 		{
 			coarsen[ib] = false;
 		}
-
+		// Warning, Here cancelling all coasening because of a bug
+		// This could become an option for optimising the refinment process ??
 		coarsen[ib] = false;
 	}
 

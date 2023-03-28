@@ -4270,6 +4270,8 @@ template <class T> int Testzbinit(Param XParam, Forcing<float> XForcing, Model<T
 
 	//InitSave2Netcdf(XParam, XModel);
 
+	return 1;
+
 }
 
 
