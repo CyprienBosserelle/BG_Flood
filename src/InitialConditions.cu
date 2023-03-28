@@ -363,6 +363,9 @@ template<class T> void Initmaparray(Model<T>& XModel)
 {
 	//Main Parameters
 	XModel.OutputVarMap["zb"] = XModel.zb;
+	XModel.Outvarlongname["zb"] = "Ground Elevation";
+	XModel.Outvarunits["zb"] = "m above datum";
+
 
 	XModel.OutputVarMap["u"] = XModel.evolv.u;
 

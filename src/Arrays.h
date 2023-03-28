@@ -175,6 +175,9 @@ struct Model
 
 	// 
 	std::map<std::string, T *> OutputVarMap;
+	std::map<std::string, std::string> Outvarlongname;
+	std::map<std::string, std::string> Outvarunits;
+
 
 	//other output
 	//std::vector< std::vector< Pointout > > TSallout;
