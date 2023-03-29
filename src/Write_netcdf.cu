@@ -185,7 +185,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_put_att_text(ncid, time_id, "standard_name", strlen(txtname), txtname );
 	//status = nc_put_att_string(ncid, time_id, "standard_name", 1, "time");
 	//units = "days since 1990-1-1 0:0:0";
-	static char timeunit[]= "seconds since 1990-1-1 0:0:0";
+	static char timeunit[]= "seconds since " + XParam.reftime;
 
 	status = nc_put_att_text(ncid, time_id, "units", strlen(timeunit), timeunit);
 
@@ -410,6 +410,11 @@ template void creatncfileBUQ<float>(Param &XParam, BlockP<float> &XBlock);
 template void creatncfileBUQ<double>(Param &XParam, BlockP<double> &XBlock);
 
 template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, int vdim, T* var, outzoneB Xzone)
+{
+	defncvarBUQ(XParam, activeblk, level, blockxo, blockyo, varst, "", "", vdim, var, Xzone);
+}
+
+template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, std::string longname, std::string unit, int vdim, T* var, outzoneB Xzone)
 {
 
 	int smallnc = XParam.smallnc;
