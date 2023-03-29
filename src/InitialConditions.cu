@@ -363,114 +363,256 @@ template<class T> void Initmaparray(Model<T>& XModel)
 {
 	//Main Parameters
 	XModel.OutputVarMap["zb"] = XModel.zb;
-	XModel.Outvarlongname["zb"] = "Ground Elevation";
-	XModel.Outvarunits["zb"] = "m above datum";
+	XModel.Outvarlongname["zb"] = "Ground elevation above datum";
+	XModel.Outvarstdname["zb"] = "ground_elevation_above_datum";
+	XModel.Outvarunits["zb"] = "m";
 
 
 	XModel.OutputVarMap["u"] = XModel.evolv.u;
+	XModel.Outvarlongname["u"] = "Water velocity in x-direction";// zonal
+	XModel.Outvarstdname["u"] = "u_velocity";
+	XModel.Outvarunits["u"] = "m s-1";
 
 	XModel.OutputVarMap["v"] = XModel.evolv.v;
+	XModel.Outvarlongname["v"] = "Velocity in y-direction";// meridional
+	XModel.Outvarstdname["v"] = "v_velocity";
+	XModel.Outvarunits["v"] = "m s-1";
 
 	XModel.OutputVarMap["zs"] = XModel.evolv.zs;
+	XModel.Outvarlongname["zs"] = "Water surface elevation above datum";
+	XModel.Outvarstdname["zs"] = "water_surface_elevation";
+	XModel.Outvarunits["zs"] = "m";
 
 	XModel.OutputVarMap["h"] = XModel.evolv.h;
+	XModel.Outvarlongname["h"] = "Water depth";
+	XModel.Outvarstdname["h"] = "water_depth";
+	XModel.Outvarunits["h"] = "m";
 
 	//Mean Max parameters
 	XModel.OutputVarMap["hmean"] = XModel.evmean.h;
+	XModel.Outvarlongname["hmean"] = "Mean water depth since last output";
+	XModel.Outvarstdname["hmean"] = "mean_water_depth";
+	XModel.Outvarunits["hmean"] = "m";
 
 	XModel.OutputVarMap["hmax"] = XModel.evmax.h;
+	XModel.Outvarlongname["hmax"] = "Maximum water depth since simulation start";
+	XModel.Outvarstdname["hmax"] = "maximum_water_depth";
+	XModel.Outvarunits["hmax"] = "m";
 
 	XModel.OutputVarMap["zsmean"] = XModel.evmean.zs;
+	XModel.Outvarlongname["zsmean"] = "Mean water elevation above datum since last output";
+	XModel.Outvarstdname["zsmean"] = "mean_water_elevation";
+	XModel.Outvarunits["zsmean"] = "m";
 
 	XModel.OutputVarMap["zsmax"] = XModel.evmax.zs;
+	XModel.Outvarlongname["zsmax"] = "Maximum water elevation above datum since simulation start";
+	XModel.Outvarstdname["zsmax"] = "maximum_water_elevation";
+	XModel.Outvarunits["zsmax"] = "m";
 
 	XModel.OutputVarMap["umean"] = XModel.evmean.u;
+	XModel.Outvarlongname["umean"] = "Mean velocity in x-direction since last output";
+	XModel.Outvarstdname["umean"] = "mean_u_velocity";
+	XModel.Outvarunits["umean"] = "m s-1";
 
 	XModel.OutputVarMap["umax"] = XModel.evmax.u;
+	XModel.Outvarlongname["umax"] = "Maximum velocity in x-direction since simulation start";
+	XModel.Outvarstdname["umax"] = "maximum_u_velocity";
+	XModel.Outvarunits["umax"] = "m s-1";
 
 	XModel.OutputVarMap["vmean"] = XModel.evmean.v;
+	XModel.Outvarlongname["vmean"] = "Mean velocity in y-direction since last output";
+	XModel.Outvarstdname["vmean"] = "mean_v_velocity";
+	XModel.Outvarunits["vmean"] = "m s-1";
 
 	XModel.OutputVarMap["vmax"] = XModel.evmax.v;
+	XModel.Outvarlongname["vmax"] = "Maximum velocity in y-direction since simulation start";
+	XModel.Outvarstdname["vmax"] = "maximum_v_velocity";
+	XModel.Outvarunits["vmax"] = "m s-1";
 
 	XModel.OutputVarMap["Umean"] = XModel.evmean.U;
+	XModel.Outvarlongname["Umean"] = "Mean velocity magnitude since last output";
+	XModel.Outvarstdname["Umean"] = "mean_velocity";
+	XModel.Outvarunits["Umean"] = "m s-1";
 
 	XModel.OutputVarMap["Umax"] = XModel.evmax.U;
+	XModel.Outvarlongname["Umax"] = "Maximum velocity magnitude since simulation start";
+	XModel.Outvarstdname["Umax"] = "maximum_velocity";
+	XModel.Outvarunits["Umax"] = "m s-1";
 
 	XModel.OutputVarMap["hUmean"] = XModel.evmean.hU;
+	XModel.Outvarlongname["hUmean"] = "Mean depth times velocity since last output";
+	XModel.Outvarstdname["hUmean"] = "mean_depth_velocity";
+	XModel.Outvarunits["hUmean"] = "m2 s-1";
 
 	XModel.OutputVarMap["hUmax"] = XModel.evmax.hU;
+	XModel.Outvarlongname["hUmax"] = "Maximum depth times velocity since simulation start";
+	XModel.Outvarstdname["hUmax"] = "maximum_depth_velocity";
+	XModel.Outvarunits["hUmax"] = "m2 s-1";
 
 	//others
 
 	XModel.OutputVarMap["uo"] = XModel.evolv_o.u;
+	XModel.Outvarlongname["uo"] = "Velocity in x-direction from previous half-step";
+	XModel.Outvarstdname["uo"] = "previous_u_velocity";
+	XModel.Outvarunits["uo"] = "m s-1";
 
 	XModel.OutputVarMap["vo"] = XModel.evolv_o.v;
+	XModel.Outvarlongname["vo"] = "Velocity in y-direction from previous half-step";
+	XModel.Outvarstdname["vo"] = "previous_v_velocity";
+	XModel.Outvarunits["vo"] = "m s-1";
 
 	XModel.OutputVarMap["zso"] = XModel.evolv_o.zs;
+	XModel.Outvarlongname["zso"] = "Water elevation above datum from previous half-step";
+	XModel.Outvarstdname["zso"] = "previous_water_elevation";
+	XModel.Outvarunits["zso"] = "m";
 
 	XModel.OutputVarMap["ho"] = XModel.evolv_o.h;
-
+	XModel.Outvarlongname["ho"] = "Water depth from previous half-step";
+	XModel.Outvarstdname["ho"] = "previous_water_depth";
+	XModel.Outvarunits["ho"] = "m";
 
 	// Gradients
 
 	XModel.OutputVarMap["dhdx"] = XModel.grad.dhdx;
+	XModel.Outvarlongname["dhdx"] = "Water depth gradient in x-direction";
+	XModel.Outvarstdname["dhdx"] = "water_depth_gradient_x_direction";
+	XModel.Outvarunits["dhdx"] = "m/m";
 
 	XModel.OutputVarMap["dhdy"] = XModel.grad.dhdy;
+	XModel.Outvarlongname["dhdy"] = "Water depth gradient in y-direction";
+	XModel.Outvarstdname["dhdy"] = "water_depth_gradient_y_direction";
+	XModel.Outvarunits["dhdy"] = "m/m";
 
 	XModel.OutputVarMap["dudx"] = XModel.grad.dudx;
+	XModel.Outvarlongname["dudx"] = "u-velocity gradient in x-direction";
+	XModel.Outvarstdname["dudx"] = "u_velocity_gradient_x_direction";
+	XModel.Outvarunits["dudx"] = "m s-1/m";
 
 	XModel.OutputVarMap["dudy"] = XModel.grad.dudy;
+	XModel.Outvarlongname["dudy"] = "u-velocity gradient in y-direction";
+	XModel.Outvarstdname["dudy"] = "u_velocity_gradient_y_direction";
+	XModel.Outvarunits["dudy"] = "m s-1/m";
 
 	XModel.OutputVarMap["dvdx"] = XModel.grad.dvdx;
+	XModel.Outvarlongname["dvdx"] = "v-velocity gradient in x-direction";
+	XModel.Outvarstdname["dvdx"] = "v_velocity_gradient_x_direction";
+	XModel.Outvarunits["dvdx"] = "m s-1/m";
 
 	XModel.OutputVarMap["dvdy"] = XModel.grad.dvdy;
+	XModel.Outvarlongname["dvdy"] = "v-velocity gradient in y-direction";
+	XModel.Outvarstdname["dvdy"] = "v_velocity_gradient_y_direction";
+	XModel.Outvarunits["dvdy"] = "m s-1/m";
 
 	XModel.OutputVarMap["dzsdx"] = XModel.grad.dzsdx;
+	XModel.Outvarlongname["dzsdx"] = "Water surface gradient in x-direction";
+	XModel.Outvarstdname["dzsdx"] = "water_surface_gradient_x_direction";
+	XModel.Outvarunits["dzsdx"] = "m/m";
 
 	XModel.OutputVarMap["dzsdy"] = XModel.grad.dzsdy;
+	XModel.Outvarlongname["dzsdy"] = "Water surface gradient in y-direction";
+	XModel.Outvarstdname["dzsdy"] = "water_surface_gradient_y_direction";
+	XModel.Outvarunits["dzsdy"] = "m/m";
 
 	XModel.OutputVarMap["dzbdx"] = XModel.grad.dzbdx;
+	XModel.Outvarlongname["dzbdx"] = "ground elevation gradient in x-direction";
+	XModel.Outvarstdname["dzbdx"] = "ground_surface_gradient_x_direction";
+	XModel.Outvarunits["dzbdx"] = "m/m";
 
 	XModel.OutputVarMap["dzbdy"] = XModel.grad.dzbdy;
+	XModel.Outvarlongname["dzbdy"] = "ground slope in y-direction";
+	XModel.Outvarstdname["dzbdy"] = "ground_surface_gradient_y_direction";
+	XModel.Outvarunits["dzbdy"] = "m/m";
 
 	//Flux
 	XModel.OutputVarMap["Fhu"] = XModel.flux.Fhu;
+	XModel.Outvarlongname["Fhu"] = "Fhu flux term in x-direction";
+	XModel.Outvarstdname["Fhu"] = "Fh_x_direction";
+	XModel.Outvarunits["Fhu"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fhv"] = XModel.flux.Fhv;
+	XModel.Outvarlongname["Fhv"] = "Fhv flux term in y-direction";
+	XModel.Outvarstdname["Fhv"] = "Fh_y_direction";
+	XModel.Outvarunits["Fhv"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fqux"] = XModel.flux.Fqux;
+	XModel.Outvarlongname["Fqux"] = "Fqux flux term in x-direction";
+	XModel.Outvarstdname["Fqux"] = "Fqu_x_direction";
+	XModel.Outvarunits["Fqux"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fqvy"] = XModel.flux.Fqvy;
+	XModel.Outvarlongname["Fqvy"] = "Fqvy flux term in y-direction";
+	XModel.Outvarstdname["Fqvy"] = "Fqv_y_direction";
+	XModel.Outvarunits["Fqvy"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fquy"] = XModel.flux.Fquy;
+	XModel.Outvarlongname["Fquy"] = "Fquy flux term in y-direction";
+	XModel.Outvarstdname["Fquy"] = "Fqu_y_direction";
+	XModel.Outvarunits["Fquy"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fqvx"] = XModel.flux.Fqvx;
+	XModel.Outvarlongname["Fqvx"] = "Fqvx flux term in x-direction";
+	XModel.Outvarstdname["Fqvx"] = "Fqv_x_direction";
+	XModel.Outvarunits["Fqvx"] = "m2 s-1";
 
 	XModel.OutputVarMap["Su"] = XModel.flux.Su;
+	XModel.Outvarlongname["Su"] = "Topography source term un x-direction";
+	XModel.Outvarstdname["Su"] = "Topo_source_x_direction";
+	XModel.Outvarunits["Su"] = "m2 s-1";
 
 	XModel.OutputVarMap["Sv"] = XModel.flux.Sv;
+	XModel.Outvarlongname["Sv"] = "Topography source term un y-direction";
+	XModel.Outvarstdname["Sv"] = "Topo_source_y_direction";
+	XModel.Outvarunits["Sv"] = "m2 s-1";
 
 	//Advance
 	XModel.OutputVarMap["dh"] = XModel.adv.dh;
+	XModel.Outvarlongname["dh"] = "rate of change in water depth";
+	XModel.Outvarstdname["dh"] = "rate_change_water_depth";
+	XModel.Outvarunits["dh"] = "m s-1";
 
 	XModel.OutputVarMap["dhu"] = XModel.adv.dhu;
+	XModel.Outvarlongname["dhu"] = "changes in flux n x-direction";
+	XModel.Outvarstdname["dhu"] = "rate_change_flux_x_direction";
+	XModel.Outvarunits["dhu"] = "m3 s-1/s";
 
 	XModel.OutputVarMap["dhv"] = XModel.adv.dhv;
+	XModel.Outvarlongname["dhv"] = "changes in flux n y-direction";
+	XModel.Outvarstdname["dhv"] = "rate_change_flux_y_direction";
+	XModel.Outvarunits["dhv"] = "m3 s-1/s";
 
 	XModel.OutputVarMap["cf"] = XModel.cf;
+	XModel.Outvarlongname["cf"] = "Roughness";
+	XModel.Outvarunits["cf"] = "m";
 
 	XModel.OutputVarMap["il"] = XModel.il;
+	XModel.Outvarlongname["il"] = "Initial loss water from inflitration";
+	XModel.Outvarunits["il"] = "mm";
+
 	XModel.OutputVarMap["cl"] = XModel.cl;
+	XModel.Outvarlongname["cl"] = "Continung loss water from inflitration";
+	XModel.Outvarunits["cl"] = "mm h-1";
+
 	XModel.OutputVarMap["hgw"] = XModel.hgw;
+	XModel.Outvarlongname["hgw"] = "Groundwater height";
+	XModel.Outvarunits["hgw"] = "m";
 
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
+	XModel.Outvarlongname["Patm"] = "Atmospheric pressure";
+	XModel.Outvarunits["Patm"] = "m";
+
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
+	XModel.Outvarlongname["datmpdx"] = "Atmospheric pressure gradient in x-direction";
+	XModel.Outvarunits["datmpdx"] = "m/m";
+
 	XModel.OutputVarMap["datmpdy"] = XModel.datmpdy;
+	XModel.Outvarlongname["datmpdy"] = "Atmospheric pressure gradient in y-direction";
+	XModel.Outvarunits["datmpdy"] = "m/m";
 
 	//XModel.OutputVarMap["U"] = XModel.U;
 
 	XModel.OutputVarMap["twet"] = XModel.wettime;
-
+	XModel.Outvarlongname["twet"] = "time since the cell has been wet";
+	XModel.Outvarunits["twet"] = "s";
 	//XModel.OutputVarMap["vort"] = XModel.vort;
 }
 

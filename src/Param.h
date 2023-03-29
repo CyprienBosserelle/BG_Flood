@@ -203,7 +203,7 @@ public:
 	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
 
 
-	std::string reftime="2020-1-1 00:00:00"
+	std::string reftime = "2020-1-1 00:00:00";
 
 };
 

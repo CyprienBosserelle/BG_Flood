@@ -176,6 +176,7 @@ struct Model
 	// 
 	std::map<std::string, T *> OutputVarMap;
 	std::map<std::string, std::string> Outvarlongname;
+	std::map<std::string, std::string> Outvarstdname;
 	std::map<std::string, std::string> Outvarunits;
 
 
