@@ -4203,7 +4203,7 @@ template <class T> int TestFirsthalfstep(Param XParam, Forcing<float> XForcing, 
 }
 
 
-template <class T> int Testzbinit(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
 
 	// Setup Model(s)
@@ -4270,7 +4270,7 @@ template <class T> int Testzbinit(Param XParam, Forcing<float> XForcing, Model<T
 
 	//InitSave2Netcdf(XParam, XModel);
 
-	return 1;
+	
 
 }
 
