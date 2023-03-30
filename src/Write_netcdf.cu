@@ -560,8 +560,14 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 		}
 		
 
+		status = nc_put_att_text(ncid, var_id, "standard_name", stdname.size(), stdname.c_str());
+		status = nc_put_att_text(ncid, var_id, "long_name", longname.size(), longname.c_str());
+		status = nc_put_att_text(ncid, var_id, "units", unit.size(),unit.c_str());
 
-
+		int shuffle = 1;
+		int deflate = 1;        // This switches compression on (1) or off (0).
+		int deflate_level = 8;  // This is the compression level in range 1 (less) - 9 (more).
+		nc_def_var_deflate(ncid, var_id, shuffle, deflate, deflate_level);
 
 	}
 	// End definition
@@ -876,7 +882,8 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 			writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], 3, XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				std::string varstr = XParam.outvars[ivar];
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr,XModel.Outvarlongname[varstr],XModel.Outvarstdname[varstr],XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
 			}
 		}
 	}
