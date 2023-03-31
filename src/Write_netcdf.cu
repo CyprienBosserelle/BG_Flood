@@ -194,6 +194,34 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	if (status != NC_NOERR) handle_ncerror(status);
 
+
+	int crsid;
+	std::string crsname;
+	status = nc_def_var(ncid, "crs", NC_INT, 0, tdim, &crsid);
+	if (XParam.spherical == 1)
+	{
+		crsname = "latitude_longitude";
+
+		float primemeridian = 0.0f;
+		float sma = 6378137.0f;
+		float iflat = 298.257223563f;
+		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
+		status = nc_put_att_float(ncid, crsid, "longitude_of_prime_meridian", NC_FLOAT, 1, &primemeridian);
+		status = nc_put_att_float(ncid, crsid, "semi_major_axis", NC_FLOAT, 1, &sma);
+		status = nc_put_att_float(ncid, crsid, "inverse_flattening", NC_FLOAT, 1, &iflat);
+	}
+	else
+	{
+		crsname = "projected";
+		std::string proj = "";
+		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
+		status = nc_put_att_text(ncid, crsid, "proj4", proj.size(), proj.c_str());
+		//status = nc_put_att_float(ncid, crsid, "semi_major_axis", NC_FLOAT, 1, 6378137.0);
+		//status = nc_put_att_float(ncid, crsid, "inverse_flattening", NC_FLOAT, 1, 298.257223563);
+	}
+
+	if (status != NC_NOERR) handle_ncerror(status);
+
 	// Define dimensions and variables to store block id, status, level xo, yo
 
 	status = nc_def_dim(ncid, "blockid", nblk, &blockid_dim);
@@ -564,9 +592,13 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 		status = nc_put_att_text(ncid, var_id, "long_name", longname.size(), longname.c_str());
 		status = nc_put_att_text(ncid, var_id, "units", unit.size(),unit.c_str());
 
+		std::string crsstrname = "crs";
+		status = nc_put_att_text(ncid, var_id, "grid_mapping", crsstrname.size(), crsstrname.c_str());
+		
+
 		int shuffle = 1;
 		int deflate = 1;        // This switches compression on (1) or off (0).
-		int deflate_level = 8;  // This is the compression level in range 1 (less) - 9 (more).
+		int deflate_level = 9;  // This is the compression level in range 1 (less) - 9 (more).
 		nc_def_var_deflate(ncid, var_id, shuffle, deflate, deflate_level);
 
 	}
