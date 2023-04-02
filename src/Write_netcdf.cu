@@ -191,6 +191,10 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	status = nc_put_att_text(ncid, time_id, "units", strlen(timeunit), timeunit);
 
+	std::string timeaxis = "T";
+
+	status = nc_put_att_text(ncid, time_id, "axis", timeaxis.size(), timeaxis.c_str());
+
 
 	if (status != NC_NOERR) handle_ncerror(status);
 
@@ -213,7 +217,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	else
 	{
 		crsname = "projected";
-		std::string proj = "";
+		std::string proj = "+proj=tmerc +lat_0=0 +lon_0=173 +k=0.9996 +x_0=1600000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
 		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
 		status = nc_put_att_text(ncid, crsid, "proj4", proj.size(), proj.c_str());
 		//status = nc_put_att_float(ncid, crsid, "semi_major_axis", NC_FLOAT, 1, 6378137.0);
@@ -249,7 +253,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	//int* levZone;
-
+	std::string xaxis = "X";
+	std::string yaxis = "Y";
 	// For each level Define xx yy 
 	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	{
@@ -289,6 +294,12 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		if (status != NC_NOERR) handle_ncerror(status);
 		status = nc_def_var(ncid, yyname.c_str(), NC_DOUBLE, 1, ydim, &yy_id);
 		if (status != NC_NOERR) handle_ncerror(status);
+
+
+		
+
+		status = nc_put_att_text(ncid, xx_id, "axis", xaxis.size(), xaxis.c_str());
+		status = nc_put_att_text(ncid, yy_id, "axis", yaxis.size(), yaxis.c_str());
 		//End definitions: leave define mode
 	}
 	status = nc_enddef(ncid);
@@ -409,6 +420,8 @@ for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	if (status != NC_NOERR) handle_ncerror(status);
 	status = nc_put_vara_double(ncid, yy_id, ystart, ycount, yval);
 	if (status != NC_NOERR) handle_ncerror(status);
+
+
 
 	free(xval);
 	free(yval);
