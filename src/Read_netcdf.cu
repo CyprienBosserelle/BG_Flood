@@ -301,7 +301,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 
 int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 {
-	// This function reads the dimentions for each variables
+	// This function reads the dimensions for each variables
 	int status, varid;
 	int ncid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];

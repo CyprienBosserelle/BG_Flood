@@ -181,7 +181,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_ncerror(status);
 
-	static char txtname[] = "time";;
+	static char txtname[] = "time";
 	status = nc_put_att_text(ncid, time_id, "standard_name", strlen(txtname), txtname );
 	//status = nc_put_att_string(ncid, time_id, "standard_name", 1, "time");
 	//units = "days since 1990-1-1 0:0:0";
@@ -195,6 +195,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	status = nc_put_att_text(ncid, time_id, "axis", timeaxis.size(), timeaxis.c_str());
 
+	//static char calendarname[] = "standard";
+	//status = nc_put_att_text(ncid, time_id, "calendar", strlen(calendarname), calendarname);
 
 	if (status != NC_NOERR) handle_ncerror(status);
 
@@ -217,7 +219,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	else
 	{
 		crsname = "projected";
-		std::string proj = "PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
+		std::string proj = XParam.crs_ref;
 			//"+proj=tmerc +lat_0=0 +lon_0=173 +k=0.9996 +x_0=1600000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
 		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
 		status = nc_put_att_text(ncid, crsid, "crs_wkt", proj.size(), proj.c_str());
