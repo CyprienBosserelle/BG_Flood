@@ -217,9 +217,11 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	else
 	{
 		crsname = "projected";
-		std::string proj = "+proj=tmerc +lat_0=0 +lon_0=173 +k=0.9996 +x_0=1600000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+		std::string proj = "PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
+			//"+proj=tmerc +lat_0=0 +lon_0=173 +k=0.9996 +x_0=1600000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
 		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
-		status = nc_put_att_text(ncid, crsid, "proj4", proj.size(), proj.c_str());
+		status = nc_put_att_text(ncid, crsid, "crs_wkt", proj.size(), proj.c_str());
+		status = nc_put_att_text(ncid, crsid, "spatial_ref", proj.size(), proj.c_str());
 		//status = nc_put_att_float(ncid, crsid, "semi_major_axis", NC_FLOAT, 1, 6378137.0);
 		//status = nc_put_att_float(ncid, crsid, "inverse_flattening", NC_FLOAT, 1, 298.257223563);
 	}
