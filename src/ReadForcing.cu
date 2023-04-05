@@ -471,7 +471,7 @@ void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 /*! \fn  void readCRSfrombathy(std::string crs_ref, StaticForcingP<float> &Sforcing)
 * Reading the CRS information from the bathymetry file (last one read);
 */
-void readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcing)
+void readCRSfrombathy(std::string& crs_ref, StaticForcingP<float>& Sforcing)
 {
 	int ncid, ncvarid, ncAttid, status;
 	size_t t_len;
