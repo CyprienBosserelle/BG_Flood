@@ -38,6 +38,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		readbathydata(XParam.posdown, XForcing.Bathy[ib]);
 	}
 	
+	//Get_CRS information from last bathymetry file
+	readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size()-1]);
+
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
 	//=================
@@ -465,7 +468,78 @@ void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 	}
 }
 
+/*! \fn  void readCRSfrombathy(std::string crs_ref, StaticForcingP<float> &Sforcing)
+* Reading the CRS information from the bathymetry file (last one read);
+*/
+void readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcing)
+{
+	int ncid, ncvarid, ncAttid, status;
+	size_t t_len;
+	char* crs;
+	char* crs_wkt;
 
+	
+
+	if (!Sforcing.inputfile.empty())
+	{
+
+		log("Reading CRS information from forcing metadata (file: " + Sforcing.inputfile + ")");
+
+
+		/* Open the netCDF file */
+		status = nc_open(Sforcing.inputfile.c_str(), NC_NOWRITE, &ncid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		/* Get variable ID */
+		status = nc_inq_varid(ncid, "z", &ncvarid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		/* Get the attribute ID */
+		status = nc_inq_attid(ncid, ncvarid, "grid_mapping", &ncAttid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+
+		/* Read CRS attribute from the variable */
+		status = nc_inq_attlen(ncid, ncvarid, "grid_mapping", &t_len);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		crs = (char*)malloc(t_len-4);
+
+		/* Read CRS attribute from the variable */
+		status = nc_get_att_text(ncid, ncvarid, "grid_mapping", crs);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		printf("CRS: %s\n", crs);
+
+		/*Get associated CRS variable ID*/
+		status = nc_inq_varid(ncid, crs, &ncvarid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		/* Get the attribute ID */
+		status = nc_inq_attid(ncid, ncvarid, "crs_wkt", &ncAttid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+
+		/* Read CRS attribute from the variable */
+		status = nc_inq_attlen(ncid, ncvarid, "crs_wkt", &t_len);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		crs_wkt = (char*)malloc(t_len - 4);
+
+		/* Read CRS attribute from the variable */
+		status = nc_get_att_text(ncid, ncvarid, "crs_wkt", crs_wkt);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		printf("CRS_info: %s\n", crs_wkt);
+
+		crs_ref = crs_wkt;
+
+		/* Close the netCDF file */
+		if (nc_close(ncid) != NC_NOERR) {
+			fprintf(stderr, "Error: Failed to close file.\n");
+		}
+	}
+}
 
 /*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 * Read boundary forcing files
