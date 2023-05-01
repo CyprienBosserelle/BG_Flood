@@ -496,43 +496,48 @@ void readCRSfrombathy(std::string& crs_ref, StaticForcingP<float>& Sforcing)
 
 		/* Get the attribute ID */
 		status = nc_inq_attid(ncid, ncvarid, "grid_mapping", &ncAttid);
-		if (status != NC_NOERR) handle_ncerror(status);
+		if (status == NC_NOERR)
+		{
 
 
-		/* Read CRS attribute from the variable */
-		status = nc_inq_attlen(ncid, ncvarid, "grid_mapping", &t_len);
-		if (status != NC_NOERR) handle_ncerror(status);
-
-		crs = (char*)malloc(t_len-4);
-
-		/* Read CRS attribute from the variable */
-		status = nc_get_att_text(ncid, ncvarid, "grid_mapping", crs);
-		if (status != NC_NOERR) handle_ncerror(status);
-
-		printf("CRS: %s\n", crs);
-
-		/*Get associated CRS variable ID*/
-		status = nc_inq_varid(ncid, crs, &ncvarid);
-		if (status != NC_NOERR) handle_ncerror(status);
-
-		/* Get the attribute ID */
-		status = nc_inq_attid(ncid, ncvarid, "crs_wkt", &ncAttid);
-		if (status != NC_NOERR) handle_ncerror(status);
 
 
-		/* Read CRS attribute from the variable */
-		status = nc_inq_attlen(ncid, ncvarid, "crs_wkt", &t_len);
-		if (status != NC_NOERR) handle_ncerror(status);
+			/* Read CRS attribute from the variable */
+			status = nc_inq_attlen(ncid, ncvarid, "grid_mapping", &t_len);
+			if (status != NC_NOERR) handle_ncerror(status);
 
-		crs_wkt = (char*)malloc(t_len - 4);
+			crs = (char*)malloc(t_len - 4);
 
-		/* Read CRS attribute from the variable */
-		status = nc_get_att_text(ncid, ncvarid, "crs_wkt", crs_wkt);
-		if (status != NC_NOERR) handle_ncerror(status);
+			/* Read CRS attribute from the variable */
+			status = nc_get_att_text(ncid, ncvarid, "grid_mapping", crs);
+			if (status != NC_NOERR) handle_ncerror(status);
 
-		printf("CRS_info: %s\n", crs_wkt);
+			printf("CRS: %s\n", crs);
 
-		crs_ref = crs_wkt;
+
+			/*Get associated CRS variable ID*/
+			status = nc_inq_varid(ncid, crs, &ncvarid);
+			if (status != NC_NOERR) handle_ncerror(status);
+
+			/* Get the attribute ID */
+			status = nc_inq_attid(ncid, ncvarid, "crs_wkt", &ncAttid);
+			if (status != NC_NOERR) handle_ncerror(status);
+
+
+			/* Read CRS attribute from the variable */
+			status = nc_inq_attlen(ncid, ncvarid, "crs_wkt", &t_len);
+			if (status != NC_NOERR) handle_ncerror(status);
+
+			crs_wkt = (char*)malloc(t_len - 4);
+
+			/* Read CRS attribute from the variable */
+			status = nc_get_att_text(ncid, ncvarid, "crs_wkt", crs_wkt);
+			if (status != NC_NOERR) handle_ncerror(status);
+
+			printf("CRS_info: %s\n", crs_wkt);
+
+			crs_ref = crs_wkt;
+		}
 
 		/* Close the netCDF file */
 		if (nc_close(ncid) != NC_NOERR) {
