@@ -647,7 +647,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 
 				if (status != NC_NOERR)
 				{
-					//printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel,initdx,lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+					printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel,initdx,lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 					//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
 					handle_ncerror(status);
 				}

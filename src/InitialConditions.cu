@@ -490,6 +490,17 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 	{
 
 		Xzone = XParam.outzone[o];
+
+		XzoneB.xo = Xzone.xstart;
+		XzoneB.yo = Xzone.ystart;
+		XzoneB.xmax = Xzone.xend;
+		XzoneB.ymax = Xzone.yend;
+
+		std::vector<int> blkzone;
+		double xl, xr, yb, yt;
+
+		int nblk = 0;
+		/*
 		cornerblk = { 0, 0, 0, 0 };
 		// Find the blocks to output for each zone (and the corner of this area) 
 		//
@@ -501,10 +512,6 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		// must be defined first to have a rectangular zone. Then, a new pass through all blocks
 		// identify the blocks inside this new defined zone.
 		
-		std::vector<int> blkzone;
-		double xl, xr, yb, yt;
-
-		int nblk = 0;
 
 		//Getting the new area's corners
 
@@ -564,7 +571,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			levdx = calcres(XParam.dx, XBlock.level[it]);
 			XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		}
-
+		*/
 		// Get the list of all blocks in the zone and the maximum and minimum level of refinement
 		int maxlevel = XParam.minlevel;
 		int minlevel = XParam.maxlevel;
@@ -582,11 +589,16 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 
 			// Checking if at least one part of the a cell of the block is 
 			// inside the area defined by the user.
-			if (OBBdetect(xl, xr, yb, yt, XzoneB.xo, XzoneB.xmax, XzoneB.yo, XzoneB.ymax))
+			if (OBBdetect(xl, xr, yb, yt, Xzone.xstart, Xzone.xend, Xzone.ystart, Xzone.yend))
 			{
 				// This block belongs to the output zone defined by the user
 				blkzone.push_back(ib);
 				nblk++;
+
+				XzoneB.xo = min(XzoneB.xo,XParam.xo + XBlock.xo[ib] - levdx / 2);
+				XzoneB.xmax = max(XzoneB.xmax, XParam.xo + XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx + levdx / 2);
+				XzoneB.yo = min(XzoneB.yo, XParam.yo + XBlock.yo[ib] - levdx / 2);
+				XzoneB.ymax = max(XzoneB.ymax, XParam.yo + XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx + levdx / 2);
 
 				//min/max levels
 				if (XBlock.level[ib] > maxlevel) { maxlevel = XBlock.level[ib]; }
