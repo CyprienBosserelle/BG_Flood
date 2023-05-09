@@ -39,7 +39,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	}
 	
 	//Get_CRS information from last bathymetry file
-	readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size()-1]);
+	XParam.crs_ref=readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size()-1]);
 
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
@@ -471,13 +471,13 @@ void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 /*! \fn  void readCRSfrombathy(std::string crs_ref, StaticForcingP<float> &Sforcing)
 * Reading the CRS information from the bathymetry file (last one read);
 */
-void readCRSfrombathy(std::string& crs_ref, StaticForcingP<float>& Sforcing)
+std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcing)
 {
 	int ncid, ncvarid, ncAttid, status;
 	size_t t_len;
 	char* crs;
 	char* crs_wkt;
-
+	std::string crs_ref2;
 	
 
 	if (!Sforcing.inputfile.empty())
@@ -512,31 +512,60 @@ void readCRSfrombathy(std::string& crs_ref, StaticForcingP<float>& Sforcing)
 			status = nc_get_att_text(ncid, ncvarid, "grid_mapping", crs);
 			if (status != NC_NOERR) handle_ncerror(status);
 
-			printf("CRS: %s\n", crs);
+			printf("grid info detected: %s\n", crs);
 
 
 			/*Get associated CRS variable ID*/
 			status = nc_inq_varid(ncid, crs, &ncvarid);
 			if (status != NC_NOERR) handle_ncerror(status);
 
-			/* Get the attribute ID */
-			status = nc_inq_attid(ncid, ncvarid, "crs_wkt", &ncAttid);
-			if (status != NC_NOERR) handle_ncerror(status);
+			std::vector<std::string> attnamevec = { "crs_wkt","spatial_ref" };
+
+			int idatt = -1;
+
+			for (int id = 0; id < attnamevec.size(); id++)
+			{
+				/* Get the attribute ID */
+				status = nc_inq_attid(ncid, ncvarid, attnamevec[id].c_str(), &ncAttid);
+				if (status == NC_NOERR)
+				{
+					idatt = id;
+					break;
+				}
+			}
+
+			if (idatt > -1)
+			{
+
+				/* Get the attribute ID */
+				status = nc_inq_attid(ncid, ncvarid, attnamevec[idatt].c_str(), &ncAttid);
+				if (status != NC_NOERR) handle_ncerror(status);
 
 
-			/* Read CRS attribute from the variable */
-			status = nc_inq_attlen(ncid, ncvarid, "crs_wkt", &t_len);
-			if (status != NC_NOERR) handle_ncerror(status);
+				/* Read CRS attribute from the variable */
+				status = nc_inq_attlen(ncid, ncvarid, attnamevec[idatt].c_str(), &t_len);
+				if (status != NC_NOERR) handle_ncerror(status);
 
-			crs_wkt = (char*)malloc(t_len - 4);
+				crs_wkt = (char*)malloc(t_len - 4);
 
-			/* Read CRS attribute from the variable */
-			status = nc_get_att_text(ncid, ncvarid, "crs_wkt", crs_wkt);
-			if (status != NC_NOERR) handle_ncerror(status);
+				/* Read CRS attribute from the variable */
+				status = nc_get_att_text(ncid, ncvarid, attnamevec[idatt].c_str(), crs_wkt);
+				if (status != NC_NOERR) handle_ncerror(status);
 
-			printf("CRS_info: %s\n", crs_wkt);
+				printf("CRS_info: %s\n", crs_wkt);
 
-			crs_ref = crs_wkt;
+				//crs_ref = crs_wkt;
+				crs_ref2 = crs_wkt;
+
+				printf("CRS_info: %s\n", crs_ref2);
+			}
+			else
+			{
+				printf("CRS_info detected but not understood reverting to default CRS\n Rename attribute in grid-mapping variable\n");
+
+				//crs_ref = "";
+			}
+
 		}
 
 		/* Close the netCDF file */
@@ -544,6 +573,7 @@ void readCRSfrombathy(std::string& crs_ref, StaticForcingP<float>& Sforcing)
 			fprintf(stderr, "Error: Failed to close file.\n");
 		}
 	}
+	return crs_ref2;
 }
 
 /*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
