@@ -41,6 +41,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//Get_CRS information from last bathymetry file
 	XParam.crs_ref=readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size()-1]);
 
+	//XParam.crs_ref = "test2";
+
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
 	//=================
@@ -555,9 +557,9 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 				printf("CRS_info: %s\n", crs_wkt);
 
 				//crs_ref = crs_wkt;
-				crs_ref2 = crs_wkt;
+				//crs_ref2 = crs_wkt;
 
-				printf("CRS_info: %s\n", crs_ref2);
+				//printf("CRS_info: %s\n", crs_ref2.c_str());
 			}
 			else
 			{
@@ -567,13 +569,13 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 			}
 
 		}
-
+		status = nc_close(ncid);
 		/* Close the netCDF file */
-		if (nc_close(ncid) != NC_NOERR) {
+		if ( status != NC_NOERR) {
 			fprintf(stderr, "Error: Failed to close file.\n");
 		}
 	}
-	return crs_ref2;
+	return crs_wkt;
 }
 
 /*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
