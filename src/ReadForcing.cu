@@ -508,7 +508,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 			status = nc_inq_attlen(ncid, ncvarid, "grid_mapping", &t_len);
 			if (status != NC_NOERR) handle_ncerror(status);
 
-			crs = (char*)malloc(t_len - 4);
+			crs = (char*)malloc(t_len + 1);
 
 			/* Read CRS attribute from the variable */
 			status = nc_get_att_text(ncid, ncvarid, "grid_mapping", crs);
@@ -548,7 +548,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 				status = nc_inq_attlen(ncid, ncvarid, attnamevec[idatt].c_str(), &t_len);
 				if (status != NC_NOERR) handle_ncerror(status);
 
-				crs_wkt = (char*)malloc(t_len - 4);
+				crs_wkt = (char*)malloc(t_len + 1);
 
 				/* Read CRS attribute from the variable */
 				status = nc_get_att_text(ncid, ncvarid, attnamevec[idatt].c_str(), crs_wkt);
