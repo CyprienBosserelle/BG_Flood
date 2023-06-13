@@ -38,11 +38,13 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		readbathydata(XParam.posdown, XForcing.Bathy[ib]);
 	}
 	
-	//Get_CRS information from last bathymetry file
-	XParam.crs_ref=readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size()-1]);
+	if (XForcing.Bathy[0].extension.compare("nc") == 0)
+	{
+		//Get_CRS information from last bathymetry file
+		XParam.crs_ref = readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size() - 1]);
 
-	//XParam.crs_ref = "test2";
-
+		//XParam.crs_ref = "test2";
+	}
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
 	//=================
