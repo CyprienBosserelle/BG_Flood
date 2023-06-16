@@ -3236,7 +3236,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	if (nzones  == 3)
 	{
 		// read param file
-		readforcing(XParam, XForcing);
+		//readforcing(XParam, XForcing);
 		outzoneP zone;
 		zone.outname = "whole.nc";
 		zone.xstart = -10;
