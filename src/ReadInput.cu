@@ -1527,5 +1527,34 @@ bndparam readbndline(std::string parametervalue)
 	return bnd;
 }
 
+time_t date_string_to_time(const char* date)
+{
+	struct tm tm = { 0 }; // Important, initialize all members
+	int n = 0;
+	sscanf(date, "%d-%d-%dT%d:%d:%d %n", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+		&tm.tm_hour, &tm.tm_min, &tm.tm_sec, &n);
+	// If scan did not completely succeed or extra junk
+	if (n == 0 || date[n]) {
+		return (time_t)-1;
+	}
+	tm.tm_isdst = 0; // Eforce output to be standard time. 
+	tm.tm_mon--;      // Months since January
+	// Assume 2 digit year if in the range 2000-2099, else assume year as given
+	if (tm.tm_year >= 0 && tm.tm_year < 100) {
+		tm.tm_year += 2000;
+	}
+	tm.tm_year -= 1900; // Years since 1900
+	time_t t = mktime(&tm);
+	return t;
+}
 
+double date_string_to_s(std::string datetime, std::string refdate)
+{
+	time_t ttime = date_string_to_time(datetime.c_str());
+	time_t reftime = date_string_to_time(refdate.c_str());
+
+	double diff = difftime(ttime, reftime);
+
+	return diff;
+}
 
