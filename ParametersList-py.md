@@ -43,8 +43,8 @@ BG_flood user interface consists in a text file, associating key words to user c
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |initlevel|initlevel| 0|Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)|
-|maxlevel|maxlevel| 0|Maximum level for grid adaptation (overwrite the adaptation map if use) |
-|minlevel|minlevel| 0|Minumim level for grid adaptation (overwrite the adaptation map if use) |
+|maxlevel|maxlevel| -99999|Maximum level for grid adaptation (overwrite the adaptation map if use) |
+|minlevel|minlevel| -99999|Minumim level for grid adaptation (overwrite the adaptation map if use) |
 |membuffer|membuffer| 1.05|Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
 ### Timekeeping
 |_Reference_|_Keys_|_default_|_Explanation_|
