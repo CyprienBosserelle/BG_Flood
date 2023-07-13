@@ -169,9 +169,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 					- the slope (%)
 			*/
 			log("\t### Homogeneous rain on grid Mass conservation test ###");
-			testrainGPU = Raintest(0.0, 0, 10);
-			result = testrainGPU ? "successful" : "failed";
-			log("\t\tHomogeneous rain on grid test GPU: " + result);
+			if (XParam.GPUDEVICE >= 0)
+			{
+				testrainGPU = Raintest(0.0, 0, 10);
+				result = testrainGPU ? "successful" : "failed";
+				log("\t\tHomogeneous rain on grid test GPU: " + result);
+			}
 			testrainCPU = Raintest(0.0, -1, 10);
 			result = testrainCPU ? "successful" : "failed";
 			log("\t\tHomogeneous rain on grid test CPU: " + result);
@@ -667,7 +670,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XForcing.rivers.push_back(thisriver);
 
 
-	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
 
 
 	checkparamsanity(XParam, XForcing);
@@ -897,7 +900,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XForcing.rivers.push_back(thisriver);
 
 
-	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
 
 
 	checkparamsanity(XParam, XForcing);
@@ -1750,7 +1753,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 	XForcing.rivers.push_back(thisriver);
 
 
-	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
 
 
 	// Overrule whatever may be set in the param file
@@ -2109,7 +2112,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	XForcing.rivers.push_back(thisriver);
 
 
-	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
 
 
 	// Overrule whatever may be set in the param file
@@ -2702,7 +2705,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	XForcing.Rain.uniform = true;
 
 	// Reading rain forcing from file for CPU and unifor rain
-	XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+	XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile, XParam.reftime);
 
 	checkparamsanity(XParam, XForcing);
 
@@ -2963,7 +2966,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		XForcing.Rain.uniform = true;
 
 		// Reading rain forcing from file for CPU and uniform rain
-		XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+		XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile, XParam.reftime);
 		printf("1D rain forcing read\n");
 	}
 	else //non-uniform forcing
@@ -3398,7 +3401,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	XForcing.rivers.push_back(thisriver);
 
 
-	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile);
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
 
 
 	checkparamsanity(XParam, XForcing);
@@ -3552,7 +3555,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	XForcing.Rain.uniform = true;
 
 	// Reading rain forcing from file for CPU and unifor rain
-	XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+	XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile, XParam.reftime);
 
 	//// Initial and Continuous loss set-up
 	//Value definition for surface IL-CL

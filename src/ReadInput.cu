@@ -1066,6 +1066,15 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	int minlev = XParam.minlevel;
 	int maxlev = XParam.maxlevel;
 
+	if (minlev == -99999)
+	{
+		minlev = XParam.initlevel;
+	}
+	if (maxlev == -99999)
+	{
+		maxlev = XParam.initlevel;
+	}
+
 	XParam.maxlevel = utils::max(maxlev, minlev);
 	XParam.minlevel = utils::min(maxlev, minlev);
 
@@ -1527,114 +1536,5 @@ bndparam readbndline(std::string parametervalue)
 	return bnd;
 }
 
-time_t date_string_to_time(const char* date)
-{
-	struct tm tm = { 0 }; // Important, initialize all members
-	int n = 0;
 
-
-
-	sscanf(date, "%d-%d-%dT%d:%d:%d %n", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-		&tm.tm_hour, &tm.tm_min, &tm.tm_sec, &n);
-	// If scan did not completely succeed or extra junk
-	if (n == 0 || date[n]) {
-		return (time_t)-1;
-	}
-	tm.tm_isdst = 0; // Eforce output to be standard time. 
-	tm.tm_mon--;      // Months since January
-	// Assume 2 digit year if in the range 2000-2099, else assume year as given
-	if (tm.tm_year >= 0 && tm.tm_year < 100) {
-		tm.tm_year += 2000;
-	}
-	tm.tm_year -= 1900; // Years since 1900
-	time_t t = mktime(&tm);
-	return t;
-}
-
-time_t date_string_to_time(std::string date)
-{
-	struct tm tm = { 0 }; // Important, initialize all members
-	int n = 0;
-	std::vector<std::string>  datetime, ddd, ttt;
-	datetime = split(date, 'T');
-
-	ddd = split(datetime[0], '-');
-	if (ddd.size() < 3)
-	{
-		ddd = split(datetime[0], '/');
-	}
-
-	
-	tm.tm_year = std::stoi(ddd[0]);
-
-	tm.tm_mon = std::stoi(ddd[1]);
-
-	tm.tm_mday = std::stoi(ddd[2]);
-
-	ttt = split(datetime[1], ':');
-
-	tm.tm_hour = std::stoi(ttt[0]);
-	tm.tm_min = std::stoi(ttt[1]);
-	if (ttt.size() == 3)
-	{
-		tm.tm_sec = std::stoi(ttt[2]);
-	}
-	else
-	{
-		tm.tm_sec = 0;
-	}
-	
-
-
-
-	//sscanf(date, "%d-%d-%dT%d:%d:%d %n", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-	//	&tm.tm_hour, &tm.tm_min, &tm.tm_sec, &n);
-	// If scan did not completely succeed or extra junk
-	//if (n == 0 || date[n]) {
-	//	return (time_t)-1;
-	//}
-	tm.tm_isdst = 0; // Eforce output to be standard time. 
-	tm.tm_mon--;      // Months since January
-	// Assume 2 digit year if in the range 2000-2099, else assume year as given
-	if (tm.tm_year >= 0 && tm.tm_year < 100) {
-		tm.tm_year += 2000;
-	}
-	tm.tm_year -= 1900; // Years since 1900
-	time_t t = mktime(&tm);
-	return t;
-}
-
-double date_string_to_s(std::string datetime, std::string refdate)
-{
-	time_t ttime = date_string_to_time(datetime.c_str());
-	time_t reftime = date_string_to_time(refdate.c_str());
-
-	double diff = difftime(ttime, reftime);
-
-	return diff;
-}
-
-// Read time string. If it is a valid datetime string return s from reftime otherwise return a foat of seconds 
-double readinputtimetxt(std::string input, std::string refdate)
-{
-	std::string date = trim(input," ");
-	double timeinsec;
-	//check if string contains a T a marker of 
-	std::vector<std::string>  datetime = split(date, 'T');
-
-	if (datetime.size() > 1)
-	{
-		//likely a datetime
-		timeinsec = date_string_to_s(date, refdate);
-
-
-	}
-	else
-	{
-		//Likely a float
-		timeinsec = std::stod(datetime[0]);
-	}
-
-	return timeinsec;
-}
 

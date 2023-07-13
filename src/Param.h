@@ -67,8 +67,8 @@ public:
 
 	//*Adaptation
 	int initlevel = 0; //Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)
-	int maxlevel = 0; //Maximum level for grid adaptation (overwrite the adaptation map if use) 
-	int minlevel = 0; //Minumim level for grid adaptation (overwrite the adaptation map if use) 
+	int maxlevel = -99999; //Maximum level for grid adaptation (overwrite the adaptation map if use) 
+	int minlevel = -99999; //Minumim level for grid adaptation (overwrite the adaptation map if use) 
 	int nblkmem = 0;
 	int navailblk = 0;
 	double membuffer = 1.05; //Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation

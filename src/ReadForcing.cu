@@ -191,7 +191,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
 			// Now read the discharge input and store to  
-			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile);
+			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile, XParam.reftime);
 
 			//Check the time range of the river forcing
 			nt = XForcing.rivers[Rin].flowinput.size();
@@ -224,8 +224,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 
 			// grid uniform time varying wind input: wlevs[0] is wind speed and wlev[1] is direction
 			XForcing.VWind.inputfile = XForcing.UWind.inputfile;
-			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.grdalpha);
-			XForcing.VWind.unidata = readWNDfileUNI(XForcing.VWind.inputfile, XParam.grdalpha);
+			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.reftime, XParam.grdalpha);
+			XForcing.VWind.unidata = readWNDfileUNI(XForcing.VWind.inputfile, XParam.reftime, XParam.grdalpha);
 
 			// this below is a bit ugly but it simplifies the other functions
 			for (int n = 0; n < XForcing.VWind.unidata.size(); n++)
@@ -276,7 +276,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		if (XForcing.Atmp.uniform == 1)
 		{
 			// grid uniform time varying atm pressure input is pretty useless...
-			XForcing.Atmp.unidata = readINfileUNI(XForcing.Atmp.inputfile);;
+			XForcing.Atmp.unidata = readINfileUNI(XForcing.Atmp.inputfile, XParam.reftime);
 		}
 		else
 		{
@@ -295,7 +295,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		if (XForcing.Rain.uniform == 1)
 		{
 			// grid uniform time varying rain input
-			XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+			XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile, XParam.reftime);
 		}
 		else
 		{
@@ -953,7 +953,7 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 * Read flow data for river forcing
 *
 */
-std::vector<Flowin> readFlowfile(std::string Flowfilename)
+std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string refdate)
 {
 	std::vector<Flowin> slbnd;
 
@@ -1004,8 +1004,8 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 				exit(1);
 			}
 
-
-			slbndline.time = std::stod(lineelements[0]);
+			slbndline.time = readinputtimetxt(lineelements[0], refdate);
+			//slbndline.time = std::stod(lineelements[0]);
 
 			
 
@@ -1035,7 +1035,7 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 * Read rain/atmpressure data for spatially uniform forcing
 *
 */
-std::vector<Windin> readINfileUNI(std::string filename)
+std::vector<Windin> readINfileUNI(std::string filename, std::string refdate)
 {
 	std::vector<Windin> wndinput;
 
@@ -1084,8 +1084,8 @@ std::vector<Windin> readINfileUNI(std::string filename)
 				exit(1);
 			}
 
-
-			wndline.time = std::stod(lineelements[0]);
+			wndline.time = readinputtimetxt(lineelements[0], refdate);
+			//wndline.time = std::stod(lineelements[0]);
 			wndline.wspeed = std::stod(lineelements[1]);
 			
 			wndinput.push_back(wndline);
@@ -1104,7 +1104,7 @@ std::vector<Windin> readINfileUNI(std::string filename)
 * Read wind data for spatially uniform forcing
 *
 */
-std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
+std::vector<Windin> readWNDfileUNI(std::string filename, std::string refdate, double grdalpha)
 {
 	// Warning grdapha is expected in radian here
 	std::vector<Windin> wndinput;
@@ -1156,8 +1156,8 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 				exit(1);
 			}
 
-
-			wndline.time = std::stod(lineelements[0]);
+			wndline.time = readinputtimetxt(lineelements[0], refdate);
+			//wndline.time = std::stod(lineelements[0]);
 			if (lineelements.size() == 5)
 			{
 				// U and v are explicitelly stated
@@ -1882,3 +1882,115 @@ template <class T> void clampedges(int nx, int ny, T clamp, T* z)
 //}
 //template void InterpstepCPU<int>(int nx, int ny, int hdstep, float totaltime, float hddt, int*& Ux, int* Uo, int* Un);
 //template void InterpstepCPU<float>(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un);
+
+
+time_t date_char_to_time(const char* date)
+{
+	struct tm tm = { 0 }; // Important, initialize all members
+	int n = 0;
+
+
+
+	sscanf(date, "%d-%d-%dT%d:%d:%d %n", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+		&tm.tm_hour, &tm.tm_min, &tm.tm_sec, &n);
+	// If scan did not completely succeed or extra junk
+	if (n == 0 || date[n]) {
+		return (time_t)-1;
+	}
+	tm.tm_isdst = 0; // Eforce output to be standard time. 
+	tm.tm_mon--;      // Months since January
+	// Assume 2 digit year if in the range 2000-2099, else assume year as given
+	if (tm.tm_year >= 0 && tm.tm_year < 100) {
+		tm.tm_year += 2000;
+	}
+	tm.tm_year -= 1900; // Years since 1900
+	time_t t = mktime(&tm);
+	return t;
+}
+
+time_t date_string_to_time(std::string date)
+{
+	struct tm tm = { 0 }; // Important, initialize all members
+	int n = 0;
+	std::vector<std::string>  datetime, ddd, ttt;
+	datetime = split(date, 'T');
+
+	ddd = split(datetime[0], '-');
+	if (ddd.size() < 3)
+	{
+		ddd = split(datetime[0], '/');
+	}
+
+
+	tm.tm_year = std::stoi(ddd[0]);
+
+	tm.tm_mon = std::stoi(ddd[1]);
+
+	tm.tm_mday = std::stoi(ddd[2]);
+
+	ttt = split(datetime[1], ':');
+
+	tm.tm_hour = std::stoi(ttt[0]);
+	tm.tm_min = std::stoi(ttt[1]);
+	if (ttt.size() == 3)
+	{
+		tm.tm_sec = std::stoi(ttt[2]);
+	}
+	else
+	{
+		tm.tm_sec = 0;
+	}
+
+
+
+
+	//sscanf(date, "%d-%d-%dT%d:%d:%d %n", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+	//	&tm.tm_hour, &tm.tm_min, &tm.tm_sec, &n);
+	// If scan did not completely succeed or extra junk
+	//if (n == 0 || date[n]) {
+	//	return (time_t)-1;
+	//}
+	tm.tm_isdst = 0; // Eforce output to be standard time. 
+	tm.tm_mon--;      // Months since January
+	// Assume 2 digit year if in the range 2000-2099, else assume year as given
+	if (tm.tm_year >= 0 && tm.tm_year < 100) {
+		tm.tm_year += 2000;
+	}
+	tm.tm_year -= 1900; // Years since 1900
+	time_t t = mktime(&tm);
+	return t;
+}
+
+double date_string_to_s(std::string datetime, std::string refdate)
+{
+	time_t ttime = date_string_to_time(datetime);
+	time_t reftime = date_string_to_time(refdate);
+
+	double diff = difftime(ttime, reftime);
+
+	return diff;
+}
+
+// Read time string. If it is a valid datetime string return s from reftime otherwise return a foat of seconds 
+double readinputtimetxt(std::string input, std::string refdate)
+{
+	std::string date = trim(input, " ");
+	double timeinsec;
+	//check if string contains a T a marker of 
+	std::vector<std::string>  datetime = split(date, 'T');
+
+	if (datetime.size() > 1)
+	{
+		//likely a datetime
+		timeinsec = date_string_to_s(date, refdate);
+
+
+	}
+	else
+	{
+		//Likely a float
+		timeinsec = std::stod(datetime[0]);
+	}
+
+	return timeinsec;
+}
