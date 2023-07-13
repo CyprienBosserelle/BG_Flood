@@ -51,7 +51,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |---|---|---|---|
 |outputtimestep| outputtimestep , outtimestep , outputstep | 0.0|Number of seconds between netCDF outputs, 0.0 for none|
 |endtime|endtime| 0.0|Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing|
-|totaltime| totaltime , inittime | 0.0|Total simulation time in s|
+|totaltime| totaltime , inittime , starttime | 0.0|Total simulation time in s|
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
 |dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
 ###  Initialisation
@@ -88,6 +88,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
 |rainbnd| rainbnd , rainonbnd | false|when false it force the rain foring on the bnd cells to be null.|
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
+|reftime| reftime , referencetime , timeref | "2020-01-01T00:00:00"|Reference time string as yyyy-mm-ddTHH:MM:SS|
 ---
 
 ## List of the Forcings' inputs
