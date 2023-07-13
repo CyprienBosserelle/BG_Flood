@@ -362,7 +362,7 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	paramvec = { "totaltime","inittime" };
+	paramvec = { "totaltime","inittime","starttime" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -375,6 +375,14 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.dtinit = std::stod(parametervalue);
+
+	}
+
+	paramvec = { "reftime","referencetime","timeref" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.reftime = parametervalue;
 
 	}
 
