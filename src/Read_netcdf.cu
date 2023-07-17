@@ -77,8 +77,17 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 
 
 
-void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
+//void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
+//void readgridncsize(forcingmap &Fmap, Param XParam)
+void readgridncsize(const std::string ncfilestr, const std::string varstr, std::string reftime, int& nx, int& ny, int& nt, double& dx, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy)
 {
+	//std::string ncfilestr = Fmap.inputfile;
+	//std::string varstr = Fmap.varname;
+
+	//int nx, ny, nt;
+	//double dx, dt, xo, xmax, yo, ymax, to, tmax;
+	//bool flipx, flipy;
+
 	//read the dimentions of grid, levels and time
 	int status;
 	int ncid, ndimshh, ndims;
@@ -248,9 +257,15 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		status = nc_inq_dimname(ncid, tcovar, coordname);
 		if (status != NC_NOERR) handle_ncerror(status);
 
+		
+
+
 		//inquire variable id
 		status = nc_inq_varid(ncid, coordname, &varid);
 		if (status != NC_NOERR) handle_ncerror(status);
+
+		
+
 
 		// read the dimension of time variable // yes it should be == 1
 		status = nc_inq_varndims(ncid, varid, &ndims);
@@ -261,10 +276,12 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		ttempvar = (double *)malloc(nt * sizeof(double));
 		size_t start[] = { 0 };
 		size_t count[] = { nt };
-		status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
+		//status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
+		status = readnctime2(ncid, reftime, nt, ttempvar);
 
 		to = ttempvar[0];
 		tmax= ttempvar[nt-1];
+		dt = ttempvar[1] - ttempvar[0];
 
 		free(ttempvar);
 	}
@@ -292,12 +309,36 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 
 	status = nc_close(ncid);
 
+	
+
 	free(ddimhh);
 	free(xcoord);
 	free(ycoord);
 
 
 }
+
+
+void readgridncsize(forcingmap& Fmap, Param XParam)
+{
+
+	readgridncsize(Fmap.inputfile, Fmap.varname, XParam.reftime, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.dt, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+}
+
+
+template<class T> void readgridncsize(T& Imap)
+{
+	double a, b, c;
+	int duma, dumb, dumc;
+	readgridncsize(Imap.inputfile, Imap.varname, "2000-01-01T00:00:00", Imap.nx, Imap.ny, duma, Imap.dx, a, Imap.xo, Imap.yo, b, Imap.xmax, Imap.ymax, c, Imap.flipxx, Imap.flipyy);
+}
+template void readgridncsize<inputmap>(inputmap &Imap);
+template void readgridncsize<forcingmap>(forcingmap &Imap);
+template void readgridncsize<StaticForcingP<int >>(StaticForcingP<int>& Imap);
+template void readgridncsize<StaticForcingP<float >>(StaticForcingP<float> &Imap);
+template void readgridncsize<deformmap<float >>(deformmap<float >& Imap);
+template void readgridncsize<DynForcingP<float >>(DynForcingP<float >& Imap);
+
 
 int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 {
@@ -380,6 +421,127 @@ int readnctime(std::string filename, double * &time)
 	status = nc_close(ncid);
 
 	return status;
+}
+
+int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
+{
+
+	int status, varid;
+
+	std::string ncfilestr;
+	std::string varstr;
+
+	double fac = 1.0;
+	double offset = 0.0;
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	///std::vector<std::string> nameelements;
+
+	///nameelements = split(filename, '?');
+	///if (nameelements.size() > 1)
+	///{
+	///	//variable name for bathy is not given so it is assumed to be zb
+	///	ncfilestr = nameelements[0];
+	///	//varstr = nameelements[1];
+	///}
+	///else
+	///{
+	///	ncfilestr = filename;
+	///	//varstr = "time";
+	///}
+
+	// Warning this could be more robust by taking the unlimited dimention if time does not exist!
+	std::string Varname = "time";
+
+	///status = nc_open(ncfilestr.c_str(), 0, &ncid);
+	///if (status != NC_NOERR) handle_ncerror(status);
+
+	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	// inquire unit of time
+	int ncAttid;
+	size_t t_len;
+
+	char* tunit;
+
+	std::string tunitstr;
+
+	/* Get the attribute ID */
+	status = nc_inq_attid(ncid, varid, "unit", &ncAttid);
+	if (status == NC_NOERR)
+	{
+		/* Read CRS attribute from the variable */
+		status = nc_inq_attlen(ncid, varid, "unit", &t_len);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		tunit = (char*)malloc(t_len + 1); // +1 to automatically have a null character at the end. Is this cross platform portable?
+
+		/* Read CRS attribute from the variable */
+		status = nc_get_att_text(ncid, ncid, "unit", tunit);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		// convert to string
+		tunitstr = std::string(tunit);
+
+		// Try to make sense of the unit
+		// The word "since" should be in the center
+		// e.g. hour since 2000-01-01 00:00:00 
+		std::vector<std::string> nodeitems = split(tunitstr, "since");
+		std::string ncstepunit = nodeitems[0];
+		std::string ncrefdatestr = nodeitems[1];
+
+		//time_t ncrefdate = date_string_to_time(ncrefdatestr);
+		offset = date_string_to_s(ncrefdatestr, refdate);
+
+		std::vector<std::string> secondvec = { "seconds","second","sec","s" };
+		std::vector<std::string> minutevec = { "minutes","minute","min","m" };
+		std::vector<std::string> hourvec = { "hours","hour","hrs","hr","h" };
+		std::vector<std::string> dayvec = { "days","day","d" };
+		std::vector<std::string> monthvec = { "months","month","mths", "mth", "mon" };
+		std::vector<std::string> yearvec = { "years","year","yrs", "yr", "y" };
+
+
+		std::size_t found;
+		found = case_insensitive_compare(ncstepunit, secondvec);
+		if (found == 0)
+			fac = 1.0;
+
+		found = case_insensitive_compare(ncstepunit, minutevec);
+		if (found == 0)
+			fac = 60.0;
+
+		found = case_insensitive_compare(ncstepunit, hourvec);
+		if (found == 0)
+			fac = 3600.0;
+
+		found = case_insensitive_compare(ncstepunit, dayvec);
+		if (found == 0)
+			fac = 3600.0*24.0;
+	
+		found = case_insensitive_compare(ncstepunit, monthvec);
+		if (found == 0)
+			fac = 3600.0 * 24.0 * 29.53059;
+
+		found = case_insensitive_compare(ncstepunit, yearvec);
+		if (found == 0)
+			fac = 3600.0 * 24.0 * 365.25;
+
+
+	}
+
+	status = nc_get_var_double(ncid, varid, time);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	for (int it = 0; it < nt; it++)
+	{
+		time[it] = time[it] * fac + offset;
+	}
+
+	///status = nc_close(ncid);
+
+	return status;
+	
 }
 
 template <class T>

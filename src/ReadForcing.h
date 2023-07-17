@@ -29,7 +29,10 @@ time_t date_string_to_time(std::string date);
 
 void readDynforcing(bool gpgpu,double totaltime, DynForcingP<float>& Dforcing);
 
-DynForcingP<float> readforcinghead(DynForcingP<float> Fmap);
+//DynForcingP<float> readforcinghead(DynForcingP<float> Fmap);
+DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam);
+
+
 template<class T> T readforcinghead(T Fmap);
 //template<class T> T readBathyhead(T BathyParam);
 template<class T> void readstaticforcing(T& Sforcing);

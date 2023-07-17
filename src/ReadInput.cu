@@ -1466,6 +1466,31 @@ std::vector<std::string> split(const std::string &s, char delim) {
 	return elems;
 }
 
+std::vector<std::string> split(const std::string s, const std::string delim)
+{
+	size_t ide=0;
+	int loc = 0;
+	std::vector<std::string> output;
+	std::string rem = s;
+	
+
+	while (ide < std::string::npos || output.size() == 0)
+	{
+		ide = rem.find(delim);
+		output.push_back(rem.substr(loc, ide));
+		if (ide < (rem.length() - delim.length()))
+		{
+			loc = ide + delim.length();
+			rem = rem.substr(loc);
+		}
+	}
+
+	return output;
+
+	
+
+}
+
 
 /*! \fn std::string trim(const std::string& str, const std::string& whitespace)
 * remove leading and trailing space in a string

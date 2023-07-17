@@ -375,7 +375,7 @@ template void readstaticforcing<StaticForcingP<int>>(int step, StaticForcingP<in
 */
 void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 {
-	Dforcing = readforcinghead(Dforcing);
+	Dforcing = readforcinghead(Dforcing, XParam);
 
 	//Sanity check on the time range of the forcing
 	if (Dforcing.tmax < XParam.endtime)
@@ -423,6 +423,11 @@ void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 	}
 }
 
+
+/*! \fn void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
+* This is a deprecated function! See InitDynforcing() instead
+*
+*/
 void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing);
@@ -783,8 +788,8 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	bool flipx = false;
 	bool flipy = false;
 
-	// Read NC info
-	readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax, flipx, flipy);
+	// Read NC info // 
+	//readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax, flipx, flipy);
 	
 	if (hor == 0)
 	{
@@ -1367,11 +1372,11 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	forcing.val = forcing.now;
 }
 
-/*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
+/*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam)
 * Read Dynamic forcing meta/header data
 *
 */
-DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
+DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam)
 {
 	// Read critical parameter for the forcing map
 	log("Forcing map was specified. Checking file... ");
@@ -1382,16 +1387,9 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 	if (fileext.compare("nc") == 0)
 	{
 		log("Reading Forcing file as netcdf file");
-		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+		//readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+		readgridncsize(Fmap, XParam);
 		
-		if (Fmap.nt > 1)
-		{
-			Fmap.dt = (Fmap.tmax - Fmap.to) / (Fmap.nt - 1);
-		}
-		else
-		{
-			Fmap.dt = Fmap.tmax; // Or a very large number!
-		}
 	}
 	else
 	{
@@ -1438,7 +1436,8 @@ template<class T> T readforcinghead(T ForcingParam)
 			int dummy;
 			double dummyb, dummyc;
 			//log("netcdf file");
-			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);
+			//readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);
+			readgridncsize(ForcingParam);
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 			//Check that the x and y variable are in crescent order:
@@ -1494,7 +1493,6 @@ template<class T> T readforcinghead(T ForcingParam)
 	}
 	return ForcingParam;
 }
-
 template inputmap readforcinghead<inputmap>(inputmap BathyParam);
 template forcingmap readforcinghead<forcingmap>(forcingmap BathyParam);
 //template StaticForcingP<float> readBathyhead<StaticForcingP<float>>(StaticForcingP<float> BathyParam);
@@ -1914,6 +1912,10 @@ time_t date_string_to_time(std::string date)
 	int n = 0;
 	std::vector<std::string>  datetime, ddd, ttt;
 	datetime = split(date, 'T');
+	if (datetime.size() < 2)
+	{
+		datetime = split(date, ' ');
+	}
 
 	ddd = split(datetime[0], '-');
 	if (ddd.size() < 3)
