@@ -468,17 +468,17 @@ int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
 	std::string tunitstr;
 
 	/* Get the attribute ID */
-	status = nc_inq_attid(ncid, varid, "unit", &ncAttid);
+	status = nc_inq_attid(ncid, varid, "units", &ncAttid);
 	if (status == NC_NOERR)
 	{
-		/* Read CRS attribute from the variable */
-		status = nc_inq_attlen(ncid, varid, "unit", &t_len);
+		/* Read units attribute length from the variable */
+		status = nc_inq_attlen(ncid, varid, "units", &t_len);
 		if (status != NC_NOERR) handle_ncerror(status);
 
 		tunit = (char*)malloc(t_len + 1); // +1 to automatically have a null character at the end. Is this cross platform portable?
 
-		/* Read CRS attribute from the variable */
-		status = nc_get_att_text(ncid, ncid, "unit", tunit);
+		/* Read units attribute from the variable */
+		status = nc_get_att_text(ncid, varid, "units", tunit);
 		if (status != NC_NOERR) handle_ncerror(status);
 
 		// convert to string
@@ -521,7 +521,7 @@ int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
 	
 		found = case_insensitive_compare(ncstepunit, monthvec);
 		if (found == 0)
-			fac = 3600.0 * 24.0 * 29.53059;
+			fac = 3600.0 * 24.0 * 30.4375;
 
 		found = case_insensitive_compare(ncstepunit, yearvec);
 		if (found == 0)
