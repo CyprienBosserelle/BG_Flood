@@ -1476,8 +1476,18 @@ std::vector<std::string> split(const std::string s, const std::string delim)
 
 	while (ide < std::string::npos || output.size() == 0)
 	{
+		
 		ide = rem.find(delim);
-		output.push_back(rem.substr(loc, ide));
+		if (ide == 0 || ide == std::string::npos)
+		{
+			output.push_back(rem);
+			ide = std::string::npos;
+		}
+		else
+		{
+			output.push_back(rem.substr(loc, ide));
+		}
+		
 		if (ide < (rem.length() - delim.length()))
 		{
 			loc = ide + delim.length();

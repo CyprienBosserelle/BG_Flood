@@ -488,8 +488,8 @@ int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
 		// The word "since" should be in the center
 		// e.g. hour since 2000-01-01 00:00:00 
 		std::vector<std::string> nodeitems = split(tunitstr, "since");
-		std::string ncstepunit = nodeitems[0];
-		std::string ncrefdatestr = nodeitems[1];
+		std::string ncstepunit = trim(nodeitems[0]," ");
+		std::string ncrefdatestr = trim(nodeitems[1], " ");
 
 		//time_t ncrefdate = date_string_to_time(ncrefdatestr);
 		offset = date_string_to_s(ncrefdatestr, refdate);

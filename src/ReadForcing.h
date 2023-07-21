@@ -23,9 +23,8 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string refdate);
 std::vector<Windin> readINfileUNI(std::string filename, std::string refdate);
 std::vector<Windin> readWNDfileUNI(std::string filename, std::string refdate, double grdalpha);
 
-double readinputtimetxt(std::string input, std::string refdate);
-double date_string_to_s(std::string datetime, std::string refdate);
-time_t date_string_to_time(std::string date);
+
+
 
 void readDynforcing(bool gpgpu,double totaltime, DynForcingP<float>& Dforcing);
 
