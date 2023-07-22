@@ -232,7 +232,7 @@ ifeq ($(SAMPLE_ENABLED),0)
 EXEC ?= @echo "[@]"
 endif
 
-OBJ = BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o  Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o
+OBJ = BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o  Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o utctime.o Write_txtlog.o
 
 
 ################################################################################
@@ -339,8 +339,11 @@ Write_netcdf.o:./src/Write_netcdf.cu
 
 Write_txtlog.o:./src/Write_txtlog.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+	
+utctime.o:./src/utctime.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-BG_Flood: BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o
+BG_Flood: BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o utctime.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 	$(EXEC) cp $@ ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
@@ -349,7 +352,7 @@ run: build
 	$(EXEC) ./BG_Flood
 
 clean:
-	rm -f BG_Flood AdaptCriteria.o Adaptation.o Advection.o BG_Flood.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o
+	rm -f BG_Flood AdaptCriteria.o Adaptation.o Advection.o BG_Flood.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o utctime.o
 	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/template
 
 clobber: clean

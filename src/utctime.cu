@@ -240,7 +240,7 @@ UTCTime date_string_to_time(std::string date)
 	if (tm.tm_year >= 0 && tm.tm_year < 100) {
 		tm.tm_year += 2000;
 	}
-	//tm.tm_year -= 1900; // Years since 1900
+	tm.tm_year -= 1900; // Years since 1900
 	UTCTime t1 = UTCClock::fromDate(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, 0);
 	return t1;
 }
