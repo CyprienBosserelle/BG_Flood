@@ -33,9 +33,10 @@ struct UTCClock
 
 using UTCTime = std::chrono::time_point<UTCClock, std::chrono::microseconds>;
 
-UTCTime date_string_to_time(std::string date);
+long long date_string_to_time(std::string date);
 double date_string_to_s(std::string datetime, std::string refdate);
 double readinputtimetxt(std::string input, std::string refdate);
-
+bool testime1(int hour);
+bool testime2(int hour);
 
 #endif

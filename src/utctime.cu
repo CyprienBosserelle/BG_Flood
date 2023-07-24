@@ -117,7 +117,7 @@ struct tm* gmtime_r(const time_t* timep, struct tm* tm) {
 
 
 // It  does not modify broken-down time
-time_t timegm(struct tm const* t)
+long long timegm(struct tm const* t)
 {
 	int year = t->tm_year + 1900;
 	int month = t->tm_mon;          // 0-11
@@ -134,7 +134,7 @@ time_t timegm(struct tm const* t)
 	}
 	int days_since_epoch = days_from_epoch(year, month + 1, t->tm_mday);
 
-	return 60 * (60 * (24L * days_since_epoch + t->tm_hour) + t->tm_min) + t->tm_sec;
+	return 60LL * (60LL * (24LL * days_since_epoch + (long long)t->tm_hour) + (long long)t->tm_min) + (long long)t->tm_sec;
 }
 
 UTCClock::time_point UTCClock::fromDate(
@@ -177,10 +177,11 @@ void UTCClock::toDate(const UTCClock::time_point &tp,
 
 
 
-UTCTime date_string_to_time(std::string date)
+long long date_string_to_time(std::string date)
 {
 	struct tm tm = { 0 }; // Important, initialize all members
-	int n = 0;
+	//int n = 0;
+	int year, mon, day, hour, min, sec;
 	std::vector<std::string>  datetime, ddd, ttt;
 	datetime = split(date, 'T');
 	if (datetime.size() < 2)
@@ -234,28 +235,36 @@ UTCTime date_string_to_time(std::string date)
 	//if (n == 0 || date[n]) {
 	//	return (time_t)-1;
 	//}
-	tm.tm_isdst = 0; // Eforce output to be standard time. 
+	//tm.tm_isdst = 0; // Eforce output to be standard time. 
 	tm.tm_mon--;      // Months since January
 	// Assume 2 digit year if in the range 2000-2099, else assume year as given
 	if (tm.tm_year >= 0 && tm.tm_year < 100) {
 		tm.tm_year += 2000;
 	}
 	tm.tm_year -= 1900; // Years since 1900
-	UTCTime t1 = UTCClock::fromDate(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, 0);
+	//UTCTime t1 = UTCClock::fromDate(year, mon, day, hour, min, sec, 0);
+	long long t1 = timegm(&tm);
 	return t1;
 }
 
 double date_string_to_s(std::string datetime, std::string refdate)
 {
+	//testime1(1);
+	//testime2(2);
 
-	UTCTime ttime = date_string_to_time(datetime);
-	UTCTime reftime = date_string_to_time(refdate);
+	//UTCTime ttime = date_string_to_time(datetime);
+	//UTCTime reftime = date_string_to_time(refdate);
+
+	long long ttime = date_string_to_time(datetime);
+	long long reftime = date_string_to_time(refdate);
 
 	//double diff = difftime(ttime, reftime);
 
 	//std::chrono::microseconds timeDiff = ttime - reftime;
 
-	double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+	//double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+
+	double diff = (double)(ttime - reftime);
 
 	return diff;
 }
@@ -282,4 +291,108 @@ double readinputtimetxt(std::string input, std::string refdate)
 	}
 
 	return timeinsec;
+}
+
+
+bool testime1(int hour)
+{
+	bool test = false;
+	double eps = 1e-7;
+
+	for (int iy = 1400; iy <= 2800; iy++)
+	{
+		tm tm1, tm2;
+
+		tm1.tm_year = iy;
+		tm2.tm_year = iy;
+
+		tm1.tm_mday = 1;
+		tm2.tm_mday = 1;
+
+		tm1.tm_mon = 0;
+		tm2.tm_mon = 0;
+
+		tm1.tm_hour = 0;
+		tm2.tm_hour = hour;
+
+		tm1.tm_min = 0;
+		tm2.tm_min = 0;
+
+		tm1.tm_sec = 0;
+		tm2.tm_sec = 0;
+
+		//UTCTime t1 = UTCClock::fromDate(iy, 1, 1, 0, 0, 0, 0);
+		//UTCTime t2 = UTCClock::fromDate(iy, 1, 1, hour, 0, 0, 0);
+
+		long long t1 = timegm(&tm1);
+		long long t2 = timegm(&tm2);
+
+
+
+
+		//double dt12 = ((double)duration_cast<std::chrono::milliseconds>(t2 - t1).count()) / 1000.0;
+		double dt12 = (double)(t2 - t1);
+		test = abs(dt12 - (hour * 3600.0)) < eps;
+		if (!test)
+		{
+			printf("Failed datetime calculation: year=%d\n", iy);
+			break;
+		}
+	}
+
+
+	return test;
+}
+bool testime2(int hour)
+{
+	bool test = false;
+	
+
+	for (int iy = 1970; iy <= 2400; iy++)
+	{
+		//UTCTime t1 = UTCClock::fromDate(1970, 1, 1, 0, 0, 0, 0);
+		//UTCTime t2 = UTCClock::fromDate(iy, 1, 1, hour, 0, 0, 0);
+		tm tm1, tm2;
+
+		tm1.tm_year = 1970;
+		tm2.tm_year = iy;
+
+		tm1.tm_mday = 1;
+		tm2.tm_mday = 1;
+
+		tm1.tm_mon = 0;
+		tm2.tm_mon = 0;
+
+		tm1.tm_hour = 0;
+		tm2.tm_hour = hour;
+
+		tm1.tm_min = 0;
+		tm2.tm_min = 0;
+
+		tm1.tm_sec = 0;
+		tm2.tm_sec = 0;
+
+		//UTCTime t1 = UTCClock::fromDate(iy, 1, 1, 0, 0, 0, 0);
+		//UTCTime t2 = UTCClock::fromDate(iy, 1, 1, hour, 0, 0, 0);
+
+		long long t1 = timegm(&tm1);
+		long long t2 = timegm(&tm2);
+
+
+
+		//double dt12 = ((double)duration_cast<std::chrono::milliseconds>(t2 - t1).count()) / 1000.0;
+
+		test = t2>t1;
+		if (!test)
+		{
+
+			int dse = days_from_epoch(tm2.tm_year, tm2.tm_mon + 1, tm2.tm_mday);
+			printf("Failed datetime calculation greater than: year=%d\n", iy);
+			printf("dse=%d\nt1 = %lld;\n t2=%lld\n",dse, t1, t2);
+			break;
+		}
+	}
+
+
+	return test;
 }

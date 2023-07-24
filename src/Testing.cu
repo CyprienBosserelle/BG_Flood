@@ -245,6 +245,17 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			result = instab ? "successful" : "failed";
 			log("\t\tWet/dry Instability test : " + result);
 		}
+	if (mytest == 12)
+	{
+		/* Test 12 is to test the calendar time to second conversion
+			This test will fail if the system or compiler does not suport long long 
+			 
+		*/
+		bool timetest;
+		timetest = testime1(1) && testime2(2);
+		result = timetest ? "successful" : "failed";
+		log("\t\tCalendar time test : " + result);
+	}
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
