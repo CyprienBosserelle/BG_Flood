@@ -274,6 +274,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		else
 		{
 			InitDynforcing(gpgpu, XParam, XForcing.Atmp);
+			// Deflault is zero wich is terrible so change to Paref so limitwaves generated at the edge of forcing
+			// Users should insure there forcing extend well beyond the intended model extent.
+			XForcing.Atmp.clampedge = XParam.Paref;
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
