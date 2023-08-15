@@ -286,7 +286,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	if (xcoord[0] > xcoord[nx - 1])
 		flipx = true;
 
-	if (ycoord[0] > ycoord[ny - 1])
+	if (ycoord[0] > ycoord[(ny - 1) * nx])
 		flipy = true;
 
 
