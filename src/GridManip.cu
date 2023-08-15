@@ -331,8 +331,8 @@ template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 	imin = max(ftoi(floor((xmin - forcing.xo) / forcing.dx)), 0);
 	imax = min(ftoi(floor((xmax - forcing.xo) / forcing.dx)), forcing.nx - 1);
 
-	jmin = max(ftoi(floor((ymin - forcing.yo) / forcing.dx)), 0);
-	jmax = min(ftoi(floor((ymax - forcing.yo) / forcing.dx)), forcing.ny - 1);
+	jmin = max(ftoi(floor((ymin - forcing.yo) / forcing.dy)), 0);
+	jmax = min(ftoi(floor((ymax - forcing.yo) / forcing.dy)), forcing.ny - 1);
 
 	//printf("imin=%d; imax=%d, jmin=%d, jmax=%d\t",imin, imax, jmin, jmax);
 
@@ -381,11 +381,11 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 	x1 = forcing.xo + forcing.dx * cfi;
 	x2 = forcing.xo + forcing.dx * cfip;
 
-	cfj = utils::min(utils::max((int)floor((yi - forcing.yo) / forcing.dx), 0), forcing.ny - 2);
+	cfj = utils::min(utils::max((int)floor((yi - forcing.yo) / forcing.dy), 0), forcing.ny - 2);
 	cfjp = cfj + 1;
 
-	y1 = forcing.yo + forcing.dx * cfj;
-	y2 = forcing.yo + forcing.dx * cfjp;
+	y1 = forcing.yo + forcing.dy * cfj;
+	y2 = forcing.yo + forcing.dy * cfjp;
 
 	q11 = forcing.val[cfi + cfj * forcing.nx];
 	q12 = forcing.val[cfi + cfjp * forcing.nx];
