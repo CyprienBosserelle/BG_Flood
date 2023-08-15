@@ -7,7 +7,7 @@
 
 struct TexSetP
 {
-	float xo, yo, dx; // used to calculate coordinates insode the device function
+	float xo, yo, dx, dy; // used to calculate coordinates insode the device function
 	float nowvalue;
 	bool uniform;
 	cudaArray* CudArr;

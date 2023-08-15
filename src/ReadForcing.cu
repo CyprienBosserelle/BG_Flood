@@ -156,6 +156,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			XForcing.deform[nd].GPU.yo = float(XForcing.deform[nd].yo);
 			XForcing.deform[nd].GPU.uniform = false;
 			XForcing.deform[nd].GPU.dx = float(XForcing.deform[nd].dx);
+			XForcing.deform[nd].GPU.dy = float(XForcing.deform[nd].dy);
 		}
 		//log("...done");
 
@@ -409,6 +410,7 @@ void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 			Dforcing.GPU.yo = float(Dforcing.yo);
 			Dforcing.GPU.uniform = Dforcing.uniform;
 			Dforcing.GPU.dx = float(Dforcing.dx);
+			Dforcing.GPU.dy = float(Dforcing.dy);
 		}
 		
 	}
@@ -666,7 +668,7 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	std::vector<double> WLS,Unest,Vnest;
 	//Define NC file variables
 	int nnx, nny, nt, nbndpts, indxx, indyy, indx, indy,nx, ny;
-	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
+	double dx, dy, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
 	double * ttt, *zsa;
 	bool checkhh = false;
 	int iswet;
@@ -674,7 +676,7 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	bool flipy = false;
 
 	// Read NC info
-	readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax, flipx, flipy);
+	readgridncsize(ncfile,varname, nnx, nny, nt, dx,dy, xxo, yyo, to, xmax, ymax, tmax, flipx, flipy);
 	
 	if (hor == 0)
 	{
@@ -1272,7 +1274,7 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 	if (fileext.compare("nc") == 0)
 	{
 		log("Reading Forcing file as netcdf file");
-		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.dy, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
 		
 		if (Fmap.nt > 1)
 		{
@@ -1317,6 +1319,7 @@ template<class T> T readforcinghead(T ForcingParam)
 		{
 			//log("'md' file");
 			readbathyHeadMD(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.grdalpha);
+			ForcingParam.dy = ForcingParam.dx;
 			ForcingParam.xo = 0.0;
 			ForcingParam.yo = 0.0;
 			ForcingParam.xmax = ForcingParam.xo + (double(ForcingParam.nx) - 1.0) * ForcingParam.dx;
@@ -1328,7 +1331,7 @@ template<class T> T readforcinghead(T ForcingParam)
 			int dummy;
 			double dummyb, dummyc;
 			//log("netcdf file");
-			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);
+			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.dy, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 			//Check that the x and y variable are in crescent order:
@@ -1357,6 +1360,7 @@ template<class T> T readforcinghead(T ForcingParam)
 			readbathyASCHead(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, ForcingParam.grdalpha);
 			ForcingParam.xmax = ForcingParam.xo + (ForcingParam.nx-1)* ForcingParam.dx;
 			ForcingParam.ymax = ForcingParam.yo + (ForcingParam.ny-1)* ForcingParam.dx;
+
 			log("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
@@ -1368,7 +1372,7 @@ template<class T> T readforcinghead(T ForcingParam)
 
 
 		//printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%lf\talpha=%f\txo=%lf\tyo=%lf\txmax=%lf\tymax=%lf\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo, BathyParam.xmax, BathyParam.ymax);
-		log("Forcing grid info: nx=" + std::to_string(ForcingParam.nx) + " ny=" + std::to_string(ForcingParam.ny) + " dx=" + std::to_string(ForcingParam.dx) + " grdalpha=" + std::to_string(ForcingParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(ForcingParam.xo) + " xmax=" + std::to_string(ForcingParam.xmax) + " yo=" + std::to_string(ForcingParam.yo) + " ymax=" + std::to_string(ForcingParam.ymax));
+		log("Forcing grid info: nx=" + std::to_string(ForcingParam.nx) + " ny=" + std::to_string(ForcingParam.ny) + " dx=" + std::to_string(ForcingParam.dx) + " dy=" + std::to_string(ForcingParam.dy) + " grdalpha=" + std::to_string(ForcingParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(ForcingParam.xo) + " xmax=" + std::to_string(ForcingParam.xmax) + " yo=" + std::to_string(ForcingParam.yo) + " ymax=" + std::to_string(ForcingParam.ymax));
 
 
 
