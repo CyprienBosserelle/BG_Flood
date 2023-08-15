@@ -277,7 +277,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	}
 
 	dx = dxx;
-	dy = dxx;
+	dy = ddy;
 
 	xo = utils::min(xcoord[0], xcoord[nx - 1]);
 	xmax = utils::max(xcoord[0], xcoord[nx - 1]);
