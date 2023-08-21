@@ -46,18 +46,18 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 
-template <class T> void WetDryProlongationGPURight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryProlongationGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryProlongationGPUBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryProlongationGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryProlongationGPURight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryProlongationGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryProlongationGPUBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 
 template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 
-template <class T> void WetDryRestrictionGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryRestrictionGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryRestrictionGPUBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryRestrictionGPURight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryRestrictionGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryRestrictionGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryRestrictionGPUBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> __global__ void WetDryRestrictionGPURight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 
 template <class T> __host__ __device__ void wetdryrestriction(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int i, int j, T* h, T* zs, T* zb);
 template <class T> __host__ __device__ void ProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, T* h, T* zs, T* zb);
