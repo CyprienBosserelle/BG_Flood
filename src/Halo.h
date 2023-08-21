@@ -75,5 +75,9 @@ template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongat
 template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> __global__ void HaloFluxGPUBT(Param XParam, BlockP<T> XBlock, T* z);
 
+template <class T> __global__  void HaloFluxGPULRnew(Param XParam, BlockP<T> XBlock, T* z);
+template <class T> __global__ void HaloFluxGPUBTnew(Param XParam, BlockP<T> XBlock, T* z);
+
+
 // End of global definition
 #endif
