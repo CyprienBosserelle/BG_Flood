@@ -863,7 +863,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
-
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
