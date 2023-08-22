@@ -378,6 +378,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -631,6 +632,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = 1.0;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -1495,6 +1497,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 	XForcing.Bathy[0].ny = 64;
 
 	XForcing.Bathy[0].dx = 126.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -2011,7 +2014,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	XForcing.Bathy[0].ny = 32;
 
 	XForcing.Bathy[0].dx = 1.0;
-
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 	T x, y;
 	T center = T(31.0);
 
@@ -2668,6 +2671,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -2905,6 +2909,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XForcing.Bathy[0].xmax = 28.0;
 	XForcing.Bathy[0].ymax = 1.0;
 	XForcing.Bathy[0].dx = 0.1;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 	XForcing.Bathy[0].nx = ftoi((XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1);
 	XForcing.Bathy[0].ny = ftoi((XForcing.Bathy[0].ymax - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx + 1);
 
@@ -3307,6 +3312,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	XForcing.Bathy[0].ny = 501;
 
 	XForcing.Bathy[0].dx = 0.1;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -3517,6 +3523,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -4296,6 +4303,7 @@ template <class T> Forcing<float> MakValleyBathy(Param XParam, T slope, bool bot
 	XForcing.Bathy[0].ny = 32;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	T x, y;
 	T center = T(10.5);
