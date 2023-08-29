@@ -6,10 +6,11 @@
 #include "General.h"
 #include "MemManagement.h"
 #include "Util_CPU.h"
+#include "Updateforcing.h"
 
 
 
-template <class T> void Flowbnd(Param XParam, Loop<T>& XLoop, BlockP<T> XBlock, bndparam side, EvolvingP<T> XEv);
+template <class T> void Flowbnd(Param XParam, Loop<T>& XLoop, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv);
 __host__ __device__ int Inside(int halowidth, int blkmemwidth, int isright, int istop, int ix, int iy, int ib);
 __host__ __device__ bool isbnd(int isright, int istop, int blkwidth, int ix, int iy);
 
@@ -19,7 +20,8 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
 template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
 
-template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, float itime, T* zs, T* h, T* un, T* ut);
+template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut);
+template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, T* zs, T* h, T* un, T* ut);
 
 
 __device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop, bool& istopleft, bool& istopright, bool& isrighttop, bool& isrightbot, bool& isbotright, bool& isbotleft);
