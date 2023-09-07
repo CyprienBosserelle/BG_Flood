@@ -36,22 +36,22 @@ BG_flood user interface consists in a text file, associating key words to user c
 |xmax|xmax| nan("")|Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)|
 |grdalpha|grdalpha| nan("")|Grid rotation Y axis from the North input in degrees but later converted to rad|
 |posdown|posdown| 0|Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f|
-|spherical| spherical , geo | 0|Flag for sperical coordinate (still in development)|
+|spherical|spherical| 0|Flag for sperical coordinate (still in development)|
 |Radius|Radius| 6371220.|Earth radius [m]|
 |mask|mask| 9999.0|Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory|
 ### Adaptation
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |initlevel|initlevel| 0|Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)|
-|maxlevel|maxlevel| 0|Maximum level for grid adaptation (overwrite the adaptation map if use) |
-|minlevel|minlevel| 0|Minumim level for grid adaptation (overwrite the adaptation map if use) |
+|maxlevel|maxlevel| -99999|Maximum level for grid adaptation (overwrite the adaptation map if use) |
+|minlevel|minlevel| -99999|Minumim level for grid adaptation (overwrite the adaptation map if use) |
 |membuffer|membuffer| 1.05|Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
 ### Timekeeping
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |outputtimestep| outputtimestep , outtimestep , outputstep | 0.0|Number of seconds between netCDF outputs, 0.0 for none|
 |endtime|endtime| 0.0|Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing|
-|totaltime| totaltime , inittime | 0.0|Total simulation time in s|
+|totaltime| totaltime , inittime , starttime | 0.0|Total simulation time in s|
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
 |dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
 ###  Initialisation
@@ -88,6 +88,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
 |rainbnd| rainbnd , rainonbnd | false|when false it force the rain foring on the bnd cells to be null.|
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
+|reftime| reftime , referencetime , timeref | "2020-01-01T00:00:00"|Reference time string as yyyy-mm-ddTHH:MM:SS|
 ---
 
 ## List of the Forcings' inputs
