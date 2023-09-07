@@ -203,7 +203,3 @@ template int ftoi<float>(float value);
 template int ftoi<double>(double value);
 
 
-bool isnan(int x)
-{
-	return false;
-}
