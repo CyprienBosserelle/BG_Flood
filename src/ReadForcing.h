@@ -24,7 +24,7 @@ std::vector<Windin> readINfileUNI(std::string filename, std::string refdate);
 std::vector<Windin> readWNDfileUNI(std::string filename, std::string refdate, double grdalpha);
 
 
-
+template <class T> void denan(int nx, int ny, float denanval, T* z);
 
 void readDynforcing(bool gpgpu,double totaltime, DynForcingP<float>& Dforcing);
 
