@@ -36,6 +36,11 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	for (int ib = 0; ib < XForcing.Bathy.size(); ib++)
 	{
 		readbathydata(XParam.posdown, XForcing.Bathy[ib]);
+
+		if (ib == 0) // Fill Nan for only the first bathy listed, the others will use values from original bathy topo.
+		{
+			denan(XForcing.Bathy[ib].nx, XForcing.Bathy[ib].ny, T(0.0), XForcing.Bathy[ib].val);
+		}
 	}
 	
 	if (XForcing.Bathy[0].extension.compare("nc") == 0)
@@ -111,6 +116,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		
 	if (!XForcing.cf.inputfile.empty())
 	{
+		XForcing.cf.denanval = 0.0000001;
 		log("\nRead Roughness map (cf) data...");
 		// roughness map was specified!
 		readstaticforcing(XForcing.cf);
@@ -124,12 +130,15 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	if (!XForcing.il.inputfile.empty())
 	{
 		log("\nRead initial losses map (il) data...");
+		XForcing.il.denanval = 0.0;
+
 		readstaticforcing(XForcing.il);
 		XParam.infiltration = true;
 	}
 	if (!XForcing.cl.inputfile.empty())
 	{
 		log("\nRead initial losses map (cl) data...");
+		XForcing.cl.denanval = 0.0;
 		readstaticforcing(XForcing.cl);
 		XParam.infiltration = true;
 	}
@@ -143,6 +152,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 
 		for (int nd = 0; nd < XForcing.deform.size(); nd++)
 		{
+			XForcing.deform[nd].denanval = 0.0;
 			// read the roughness map header
 			readstaticforcing(XForcing.deform[nd]);
 			//XForcing.deform[nd].grid = readcfmaphead(XForcing.deform[nd].grid);
@@ -256,6 +266,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			//
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
+
+			XForcing.UWind.denanval = 0.0;
+			XForcing.VWind.denanval = 0.0;
 			InitDynforcing(gpgpu, XParam, XForcing.UWind);
 			InitDynforcing(gpgpu, XParam, XForcing.VWind);
 
@@ -280,6 +293,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
+			XForcing.Atmp.denanval = XParam.Paref;
 			InitDynforcing(gpgpu, XParam, XForcing.Atmp);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
@@ -299,6 +313,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		else
 		{
+			XForcing.Rain.denanval = 0.0;
 			InitDynforcing(gpgpu, XParam, XForcing.Rain);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		}
@@ -358,6 +373,8 @@ template <class T> void readstaticforcing(int step,T& Sforcing)
 		readforcingdata(step,Sforcing);
 		//readvardata(forcing.inputfile, forcing.varname, step, forcing.val);
 
+		denan(Sforcing.nx, Sforcing.ny, float(Sforcing.denanval), Sforcing.val);
+
 	}
 	else
 	{
@@ -394,6 +411,7 @@ void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 	{
 		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
 		readforcingdata(XParam.totaltime, Dforcing);
+		
 		if (gpgpu)
 		{ 
 			AllocateGPU(Dforcing.nx, Dforcing.ny, Dforcing.now_g);
@@ -1365,6 +1383,10 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
 	readvardata(forcing.inputfile, forcing.varname, step, forcing.before, forcing.flipxx, forcing.flipyy);
 	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after, forcing.flipxx, forcing.flipyy);
+
+	denan(forcing.nx, forcing.ny, float(forcing.denanval), forcing.before);
+	denan(forcing.nx, forcing.ny, float(forcing.denanval), forcing.after);
+	
 	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.before);
 	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.after);
 
@@ -1852,6 +1874,29 @@ template <class T> void clampedges(int nx, int ny, T clamp, T* z)
 		z[ii] = clamp;
 	}
 }
+
+template <class T> void denan(int nx, int ny, float denanval, T* z)
+{
+	for (int j = 0; j < ny; j++)
+	{
+		for (int i = 0; i < nx; i++)
+		{
+			if (isnan(z[i + j * nx]))
+			{
+				z[i + j * nx] = denanval;
+			}
+		}
+	}
+}
+template void denan<float>(int nx, int ny, float denanval, float* z);
+template void denan<double>(int nx, int ny, float denanval, double* z);
+
+void denan(int nx, int ny, float denanval, int* z)
+{
+	//don't do nothing
+	// This function exist for cleaner compiling requirement that NaN do not exist in int form
+}
+
 /*! \fn void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
 * linearly interpolate between 2 cartesian arrays (of the same size)
 * This is used to interpolate dynamic forcing to a current time step 

@@ -810,7 +810,7 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 					if (test) // i.e. if vardata is anywhere near missing
 					{
 						
-						vardata[i + j * nx] = T(0.0);
+						vardata[i + j * nx] = T(NAN);
 					}
 					//maxval = utils::max(maxval, vardata[i + j * nx]);
 				}

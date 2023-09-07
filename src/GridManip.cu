@@ -287,7 +287,11 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 					{
 						if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
 						{
-							z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+							T interpval= interp2BUQ(x, y, T(blkdx), forcing[nf]);
+							if (!isnan(interpval))
+							{
+								z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+							}
 						}
 					}
 				}
