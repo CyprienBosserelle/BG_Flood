@@ -518,7 +518,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 		if (status != NC_NOERR) handle_ncerror(status);
 
 		/* Get variable ID */
-		status = nc_inq_varid(ncid, "z", &ncvarid);
+		status = nc_inq_varid(ncid, Sforcing.varname.c_str(), &ncvarid);
 		if (status != NC_NOERR) handle_ncerror(status);
 
 		/* Get the attribute ID */
