@@ -755,6 +755,13 @@ Param readparamstr(std::string line, Param param)
 		}
 	}
 
+	paramvec = { "crs", "spatialref", "spatial_ref", "wtk", "crsinfo","crs_info" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.crs_ref = parametervalue;
+	}
+
 	return param;
 }
 
