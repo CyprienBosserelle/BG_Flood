@@ -45,9 +45,14 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	
 	if (XForcing.Bathy[0].extension.compare("nc") == 0)
 	{
+		std::string nccrs;
 		//Get_CRS information from last bathymetry file
-		XParam.crs_ref = readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size() - 1]);
+		nccrs = readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size() - 1]);
 
+		if (!nccrs.empty())
+		{
+			XParam.crs_ref = nccrs;
+		}
 		//XParam.crs_ref = "test2";
 	}
 	bool gpgpu = XParam.GPUDEVICE >= 0;

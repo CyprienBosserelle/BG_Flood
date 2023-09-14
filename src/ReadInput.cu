@@ -1414,6 +1414,10 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 	{
 		left = trim(splittedstr[0]," ");
 		right = splittedstr[1]; // if there are more than one equal sign in the line the second one is ignored
+		for (int ieq = 2; ieq < splittedstr.size(); ieq++)
+		{
+			right = right + "=" + splittedstr[ieq];
+		}
 		for (int ii = 0; ii < parameterstr.size(); ii++)
 		{
 			found = case_insensitive_compare(left,parameterstr[ii]);// it needs to strictly compare
@@ -1434,6 +1438,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		}
 	}
 	return trim(parameternumber, " ");
+	//return parameternumber;
 }
 
 
