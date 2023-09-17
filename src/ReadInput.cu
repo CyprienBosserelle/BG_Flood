@@ -354,19 +354,20 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	parameterstr = "endtime";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.endtime = std::stod(parametervalue);
-
-	}
-
-	paramvec = { "totaltime","inittime","starttime" };
+	paramvec = { "endtime", "stoptime", "end", "stop","end_time","stop_time" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.totaltime = std::stod(parametervalue);
+		param.endtime = readinputtimetxt(parametervalue, param.reftime);
+
+	}
+
+	paramvec = { "totaltime","inittime","starttime", "start_time", "init_time", "start", "init"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//param.totaltime = std::stod(parametervalue);
+		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
 
 	}
 
@@ -382,7 +383,10 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.reftime = parametervalue;
+		if (param.reftime.empty())
+		{
+			param.reftime = parametervalue;
+		}
 
 	}
 
@@ -1234,8 +1238,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	XParam.endtime = setendtime(XParam, XForcing);
 
 
-
-
+	// Assign a value for reftime if not yet set. 
+	//It is needed in the Netcdf file generation
+	if (XParam.reftime.empty())
+	{
+		XParam.reftime = "2000-01-01T00:00:00";
+	}
 
 
 

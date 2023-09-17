@@ -270,7 +270,7 @@ double date_string_to_s(std::string datetime, std::string refdate)
 }
 
 // Read time string. If it is a valid datetime string return s from reftime otherwise return a foat of seconds 
-double readinputtimetxt(std::string input, std::string refdate)
+double readinputtimetxt(std::string input, std::string & refdate)
 {
 	std::string date = trim(input, " ");
 	double timeinsec;
@@ -280,6 +280,10 @@ double readinputtimetxt(std::string input, std::string refdate)
 	if (datetime.size() > 1)
 	{
 		//likely a datetime
+		if (refdate.empty())
+		{
+			refdate = date;
+		}
 		timeinsec = date_string_to_s(date, refdate);
 
 

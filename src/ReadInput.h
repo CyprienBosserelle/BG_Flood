@@ -7,6 +7,7 @@
 #include "Write_txtlog.h"
 #include "Forcing.h"
 #include "Util_CPU.h"
+#include "utctime.h"
 
 
 template <class T> T readfileinfo(std::string input, T outinfo);

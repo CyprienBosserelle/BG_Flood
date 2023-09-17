@@ -612,7 +612,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 * Read boundary forcing files
 * 
 */
-std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
+std::vector<SLTS> readbndfile(std::string filename,Param & XParam, int side)
 {
 	// read bnd or nest file
 	// side is for deciding whether we are talking about a left(side=0) bot (side =1) right (side=2) or top (side=3)
@@ -686,7 +686,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	}
 	else
 	{
-		Bndinfo = readWLfile(filename);
+		Bndinfo = readWLfile(filename,XParam.reftime);
 	}
 
 	// Add zsoffset
@@ -708,7 +708,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 * Read boundary water level data
 *
 */
-std::vector<SLTS> readWLfile(std::string WLfilename)
+std::vector<SLTS> readWLfile(std::string WLfilename, std::string & refdate)
 {
 	std::vector<SLTS> slbnd;
 
@@ -760,7 +760,8 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 			}
 
 
-			slbndline.time = std::stod(lineelements[0]);
+			//slbndline.time = std::stod(lineelements[0]);
+			slbndline.time = readinputtimetxt(lineelements[0], refdate);
 
 			for (int n = 1; n < lineelements.size(); n++)
 			{
@@ -981,7 +982,7 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 * Read flow data for river forcing
 *
 */
-std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string refdate)
+std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string &refdate)
 {
 	std::vector<Flowin> slbnd;
 
@@ -1063,7 +1064,7 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string refdate)
 * Read rain/atmpressure data for spatially uniform forcing
 *
 */
-std::vector<Windin> readINfileUNI(std::string filename, std::string refdate)
+std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate)
 {
 	std::vector<Windin> wndinput;
 
@@ -1132,7 +1133,7 @@ std::vector<Windin> readINfileUNI(std::string filename, std::string refdate)
 * Read wind data for spatially uniform forcing
 *
 */
-std::vector<Windin> readWNDfileUNI(std::string filename, std::string refdate, double grdalpha)
+std::vector<Windin> readWNDfileUNI(std::string filename, std::string & refdate, double grdalpha)
 {
 	// Warning grdapha is expected in radian here
 	std::vector<Windin> wndinput;
