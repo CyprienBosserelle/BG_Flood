@@ -48,12 +48,12 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 
-
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 	//T dhdxi = XGrad.dhdx[i];
 	//T dhdxmin = XGrad.dhdx[ileft];
-	T cm = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
 
 	T hi = XEv.h[i];
@@ -241,12 +241,12 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 
-
+				T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 				//T dhdxi = XGrad.dhdx[i];
 				//T dhdxmin = XGrad.dhdx[ileft];
-				T cm = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 				T fmu = T(1.0);
 
 				T hi = XEv.h[i];
@@ -428,11 +428,11 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
 
-
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 	//T dhdyi = XGrad.dhdy[i];
 	//T dhdymin = XGrad.dhdy[ibot];
-	T cm = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
 
 	T hi = XEv.h[i];
@@ -622,12 +622,12 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
-
+				T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 				//T dhdyi = XGrad.dhdy[i];
 				//T dhdymin = XGrad.dhdy[ibot];
-				T cm = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 				T fmu = T(1.0);
 
 				T hi = XEv.h[i];
