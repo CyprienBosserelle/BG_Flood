@@ -433,7 +433,7 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 	//T dhdyi = XGrad.dhdy[i];
 	//T dhdymin = XGrad.dhdy[ibot];
 	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
-	T fmu = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 
 	T hi = XEv.h[i];
 
@@ -508,7 +508,7 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 
 
 		//solver below also modifies fh and fu
-		dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, vl, vr, fh, fu);
+		dt = hllc(g, delta, epsi, CFL, cm, fmv, hCNl, hCNr, vl, vr, fh, fu);
 		//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
 
 		if (dt < dtmax[i])
@@ -544,10 +544,10 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 
 		////Flux update
 
-		XFlux.Fhv[i] = fmu * fh;
-		XFlux.Fqvy[i] = fmu * (fu - sl);
-		XFlux.Sv[i] = fmu * (fu - sr);
-		XFlux.Fquy[i] = fmu * fv;
+		XFlux.Fhv[i] = fmv * fh;
+		XFlux.Fqvy[i] = fmv * (fu - sl);
+		XFlux.Sv[i] = fmv * (fu - sr);
+		XFlux.Fquy[i] = fmv * fv;
 	}
 	else
 	{
@@ -628,7 +628,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 				//T dhdyi = XGrad.dhdy[i];
 				//T dhdymin = XGrad.dhdy[ibot];
 				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
-				T fmu = T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 
 				T hi = XEv.h[i];
 
@@ -703,7 +703,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 
 					//solver below also modifies fh and fu
-					dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, vl, vr, fh, fu);
+					dt = hllc(g, delta, epsi, CFL, cm, fmv, hCNl, hCNr, vl, vr, fh, fu);
 					//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
 
 					if (dt < dtmax[i])
@@ -741,10 +741,10 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 					////Flux update
 
-					XFlux.Fhv[i] = fmu * fh;
-					XFlux.Fqvy[i] = fmu * (fu - sl);
-					XFlux.Sv[i] = fmu * (fu - sr);
-					XFlux.Fquy[i] = fmu * fv;
+					XFlux.Fhv[i] = fmv * fh;
+					XFlux.Fqvy[i] = fmv * (fu - sl);
+					XFlux.Sv[i] = fmv * (fu - sr);
+					XFlux.Fquy[i] = fmv * fv;
 				}
 				else
 				{
