@@ -1126,7 +1126,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		//Geo grid
 
 		XParam.delta = XParam.dx * XParam.Radius * pi / 180.0;
-		XParam.engine = 2;
+		//XParam.engine = 2;
 
 		//printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
 		log("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
