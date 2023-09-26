@@ -55,6 +55,12 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 		//XParam.crs_ref = "test2";
 	}
+	
+	if (isnan(XParam.grdalpha))
+	{
+		XParam.grdalpha=0.0;
+	}
+	
 	bool gpgpu = XParam.GPUDEVICE >= 0;
 
 	//=================
