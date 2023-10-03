@@ -61,7 +61,7 @@ public:
 	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double grdalpha = nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
-	int spherical = 0; // Flag for sperical coordinate (still in development)
+	bool spherical = 0; // Flag for sperical coordinate (still in development)
 	double Radius = 6371220.; //Earth radius [m]
 	double mask = 9999.0; //Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory
 
@@ -197,8 +197,10 @@ public:
 	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be null.
 
 	// This here should be stored in a structure at a later stage
+
 	std::string AdaptCrit;
 	int* AdaptCrit_funct_pointer;
+
 	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
 	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
 

@@ -209,7 +209,7 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+				//T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 				//T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 				//T y = XParam.yo + XBlock.yo[ib] + iy * delta;
@@ -693,7 +693,7 @@ template <class T> __device__ T interp2BUQ(T x, T y, TexSetP Forcing)
 	T read;
 	
 	float ivw = float((x - T(Forcing.xo)) / T(Forcing.dx) + T(0.5));
-	float jvw = float((y - T(Forcing.yo)) / T(Forcing.dx) + T(0.5));
+	float jvw = float((y - T(Forcing.yo)) / T(Forcing.dy) + T(0.5));
 	read = tex2D<float>(Forcing.tex, ivw, jvw);
 	
 	return read;

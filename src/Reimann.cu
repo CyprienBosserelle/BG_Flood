@@ -41,19 +41,19 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 
-
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 	//T dhdxi = XGrad.dhdx[i];
 	//T dhdxmin = XGrad.dhdx[ileft];
-	T cm = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
 
 	T hi = XEv.h[i];
@@ -222,7 +222,7 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(T(XParam.dx), lev);
+		delta = calcres(T(XParam.delta), lev);
 
 		// neighbours for source term
 
@@ -241,12 +241,12 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 
-
+				T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 				//T dhdxi = XGrad.dhdx[i];
 				//T dhdxmin = XGrad.dhdx[ileft];
-				T cm = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 				T fmu = T(1.0);
 
 				T hi = XEv.h[i];
@@ -420,7 +420,7 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
@@ -428,12 +428,12 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
 
-
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 	//T dhdyi = XGrad.dhdy[i];
 	//T dhdymin = XGrad.dhdy[ibot];
-	T cm = T(1.0);
-	T fmu = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 
 	T hi = XEv.h[i];
 
@@ -508,7 +508,7 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 
 
 		//solver below also modifies fh and fu
-		dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, vl, vr, fh, fu);
+		dt = hllc(g, delta, epsi, CFL, cm, fmv, hCNl, hCNr, vl, vr, fh, fu);
 		//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
 
 		if (dt < dtmax[i])
@@ -544,10 +544,10 @@ template <class T> __global__ void UpdateButtingerYGPU(Param XParam, BlockP<T> X
 
 		////Flux update
 
-		XFlux.Fhv[i] = fmu * fh;
-		XFlux.Fqvy[i] = fmu * (fu - sl);
-		XFlux.Sv[i] = fmu * (fu - sr);
-		XFlux.Fquy[i] = fmu * fv;
+		XFlux.Fhv[i] = fmv * fh;
+		XFlux.Fqvy[i] = fmv * (fu - sl);
+		XFlux.Sv[i] = fmv * (fu - sr);
+		XFlux.Fquy[i] = fmv * fv;
 	}
 	else
 	{
@@ -613,7 +613,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 		lev = XBlock.level[ib];
 
-		delta = calcres(T(XParam.dx), lev);
+		delta = calcres(T(XParam.delta), lev);
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -622,13 +622,13 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
-
+				T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 				//T dhdyi = XGrad.dhdy[i];
 				//T dhdymin = XGrad.dhdy[ibot];
-				T cm = T(1.0);
-				T fmu = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 
 				T hi = XEv.h[i];
 
@@ -703,7 +703,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 
 					//solver below also modifies fh and fu
-					dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, vl, vr, fh, fu);
+					dt = hllc(g, delta, epsi, CFL, cm, fmv, hCNl, hCNr, vl, vr, fh, fu);
 					//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
 
 					if (dt < dtmax[i])
@@ -741,10 +741,10 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 
 					////Flux update
 
-					XFlux.Fhv[i] = fmu * fh;
-					XFlux.Fqvy[i] = fmu * (fu - sl);
-					XFlux.Sv[i] = fmu * (fu - sr);
-					XFlux.Fquy[i] = fmu * fv;
+					XFlux.Fhv[i] = fmv * fh;
+					XFlux.Fqvy[i] = fmv * (fu - sl);
+					XFlux.Sv[i] = fmv * (fu - sr);
+					XFlux.Fquy[i] = fmv * fv;
 				}
 				else
 				{

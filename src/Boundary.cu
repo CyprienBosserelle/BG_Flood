@@ -1,7 +1,7 @@
 ﻿#include "Boundary.h"
 
 
-template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop,BlockP<T> XBlock, bndparam side, EvolvingP<T> XEv)
+template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv)
 {
 	dim3 blockDim(XParam.blkwidth, 1, 1);
 	dim3 gridDimBBND(side.nblk, 1, 1);
@@ -64,21 +64,21 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop,BlockP<T> XBlock, b
 	}
 	if (XParam.GPUDEVICE >= 0)
 	{
-		bndGPU <<< gridDimBBND, blockDim, 0 >>> (XParam, side, XBlock, T(itime), XEv.zs, XEv.h, un, ut);
+		bndGPU <<< gridDimBBND, blockDim, 0 >>> (XParam, side, XBlock, Atmp, T(itime), XEv.zs, XEv.h, un, ut);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
-		bndCPU(XParam, side, XBlock, zsbndleft, uubndleft, vvbndleft, XEv.zs, XEv.h, un, ut);
+		bndCPU(XParam, side, XBlock, zsbndleft, uubndleft, vvbndleft, Atmp, XEv.zs, XEv.h, un, ut);
 	}
 
 
 
 }
-template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, BlockP<float> XBlock, bndparam side, EvolvingP<float> XEv);
-template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, BlockP<double> XBlock, bndparam side, EvolvingP<double> XEv);
+template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv);
+template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv);
 
-template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock,float itime, T* zs, T* h, T* un, T* ut)
+template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut)
 {
 	//
 
@@ -127,8 +127,15 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 		itx = (yy) / (XParam.ymax - XParam.yo) * side.nbnd;
 	}
 
+	T zsatm = T(0.0);
 
-	
+	if (XParam.atmpforcing)
+	{
+		float atmpi;
+
+		atmpi = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp.GPU);
+		zsatm = -1.0 * (atmpi - XParam.Paref) * XParam.Pa2m;
+	}
 
 	int inside= Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
 		   	
@@ -151,7 +158,7 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 	if (side.on)
 	{
 		
-		zsbnd = tex2D<float>(side.GPU.WLS.tex, itime + 0.5f, itx + 0.5f);
+		zsbnd = tex2D<float>(side.GPU.WLS.tex, itime + 0.5f, itx + 0.5f) + zsatm;
 
 		if (side.type == 4)
 		{
@@ -193,10 +200,10 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 	h[i] = hnew;
 	zs[i] = zsnew;
 }
-template __global__ void bndGPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, float itime, float* zs, float* h, float* un, float* ut);
-template __global__ void bndGPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, float itime, double* zs, double* h, double* un, double* ut);
+template __global__ void bndGPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, DynForcingP<float> Atmp, float itime, float* zs, float* h, float* un, float* ut);
+template __global__ void bndGPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, DynForcingP<float> Atmp, float itime, double* zs, double* h, double* un, double* ut);
 
-template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, T* zs, T* h, T* un, T* ut)
+template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, T* zs, T* h, T* un, T* ut)
 {
 	//
 	unsigned int halowidth = XParam.halowidth;
@@ -242,6 +249,22 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 				itx = (yy) / (XParam.ymax - XParam.yo) * side.nbnd;
 			}
 
+			T zsatm = T(0.0);
+			T atmpi = T(0.0);
+
+			if (XParam.atmpforcing)
+			{
+				if (Atmp.uniform)
+				{
+					atmpi = T(Atmp.nowvalue);
+				}
+				else
+				{
+					atmpi = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp);
+				}
+				zsatm = -(atmpi - XParam.Paref) * XParam.Pa2m;
+			}
+
 
 			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 			int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
@@ -269,7 +292,7 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 
 				if (side.nbnd == 1)
 				{
-					zsbnd = zsbndvec[0];
+					zsbnd = zsbndvec[0] + zsatm;
 					if (side.type == 4)
 					{
 						unbnd = side.isright == 0 ? vvbndvec[0] : uubndvec[0];
@@ -280,7 +303,7 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 				{
 
 					// here interp time is used to interpolate to the right node rather than in time...
-					zsbnd = T(interptime(zsbndvec[inext], zsbndvec[iprev], 1.0, itx * (nbnd - 1) - iprev));
+					zsbnd = T(interptime(zsbndvec[inext], zsbndvec[iprev], 1.0, itx * (nbnd - 1) - iprev)) + zsatm;
 
 					if (side.type == 4)
 					{
@@ -326,8 +349,8 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 		}
 	}
 }
-template __host__ void bndCPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, float* zs, float* h, float* un, float* ut);
-template __host__ void bndCPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, double* zs, double* h, double* un, double* ut);
+template __host__ void bndCPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, float* zs, float* h, float* un, float* ut);
+template __host__ void bndCPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, double* zs, double* h, double* un, double* ut);
 
 
 // function to apply bnd at the boundary with masked blocked

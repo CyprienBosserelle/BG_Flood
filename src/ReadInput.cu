@@ -134,9 +134,7 @@ Param readparamstr(std::string line, Param param)
 	///////////////////////////////////////////////////////
 	// General parameters
 	//
-	std::vector<std::string> truestr = { "1","true","yes", "on" };
-	std::vector<std::string> falsestr = { "-1","false","no","off" };
-
+	
 	parameterstr = "test";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -162,7 +160,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> buttingerstr = { "b","butt","buttinger","2" };
+		std::vector<std::string> buttingerstr = { "b","butt","buttinger","1" };
 		std::size_t found;
 		bool foo = false;
 		for (int ii = 0; ii < buttingerstr.size(); ii++)
@@ -215,19 +213,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-
-		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
-		if (case_insensitive_compare(parametervalue, truestr) == 0)
-		{
-			param.conserveElevation = true;
-		}
-		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
-		else if (case_insensitive_compare(parametervalue, falsestr) == 0)
-		{
-			param.conserveElevation = false;
-		}
-
-
+		param.conserveElevation = readparambool(parametervalue, param.conserveElevation);
 	}
 
 	paramvec = { "wetdryfix","reminstab" };
@@ -235,18 +221,8 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 
-		//if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
-		if (case_insensitive_compare(parametervalue, truestr) == 0)
-		{
-			param.wetdryfix = true;
-		}
-		//else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
-		else if (case_insensitive_compare(parametervalue, falsestr) == 0)
-		{
-			param.wetdryfix = false;
-		}
-
-
+		param.wetdryfix = readparambool(parametervalue, param.wetdryfix);
+		
 	}
 
 
@@ -677,14 +653,8 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (case_insensitive_compare(parametervalue, truestr) == 0)
-		{
-			param.rainbnd = true;
-		}
-		if (case_insensitive_compare(parametervalue, falsestr) == 0)
-		{
-			param.rainbnd = false;
-		}
+		param.rainbnd = readparambool(parametervalue, param.rainbnd);
+		
 	}
 		
 
@@ -704,11 +674,11 @@ Param readparamstr(std::string line, Param param)
 	}
 	
 
-	parameterstr = "spherical";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = {"spherical", "geo"};
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.spherical = std::stoi(parametervalue);
+		param.spherical = readparambool(parametervalue, param.spherical);
 	}
 
 	parameterstr = "Radius";
@@ -1154,7 +1124,10 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	else
 	{
 		//Geo grid
+
 		XParam.delta = XParam.dx * XParam.Radius * pi / 180.0;
+		//XParam.engine = 2;
+
 		//printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
 		log("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
 		if (XParam.grdalpha != 0.0)
@@ -1527,5 +1500,21 @@ bndparam readbndline(std::string parametervalue)
 	return bnd;
 }
 
+bool readparambool(std::string paramstr,bool defaultval)
+{
+	bool out = defaultval;
+	std::vector<std::string> truestr = { "1","true","yes", "on" };
+	std::vector<std::string> falsestr = { "-1","false","no","off" };
 
+	if (case_insensitive_compare(paramstr, truestr) == 0)
+	{
+		out = true;
+	}
+	if (case_insensitive_compare(paramstr, falsestr) == 0)
+	{
+		out = false;
+	}
+
+	return out;
+}
 

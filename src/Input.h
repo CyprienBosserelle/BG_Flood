@@ -51,6 +51,7 @@ public:
 	double xmax = 0.0;
 	double ymax = 0.0;
 	double dx = 0.0;
+	double dy = 0.0;
 	double grdalpha=0.0;
 	bool flipxx = false;
 	bool flipyy = false;

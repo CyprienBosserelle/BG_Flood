@@ -77,7 +77,7 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 
 
 
-void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
+void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &dy, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
 {
 	//read the dimentions of grid, levels and time
 	int status;
@@ -234,9 +234,10 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 
 	}
 
-	double dxx;
+	double dxx,ddy;
 	//check dx
-	dxx = (xcoord[nx - 1] - xcoord[0]) / (nx - 1.0);
+	dxx = abs(xcoord[nx - 1] - xcoord[0]) / (nx - 1.0);
+	ddy = abs(ycoord[(ny - 1) * nx]- ycoord[0]) / (ny - 1.0);
 	//log("xo=" + std::to_string(xcoord[0])+"; xmax="+ std::to_string(xcoord[nx - 1]) +"; nx="+ std::to_string(nx) +"; dxx=" +std::to_string(dxx));
 	//dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
 
@@ -276,6 +277,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	}
 
 	dx = dxx;
+	dy = ddy;
 
 	xo = utils::min(xcoord[0], xcoord[nx - 1]);
 	xmax = utils::max(xcoord[0], xcoord[nx - 1]);
@@ -286,7 +288,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	if (xcoord[0] > xcoord[nx - 1])
 		flipx = true;
 
-	if (ycoord[0] > ycoord[ny - 1])
+	if (ycoord[0] > ycoord[(ny - 1) * nx])
 		flipy = true;
 
 

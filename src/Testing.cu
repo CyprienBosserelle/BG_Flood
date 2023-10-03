@@ -378,6 +378,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -631,6 +632,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = 1.0;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -700,7 +702,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
-		delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+		delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -751,7 +753,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 			{
 				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 				int ib = XModel.blocks.active[ibl];
-				delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+				delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 				for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -861,7 +863,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
-
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
@@ -969,7 +971,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	{
 		//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 		int ib = XModel.blocks.active[ibl];
-		delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+		delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -1021,7 +1023,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 			{
 				//printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
 				int ib = XModel.blocks.active[ibl];
-				delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+				delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 
 				for (int iy = 0; iy < XParam.blkwidth; iy++)
@@ -1225,15 +1227,15 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//GPU gradients
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
@@ -1495,6 +1497,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 	XForcing.Bathy[0].ny = 64;
 
 	XForcing.Bathy[0].dx = 126.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -1780,7 +1783,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -1801,7 +1804,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2011,7 +2014,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	XForcing.Bathy[0].ny = 32;
 
 	XForcing.Bathy[0].dx = 1.0;
-
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 	T x, y;
 	T center = T(31.0);
 
@@ -2146,7 +2149,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2167,7 +2170,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2356,7 +2359,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 	int ileft = memloc(XParam.halowidth, XParam.blkmemwidth, ix - 1, iy, ib);
 
 	int lev = XModel.blocks.level[ib];
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
@@ -2504,7 +2507,7 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 	int ileft = memloc(XParam.halowidth, XParam.blkmemwidth, ix - 1, iy, ib);
 
 	int lev = XModel.blocks.level[ib];
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
@@ -2668,6 +2671,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -2717,7 +2721,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2738,7 +2742,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XModel.blocks.active[ibl];
-		T delta = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < (XParam.blkwidth); ix++)
@@ -2853,6 +2857,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XParam.yo = 0;
 	XParam.ymax = 0.196;
 	XParam.dx=(XParam.ymax - XParam.yo) / (1 << 1);
+	XParam.delta = XParam.dx;
 	double Xmax_exp = 28.0; //minimum Xmax position (adjust to have a "full blocks" config)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
 	XParam.xmax = XParam.xo + (16 * XParam.dx) * std::ceil((Xmax_exp - XParam.xo) / (16 * XParam.dx)) + (16 * XParam.dx);
@@ -2904,6 +2909,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XForcing.Bathy[0].xmax = 28.0;
 	XForcing.Bathy[0].ymax = 1.0;
 	XForcing.Bathy[0].dx = 0.1;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 	XForcing.Bathy[0].nx = ftoi((XForcing.Bathy[0].xmax - XForcing.Bathy[0].xo) / XForcing.Bathy[0].dx + 1);
 	XForcing.Bathy[0].ny = ftoi((XForcing.Bathy[0].ymax - XForcing.Bathy[0].yo) / XForcing.Bathy[0].dx + 1);
 
@@ -3194,7 +3200,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 
 			//Calculation of the flux at the bottom of the slope (x=24m)
 			ib = XModel.blocks.active[bl];
-			delta = calcres(T(XParam.dx), XModel.blocks.level[ib]);
+			delta = calcres(T(XParam.delta), XModel.blocks.level[ib]);
 
 			for (int iy = 0; iy < XParam.blkwidth; iy++)
 			{
@@ -3306,6 +3312,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	XForcing.Bathy[0].ny = 501;
 
 	XForcing.Bathy[0].dx = 0.1;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -3516,6 +3523,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	XForcing.Bathy[0].ny = 3;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
@@ -3721,7 +3729,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startA, NULL);
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3744,7 +3752,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startB, NULL);
-	gradientSM << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientSM << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3767,7 +3775,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startC, NULL);
-	gradientSMC << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientSMC << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -4269,6 +4277,8 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 
 	//InitSave2Netcdf(XParam, XModel);
 
+	
+
 }
 
 
@@ -4293,6 +4303,7 @@ template <class T> Forcing<float> MakValleyBathy(Param XParam, T slope, bool bot
 	XForcing.Bathy[0].ny = 32;
 
 	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
 	T x, y;
 	T center = T(10.5);
