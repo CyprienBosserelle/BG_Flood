@@ -546,6 +546,8 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 
 			crs = (char*)malloc(t_len + 1);
 
+			crs[t_len] = '\0';
+
 			/* Read CRS attribute from the variable */
 			status = nc_get_att_text(ncid, ncvarid, "grid_mapping", crs);
 			if (status != NC_NOERR) handle_ncerror(status);
@@ -585,6 +587,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 				if (status != NC_NOERR) handle_ncerror(status);
 
 				crs_wkt = (char*)malloc(t_len + 1);
+				crs_wkt[t_len] = '\0';
 
 				/* Read CRS attribute from the variable */
 				status = nc_get_att_text(ncid, ncvarid, attnamevec[idatt].c_str(), crs_wkt);
