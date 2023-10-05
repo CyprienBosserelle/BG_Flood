@@ -604,7 +604,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 			{
 				printf("CRS_info detected but not understood reverting to default CRS\n Rename attribute in grid-mapping variable\n");
 
-				//crs_ref = "";
+				crs_wkt = "";
 			}
 
 		}
