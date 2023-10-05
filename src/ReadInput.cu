@@ -330,19 +330,20 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	parameterstr = "endtime";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.endtime = std::stod(parametervalue);
-
-	}
-
-	paramvec = { "totaltime","inittime" };
+	paramvec = { "endtime", "stoptime", "end", "stop","end_time","stop_time" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.totaltime = std::stod(parametervalue);
+		param.endtime = readinputtimetxt(parametervalue, param.reftime);
+
+	}
+
+	paramvec = { "totaltime","inittime","starttime", "start_time", "init_time", "start", "init"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//param.totaltime = std::stod(parametervalue);
+		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
 
 	}
 
@@ -351,6 +352,17 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.dtinit = std::stod(parametervalue);
+
+	}
+
+	paramvec = { "reftime","referencetime","timeref" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (param.reftime.empty())
+		{
+			param.reftime = parametervalue;
+		}
 
 	}
 
@@ -717,6 +729,13 @@ Param readparamstr(std::string line, Param param)
 		}
 	}
 
+	paramvec = { "crs", "spatialref", "spatial_ref", "wtk", "crsinfo","crs_info" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.crs_ref = parametervalue;
+	}
+
 	return param;
 }
 
@@ -1036,6 +1055,15 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	int minlev = XParam.minlevel;
 	int maxlev = XParam.maxlevel;
 
+	if (minlev == -99999)
+	{
+		minlev = XParam.initlevel;
+	}
+	if (maxlev == -99999)
+	{
+		maxlev = XParam.initlevel;
+	}
+
 	XParam.maxlevel = utils::max(maxlev, minlev);
 	XParam.minlevel = utils::min(maxlev, minlev);
 
@@ -1183,12 +1211,17 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	XParam.endtime = setendtime(XParam, XForcing);
 
 
+	// Assign a value for reftime if not yet set. 
+	//It is needed in the Netcdf file generation
+	if (XParam.reftime.empty())
+	{
+		XParam.reftime = "2000-01-01T00:00:00";
+	}
 
+	log("Reference time: " + XParam.reftime);
+	log("Model Initial time: " + std::to_string(XParam.totaltime));
 
-
-
-
-
+	log("Model end time: " + std::to_string(XParam.endtime));
 
 	// Check that outputtimestep is not zero, so at least the first and final time step are saved
 	// If only the model stepup is needed than just run with endtime=0.0
@@ -1363,6 +1396,10 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 	{
 		left = trim(splittedstr[0]," ");
 		right = splittedstr[1]; // if there are more than one equal sign in the line the second one is ignored
+		for (int ieq = 2; ieq < splittedstr.size(); ieq++)
+		{
+			right = right + "=" + splittedstr[ieq];
+		}
 		for (int ii = 0; ii < parameterstr.size(); ii++)
 		{
 			found = case_insensitive_compare(left,parameterstr[ii]);// it needs to strictly compare
@@ -1383,6 +1420,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		}
 	}
 	return trim(parameternumber, " ");
+	//return parameternumber;
 }
 
 
@@ -1420,6 +1458,41 @@ std::vector<std::string> split(const std::string &s, char delim) {
 	std::vector<std::string> elems;
 	split(s, delim, elems);
 	return elems;
+}
+
+std::vector<std::string> split(const std::string s, const std::string delim)
+{
+	size_t ide=0;
+	int loc = 0;
+	std::vector<std::string> output;
+	std::string rem = s;
+	
+
+	while (ide < std::string::npos || output.size() == 0)
+	{
+		
+		ide = rem.find(delim);
+		if (ide == 0 || ide == std::string::npos)
+		{
+			output.push_back(rem);
+			ide = std::string::npos;
+		}
+		else
+		{
+			output.push_back(rem.substr(loc, ide));
+		}
+		
+		if (ide < (rem.length() - delim.length()))
+		{
+			loc = ide + delim.length();
+			rem = rem.substr(loc);
+		}
+	}
+
+	return output;
+
+	
+
 }
 
 

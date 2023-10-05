@@ -53,6 +53,7 @@ public:
 	double dx = 0.0;
 	double dy = 0.0;
 	double grdalpha=0.0;
+	double denanval = NAN;
 	bool flipxx = false;
 	bool flipyy = false;
 	std::string inputfile;

@@ -181,6 +181,55 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_def_var(ncid, "time", NC_FLOAT, 1, tdim, &time_id);
 	if (status != NC_NOERR) handle_ncerror(status);
 
+	static char txtname[] = "time";
+	status = nc_put_att_text(ncid, time_id, "standard_name", strlen(txtname), txtname );
+	//status = nc_put_att_string(ncid, time_id, "standard_name", 1, "time");
+	//units = "days since 1990-1-1 0:0:0";
+
+	std::string timestr= "seconds since " + XParam.reftime;
+	const char* timeunit = timestr.c_str();
+
+	status = nc_put_att_text(ncid, time_id, "units", strlen(timeunit), timeunit);
+
+	std::string timeaxis = "T";
+
+	status = nc_put_att_text(ncid, time_id, "axis", timeaxis.size(), timeaxis.c_str());
+
+	//static char calendarname[] = "standard";
+	//status = nc_put_att_text(ncid, time_id, "calendar", strlen(calendarname), calendarname);
+
+	if (status != NC_NOERR) handle_ncerror(status);
+
+
+	int crsid;
+	std::string crsname;
+	status = nc_def_var(ncid, "crs", NC_INT, 0, tdim, &crsid);
+	if (XParam.spherical == 1)
+	{
+		crsname = "latitude_longitude";
+
+		float primemeridian = 0.0f;
+		float sma = 6378137.0f;
+		float iflat = 298.257223563f;
+		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
+		status = nc_put_att_float(ncid, crsid, "longitude_of_prime_meridian", NC_FLOAT, 1, &primemeridian);
+		status = nc_put_att_float(ncid, crsid, "semi_major_axis", NC_FLOAT, 1, &sma);
+		status = nc_put_att_float(ncid, crsid, "inverse_flattening", NC_FLOAT, 1, &iflat);
+	}
+	else
+	{
+		crsname = "projected";
+		std::string proj = XParam.crs_ref;
+			//"+proj=tmerc +lat_0=0 +lon_0=173 +k=0.9996 +x_0=1600000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
+		status = nc_put_att_text(ncid, crsid, "crs_wkt", proj.size(), proj.c_str());
+		status = nc_put_att_text(ncid, crsid, "spatial_ref", proj.size(), proj.c_str());
+		//status = nc_put_att_float(ncid, crsid, "semi_major_axis", NC_FLOAT, 1, 6378137.0);
+		//status = nc_put_att_float(ncid, crsid, "inverse_flattening", NC_FLOAT, 1, 298.257223563);
+	}
+
+	if (status != NC_NOERR) handle_ncerror(status);
+
 	// Define dimensions and variables to store block id, status, level xo, yo
 
 	status = nc_def_dim(ncid, "blockid", nblk, &blockid_dim);
@@ -208,7 +257,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	//int* levZone;
-
+	std::string xaxis = "X";
+	std::string yaxis = "Y";
 	// For each level Define xx yy 
 	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	{
@@ -248,6 +298,12 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		if (status != NC_NOERR) handle_ncerror(status);
 		status = nc_def_var(ncid, yyname.c_str(), NC_DOUBLE, 1, ydim, &yy_id);
 		if (status != NC_NOERR) handle_ncerror(status);
+
+
+		
+
+		status = nc_put_att_text(ncid, xx_id, "axis", xaxis.size(), xaxis.c_str());
+		status = nc_put_att_text(ncid, yy_id, "axis", yaxis.size(), yaxis.c_str());
 		//End definitions: leave define mode
 	}
 	status = nc_enddef(ncid);
@@ -369,6 +425,8 @@ for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	status = nc_put_vara_double(ncid, yy_id, ystart, ycount, yval);
 	if (status != NC_NOERR) handle_ncerror(status);
 
+
+
 	free(xval);
 	free(yval);
 }
@@ -399,6 +457,11 @@ template void creatncfileBUQ<float>(Param &XParam, BlockP<float> &XBlock);
 template void creatncfileBUQ<double>(Param &XParam, BlockP<double> &XBlock);
 
 template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, int vdim, T* var, outzoneB Xzone)
+{
+	defncvarBUQ(XParam, activeblk, level, blockxo, blockyo, varst, "", "","", vdim, var, Xzone);
+}
+
+template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, std::string longname, std::string stdname, std::string unit, int vdim, T* var, outzoneB Xzone)
 {
 
 	int smallnc = XParam.smallnc;
@@ -542,8 +605,18 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 		}
 		
 
+		status = nc_put_att_text(ncid, var_id, "standard_name", stdname.size(), stdname.c_str());
+		status = nc_put_att_text(ncid, var_id, "long_name", longname.size(), longname.c_str());
+		status = nc_put_att_text(ncid, var_id, "units", unit.size(),unit.c_str());
 
+		std::string crsstrname = "crs";
+		status = nc_put_att_text(ncid, var_id, "grid_mapping", crsstrname.size(), crsstrname.c_str());
+		
 
+		int shuffle = 1;
+		int deflate = 1;        // This switches compression on (1) or off (0).
+		int deflate_level = 9;  // This is the compression level in range 1 (less) - 9 (more).
+		nc_def_var_deflate(ncid, var_id, shuffle, deflate, deflate_level);
 
 	}
 	// End definition
@@ -858,7 +931,8 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 			writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], 3, XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				std::string varstr = XParam.outvars[ivar];
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr,XModel.Outvarlongname[varstr],XModel.Outvarstdname[varstr],XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
 			}
 		}
 	}

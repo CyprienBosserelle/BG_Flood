@@ -14,18 +14,25 @@
 
 template<class T> void readforcing(Param& XParam, Forcing<T> & XForcing);
 
-std::vector<SLTS> readbndfile(std::string filename, Param XParam, int side);
-std::vector<SLTS> readWLfile(std::string WLfilename);
+std::vector<SLTS> readbndfile(std::string filename, Param & XParam, int side);
+std::vector<SLTS> readWLfile(std::string WLfilename,  std::string& refdate);
 
 std::vector<SLTS> readNestfile(std::string ncfile, std::string varname, int hor, double eps, double bndxo, double bndxmax, double bndy);
 
-std::vector<Flowin> readFlowfile(std::string Flowfilename);
-std::vector<Windin> readINfileUNI(std::string filename);
-std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha);
+std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string &refdate);
+std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate);
+std::vector<Windin> readWNDfileUNI(std::string filename, std::string & refdate, double grdalpha);
+
+void denan(int nx, int ny, float denanval, int* z);
+template <class T> void denan(int nx, int ny, float denanval, T* z);
+
 
 void readDynforcing(bool gpgpu,double totaltime, DynForcingP<float>& Dforcing);
 
-DynForcingP<float> readforcinghead(DynForcingP<float> Fmap);
+//DynForcingP<float> readforcinghead(DynForcingP<float> Fmap);
+DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam);
+
+
 template<class T> T readforcinghead(T Fmap);
 //template<class T> T readBathyhead(T BathyParam);
 template<class T> void readstaticforcing(T& Sforcing);

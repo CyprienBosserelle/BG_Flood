@@ -20,6 +20,8 @@
 
 #include "Adaptation.h"
 
+#include "utctime.h"
+
 template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
 
 template <class T> bool GaussianHumptest(T zsnit, int gpu,bool compare);

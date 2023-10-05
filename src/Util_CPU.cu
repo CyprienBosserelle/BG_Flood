@@ -217,3 +217,5 @@ template <class T> int ftoi(T value) {
 }
 template int ftoi<float>(float value);
 template int ftoi<double>(double value);
+
+

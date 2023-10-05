@@ -10,6 +10,7 @@
 #include "Util_CPU.h"
 #include "GridManip.h"
 #include "Forcing.h"
+#include "utctime.h"
 
 
 
@@ -27,9 +28,16 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 //int readnczb(int nx, int ny, const std::string ncfile, double*& zb);
 std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE);
 
-void readgridncsize(const std::string ncfilestr, const std::string varstr, int& nx, int& ny, int& nt, double& dx, double& dy, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy);
+
+void readgridncsize(const std::string ncfilestr, const std::string varstr, int& nx, int& ny, int& nt, double& dx, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy);
+void readgridncsize(forcingmap& Fmap, Param XParam);
+
+template<class T> void readgridncsize(T& Imap);
+
+
 int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU);
 int readnctime(std::string filename, double * &time);
+int readnctime2(int ncid, std::string refdate, size_t nt, double*& time);
 template <class T> int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T * &zsa);
 template <class T> int readvardata(std::string filename, std::string Varname, int step, T*& vardata, bool flipx, bool flipy);
 //template <class T> int readhotstartfile(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, T * &zs, T * &zb, T * &hh, T *&uu, T * &vv);
