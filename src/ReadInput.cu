@@ -1245,9 +1245,10 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		XParam.reftime = "2000-01-01T00:00:00";
 	}
 
+	log("Reference time: " + XParam.reftime);
+	log("Model Initial time: " + std::to_string(XParam.totaltime));
 
-
-
+	log("Model end time: " + std::to_string(XParam.endtime));
 
 	// Check that outputtimestep is not zero, so at least the first and final time step are saved
 	// If only the model stepup is needed than just run with endtime=0.0

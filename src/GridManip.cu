@@ -288,10 +288,24 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 						if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
 						{
 							T interpval= interp2BUQ(x, y, T(blkdx), forcing[nf]);
+
+							//if (isnan(interpval))
+							//{
+							//	log("NAN detected");
+							//}
+
 							if (!isnan(interpval))
 							{
 								z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
 							}
+							//else
+							//{
+							//	z[n] = -999.0;
+							//}
+							//{
+							//	log("NAN detected: Z="+std::to_string(z[n]));
+							//}
+
 						}
 					}
 				}

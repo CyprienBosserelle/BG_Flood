@@ -796,7 +796,10 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		{
 			merr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
 		}
-
+		if (merr != NC_NOERR)
+		{
+			merr = nc_get_att_double(ncid, varid, "missing_value", &missing);
+		}
 
 		// remove fill value
 		if (merr == NC_NOERR)
@@ -806,7 +809,7 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					bool test = missing != missing ? vardata[i + j * nx] != vardata[i + j * nx] : (vardata[i + j * nx] > T(0.9 * missing));
+					bool test = missing != missing ? vardata[i + j * nx] != vardata[i + j * nx] : (abs(vardata[i + j * nx]) > abs(T(0.9 * missing)));
 					if (test) // i.e. if vardata is anywhere near missing
 					{
 						
