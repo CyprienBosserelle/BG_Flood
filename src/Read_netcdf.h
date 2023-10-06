@@ -29,7 +29,7 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE);
 
 
-void readgridncsize(const std::string ncfilestr, const std::string varstr, int& nx, int& ny, int& nt, double& dx, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy);
+void readgridncsize(const std::string ncfilestr, const std::string varstr, std::string reftime, int& nx, int& ny, int& nt, double& dx, double& dy, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy);
 void readgridncsize(forcingmap& Fmap, Param XParam);
 
 template<class T> void readgridncsize(T& Imap);

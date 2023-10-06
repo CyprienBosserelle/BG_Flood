@@ -80,7 +80,7 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 
 //void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
 //void readgridncsize(forcingmap &Fmap, Param XParam)
-void readgridncsize(const std::string ncfilestr, const std::string varstr, std::string reftime, int& nx, int& ny, int& nt, double& dx, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy)
+void readgridncsize(const std::string ncfilestr, const std::string varstr, std::string reftime, int& nx, int& ny, int& nt, double& dx, double& dy, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy)
 {
 	//std::string ncfilestr = Fmap.inputfile;
 	//std::string varstr = Fmap.varname;
@@ -325,7 +325,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 void readgridncsize(forcingmap& Fmap, Param XParam)
 {
 
-	readgridncsize(Fmap.inputfile, Fmap.varname, XParam.reftime, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.dt, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+	readgridncsize(Fmap.inputfile, Fmap.varname, XParam.reftime, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.dy, Fmap.dt, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
 }
 
 
@@ -333,7 +333,7 @@ template<class T> void readgridncsize(T& Imap)
 {
 	double a, b, c;
 	int duma, dumb, dumc;
-	readgridncsize(Imap.inputfile, Imap.varname, "2000-01-01T00:00:00", Imap.nx, Imap.ny, duma, Imap.dx, a, Imap.xo, Imap.yo, b, Imap.xmax, Imap.ymax, c, Imap.flipxx, Imap.flipyy);
+	readgridncsize(Imap.inputfile, Imap.varname, "2000-01-01T00:00:00", Imap.nx, Imap.ny, duma, Imap.dx, Imap.dy, a, Imap.xo, Imap.yo, b, Imap.xmax, Imap.ymax, c, Imap.flipxx, Imap.flipyy);
 }
 template void readgridncsize<inputmap>(inputmap &Imap);
 template void readgridncsize<forcingmap>(forcingmap &Imap);
