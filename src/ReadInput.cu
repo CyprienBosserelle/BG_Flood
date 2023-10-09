@@ -1143,7 +1143,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax));
 	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx));
 
-	if (XParam.spherical < 1)
+	if (XParam.spherical == false)
 	{
 		XParam.delta = XParam.dx;
 		XParam.grdalpha = XParam.grdalpha * pi / 180.0; // grid rotation

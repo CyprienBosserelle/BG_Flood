@@ -126,7 +126,7 @@ template <class T> void Recalculatehh(Param XParam, BlockP<T> XBlock, EvolvingP<
 			{
 				n = memloc(XParam.halowidth, XParam.blkmemwidth, i, j, ib);
 				
-				Xev.h[n] = max(Xev.zs[n]- zb[n],0.0) ;
+				Xev.h[n] = max(Xev.zs[n]- zb[n],(T)0.0) ;
 			}
 		}
 

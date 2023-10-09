@@ -262,7 +262,7 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 				{
 					atmpi = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp);
 				}
-				zsatm = -(atmpi - XParam.Paref) * XParam.Pa2m;
+				zsatm = -(atmpi - (T)XParam.Paref) * (T)XParam.Pa2m;
 			}
 
 

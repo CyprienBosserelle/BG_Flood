@@ -155,7 +155,7 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 		lev = XBlock.level[ib];
 		delta = calcres(T(XParam.delta), lev);
 
-		ybo = XParam.yo + XBlock.yo[ib];
+		ybo = (T)XParam.yo + XBlock.yo[ib];
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{

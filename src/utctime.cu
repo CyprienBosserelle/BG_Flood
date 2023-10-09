@@ -4,7 +4,7 @@
 namespace chrono = std::chrono;
 using chrono::duration_cast;
 using chrono::time_point_cast; 
-
+/*
 namespace {
 
 std::time_t to_time_t(const UTCClock::time_point &tp) noexcept
@@ -20,7 +20,7 @@ UTCClock::time_point from_time_t(std::time_t tt) noexcept
 }
 
 } // namespace
-
+*/
 // Algorithm: http://howardhinnant.github.io/date_algorithms.html
 int days_from_epoch(int y, int m, int d)
 {
@@ -136,7 +136,7 @@ long long timegm(struct tm const* t)
 
 	return 60LL * (60LL * (24LL * days_since_epoch + (long long)t->tm_hour) + (long long)t->tm_min) + (long long)t->tm_sec;
 }
-
+/*
 UTCClock::time_point UTCClock::fromDate(
     int year, int month, int day, int hour, int min, int sec, int usec)
 {
@@ -151,6 +151,7 @@ UTCClock::time_point UTCClock::fromDate(
   std::time_t tt = timegm(&tm);
   return from_time_t(tt) + chrono::microseconds(usec);
 }
+
 
 void UTCClock::toDate(const UTCClock::time_point &tp,
                       int &year,
@@ -174,14 +175,14 @@ void UTCClock::toDate(const UTCClock::time_point &tp,
   sec = duration_cast<chrono::seconds>(leftover).count();
   usec = (leftover-chrono::seconds(sec)).count();
 }
-
+*/
 
 
 long long date_string_to_time(std::string date)
 {
 	struct tm tm = { 0 }; // Important, initialize all members
 	//int n = 0;
-	int year, mon, day, hour, min, sec;
+	//int year, mon, day, hour, min, sec;
 	std::vector<std::string>  datetime, ddd, ttt;
 	datetime = split(date, 'T');
 	if (datetime.size() < 2)

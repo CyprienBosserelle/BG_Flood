@@ -331,7 +331,7 @@ void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, Ev
 					{
 						atmpi = interp2BUQ(xi, yi, XForcing.Atmp);
 					}
-					zsbnd = zsbnd - (atmpi- XParam.Paref) * XParam.Pa2m;
+					zsbnd = zsbnd - (atmpi- (T)XParam.Paref) * (T)XParam.Pa2m;
 				}
 
 				XEv.zs[n] = utils::max(zsbnd, zb[n]);

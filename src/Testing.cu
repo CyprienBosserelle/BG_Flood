@@ -2177,7 +2177,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
-	T TheoryInput = Q * XParam.endtime;
+	T TheoryInput = Q * (T)XParam.endtime;
 
 
 	T SimulatedVolume = T(0.0);
@@ -3339,8 +3339,8 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
 		{
-			x = XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx;
-			y = XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx;
+			x = float(XForcing.Bathy[0].xo + i * XForcing.Bathy[0].dx);
+			y = float(XForcing.Bathy[0].yo + j * XForcing.Bathy[0].dx);
 			r = sqrt(x * x + y * y);
 			if (r < rs)
 			{
@@ -3374,8 +3374,8 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	{
 		for (int i = 0; i < XForcing.targetadapt[0].nx; i++)
 		{
-			x = XForcing.targetadapt[0].xo + i * XForcing.targetadapt[0].dx;
-			y = XForcing.targetadapt[0].yo + j * XForcing.targetadapt[0].dx;
+			x = float(XForcing.targetadapt[0].xo + i * XForcing.targetadapt[0].dx);
+			y = float(XForcing.targetadapt[0].yo + j * XForcing.targetadapt[0].dx);
 			if (x < 0.0)
 			{
 				XForcing.targetadapt[0].val[i + j * XForcing.targetadapt[0].nx] = -1;

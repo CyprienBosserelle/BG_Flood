@@ -282,8 +282,8 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 			if ((nmask < (XParam.blkwidth * XParam.blkwidth)) && insidepoly)
 			{
 				//
-				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * levdx + T(0.5) * levdx;
-				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * levdx + T(0.5) * levdx;
+				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * (T)levdx + T(0.5) * (T)levdx;
+				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * (T)levdx + T(0.5) * (T)levdx;
 				XBlock.active[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;
@@ -307,25 +307,25 @@ template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForci
 	//====================================
 	// First setp up neighbours
 
-	T levdx = calcres(XParam.dx, XParam.initlevel);
+	double levdx = calcres(XParam.dx, XParam.initlevel);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 
 		int bl = XBlock.active[ibl];
 		//T espdist = std::numeric_limits<T>::epsilon() * (T)100.0; // i.e. distances are calculated within 100x theoretical machine precision
 		// This too theoretical error definition has been modified to allow more flexibility
-		T espdist = levdx/3;
+		T espdist = (T)levdx/3;
 		
 
-		leftxo = XBlock.xo[bl] - ((T)XParam.blkwidth) * levdx;
+		leftxo = XBlock.xo[bl] - ((T)XParam.blkwidth) * (T)levdx;
 
 		leftyo = XBlock.yo[bl];
-		rightxo = XBlock.xo[bl] + ((T)XParam.blkwidth) * levdx;
+		rightxo = XBlock.xo[bl] + ((T)XParam.blkwidth) * (T)levdx;
 		rightyo = XBlock.yo[bl];
 		topxo = XBlock.xo[bl];
-		topyo = XBlock.yo[bl] + ((T)XParam.blkwidth) * levdx;
+		topyo = XBlock.yo[bl] + ((T)XParam.blkwidth) * (T)levdx;
 		botxo = XBlock.xo[bl];
-		botyo = XBlock.yo[bl] - ((T)XParam.blkwidth) * levdx;
+		botyo = XBlock.yo[bl] - ((T)XParam.blkwidth) * (T)levdx;
 
 		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour
 		XBlock.LeftBot[bl] = bl;
@@ -382,12 +382,12 @@ template <class T> int CalcMaskblk(Param XParam, BlockP<T> XBlock)
 	int nmask = 0;
 	bool neighbourmask = false;
 	T leftxo, rightxo, topyo,  botyo;
-	T initlevdx = calcres(XParam.dx, XParam.initlevel);
+	T initlevdx = calcres((T)XParam.dx, XParam.initlevel);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-		T levdx = calcres(XParam.dx, XBlock.level[ib]);
+		T levdx = calcres((T)XParam.dx, XBlock.level[ib]);
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
@@ -449,7 +449,7 @@ template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 		for (int ibl = 0; ibl < XParam.nblk; ibl++)
 		{
 			int ib = XBlock.active[ibl];
-			T levdx = calcres(XParam.dx, XBlock.level[ib]);
+			T levdx = calcres((T)XParam.dx, XBlock.level[ib]);
 
 			leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 

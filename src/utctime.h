@@ -3,7 +3,7 @@
 
 #include "General.h"
 #include "ReadInput.h"
-
+/*
 struct UTCClock
 {
 	typedef std::chrono::microseconds duration;
@@ -30,8 +30,8 @@ struct UTCClock
 	// want to represent UTC DateTime
 	// static time_point now(); 
 };
-
-using UTCTime = std::chrono::time_point<UTCClock, std::chrono::microseconds>;
+*/
+//using UTCTime = std::chrono::time_point<UTCClock, std::chrono::microseconds>;
 
 long long date_string_to_time(std::string date);
 double date_string_to_s(std::string datetime, std::string refdate);

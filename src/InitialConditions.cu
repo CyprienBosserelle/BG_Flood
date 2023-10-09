@@ -222,13 +222,13 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 			ib = XBlock.active[blk];
 			levdx = T(calcres(XParam.dx,XBlock.level[ib]));
 
-			x = XParam.TSnodesout[o].x;
-			y = XParam.TSnodesout[o].y;
+			x = (T)XParam.TSnodesout[o].x;
+			y = (T)XParam.TSnodesout[o].y;
 
 			dxblk = (T)(XParam.blkwidth) * levdx;
 
-			blkxmin = (XParam.xo + XBlock.xo[ib] - 0.5 * levdx);
-			blkymin = (XParam.yo + XBlock.yo[ib] - 0.5 * levdx);
+			blkxmin = ((T)XParam.xo + XBlock.xo[ib] - 0.5 * levdx);
+			blkymin = ((T)XParam.yo + XBlock.yo[ib] - 0.5 * levdx);
 
 			blkxmax = (blkxmin + dxblk);
 			blkymax = (blkymin + dxblk);
