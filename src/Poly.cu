@@ -374,8 +374,8 @@ bool PolygonIntersect(Polygon P, Polygon Q)
 
 			if (intersect)
 			{
-				i = P.vertices.size();
-				j = Q.vertices.size();
+				i = (int)P.vertices.size();
+				j = (int)Q.vertices.size();
 				break;
 			}
 

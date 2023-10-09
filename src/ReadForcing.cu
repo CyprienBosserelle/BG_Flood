@@ -216,7 +216,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile, XParam.reftime);
 
 			//Check the time range of the river forcing
-			nt = XForcing.rivers[Rin].flowinput.size();
+			nt = (int)XForcing.rivers[Rin].flowinput.size();
 			XForcing.rivers[Rin].to = XForcing.rivers[Rin].flowinput[0].time;
 			XForcing.rivers[Rin].tmax = XForcing.rivers[Rin].flowinput[nt-1].time;
 			if ( XForcing.rivers[Rin].tmax < XParam.endtime)
@@ -260,7 +260,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			}
 
 			//Sanity check on the time range of the forcing
-			nt = XForcing.UWind.unidata.size();
+			nt = (int)XForcing.UWind.unidata.size();
 			if (XForcing.UWind.unidata[nt - 1].time < XParam.endtime || XForcing.VWind.unidata[nt - 1].time < XParam.endtime)
 			{
 				XParam.endtime = min(XForcing.UWind.unidata[nt - 1].time, XForcing.VWind.unidata[nt - 1].time);
@@ -309,7 +309,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			InitDynforcing(gpgpu, XParam, XForcing.Atmp);
 			// Deflault is zero wich is terrible so change to Paref so limitwaves generated at the edge of forcing
 			// Users should insure there forcing extend well beyond the intended model extent.
-			XForcing.Atmp.clampedge = XParam.Paref;
+			XForcing.Atmp.clampedge = T(XParam.Paref);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
@@ -819,7 +819,7 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	std::vector<double> WLS,Unest,Vnest;
 	//Define NC file variables
 	int nnx, nny, nt, nbndpts, indxx, indyy, indx, indy,nx, ny;
-	double dx, dy, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
+	double dx, dy, xxo, yyo, tmax,xo,yo;
 	double * ttt, *zsa;
 	bool checkhh = false;
 	int iswet;
@@ -1480,8 +1480,8 @@ template<class T> T readforcinghead(T ForcingParam)
 		}
 		if (ForcingParam.extension.compare("nc") == 0)
 		{
-			int dummy;
-			double dummyb, dummyc;
+			//int dummy;
+			//double dummyb, dummyc;
 			//log("netcdf file");
 
 			//readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);

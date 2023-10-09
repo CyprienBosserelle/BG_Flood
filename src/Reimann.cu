@@ -114,8 +114,8 @@ template <class T> __global__ void UpdateButtingerXGPU(Param XParam, BlockP<T> X
 			vr = vi - dx * dvdxi;
 		}
 		if (hn > eps) {
-			ul = uli + (1. - dx * dhdxil / hn) * dx * dudxil;
-			vl = vli + (1. - dx * dhdxil / hn) * dx * dvdxil;
+			ul = uli + (T(1.0) - dx * dhdxil / hn) * dx * dudxil;
+			vl = vli + (T(1.0) - dx * dhdxil / hn) * dx * dvdxil;
 		}
 		else {
 			ul = uli + dx * dudxil;
@@ -299,16 +299,16 @@ template <class T> __host__ void UpdateButtingerXCPU(Param XParam, BlockP<T> XBl
 					//To avoid high velocities near dry cells, we reconstruct velocities according to Bouchut.
 					T ul, ur, vl, vr, sl, sr;
 					if (hi > eps) {
-						ur = ui - (1. + dx * dhdxi / hi) * dx * dudxi;
-						vr = vi - (1. + dx * dhdxi / hi) * dx * dvdxi;
+						ur = ui - (T(1.0) + dx * dhdxi / hi) * dx * dudxi;
+						vr = vi - (T(1.0) + dx * dhdxi / hi) * dx * dvdxi;
 					}
 					else {
 						ur = ui - dx * dudxi;
 						vr = vi - dx * dvdxi;
 					}
 					if (hn > eps) {
-						ul = uli + (1. - dx * dhdxil / hn) * dx * dudxil;
-						vl = vli + (1. - dx * dhdxil / hn) * dx * dvdxil;
+						ul = uli + (T(1.0) - dx * dhdxil / hn) * dx * dudxil;
+						vl = vli + (T(1.0) - dx * dhdxil / hn) * dx * dvdxil;
 					}
 					else {
 						ul = uli + dx * dudxil;
@@ -680,16 +680,16 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 					//To avoid high velocities near dry cells, we reconstruct velocities according to Bouchut.
 					T ul, ur, vl, vr, sl, sr;
 					if (hi > eps) {
-						ur = ui - (1. + dx * dhdyi / hi) * dx * dudyi;
-						vr = vi - (1. + dx * dhdyi / hi) * dx * dvdyi;
+						ur = ui - (T(1.0) + dx * dhdyi / hi) * dx * dudyi;
+						vr = vi - (T(1.0) + dx * dhdyi / hi) * dx * dvdyi;
 					}
 					else {
 						ur = ui - dx * dudyi;
 						vr = vi - dx * dvdyi;
 					}
 					if (hn > eps) {
-						ul = uli + (1. - dx * dhdyil / hn) * dx * dudyil;
-						vl = vli + (1. - dx * dhdyil / hn) * dx * dvdyil;
+						ul = uli + (T(1.0) - dx * dhdyil / hn) * dx * dudyil;
+						vl = vli + (T(1.0) - dx * dhdyil / hn) * dx * dvdyil;
 					}
 					else {
 						ul = uli + dx * dudyil;
@@ -712,7 +712,7 @@ template <class T> __host__ void UpdateButtingerYCPU(Param XParam, BlockP<T> XBl
 					}
 					
 
-					fv = (fh > 0. ? ul : ur) * fh;
+					fv = (fh > T(0.0) ? ul : ur) * fh;
 
 
 					// Topographic source term
@@ -812,7 +812,7 @@ template <class T> __host__ __device__ T hllc(T g, T delta, T epsi, T CFL, T cm,
 	double a = max(fabs(SL), fabs(SR));
 	if (a > epsi) {
 		dlt = delta * cm / fm;
-		dt = CFL * dlt / a;
+		dt = CFL * dlt / T(a);
 		
 	}
 	else

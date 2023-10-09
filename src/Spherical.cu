@@ -58,12 +58,12 @@ __host__ __device__  T haversin(T Radius, T lon1, T lat1, T lon2, T lat2)
 	phi1 = lat1 * T(pi / 180.0);
 	phi2 = lat2 * T(pi / 180.0);
 
-	T sindphid2 = sin(dphi / 2.0);
-	T sindlbdad2 = sin(dlbda / 2.0);
+	T sindphid2 = sin(dphi / T(2.0));
+	T sindlbdad2 = sin(dlbda / T(2.0));
 	
 	a = sindphid2 * sindphid2 + cos(phi1) * cos(phi2) * sindlbdad2 * sindlbdad2;
 
-	c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+	c = T(2.0) * atan2(sqrt(a), sqrt(T(1.0) - a));
 
 	return Radius * c;
 

@@ -736,7 +736,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 			T dtdef = min(XLoop.dt, XLoop.totaltime - deform[nd].startime);
 			if (XLoop.totaltime > deform[nd].startime + deform[nd].duration)
 			{
-				dtdef = min(XLoop.dt, XLoop.totaltime - (deform[nd].startime + deform[nd].duration));
+				dtdef = (T)min(XLoop.dt, XLoop.totaltime - (deform[nd].startime + deform[nd].duration));
 			}
 				
 

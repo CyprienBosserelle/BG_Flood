@@ -158,7 +158,7 @@ __host__ __device__ T calcres(Param XParam, T dx, int level)
 	
 	if (XParam.spherical)
 	{
-		ddx = ddx * XParam.Radius * pi / T(180.0);
+		ddx = ddx * T(XParam.Radius * pi / 180.0);
 	}
 		
 	return ddx;

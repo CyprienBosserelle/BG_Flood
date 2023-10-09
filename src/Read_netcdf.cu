@@ -182,7 +182,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 		double * ytempvar;
 		ytempvar = (double *)malloc(ny*sizeof(double));
 		size_t start[] = { 0 };
-		size_t count[] = { ny };
+		size_t count[] = { (size_t)ny };
 		status = nc_get_vara_double(ncid, varid, start, count, ytempvar);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -200,7 +200,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 	else
 	{
 		size_t start[] = { 0, 0 };
-		size_t count[] = { ny, nx };
+		size_t count[] = { (size_t)ny, (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, ycoord);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -220,7 +220,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 		double * xtempvar;
 		xtempvar = (double *)malloc(nx*sizeof(double));
 		size_t start[] = { 0 };
-		size_t count[] = { nx };
+		size_t count[] = { (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, xtempvar);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -238,7 +238,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 	else
 	{
 		size_t start[] = { 0, 0 };
-		size_t count[] = { ny, nx };
+		size_t count[] = { (size_t)ny, (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, xcoord);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -276,8 +276,8 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 		//allocate temporary array and read time vector
 		double * ttempvar;
 		ttempvar = (double *)malloc(nt * sizeof(double));
-		size_t start[] = { 0 };
-		size_t count[] = { nt };
+		//size_t start[] = { 0 };
+		//size_t count[] = { (size_t)nt };
 		//status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
 		status = readnctime2(ncid, reftime, nt, ttempvar);
 
@@ -332,7 +332,7 @@ void readgridncsize(forcingmap& Fmap, Param XParam)
 template<class T> void readgridncsize(T& Imap)
 {
 	double a, b, c;
-	int duma, dumb, dumc;
+	int duma;
 	readgridncsize(Imap.inputfile, Imap.varname, "2000-01-01T00:00:00", Imap.nx, Imap.ny, duma, Imap.dx, Imap.dy, a, Imap.xo, Imap.yo, b, Imap.xmax, Imap.ymax, c, Imap.flipxx, Imap.flipyy);
 }
 template void readgridncsize<inputmap>(inputmap &Imap);
@@ -634,7 +634,7 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 	if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 	{
-		zsa[0] = zsa[0] * scalefac + offset;
+		zsa[0] = zsa[0] * (T)scalefac + (T)offset;
 	}
 
 	if (checkhh)
@@ -679,17 +679,17 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 			if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 			{
-				zsa[0] = zsa[0] * scalefac + offset;
+				zsa[0] = zsa[0] * (T)scalefac + (T)offset;
 			}
 
 			hha = zsa[0];
 			if (hha > eps)
 			{
-				zsa[0] = zza;
+				zsa[0] = T(zza);
 			}
 			else
 			{
-				zsa[0] = 0.0;
+				zsa[0] = T(0.0);
 				wet = 0;
 			}
 			
@@ -961,9 +961,9 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
 	//size_t countlv[]={1,1,netav,nxiv};
-	size_t startl[] = { steptoread, 0, 0 };
-	size_t countlu[] = { 1, WNDUmap.ny, WNDUmap.nx };
-	size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
+	size_t startl[] = { (size_t)steptoread, 0, 0 };
+	size_t countlu[] = { 1, (size_t)WNDUmap.ny, (size_t)WNDUmap.nx };
+	size_t countlv[] = { 1, (size_t)WNDVmap.ny, (size_t)WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};
 	//static ptrdiff_t stridel[] = { 1, 1, 1 };
@@ -1052,8 +1052,8 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
 	//size_t countlv[]={1,1,netav,nxiv};
-	size_t startl[] = { steptoread, 0, 0 };
-	size_t countlu[] = { 1, ATMPmap.ny, ATMPmap.nx };
+	size_t startl[] = { (size_t)steptoread, 0, 0 };
+	size_t countlu[] = { 1, (size_t)ATMPmap.ny, (size_t)ATMPmap.nx };
 	//size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};

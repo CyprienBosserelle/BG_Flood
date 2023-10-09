@@ -325,11 +325,11 @@ void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, Ev
 
 					if (XForcing.Atmp.uniform)
 					{
-						atmpi = T(XForcing.Atmp.nowvalue);
+						atmpi = float(XForcing.Atmp.nowvalue);
 					}
 					else
 					{
-						atmpi = interp2BUQ(xi, yi, XForcing.Atmp);
+						atmpi = float(interp2BUQ(xi, yi, XForcing.Atmp));
 					}
 					zsbnd = zsbnd - (atmpi- (T)XParam.Paref) * (T)XParam.Pa2m;
 				}

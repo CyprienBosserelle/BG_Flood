@@ -1182,7 +1182,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	XForcing.bot.isright = 0;
 	XForcing.bot.istop = -1;
 
-	XForcing.Atmp.clampedge = XParam.Paref;
+	XForcing.Atmp.clampedge = float(XParam.Paref);
 
 	if (!XForcing.Atmp.inputfile.empty())
 	{
@@ -1484,7 +1484,7 @@ std::vector<std::string> split(const std::string s, const std::string delim)
 		
 		if (ide < (rem.length() - delim.length()))
 		{
-			loc = ide + delim.length();
+			loc = int(ide + delim.length());
 			rem = rem.substr(loc);
 		}
 	}

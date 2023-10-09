@@ -227,8 +227,8 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 
 			dxblk = (T)(XParam.blkwidth) * levdx;
 
-			blkxmin = ((T)XParam.xo + XBlock.xo[ib] - 0.5 * levdx);
-			blkymin = ((T)XParam.yo + XBlock.yo[ib] - 0.5 * levdx);
+			blkxmin = ((T)XParam.xo + XBlock.xo[ib] - T(0.5) * levdx);
+			blkymin = ((T)XParam.yo + XBlock.yo[ib] - T(0.5) * levdx);
 
 			blkxmax = (blkxmin + dxblk);
 			blkymax = (blkymin + dxblk);
@@ -639,7 +639,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 	std::vector<int> cornerblk; //index of the blocks at the corner of the zone 
 	outzoneP Xzone; //info on outzone given by the user
 	outzoneB XzoneB; //info on outzone computed and used actually for writing nc files
-	double eps;
+	//double eps;
 
 	// Find the blocks to output and the corners of this area for each zone
 	for (int o = 0; o < XParam.outzone.size(); o++)
