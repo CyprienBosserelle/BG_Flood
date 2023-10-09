@@ -1008,7 +1008,7 @@ extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* y
 
 	status = nc_put_vara_double(ncid, tvar_id, start, count, var);
 	status = nc_close(ncid);
-	if (status != NC_NOERR) handle_ncerror(status);
+	//if (status != NC_NOERR) handle_ncerror(status);
 
 }
 
