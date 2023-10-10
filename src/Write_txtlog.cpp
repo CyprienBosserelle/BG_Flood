@@ -211,3 +211,200 @@ void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 	write_text_to_log_file("rho = " + std::to_string(XParam.rho) + ";");
 	write_text_to_log_file("\n");
 }
+
+
+
+void saveparam2netCDF(int ncid, int bgfid, Param XParam)
+{
+	int status, boolanswer;
+	//status = nc_put_att_text(ncid, bgfid, "grid_mapping_name", crsname.size(), crsname.c_str());
+	//status = nc_put_att_float(ncid, bgfid, "longitude_of_prime_meridian", NC_FLOAT, 1, &primemeridian);
+
+	status = nc_put_att_int(ncid, bgfid, "test", NC_INT, 1, &XParam.test);
+	status = nc_put_att_double(ncid, bgfid, "g", NC_DOUBLE, 1, &XParam.g);
+	status = nc_put_att_double(ncid, bgfid, "rho", NC_DOUBLE, 1, &XParam.rho);
+	status = nc_put_att_double(ncid, bgfid, "eps", NC_DOUBLE, 1, &XParam.eps);
+	status = nc_put_att_double(ncid, bgfid, "CFL", NC_DOUBLE, 1, &XParam.CFL);
+	status = nc_put_att_double(ncid, bgfid, "theta", NC_DOUBLE, 1, &XParam.theta);
+	status = nc_put_att_double(ncid, bgfid, "VelThreshold", NC_DOUBLE, 1, &XParam.VelThreshold);
+
+	status = nc_put_att_int(ncid, bgfid, "frictionmodel", NC_INT, 1, &XParam.frictionmodel);
+	
+	status = nc_put_att_double(ncid, bgfid, "Cd", NC_DOUBLE, 1, &XParam.Cd);
+	status = nc_put_att_double(ncid, bgfid, "Pa2m", NC_DOUBLE, 1, &XParam.Pa2m);
+	status = nc_put_att_double(ncid, bgfid, "Paref", NC_DOUBLE, 1, &XParam.Paref);
+	status = nc_put_att_double(ncid, bgfid, "lat", NC_DOUBLE, 1, &XParam.lat);
+
+	boolanswer = XParam.windforcing;
+	status = nc_put_att_int(ncid, bgfid, "windforcing", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.atmpforcing;
+	status = nc_put_att_int(ncid, bgfid, "atmpforcing", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.rainforcing;
+	status = nc_put_att_int(ncid, bgfid, "rainforcing", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.infiltration;
+	status = nc_put_att_int(ncid, bgfid, "infiltration", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.conserveElevation;
+	status = nc_put_att_int(ncid, bgfid, "conserveElevation", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.wetdryfix;
+	status = nc_put_att_int(ncid, bgfid, "wetdryfix", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.leftbnd;
+	status = nc_put_att_int(ncid, bgfid, "leftbnd", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.rightbnd;
+	status = nc_put_att_int(ncid, bgfid, "rightbnd", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.topbnd;
+	status = nc_put_att_int(ncid, bgfid, "topbnd", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.botbnd;
+	status = nc_put_att_int(ncid, bgfid, "botbnd", NC_INT, 1, &boolanswer);
+
+
+
+
+	
+	double cf = 0.0001; // Bottom friction coefficient for flow model (if constant)
+	
+	
+	status = nc_put_att_int(ncid, bgfid, "GPUDEVICE", NC_INT, 1, &XParam.GPUDEVICE);
+
+	status = nc_put_att_int(ncid, bgfid, "doubleprecision", NC_INT, 1, &XParam.doubleprecision);
+
+	status = nc_put_att_int(ncid, bgfid, "engine", NC_INT, 1, &XParam.engine);
+	
+	status = nc_put_att_double(ncid, bgfid, "dx", NC_DOUBLE, 1, &XParam.dx);
+	status = nc_put_att_double(ncid, bgfid, "delta", NC_DOUBLE, 1, &XParam.delta);
+
+	status = nc_put_att_double(ncid, bgfid, "xo", NC_DOUBLE, 1, &XParam.xo);
+	status = nc_put_att_double(ncid, bgfid, "yo", NC_DOUBLE, 1, &XParam.yo);
+	status = nc_put_att_double(ncid, bgfid, "xmax", NC_DOUBLE, 1, &XParam.xmax);
+	status = nc_put_att_double(ncid, bgfid, "ymax", NC_DOUBLE, 1, &XParam.ymax);
+
+	status = nc_put_att_double(ncid, bgfid, "grdalpha", NC_DOUBLE, 1, &XParam.grdalpha);
+
+	status = nc_put_att_int(ncid, bgfid, "nx", NC_INT, 1, &XParam.nx);
+	status = nc_put_att_int(ncid, bgfid, "ny", NC_INT, 1, &XParam.ny);
+	status = nc_put_att_int(ncid, bgfid, "nblk", NC_INT, 1, &XParam.nblk);
+
+	status = nc_put_att_int(ncid, bgfid, "blkwidth", NC_INT, 1, &XParam.blkwidth);
+	status = nc_put_att_int(ncid, bgfid, "blkmemwidth", NC_INT, 1, &XParam.blkmemwidth);
+	status = nc_put_att_int(ncid, bgfid, "blksize", NC_INT, 1, &XParam.blksize);
+	status = nc_put_att_int(ncid, bgfid, "halowidth", NC_INT, 1, &XParam.halowidth);
+	status = nc_put_att_int(ncid, bgfid, "posdown", NC_INT, 1, &XParam.posdown);
+	
+	boolanswer = XParam.spherical;
+	status = nc_put_att_int(ncid, bgfid, "spherical", NC_INT, 1, &boolanswer);
+	status = nc_put_att_double(ncid, bgfid, "Radius", NC_DOUBLE, 1, &XParam.Radius);
+	status = nc_put_att_double(ncid, bgfid, "mask", NC_DOUBLE, 1, &XParam.mask);
+
+	status = nc_put_att_int(ncid, bgfid, "initlevel", NC_INT, 1, &XParam.initlevel);
+	status = nc_put_att_int(ncid, bgfid, "maxlevel", NC_INT, 1, &XParam.maxlevel);
+	status = nc_put_att_int(ncid, bgfid, "minlevel", NC_INT, 1, &XParam.minlevel);
+	status = nc_put_att_int(ncid, bgfid, "nblkmem", NC_INT, 1, &XParam.nblkmem);
+	status = nc_put_att_int(ncid, bgfid, "navailblk", NC_INT, 1, &XParam.navailblk);
+	status = nc_put_att_double(ncid, bgfid, "membuffer", NC_DOUBLE, 1, &XParam.membuffer);
+	
+	status = nc_put_att_double(ncid, bgfid, "outputtimestep", NC_DOUBLE, 1, &XParam.outputtimestep);
+	status = nc_put_att_double(ncid, bgfid, "endtime", NC_DOUBLE, 1, &XParam.endtime);
+	status = nc_put_att_double(ncid, bgfid, "totaltime", NC_DOUBLE, 1, &XParam.totaltime);
+	status = nc_put_att_double(ncid, bgfid, "dtinit", NC_DOUBLE, 1, &XParam.dtinit);
+	status = nc_put_att_double(ncid, bgfid, "dtmin", NC_DOUBLE, 1, &XParam.dtmin);
+
+	status = nc_put_att_double(ncid, bgfid, "zsinit", NC_DOUBLE, 1, &XParam.zsinit);
+	status = nc_put_att_double(ncid, bgfid, "zsoffset", NC_DOUBLE, 1, &XParam.zsoffset);
+
+	status = nc_put_att_text(ncid, bgfid, "hotstartfile", XParam.hotstartfile.size(), XParam.hotstartfile.c_str());
+	status = nc_put_att_int(ncid, bgfid, "hotstep", NC_INT, 1, &XParam.hotstep);
+
+	status = nc_put_att_double(ncid, bgfid, "wet_threshold ", NC_DOUBLE, 1, &XParam.wet_threshold);
+
+	status = nc_put_att_int(ncid, bgfid, "maxTSstorage", NC_INT, 1, &XParam.maxTSstorage);
+
+	boolanswer = XParam.resetmax;
+	status = nc_put_att_int(ncid, bgfid, "resetmax", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.outmax;
+	status = nc_put_att_int(ncid, bgfid, "outmax", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.outmean;
+	status = nc_put_att_int(ncid, bgfid, "outmean", NC_INT, 1, &boolanswer);
+
+	boolanswer = XParam.outtwet;
+	status = nc_put_att_int(ncid, bgfid, "outtwet", NC_INT, 1, &boolanswer);
+
+	status = nc_put_att_int(ncid, bgfid, "outishift", NC_INT, 1, &XParam.outishift);
+
+	status = nc_put_att_int(ncid, bgfid, "outjshift", NC_INT, 1, &XParam.outjshift);
+
+	status = nc_put_att_int(ncid, bgfid, "nrivers", NC_INT, 1, &XParam.nrivers);
+
+	status = nc_put_att_int(ncid, bgfid, "nblkriver", NC_INT, 1, &XParam.nblkriver);
+
+	status = nc_put_att_int(ncid, bgfid, "nbndblkleft", NC_INT, 1, &XParam.nbndblkleft);
+	status = nc_put_att_int(ncid, bgfid, "nbndblkright", NC_INT, 1, &XParam.nbndblkright);
+	status = nc_put_att_int(ncid, bgfid, "nbndblktop", NC_INT, 1, &XParam.nbndblktop);
+	status = nc_put_att_int(ncid, bgfid, "nbndblkbot", NC_INT, 1, &XParam.nbndblkbot);
+
+	status = nc_put_att_int(ncid, bgfid, "nmaskblk", NC_INT, 1, &XParam.nmaskblk);
+
+	status = nc_put_att_int(ncid, bgfid, "smallnc", NC_INT, 1, &XParam.smallnc);
+
+	status = nc_put_att_float(ncid, bgfid, "scalefactor", NC_FLOAT, 1, &XParam.scalefactor);
+
+	status = nc_put_att_float(ncid, bgfid, "addoffset", NC_FLOAT, 1, &XParam.addoffset);
+
+	status = nc_put_att_double(ncid, bgfid, "deformmaxtime", NC_DOUBLE, 1, &XParam.deformmaxtime);
+
+	boolanswer = XParam.rainbnd;
+	status = nc_put_att_int(ncid, bgfid, "rainbnd", NC_INT, 1, &boolanswer);
+
+	status = nc_put_att_text(ncid, bgfid, "AdaptCrit", XParam.AdaptCrit.size(), XParam.AdaptCrit.c_str());
+
+	status = nc_put_att_text(ncid, bgfid, "Adapt_arg1", XParam.Adapt_arg1.size(), XParam.Adapt_arg1.c_str());
+	status = nc_put_att_text(ncid, bgfid, "Adapt_arg2", XParam.Adapt_arg2.size(), XParam.Adapt_arg2.c_str());
+	status = nc_put_att_text(ncid, bgfid, "Adapt_arg3", XParam.Adapt_arg3.size(), XParam.Adapt_arg3.c_str());
+	status = nc_put_att_text(ncid, bgfid, "Adapt_arg4", XParam.Adapt_arg4.size(), XParam.Adapt_arg4.c_str());
+	status = nc_put_att_text(ncid, bgfid, "Adapt_arg5", XParam.Adapt_arg5.size(), XParam.Adapt_arg5.c_str());
+
+	status = nc_put_att_int(ncid, bgfid, "adaptmaxiteration", NC_INT, 1, &XParam.adaptmaxiteration);
+
+	status = nc_put_att_text(ncid, bgfid, "reftime", XParam.reftime.size(), XParam.reftime.c_str());
+
+	/*
+	
+	std::vector<TSoutnode> TSnodesout;
+	
+
+	std::string outfile = "Output.nc"; // netcdf output file name
+	std::vector<std::string> outvars;
+	//List of names of the variables to output (for 2D maps)
+	//Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
+	//Default: "zb", "zs", "u", "v", "h"
+	
+	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
+
+	std::vector<outzoneP> outzone;
+	
+	// deformation forcing for tsunami generation
+	//std::vector<deformmap> deform;
+	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
+	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be null.
+
+	// This here should be stored in a structure at a later stage
+
+	std::string AdaptCrit;
+	int* AdaptCrit_funct_pointer;
+
+	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
+	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
+
+	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
+	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
+	*/
+}
