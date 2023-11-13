@@ -74,7 +74,7 @@ void create_logfile()
 
 
 	log("#################################");
-	log("BG_Flood v0.8");
+	log("BG_Flood v0.9");
 	log("#################################");
 	//log("model started at " + ss.str());
 	log("#################################");
