@@ -748,10 +748,10 @@ template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqvy[inside] = T(0.0);
+				Flux.Fqvy[i] = T(0.0);
 				//Flux.Fqux[i] = T(0.0);
 
-				Flux.Fhv[inside] = T(0.0);
+				Flux.Fhv[i] = T(0.0);
 				
 
 
@@ -863,10 +863,10 @@ template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> X
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqux[inside] = T(0.0);
+				Flux.Fqux[i] = T(0.0);
 				//Flux.Fqux[i] = T(0.0);
 
-				Flux.Fhu[inside] = T(0.0);
+				Flux.Fhu[i] = T(0.0);
 
 				
 

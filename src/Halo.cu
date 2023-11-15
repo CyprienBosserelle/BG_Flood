@@ -708,7 +708,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 	fillHaloBotTopGPUnew(XParam, XBlock, streams[6], Flux.Fhv);
 	fillHaloBotTopGPUnew(XParam, XBlock, streams[7], Flux.Sv);
 
-	/*
+	
 	for (int i = 0; i < num_streams; i++)
 	{
 		cudaStreamSynchronize(streams[i]);
@@ -723,7 +723,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 
 		//CUDA_CHECK(cudaDeviceSynchronize());
 	}
-	*/
+	
 	for (int i = 0; i < num_streams; i++)
 	{
 		cudaStreamDestroy(streams[i]);
