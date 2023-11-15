@@ -20,6 +20,11 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
 template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
 
+template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
+template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
+template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
+template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
+
 template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut);
 template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, T* zs, T* h, T* un, T* ut);
 

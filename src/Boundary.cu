@@ -398,7 +398,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
+				hnew = Xev.h[i];
 				zbnew = zb[i];
 
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -432,7 +432,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
+				hnew = Xev.h[i];
 				zbnew = zb[i];
 
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -466,7 +466,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
+				hnew = Xev.h[i];
 				zbnew = zb[i];
 
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -501,7 +501,7 @@ template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, Evolvin
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
-				hnew = Xev.zs[i];
+				hnew = Xev.h[i];
 				zbnew = zb[i];
 
 				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
@@ -537,6 +537,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 		int isright, istop;
 
 		T zsinside, zsnew, hnew, vnew, unew, zbnew;
+		T hinside;
 
 		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
 
@@ -562,6 +563,8 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 
 
 				zsinside = Xev.zs[inside];
+				hinside = Xev.h[inside];
+
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
@@ -569,7 +572,8 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 				zbnew = zb[i];
 
 
-				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				//halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				//noslipbnd(zsinside, hinside, unew, vnew, zsnew, hnew);
 
 
 				Xev.u[i] = unew;
@@ -588,6 +592,64 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 template __global__ void maskbndGPUleft<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+//For the GPU version we apply 4 separate global function in the hope to increase occupancy
+template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = XParam.blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
+	{
+		int ix, iy;
+
+		int isright, istop;
+
+		//T zsinside, zsnew, hnew, vnew, unew, zbnew;
+		//T hinside;
+
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		//leftside
+		if (isleftbot | islefttop)//?
+		{
+			isright = -1;
+			istop = 0;
+
+			ix = -1;
+			iy = threadIdx.x;
+			int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
+			int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+			if (iy >= yst && iy < ynd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+				Flux.Fqux[inside] = T(0.0);
+				//Flux.Fqux[i] = T(0.0);
+
+				Flux.Fhu[inside] = T(0.0);
+
+				//Flux.Fhu[i] = T(0.0);
+
+				
+
+
+			}
+
+		}
+	}
+
+}
+template __global__ void maskbndGPUFluxleft<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxleft<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+
+
 template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -601,7 +663,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 		int isright, istop;
 
 		T zsinside, zsnew, hnew, vnew, unew, zbnew;
-
+		T hinside;
 		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
 
 		int ib = XBlock.mask.blks[ibl];
@@ -626,14 +688,15 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 
 
 				zsinside = Xev.zs[inside];
+				hinside = Xev.h[inside];
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
 				hnew = Xev.h[i];
 				zbnew = zb[i];
 
-				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
-
+				//halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				//noslipbnd(zsinside, hinside, vnew, unew, zsnew, hnew);
 
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
@@ -649,6 +712,56 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 template __global__ void maskbndGPUtop<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUtop<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = XParam.blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
+	{
+		int ix, iy;
+
+		int isright, istop;
+
+		////T zsinside, zsnew, hnew, vnew, unew, zbnew;
+		T hinside;
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		if (istopleft | istopright)//?
+		{
+			isright = 0;
+			istop = 1;
+
+			iy = XParam.blkwidth;
+			ix = threadIdx.x;
+
+			int xst = istopleft ? 0 : XParam.blkwidth * 0.5;
+			int xnd = istopright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+			if (ix >= xst && ix < xnd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+				Flux.Fqvy[inside] = T(0.0);
+				//Flux.Fqux[i] = T(0.0);
+
+				Flux.Fhv[inside] = T(0.0);
+				
+
+
+			}
+		}
+	}
+}
+template __global__ void maskbndGPUFluxtop<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxtop<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+
 template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -662,7 +775,7 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 		int isright, istop;
 
 		T zsinside, zsnew, hnew, vnew, unew, zbnew;
-
+		T hinside;
 		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
 
 		int ib = XBlock.mask.blks[ibl];
@@ -688,14 +801,15 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 
 
 				zsinside = Xev.zs[inside];
+				hinside = Xev.h[inside];
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
 				hnew = Xev.h[i];
 				zbnew = zb[i];
 
-				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
-
+				//halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				//noslipbnd(zsinside, hinside, unew, vnew, zsnew, hnew);
 
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
@@ -711,6 +825,58 @@ template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBloc
 template __global__ void maskbndGPUright<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUright<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+
+template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = XParam.blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
+	{
+		int ix, iy;
+
+		int isright, istop;
+
+		//T zsinside, zsnew, hnew, vnew, unew, zbnew;
+		//T hinside;
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		if (isrighttop | isrightbot)//?
+		{
+			isright = 1;
+			istop = 0;
+
+			ix = XParam.blkwidth;
+
+			iy = threadIdx.x;
+
+			int yst = isrightbot ? 0 : XParam.blkwidth * 0.5;
+			int ynd = isrighttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+			if (iy >= yst && iy < ynd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+				Flux.Fqux[inside] = T(0.0);
+				//Flux.Fqux[i] = T(0.0);
+
+				Flux.Fhu[inside] = T(0.0);
+
+				
+
+			}
+		}
+	}
+}
+template __global__ void maskbndGPUFluxright<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxright<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+
 template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -724,7 +890,7 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 		int isright, istop;
 
 		T zsinside, zsnew, hnew, vnew, unew, zbnew;
-
+		T hinside;
 		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
 
 		int ib = XBlock.mask.blks[ibl];
@@ -750,13 +916,16 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 
 
 				zsinside = Xev.zs[inside];
+				hinside = Xev.h[inside];
+
 				unew = Xev.u[i];
 				vnew = Xev.v[i];
 				zsnew = Xev.zs[i];
 				hnew = Xev.h[i];
 				zbnew = zb[i];
 
-				halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				//halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+				//noslipbnd(zsinside, hinside, vnew, unew, zsnew, hnew);
 
 				Xev.u[i] = unew;
 				Xev.v[i] = vnew;
