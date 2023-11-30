@@ -256,6 +256,11 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		result = timetest ? "successful" : "failed";
 		log("\t\tCalendar time test : " + result);
 	}
+
+		if (mytest == 993)
+		{
+			TestAIObnd(XParam, XModel, XModel_g);
+		}
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -274,6 +279,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			TestGradientSpeed(XParam, XModel, XModel_g);
 
 		}
+		
 		if (mytest == 998)
 		{
 			//
@@ -4293,6 +4299,184 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 
 	
 
+}
+
+
+template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	Forcing<float> XForcing;
+
+	XForcing = MakValleyBathy(XParam, T(0.4), true, true);
+
+	XParam.conserveElevation = true;
+
+	float maxtopo = std::numeric_limits<float>::min();
+	float mintopo = std::numeric_limits<float>::max();
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			maxtopo = max(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], maxtopo);
+			mintopo = min(XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx], mintopo);
+		}
+	}
+
+	// Overrule whatever may be set in the param file
+	XParam.xmax = XForcing.Bathy[0].xmax;
+	XParam.ymax = XForcing.Bathy[0].ymax;
+	XParam.xo = XForcing.Bathy[0].xo;
+	XParam.yo = XForcing.Bathy[0].yo;
+
+	XParam.dx = XForcing.Bathy[0].dx;
+
+	XParam.zsinit = mintopo + 6.9;// Had a water level so that the wet and dry affects the 
+	XParam.endtime = 20.0;
+
+	XParam.dtmin = 0.00000001;
+
+	XParam.outputtimestep = XParam.endtime;
+	
+	std::ofstream aoi_file(
+		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
+	aoi_file << "5.0 3.0" << std::endl;
+	aoi_file << "27.0 3.0" << std::endl;
+	aoi_file << "27.0 27.0"<< std::endl;
+	aoi_file << "5.0 27.0" << std::endl;
+	aoi_file << "5.0 3.0" << std::endl;
+	aoi_file.close(); //destructor implicitly does it
+	
+	/*
+	std::ofstream aoi_file(
+		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
+	aoi_file << "-5.0 -3.0" << std::endl;
+	aoi_file << "27.0 -3.0" << std::endl;
+	aoi_file << "27.0 270.0" << std::endl;
+	aoi_file << "-5.0 270.0" << std::endl;
+	aoi_file << "-5.0 -3.0" << std::endl;
+	aoi_file.close(); //destructor implicitly does it
+	*/
+	XForcing.AOI.file = "testaoi.tmp";
+	XForcing.AOI.active = true;
+	XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
+
+	
+	XParam.minlevel = 3;
+	XParam.maxlevel = 3;
+	XParam.initlevel = 3;
+	/*
+	// coarse to fine
+	// Change arg 1 and 2 if the slope is changed
+	XParam.AdaptCrit = "Targetlevel";
+	XParam.Adapt_arg1 = "";
+	XParam.Adapt_arg2 = "";
+	XParam.Adapt_arg3 = "";
+	
+	StaticForcingP<int> targetlevel;
+	XForcing.targetadapt.push_back(targetlevel);
+
+	XForcing.targetadapt[0].xo = 0.0;
+	XForcing.targetadapt[0].yo = 0.0;
+
+	XForcing.targetadapt[0].xmax = 31.0;
+	XForcing.targetadapt[0].ymax = 31.0;
+	XForcing.targetadapt[0].nx = 32;
+	XForcing.targetadapt[0].ny = 32;
+
+	XForcing.targetadapt[0].dx = 1.0;
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.targetadapt[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			XForcing.targetadapt[0].val[i + j * XForcing.Bathy[0].nx] = 1;
+		}
+	}
+
+	XForcing.targetadapt[0].val[12 + 12 * XForcing.Bathy[0].nx] = 2;
+	*/
+	// Add rain forcing
+	//Create a temporary file with river fluxes
+	float Q = 1;
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = 10;
+	thisriver.xend = 12;
+	thisriver.ystart = 10;
+	thisriver.yend =12;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
+
+
+	// Setup Model(s)
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+	T initVol = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				initVol = initVol + XModel.evolv.h[i] * delta * delta;
+			}
+		}
+	}
+
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	T TheoryInput = Q * XParam.endtime;
+	
+
+	T SimulatedVolume = T(0.0);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		T delta = calcres(XParam.delta, XModel.blocks.level[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth); ix++)
+			{
+				int i = memloc(XParam, ix, iy, ib);
+				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
+				
+			}
+		}
+	}
+
+	SimulatedVolume = SimulatedVolume - initVol;
+
+	T error = abs(SimulatedVolume - TheoryInput);
+
+	int modelgood = error / TheoryInput < 0.05;
+
+	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput)*100);
+
+	//log("#####");
+	return modelgood;
 }
 
 

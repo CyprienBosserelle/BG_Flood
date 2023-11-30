@@ -719,7 +719,7 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 		maskbndGPUFluxleft << <gridDim, blockDimHalo, 0, streams[0] >> > (XParam, XBlock, Flux);
 		maskbndGPUFluxtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Flux);
 		maskbndGPUFluxright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Flux);
-		maskbndGPUFluxtop << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Flux);
+		maskbndGPUFluxbot << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Flux);
 
 		//CUDA_CHECK(cudaDeviceSynchronize());
 	}

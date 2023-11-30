@@ -630,7 +630,7 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqux[inside] = T(0.0);
+				Flux.Fqux[i] = Flux.Su[inside];
 				//Flux.Fqux[i] = T(0.0);
 
 				Flux.Fhu[inside] = T(0.0);
@@ -748,7 +748,7 @@ template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqvy[i] = T(0.0);
+				Flux.Fqvy[inside] = Flux.Sv[i];
 				//Flux.Fqux[i] = T(0.0);
 
 				Flux.Fhv[i] = T(0.0);
@@ -863,9 +863,9 @@ template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> X
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqux[i] = T(0.0);
+				Flux.Fqux[inside] = Flux.Su[i];
 				//Flux.Fqux[i] = T(0.0);
-
+				//Flux.Fquy[i] = T(0.0);
 				Flux.Fhu[i] = T(0.0);
 
 				
@@ -940,6 +940,60 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 }
 template __global__ void maskbndGPUbot<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUbot<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
+template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = XParam.blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ibl = blockIdx.x;
+	if (ibl < XBlock.mask.nblk)
+	{
+		int ix, iy;
+
+		int isright, istop;
+
+		T zsinside, zsnew, hnew, vnew, unew, zbnew;
+		T hinside;
+		bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+		int ib = XBlock.mask.blks[ibl];
+		//
+		findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+		if (isbotright | isbotleft)//?
+		{
+			isright = 0;
+			istop = -1;
+
+
+			iy = -1;
+			ix = threadIdx.x;
+			int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
+			int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+
+			if (ix >= xst && ix < xnd)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+
+
+				Flux.Sv[inside] = Flux.Fqvy[i];
+				//Flux.Fqux[i] = T(0.0);
+
+				Flux.Fhv[inside] = T(0.0);
+
+				//Flux.Fhu[i] = T(0.0);
+
+			}
+
+		}
+	}
+}
+template __global__ void maskbndGPUFluxbot<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxbot<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
 __device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop, bool& istopleft, bool& istopright, bool& isrighttop, bool& isrightbot, bool& isbotright, bool& isbotleft)
 {
