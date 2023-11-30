@@ -257,9 +257,13 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t\tCalendar time test : " + result);
 	}
 
-		if (mytest == 993)
+		if (mytest == 13)
 		{
-			TestAIObnd(XParam, XModel, XModel_g);
+			bool wallbnd;
+			log("\t###AOI bnd wall test ###");
+			wallbnd=TestAIObnd(XParam, XModel, XModel_g);
+			result = wallbnd ? "successful" : "failed";
+			log("\t\tAOI bnd wall test : " + result);
 		}
 		if (mytest == 994)
 		{
