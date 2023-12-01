@@ -1056,19 +1056,25 @@ template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinsi
 	h = hinside;
 }
 
-template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd, T unbnd, T& un, T& ut, T& zs, T& h)
+template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime, T zsbnd, T zsinside, T hinside, T utbnd, T& qmean, T& q)
 {
 	//Absorbing 1D boundary
 	//When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
 	// For utbnd use utinside if no utbnd are known 
+
+	qmean = factime * q + T(0.99) * (T(1.0) - factime) * qmean;
+
+	T un;
 	T q=0.0;
 
 	un = sign * sqrt(g / h) * (T(2.0)*(zs - zsbnd) - (zsinside - zsbnd));
-	zs = zsinside;
-	ut = T(utbnd);//ut[inside];
+	//zs = zsinside;
+	//ut = T(utbnd);//ut[inside];
 	h = hinside;
 
 	q = un*h+qmean
+
+
 }
 
 template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h)
