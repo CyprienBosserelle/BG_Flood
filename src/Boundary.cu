@@ -78,6 +78,210 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, BlockP<T> XBlock, 
 template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv);
 template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv);
 
+template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux)
+{
+	dim3 blockDim(XParam.blkwidth, 1, 1);
+	dim3 gridDimBBND(side.nblk, 1, 1);
+
+	T* un, * ut, *Fh, *Fq, *S;
+
+
+	double itime = 0.0;
+	if (side.on)
+	{
+		int SLstepinbnd = 1;
+
+		double difft = side.data[SLstepinbnd].time - totaltime;
+		while (difft < 0.0)
+		{
+			SLstepinbnd++;
+			difft = side.data[SLstepinbnd].time - totaltime;
+		}
+
+		itime = SLstepinbnd - 1.0 + (totaltime - side.data[SLstepinbnd - 1].time) / (side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time);
+
+	}
+
+
+	if (side.isright == 0)
+	{
+		//top or bottom
+		un = XEv.v; //u normal to boundary
+		ut = XEv.u; //u tangent to boundary
+	}
+	else
+	{
+		un = XEv.u;
+		ut = XEv.v;
+	}
+
+	if (side.isright == 0) // top or bottom
+	{
+		Fh =  XFlux.Fhv;
+		Fq =  XFlux.Fqvy;
+		S = XFlux.Sv;
+	}
+	else
+	{
+		Fh = XFlux.Fhu;
+		Fq = XFlux.Fqux;
+		S = XFlux.Su;
+	}
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		bndFluxGPU <<< gridDimBBND, blockDim, 0 >>> (XParam, side, XBlock, Atmp, float(itime), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		//bndFluxCPU(XParam, side, XBlock, zsbndleft, uubndleft, vvbndleft, Atmp, XEv.zs, XEv.h, un, ut);
+	}
+}
+template void FlowbndFlux<float>(Param XParam,  double totaltime, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
+template void FlowbndFlux<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
+
+template <class T> __global__ void bndFluxGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
+{
+	//
+
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	unsigned int ibl = blockIdx.x;
+	unsigned int ix, iy;
+	float itx;
+
+	int ib = side.blks_g[ibl];
+	int lev = XBlock.level[ib];
+
+
+	T delta = calcres(T(XParam.dx), lev);
+
+	if (side.isright == 0)
+	{
+		ix = threadIdx.x;
+		iy = side.istop < 0 ? 0 : (blockDim.x);
+		//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+	}
+	else
+	{
+		iy = threadIdx.x;
+		ix = side.isright < 0 ? 0 : (blockDim.x);
+		//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+	}
+
+	T sign = T(side.isright) + T(side.istop);
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+
+	T xx, yy;
+
+	xx = XBlock.xo[ib] + ix * delta;
+	yy = XBlock.yo[ib] + iy * delta;
+
+	if (side.isright == 0)
+	{
+		itx = (xx) / (XParam.xmax - XParam.xo) * side.nbnd;
+	}
+	else
+	{
+		itx = (yy) / (XParam.ymax - XParam.yo) * side.nbnd;
+	}
+
+	T zsatm = T(0.0);
+
+	if (XParam.atmpforcing)
+	{
+		float atmpi;
+
+		atmpi = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp.GPU);
+		zsatm = -1.0 * (atmpi - XParam.Paref) * XParam.Pa2m;
+	}
+
+	int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+
+	T zsbnd;
+	T unbnd = T(0.0);
+	T utbnd = T(0.0);
+
+	T zsinside, hinside, uninside, utinside;
+	T F, G, S;
+
+	zsinside = zs[inside];
+	hinside = h[inside];
+	uninside = un[inside];
+	utinside = ut[inside];
+
+	
+	if (side.isright < 0 || side.istop < 0) // top or bottom
+	{
+		F = Fh[inside];
+		G = Fq[i];
+		S = Ss[inside];
+	}
+	else
+	{
+		F = Fh[i];
+		G = Ss[i];
+		S = Fq[inside];
+	}
+	
+
+
+	if (side.on)
+	{
+
+		zsbnd = tex2D<float>(side.GPU.WLS.tex, itime + 0.5f, itx + 0.5f) + zsatm;
+
+		if (side.type == 4)
+		{
+			//un is V (top or bot bnd) or U (left or right bnd) depending on which side it's dealing with (same for ut)
+			unbnd = side.isright == 0 ? tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f);
+			utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
+
+		}
+
+	}
+
+	if (side.type == 0) // No Flux
+	{
+		//noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+		//noslipbndQ(F, G, S);
+		//printf("F=%f, S=%f G=%f;\n",F, S, G);
+
+
+
+	}
+	else if (side.type == 3)
+	{
+		//if (hnew > XParam.eps && hinside > XParam.eps)
+		//ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+		
+		//ABS1DQ(T(XParam.g), sign, T(0.0), zsbnd, zsinside, hinside, utbnd, zs, h, T(0.0), F);
+	}
+
+	if (side.isright < 0 || side.istop < 0) // left or bottom
+	{
+		Fh[inside] = T(0.0);
+		//Fh[i] = 0.0;
+		//Fq[i] = G;
+		Ss[inside]=G;
+	}
+	else
+	{
+		Fh[i] = T(0.0);
+		//Ss[i] = G;
+		Fq[inside]= G;
+	}
+
+
+
+
+}
+
+
 template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut)
 {
 	//
@@ -172,7 +376,7 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 
 	if (side.type == 0) // No slip == no friction wall
 	{
-		noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+		//noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
 	}
 	else if (side.type == 1) // neumann type
 	{
@@ -620,7 +824,7 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 			isright = -1;
 			istop = 0;
 
-			ix = -1;
+			ix = 0;
 			iy = threadIdx.x;
 			int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
 			int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
@@ -630,7 +834,7 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqux[i] = Flux.Su[inside];
+				Flux.Su[inside] = Flux.Fqux[i];
 				//Flux.Fqux[i] = T(0.0);
 
 				Flux.Fhu[inside] = T(0.0);
@@ -967,7 +1171,7 @@ template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBl
 			istop = -1;
 
 
-			iy = -1;
+			iy = 0;
 			ix = threadIdx.x;
 			int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
 			int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
@@ -1041,6 +1245,15 @@ template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un
 	zs = zsinside;
 	//ut[i] = ut[inside];//=0.0?
 	h = hinside;//=0.0?
+
+}
+
+template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S)
+{
+	// Basic no slip bnd hs no normal velocity and leaves tanegtial velocity alone (maybe needs a wall friction added to it?)
+	// 
+	F = T(0.0);
+	S = G;
 
 }
 

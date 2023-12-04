@@ -735,6 +735,8 @@ template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, FluxP<float
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
 
+
+
 //template <class T> void refine_linearCPU(Param XParam, int ib, bool isLR, bool isoposit, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 //{
 //	int Neighblock, Mirrorblock;

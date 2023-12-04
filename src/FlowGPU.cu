@@ -129,6 +129,13 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	// Reduce minimum timestep
 	XLoop.dt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
 	XLoop.dtmax = XLoop.dt;
+
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv, XModel.flux);
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv, XModel.flux);
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv, XModel.flux);
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv, XModel.flux);
+
+
 	
 
 	XModel.time.dt = T(XLoop.dt);
@@ -213,6 +220,11 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	//============================================
 	// Fill Halo for flux from fine to coarse
 	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
+
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv, XModel.flux);
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv, XModel.flux);
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv, XModel.flux);
+	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv, XModel.flux);
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 

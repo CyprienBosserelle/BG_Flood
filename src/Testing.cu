@@ -4310,7 +4310,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 {
 	Forcing<float> XForcing;
 
-	XForcing = MakValleyBathy(XParam, T(0.4), true, true);
+	XForcing = MakValleyBathy(XParam, T(0.4), false, true);
 
 	XParam.conserveElevation = true;
 
@@ -4334,7 +4334,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 
 	XParam.dx = XForcing.Bathy[0].dx;
 
-	XParam.zsinit = mintopo + 6.9;// Had a water level so that the wet and dry affects the 
+	XParam.zsinit = mintopo - 6.9;// Had a water level so that the wet and dry affects the 
 	XParam.endtime = 20.0;
 
 	XParam.dtmin = 0.00000001;
