@@ -259,10 +259,13 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 		if (mytest == 13)
 		{
-			bool wallbnd;
+			bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
 			log("\t###AOI bnd wall test ###");
-			wallbnd=TestAIObnd(XParam, XModel, XModel_g);
-			result = wallbnd ? "successful" : "failed";
+			wallbndleft=TestAIObnd(XParam, XModel, XModel_g,false,false);
+			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true);
+			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false);
+			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true);
+			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
 			log("\t\tAOI bnd wall test : " + result);
 		}
 		if (mytest == 994)
@@ -4306,11 +4309,11 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 }
 
 
-template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g)
+template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop,bool flip)
 {
 	Forcing<float> XForcing;
 
-	XForcing = MakValleyBathy(XParam, T(0.4), false, true);
+	XForcing = MakValleyBathy(XParam, T(0.4), bottop, flip);
 
 	XParam.conserveElevation = true;
 
