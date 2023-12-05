@@ -217,7 +217,7 @@ template <class T> __global__ void bndFluxGPU(Param XParam, bndparam side, Block
 	
 	if (side.isright < 0 || side.istop < 0) // top or bottom
 	{
-		F = Fh[inside];
+		F = Fh[i];
 		G = Fq[i];
 		S = Ss[inside];
 	}
@@ -264,7 +264,7 @@ template <class T> __global__ void bndFluxGPU(Param XParam, bndparam side, Block
 
 	if (side.isright < 0 || side.istop < 0) // left or bottom
 	{
-		Fh[inside] = T(0.0);
+		Fh[i] = T(0.0);
 		//Fh[i] = 0.0;
 		//Fq[i] = G;
 		Ss[inside]=G;
