@@ -615,7 +615,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 
 		int shuffle = 1;
 		int deflate = 1;        // This switches compression on (1) or off (0).
-		int deflate_level = 9;  // This is the compression level in range 1 (less) - 9 (more).
+		int deflate_level = 5;  // This is the compression level in range 1 (less) - 9 (more).
 		nc_def_var_deflate(ncid, var_id, shuffle, deflate, deflate_level);
 
 	}
