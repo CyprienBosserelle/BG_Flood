@@ -59,6 +59,15 @@ struct AdvanceP
 };
 
 
+struct outP
+{
+	float* z;
+	short* z_s;
+	int level;
+	double xmin, xmax, ymin, ymax;
+};
+
+
 struct maskinfo 
 {
 
