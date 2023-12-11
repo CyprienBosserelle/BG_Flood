@@ -29,14 +29,14 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, BlockP<T> XBlock, 
 	if (side.on)
 	{
 		int SLstepinbnd = 1;
-
+		
 		double difft = side.data[SLstepinbnd].time - XLoop.totaltime;
 		while (difft < 0.0)
 		{
 			SLstepinbnd++;
 			difft = side.data[SLstepinbnd].time - XLoop.totaltime;
 		}
-
+		
 		itime = SLstepinbnd - 1.0 + (XLoop.totaltime - side.data[SLstepinbnd - 1].time) / (side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time);
 
 		
@@ -238,8 +238,8 @@ template <class T> __global__ void bndFluxGPU(Param XParam, bndparam side, Block
 		if (side.type == 4)
 		{
 			//un is V (top or bot bnd) or U (left or right bnd) depending on which side it's dealing with (same for ut)
-			unbnd = side.isright == 0 ? tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f);
-			utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
+			unbnd = side.isright == 0 ? tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
+			utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f);
 
 		}
 
@@ -367,8 +367,8 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 		if (side.type == 4)
 		{
 			//un is V (top or bot bnd) or U (left or right bnd) depending on which side it's dealing with (same for ut)
-			unbnd = side.isright == 0 ? tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f);
-			utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
+			unbnd = side.isright == 0 ? tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
+			utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f);
 
 		}
 		
