@@ -1039,7 +1039,7 @@ template <class T> void writencvarstepBUQlev(Param XParam, int vdim, int* active
 		xxmin = Xzone.xo + calcres(XParam.dx, levi) / 2.0;
 		yymin = Xzone.yo + calcres(XParam.dx, levi) / 2.0;
 
-		int levindex = (lev - Xzone.minlevel);
+		int levindex = (levi - Xzone.minlevel);
 
 		if (vdim == 2)
 		{
