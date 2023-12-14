@@ -762,7 +762,7 @@ template <class T> void defncvarBUQlev(Param XParam, int* activeblk, int* level,
 	short* varblk_s;
 	float* varblk;
 	int recid, xid, yid;
-	int bl, ibl, lev;
+	int bl, ibl;
 	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
 
 	float fillval = 9.9692e+36f;
@@ -821,7 +821,7 @@ template <class T> void defncvarBUQlev(Param XParam, int* activeblk, int* level,
 	std::string xxname, yyname, varname, sign;
 
 	//generate a different variable name for each level and add attribute as necessary
-	for (lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
+	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	{
 
 		//std::string xxname, yyname, sign;
