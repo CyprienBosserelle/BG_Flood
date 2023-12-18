@@ -957,7 +957,7 @@ template <class T> void defncvarBUQlev(Param XParam, int* activeblk, int* level,
 	//for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	//{
 		bl = activeblkzone[ibl];
-		lev = level[bl];
+		int lev = level[bl];
 
 		double  xxmin, yymin;
 		int nxlev, nylev;
