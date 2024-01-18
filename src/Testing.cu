@@ -257,17 +257,20 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t\tCalendar time test : " + result);
 	}
 
-		if (mytest == 13)
-		{
-			bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
-			log("\t###AOI bnd wall test ###");
-			wallbndleft=TestAIObnd(XParam, XModel, XModel_g,false,false);
-			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true);
-			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false);
-			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true);
-			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-			log("\t\tAOI bnd wall test : " + result);
-		}
+	if (mytest == 13)
+	{
+		/* Test 13  This test AOI bnds aswall to start with
+
+		*/
+		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
+		log("\t###AOI bnd wall test ###");
+		wallbndleft=TestAIObnd(XParam, XModel, XModel_g,false,false);
+		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true);
+		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false);
+		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true);
+		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+		log("\t\tAOI bnd wall test : " + result);
+	}
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
