@@ -796,7 +796,7 @@ template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock
 template __global__ void maskbndGPUleft<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
-//For the GPU version we apply 4 separate global function in the hope to increase occupancy
+
 template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -834,14 +834,11 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Su[inside] = Flux.Fqux[i];
-				//Flux.Fqux[i] = T(0.0);
 
-				Flux.Fhu[inside] = T(0.0);
-
-				//Flux.Fhu[i] = T(0.0);
-
+				noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
 				
+
+
 
 
 			}
@@ -952,10 +949,8 @@ template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqvy[inside] = Flux.Sv[i];
-				//Flux.Fqux[i] = T(0.0);
-
-				Flux.Fhv[i] = T(0.0);
+				
+				noslipbndQ(Flux.Fhv[i], Flux.Sv[i], Flux.Fqvy[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
 				
 
 
@@ -1067,10 +1062,8 @@ template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> X
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-				Flux.Fqux[inside] = Flux.Su[i];
-				//Flux.Fqux[i] = T(0.0);
-				//Flux.Fquy[i] = T(0.0);
-				Flux.Fhu[i] = T(0.0);
+				
+				noslipbndQ(Flux.Fhu[i], Flux.Su[i], Flux.Fqux[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
 
 				
 
@@ -1182,14 +1175,7 @@ template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBl
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
-
-
-				Flux.Sv[inside] = Flux.Fqvy[i];
-				//Flux.Fqux[i] = T(0.0);
-
-				Flux.Fhv[inside] = T(0.0);
-
-				//Flux.Fhu[i] = T(0.0);
+				noslipbndQ(Flux.Fhv[inside], Flux.Fqvy[i], Flux.Sv[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
 
 			}
 
