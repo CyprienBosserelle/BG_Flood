@@ -35,6 +35,7 @@ template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> X
 __device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop, bool& istopleft, bool& istopright, bool& isrighttop, bool& isrightbot, bool& isbotright, bool& isbotleft);
 template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T& zs, T& h,T&zb);
 template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un, T &ut,T &zs, T &h);
+template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S);
 template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd,T unbnd, T& un, T& ut, T& zs, T& h);
 template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h);
 
