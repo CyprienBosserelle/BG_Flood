@@ -797,7 +797,7 @@ template __global__ void maskbndGPUleft<float>(Param XParam, BlockP<float> XBloc
 template __global__ void maskbndGPUleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
 
-template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
@@ -834,10 +834,20 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
 
+				T zsinside = Xev.zs[inside];
+				T zsi = Xev.zs[i];
+				T hinside = Xev.h[i];
 
-				noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
-				
+				T zsbnd = T(0.0);
+				T qmean = T(0.0);
+				T factime = min(T(XParam.dt / 60.0), T(1.0));
+				T facrel = T(1.0) - min(T(XParam.dt / 3600.0), T(1.0));
 
+				//noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+
+				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
+				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
+				ABS1DQ(T(XParam.g), T(1.0), factime, facrel, zsi, zsbnd, zsinside, hinside, qmean, Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
 
 
 
@@ -847,8 +857,8 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 	}
 
 }
-template __global__ void maskbndGPUFluxleft<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
-template __global__ void maskbndGPUFluxleft<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+template __global__ void maskbndGPUFluxleft<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, FluxP<double> Flux);
 
 
 template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
@@ -913,7 +923,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 template __global__ void maskbndGPUtop<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUtop<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
-template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBlock,  FluxP<T> Flux)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = XParam.blkmemwidth;
@@ -1255,25 +1265,28 @@ template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinsi
 	h = hinside;
 }
 
-template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime, T zsbnd, T zsinside, T hinside, T utbnd, T& zs, T&h, T& qmean, T& q)
+template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facrel,T zs, T zsbnd, T zsinside, T h, T& qmean, T& q, T& G, T& S)
 {
 	//Absorbing 1D boundary
 	//When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
 	// For utbnd use utinside if no utbnd are known 
 
-	qmean = factime * q + T(0.99) * (T(1.0) - factime) * qmean;
+	qmean = factime * q + facrel * (T(1.0) - factime) * qmean;
 
 	T un;
 	
 
 	// Below should be hinside ? or h at Flux bnd?
 	// What if h is 0? then q and qmean should be 0
-	un = sign * sqrt(g / h) * (T(2.0)*(zs - zsbnd) - (zsinside - zsbnd));
+	//un = sign * sqrt(g / h) * (T(2.0)*(zs - zsbnd) - (zsinside - zsbnd));
+	un = sign * sqrt(g / h) * (T(2.0) * zs - zsinside - zsbnd);
 	//zs = zsinside;
 	//ut = T(utbnd);//ut[inside];
 	//h = hinside;
 
 	q = un * h + qmean;
+
+	S = G;
 
 
 }

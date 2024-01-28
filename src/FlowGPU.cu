@@ -226,6 +226,8 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv, XModel.flux);
 	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv, XModel.flux);
 
+	bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
+
 	//============================================
 	// Update advection terms (dh dhu dhv) 
 	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);

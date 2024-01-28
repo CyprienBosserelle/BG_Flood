@@ -20,7 +20,7 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
 template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb);
 
-template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
+template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux);
 template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
 template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
 template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
@@ -37,6 +37,7 @@ template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T
 template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un, T &ut,T &zs, T &h);
 template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S);
 template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd,T unbnd, T& un, T& ut, T& zs, T& h);
+template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T& qmean, T& q, T& G, T& S);
 template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h);
 
 // End of global definition

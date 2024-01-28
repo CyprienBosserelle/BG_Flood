@@ -552,15 +552,15 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 	RecalculateZsGPU << < gridDimfull, blockDimfull, 0 >> > (XParam, XBlock, Xev, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	if (XBlock.mask.nblk > 0)
-	{
-		maskbndGPUleft << <gridDim, blockDimHalo, 0, streams[0] >> > (XParam, XBlock, Xev, zb);
-		maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Xev, zb);
-		maskbndGPUright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Xev, zb);
-		maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Xev, zb);
+	//if (XBlock.mask.nblk > 0)
+	//{
+	//	maskbndGPUleft << <gridDim, blockDimHalo, 0, streams[0] >> > (XParam, XBlock, Xev, zb);
+	//	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Xev, zb);
+	//	maskbndGPUright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Xev, zb);
+	//	maskbndGPUtop << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Xev, zb);
 
-		//CUDA_CHECK(cudaDeviceSynchronize());
-	}
+	//	//CUDA_CHECK(cudaDeviceSynchronize());
+	//}
 	for (int i = 0; i < num_streams; i++)
 	{
 		cudaStreamDestroy(streams[i]);
@@ -713,16 +713,16 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 	{
 		cudaStreamSynchronize(streams[i]);
 	}
+	// Below has now moved to its own function
+	//if (XBlock.mask.nblk > 0)
+	//{
+	//	maskbndGPUFluxleft << <gridDim, blockDimHalo, 0, streams[0] >> > (XParam, XBlock, Flux);
+	//	maskbndGPUFluxtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Flux);
+	//	maskbndGPUFluxright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Flux);
+	//	maskbndGPUFluxbot << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Flux);
 
-	if (XBlock.mask.nblk > 0)
-	{
-		maskbndGPUFluxleft << <gridDim, blockDimHalo, 0, streams[0] >> > (XParam, XBlock, Flux);
-		maskbndGPUFluxtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock, Flux);
-		maskbndGPUFluxright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock, Flux);
-		maskbndGPUFluxbot << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Flux);
-
-		//CUDA_CHECK(cudaDeviceSynchronize());
-	}
+	//	//CUDA_CHECK(cudaDeviceSynchronize());
+	//}
 	
 	for (int i = 0; i < num_streams; i++)
 	{
@@ -734,8 +734,38 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
+template <class T> void bndmaskGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux)
+{
+	const int num_streams = 8;
 
+	cudaStream_t streams[num_streams];
 
+	for (int i = 0; i < num_streams; i++)
+	{
+		CUDA_CHECK(cudaStreamCreate(&streams[i]));
+	}
+
+	dim3 blockDimHalo(XParam.blkwidth, 1, 1);
+
+	dim3 gridDim(XBlock.mask.nblk, 1, 1);
+	if (XBlock.mask.nblk > 0)
+	{
+		maskbndGPUFluxleft << <gridDim, blockDimHalo, 0, streams[0] >> > (XParam, XBlock, Xev, Flux);
+		maskbndGPUFluxtop << <gridDim, blockDimHalo, 0, streams[1] >> > (XParam, XBlock,  Flux);
+		maskbndGPUFluxright << <gridDim, blockDimHalo, 0, streams[2] >> > (XParam, XBlock,  Flux);
+		maskbndGPUFluxbot << <gridDim, blockDimHalo, 0, streams[3] >> > (XParam, XBlock, Flux);
+
+		//CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
+	for (int i = 0; i < num_streams; i++)
+	{
+		cudaStreamDestroy(streams[i]);
+	}
+
+}
+template void bndmaskGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, FluxP<float> Flux);
+template void bndmaskGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, FluxP<double> Flux);
 
 //template <class T> void refine_linearCPU(Param XParam, int ib, bool isLR, bool isoposit, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 //{
