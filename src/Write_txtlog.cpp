@@ -376,35 +376,42 @@ void saveparam2netCDF(int ncid, int bgfid, Param XParam)
 
 	status = nc_put_att_text(ncid, bgfid, "reftime", XParam.reftime.size(), XParam.reftime.c_str());
 
+
+	std::string allouvars;
+	for (int i = 0; i < XParam.outvars.size(); i++)
+	{
+		allouvars = allouvars + XParam.outvars[i];
+		if (i < (XParam.outvars.size() - 1))
+		{
+			allouvars = allouvars + ", ";
+		}
+	}
+
+	status = nc_put_att_text(ncid, bgfid, "outvars", allouvars.size(), allouvars.c_str());
+
+	status = nc_put_att_text(ncid, bgfid, "outfile", XParam.outfile.size(), XParam.outfile.c_str());
+
+	
+
+
+
 	/*
 	
 	std::vector<TSoutnode> TSnodesout;
 	
 
-	std::string outfile = "Output.nc"; // netcdf output file name
-	std::vector<std::string> outvars;
-	//List of names of the variables to output (for 2D maps)
-	//Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
-	//Default: "zb", "zs", "u", "v", "h"
 	
-	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
+	
 
 	std::vector<outzoneP> outzone;
 	
 	// deformation forcing for tsunami generation
 	//std::vector<deformmap> deform;
-	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be null.
-
-	// This here should be stored in a structure at a later stage
-
+	
+	
 	std::string AdaptCrit;
 	int* AdaptCrit_funct_pointer;
 
-	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
-	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
-
-	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
-	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
+	
 	*/
 }
