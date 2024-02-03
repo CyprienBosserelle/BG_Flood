@@ -4489,7 +4489,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 
 	T error = abs(SimulatedVolume - TheoryInput);
 
-	int modelgood = error / TheoryInput < 0.05;
+	int modelgood = error / TheoryInput < 0.001;
 
 	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput)*100);
 
