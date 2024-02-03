@@ -264,10 +264,16 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		*/
 		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
 		log("\t###AOI bnd wall test ###");
-		wallbndleft=TestAIObnd(XParam, XModel, XModel_g,false,false);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true);
+		wallbndleft=TestAIObnd(XParam, XModel, XModel_g,false,false, false);
+		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
+		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
+		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
+		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+		log("\t\tBBox bnd wall test : " + result);
+		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
+		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
+		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
+		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
 		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
 		log("\t\tAOI bnd wall test : " + result);
 	}
@@ -4312,7 +4318,7 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 }
 
 
-template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop,bool flip)
+template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop,bool flip, bool withaoi)
 {
 	Forcing<float> XForcing;
 
@@ -4366,10 +4372,12 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	aoi_file << "-5.0 -3.0" << std::endl;
 	aoi_file.close(); //destructor implicitly does it
 	*/
-	XForcing.AOI.file = "testaoi.tmp";
-	XForcing.AOI.active = true;
-	XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
-
+	if (withaoi)
+	{	
+		XForcing.AOI.file = "testaoi.tmp";
+		XForcing.AOI.active = true;
+		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
+	}
 	
 	XParam.minlevel = 3;
 	XParam.maxlevel = 3;

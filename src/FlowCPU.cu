@@ -84,7 +84,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv, XModel.flux);
 	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv, XModel.flux);
 
-	bndmaskCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
+	//bndmaskCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
 	
 	//============================================
 	// Reduce minimum timestep

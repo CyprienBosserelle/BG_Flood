@@ -135,7 +135,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv, XModel.flux);
 	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv, XModel.flux);
 
-
+	bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
 	
 
 	XModel.time.dt = T(XLoop.dt);
