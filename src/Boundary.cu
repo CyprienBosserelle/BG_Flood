@@ -250,7 +250,20 @@ template <class T> __global__ void bndFluxGPU(Param XParam, bndparam side, Block
 		//noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
 		//noslipbndQ(F, G, S);
 		//printf("F=%f, S=%f G=%f;\n",F, S, G);
-
+		if (side.isright < 0 || side.istop < 0) // left or bottom
+		{
+			noslipbndQ(Fh[i], G, Ss[inside]);
+			//Fh[i] = T(0.0);
+			
+			//Ss[inside]=G;
+		}
+		else
+		{
+			noslipbndQ(Fh[i], G, Fq[inside]);
+			//Fh[i] = T(0.0);
+			
+			//Fq[inside]= G;
+		}
 
 
 	}
@@ -262,19 +275,7 @@ template <class T> __global__ void bndFluxGPU(Param XParam, bndparam side, Block
 		//ABS1DQ(T(XParam.g), sign, T(0.0), zsbnd, zsinside, hinside, utbnd, zs, h, T(0.0), F);
 	}
 
-	if (side.isright < 0 || side.istop < 0) // left or bottom
-	{
-		Fh[i] = T(0.0);
-		//Fh[i] = 0.0;
-		//Fq[i] = G;
-		Ss[inside]=G;
-	}
-	else
-	{
-		Fh[i] = T(0.0);
-		//Ss[i] = G;
-		Fq[inside]= G;
-	}
+	
 
 
 
@@ -390,7 +391,8 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 	{
 		if (hnew > XParam.eps && hinside > XParam.eps)
 		{
-			ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+			//ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+			//printf("No boundary!\n");
 		}
 	}
 	else if (side.type == 4)
@@ -824,7 +826,7 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 			isright = -1;
 			istop = 0;
 
-			ix = 0;
+			ix = -1;
 			iy = threadIdx.x;
 			int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
 			int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
@@ -843,11 +845,14 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 				T factime = min(T(XParam.dt / 60.0), T(1.0));
 				T facrel = T(1.0) - min(T(XParam.dt / 3600.0), T(1.0));
 
-				noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+				//noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
 
 				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
 				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
-				//ABS1DQ(T(XParam.g), T(1.0), factime, facrel, zsi, zsbnd, zsinside, hinside, qmean, Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
+				if (hinside > XParam.eps)
+				{
+					ABS1DQ(T(XParam.g), T(-1.0), factime, facrel, zsi, zsbnd, zsinside, hinside, qmean, Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
+				}
 
 
 
@@ -1280,6 +1285,8 @@ template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facr
 	// What if h is 0? then q and qmean should be 0
 	//un = sign * sqrt(g / h) * (T(2.0)*(zs - zsbnd) - (zsinside - zsbnd));
 	un = sign * sqrt(g / h) * (T(2.0) * zs - zsinside - zsbnd);
+	//un = sign * sqrt(g / h) * (zsinside-zsbnd);
+	//zs = zsinside;
 	//zs = zsinside;
 	//ut = T(utbnd);//ut[inside];
 	//h = hinside;

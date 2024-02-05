@@ -67,6 +67,10 @@ struct maskinfo
 	int* blks; // array of block where bnd applies 
 	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
 	int* side; // e.g. 11000000 for the entire left side being a mask
+
+	int type = 0;
+
+
 };
 
 // outzone info used to actually write the nc files (one nc file by zone, the default zone is the full domain)

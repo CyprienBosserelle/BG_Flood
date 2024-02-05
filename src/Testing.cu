@@ -4346,7 +4346,8 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 
 	XParam.dx = XForcing.Bathy[0].dx;
 
-	XParam.zsinit = mintopo - 6.9;// Had a water level so that the wet and dry affects the 
+	//XParam.zsinit = mintopo - 6.9;// Had a water level so that the wet and dry affects the 
+	XParam.zsinit = mintopo - 9.9;// Had a water level so that the wet and dry affects the 
 	XParam.endtime = 20.0;
 
 	XParam.dtmin = 0.00000001;
@@ -4377,6 +4378,23 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 		XForcing.AOI.file = "testaoi.tmp";
 		XForcing.AOI.active = true;
 		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
+	}
+
+	if (bottop==false && flip==false)
+	{
+		XForcing.left.type = 0;
+	}
+	if (bottop == false && flip == true)
+	{
+		XForcing.right.type = 0;
+	}
+	if (bottop == true && flip == false)
+	{
+		XForcing.bot.type = 0;
+	}
+	if (bottop == true && flip == true)
+	{
+		XForcing.top.type = 0;
 	}
 	
 	XParam.minlevel = 3;
