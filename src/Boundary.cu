@@ -844,14 +844,22 @@ template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XB
 				T qmean = T(0.0);
 				T factime = min(T(XParam.dt / 60.0), T(1.0));
 				T facrel = T(1.0) - min(T(XParam.dt / 3600.0), T(1.0));
-
-				//noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
-
-				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
-				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
-				if (hinside > XParam.eps)
+				if (XParam.aoibnd == 0)
 				{
-					ABS1DQ(T(XParam.g), T(-1.0), factime, facrel, zsi, zsbnd, zsinside, hinside, qmean, Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
+					noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+				}
+				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
+				//ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
+				if (XParam.aoibnd == 3)
+				{
+					if (hinside > XParam.eps)
+					{
+						ABS1DQ(T(XParam.g), T(-1.0), factime, facrel, zsi, zsbnd, zsinside, hinside, qmean, Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
+					}
+					else
+					{
+						noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
+					}
 				}
 
 
