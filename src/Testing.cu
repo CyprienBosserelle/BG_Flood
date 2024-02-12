@@ -19,6 +19,9 @@
 * Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
 * Test 9 Zoned output (test zoned outputs with adaptative grid)
 * Test 10 Initial Loss / Continuous Loss on a slope, under uniform rain
+* Test 11 Wet/dry Instability test with Conserve Elevation
+* Test 12 Calendar time to second conversion
+* Test 13 Multi bathy and roughness map input
 
 * Test 99 Run all the test with test number < 99.
 
@@ -255,6 +258,19 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		timetest = testime1(1) && testime2(2);
 		result = timetest ? "successful" : "failed";
 		log("\t\tCalendar time test : " + result);
+	}
+	if (mytest == 13)
+	{
+		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
+			Test1: A slope with a set of input of different elevations
+			Test2: A slope with a set of input of different roughness
+		*/
+		bool Vector_Inputs;
+		log("\t### Differemt bathy and different roughness file inputs ###");
+		Vector_Inputs = TestBathy(0, 0.0);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = Vector_Inputs ? "successful" : "failed";
+		log("\t\tDifferent Bathy and Roughness test : " + result);
+
 	}
 		if (mytest == 994)
 		{
@@ -4159,6 +4175,117 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 	return test;
 
 }
+
+
+
+
+
+//TestBathy(XParam, XModel, XModel_g) && TestRoughness
+/*! \fn 
+*
+* This function tests the reading and interpolation of the bathymetry
+*/
+template <class T> bool TestBathy(int gpu, T ref)
+{
+	T Z0 = ref + 0.0;
+	T Z1 = ref + 1.0;
+	int NX = 22;
+	int NY = 22;
+	double* xz;
+	double* yz;
+	double* Z0_map;
+	double* Z1_map;
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+
+
+	//Creation of a Bathy file
+
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	Z0_map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			Z0_map[j * NX + i] = Z0; //+ (yz[j] + 1) * 0.5;
+		}
+	}
+	create2dnc("Z0_map.nc", NX, NY, xz, yz, Z0_map, "z");
+	
+	//Creation of a smaller Bathy file
+
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -0.5 + 0.05 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -0.5 + 0.05 * j; }
+
+	Z1_map = (double*)malloc(sizeof(double) * NY * NX);
+
+	//Create the Losses forcing:
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			Z1_map[j * NX + i] = Z1 + (yz[j] + 1) * 0.5;
+		}
+	}
+	create2dnc("Z1_map.nc", NX, NY, xz, yz, Z1_map, "z");
+
+	// Creation of a rain fall file
+	std::ofstream rain_file(
+		"rainTest13.txt", std::ios_base::out | std::ios_base::trunc);
+	rain_file << "0 10" << std::endl;
+	rain_file << "10000 10" << std::endl;
+	rain_file.close();
+
+	// Creation of BG_param_test13.txt file
+	std::ofstream param_file(
+		"BG_param_test13.txt", std::ios_base::out | std::ios_base::trunc);
+	//Add Bathymetries to the file
+	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
+	param_file << "bathy = Z1_map.nc?z ;" << std::endl;
+	//Add River forcing
+	param_file << "rainfile = rainTest13.txt ;" << std::endl;
+	//Add endtime
+	param_file << "endtime = 1.0 ;" << std::endl;
+	param_file.close();
+
+	//read param file
+	Readparamfile(XParam, XForcing, "BG_param_test13.txt");
+
+	//readforcing
+    readforcing(XParam, XForcing);
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	//Loop<T> XLoop = InitLoop(XParam, XModel);
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	//printf(Xmodel.evolve.v);
+    
+	bool result = false;
+
+	return result;
+}
+
+
 
 template <class T> void TestFirsthalfstep(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
