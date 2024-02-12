@@ -73,6 +73,7 @@ struct maskinfo
 
 };
 
+
 // outzone info used to actually write the nc files (one nc file by zone, the default zone is the full domain)
 struct outzoneB 
 {
