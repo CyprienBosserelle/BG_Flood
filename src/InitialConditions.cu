@@ -32,7 +32,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Initialise Friction map
 
-	if (!XForcing.cf.inputfile.empty())
+	if (!XForcing.cf.empty())
 	{
 		interp2BUQ(XParam, XModel.blocks, XForcing.cf, XModel.cf);
 	}

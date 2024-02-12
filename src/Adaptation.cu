@@ -72,7 +72,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 		//=====================================
 		// Initialise Friction map
 
-		if (!XForcing.cf.inputfile.empty())
+		if (!XForcing.cf.empty())
 		{
 			interp2BUQ(XParam, XModel.blocks, XForcing.cf, XModel.cf);
 		}

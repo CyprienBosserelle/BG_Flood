@@ -125,15 +125,27 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//==================
 	// Friction maps 
 		
-	if (!XForcing.cf.inputfile.empty())
+	if (!XForcing.cf.empty())
 	{
-		XForcing.cf.denanval = 0.0000001;
+		//denanval = 0.0000001;
 		log("\nRead Roughness map (cf) data...");
 		// roughness map was specified!
-		readstaticforcing(XForcing.cf);
-
+		//readstaticforcing(XForcing.cf);
 		//log("...done");
+
+		for (int ib = 0; ib < XForcing.cf.size(); ib++)
+		{
+			readstaticforcing(XForcing.cf[ib]);
+			if (ib == 0) // Fill Nan for only the first bathy listed, the others will use values from original bathy topo.
+			{
+				denan(XForcing.cf[ib].nx, XForcing.cf[ib].ny, T(0.0000001), XForcing.cf[ib].val);
+			}
+		}
 	}
+
+
+
+
 
 	//==================
 	// Rain losses maps

@@ -764,8 +764,6 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	paramvec = { "AOI","aoipoly" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "bathy";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		forcing.AOI.file= parametervalue;
@@ -925,9 +923,18 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		if (std::isdigit(parametervalue[0]) == false)
 		{
-			forcing.cf = readfileinfo(parametervalue, forcing.cf);
+			//forcing.cf = readfileinfo(parametervalue, forcing.cf);
+			StaticForcingP<float> infoRoughness;
+			forcing.cf.push_back(readfileinfo(parametervalue, infoRoughness));
 		}
 	}
+
+
+	//if (!parametervalue.empty())
+	//{
+	//
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	//}
 
 	// Rain losses, initial and continuous loss
 	paramvec = { "il","Rain_il","initialloss" };
