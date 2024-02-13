@@ -4313,14 +4313,17 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 
 	InitialAdaptation(XParam, XForcing, XModel);
 
-	SetupGPU(XParam, XModel, XForcing, XModel_g);
+	//SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	// Run first full step (i.e. 2 half steps)
 
 	//Loop<T> XLoop = InitLoop(XParam, XModel);
-	MainLoop(XParam, XForcing, XModel, XModel_g);
+	//MainLoop(XParam, XForcing, XModel, XModel_g);
 
-	//printf(Xmodel.evolve.v);
+	//if XModel.cf[0]
+	//	XModel.zb
+
+	//printf(Xmodel.evolv.v);
     
 	bool result = false;
 	
