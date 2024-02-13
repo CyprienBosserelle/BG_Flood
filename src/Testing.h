@@ -40,7 +40,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha);
 template <class T> bool testboundaries(Param XParam, T maxslope);
 template <class T> bool ZoneOutputTest(int nzones, T zsinit);
 template <class T> bool Rainlossestest(T zsnit, int gpu, float alpha);
-template <class T> bool TestBathy(int gpu, T ref);
+template <class T> bool TestBathyRough(int gpu, T ref);
 
 // End of global definition
 #endif

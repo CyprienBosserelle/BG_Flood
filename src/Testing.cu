@@ -267,7 +267,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		*/
 		bool Vector_Inputs;
 		log("\t### Differemt bathy and different roughness file inputs ###");
-		Vector_Inputs = TestBathy(0, 0.0);//&& TestRoughness(XParam, XModel, XModel_g);
+		Vector_Inputs = TestBathyRough(0, 0.0);//&& TestRoughness(XParam, XModel, XModel_g);
 		result = Vector_Inputs ? "successful" : "failed";
 		log("\t\tDifferent Bathy and Roughness test : " + result);
 
@@ -4185,16 +4185,17 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 *
 * This function tests the reading and interpolation of the bathymetry
 */
-template <class T> bool TestBathy(int gpu, T ref)
+template <class T> bool TestBathyRough(int gpu, T ref)
 {
-	T Z0 = ref + 0.0;
+	T Z0 = ref + 2.0;
 	T Z1 = ref + 1.0;
-	int NX = 22;
-	int NY = 22;
+	T R0 = 0.000001;
+	T R1 = 0.1;
+	int NX = 21;
+	int NY = 21;
 	double* xz;
 	double* yz;
-	double* Z0_map;
-	double* Z1_map;
+	double* map;
 	Param XParam;
 	Forcing<float> XForcing;
 	Model<float> XModel;
@@ -4208,35 +4209,71 @@ template <class T> bool TestBathy(int gpu, T ref)
 	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
 	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
 
-	Z0_map = (double*)malloc(sizeof(double) * NY * NX);
+	map = (double*)malloc(sizeof(double) * NY * NX);
 
 	for (int j = 0; j < NY; j++)
 	{
 		for (int i = 0; i < NX; i++)
 		{
-			Z0_map[j * NX + i] = Z0; //+ (yz[j] + 1) * 0.5;
+			map[j * NX + i] = Z0; //+ (yz[j] + 1) * 0.5;
 		}
 	}
-	create2dnc("Z0_map.nc", NX, NY, xz, yz, Z0_map, "z");
+	create2dnc("Z0_map.nc", NX, NY, xz, yz, map, "z");
 	
 	//Creation of a smaller Bathy file
 
 	xz = (double*)malloc(sizeof(double) * NX);
 	yz = (double*)malloc(sizeof(double) * NY);
-	for (int i = 0; i < NX; i++) { xz[i] = -0.5 + 0.05 * i; }
-	for (int j = 0; j < NY; j++) { yz[j] = -0.5 + 0.05 * j; }
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.05 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.05 * j; }
 
-	Z1_map = (double*)malloc(sizeof(double) * NY * NX);
+	map = (double*)malloc(sizeof(double) * NY * NX);
 
 	//Create the Losses forcing:
 	for (int j = 0; j < NY; j++)
 	{
 		for (int i = 0; i < NX; i++)
 		{
-			Z1_map[j * NX + i] = Z1 + (yz[j] + 1) * 0.5;
+			map[j * NX + i] = Z1 + (yz[j] + 1) * 0.5;
 		}
 	}
-	create2dnc("Z1_map.nc", NX, NY, xz, yz, Z1_map, "z");
+	create2dnc("Z1_map.nc", NX, NY, xz, yz, map, "z");
+
+	//Creation of a roughness file
+
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = R0; //+ (yz[j] + 1) * 0.5;
+		}
+	}
+	create2dnc("R0_map.nc", NX, NY, xz, yz, map, "z0");
+
+	//Creation of a smaller Roughness file
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.05 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = 0.0 + 0.05 * j; }
+
+	map = (double*)malloc(sizeof(double) * NY * NX);
+
+	//Create the Losses forcing:
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = R1;
+		}
+	}
+	create2dnc("R1_map.nc", NX, NY, xz, yz, map, "z0");
 
 	// Creation of a rain fall file
 	std::ofstream rain_file(
@@ -4251,10 +4288,15 @@ template <class T> bool TestBathy(int gpu, T ref)
 	//Add Bathymetries to the file
 	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
 	param_file << "bathy = Z1_map.nc?z ;" << std::endl;
+	//Add Roughness to the file
+	param_file << "cfmap = R0_map.nc?z0 ;" << std::endl;
+	param_file << "cfmap = R1_map.nc?z0 ;" << std::endl;
+	param_file << "frictionmodel=1 ;" << std::endl;
 	//Add River forcing
 	param_file << "rainfile = rainTest13.txt ;" << std::endl;
-	//Add endtime
-	param_file << "endtime = 1.0 ;" << std::endl;
+	//Add endtime and outputvar
+	param_file << "endtime = 10.0 ;" << std::endl;
+	param_file << "outvars = zs,h,u,v,zb,cf;" << std::endl;
 	param_file.close();
 
 	//read param file
@@ -4281,6 +4323,7 @@ template <class T> bool TestBathy(int gpu, T ref)
 	//printf(Xmodel.evolve.v);
     
 	bool result = false;
+	
 
 	return result;
 }
