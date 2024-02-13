@@ -95,7 +95,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 
 |_Reference_|_Keys_|_default_|_Example_|_Explanation_|
 |---|---|---|---|---|
-|cf| cf , roughness , cfmap |(see constant in parameters)|cf=0.001;<br>cf=bottom_friction.nc?bfc;|Bottom friction coefficient map (associated to the chosen bottom friction model)<br>A list of roughness map can be provide. At any grid point, the last one defined will be used.|
+|cf| cf , roughness , cfmap |(see constant in parameters)|cf=0.001;<br>cf=bottom_friction.nc?bfc;|Bottom friction coefficient map (associated to the chosen bottom friction model)|
 |Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|bathy=Westport_DEM_2020.nc?z<br>topo=Westport_DEM_2020.asc| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spherical (still in development).<br>A list of file can also be use to provide a thiner resolution localy by using the key word each time on a different line.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
 |AOI| AOI , aoipoly |N/A|AOI=myarea.gmt;|Area of interest polygon<br>the input file is a text file with 2 columns containing the coordinate of a closed polygon (last line==first line)|
 |left| left , leftbndfile , leftbnd |1|left = 0;<br>left = leftBnd.txt,2;| 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)<br>For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first column containing time (with possibly variable time steps) and forcing values in the following columns (1 column of values corresponding to a constant value along the boundary, 2 columns correspond to values at boundary edges with linear evolution in between, n columns correspond to n regularly spaced values applied along the boundary)|
@@ -117,6 +117,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |---|---|
 |Adaptation|Adaptation|
 |crs| crs , spatialref , spatial_ref , wtk , crsinfo , crs_info |
+|bathy|bathy|
 |bathyfile|bathyfile|
 |bathymetry|bathymetry|
 |depfile|depfile|
