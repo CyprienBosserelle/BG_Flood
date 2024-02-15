@@ -1480,7 +1480,16 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
 				std::string varstr = XParam.outvars[ivar];
-				defncvarBUQlev(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr,XModel.Outvarlongname[varstr],XModel.Outvarstdname[varstr],XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+				if (XParam.savebyblk)
+				{
+					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+
+				}
+				else
+				{
+					defncvarBUQlev(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+
+				}
 			}
 		}
 	}
@@ -1499,7 +1508,14 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
 			writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
-				writencvarstepBUQlev(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				if (XParam.savebyblk)
+				{
+					writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				}
+				else
+				{
+					writencvarstepBUQlev(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				}
 			}
 		}
 	}
