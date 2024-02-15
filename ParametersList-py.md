@@ -15,6 +15,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
+|savebyblk| savebyblk , writebyblk , saveperblk , writeperblk | 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |conserveElevation|conserveElevation| false|Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks|
