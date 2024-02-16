@@ -746,11 +746,11 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 			if (XParam.GPUDEVICE < 0)
 			{
-				AddDeformCPU(XParam, XModel.blocks, deform[nd], scale, XModel.evolv.zs, XModel.zb);
+				AddDeformCPU(XParam, XModel.blocks, deform[nd], XModel.evolv, scale, XModel.zb);
 			}
 			else
 			{
-				AddDeformGPU <<<gridDim, blockDim, 0 >>> (XParam, XModel.blocks, deform[nd], scale, XModel.evolv.zs, XModel.zb);
+				AddDeformGPU <<<gridDim, blockDim, 0 >>> (XParam, XModel.blocks, deform[nd], XModel.evolv, scale, XModel.zb);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 
@@ -779,7 +779,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 }
 
 
-template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb)
+template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb)
 {
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
@@ -801,7 +801,7 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 	//	printf("x=%f, y=%f, def=%f\n ", x, y, def);
 	//}
 
-	zss = zs[i] + def * scale;
+	zss = XEv.zs[i] + def * scale;
 	if (defmap.iscavity == true)
 	{
 		zbb = min(zss, zb[i]);
@@ -811,7 +811,8 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 		zbb = zb[i] + def * scale;
 	}
 
-	zs[i] = zss;
+	XEv.h[i] = zss - zbb;
+	XEv.zs[i] = zss;
 	zb[i] = zbb;
 
 	//zs[i] = zs[i] + def * scale;
@@ -821,7 +822,7 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 
 }
 
-template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb)
+template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb)
 {
 	int ib;
 	
@@ -846,7 +847,7 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 
 				def = interp2BUQ(x, y, defmap);
 
-				zss = zs[i] + def * scale;
+				zss = XEv.zs[i] + def * scale;
 				if (defmap.iscavity == true)
 				{
 					zbb = min(zss, zb[i]);
@@ -856,7 +857,8 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 					zbb = zb[i] + def * scale;
 				}
 
-				zs[i] = zss;
+				XEv.zs[i] = zss;
+				XEv.h[i] = zss - zbb;
 				zb[i] = zbb;
 			}
 		}
