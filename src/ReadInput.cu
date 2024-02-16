@@ -736,7 +736,7 @@ Param readparamstr(std::string line, Param param)
 		param.crs_ref = parametervalue;
 	}
 
-	paramvec = { "savebyblk", "writebyblk","saveperblk", "writeperblk" };
+	paramvec = { "savebyblk", "writebyblk","saveperblk", "writeperblk","savebyblock", "writebyblock","saveperblock", "writeperblock" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
