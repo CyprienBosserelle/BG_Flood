@@ -269,7 +269,9 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t### Differemt bathy and different roughness file inputs ###");
 		Vector_Inputs = TestBathyRough(0, 0.0);//&& TestRoughness(XParam, XModel, XModel_g);
 		result = Vector_Inputs ? "successful" : "failed";
-		log("\t\tDifferent Bathy and Roughness test : " + result);
+		log("\t\t ##### \n");
+		log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
+		log("\t\t ##### \n");
 
 	}
 		if (mytest == 994)
@@ -4187,10 +4189,11 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 */
 template <class T> bool TestBathyRough(int gpu, T ref)
 {
-	T Z0 = ref + 2.0;
-	T Z1 = ref + 1.0;
+	T Z0 = ref + 0.0;
+	T Z1 = ref + 2.0;
 	T R0 = 0.000001;
 	T R1 = 0.1;
+	T eps = 0.0000001;
 	int NX = 21;
 	int NY = 21;
 	double* xz;
@@ -4222,48 +4225,47 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 	
 	//Creation of a smaller Bathy file
 
-	xz = (double*)malloc(sizeof(double) * NX);
-	yz = (double*)malloc(sizeof(double) * NY);
-	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.05 * i; }
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.05 * i; }
 	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.05 * j; }
 
-	map = (double*)malloc(sizeof(double) * NY * NX);
+	//map = (double*)malloc(sizeof(double) * NY * NX);
 
 	//Create the Losses forcing:
 	for (int j = 0; j < NY; j++)
 	{
 		for (int i = 0; i < NX; i++)
 		{
-			map[j * NX + i] = Z1 + (yz[j] + 1) * 0.5;
+			map[j * NX + i] = Z1; // -(yz[j] + 1) * 0.5;
 		}
 	}
 	create2dnc("Z1_map.nc", NX, NY, xz, yz, map, "z");
 
 	//Creation of a roughness file
-
-	xz = (double*)malloc(sizeof(double) * NX);
-	yz = (double*)malloc(sizeof(double) * NY);
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
 	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
 	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
 
-	map = (double*)malloc(sizeof(double) * NY * NX);
+	//map = (double*)malloc(sizeof(double) * NY * NX);
 
 	for (int j = 0; j < NY; j++)
 	{
 		for (int i = 0; i < NX; i++)
 		{
-			map[j * NX + i] = R0; //+ (yz[j] + 1) * 0.5;
+			map[j * NX + i] = R0;
 		}
 	}
 	create2dnc("R0_map.nc", NX, NY, xz, yz, map, "z0");
 
 	//Creation of a smaller Roughness file
-	xz = (double*)malloc(sizeof(double) * NX);
-	yz = (double*)malloc(sizeof(double) * NY);
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
 	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.05 * i; }
 	for (int j = 0; j < NY; j++) { yz[j] = 0.0 + 0.05 * j; }
 
-	map = (double*)malloc(sizeof(double) * NY * NX);
+	//map = (double*)malloc(sizeof(double) * NY * NX);
 
 	//Create the Losses forcing:
 	for (int j = 0; j < NY; j++)
@@ -4275,12 +4277,33 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 	}
 	create2dnc("R1_map.nc", NX, NY, xz, yz, map, "z0");
 
-	// Creation of a rain fall file
+	//Creation of a refinement file
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = 0;
+			if ((abs(xz[i]) < 0.5) && (abs(yz[j]) < 0.5))
+			{
+				map[j * NX + i] = 1;
+			}
+		}
+	}
+	create2dnc("refinement.nc", NX, NY, xz, yz, map, "z");
+
+	/*// Creation of a rain fall file
 	std::ofstream rain_file(
 		"rainTest13.txt", std::ios_base::out | std::ios_base::trunc);
-	rain_file << "0 10" << std::endl;
-	rain_file << "10000 10" << std::endl;
-	rain_file.close();
+	rain_file << "0.000000\t10.00" << std::endl;
+	rain_file << "1000.000\t10.00" << std::endl;
+	rain_file.close();*/
 
 	// Creation of BG_param_test13.txt file
 	std::ofstream param_file(
@@ -4292,15 +4315,20 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 	param_file << "cfmap = R0_map.nc?z0 ;" << std::endl;
 	param_file << "cfmap = R1_map.nc?z0 ;" << std::endl;
 	param_file << "frictionmodel=1 ;" << std::endl;
+	//Add refinement to the file
+	param_file << "Adaptation = Targetlevel,refinement.nc?z ;" << std::endl;
+	param_file << "initlevel = 0; " << std::endl;
+	param_file << "maxlevel = 1; " << std::endl;
+	param_file << "minlevel = 0; " << std::endl;
 	//Add River forcing
-	param_file << "rainfile = rainTest13.txt ;" << std::endl;
+	//param_file << "rainfile = rainTest13.txt ;" << std::endl;
 	//Add endtime and outputvar
 	param_file << "endtime = 10.0 ;" << std::endl;
 	param_file << "outvars = zs,h,u,v,zb,cf;" << std::endl;
 	param_file.close();
 
 	//read param file
-	Readparamfile(XParam, XForcing, "BG_param_test13.txt");
+	Readparamfile(XParam, XForcing, "BG_param_test13.txt"); // "BG_param_test13.txt");
 
 	//readforcing
     readforcing(XParam, XForcing);
@@ -4313,20 +4341,48 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 
 	InitialAdaptation(XParam, XForcing, XModel);
 
-	//SetupGPU(XParam, XModel, XForcing, XModel_g);
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	// Run first full step (i.e. 2 half steps)
 
 	//Loop<T> XLoop = InitLoop(XParam, XModel);
-	//MainLoop(XParam, XForcing, XModel, XModel_g);
+	MainLoop(XParam, XForcing, XModel, XModel_g);
 
 	//if XModel.cf[0]
 	//	XModel.zb
-
-	//printf(Xmodel.evolv.v);
-    
-	bool result = false;
 	
+	T maxz = std::numeric_limits<float>::min();
+	T minz = std::numeric_limits<float>::min();
+	T maxr = std::numeric_limits<float>::min();
+	T minr = std::numeric_limits<float>::min();
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				maxz = max(maxz, abs(XModel.zb[i]));
+				minz = min(minz, abs(XModel.zb[i]));
+				maxr = max(maxr, abs(XModel.cf[i]));
+				minr = min(minr, abs(XModel.cf[i]));
+			}
+		}
+	}
+
+	bool result = false;
+
+	if (abs(maxz - Z1)<eps && abs(maxr - R1)<eps && abs(minz - Z0)<eps && abs(minr - R0)<eps)
+	{
+		result = true;
+	}
+
+	//log("\t\tZb corner " + XModel.zb[0]);
+	//log("\t\tcf corner " + XModel.cf[0]);
+    
 
 	return result;
 }

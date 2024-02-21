@@ -534,6 +534,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 	char* crs_wkt;
 	std::string crs_ref2;
 	
+	crs_wkt = "";
 
 	if (!Sforcing.inputfile.empty())
 	{
@@ -621,7 +622,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 			{
 				printf("CRS_info detected but not understood reverting to default CRS\n Rename attribute in grid-mapping variable\n");
 
-				crs_wkt = "";
+				//crs_wkt = ""; //Move to the top of the file for initialisation
 			}
 
 		}
