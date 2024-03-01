@@ -116,6 +116,9 @@ public:
 class bndsegment {
 public:
 	std::vector<SLTS> data;
+	std::string inputfile;
+	Polygon poly;
+	std::string polyfile;
 	bool on = false;
 	//If changing this default value, please change documentation later on the file
 	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)

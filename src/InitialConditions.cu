@@ -840,6 +840,32 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 template void Initoutzone<float>(Param& XParam, BlockP<float>& XBlock);
 template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
 
+/*
+*  Initialise bnd blk assign block to their relevant segment allocate memory...
+*
+*/
+template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
+{
+	//To do
+
+	// 1. Find all the boundary blocks (block with themselves as neighbours)
+
+	// 2. make an array to store which segemnt they belown to 
+
+	// If any bnd segment was specified
+	// 3. scan each block and find which (if any) segment they belong to
+		// For each segment
+			// Calculate bbox
+			// if inbbox calc inpoly
+			//if inpoly overwrite assingned segment with new one
+
+	 
+	// 4. Calculate nblk per segment & allocate (do for each segment)
+	
+	// 5. fill segmnent and side arrays for each segments
+
+
+}
 
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {
@@ -915,9 +941,10 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 }
 
 
-
-
-
+/*! \fn Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
+* Find which block on the model edge belongs to a "side boundary"
+* 
+*/
 template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
 {
 	//=====================================
