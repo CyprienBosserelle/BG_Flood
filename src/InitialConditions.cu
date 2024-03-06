@@ -906,12 +906,17 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		int topcount = 0;
 		int botcount = 0;
 		
-		for (int ib = 0; ib < bndblks.size(); ib++)
+		for (int ibl = 0; ibl < bndblks.size(); ibl++)
 		{
-			if (bndsegment[ib] == s)
+			ib = bndblks[ibl];
+			if (bndsegment[ibl] == s)
 			{
 				segcount++;
 
+				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
+				{
+					botcount++;
+				}
 
 			}
 		}

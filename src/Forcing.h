@@ -122,7 +122,7 @@ public:
 	bool on = false;
 	//If changing this default value, please change documentation later on the file
 	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
-	std::string inputfile;
+	
 	int nbnd; // number of forcing bnds along the side (>=1 is side is on) 
 	int nblk = 0; //number of blocks where this bnd applies
 
