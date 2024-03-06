@@ -860,7 +860,7 @@ template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
 */
 template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {
-	//To do
+	//if(XForcing.bndseg.size()>0)
 
 	std::vector<int> bndblks;
 	std::vector<int> bndsegment;
@@ -874,7 +874,21 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
 		if (testbot)
 		{
+			T dxlev=calcres(Xparam.dx,Xblock.level[ib])
+
 			bndblks.push_back(ib);
+			bndsegment.push_back(-1); // i.e. by default the block doesn't belong to a segment
+
+			for (int s = 0; s < XForcing.bndseg.size(); s++)
+			{
+				bool inpoly=blockinpoly(XBlock.xo[ib], XBlock.yo[ib], dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+
+				if (inpoly)
+				{
+					bndsegment.back() = s;
+				}
+
+			}
 
 
 
@@ -884,7 +898,29 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	}
 
 	// 2. make an array to store which segemnt they belong to 
+	for (int s = 0; s < XForcing.bndseg.size(); s++)
+	{
+		int segcount = 0;
+		int leftcount = 0;
+		int rightcount = 0;
+		int topcount = 0;
+		int botcount = 0;
+		
+		for (int ib = 0; ib < bndblks.size(); ib++)
+		{
+			if (bndsegment[ib] == s)
+			{
+				segcount++;
 
+
+			}
+		}
+		XForcing.bndseg[s].nblk = segcount;
+
+		//allocate array
+		XForcing.bndseg[s].left.blk
+
+	}
 
 	// If any bnd segment was specified
 	// 3. scan each block and find which (if any) segment they belong to

@@ -105,7 +105,7 @@ public:
 
 class bndsegmentside {
 public:
-	int nblk;
+	int nblk=0;
 	int* blk;
 	int* blk_g;
 	float* qmean;
