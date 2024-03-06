@@ -842,15 +842,49 @@ template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
 
 /*
 *  Initialise bnd blk assign block to their relevant segment allocate memory...
+* 1. Find all the boundary blocks(block with themselves as neighbours)
 *
+* 2. make an array to store which segemnt they belong to
+*
+* If any bnd segment was specified
+* 3. scan each block and find which (if any) segment they belong to
+*	 For each segment
+*		 Calculate bbox
+*		 if inbbox calc inpoly
+*		if inpoly overwrite assingned segment with new one
+*
+*
+* 4. Calculate nblk per segment & allocate (do for each segment)
+*
+* 5. fill segmnent and side arrays for each segments
 */
 template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {
 	//To do
 
+	std::vector<int> bndblks;
+	std::vector<int> bndsegment;
 	// 1. Find all the boundary blocks (block with themselves as neighbours)
+	
+	
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
 
-	// 2. make an array to store which segemnt they belown to 
+		testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
+		if (testbot)
+		{
+			bndblks.push_back(ib);
+
+
+
+		}
+		
+
+	}
+
+	// 2. make an array to store which segemnt they belong to 
+
 
 	// If any bnd segment was specified
 	// 3. scan each block and find which (if any) segment they belong to
