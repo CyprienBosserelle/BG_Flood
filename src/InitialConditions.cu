@@ -871,10 +871,10 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	{
 		int ib = XBlock.active[ibl];
 
-		testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
+		bool testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
 		if (testbot)
 		{
-			T dxlev=calcres(Xparam.dx,Xblock.level[ib])
+			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
 
 			bndblks.push_back(ib);
 			bndsegment.push_back(-1); // i.e. by default the block doesn't belong to a segment
@@ -908,7 +908,7 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		
 		for (int ibl = 0; ibl < bndblks.size(); ibl++)
 		{
-			ib = bndblks[ibl];
+			int ib = bndblks[ibl];
 			if (bndsegment[ibl] == s)
 			{
 				segcount++;
@@ -952,7 +952,7 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 		for (int ibl = 0; ibl < bndblks.size(); ibl++)
 		{
-			ib = bndblks[ibl];
+			int ib = bndblks[ibl];
 
 			if (bndsegment[ibl] == s)
 			{
@@ -973,7 +973,7 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 				}
 				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
 				{
-					Forcing.bndseg[s].right.blk[rightcount] = ib;
+					XForcing.bndseg[s].right.blk[rightcount] = ib;
 					rightcount++;
 				}
 
