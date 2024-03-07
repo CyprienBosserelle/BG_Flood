@@ -897,7 +897,7 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 	}
 
-	// 2. make an array to store which segemnt they belong to 
+	
 	for (int s = 0; s < XForcing.bndseg.size(); s++)
 	{
 		int segcount = 0;
@@ -917,27 +917,73 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 				{
 					botcount++;
 				}
-
+				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
+				{
+					topcount++;
+				}
+				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
+				{
+					leftcount++;
+				}
+				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
+				{
+					rightcount++;
+				}
 			}
 		}
 		XForcing.bndseg[s].nblk = segcount;
 
 		//allocate array
-		XForcing.bndseg[s].left.blk
+		AllocateCPU(leftcount, 1, XForcing.bndseg[s].left.blk);
+		AllocateCPU(rightcount, 1, XForcing.bndseg[s].right.blk);
+		AllocateCPU(topcount, 1, XForcing.bndseg[s].top.blk);
+		AllocateCPU(botcount, 1, XForcing.bndseg[s].bot.blk);
+
+		AllocateCPU(leftcount, XParam.blkwidth, XForcing.bndseg[s].left.qmean);
+		AllocateCPU(rightcount, XParam.blkwidth, XForcing.bndseg[s].right.qmean);
+		AllocateCPU(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
+		AllocateCPU(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
+
+
+		leftcount = 0;
+		rightcount = 0;
+		topcount = 0;
+		botcount = 0;
+
+		for (int ibl = 0; ibl < bndblks.size(); ibl++)
+		{
+			ib = bndblks[ibl];
+
+			if (bndsegment[ibl] == s)
+			{
+				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
+				{
+					XForcing.bndseg[s].bot.blk[botcount] = ib;
+					botcount++;
+				}
+				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
+				{
+					XForcing.bndseg[s].top.blk[topcount] = ib;
+					topcount++;
+				}
+				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
+				{
+					XForcing.bndseg[s].left.blk[leftcount] = ib;
+					leftcount++;
+				}
+				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
+				{
+					Forcing.bndseg[s].right.blk[rightcount] = ib;
+					rightcount++;
+				}
+
+			}
+
+		}
+
+
 
 	}
-
-	// If any bnd segment was specified
-	// 3. scan each block and find which (if any) segment they belong to
-		// For each segment
-			// Calculate bbox
-			// if inbbox calc inpoly
-			//if inpoly overwrite assingned segment with new one
-
-	 
-	// 4. Calculate nblk per segment & allocate (do for each segment)
-	
-	// 5. fill segmnent and side arrays for each segments
 
 
 }
