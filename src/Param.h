@@ -35,6 +35,8 @@ public:
 	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
 
+	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
+
 	double Pa2m = 0.00009916; // Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)
 	double Paref = 101300.0; // Reference pressure in Pa (if unit is hPa then user should use 1013.0)
 	double lat = 0.0; // Model latitude. This is ignored in spherical case

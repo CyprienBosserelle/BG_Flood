@@ -1540,6 +1540,23 @@ std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> ve
 	return found;
 }
 
+
+bndparam readbndlineNew(std::string parametervalue)
+{
+	bndparam bnd;
+
+	std::vector<std::string> items = split(parametervalue, ',');
+
+	if (items.size() == 1)
+	{
+		bnd.type = std::stoi(items[0]);
+
+	}
+	
+	return bnd;
+}
+
+
 bndparam readbndline(std::string parametervalue)
 {
 	bndparam bnd;
