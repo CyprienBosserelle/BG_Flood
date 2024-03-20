@@ -262,16 +262,23 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 	if (mytest == 13)
 	{
 		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
-			Test1: A slope with a set of input of different elevations
-			Test2: A slope with a set of input of different roughness
+			Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
+				The max / min values are check to see if the z/z0 maps are created as expected
+			Test2: A roughness file name is changed to have a number in first position. We check that the 
+				file is read and not the number taken as z0 value.
 		*/
-		bool Vector_Inputs;
-		log("\t### Differemt bathy and different roughness file inputs ###");
-		Vector_Inputs = TestBathyRough(0, 0.0);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = Vector_Inputs ? "successful" : "failed";
+		bool RoughBathyresult, RoughInput ;
+		log("\t### Different bathy and different roughness file inputs ###");
+		RoughBathyresult = TestBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = RoughBathyresult ? "successful" : "failed";
 		log("\t\t ##### \n");
 		log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
+		RoughInput = TestBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = RoughInput ? "successful" : "failed";
 		log("\t\t ##### \n");
+		log("\t\t ##### Roughness file name test : " + result + "\n");
+		log("\t\t ##### \n");
+		isfailed = (!RoughBathyresult || !RoughInput || isfailed) ? true : false;
 
 	}
 		if (mytest == 994)
@@ -4187,13 +4194,13 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 *
 * This function tests the reading and interpolation of the bathymetry
 */
-template <class T> bool TestBathyRough(int gpu, T ref)
+template <class T> bool TestBathyRough(int gpu, T ref, int scenario)
 {
 	T Z0 = ref + 0.0;
 	T Z1 = ref + 2.0;
 	T R0 = 0.000001;
 	T R1 = 0.1;
-	T eps = 0.0000001;
+	T eps;
 	int NX = 21;
 	int NY = 21;
 	double* xz;
@@ -4203,6 +4210,7 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 	Forcing<float> XForcing;
 	Model<float> XModel;
 	Model<float> XModel_g;
+	char* name_file_R1;
 
 
 	//Creation of a Bathy file
@@ -4275,7 +4283,15 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 			map[j * NX + i] = R1;
 		}
 	}
-	create2dnc("R1_map.nc", NX, NY, xz, yz, map, "z0");
+	if (scenario < 0.5)
+	{
+		name_file_R1 = "R1_map.nc";
+	}
+	else
+	{
+		name_file_R1 = "1R_map.nc";
+	}
+	create2dnc(name_file_R1, NX, NY, xz, yz, map, "z0");
 
 	//Creation of a refinement file
 	//xz = (double*)malloc(sizeof(double) * NX);
@@ -4313,7 +4329,8 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 	param_file << "bathy = Z1_map.nc?z ;" << std::endl;
 	//Add Roughness to the file
 	param_file << "cfmap = R0_map.nc?z0 ;" << std::endl;
-	param_file << "cfmap = R1_map.nc?z0 ;" << std::endl;
+	param_file << "cfmap = " << name_file_R1 << "?z0 ;" << std::endl;
+	//param_file << "cfmap = R1_map.nc?z0 ;" << std::endl;
 	param_file << "frictionmodel=1 ;" << std::endl;
 	//Add refinement to the file
 	param_file << "Adaptation = Targetlevel,refinement.nc?z ;" << std::endl;
@@ -4325,6 +4342,7 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 	//Add endtime and outputvar
 	param_file << "endtime = 10.0 ;" << std::endl;
 	param_file << "outvars = zs,h,u,v,zb,cf;" << std::endl;
+	param_file << "dx = 0.01;" << std::endl;
 	param_file.close();
 
 	//read param file
@@ -4374,15 +4392,16 @@ template <class T> bool TestBathyRough(int gpu, T ref)
 	}
 
 	bool result = false;
-
-	if (abs(maxz - Z1)<eps && abs(maxr - R1)<eps && abs(minz - Z0)<eps && abs(minr - R0)<eps)
+	eps = 0.000000001;
+	if ((abs(maxz - Z1)<eps) && (abs(maxr - R1)<eps) && (abs(minz - Z0)<eps) && (abs(minr - R0)<eps))
 	{
 		result = true;
 	}
-
-	//log("\t\tZb corner " + XModel.zb[0]);
-	//log("\t\tcf corner " + XModel.cf[0]);
-    
+	printf("\t\n");
+	printf("\t\tZ max forced : %f, Z max obs :  %f\n ", Z1, maxz);
+	printf("\t\tR max forced :  %f, R max obs:  %f\n", R1, maxr);
+	printf("\t\tZ min forced :  %f, Z min obs:  %f\n", Z0, minz);
+	printf("\t\tR min forced : %f, R min obs : %f\n ", R0, minr);
 
 	return result;
 }

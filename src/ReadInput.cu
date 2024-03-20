@@ -247,7 +247,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == true)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
 		{
 			param.cf = std::stod(parametervalue);
 		}
@@ -921,7 +921,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			//forcing.cf = readfileinfo(parametervalue, forcing.cf);
 			StaticForcingP<float> infoRoughness;
@@ -941,7 +941,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.il = readfileinfo(parametervalue, forcing.il);
 		}
@@ -950,7 +950,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.cl = readfileinfo(parametervalue, forcing.cl);
 		}
