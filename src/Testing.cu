@@ -266,19 +266,24 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 				The max / min values are check to see if the z/z0 maps are created as expected
 			Test2: A roughness file name is changed to have a number in first position. We check that the 
 				file is read and not the number taken as z0 value.
+			Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
 		*/
-		bool RoughBathyresult, RoughInput ;
+		bool RoughBathyresult, RoughInput, RoughtInputnumber ;
 		log("\t### Different bathy and different roughness file inputs ###");
-		RoughBathyresult = TestBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
+		RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
 		result = RoughBathyresult ? "successful" : "failed";
 		log("\t\t ##### \n");
 		log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
-		RoughInput = TestBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
+		RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
 		result = RoughInput ? "successful" : "failed";
 		log("\t\t ##### \n");
 		log("\t\t ##### Roughness file name test : " + result + "\n");
+		RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = RoughtInputnumber ? "successful" : "failed";
 		log("\t\t ##### \n");
-		isfailed = (!RoughBathyresult || !RoughInput || isfailed) ? true : false;
+		log("\t\t ##### Roughness value input test : " + result + "\n");
+		log("\t\t ##### \n");
+		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || isfailed) ? true : false;
 
 	}
 		if (mytest == 994)
@@ -4189,12 +4194,14 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 
 
-//TestBathy(XParam, XModel, XModel_g) && TestRoughness
+//TestMultiBathyRough(int gpu, T ref, int scenario)
 /*! \fn 
 *
-* This function tests the reading and interpolation of the bathymetry
+* This function creates bathy and roughtness files and tests their reading (and interpolation)
+* The objectif is particularly to test multi bathy/roughness inputs and value/file input.
+*
 */
-template <class T> bool TestBathyRough(int gpu, T ref, int scenario)
+template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 {
 	T Z0 = ref + 0.0;
 	T Z1 = ref + 2.0;
@@ -4328,8 +4335,17 @@ template <class T> bool TestBathyRough(int gpu, T ref, int scenario)
 	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
 	param_file << "bathy = Z1_map.nc?z ;" << std::endl;
 	//Add Roughness to the file
-	param_file << "cfmap = R0_map.nc?z0 ;" << std::endl;
-	param_file << "cfmap = " << name_file_R1 << "?z0 ;" << std::endl;
+	if (scenario > 1.5)
+	{
+		R1 = 3.56;
+		param_file << "cfmap = " << R1 << std::endl;
+		R0 = 3.56;
+	}
+	else
+	{
+		param_file << "cfmap = R0_map.nc?z0 ;" << std::endl;
+		param_file << "cfmap = " << name_file_R1 << "?z0 ;" << std::endl;
+	}
 	//param_file << "cfmap = R1_map.nc?z0 ;" << std::endl;
 	param_file << "frictionmodel=1 ;" << std::endl;
 	//Add refinement to the file
@@ -4343,6 +4359,9 @@ template <class T> bool TestBathyRough(int gpu, T ref, int scenario)
 	param_file << "endtime = 10.0 ;" << std::endl;
 	param_file << "outvars = zs,h,u,v,zb,cf;" << std::endl;
 	param_file << "dx = 0.01;" << std::endl;
+	param_file << "zsinit = 0.1;" << std::endl;
+	param_file << "smallnc = 0;" << std::endl;
+	param_file << "doubleprecision = 1;" << std::endl;
 	param_file.close();
 
 	//read param file
