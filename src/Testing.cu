@@ -4388,10 +4388,13 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	//if XModel.cf[0]
 	//	XModel.zb
 	
-	T maxz = std::numeric_limits<float>::min();
-	T minz = std::numeric_limits<float>::min();
-	T maxr = std::numeric_limits<float>::min();
-	T minr = std::numeric_limits<float>::min();
+	T maxz = T(-1.0)*std::numeric_limits<float>::max();
+	T minz = std::numeric_limits<float>::max();
+	T maxr = T(-1.0)*std::numeric_limits<float>::max();
+	T minr = std::numeric_limits<float>::max();
+
+
+	printf("min float=%f\n", std::numeric_limits<float>::min());
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
