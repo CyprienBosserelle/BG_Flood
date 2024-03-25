@@ -253,6 +253,26 @@ Param readparamstr(std::string line, Param param)
 		}
 	}
 
+	paramvec = { "il","Rain_il","initialloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.il = std::stod(parametervalue);
+		}
+	}
+
+	paramvec = { "cl","Rain_cl","continuousloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.cl = std::stod(parametervalue);
+		}
+	}
+
 	paramvec = { "VelThreshold","vthresh","vmax","velmax" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
