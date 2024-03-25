@@ -480,7 +480,7 @@ template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XM
 		log(" \n ");
 		log("\t\tModel CRASHED: time steps (" + std::to_string(XLoop.dt) + ") inferior to " + std::to_string(XParam.dtmin) + "\n");
 
-		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho", "vo", "uo", "zso" };
+		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho","vo","uo","zso" };
 		std::vector<std::string> outvold = XParam.outvars;
 		if (XParam.GPUDEVICE >= 0)
 		{
