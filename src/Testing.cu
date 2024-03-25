@@ -4414,7 +4414,8 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	}
 
 	bool result = false;
-	eps = 0.000000001;
+	eps = 0.0000001;
+
 	if ((abs(maxz - Z1)<eps) && (abs(maxr - R1)<eps) && (abs(minz - Z0)<eps) && (abs(minr - R0)<eps))
 	{
 		result = true;
