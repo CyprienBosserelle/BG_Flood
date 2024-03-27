@@ -32,7 +32,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Initialise Friction map
 
-	if (!XForcing.cf.inputfile.empty())
+	if (!XForcing.cf.empty())
 	{
 		interp2BUQ(XParam, XModel.blocks, XForcing.cf, XModel.cf);
 	}
@@ -75,8 +75,22 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 	if (XParam.infiltration)
 	{
-		interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
-		interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+		if (!XForcing.il.inputfile.empty())
+		{
+			interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+		}
+		else
+		{
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.il, XModel.il);
+		}
+		if (!XForcing.cl.inputfile.empty())
+		{
+			interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+		}
+		else
+		{
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.cl, XModel.cl);
+		}
 		// Set edges of friction map
 		setedges(XParam, XModel.blocks, XModel.il);
 		setedges(XParam, XModel.blocks, XModel.cl);

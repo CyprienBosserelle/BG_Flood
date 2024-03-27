@@ -91,7 +91,15 @@ jobs:
         run: |
           sed -i 's/test = 10/test = 11/' BG_param.txt
           ./BG_Flood
-          
+
+      - name: running test 12, Test on calendar time
+        run: |
+          sed -i 's/test = 11/test = 12/' BG_param.txt
+          ./BG_Flood
+
+      - name: running test 13, Test on multi-Bathy / Multi-Roughness input
+        run: |
+          sed -i 's/test = 12/test = 13/' BG_param.txt
+          ./BG_Flood          
 
      
-

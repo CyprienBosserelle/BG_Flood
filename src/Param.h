@@ -22,6 +22,8 @@ public:
 	int frictionmodel = 0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)
 	double cf = 0.0001; // Bottom friction coefficient for flow model (if constant)
 	double Cd = 0.002; // Wind drag coefficient
+	double il = 0.0; //Initial Loss (if constant)
+	double cl = 0.0; //Continuous Loss (if constant)
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
