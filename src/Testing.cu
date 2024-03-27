@@ -267,8 +267,9 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			Test2: A roughness file name is changed to have a number in first position. We check that the 
 				file is read and not the number taken as z0 value.
 			Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
+			Test4 :  Test value input for initial loss / continuous loss
 		*/
-		bool RoughBathyresult, RoughInput, RoughtInputnumber ;
+		bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
 		log("\t### Different bathy and different roughness file inputs ###");
 		RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
 		result = RoughBathyresult ? "successful" : "failed";
@@ -283,7 +284,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t\t ##### \n");
 		log("\t\t ##### Roughness value input test : " + result + "\n");
 		log("\t\t ##### \n");
-		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || isfailed) ? true : false;
+		ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = ILCLInputnumber ? "successful" : "failed";
+		log("\t\t ##### \n");
+		log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
+		log("\t\t ##### \n");
+		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
 
 	}
 		if (mytest == 994)
@@ -4207,6 +4213,8 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	T Z1 = ref + 2.0;
 	T R0 = 0.000001;
 	T R1 = 0.1;
+	T IL = 8.6;
+	T CL = 7.2;
 	T eps;
 	int NX = 21;
 	int NY = 21;
@@ -4362,6 +4370,12 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	param_file << "zsinit = 0.1;" << std::endl;
 	param_file << "smallnc = 0;" << std::endl;
 	param_file << "doubleprecision = 1;" << std::endl;
+	if (scenario > 2.5)
+	{
+		param_file << "il = " << IL << std::endl;
+		param_file << "cl = " << CL << std::endl;
+	}
+
 	param_file.close();
 
 	//read param file
@@ -4426,6 +4440,42 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	printf("\t\tZ min forced :  %f, Z min obs:  %f\n", Z0, minz);
 	printf("\t\tR min forced : %f, R min obs : %f\n ", R0, minr);
 
+	if (scenario > 2.5)
+	{
+		T maxil = T(-1.0) * std::numeric_limits<float>::max();
+		T minil = std::numeric_limits<float>::max();
+		T maxcl = T(-1.0) * std::numeric_limits<float>::max();
+		T mincl = std::numeric_limits<float>::max();
+
+
+		//printf("min float=%f\n", std::numeric_limits<float>::min());
+
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		{
+			int ib = XModel.blocks.active[ibl];
+			for (int iy = 0; iy < XParam.blkwidth; iy++)
+			{
+				for (int ix = 0; ix < XParam.blkwidth; ix++)
+				{
+					int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+					maxil = max(maxil, abs(XModel.il[i]));
+					minil = min(minil, abs(XModel.il[i]));
+					maxcl = max(maxcl, abs(XModel.cl[i]));
+					mincl = min(mincl, abs(XModel.cl[i]));
+				}
+			}
+		}
+
+		bool result = false;
+		eps = 0.0000001;
+		// IL is expected here to be value when dry and 0 where wet at the begining of the computation
+		if ((abs(maxil - IL) < eps) && (abs(maxcl - CL) < eps) && (abs(minil - T(0.0)) < eps) && (abs(mincl - CL) < eps))
+		{
+			result = true;
+		}
+	}
+	
 	return result;
 }
 
