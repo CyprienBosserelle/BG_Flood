@@ -1541,9 +1541,9 @@ std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> ve
 }
 
 
-bndparam readbndlineNew(std::string parametervalue)
+bndsegment readbndlineside(std::string parametervalue)
 {
-	bndparam bnd;
+	bndsegment bnd;
 
 	std::vector<std::string> items = split(parametervalue, ',');
 
@@ -1552,7 +1552,27 @@ bndparam readbndlineNew(std::string parametervalue)
 		bnd.type = std::stoi(items[0]);
 
 	}
-	
+	else if (items.size() >= 2)
+	{
+		const char* cstr = items[1].c_str();
+		if (items[1].length() < 2)
+		{
+			if (!isdigit(cstr[0]))
+			{
+				// Error
+				//exit?
+			}
+			bnd.type = std::stoi(items[1]);
+			bnd.inputfile = items[0];
+			bnd.on = true;
+		}
+		else
+		{
+			bnd.type = std::stoi(items[0]);
+			bnd.inputfile = items[1];
+			bnd.on = true;
+		}
+	}
 	return bnd;
 }
 
@@ -1608,3 +1628,7 @@ bool readparambool(std::string paramstr,bool defaultval)
 	return out;
 }
 
+inline bool fileexists(const std::string& name) {
+	struct stat buffer;
+	return (stat(name.c_str(), &buffer) == 0);
+}

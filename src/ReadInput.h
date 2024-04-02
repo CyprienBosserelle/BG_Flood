@@ -32,5 +32,7 @@ std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> ve
 bool readparambool(std::string paramstr, bool defaultval);
 bndparam readbndline(std::string parametervalue);
 
+inline bool fileexists(const std::string& name)
+
 // End of global definition
 #endif

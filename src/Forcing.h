@@ -110,6 +110,8 @@ public:
 	int* blk_g;
 	float* qmean;
 	float* qmean_g;
+	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
+	//int* side; // e.g. 11000000 for the entire left side being a mask
 };
 
 
@@ -126,8 +128,7 @@ public:
 	int nbnd; // number of forcing bnds along the side (>=1 is side is on) 
 	int nblk = 0; //number of blocks where this bnd applies
 
-	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
-	int* side; // e.g. 11000000 for the entire left side being a mask
+	
 
 	
 	bndTexP GPU;
