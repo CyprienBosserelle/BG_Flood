@@ -809,7 +809,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.left = readbndline(parametervalue);
+		//forcing.left = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "left"));
 			
 	}
 	
@@ -817,7 +818,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.right = readbndline(parametervalue);
+		//forcing.right = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "right"));
 
 	}
 
@@ -825,14 +827,16 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.top = readbndline(parametervalue);
+		//forcing.top = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "top"));
 	}
 
 	paramvec = { "bot","botbndfile","botbnd","bottom" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.bot = readbndline(parametervalue);
+		//forcing.bot = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "bot"));
 	}
 
 
@@ -1541,9 +1545,10 @@ std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> ve
 }
 
 
-bndsegment readbndlineside(std::string parametervalue)
+bndsegment readbndlineside(std::string parametervalue, std::string side)
 {
 	bndsegment bnd;
+
 
 	std::vector<std::string> items = split(parametervalue, ',');
 
@@ -1565,6 +1570,7 @@ bndsegment readbndlineside(std::string parametervalue)
 			bnd.type = std::stoi(items[1]);
 			bnd.inputfile = items[0];
 			bnd.on = true;
+			
 		}
 		else
 		{
@@ -1572,6 +1578,7 @@ bndsegment readbndlineside(std::string parametervalue)
 			bnd.inputfile = items[1];
 			bnd.on = true;
 		}
+		bnd.polyfile = side;
 	}
 	return bnd;
 }
