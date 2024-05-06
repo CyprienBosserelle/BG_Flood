@@ -121,6 +121,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |bathyfile|bathyfile|
 |bathymetry|bathymetry|
 |depfile|depfile|
+|bnd| bnd , bndseg |
 |cavity|cavity|
 ---
 
