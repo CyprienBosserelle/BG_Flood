@@ -622,6 +622,22 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 	return crs_wkt;
 }
 
+Polygon readbndsegment(bndsegment bnd)
+{
+	Polygon bndpoly;
+
+	if (bnd.polyfile == "left")
+	{
+
+	}
+	else
+	{
+		bndpoly = readPolygon(bnd.polyfile);
+	}
+	
+	return bndpoly;
+}
+
 /*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 * Read boundary forcing files
 * 

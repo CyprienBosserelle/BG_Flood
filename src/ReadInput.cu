@@ -839,6 +839,14 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		forcing.bndseg.push_back(readbndlineside(parametervalue, "bot"));
 	}
 
+	paramvec = { "bnd","bndseg" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//forcing.bot = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndline(parametervalue));
+	}
+
 
 	//Tsunami deformation input files
 	parameterstr = "deform";
@@ -1584,9 +1592,10 @@ bndsegment readbndlineside(std::string parametervalue, std::string side)
 }
 
 
-bndparam readbndline(std::string parametervalue)
+bndsegment readbndline(std::string parametervalue)
 {
-	bndparam bnd;
+	//bndseg = area.txt, waterlevelforcing, 1;
+	bndsegment bnd;
 	std::vector<std::string> items = split(parametervalue, ',');
 	if (items.size() == 1)
 	{
@@ -1596,26 +1605,25 @@ bndparam readbndline(std::string parametervalue)
 	else if (items.size() >= 2)
 	{
 		const char* cstr = items[1].c_str();
-		if (items[1].length()<2)
+		if (items[1].length()>2)
 		{
-			if (!isdigit(cstr[0]))
-			{
-				// Error
-				//exit?
-			}
-			bnd.type = std::stoi(items[1]);
-			bnd.inputfile = items[0];
+			bnd.polyfile = items[0];
+			bnd.type = std::stoi(items[2]);
+			bnd.inputfile = items[1];
 			bnd.on = true;
+			
 		}
 		else
 		{
-			bnd.type = std::stoi(items[0]);
-			bnd.inputfile = items[1];
-			bnd.on = true;
+			bnd.polyfile = items[0];
+			bnd.type = std::max(std::stoi(items[1]),1); // only 2 param implies that it is either a wall or Neumann bnd
+	
 		}
 	}
 	return bnd;
 }
+
+
 
 bool readparambool(std::string paramstr,bool defaultval)
 {
