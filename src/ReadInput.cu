@@ -1661,9 +1661,9 @@ bool readparambool(std::string paramstr,bool defaultval)
 
 
 
-inline bool fileexists(const std::string& name) {
-	struct stat buffer;
-	return (stat(name.c_str(), &buffer) == 0);
-}
+//inline bool fileexists(const std::string& name) {
+//	struct stat buffer;
+//	return (stat(name.c_str(), &buffer) == 0);
+//}
 
 
