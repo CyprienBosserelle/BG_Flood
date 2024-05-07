@@ -56,6 +56,7 @@ template <class T> void clampedges(int nx, int ny, T clamp, T* z);
 std::vector<std::string> DelimLine(std::string line, int n, char delim);
 std::vector<std::string> DelimLine(std::string line, int n);
 Polygon readPolygon(std::string filename);
+Polygon readbndpolysegment(bndsegment bnd, Param XParam);
 
 
 // End of global definition

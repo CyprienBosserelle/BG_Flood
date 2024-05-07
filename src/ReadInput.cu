@@ -1177,7 +1177,19 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		}
 	}
 
+	// Read/setup bdn segment polygon. Note this can't be part of the "readforcing" step because xmin, xmax ymin ymax are not known then
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		XForcing.bndseg[iseg].poly= readbndpolysegment(XForcing.bndseg[iseg], XParam);
+
+	}
+
+	
+	
+	
+	
 	//setup extra infor about boundaries
+	// This is not needed anymore?
 	XForcing.left.side = 3;
 	XForcing.left.isright = -1;
 	XForcing.left.istop = 0;
@@ -1193,6 +1205,9 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	XForcing.bot.side = 2;
 	XForcing.bot.isright = 0;
 	XForcing.bot.istop = -1;
+
+
+	//
 
 	XForcing.Atmp.clampedge = float(XParam.Paref);
 
@@ -1643,7 +1658,12 @@ bool readparambool(std::string paramstr,bool defaultval)
 	return out;
 }
 
+
+
+
 inline bool fileexists(const std::string& name) {
 	struct stat buffer;
 	return (stat(name.c_str(), &buffer) == 0);
 }
+
+

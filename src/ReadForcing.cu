@@ -622,19 +622,92 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 	return crs_wkt;
 }
 
-Polygon readbndsegment(bndsegment bnd)
+Polygon readbndpolysegment(bndsegment bnd, Param XParam)
 {
 	Polygon bndpoly;
+	Vertex va,vb,vc,vd;
+	double epsbnd = XParam.dx*2.0;
+	double xo = XParam.xo;
+	double xmax = XParam.xmax;
+	double yo = XParam.yo;
+	double ymax = XParam.ymax;
 
-	if (bnd.polyfile == "left")
+	if (case_insensitive_compare(bnd.polyfile,"left")==0)
+	{
+		va.x = xo - epsbnd; va.y = yo;
+		vb.x = xo + epsbnd; vb.y = yo;
+		vc.x = xo + epsbnd; vc.y = ymax;
+		vd.x = xo - epsbnd; vd.y = ymax;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo - epsbnd;
+		bndpoly.xmax = xo + epsbnd;
+		bndpoly.ymin = yo;
+		bndpoly.ymax = ymax;
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "bot") == 0)
+	{
+		va.x = xo ; va.y = yo - epsbnd;
+		vb.x = xmax; vb.y = yo - epsbnd;
+		vc.x = xmax; vc.y = yo + epsbnd;
+		vd.x = xo; vd.y = yo + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo ;
+		bndpoly.xmax = xmax;
+		bndpoly.ymin = yo - epsbnd;
+		bndpoly.ymax = yo + epsbnd;
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "right") == 0)
+	{
+		va.x = xmax - epsbnd; va.y = yo;
+		vb.x = xmax + epsbnd; vb.y = yo;
+		vc.x = xmax + epsbnd; vc.y = ymax;
+		vd.x = xmax - epsbnd; vd.y = ymax;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xmax - epsbnd;
+		bndpoly.xmax = xmax + epsbnd;
+		bndpoly.ymin = yo;
+		bndpoly.ymax = ymax;
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "top") == 0)
 	{
 
+		va.x = xo; va.y = ymax - epsbnd;
+		vb.x = xmax; vb.y = ymax - epsbnd;
+		vc.x = xmax; vc.y = ymax + epsbnd;
+		vd.x = xo; vd.y = ymax + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo;
+		bndpoly.xmax = xmax;
+		bndpoly.ymin = ymax - epsbnd;
+		bndpoly.ymax = ymax + epsbnd;
 	}
 	else
 	{
 		bndpoly = readPolygon(bnd.polyfile);
 	}
-	
+
 	return bndpoly;
 }
 
