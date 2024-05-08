@@ -63,8 +63,10 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 	//=====================================
 	// Initial bndinfo
-	Calcbndblks(XParam, XForcing, XModel.blocks);
-	Findbndblks(XParam, XModel, XForcing);
+	//Calcbndblks(XParam, XForcing, XModel.blocks);
+	//Findbndblks(XParam, XModel, XForcing);
+	Initbndblks(XParam, XForcing, XModel.blocks);
+
 
 	//=====================================
 	// Calculate Active cells
@@ -871,7 +873,7 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	{
 		int ib = XBlock.active[ibl];
 
-		bool testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
+		bool testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) || (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
 		if (testbot)
 		{
 			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
@@ -932,6 +934,11 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 			}
 		}
 		XForcing.bndseg[s].nblk = segcount;
+
+		XForcing.bndseg[s].left.nblk = leftcount;
+		XForcing.bndseg[s].right.nblk = rightcount;
+		XForcing.bndseg[s].top.nblk = topcount;
+		XForcing.bndseg[s].bot.nblk = botcount;
 
 		//allocate array
 		AllocateCPU(leftcount, 1, XForcing.bndseg[s].left.blk);
