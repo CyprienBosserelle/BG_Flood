@@ -504,16 +504,15 @@ template void HalfStepGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float
 template void HalfStepGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
 
-
 template <class T> __global__ void reset_var(int halowidth, int* active, T resetval, T* Var)
 {
 
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int n = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	//int n= (ix + halowidth) + (iy + halowidth) * blkmemwidth + ib * blksize;

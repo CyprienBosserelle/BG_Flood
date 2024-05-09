@@ -951,6 +951,10 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		AllocateCPU(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
 		AllocateCPU(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
 
+		FillCPU(leftcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].left.qmean);
+		FillCPU(rightcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].right.qmean);
+		FillCPU(topcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].top.qmean);
+		FillCPU(botcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].bot.qmean);
 
 		leftcount = 0;
 		rightcount = 0;
