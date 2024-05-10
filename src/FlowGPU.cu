@@ -130,10 +130,10 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	XLoop.dt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
 	XLoop.dtmax = XLoop.dt;
 
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv, XModel.flux);
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv, XModel.flux);
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv, XModel.flux);
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv, XModel.flux);
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.flux);
+	}
 
 	bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
 	
@@ -221,11 +221,11 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	// Fill Halo for flux from fine to coarse
 	fillHaloGPU(XParam, XModel.blocks, XModel.flux);
 
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv, XModel.flux);
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv, XModel.flux);
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv, XModel.flux);
-	FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv, XModel.flux);
-
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt , XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.flux);
+	}
+	
 	bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
 
 	//============================================

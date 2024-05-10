@@ -1182,6 +1182,17 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	{
 		XForcing.bndseg[iseg].poly= readbndpolysegment(XForcing.bndseg[iseg], XParam);
 
+		XForcing.bndseg[iseg].left.isright = -1;
+		XForcing.bndseg[iseg].left.istop = 0;
+
+		XForcing.bndseg[iseg].right.isright = 1;
+		XForcing.bndseg[iseg].right.istop = 0;
+
+		XForcing.bndseg[iseg].top.isright = 0;
+		XForcing.bndseg[iseg].top.istop = 1;
+
+		XForcing.bndseg[iseg].bot.isright = 0;
+		XForcing.bndseg[iseg].bot.istop = -1;
 	}
 
 	
@@ -1189,7 +1200,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	
 	
 	//setup extra infor about boundaries
-	// This is not needed anymore?
+	// This is not needed anymore
 	XForcing.left.side = 3;
 	XForcing.left.isright = -1;
 	XForcing.left.istop = 0;

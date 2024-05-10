@@ -110,6 +110,8 @@ public:
 	int* blk_g;
 	float* qmean;
 	float* qmean_g;
+	int isright = 0;
+	int istop = 0;
 	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
 	//int* side; // e.g. 11000000 for the entire left side being a mask
 };
@@ -122,6 +124,7 @@ public:
 	Polygon poly;
 	std::string polyfile;
 	bool on = false;
+	bool uniform = true;
 	//If changing this default value, please change documentation later on the file
 	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
 	
@@ -131,7 +134,7 @@ public:
 	
 
 	
-	bndTexP GPU;
+	DynForcingP<float> WLmap;
 
 	bndsegmentside left;
 	bndsegmentside right;

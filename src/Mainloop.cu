@@ -205,19 +205,25 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 
 template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	if (XParam.GPUDEVICE >= 0)
+	for (int ibndseg = 0; ibndseg < XForcing.bndseg.size(); ibndseg++)
 	{
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XForcing.Atmp, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XForcing.Atmp, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XForcing.Atmp, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XForcing.Atmp, XModel_g.evolv);
-	}
-	else
-	{
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv);
+		if (XParam.GPUDEVICE >= 0)
+		{
+
+
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XForcing.Atmp, XModel_g.evolv);
+
+		}
+		else
+		{
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv);
+		}
 	}
 }
 

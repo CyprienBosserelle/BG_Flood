@@ -83,6 +83,9 @@ public:
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
+	double bndrelaxtime = 3600.0; // Realxation time for absorbing boundary
+	double bndfiltertime = 60.0; // Filtering time for absorbing boundary
+
 
 	//* Initialisation
 	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
