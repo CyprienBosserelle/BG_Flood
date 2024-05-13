@@ -879,11 +879,11 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
 
 			bndblks.push_back(ib);
-			bndsegment.push_back(-1); // i.e. by default the block doesn't belong to a segment
-
-			for (int s = 0; s < XForcing.bndseg.size(); s++)
+			bndsegment.push_back(XForcing.bndseg.size()-1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
+			//loop through all but the last bnd seg which is meant for block that are not in any segments
+			for (int s = 0; s < XForcing.bndseg.size()-1; s++)
 			{
-				bool inpoly=blockinpoly(XBlock.xo[ib], XBlock.yo[ib], dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+				bool inpoly=blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
 
 				if (inpoly)
 				{
@@ -941,15 +941,16 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		XForcing.bndseg[s].bot.nblk = botcount;
 
 		//allocate array
-		AllocateCPU(leftcount, 1, XForcing.bndseg[s].left.blk);
-		AllocateCPU(rightcount, 1, XForcing.bndseg[s].right.blk);
-		AllocateCPU(topcount, 1, XForcing.bndseg[s].top.blk);
-		AllocateCPU(botcount, 1, XForcing.bndseg[s].bot.blk);
+		//ReallocArray(int nblk, int blksize, T * &zb)
+		ReallocArray(leftcount, 1, XForcing.bndseg[s].left.blk);
+		ReallocArray(rightcount, 1, XForcing.bndseg[s].right.blk);
+		ReallocArray(topcount, 1, XForcing.bndseg[s].top.blk);
+		ReallocArray(botcount, 1, XForcing.bndseg[s].bot.blk);
 
-		AllocateCPU(leftcount, XParam.blkwidth, XForcing.bndseg[s].left.qmean);
-		AllocateCPU(rightcount, XParam.blkwidth, XForcing.bndseg[s].right.qmean);
-		AllocateCPU(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
-		AllocateCPU(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
+		ReallocArray(leftcount, XParam.blkwidth, XForcing.bndseg[s].left.qmean);
+		ReallocArray(rightcount, XParam.blkwidth, XForcing.bndseg[s].right.qmean);
+		ReallocArray(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
+		ReallocArray(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
 
 		FillCPU(leftcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].left.qmean);
 		FillCPU(rightcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].right.qmean);

@@ -135,7 +135,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.flux);
 	}
 
-	bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
+	//bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
 	
 
 	XModel.time.dt = T(XLoop.dt);
@@ -226,7 +226,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt , XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.flux);
 	}
 	
-	bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
+	//bndmaskGPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 

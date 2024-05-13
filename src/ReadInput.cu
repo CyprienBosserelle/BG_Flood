@@ -1195,6 +1195,36 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		XForcing.bndseg[iseg].bot.istop = -1;
 	}
 
+	bndsegment remainderblk;
+
+	remainderblk.left.isright = -1;
+	remainderblk.left.istop = 0;
+
+	remainderblk.right.isright = 1;
+	remainderblk.right.istop = 0;
+
+	remainderblk.top.isright = 0;
+	remainderblk.top.istop = 1;
+
+	remainderblk.bot.isright = 0;
+	remainderblk.bot.istop = -1;
+	remainderblk.type = XParam.aoibnd;
+
+	XForcing.bndseg.push_back(remainderblk);
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].left.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].right.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].top.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].bot.blk);
+
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].left.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].right.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].top.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].bot.qmean);
+	}
+
 	
 	
 	
@@ -1594,16 +1624,15 @@ bndsegment readbndlineside(std::string parametervalue, std::string side)
 	else if (items.size() >= 2)
 	{
 		const char* cstr = items[1].c_str();
-		if (items[1].length() < 2)
+		
+		if (isdigit(cstr[0]))
 		{
-			if (!isdigit(cstr[0]))
-			{
-				// Error
-				//exit?
-			}
+			//?
 			bnd.type = std::stoi(items[1]);
 			bnd.inputfile = items[0];
 			bnd.on = true;
+			
+			
 			
 		}
 		else
@@ -1612,8 +1641,9 @@ bndsegment readbndlineside(std::string parametervalue, std::string side)
 			bnd.inputfile = items[1];
 			bnd.on = true;
 		}
-		bnd.polyfile = side;
+		
 	}
+	bnd.polyfile = side;
 	return bnd;
 }
 

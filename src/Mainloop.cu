@@ -20,7 +20,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+		//updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
 
 
 		// Calculate dynamic forcing at this step

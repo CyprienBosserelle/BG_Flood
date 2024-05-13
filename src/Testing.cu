@@ -4379,7 +4379,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 		XForcing.AOI.active = true;
 		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
 	}
-
+	/*
 	if (bottop==false && flip==false)
 	{
 		XForcing.left.type = 0;
@@ -4396,7 +4396,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	{
 		XForcing.top.type = 0;
 	}
-	
+	*/
 	XParam.minlevel = 3;
 	XParam.maxlevel = 3;
 	XParam.initlevel = 3;

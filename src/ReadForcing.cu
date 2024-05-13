@@ -67,6 +67,15 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// Read bnd files
 	log("\nReading boundary data...");
 
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on)
+		{
+			XForcing.bndseg[iseg].data = readbndfile(XForcing.bndseg[iseg].inputfile, XParam);
+		}
+	}
+
+	/*
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 	
 
@@ -115,6 +124,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			AllocateBndTEX(XForcing.bot);
 		}
 	}
+	*/
+
+
 
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
 	// Removed. This is better done in the sanity check!
@@ -626,7 +638,7 @@ Polygon readbndpolysegment(bndsegment bnd, Param XParam)
 {
 	Polygon bndpoly;
 	Vertex va,vb,vc,vd;
-	double epsbnd = XParam.dx*2.0;
+	double epsbnd = calcres(XParam.dx,XParam.initlevel);
 	double xo = XParam.xo;
 	double xmax = XParam.xmax;
 	double yo = XParam.yo;
@@ -715,7 +727,7 @@ Polygon readbndpolysegment(bndsegment bnd, Param XParam)
 * Read boundary forcing files
 * 
 */
-std::vector<SLTS> readbndfile(std::string filename,Param & XParam, int side)
+std::vector<SLTS> readbndfile(std::string filename,Param & XParam)
 {
 	// read bnd or nest file
 	// side is for deciding whether we are talking about a left(side=0) bot (side =1) right (side=2) or top (side=3)
