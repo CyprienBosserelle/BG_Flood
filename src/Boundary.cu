@@ -107,7 +107,7 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 	{
 		if (XParam.GPUDEVICE >= 0)
 		{
-			if (bndseg.left.nblk > 0)
+			//if (bndseg.left.nblk > 0)
 			{
 				//Left
 				//template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, float zsbnd, T * zs, T * h, T * un, T * ut, T * Fh, T * Fq, T * Ss)
@@ -115,19 +115,19 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
 			CUDA_CHECK(cudaDeviceSynchronize());
 			}
-			if (bndseg.right.nblk > 0)
+			//if (bndseg.right.nblk > 0)
 			{
 				//Right
 				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
-			if (bndseg.top.nblk > 0)
+			//if (bndseg.top.nblk > 0)
 			{
 				//top
 				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
-			if (bndseg.bot.nblk > 0)
+			//if (bndseg.bot.nblk > 0)
 			{
 				//bot
 				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
@@ -290,7 +290,7 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	
 	if (side.isright < 0 || side.istop < 0) //left or bottom
 	{
-		F = Fh[inside];
+		F = Fh[i];
 		G = Fq[i];
 		S = Ss[inside];
 	}
@@ -301,8 +301,8 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		S = Fq[inside];
 	}
 	
-	T factime = T(0.0001);//min(T(XParam.dt / XParam.bndfiltertime), T(1.0));
-	T facrel = T(0.999);// T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
+	T factime = min(T(XParam.dt / XParam.bndfiltertime), T(1.0));
+	T facrel =  T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
 
 
 
@@ -313,18 +313,20 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		//noslipbndQ(F, G, S);
 		
 		
-		noslipbndQ(F, G, S);
+		noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
 	
 	}
 	else if (type == 3)
 	{
-		if (hinside > XParam.eps)
+		if (h[i] > XParam.eps || zsX > zsi )
 		{
-			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, hinside, qmean, F, G, S);
+			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
+			
 		}
 		else
 		{
 			noslipbndQ(F, G, S);
+			qmean = T(0.0);
 		}
 		side.qmean_g[iq] = qmean;
 	}
@@ -334,7 +336,7 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 
 	if (side.isright < 0 || side.istop < 0) // left or bottom
 	{
-		Fh[inside]=F;
+		Fh[i]=F;
 		Fq[i]=G;
 		Ss[inside]=S;
 	}
@@ -1355,24 +1357,29 @@ template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facr
 	//When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
 	// For utbnd use utinside if no utbnd are known 
 
-	qmean = factime * q + facrel * (T(1.0) - factime) * qmean;
+	qmean = factime* q + facrel * (T(1.0) - factime) * qmean;
 
 	T un;
+	T zn = max(zsbnd, (zs - h));
+
+	T hn = max(h, 0.0001);
 	
 
 	// Below should be hinside ? or h at Flux bnd?
 	// What if h is 0? then q and qmean should be 0
 	//un = sign * sqrt(g / h) * (T(2.0)*(zs - zsbnd) - (zsinside - zsbnd));
-	un = sign * sqrt(g / h) * (T(2.0) * zs - zsinside - zsbnd);
-	//un = sign * sqrt(g / h) * (zsinside-zsbnd);
+	//un = sign* sqrt(g / h)* (T(2.0) * zs - zsinside - zsbnd);
+	un = sign * sqrt(g / hn) * (zs-zn);
+	//un = sign* sqrt(g / h)* (zs + zsinside - T(2.0) * zsbnd);
 	//zs = zsinside;
 	//zs = zsinside;
 	//ut = T(utbnd);//ut[inside];
 	//h = hinside;
 
-	q = un * h + qmean;
+	q = un * hn + qmean;
 
-	S = G;
+	//S = G;
+	//G = S-q;
 
 
 }
