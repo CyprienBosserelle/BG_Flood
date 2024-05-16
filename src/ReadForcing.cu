@@ -73,7 +73,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		{
 			//XForcing.bndseg[iseg].data = readbndfile(XForcing.bndseg[iseg].inputfile, XParam);
 
-			if (XForcing.Rain.uniform == 1)
+			if (XForcing.bndseg[iseg].uniform == 1)
 			{
 				// grid uniform time varying rain input
 				XForcing.bndseg[iseg].data = readINfileUNI(XForcing.bndseg[iseg].inputfile, XParam.reftime);
