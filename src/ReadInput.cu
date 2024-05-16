@@ -216,7 +216,7 @@ Param readparamstr(std::string line, Param param)
 		param.conserveElevation = readparambool(parametervalue, param.conserveElevation);
 	}
 
-	paramvec = { "wetdryfix","reminstab" };
+	paramvec = { "wetdryfix","reminstab","fixinstab" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -304,6 +304,13 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.dtmin = std::stod(parametervalue);
+
+	}
+	parameterstr = "bndtaper";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndtaper = std::stod(parametervalue);
 
 	}
 

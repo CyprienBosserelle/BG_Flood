@@ -87,7 +87,7 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 	dim3 gridDimBBNDBot(bndseg.bot.nblk, 1, 1);
 
 	double zsbnd=0.0;
-
+	T taper=T(1.0);
 	if (bndseg.on)
 	{
 
@@ -102,7 +102,15 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 
 		//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
 		zsbnd = interptime(bndseg.data[SLstepinbnd].wlevs[0], bndseg.data[SLstepinbnd - 1].wlevs[0], bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
+		
+
+		if (XParam.bndtaper > 0.0)
+		{
+			taper = min(totaltime / XParam.bndtaper, 1.0);
+		}
+		
 	}
+
 	if (bndseg.type != 1)
 	{
 		if (XParam.GPUDEVICE >= 0)
@@ -112,25 +120,25 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 				//Left
 				//template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, float zsbnd, T * zs, T * h, T * un, T * ut, T * Fh, T * Fq, T * Ss)
 				//bndFluxGPUSide <<< gridDimBBND, blockDim, 0 >>> (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
-				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
 			CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.right.nblk > 0)
 			{
 				//Right
-				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.top.nblk > 0)
 			{
 				//top
-				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.bot.nblk > 0)
 			{
 				//bot
-				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 		}
@@ -206,16 +214,16 @@ template <class T> void FlowbndFluxold(Param XParam, double totaltime, BlockP<T>
 template void FlowbndFluxold<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
 template void FlowbndFluxold<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
 
-template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
+template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
 {
 	//
 
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
-	unsigned int ibl = blockIdx.x;
-	unsigned int ix, iy;
+	int ibl = blockIdx.x;
+	int ix, iy;
 	
 
 	int iq = ibl * XParam.blkwidth + threadIdx.x;
@@ -265,8 +273,9 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		zsbnd = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Zsmap.GPU);
 	}
 
+	
 
-	T zsX = zsbnd + zsatm;
+	
 
 
 	int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
@@ -284,6 +293,8 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	hinside = h[inside];
 	uninside = un[inside];
 	utinside = ut[inside];
+
+	T zsX = (zsbnd + zsatm - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
 
 	qmean = side.qmean_g[iq];
 

@@ -56,6 +56,7 @@ public:
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
 	int halowidth = 1; // Use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
+	
 
 	double xo = nan(""); // Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
@@ -98,6 +99,9 @@ public:
 	*/
 	//std::string deformfile;
 	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
+
+
+	double bndtaper = 0.0; // number of second to taper boundary values to smooth transition with initial conditions default is no tapering but 600s is good practice
 	//other
 	clock_t startcputime, endcputime, setupcputime;
 	size_t GPU_initmem_byte, GPU_totalmem_byte;
