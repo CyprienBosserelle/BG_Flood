@@ -332,7 +332,7 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		if (h[i] > XParam.eps || zsX > zsi )
 		{
 			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
-			
+			//qmean = T(0.0);
 		}
 		else
 		{
@@ -1370,7 +1370,8 @@ template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facr
 
 	
 	
-	qmean = h < T(0.1) ? T(0.0) : factime* q + facrel * (T(1.0) - factime) * qmean;
+	qmean = h < T(0.01) ? T(0.0) : factime* q + facrel * (T(1.0) - factime) * qmean;
+	//qmean = factime * q + facrel * (T(1.0) - factime) * qmean;
 
 	T un;
 	T zn = max(zsbnd, (zs - h));
