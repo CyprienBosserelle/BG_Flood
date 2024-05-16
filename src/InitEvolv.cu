@@ -163,7 +163,7 @@ void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, E
 				}
 
 				//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
-				zsbnduni = zsbnduni + interptime(XForcing.bndseg[iseg].data[SLstepinbnd].wlevs[0], XForcing.bndseg[iseg].data[SLstepinbnd - 1].wlevs[0], XForcing.bndseg[iseg].data[SLstepinbnd].time - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time);
+				zsbnduni = zsbnduni + interptime(XForcing.bndseg[iseg].data[SLstepinbnd].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd - 1].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd].time - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time);
 
 			}
 			else

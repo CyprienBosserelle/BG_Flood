@@ -119,7 +119,7 @@ public:
 
 class bndsegment {
 public:
-	std::vector<SLTS> data;
+	std::vector<Windin> data;
 	std::string inputfile;
 	Polygon poly;
 	std::string polyfile;

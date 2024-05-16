@@ -101,7 +101,7 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 		}
 
 		//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
-		zsbnd = interptime(bndseg.data[SLstepinbnd].wlevs[0], bndseg.data[SLstepinbnd - 1].wlevs[0], bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
+		zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
 		
 
 		if (XParam.bndtaper > 0.0)
@@ -121,7 +121,7 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 				//template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, float zsbnd, T * zs, T * h, T * un, T * ut, T * Fh, T * Fq, T * Ss)
 				//bndFluxGPUSide <<< gridDimBBND, blockDim, 0 >>> (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
 				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
-			CUDA_CHECK(cudaDeviceSynchronize());
+				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.right.nblk > 0)
 			{
@@ -1368,12 +1368,14 @@ template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facr
 	//When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
 	// For utbnd use utinside if no utbnd are known 
 
-	qmean = factime* q + facrel * (T(1.0) - factime) * qmean;
+	
+	
+	qmean = h < T(0.1) ? T(0.0) : factime* q + facrel * (T(1.0) - factime) * qmean;
 
 	T un;
 	T zn = max(zsbnd, (zs - h));
 
-	T hn = max(h, 0.0001);
+	T hn = max(h, T(0.0001));
 	
 
 	// Below should be hinside ? or h at Flux bnd?

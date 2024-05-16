@@ -19,6 +19,13 @@ template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float
 		Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.UWind);
 		Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.VWind);
 	}
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on && !XForcing.bndseg[iseg].uniform)
+		{
+			Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.bndseg[iseg].WLmap);
+		}
+	}
 
 	
 }

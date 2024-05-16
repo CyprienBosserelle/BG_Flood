@@ -818,6 +818,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		//forcing.left = readbndline(parametervalue);
 		forcing.bndseg.push_back(readbndlineside(parametervalue, "left"));
+
+		
 			
 	}
 	
@@ -1651,6 +1653,23 @@ bndsegment readbndlineside(std::string parametervalue, std::string side)
 		
 	}
 	bnd.polyfile = side;
+	if (bnd.on)
+	{
+		bnd.WLmap = readfileinfo(bnd.inputfile, bnd.WLmap);
+
+		//set the expected type of input
+
+		if (bnd.WLmap.extension.compare("nc") == 0)
+		{
+			bnd.WLmap.uniform = 0;
+			bnd.uniform = 0;
+		}
+		else
+		{
+			bnd.WLmap.uniform = 1;
+			bnd.uniform = 1;
+		}
+	}
 	return bnd;
 }
 
@@ -1681,6 +1700,27 @@ bndsegment readbndline(std::string parametervalue)
 			bnd.polyfile = items[0];
 			bnd.type = std::max(std::stoi(items[1]),1); // only 2 param implies that it is either a wall or Neumann bnd
 	
+		}
+	}
+	
+
+	//set the expected type of input
+
+	if (bnd.on)
+	{
+		bnd.WLmap = readfileinfo(bnd.inputfile, bnd.WLmap);
+
+		//set the expected type of input
+
+		if (bnd.WLmap.extension.compare("nc") == 0)
+		{
+			bnd.WLmap.uniform = 0;
+			bnd.uniform = 0;
+		}
+		else
+		{
+			bnd.WLmap.uniform = 1;
+			bnd.uniform = 1;
 		}
 	}
 	return bnd;

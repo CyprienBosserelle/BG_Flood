@@ -71,7 +71,19 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	{
 		if (XForcing.bndseg[iseg].on)
 		{
-			XForcing.bndseg[iseg].data = readbndfile(XForcing.bndseg[iseg].inputfile, XParam);
+			//XForcing.bndseg[iseg].data = readbndfile(XForcing.bndseg[iseg].inputfile, XParam);
+
+			if (XForcing.Rain.uniform == 1)
+			{
+				// grid uniform time varying rain input
+				XForcing.bndseg[iseg].data = readINfileUNI(XForcing.bndseg[iseg].inputfile, XParam.reftime);
+			}
+			else
+			{
+				XForcing.bndseg[iseg].WLmap.denanval = 0.0;
+				InitDynforcing(gpgpu, XParam, XForcing.bndseg[iseg].WLmap);
+				//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			}
 		}
 	}
 
@@ -1189,7 +1201,7 @@ std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate)
 
 	if (fs.fail()) {
 		//std::cerr << filename << "ERROR: Atm presssure / Rainfall file could not be opened" << std::endl;
-		log("ERROR: Atm presssure / Rainfall file could not be opened : " + filename);
+		log("ERROR: Bnd file / Atm presssure / Rainfall file could not be opened : " + filename);
 		exit(1);
 	}
 
