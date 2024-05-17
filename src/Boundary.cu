@@ -144,7 +144,12 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 		}
 		else
 		{
-			//bndFluxCPU(XParam, side, XBlock, zsbndleft, uubndleft, vvbndleft, Atmp, XEv.zs, XEv.h, un, ut);
+			bndFluxGPUSideCPU(XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			bndFluxGPUSideCPU(XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			bndFluxGPUSideCPU(XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+			bndFluxGPUSideCPU(XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+
+
 		}
 	}
 }
@@ -366,6 +371,148 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 
 }
 
+
+template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	for (int ibl = 0; ibl < side.nblk; ibl++)
+	{
+
+		int ib = side.blk[ibl];
+		int lev = XBlock.level[ib];
+		
+		T delta = calcres(T(XParam.dx), lev);
+
+		for (int tx = 0; tx < XParam.blkwidth; tx++)
+		{
+			int ix, iy;
+
+			T xx, yy;
+			if (side.isright == 0)
+			{
+				ix = tx;
+				iy = side.istop < 0 ? 0 : (XParam.blkwidth - 1);
+				//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+			}
+			else
+			{
+				iy = tx;
+				ix = side.isright < 0 ? 0 : (XParam.blkwidth - 1);
+				//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+			}
+			xx = XBlock.xo[ib] + ix * delta;
+			yy = XBlock.yo[ib] + iy * delta;
+
+			T sign = T(side.isright) + T(side.istop);
+			int iq = ibl * XParam.blkwidth + tx;
+
+
+			T zsatm = T(0.0);
+			T atmpi = T(0.0);
+
+			if (XParam.atmpforcing)
+			{
+				if (Atmp.uniform)
+				{
+					atmpi = T(Atmp.nowvalue);
+				}
+				else
+				{
+					atmpi = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp);
+				}
+				zsatm = -(atmpi - (T)XParam.Paref) * (T)XParam.Pa2m;
+			}
+			if (!uniform)
+			{
+
+
+				zsbnd = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Zsmap);
+			}
+
+
+			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+			int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+
+			//T zsbnd;
+			T unbnd = T(0.0);
+			T utbnd = T(0.0);
+
+			T zsinside, hinside, uninside, utinside, zsi;
+			T F, G, S;
+			T qmean;
+
+			zsi = zs[i];
+			zsinside = zs[inside];
+			hinside = h[inside];
+			uninside = un[inside];
+			utinside = ut[inside];
+
+			T zsX = (zsbnd + zsatm - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
+
+			qmean = side.qmean[iq];
+
+
+			if (side.isright < 0 || side.istop < 0) //left or bottom
+			{
+				F = Fh[i];
+				G = Fq[i];
+				S = Ss[inside];
+			}
+			else
+			{
+				F = Fh[i];
+				G = Ss[i];
+				S = Fq[inside];
+			}
+
+			T factime = min(T(XParam.dt / XParam.bndfiltertime), T(1.0));
+			T facrel = T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
+			if (type == 0) // No Flux
+			{
+				//noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+				//noslipbndQ(F, G, S);
+
+
+				noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+
+			}
+			else if (type == 3)
+			{
+				if (h[i] > XParam.eps || zsX > zsi)
+				{
+					ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
+					//qmean = T(0.0);
+				}
+				else
+				{
+					noslipbndQ(F, G, S);
+					qmean = T(0.0);
+				}
+				side.qmean[iq] = qmean;
+			}
+
+
+			// write the results
+
+			if (side.isright < 0 || side.istop < 0) // left or bottom
+			{
+				Fh[i] = F;
+				Fq[i] = G;
+				Ss[inside] = S;
+			}
+			else
+			{
+				Fh[i] = F;
+				Ss[i] = G;
+				Fq[inside] = S;
+			}
+		}
+	}
+
+}
 
 template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut)
 {
