@@ -373,6 +373,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	XParam.zsinit = zsnit;
 	XParam.zsoffset = 0.0;
 
+	XParam.aoibnd = 3;
+
 	//Output times for comparisons
 	XParam.endtime = 1.0;
 	XParam.outputtimestep = 0.1;
@@ -416,7 +418,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	XForcing.Bathy[0].dx = 1.0;
 	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
 
-	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+	//AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 
