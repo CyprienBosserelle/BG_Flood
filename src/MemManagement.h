@@ -25,6 +25,8 @@ template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev);
 template <class T> void ReallocArray(int nblk, int blksize, EvolvingP_M<T>& Ev);
 template <class T> void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel);
 
+template <class T> __host__ void FillCPU(int nx, int ny, T fillval, T*& zb);
+
 int memloc(Param XParam, int i, int j, int ib);
 //__device__ int memloc(int halowidth, int blkmemwidth, int  blksize, int i, int j, int ib);
 __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int ib);

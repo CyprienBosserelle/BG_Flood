@@ -35,6 +35,8 @@ public:
 	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
 
+	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
+
 	double Pa2m = 0.00009916; // Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)
 	double Paref = 101300.0; // Reference pressure in Pa (if unit is hPa then user should use 1013.0)
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
@@ -54,6 +56,7 @@ public:
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
 	int halowidth = 1; // Use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
+	
 
 	double xo = nan(""); // Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
@@ -81,6 +84,9 @@ public:
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
+	double bndrelaxtime = 3600.0; // Realxation time for absorbing boundary
+	double bndfiltertime = 60.0; // Filtering time for absorbing boundary
+
 
 	//* Initialisation
 	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
@@ -93,6 +99,9 @@ public:
 	*/
 	//std::string deformfile;
 	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
+
+
+	double bndtaper = 0.0; // number of second to taper boundary values to smooth transition with initial conditions default is no tapering but 600s is good practice
 	//other
 	clock_t startcputime, endcputime, setupcputime;
 	size_t GPU_initmem_byte, GPU_totalmem_byte;

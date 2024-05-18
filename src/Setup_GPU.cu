@@ -47,6 +47,35 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 		AllocateGPU(XForcing.bot.nblk, 1, XForcing.bot.blks_g);
 		CopytoGPU(XForcing.bot.nblk, 1, XForcing.bot.blks, XForcing.bot.blks_g);
 
+
+		for (int s = 0; s < XForcing.bndseg.size(); s++)
+		{
+			AllocateGPU(XForcing.bndseg[s].left.nblk, 1, XForcing.bndseg[s].left.blk_g);
+			CopytoGPU(XForcing.bndseg[s].left.nblk, 1, XForcing.bndseg[s].left.blk, XForcing.bndseg[s].left.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].right.nblk, 1, XForcing.bndseg[s].right.blk_g);
+			CopytoGPU(XForcing.bndseg[s].right.nblk, 1, XForcing.bndseg[s].right.blk, XForcing.bndseg[s].right.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].top.nblk, 1, XForcing.bndseg[s].top.blk_g);
+			CopytoGPU(XForcing.bndseg[s].top.nblk, 1, XForcing.bndseg[s].top.blk, XForcing.bndseg[s].top.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].bot.nblk, 1, XForcing.bndseg[s].bot.blk_g);
+			CopytoGPU(XForcing.bndseg[s].bot.nblk, 1, XForcing.bndseg[s].bot.blk, XForcing.bndseg[s].bot.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].left.nblk, XParam.blkwidth, XForcing.bndseg[s].left.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].left.nblk, XParam.blkwidth, XForcing.bndseg[s].left.qmean, XForcing.bndseg[s].left.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].right.nblk, XParam.blkwidth, XForcing.bndseg[s].right.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].right.nblk, XParam.blkwidth, XForcing.bndseg[s].right.qmean, XForcing.bndseg[s].right.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].top.nblk, XParam.blkwidth, XForcing.bndseg[s].top.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].top.nblk, XParam.blkwidth, XForcing.bndseg[s].top.qmean, XForcing.bndseg[s].top.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].bot.nblk, XParam.blkwidth, XForcing.bndseg[s].bot.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].bot.nblk, XParam.blkwidth, XForcing.bndseg[s].bot.qmean, XForcing.bndseg[s].bot.qmean_g);
+		}
+
+
 		// Also for mask
 		XModel_g.blocks.mask.nblk = XModel.blocks.mask.nblk;
 		AllocateGPU(XModel_g.blocks.mask.nblk, 1, XModel_g.blocks.mask.side);
