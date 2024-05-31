@@ -132,11 +132,13 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		// roughness map was specified!
 		//readstaticforcing(XForcing.cf);
 		//log("...done");
-
+		// Here we are not using the automated denaning because we want to preserve the Nan in all but the "main/first" listed roughness map. 
+		// This mean that subsequently listed roughness map can have large NAN holes in them.
 		for (int ib = 0; ib < XForcing.cf.size(); ib++)
 		{
+			
 			readstaticforcing(XForcing.cf[ib]);
-			if (ib == 0) // Fill Nan for only the first bathy listed, the others will use values from original bathy topo.
+			if (ib == 0) // Fill Nan for only the first map listed, the others will use values from original bathy topo.
 			{
 				denan(XForcing.cf[ib].nx, XForcing.cf[ib].ny, T(0.0000001), XForcing.cf[ib].val);
 			}
