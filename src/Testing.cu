@@ -19,6 +19,9 @@
 * Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
 * Test 9 Zoned output (test zoned outputs with adaptative grid)
 * Test 10 Initial Loss / Continuous Loss on a slope, under uniform rain
+* Test 11 Wet/dry Instability test with Conserve Elevation
+* Test 12 Calendar time to second conversion
+* Test 13 Multi bathy and roughness map input
 
 * Test 99 Run all the test with test number < 99.
 
@@ -255,6 +258,39 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		timetest = testime1(1) && testime2(2);
 		result = timetest ? "successful" : "failed";
 		log("\t\tCalendar time test : " + result);
+	}
+	if (mytest == 13)
+	{
+		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
+			Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
+				The max / min values are check to see if the z/z0 maps are created as expected
+			Test2: A roughness file name is changed to have a number in first position. We check that the 
+				file is read and not the number taken as z0 value.
+			Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
+			Test4 :  Test value input for initial loss / continuous loss
+		*/
+		bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
+		log("\t### Different bathy and different roughness file inputs ###");
+		RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = RoughBathyresult ? "successful" : "failed";
+		log("\t\t ##### \n");
+		log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
+		RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = RoughInput ? "successful" : "failed";
+		log("\t\t ##### \n");
+		log("\t\t ##### Roughness file name test : " + result + "\n");
+		RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = RoughtInputnumber ? "successful" : "failed";
+		log("\t\t ##### \n");
+		log("\t\t ##### Roughness value input test : " + result + "\n");
+		log("\t\t ##### \n");
+		ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
+		result = ILCLInputnumber ? "successful" : "failed";
+		log("\t\t ##### \n");
+		log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
+		log("\t\t ##### \n");
+		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
+
 	}
 		if (mytest == 994)
 		{
@@ -4159,6 +4195,291 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 	return test;
 
 }
+
+
+
+
+
+//TestMultiBathyRough(int gpu, T ref, int scenario)
+/*! \fn 
+*
+* This function creates bathy and roughtness files and tests their reading (and interpolation)
+* The objectif is particularly to test multi bathy/roughness inputs and value/file input.
+*
+*/
+template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
+{
+	T Z0 = ref + 0.0;
+	T Z1 = ref + 2.0;
+	T R0 = 0.000001;
+	T R1 = 0.1;
+	T IL = 8.6;
+	T CL = 7.2;
+	T eps;
+	int NX = 21;
+	int NY = 21;
+	double* xz;
+	double* yz;
+	double* map;
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+	char* name_file_R1;
+
+
+	//Creation of a Bathy file
+
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = Z0; //+ (yz[j] + 1) * 0.5;
+		}
+	}
+	create2dnc("Z0_map.nc", NX, NY, xz, yz, map, "z");
+	
+	//Creation of a smaller Bathy file
+
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.05 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.05 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	//Create the Losses forcing:
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = Z1; // -(yz[j] + 1) * 0.5;
+		}
+	}
+	create2dnc("Z1_map.nc", NX, NY, xz, yz, map, "z");
+
+	//Creation of a roughness file
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = R0;
+		}
+	}
+	create2dnc("R0_map.nc", NX, NY, xz, yz, map, "z0");
+
+	//Creation of a smaller Roughness file
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.05 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = 0.0 + 0.05 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	//Create the Losses forcing:
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = R1;
+		}
+	}
+	if (scenario < 0.5)
+	{
+		name_file_R1 = "R1_map.nc";
+	}
+	else
+	{
+		name_file_R1 = "1R_map.nc";
+	}
+	create2dnc(name_file_R1, NX, NY, xz, yz, map, "z0");
+
+	//Creation of a refinement file
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = 0;
+			if ((abs(xz[i]) < 0.5) && (abs(yz[j]) < 0.5))
+			{
+				map[j * NX + i] = 1;
+			}
+		}
+	}
+	create2dnc("refinement.nc", NX, NY, xz, yz, map, "z");
+
+	/*// Creation of a rain fall file
+	std::ofstream rain_file(
+		"rainTest13.txt", std::ios_base::out | std::ios_base::trunc);
+	rain_file << "0.000000\t10.00" << std::endl;
+	rain_file << "1000.000\t10.00" << std::endl;
+	rain_file.close();*/
+
+	// Creation of BG_param_test13.txt file
+	std::ofstream param_file(
+		"BG_param_test13.txt", std::ios_base::out | std::ios_base::trunc);
+	//Add Bathymetries to the file
+	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
+	param_file << "bathy = Z1_map.nc?z ;" << std::endl;
+	//Add Roughness to the file
+	if (scenario > 1.5)
+	{
+		R1 = 3.56;
+		param_file << "cfmap = " << R1 << std::endl;
+		R0 = 3.56;
+	}
+	else
+	{
+		param_file << "cfmap = R0_map.nc?z0 ;" << std::endl;
+		param_file << "cfmap = " << name_file_R1 << "?z0 ;" << std::endl;
+	}
+	//param_file << "cfmap = R1_map.nc?z0 ;" << std::endl;
+	param_file << "frictionmodel=1 ;" << std::endl;
+	//Add refinement to the file
+	param_file << "Adaptation = Targetlevel,refinement.nc?z ;" << std::endl;
+	param_file << "initlevel = 0; " << std::endl;
+	param_file << "maxlevel = 1; " << std::endl;
+	param_file << "minlevel = 0; " << std::endl;
+	//Add River forcing
+	//param_file << "rainfile = rainTest13.txt ;" << std::endl;
+	//Add endtime and outputvar
+	param_file << "endtime = 10.0 ;" << std::endl;
+	param_file << "outvars = zs,h,u,v,zb,cf;" << std::endl;
+	param_file << "dx = 0.01;" << std::endl;
+	param_file << "zsinit = 0.1;" << std::endl;
+	param_file << "smallnc = 0;" << std::endl;
+	param_file << "doubleprecision = 1;" << std::endl;
+	if (scenario > 2.5)
+	{
+		param_file << "il = " << IL << std::endl;
+		param_file << "cl = " << CL << std::endl;
+	}
+
+	param_file.close();
+
+	//read param file
+	Readparamfile(XParam, XForcing, "BG_param_test13.txt"); // "BG_param_test13.txt");
+
+	//readforcing
+    readforcing(XParam, XForcing);
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	//Loop<T> XLoop = InitLoop(XParam, XModel);
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	//if XModel.cf[0]
+	//	XModel.zb
+	
+	T maxz = T(-1.0)*std::numeric_limits<float>::max();
+	T minz = std::numeric_limits<float>::max();
+	T maxr = T(-1.0)*std::numeric_limits<float>::max();
+	T minr = std::numeric_limits<float>::max();
+
+
+	printf("min float=%f\n", std::numeric_limits<float>::min());
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				maxz = max(maxz, abs(XModel.zb[i]));
+				minz = min(minz, abs(XModel.zb[i]));
+				maxr = max(maxr, abs(XModel.cf[i]));
+				minr = min(minr, abs(XModel.cf[i]));
+			}
+		}
+	}
+
+	bool result = false;
+	eps = 0.0000001;
+
+	if ((abs(maxz - Z1)<eps) && (abs(maxr - R1)<eps) && (abs(minz - Z0)<eps) && (abs(minr - R0)<eps))
+	{
+		result = true;
+	}
+	printf("\t\n");
+	printf("\t\tZ max forced : %f, Z max obs :  %f\n ", Z1, maxz);
+	printf("\t\tR max forced :  %f, R max obs:  %f\n", R1, maxr);
+	printf("\t\tZ min forced :  %f, Z min obs:  %f\n", Z0, minz);
+	printf("\t\tR min forced : %f, R min obs : %f\n ", R0, minr);
+
+	if (scenario > 2.5)
+	{
+		T maxil = T(-1.0) * std::numeric_limits<float>::max();
+		T minil = std::numeric_limits<float>::max();
+		T maxcl = T(-1.0) * std::numeric_limits<float>::max();
+		T mincl = std::numeric_limits<float>::max();
+
+
+		//printf("min float=%f\n", std::numeric_limits<float>::min());
+
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		{
+			int ib = XModel.blocks.active[ibl];
+			for (int iy = 0; iy < XParam.blkwidth; iy++)
+			{
+				for (int ix = 0; ix < XParam.blkwidth; ix++)
+				{
+					int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+					maxil = max(maxil, abs(XModel.il[i]));
+					minil = min(minil, abs(XModel.il[i]));
+					maxcl = max(maxcl, abs(XModel.cl[i]));
+					mincl = min(mincl, abs(XModel.cl[i]));
+				}
+			}
+		}
+
+		bool result = false;
+		eps = 0.0000001;
+		// IL is expected here to be value when dry and 0 where wet at the begining of the computation
+		if ((abs(maxil - IL) < eps) && (abs(maxcl - CL) < eps) && (abs(minil - T(0.0)) < eps) && (abs(mincl - CL) < eps))
+		{
+			result = true;
+		}
+	}
+	
+	return result;
+}
+
+
 
 template <class T> void TestFirsthalfstep(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {

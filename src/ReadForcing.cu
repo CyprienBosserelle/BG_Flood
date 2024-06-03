@@ -125,15 +125,29 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//==================
 	// Friction maps 
 		
-	if (!XForcing.cf.inputfile.empty())
+	if (!XForcing.cf.empty())
 	{
-		XForcing.cf.denanval = 0.0000001;
+		//denanval = 0.0000001;
 		log("\nRead Roughness map (cf) data...");
 		// roughness map was specified!
-		readstaticforcing(XForcing.cf);
-
+		//readstaticforcing(XForcing.cf);
 		//log("...done");
+		// Here we are not using the automated denaning because we want to preserve the Nan in all but the "main/first" listed roughness map. 
+		// This mean that subsequently listed roughness map can have large NAN holes in them.
+		for (int ib = 0; ib < XForcing.cf.size(); ib++)
+		{
+			
+			readstaticforcing(XForcing.cf[ib]);
+			if (ib == 0) // Fill Nan for only the first map listed, the others will use values from original bathy topo.
+			{
+				denan(XForcing.cf[ib].nx, XForcing.cf[ib].ny, T(0.0000001), XForcing.cf[ib].val);
+			}
+		}
 	}
+
+
+
+
 
 	//==================
 	// Rain losses maps
@@ -522,6 +536,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 	char* crs_wkt;
 	std::string crs_ref2;
 	
+	crs_wkt = "";
 
 	if (!Sforcing.inputfile.empty())
 	{
@@ -609,7 +624,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 			{
 				printf("CRS_info detected but not understood reverting to default CRS\n Rename attribute in grid-mapping variable\n");
 
-				crs_wkt = "";
+				//crs_wkt = ""; //Move to the top of the file for initialisation
 			}
 
 		}

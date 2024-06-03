@@ -247,9 +247,31 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == true)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
 		{
 			param.cf = std::stod(parametervalue);
+		}
+	}
+
+	paramvec = { "il","Rain_il","initialloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.il = std::stod(parametervalue);
+			param.infiltration = true;
+		}
+	}
+
+	paramvec = { "cl","Rain_cl","continuousloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.cl = std::stod(parametervalue);
+			param.infiltration = true;
 		}
 	}
 
@@ -417,7 +439,7 @@ Param readparamstr(std::string line, Param param)
 			//Verify that the variable name makes sense?
 			//Need to add more here
 
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl", "hgw"};
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw"};
 
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
@@ -764,8 +786,6 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	paramvec = { "AOI","aoipoly" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "bathy";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		forcing.AOI.file= parametervalue;
@@ -923,18 +943,27 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
-			forcing.cf = readfileinfo(parametervalue, forcing.cf);
+			//forcing.cf = readfileinfo(parametervalue, forcing.cf);
+			StaticForcingP<float> infoRoughness;
+			forcing.cf.push_back(readfileinfo(parametervalue, infoRoughness));
 		}
 	}
+
+
+	//if (!parametervalue.empty())
+	//{
+	//
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	//}
 
 	// Rain losses, initial and continuous loss
 	paramvec = { "il","Rain_il","initialloss" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.il = readfileinfo(parametervalue, forcing.il);
 		}
@@ -943,7 +972,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.cl = readfileinfo(parametervalue, forcing.cl);
 		}
@@ -1308,7 +1337,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	}
 
 	//Check that the Initial Loss/ Continuing Loss model is used if il, cl or hgw output are asked by user.
-	if (XForcing.il.inputfile.empty() || XForcing.cl.inputfile.empty())
+	if (!XParam.infiltration) // (XForcing.il.inputfile.empty() && XForcing.cl.inputfile.empty() && (XParam.il == 0.0) && (XParam.cl == 0.0))
 	{
 		std::vector<std::string> namestr = { "il","cl","hgw"};
 		for (int ii = 0; ii < namestr.size(); ii++)
