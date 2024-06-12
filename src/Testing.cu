@@ -519,7 +519,10 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		}
 		if (XParam.GPUDEVICE >= 0 && compare)
 		{
+			int GPUdev = XParam.GPUDEVICE;
+			XParam.GPUDEVICE = -1;
 			FlowCPU(XParam, XLoop, XForcing, XModel);
+			XParam.GPUDEVICE = GPUdev;
 
 			T diffdt = T(XLoop_g.dt - XLoop.dt);
 			if (abs(diffdt) > T(100.0) * (XLoop.epsilon))
