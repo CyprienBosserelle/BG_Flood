@@ -212,7 +212,7 @@ Polygon CounterCWPoly(Polygon Poly)
 	if (sum > 0.0)
 	{
 		log(" Reversing Polygon handedness");
-		for (int i = Poly.vertices.size(); i > 0; i--)
+		for (int i = Poly.vertices.size()-1; i > 0; i--)
 		{
 			//
 			
