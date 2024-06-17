@@ -394,13 +394,13 @@ template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, Blo
 			if (side.isright == 0)
 			{
 				ix = tx;
-				iy = side.istop < 0 ? 0 : (XParam.blkwidth - 1);
+				iy = side.istop < 0 ? 0 : (XParam.blkwidth);
 				//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
 			}
 			else
 			{
 				iy = tx;
-				ix = side.isright < 0 ? 0 : (XParam.blkwidth - 1);
+				ix = side.isright < 0 ? 0 : (XParam.blkwidth);
 				//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
 			}
 			xx = XBlock.xo[ib] + ix * delta;
