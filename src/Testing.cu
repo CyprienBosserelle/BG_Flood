@@ -4358,6 +4358,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	XParam.endtime = 20.0;
 
 	XParam.dtmin = 0.00000001;
+	XParam.aoibnd = 0;
 
 	XParam.outputtimestep = XParam.endtime;
 	
