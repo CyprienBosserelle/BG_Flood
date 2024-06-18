@@ -8,6 +8,7 @@
 #include "ReadInput.h"
 #include "MemManagement.h"
 #include "Util_CPU.h"
+#include "Arrays.h"
 
 void handle_ncerror(int status);
 template<class T> void creatncfileBUQ(Param &XParam, int* activeblk, int* level, T* blockxo, T* blockyo, outzoneB &Xzone);
