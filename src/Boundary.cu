@@ -86,7 +86,12 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 	dim3 gridDimBBNDTop(bndseg.top.nblk, 1, 1);
 	dim3 gridDimBBNDBot(bndseg.bot.nblk, 1, 1);
 
-	double zsbnd=0.0;
+	double zsbnd = 0.0;
+	if (!std::isnan(XParam.zsinit)) // apply specified zsinit
+	{
+		zsbnd = XParam.zsinit;
+	}
+	// Warning this above is not ideal but sufficient for fail safe of testing if someone specifies initial conditions and no boundary for a type 3 they should be in trouble
 	T taper=T(1.0);
 	if (bndseg.on)
 	{

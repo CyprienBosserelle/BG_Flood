@@ -583,6 +583,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerifButtinger[iv], diff);
 					modelgood = false;
+					creatncfileBUQ(XParam, XModel.blocks);
+					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs, XModel.blocks.outZone[0]);
 				}
 
 
