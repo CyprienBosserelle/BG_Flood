@@ -95,23 +95,29 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 	T taper=T(1.0);
 	if (bndseg.on)
 	{
-
-		int SLstepinbnd = 1;
-
-		double difft = bndseg.data[SLstepinbnd].time - totaltime;
-		while (difft < 0.0)
+		if (bndseg.uniform)
 		{
-			SLstepinbnd++;
-			difft = bndseg.data[SLstepinbnd].time - totaltime;
+			int SLstepinbnd = 1;
+
+			double difft = bndseg.data[SLstepinbnd].time - totaltime;
+			while (difft < 0.0)
+			{
+				SLstepinbnd++;
+				difft = bndseg.data[SLstepinbnd].time - totaltime;
+			}
+
+			//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+			zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
+
+
+			if (XParam.bndtaper > 0.0)
+			{
+				taper = min(totaltime / XParam.bndtaper, 1.0);
+			}
 		}
-
-		//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
-		zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
-		
-
-		if (XParam.bndtaper > 0.0)
+		else
 		{
-			taper = min(totaltime / XParam.bndtaper, 1.0);
+			// Nothing. it is already done in update forcing
 		}
 		
 	}
