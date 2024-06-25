@@ -15,12 +15,13 @@ BG_flood user interface consists in a text file, associating key words to user c
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
+|savebyblk| savebyblk , writebyblk , saveperblk , writeperblk , savebyblock , writebyblock , saveperblock , writeperblock | 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |il| il , Rain_il , initialloss | 0.0|Initial Loss (if constant)|
 |cl| cl , Rain_cl , continuousloss | 0.0|Continuous Loss (if constant)|
 |conserveElevation|conserveElevation| false|Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks|
-|wetdryfix| wetdryfix , reminstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
+|wetdryfix| wetdryfix , reminstab , fixinstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
 |Pa2m|Pa2m| 0.00009916|Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)|
 |Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
@@ -63,6 +64,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |zsoffset|zsoffset| nan("")|Add a water level offset in m to initial conditions and boundaries (0.0 by default)|
 |hotstartfile|hotstartfile|None<br>|Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb, h or zs, u and v<br>|
 |hotstep|hotstep| 0|Step to read if hotstart file has multiple steps (step and not (computation) time)|
+|bndtaper|bndtaper| 0.0|number of second to taper boundary values to smooth transition with initial conditions default is no tapering but 600s is good practice|
 ### Outputs
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
@@ -122,6 +124,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |bathyfile|bathyfile|
 |bathymetry|bathymetry|
 |depfile|depfile|
+|bnd| bnd , bndseg |
 |cavity|cavity|
 ---
 
