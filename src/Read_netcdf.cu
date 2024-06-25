@@ -279,7 +279,8 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 		//size_t start[] = { 0 };
 		//size_t count[] = { (size_t)nt };
 		//status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
-		status = readnctime2(ncid, reftime, nt, ttempvar);
+
+		status = readnctime2(ncid, coordname, reftime, nt, ttempvar);
 
 		to = ttempvar[0];
 		tmax= ttempvar[nt-1];
@@ -426,7 +427,7 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
-int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
+int readnctime2(int ncid,char * timecoordname,std::string refdate,size_t nt, double*& time)
 {
 
 	int status, varid;
@@ -453,13 +454,13 @@ int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
 	///	//varstr = "time";
 	///}
 
-	// Warning this could be more robust by taking the unlimited dimention if time does not exist!
-	std::string Varname = "time";
+	// Warning this could be more robust by taking the unlimited dimension if time does not exist!
+	//std::string Varname = "time";
 
 	///status = nc_open(ncfilestr.c_str(), 0, &ncid);
 	///if (status != NC_NOERR) handle_ncerror(status);
 
-	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	status = nc_inq_varid(ncid, timecoordname, &varid);
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	// inquire unit of time
