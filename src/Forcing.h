@@ -79,7 +79,6 @@ template <class T>
 struct StaticForcingP : public inputmap
 {
 	T *val;
-	
 
 };
 
@@ -196,8 +195,9 @@ struct Forcing
 	Default: None but input NECESSARY
 	*/
 
-	StaticForcingP<T> cf;
+	std::vector<StaticForcingP<T>> cf;
 	/*Bottom friction coefficient map (associated to the chosen bottom friction model)
+	A list of roughness map can be provide. At any grid point, the last one defined will be used.
 	Ex: cf=0.001;
 	Ex: cf=bottom_friction.nc?bfc;
 	Default: (see constant in parameters)

@@ -1,7 +1,7 @@
 
 #include "Meanmax.h"
 
-
+// Calculate the mean and or max of requested variable on the GPU/CPU
 template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
