@@ -98,6 +98,48 @@ public:
 	bndTexP GPU;
 	int* blks; // array of block where bnd applies 
 	int* blks_g; // Also needed for GPU (because it should be a gpu allocated pointer) This is not pretty at all! In the future maybe using pagelocked memory or other new type may be beneficial 
+	float* qmean;
+	float* qmean_g;
+};
+
+class bndsegmentside {
+public:
+	int nblk=0;
+	int* blk;
+	int* blk_g;
+	float* qmean;
+	float* qmean_g;
+	int isright = 0;
+	int istop = 0;
+	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
+	//int* side; // e.g. 11000000 for the entire left side being a mask
+};
+
+
+class bndsegment {
+public:
+	std::vector<Windin> data;
+	std::string inputfile;
+	Polygon poly;
+	std::string polyfile;
+	bool on = false;
+	bool uniform = true;
+	//If changing this default value, please change documentation later on the file
+	int type = 1; // 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
+	
+	int nbnd; // number of forcing bnds along the side (>=1 is side is on) 
+	int nblk = 0; //number of blocks where this bnd applies
+
+	
+
+	
+	DynForcingP<float> WLmap;
+
+	bndsegmentside left;
+	bndsegmentside right;
+	bndsegmentside top;
+	bndsegmentside bot;
+		
 };
 
 
@@ -220,6 +262,13 @@ struct Forcing
 	Ex: bot = 0;
 	Ex: bot = botBnd.txt,2;
 	Default: 1
+	*/
+
+
+	std::vector<bndsegment> bndseg;
+	/* boundary segment; Only applies to AOI bnds
+	Ex: bndseg=area.txt,waterlevelforcing,1;
+	Default: none
 	*/
 
 	AOIinfo AOI;

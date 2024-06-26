@@ -31,6 +31,8 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloTopRightGPU(Param XParam, bool doprolong, BlockP<T> XBlock, cudaStream_t stream, T* z);
 
+template <class T> void bndmaskGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux);
+
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z);

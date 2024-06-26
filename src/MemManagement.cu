@@ -23,6 +23,19 @@ template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zb)
 	}
 }
 
+template <class T> __host__ void FillCPU(int nx, int ny,T fillval, T*& zb)
+{
+	for (int ix = 0; ix < nx; ix++)
+	{
+		for (int iy = 0; iy < ny; iy++)
+		{
+			zb[iy * nx + ix] = fillval;
+		}
+	}
+}
+template void FillCPU<double>(int nx, int ny, double fillval, double*& zb);
+template void FillCPU<float>(int nx, int ny, float fillval, float*& zb);
+template void FillCPU<int>(int nx, int ny, int fillval, int*& zb);
 
 template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zs, T *&h, T *&u, T *&v)
 {

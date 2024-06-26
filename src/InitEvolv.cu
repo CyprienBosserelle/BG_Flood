@@ -61,8 +61,18 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		//!leftWLbnd.empty()
 
 		//case 0 (i.e. zsinint not specified by user and no boundaries were specified)
+		bool bndison = false;
+		for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+		{
+			if (XForcing.bndseg[iseg].on)
+			{
+				bndison = true;
+			}
+		}
+
+
 		
-		if (std::isnan(XParam.zsinit) && (!XForcing.left.on && !XForcing.right.on && !XForcing.top.on && !XForcing.bot.on)) //zsinit is default
+		if (std::isnan(XParam.zsinit) && (!bndison)) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value than nan
 		}
@@ -127,9 +137,108 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 	return coldstartsucess;
 }
 
+template <class T>
+void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
+{
+	int nuni=0;
+	int ndyn=0;
+
+	T zsbnduni=T(0.0);
+	T zsbnd;
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on)
+		{
+			if (XForcing.bndseg[iseg].uniform)
+			{
+				nuni++;
+
+				int SLstepinbnd = 1;
+
+				double difft = XForcing.bndseg[iseg].data[SLstepinbnd].time - XParam.totaltime;
+				while (difft < 0.0)
+				{
+					SLstepinbnd++;
+					difft = XForcing.bndseg[iseg].data[SLstepinbnd].time - XParam.totaltime;
+				}
+
+				//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+				zsbnduni = zsbnduni + interptime(XForcing.bndseg[iseg].data[SLstepinbnd].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd - 1].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd].time - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time);
+
+			}
+			else
+			{
+				ndyn++;
+				Forcingthisstep(XParam, XParam.totaltime, XForcing.bndseg[iseg].WLmap);
+			}
+		}
+	}
+	if (nuni > 0)
+	{
+		zsbnduni = zsbnduni / nuni;
+	}
+
+	int ib;
+	double xi, yi;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+
+				double levdx = calcres(XParam.dx, XBlock.level[ib]);
+				xi = XParam.xo + XBlock.xo[ib] + i * levdx;
+				yi = XParam.yo + XBlock.yo[ib] + j * levdx;
+
+				zsbnd = zsbnduni;
+
+				if (ndyn > 0)
+				{
+					zsbnd = zsbnduni * nuni;
+					
+					for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+					{
+						if (XForcing.bndseg[iseg].on && !XForcing.bndseg[iseg].uniform)
+						{
+							//
+							zsbnd = zsbnd + float(interp2BUQ(xi, yi, XForcing.bndseg[iseg].WLmap));
+						}
+					}
+
+					zsbnd = zsbnd / (nuni + ndyn);
+				}
+
+				if (XParam.atmpforcing)
+				{
+					float atmpi;
+
+					if (XForcing.Atmp.uniform)
+					{
+						atmpi = float(XForcing.Atmp.nowvalue);
+					}
+					else
+					{
+						atmpi = float(interp2BUQ(xi, yi, XForcing.Atmp));
+					}
+					zsbnd = zsbnd - (atmpi - (T)XParam.Paref) * (T)XParam.Pa2m;
+				}
+
+				XEv.zs[n] = utils::max(zsbnd, zb[n]);
+				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
+				XEv.u[n] = T(0.0);
+				XEv.v[n] = T(0.0);
+			}
+		}
+	}
+
+}
+
 
 template <class T>
-void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
+void warmstartold(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
 	// This function read water level boundary if they have been setup and calculate the distance to the boundary 
 	// toward the end the water level value is calculated as an inverse distance to the available boundaries.

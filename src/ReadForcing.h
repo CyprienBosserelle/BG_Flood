@@ -14,7 +14,7 @@
 
 template<class T> void readforcing(Param& XParam, Forcing<T> & XForcing);
 
-std::vector<SLTS> readbndfile(std::string filename, Param & XParam, int side);
+std::vector<SLTS> readbndfile(std::string filename, Param & XParam);
 std::vector<SLTS> readWLfile(std::string WLfilename,  std::string& refdate);
 
 std::vector<SLTS> readNestfile(std::string ncfile, std::string varname, int hor, double eps, double bndxo, double bndxmax, double bndy);
@@ -56,6 +56,7 @@ template <class T> void clampedges(int nx, int ny, T clamp, T* z);
 std::vector<std::string> DelimLine(std::string line, int n, char delim);
 std::vector<std::string> DelimLine(std::string line, int n);
 Polygon readPolygon(std::string filename);
+Polygon readbndpolysegment(bndsegment bnd, Param XParam);
 
 
 // End of global definition

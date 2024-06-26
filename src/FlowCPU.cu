@@ -78,6 +78,13 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Fill Halo for flux from fine to coarse
 	fillHalo(XParam, XModel.blocks, XModel.flux);
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt * 0.5, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.flux);
+	}
+	
+
+	//bndmaskCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux);
 	
 	//============================================
 	// Reduce minimum timestep
@@ -163,6 +170,12 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Fill Halo for flux from fine to coarse
 	fillHalo(XParam, XModel.blocks, XModel.flux);
+
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFlux(XParam, XLoop.totaltime + XLoop.dt , XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.flux);
+	}
+
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 

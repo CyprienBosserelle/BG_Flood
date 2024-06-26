@@ -14,6 +14,7 @@
 
 template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float>& XForcing);
 
+void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float>& XDynForcing);
 
 template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing);
 
@@ -36,7 +37,7 @@ template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, st
 template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel, Model<T> XModel_g);
 
 template <class T> __global__ void InjectRiverGPU(Param XParam, River XRiver, T qnow, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv);
-template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb);
+template <class T> __global__ void  AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb);
 
 
 #endif
