@@ -268,7 +268,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		*/
 		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
 		log("\t###AOI bnd wall test ###");
-		wallbndleft=TestAIObnd(XParam, XModel, XModel_g,false,false, false);
+		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
 		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
 		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
 		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
@@ -280,7 +280,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
 		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
 		log("\t\tAOI bnd wall test : " + result);
-
+	}
 	if (mytest == 13)
 	{
 		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
