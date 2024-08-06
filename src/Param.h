@@ -78,6 +78,7 @@ public:
 
 
 	//*Timekeeping
+	double outputtimeinit = -99999; //Initial time for the output, initialised to initial running time
 	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for none
 	double endtime = std::numeric_limits<double>::max(); // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s

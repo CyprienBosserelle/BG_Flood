@@ -246,7 +246,7 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 		Save2Netcdf(XParam, XLoop, XModel);
 
 
-		XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
+		XLoop.nextoutputtime = max(min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime), XParam.outputtimeinit);
 
 		XLoop.nstepout = 0;
 	}

@@ -1265,6 +1265,16 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		//otherwise, no final output
 	}
 
+	//Initialisation of the intial step for outputs:
+	if (XParam.outputtimeinit == -99999)
+	{
+		XParam.outputtimeinit = XParam.dtinit;
+	}
+	if (XParam.outputtimeinit > XParam.endtime)
+	{
+		XParam.outputtimeinit = XParam.endtime;
+	}
+
 
 
 	if (XParam.outvars.empty() && XParam.outputtimestep > 0.0)
