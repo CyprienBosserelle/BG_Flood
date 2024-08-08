@@ -15,6 +15,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
+|Toutput|Toutput| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |il| il , Rain_il , initialloss | 0.0|Initial Loss (if constant)|
@@ -55,7 +56,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |endtime| endtime , stoptime , end , stop , end_time , stop_time | 0.0|Number of seconds between netCDF outputs, 0.0 for none|
 |totaltime| totaltime , inittime , starttime , start_time , init_time , start , init | 0.0|Total simulation time in s|
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
-|dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
+|dtmin|dtmin| 0.0005|Toutput Toutput;  Flexible time definition for outputs (nc files)<br>Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100" <br>Default = First and last timne steps<br>Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
 ###  Initialisation
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
