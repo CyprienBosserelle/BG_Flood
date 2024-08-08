@@ -99,6 +99,9 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 		// Initialise infiltration to IL where h is already wet
 		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.hgw);
 
+		// Initialise Output times' vector
+		initOutputTimes(XParam, XModel.OutputT)
+
 	}
 
 
@@ -1194,3 +1197,45 @@ void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 		}
 	}
 }
+
+
+// Creation of a vector for times requiering a map output
+// Compilations of vectors and independent times from the general input
+// and the different zones outputs
+template <class T>
+void initOutputTimes(Param XParam, std::vector<double> OutputT)
+{
+	std::vector<double> times;
+
+	times.push_back(GetTimeOutput(XParam.Toutput));
+	// if zoneOutputs, add their contribution
+	if (XParam.outzone.size() > 0)
+	{
+		for (int ii = 0; ii < XParam.outzone.size(); ii++)
+		{
+			times.push_back(GetTimeOutput(XParam.outzone.Toutput));
+		}
+	}
+	// Sort the times for output
+	sort(times.begin(), times.end());
+	// remove duplicate
+	times.erase( unique ( times.begin(), times.end()), times.end());
+
+	OutputT = times;
+}
+
+std::vector<double> GetTimeOutput(Toutput time_info)
+{
+	std::vector<double> time_vect;
+	double time;
+
+	time_vect = time_info.val;
+	time = time_info.init;
+	while (time < time_info.end)
+	{
+		time_vect.push_back(time);
+		time += time_info.tstep;
+	}
+	return(time_vect);
+}
+

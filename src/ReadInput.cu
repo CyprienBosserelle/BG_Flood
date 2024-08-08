@@ -758,6 +758,43 @@ Param readparamstr(std::string line, Param param)
 		param.crs_ref = parametervalue;
 	}
 
+	//Read Flexible Toutput variable
+	parameterstr = "Toutput";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> Toutputpar = split(parametervalue, ',');
+
+		if (!Toutputpar.empty())
+		{
+			std::vector<std::string> Toutputpar_vect = split(Toutputpar[0], ':');
+			if (Toutputpar_vect.size == 3)
+			{
+				param.Toutput.init = std::stod(Toutputpar_vect[0]);
+				param.Toutput.tstep = std::stod(Toutputpar_vect[1]);
+				param.Toutput.end = std::stod(Toutputpar_vect[2]);
+			}
+			else if (Toutputpar_vect.size > 1)
+			{
+				//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
+				std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
+
+				log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
+				log(parametervalue);
+			}
+			else
+				param.Toutput.val.push_back = std::stod(Toutputpar_vect[0]);
+			if (Toutputpar.size > 1)
+			{
+				for (int ii = 1; ii < Toutputpar.size(); ii++)
+				{
+					param.Toutput.val.push_back = std::stod(Toutputpar_vect[ii]);
+				}
+			}
+
+		}
+	}
+
 	return param;
 }
 

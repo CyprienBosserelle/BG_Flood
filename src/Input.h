@@ -12,6 +12,13 @@ public:
 	std::string outname;
 };
 
+// Flexible definition of time outputs
+class Toutput {
+public: 
+	double init, tstep, end;
+	std::vector<double> val;
+};
+
 // Special output zones for nc files, informatin given by the user
 class outzoneP {
 public:

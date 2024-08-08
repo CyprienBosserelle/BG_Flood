@@ -78,6 +78,7 @@ struct outzoneB
 	std::string outname; // name for the output file (one for each zone)
 	int maxlevel; // maximum level in the zone
 	int minlevel; //minimum level in the zone
+	//double Next_OutputT; //Next time for the output of this zone
 };
 
 
@@ -178,7 +179,7 @@ struct Model
 	std::map<std::string, std::string> Outvarlongname;
 	std::map<std::string, std::string> Outvarstdname;
 	std::map<std::string, std::string> Outvarunits;
-
+	std::vector<double> OutputT;
 
 	//other output
 	//std::vector< std::vector< Pointout > > TSallout;

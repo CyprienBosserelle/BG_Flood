@@ -78,12 +78,15 @@ public:
 
 
 	//*Timekeeping
-	double outputtimeinit = -99999; //Initial time for the output, initialised to initial running time
+	//double outputtimeinit = -99999; //Initial time for the output, initialised to initial running time
 	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for none
 	double endtime = std::numeric_limits<double>::max(); // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
+	Toutput Toutput; /* Flexible time definition for outputs (nc files)
+	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100" 
+	Default = First and last timne steps*/
 
 	//* Initialisation
 	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
