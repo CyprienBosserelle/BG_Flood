@@ -493,16 +493,42 @@ Param readparamstr(std::string line, Param param)
 			zone.xend = std::stod(zoneitems[2]);
 			zone.ystart = std::stod(zoneitems[3]);
 			zone.yend = std::stod(zoneitems[4]);
-			param.outzone.push_back(zone);
+		}
+		if (zoneitems.size() > 5)
+		{
+			std::vector<std::string> Toutputpar_vect = split(zoneitems[5], ':');
+			if (Toutputpar_vect.size() == 3)
+			{
+				zone.Toutput.init = std::stod(Toutputpar_vect[0]);
+				zone.Toutput.tstep = std::stod(Toutputpar_vect[1]);
+				zone.Toutput.end = std::stod(Toutputpar_vect[2]);
+			}
+			else if (Toutputpar_vect.size() > 1)
+			{
+				//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
+				std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
+
+				log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
+				log(parametervalue);
+			}
+			else
+				zone.Toutput.val.push_back(std::stod(Toutputpar_vect[0]));
+			if (zoneitems.size() > 6)
+			{
+				for (int ii = 6; ii < zoneitems.size(); ii++)
+				{
+					zone.Toutput.val.push_back(std::stod(zoneitems[ii]));
+				}
+			}
 		}
 		else
 		{
 			std::cerr << "Zone input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details" << std::endl;
 
-			log("Node input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details. Input was: " + parametervalue);
+			log("Node input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details (with possibly some time inputs after). Input was: " + parametervalue);
 
 		}
-
+		param.outzone.push_back(zone);
 	}
 
 
@@ -768,13 +794,13 @@ Param readparamstr(std::string line, Param param)
 		if (!Toutputpar.empty())
 		{
 			std::vector<std::string> Toutputpar_vect = split(Toutputpar[0], ':');
-			if (Toutputpar_vect.size == 3)
+			if (Toutputpar_vect.size() == 3)
 			{
 				param.Toutput.init = std::stod(Toutputpar_vect[0]);
 				param.Toutput.tstep = std::stod(Toutputpar_vect[1]);
 				param.Toutput.end = std::stod(Toutputpar_vect[2]);
 			}
-			else if (Toutputpar_vect.size > 1)
+			else if (Toutputpar_vect.size() > 1)
 			{
 				//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
 				std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
@@ -783,12 +809,12 @@ Param readparamstr(std::string line, Param param)
 				log(parametervalue);
 			}
 			else
-				param.Toutput.val.push_back = std::stod(Toutputpar_vect[0]);
-			if (Toutputpar.size > 1)
+				param.Toutput.val.push_back(std::stod(Toutputpar_vect[0]));
+			if (Toutputpar.size() > 1)
 			{
 				for (int ii = 1; ii < Toutputpar.size(); ii++)
 				{
-					param.Toutput.val.push_back = std::stod(Toutputpar_vect[ii]);
+					param.Toutput.val.push_back(std::stod(Toutputpar[ii]));
 				}
 			}
 
@@ -1302,14 +1328,28 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		//otherwise, no final output
 	}
 
-	//Initialisation of the intial step for outputs:
-	if (XParam.outputtimeinit == -99999)
+	//Initialisation of the main time output vector
+	//Initialise default values for Toutput (output times for map outputs)
+	InitialiseToutput(XParam.Toutput, XParam);
+
+
+	// Initialisation of the time output vector for the zones outputs
+	if (XParam.outzone.size() > 0)
 	{
-		XParam.outputtimeinit = XParam.dtinit;
-	}
-	if (XParam.outputtimeinit > XParam.endtime)
-	{
-		XParam.outputtimeinit = XParam.endtime;
+		for (int ii = 0; ii < XParam.outzone.size(); ii++)
+		{
+			if (XParam.outzone[ii].Toutput.val.empty()) // &
+				//XParam.outzone[ii].Toutput.init.empty() &
+				//XParam.outzone[ii].Toutput.tstep.empty() &
+				//XParam.outzone[ii].Toutput.end.empty())
+			{
+				XParam.outzone[ii].Toutput = XParam.Toutput;
+			}
+			else
+			{
+				InitialiseToutput(XParam.outzone[ii].Toutput, XParam);
+			}
+		}
 	}
 
 
@@ -1414,6 +1454,23 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 
 	}
 
+}
+
+//Initialise default values for Toutput (output times for map outputs)
+void InitialiseToutput(Toutput & Toutput, Param XParam)
+{
+	if (Toutput.init.empty())
+	{
+		Toutput.init = XParam.totaltime;
+	}
+	if (Toutput.end.empty())
+	{
+		Toutput.end = XParam.endtime;
+	}
+	if (Toutput.tstep.empty())
+	{
+		Toutput.tstep = XParam.outputtimestep;
+	}
 }
 
 /*! \fn double setendtime(Param XParam,Forcing<float> XForcing)

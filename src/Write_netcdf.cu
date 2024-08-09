@@ -922,7 +922,7 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 		log("Create netCDF output file...");
 		creatncfileBUQ(XParam, XModel.blocks);
 		//creatncfileBUQ(XParam);
-		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
+		/*for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
 			writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -930,30 +930,36 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 				std::string varstr = XParam.outvars[ivar];
 				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr,XModel.Outvarlongname[varstr],XModel.Outvarstdname[varstr],XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
 			}
-		}
+		}*/
 	}
 }
 template void InitSave2Netcdf<float>(Param &XParam, Model<float> &XModel);
 template void InitSave2Netcdf<double>(Param &XParam, Model<double> &XModel);
 
 
-template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
+template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T>& XModel)
 {
+	double NextZoneOutTime;
 	if (!XParam.outvars.empty())
 	{
 		//creatncfileBUQ(XParam);
 		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
-			writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
-			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[XModel.blocks.outZone[o].index_next_OutputT];
+			if (XLoop.nextoutputtime == NextZoneOutTime)
 			{
-				writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				}
+				XModel.blocks.outZone[o].index_next_OutputT++;
 			}
 		}
 	}
 }
-template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
-template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double> XModel);
+template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float>& XModel);
+template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double>& XModel);
 
 
 //The following functions are tools to create 2D or 3D netcdf files (for testing for example)

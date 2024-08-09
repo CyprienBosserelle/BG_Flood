@@ -131,8 +131,9 @@ public:
 	std::vector<outzoneP> outzone; 
 	/*Zoned output (netcdf file), giving a file name and the position of two corner points
 	(which will be converted to a rectagle containing full blocks).
+	Time vector or values can also be added to specified special outputs for this one in particular.
 	This keyword can be used multiple times to output maps of different areas.
-	Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*)
+	Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*) or "outzone=zoomed.nc,5.3,5.4,0.5,0.8, 3600:360:7200;" (*filename,x1,x2,y1,y2, t_init:t_step:t_end*)
 	Default: Full domain
 	*/
 

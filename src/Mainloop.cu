@@ -12,11 +12,12 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
-	
-
+	// Check for map output (output initialisation if needed)
+	mapoutput(XParam, XLoop, XModel, XModel_g);
 	
 	log("\t\tCompleted");
 	log("Model Running...");
+
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
@@ -245,11 +246,15 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 		
 		Save2Netcdf(XParam, XLoop, XModel);
 
-
-		XLoop.nextoutputtime = max(min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime), XParam.outputtimeinit);
+		//XLoop.nextoutputtime = max(min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime));// , XParam.outputtimeinit);
+		//XLoop.nextoutputtime = min(XModel.OutputT[indNextoutputtime] + XParam.outputtimestep, XParam.endtime);// , XParam.outputtimeinit);
+		
+		XLoop.indNextoutputtime++;
+		XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
 
 		XLoop.nstepout = 0;
 	}
+
 }
 
 template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)

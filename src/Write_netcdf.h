@@ -16,7 +16,7 @@ template <class T> void defncvarBUQ(Param XParam, int * activeblk, int * level, 
 template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activeblk, int* level, T * blockxo, T *blockyo, std::string varst, T * var, outzoneB Xzone);
 template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel);
 extern "C" void writenctimestep(std::string outfile, double totaltime);
-template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T> XModel);
+template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T> &XModel);
 
 extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* yy, double* var, char* varname);
 extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, double* yy, double* theta, double* var, char* varname);

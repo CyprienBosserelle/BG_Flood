@@ -26,6 +26,7 @@ public:
 	double xstart, xend, ystart, yend; // definition of the zone needed for special nc output (rectangular zone) by the user
 	//double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)
 	std::string outname; // name for the output file (one for each zone)
+	Toutput Toutput; // time for outputs for the zone
 };
 
 class Flowin {

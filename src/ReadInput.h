@@ -8,6 +8,7 @@
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "utctime.h"
+#include "Input.h"
 
 
 template <class T> T readfileinfo(std::string input, T outinfo);
@@ -31,6 +32,7 @@ std::size_t case_insensitive_compare(std::string s1, std::string s2);
 std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> vecstr);
 bool readparambool(std::string paramstr, bool defaultval);
 bndparam readbndline(std::string parametervalue);
+void InitialiseToutput(Toutput& Toutput, Param XParam);
 
 // End of global definition
 #endif
