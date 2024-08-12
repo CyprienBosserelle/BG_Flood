@@ -496,12 +496,18 @@ Param readparamstr(std::string line, Param param)
 		}
 		if (zoneitems.size() > 5)
 		{
-			std::vector<std::string> Toutputpar_vect = split(zoneitems[5], ':');
+			std::vector<std::string> Toutputpar_vect = split_full(zoneitems[5], ':');
 			if (Toutputpar_vect.size() == 3)
 			{
-				zone.Toutput.init = std::stod(Toutputpar_vect[0]);
-				zone.Toutput.tstep = std::stod(Toutputpar_vect[1]);
-				zone.Toutput.end = std::stod(Toutputpar_vect[2]);
+				if (!Toutputpar_vect[0].empty()) {
+					zone.Toutput.init = std::stod(Toutputpar_vect[0]);
+				}
+				if (!Toutputpar_vect[1].empty()) {
+					zone.Toutput.tstep = std::stod(Toutputpar_vect[1]);
+				}
+				if (!Toutputpar_vect[2].empty()) {
+					zone.Toutput.end = std::stod(Toutputpar_vect[2]);
+				}
 			}
 			else if (Toutputpar_vect.size() > 1)
 			{
@@ -793,12 +799,15 @@ Param readparamstr(std::string line, Param param)
 
 		if (!Toutputpar.empty())
 		{
-			std::vector<std::string> Toutputpar_vect = split(Toutputpar[0], ':');
+			std::vector<std::string> Toutputpar_vect = split_full(Toutputpar[0], ':');
 			if (Toutputpar_vect.size() == 3)
 			{
-				param.Toutput.init = std::stod(Toutputpar_vect[0]);
-				param.Toutput.tstep = std::stod(Toutputpar_vect[1]);
-				param.Toutput.end = std::stod(Toutputpar_vect[2]);
+				if (!Toutputpar_vect[0].empty()) {
+					param.Toutput.init = std::stod(Toutputpar_vect[0]); }
+				if (!Toutputpar_vect[1].empty()) {
+					param.Toutput.tstep = std::stod(Toutputpar_vect[1]); }
+				if (!Toutputpar_vect[2].empty()) {
+					param.Toutput.end = std::stod(Toutputpar_vect[2]); }
 			}
 			else if (Toutputpar_vect.size() > 1)
 			{
@@ -1457,19 +1466,19 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 }
 
 //Initialise default values for Toutput (output times for map outputs)
-void InitialiseToutput(Toutput & Toutput, Param XParam)
+void InitialiseToutput(Toutput& Toutput_loc, Param XParam)
 {
-	if (Toutput.init.empty())
+	if (std::isnan(Toutput_loc.init))
 	{
-		Toutput.init = XParam.totaltime;
+		Toutput_loc.init = XParam.totaltime;
 	}
-	if (Toutput.end.empty())
+	if (std::isnan(Toutput_loc.end))
 	{
-		Toutput.end = XParam.endtime;
+		Toutput_loc.end = XParam.endtime;
 	}
-	if (Toutput.tstep.empty())
+	if (std::isnan(Toutput_loc.tstep))
 	{
-		Toutput.tstep = XParam.outputtimestep;
+		Toutput_loc.tstep = XParam.outputtimestep;
 	}
 }
 
@@ -1592,6 +1601,33 @@ std::vector<std::string> split(const std::string &s, char delim) {
 	split(s, delim, elems);
 	return elems;
 }
+
+
+
+/*! \fn void split_full(const std::string &s, char delim, std::vector<std::string> &elems)
+* split string based in character, conserving empty item
+*
+*/
+void split_full(const std::string& s, char delim, std::vector<std::string>& elems) {
+	std::stringstream ss;
+	ss.str(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		elems.push_back(item);
+
+	}
+}
+
+/*! \fn std::vector<std::string> split_full(const std::string &s, char delim)
+* split string based in character, conserving empty items
+*
+*/
+std::vector<std::string> split_full(const std::string& s, char delim) {
+	std::vector<std::string> elems;
+	split_full(s, delim, elems);
+	return elems;
+}
+
 
 std::vector<std::string> split(const std::string s, const std::string delim)
 {

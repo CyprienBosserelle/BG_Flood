@@ -15,7 +15,9 @@ public:
 // Flexible definition of time outputs
 class Toutput {
 public: 
-	double init, tstep, end;
+	double init = NAN;
+	double tstep = NAN;
+	double end = NAN;
 	std::vector<double> val;
 };
 
