@@ -320,7 +320,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	AllocateCPU(1, nblk, blkwidth);
 	AllocateCPU(1, nblk, blkid);
 
-	printf("blockId:\n");
+	//printf("blockId:\n");
 	for (int ib = 0; ib < nblk; ib++)
 	{
 		//int ibl = activeblk[Xzone.blk[ib]];
@@ -940,6 +940,12 @@ template void InitSave2Netcdf<double>(Param &XParam, Model<double> &XModel);
 template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T>& XModel)
 {
 	double NextZoneOutTime;
+
+	char buffer[256];
+	sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
+	std::string str(buffer);
+	//std::string maps;
+
 	if (!XParam.outvars.empty())
 	{
 		//creatncfileBUQ(XParam);
@@ -948,6 +954,10 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T>& XModel
 			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[XModel.blocks.outZone[o].index_next_OutputT];
 			if (XLoop.nextoutputtime == NextZoneOutTime)
 			{
+				//maps +=  + ", ";
+				log("Output to map: " + XModel.blocks.outZone[o].outname + ", Totaltime = " + std::to_string(XLoop.totaltime) + " s; Mean dt = " + str + " s");
+
+
 				writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
 				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 				{
@@ -957,6 +967,7 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T>& XModel
 			}
 		}
 	}
+	//maps.erase(maps.size() - 2);
 }
 template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float>& XModel);
 template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double>& XModel);

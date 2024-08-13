@@ -171,7 +171,7 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	Loop<T> XLoop;
 	XLoop.atmpuni = T(XParam.Paref);
 	XLoop.totaltime = XParam.totaltime;
-	XLoop.nextoutputtime = XParam.totaltime + XParam.outputtimestep;
+	XLoop.nextoutputtime = XModel.OutputT[0];
 	
 	// Prepare output files
 	InitSave2Netcdf(XParam, XModel);
@@ -231,11 +231,11 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 
 	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.5) && XParam.outputtimestep > 0.0)
 	{
-		char buffer[256];
-		sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
-		std::string str(buffer);
+		//char buffer[256];
+		//sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
+		//std::string str(buffer);
 
-		log("Output to map. Totaltime = "+ std::to_string(XLoop.totaltime) +" s; Mean dt = " + str + " s");
+		//log("Output to map. Totaltime = "+ std::to_string(XLoop.totaltime) +" s; Mean dt = " + str + " s");
 		if (XParam.GPUDEVICE >= 0)
 		{
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)

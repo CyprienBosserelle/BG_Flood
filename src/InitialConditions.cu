@@ -99,16 +99,14 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 		// Initialise infiltration to IL where h is already wet
 		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.hgw);
-
 	}
-
-	// Initialise Output times' vector
-	initOutputTimes(XParam, XModel.OutputT, XModel.blocks);
 
 	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
 
+	// Initialise Output times' vector
+	initOutputTimes(XParam, XModel.OutputT, XModel.blocks);
 }
 template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
@@ -1197,22 +1195,29 @@ template <class T> void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T
 	}
 }
 
+// Create a vector of times steps from the input structure Toutput
 std::vector<double> GetTimeOutput(Toutput time_info)
 {
 	std::vector<double> time_vect;
 	double time;
-
+	
+	//Add independant values
 	if (!time_info.val.empty())
 	{
 		time_vect = time_info.val;
 	}
 	
+	//Add timesteps from the vector 
 	time = time_info.init;
 	while (time < time_info.end)
 	{
 		time_vect.push_back(time);
 		time += time_info.tstep;
 	}
+
+	//Add last timesteps from the vector definition
+	time_vect.push_back(time_info.end);
+
 	return(time_vect);
 }
 
@@ -1235,7 +1240,11 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 		for (int ii = 0; ii < XParam.outzone.size(); ii++)
 		{
 			times_partial = GetTimeOutput(XParam.outzone[ii].Toutput);
+			//Add to main vector
 			times.insert(times.end(), times_partial.begin(), times_partial.end());
+			//Sort and remove duplicate before saving in outZone struct
+			sort(times_partial.begin(), times_partial.end());
+			times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
 			XBlock.outZone[ii].OutputT = times_partial;
 		}
 	}

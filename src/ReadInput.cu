@@ -517,9 +517,10 @@ Param readparamstr(std::string line, Param param)
 				log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
 				log(parametervalue);
 			}
-			else
+			else { //only values
 				zone.Toutput.val.push_back(std::stod(Toutputpar_vect[0]));
-			if (zoneitems.size() > 6)
+			}
+			if (zoneitems.size() > 6) //vector + values
 			{
 				for (int ii = 6; ii < zoneitems.size(); ii++)
 				{
@@ -527,16 +528,17 @@ Param readparamstr(std::string line, Param param)
 				}
 			}
 		}
+		else if (zoneitems.size() == 5)//No time input in the zone area
+		{
+			zone.Toutput = param.Toutput;
+		}
 		else
 		{
-			std::cerr << "Zone input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details" << std::endl;
-
-			log("Node input failed there should be 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details (with possibly some time inputs after). Input was: " + parametervalue);
-
+			std::cerr << "Zone input failed there should be at least 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details" << std::endl;
+			log("Node input failed there should be at least 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details (with possibly some time inputs after). Input was: " + parametervalue);
 		}
 		param.outzone.push_back(zone);
 	}
-
 
 	parameterstr = "resetmax";
 	parametervalue = findparameter(parameterstr, line);
@@ -817,8 +819,8 @@ Param readparamstr(std::string line, Param param)
 				log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
 				log(parametervalue);
 			}
-			else
-				param.Toutput.val.push_back(std::stod(Toutputpar_vect[0]));
+			else {
+				param.Toutput.val.push_back(std::stod(Toutputpar_vect[0])); }
 			if (Toutputpar.size() > 1)
 			{
 				for (int ii = 1; ii < Toutputpar.size(); ii++)
@@ -826,7 +828,6 @@ Param readparamstr(std::string line, Param param)
 					param.Toutput.val.push_back(std::stod(Toutputpar[ii]));
 				}
 			}
-
 		}
 	}
 
@@ -1347,14 +1348,6 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	{
 		for (int ii = 0; ii < XParam.outzone.size(); ii++)
 		{
-			if (XParam.outzone[ii].Toutput.val.empty()) // &
-				//XParam.outzone[ii].Toutput.init.empty() &
-				//XParam.outzone[ii].Toutput.tstep.empty() &
-				//XParam.outzone[ii].Toutput.end.empty())
-			{
-				XParam.outzone[ii].Toutput = XParam.Toutput;
-			}
-			else
 			{
 				InitialiseToutput(XParam.outzone[ii].Toutput, XParam);
 			}
@@ -1613,8 +1606,14 @@ void split_full(const std::string& s, char delim, std::vector<std::string>& elem
 	ss.str(s);
 	std::string item;
 	while (std::getline(ss, item, delim)) {
+		std::string::iterator end_pos = std::remove(item.begin(), item.end(), ' ');
+		item.erase(end_pos, item.end());
 		elems.push_back(item);
-
+	}
+	if (s[s.length()-1] == delim)
+	{
+		std::string item;
+		elems.push_back(item);
 	}
 }
 
