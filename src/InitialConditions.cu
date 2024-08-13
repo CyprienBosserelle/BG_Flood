@@ -63,8 +63,10 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 	//=====================================
 	// Initial bndinfo
-	Calcbndblks(XParam, XForcing, XModel.blocks);
-	Findbndblks(XParam, XModel, XForcing);
+	//Calcbndblks(XParam, XForcing, XModel.blocks);
+	//Findbndblks(XParam, XModel, XForcing);
+	Initbndblks(XParam, XForcing, XModel.blocks);
+
 
 	//=====================================
 	// Calculate Active cells
@@ -854,6 +856,163 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 template void Initoutzone<float>(Param& XParam, BlockP<float>& XBlock);
 template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
 
+/*
+*  Initialise bnd blk assign block to their relevant segment allocate memory...
+* 1. Find all the boundary blocks(block with themselves as neighbours)
+*
+* 2. make an array to store which segemnt they belong to
+*
+* If any bnd segment was specified
+* 3. scan each block and find which (if any) segment they belong to
+*	 For each segment
+*		 Calculate bbox
+*		 if inbbox calc inpoly
+*		if inpoly overwrite assingned segment with new one
+*
+*
+* 4. Calculate nblk per segment & allocate (do for each segment)
+*
+* 5. fill segmnent and side arrays for each segments
+*/
+template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
+{
+	//if(XForcing.bndseg.size()>0)
+
+	std::vector<int> bndblks;
+	std::vector<int> bndsegment;
+	// 1. Find all the boundary blocks (block with themselves as neighbours)
+	
+	
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+
+		bool testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) || (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
+		if (testbot)
+		{
+			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
+
+			bndblks.push_back(ib);
+			bndsegment.push_back(XForcing.bndseg.size()-1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
+			//loop through all but the last bnd seg which is meant for block that are not in any segments
+			for (int s = 0; s < XForcing.bndseg.size()-1; s++)
+			{
+				bool inpoly=blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+
+				if (inpoly)
+				{
+					bndsegment.back() = s;
+				}
+
+			}
+
+
+
+		}
+		
+
+	}
+
+	
+	for (int s = 0; s < XForcing.bndseg.size(); s++)
+	{
+		int segcount = 0;
+		int leftcount = 0;
+		int rightcount = 0;
+		int topcount = 0;
+		int botcount = 0;
+		
+		for (int ibl = 0; ibl < bndblks.size(); ibl++)
+		{
+			int ib = bndblks[ibl];
+			if (bndsegment[ibl] == s)
+			{
+				segcount++;
+
+				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
+				{
+					botcount++;
+				}
+				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
+				{
+					topcount++;
+				}
+				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
+				{
+					leftcount++;
+				}
+				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
+				{
+					rightcount++;
+				}
+			}
+		}
+		XForcing.bndseg[s].nblk = segcount;
+
+		XForcing.bndseg[s].left.nblk = leftcount;
+		XForcing.bndseg[s].right.nblk = rightcount;
+		XForcing.bndseg[s].top.nblk = topcount;
+		XForcing.bndseg[s].bot.nblk = botcount;
+
+		//allocate array
+		//ReallocArray(int nblk, int blksize, T * &zb)
+		ReallocArray(leftcount, 1, XForcing.bndseg[s].left.blk);
+		ReallocArray(rightcount, 1, XForcing.bndseg[s].right.blk);
+		ReallocArray(topcount, 1, XForcing.bndseg[s].top.blk);
+		ReallocArray(botcount, 1, XForcing.bndseg[s].bot.blk);
+
+		ReallocArray(leftcount, XParam.blkwidth, XForcing.bndseg[s].left.qmean);
+		ReallocArray(rightcount, XParam.blkwidth, XForcing.bndseg[s].right.qmean);
+		ReallocArray(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
+		ReallocArray(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
+
+		FillCPU(leftcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].left.qmean);
+		FillCPU(rightcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].right.qmean);
+		FillCPU(topcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].top.qmean);
+		FillCPU(botcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].bot.qmean);
+
+		leftcount = 0;
+		rightcount = 0;
+		topcount = 0;
+		botcount = 0;
+
+		for (int ibl = 0; ibl < bndblks.size(); ibl++)
+		{
+			int ib = bndblks[ibl];
+
+			if (bndsegment[ibl] == s)
+			{
+				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
+				{
+					XForcing.bndseg[s].bot.blk[botcount] = ib;
+					botcount++;
+				}
+				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
+				{
+					XForcing.bndseg[s].top.blk[topcount] = ib;
+					topcount++;
+				}
+				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
+				{
+					XForcing.bndseg[s].left.blk[leftcount] = ib;
+					leftcount++;
+				}
+				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
+				{
+					XForcing.bndseg[s].right.blk[rightcount] = ib;
+					rightcount++;
+				}
+
+			}
+
+		}
+
+
+
+	}
+
+
+}
 
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {
@@ -929,9 +1088,10 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 }
 
 
-
-
-
+/*! \fn Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
+* Find which block on the model edge belongs to a "side boundary"
+* 
+*/
 template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
 {
 	//=====================================
