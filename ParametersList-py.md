@@ -15,13 +15,13 @@ BG_flood user interface consists in a text file, associating key words to user c
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
-|Toutput|Toutput| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
+|savebyblk| savebyblk , writebyblk , saveperblk , writeperblk , savebyblock , writebyblock , saveperblock , writeperblock | 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |il| il , Rain_il , initialloss | 0.0|Initial Loss (if constant)|
 |cl| cl , Rain_cl , continuousloss | 0.0|Continuous Loss (if constant)|
 |conserveElevation|conserveElevation| false|Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks|
-|wetdryfix| wetdryfix , reminstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
+|wetdryfix| wetdryfix , reminstab , fixinstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
 |Pa2m|Pa2m| 0.00009916|Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)|
 |Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
@@ -56,7 +56,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |endtime| endtime , stoptime , end , stop , end_time , stop_time | 0.0|Number of seconds between netCDF outputs, 0.0 for none|
 |totaltime| totaltime , inittime , starttime , start_time , init_time , start , init | 0.0|Total simulation time in s|
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
-|dtmin|dtmin| 0.0005|Toutput Toutput;  Flexible time definition for outputs (nc files)<br>Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100" <br>Default = First and last timne steps<br>Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
+|dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
 ###  Initialisation
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
@@ -64,13 +64,14 @@ BG_flood user interface consists in a text file, associating key words to user c
 |zsoffset|zsoffset| nan("")|Add a water level offset in m to initial conditions and boundaries (0.0 by default)|
 |hotstartfile|hotstartfile|None<br>|Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb, h or zs, u and v<br>|
 |hotstep|hotstep| 0|Step to read if hotstart file has multiple steps (step and not (computation) time)|
+|bndtaper|bndtaper| 0.0|number of second to taper boundary values to smooth transition with initial conditions default is no tapering but 600s is good practice|
 ### Outputs
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position <br>(which will be converted to nearest grid position). <br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
 |outfile|outfile| "Output.nc"|netcdf output file name|
 |outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";<br>|
-|outzone|outzone|Full domain<br>|Zoned output (netcdf file), giving a file name and the position of two corner points<br>(which will be converted to a rectagle containing full blocks).<br>Time vector or values can also be added to specified special outputs for this one in particular.<br>This keyword can be used multiple times to output maps of different areas.<br>Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*) or "outzone=zoomed.nc,5.3,5.4,0.5,0.8, 3600:360:7200;" (*filename,x1,x2,y1,y2, t_init:t_step:t_end*)<br>|
+|outzone|outzone|Full domain<br>|Zoned output (netcdf file), giving a file name and the position of two corner points<br>(which will be converted to a rectagle containing full blocks).<br>This keyword can be used multiple times to output maps of different areas.<br>Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*)<br>|
 |resetmax|resetmax| false|Switch to reset the "max" outputs after each output|
 |outishift|outishift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output |
 |outjshift|outjshift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output |
@@ -123,6 +124,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |bathyfile|bathyfile|
 |bathymetry|bathymetry|
 |depfile|depfile|
+|bnd| bnd , bndseg |
 |cavity|cavity|
 ---
 
