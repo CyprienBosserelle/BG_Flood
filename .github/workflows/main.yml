@@ -109,7 +109,7 @@ jobs:
           ./BG_Flood BG_param_test15.txt
           var=$(ncdump -v h_P0 Test15_zoom2.nc)
           var_length=${#var}
-        if: ${{ var_length == 7}}
+        if: echo ${{ var_length == 7}}
 
 
      
