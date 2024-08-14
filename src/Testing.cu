@@ -4544,7 +4544,7 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 
 	// Creation of BG_param_test13.txt file
 	std::ofstream param_file(
-		"BG_param_test14.txt", std::ios_base::out | std::ios_base::trunc);
+		"BG_param_test15.txt", std::ios_base::out | std::ios_base::trunc);
 	//Add Bathymetries to the file
 	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
 
@@ -4556,15 +4556,15 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 	param_file << "smallnc = 0;" << std::endl;
 	param_file << "doubleprecision = 1;" << std::endl;
 	param_file << "Toutput = 1:1:, 8.5,  9.5;" << std::endl;
-	param_file << "outzone = zoom1.nc,0.2,0.6,-0.2,0.2, 2:0.5:5, 5.6,6.9;" << std::endl;
-	param_file << "outzone = zoom2.nc,0.2,0.6,-0.2,0.2, 8:0.7:, 5.6;" << std::endl;
-	param_file << "outzone = zoom3.nc,0.2,0.6,-0.2,0.2, :0.8:2;" << std::endl;
-	param_file << "outzone = zoom4.nc,0.2,0.6,-0.2,0.2, 8::9;" << std::endl;
-	param_file << "outzone = zoom5.nc,0.2,0.6,-0.2,0.2;" << std::endl;
+	param_file << "outzone = Test15_zoom1.nc,0.2,0.6,-0.2,0.2, 2:0.5:5, 5.6,6.9;" << std::endl;
+	param_file << "outzone = Test15_zoom2.nc,0.2,0.6,-0.2,0.2, 8:0.7:, 5.6;" << std::endl;
+	param_file << "outzone = Test15_zoom3.nc,0.2,0.6,-0.2,0.2, :0.8:2;" << std::endl;
+	param_file << "outzone = Test15_zoom4.nc,0.2,0.6,-0.2,0.2, 8::9;" << std::endl;
+	param_file << "outzone = Test15_zoom5.nc,0.2,0.6,-0.2,0.2;" << std::endl;
 	param_file.close();
 
 	//read param file
-	Readparamfile(XParam, XForcing, "BG_param_test14.txt"); // "BG_param_test13.txt");
+	Readparamfile(XParam, XForcing, "BG_param_test15.txt"); // "BG_param_test13.txt");
 
 	//readforcing
 	readforcing(XParam, XForcing);
@@ -4603,28 +4603,6 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 		result = false;
 	if (!XModel.blocks.outZone[0].OutputT.size() == 9)
 		result = false;
-
-	/*//TEST 3: Netcdf files created
-	const std::string ncfilestr;
-	int status;
-	int ncid, ndimshh, ndims;
-	int varid;*/
-
-	//status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
-	//if (status != NC_NOERR) handle_ncerror(status);
-	//status = nc_inq_varid(ncid, varstr.c_str(), &varid);
-	//if (status != NC_NOERR)	handle_ncerror(status);
-	//status = nc_inq_varndims(ncid, varid, &ndimshh);
-	//if (status != NC_NOERR) handle_ncerror(status);
-
-
-
-//		eps = 0.0000001;
-		// IL is expected here to be value when dry and 0 where wet at the begining of the computation
-//		if ((abs(maxil - IL) < eps) && (abs(maxcl - CL) < eps) && (abs(minil - T(0.0)) < eps) && (abs(mincl - CL) < eps))
-//		{
-//			result = true;
-//		}
 	
 	return result;
 }
