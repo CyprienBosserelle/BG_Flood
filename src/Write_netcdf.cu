@@ -915,6 +915,7 @@ extern "C" void writenctimestep(std::string outfile, double totaltime)
 	if (status != NC_NOERR) handle_ncerror(status);
 }
 
+//Initialise netcdf files
 template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 {
 	if (!XParam.outvars.empty())
@@ -936,32 +937,71 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 template void InitSave2Netcdf<float>(Param &XParam, Model<float> &XModel);
 template void InitSave2Netcdf<double>(Param &XParam, Model<double> &XModel);
 
+//Save initialisation in maps outpout if require
+template <class T> void SaveInitialisation2Netcdf(Param& XParam, Model<T>& XModel)
+{
+	double NextZoneOutTime;
+	
+	if (!XParam.outvars.empty())
+	{
+		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
+		{
+			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[XModel.blocks.outZone[o].index_next_OutputT];
+			if (XParam.totaltime == NextZoneOutTime)
+			{
+				log("Output to map: " + XModel.blocks.outZone[o].outname + ", Totaltime = " + std::to_string(XParam.totaltime) + " s; Initialisation");
+
+				writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					std::string varstr = XParam.outvars[ivar];
+					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+				}
+				XModel.blocks.outZone[o].index_next_OutputT++;
+			}
+			
+
+		}
+	}
+}
+template void SaveInitialisation2Netcdf<float>(Param& XParam, Model<float>& XModel);
+template void SaveInitialisation2Netcdf<double>(Param& XParam, Model<double>& XModel);
+
 
 template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T>& XModel)
 {
 	double NextZoneOutTime;
+	double tiny = 0.0000001;
 
 	char buffer[256];
-	sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
+	double meanTspeps = (XModel.OutputT[XLoop.indNextoutputtime] - XModel.OutputT[XLoop.indNextoutputtime - T(1)]) / XLoop.nstepout;
+	sprintf(buffer, "%e", meanTspeps);
 	std::string str(buffer);
 	//std::string maps;
 
 	if (!XParam.outvars.empty())
 	{
-		//creatncfileBUQ(XParam);
 		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
-			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[XModel.blocks.outZone[o].index_next_OutputT];
-			if (XLoop.nextoutputtime == NextZoneOutTime)
+			int indLoc = min(XModel.blocks.outZone[o].index_next_OutputT, (int(XModel.blocks.outZone[o].OutputT.size() - 1)));
+			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[indLoc];
+			if (abs(XLoop.nextoutputtime - NextZoneOutTime) < tiny)
 			{
 				//maps +=  + ", ";
 				log("Output to map: " + XModel.blocks.outZone[o].outname + ", Totaltime = " + std::to_string(XLoop.totaltime) + " s; Mean dt = " + str + " s");
 
-
 				writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
 				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 				{
-					writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+					if (XModel.blocks.outZone[o].index_next_OutputT == 0)//first time output
+					{
+						std::string varstr = XParam.outvars[ivar];
+						defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+					}
+					else
+					{
+						writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+					}
 				}
 				XModel.blocks.outZone[o].index_next_OutputT++;
 			}
