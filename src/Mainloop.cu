@@ -232,11 +232,6 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 
 	if  (abs(XLoop.nextoutputtime - XParam.totaltime) < tiny)
 	{
-		//char buffer[256];
-		//sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
-		//std::string str(buffer);
-
-		//log("Output to map. Totaltime = "+ std::to_string(XLoop.totaltime) +" s; Mean dt = " + str + " s");
 		if (XParam.GPUDEVICE >= 0)
 		{
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -247,22 +242,19 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 
 		SaveInitialisation2Netcdf(XParam, XModel);
 
-		//XLoop.nextoutputtime = max(min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime));// , XParam.outputtimeinit);
-		//XLoop.nextoutputtime = min(XModel.OutputT[indNextoutputtime] + XParam.outputtimestep, XParam.endtime);// , XParam.outputtimeinit);
-
 		XLoop.indNextoutputtime++;
-		XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
+		if (XLoop.indNextoutputtime < XModel.OutputT.size())
+		{
+			XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
+
+		}
 
 		XLoop.nstepout = 0;
+
 	}
 
 	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.5))
 	{
-		//char buffer[256];
-		//sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
-		//std::string str(buffer);
-
-		//log("Output to map. Totaltime = "+ std::to_string(XLoop.totaltime) +" s; Mean dt = " + str + " s");
 		if (XParam.GPUDEVICE >= 0)
 		{
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -270,21 +262,20 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			}
 		}
-		
+
 		Save2Netcdf(XParam, XLoop, XModel);
 
-		//XLoop.nextoutputtime = max(min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime));// , XParam.outputtimeinit);
-		//XLoop.nextoutputtime = min(XModel.OutputT[indNextoutputtime] + XParam.outputtimestep, XParam.endtime);// , XParam.outputtimeinit);
-		
 		XLoop.indNextoutputtime++;
 		if (XLoop.indNextoutputtime < XModel.OutputT.size())
 		{
 			XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
+
 		}
 
 		XLoop.nstepout = 0;
 	}
 
+	
 }
 
 template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
