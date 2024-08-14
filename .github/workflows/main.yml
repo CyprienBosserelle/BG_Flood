@@ -100,6 +100,11 @@ jobs:
       - name: running test 13, Test on multi-Bathy / Multi-Roughness input
         run: |
           sed -i 's/test = 12/test = 13/' BG_param.txt
-          ./BG_Flood          
+          ./BG_Flood
+          
+      - name: running test 14, Test on AOI implementation aa wall bnb
+        run: |
+          sed -i 's/test = 13/test = 14/' BG_param.txt
+          ./BG_Flood  
 
      
