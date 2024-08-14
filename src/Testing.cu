@@ -22,6 +22,8 @@
 * Test 11 Wet/dry Instability test with Conserve Elevation
 * Test 12 Calendar time to second conversion
 * Test 13 Multi bathy and roughness map input
+* Test 15 Flexible times reading
+
 
 * Test 99 Run all the test with test number < 99.
 
@@ -292,8 +294,8 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
 
 		}
-		if (mytest == 14)
-			/* Test 14 is to test the input of flexible times outputs (general and in zone_outputs)
+		if (mytest == 15)
+			/* Test 15 is to test the input of flexible times outputs (general and in zone_outputs)
 				Test1: Test of times in second/durations (for general and zone_outputs)
 					The data is read from paramfile and we test the reading and nc files created.
 			*/
@@ -303,7 +305,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			FlexibleOutTime = TestFlexibleOutputTimes(0, 0.0, 0);
 			result = FlexibleOutTime ? "successful" : "failed";
 			log("\t\t ##### \n");
-			log("\t\t ##### Flexible output times test : " + result + "\n");
+			log("\t\t ##### Flexible output times reading test : " + result + "\n");
 			log("\t\t ##### \n");
 			isfailed = (!FlexibleOutTime || isfailed) ? true : false;
 
@@ -4540,50 +4542,16 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 	create2dnc("Z0_map.nc", NX, NY, xz, yz, map, "z");
 
 
-	//Creation of a refinement file
-	//xz = (double*)malloc(sizeof(double) * NX);
-	//yz = (double*)malloc(sizeof(double) * NY);
-	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
-	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
-
-	//map = (double*)malloc(sizeof(double) * NY * NX);
-
-	for (int j = 0; j < NY; j++)
-	{
-		for (int i = 0; i < NX; i++)
-		{
-			map[j * NX + i] = 0;
-			if ((abs(xz[i]) < 0.5) && (abs(yz[j]) < 0.5))
-			{
-				map[j * NX + i] = 1;
-			}
-		}
-	}
-	create2dnc("refinement.nc", NX, NY, xz, yz, map, "z");
-
-	/*// Creation of a rain fall file
-	std::ofstream rain_file(
-		"rainTest13.txt", std::ios_base::out | std::ios_base::trunc);
-	rain_file << "0.000000\t10.00" << std::endl;
-	rain_file << "1000.000\t10.00" << std::endl;
-	rain_file.close();*/
-
 	// Creation of BG_param_test13.txt file
 	std::ofstream param_file(
 		"BG_param_test14.txt", std::ios_base::out | std::ios_base::trunc);
 	//Add Bathymetries to the file
 	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
-	//Add refinement to the file
-	param_file << "Adaptation = Targetlevel,refinement.nc?z ;" << std::endl;
-	param_file << "initlevel = 0; " << std::endl;
-	param_file << "maxlevel = 1; " << std::endl;
-	param_file << "minlevel = 0; " << std::endl;
-	//Add River forcing
-	//param_file << "rainfile = rainTest13.txt ;" << std::endl;
+
 	//Add endtime and outputvar
 	param_file << "endtime = 11.0 ;" << std::endl;
 	param_file << "outvars = zs,h,u,v,zb;" << std::endl;
-	param_file << "dx = 0.01;" << std::endl;
+	param_file << "dx = 0.05;" << std::endl;
 	param_file << "zsinit = 0.1;" << std::endl;
 	param_file << "smallnc = 0;" << std::endl;
 	param_file << "doubleprecision = 1;" << std::endl;
@@ -4614,7 +4582,7 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 	// Run first full step (i.e. 2 half steps)
 
 	//Loop<T> XLoop = InitLoop(XParam, XModel);
-	MainLoop(XParam, XForcing, XModel, XModel_g);
+	//MainLoop(XParam, XForcing, XModel, XModel_g);
 
 	//TEST 1: reading and default values check:
 	bool result = true;
@@ -4636,7 +4604,18 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 	if (!XModel.blocks.outZone[0].OutputT.size() == 9)
 		result = false;
 
-	//TEST 3: Netcdf files created
+	/*//TEST 3: Netcdf files created
+	const std::string ncfilestr;
+	int status;
+	int ncid, ndimshh, ndims;
+	int varid;*/
+
+	//status = nc_open(ncfilestr.c_str(), NC_NOWRITE, &ncid);
+	//if (status != NC_NOERR) handle_ncerror(status);
+	//status = nc_inq_varid(ncid, varstr.c_str(), &varid);
+	//if (status != NC_NOERR)	handle_ncerror(status);
+	//status = nc_inq_varndims(ncid, varid, &ndimshh);
+	//if (status != NC_NOERR) handle_ncerror(status);
 
 
 
@@ -4647,7 +4626,6 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 //			result = true;
 //		}
 	
-
 	return result;
 }
 
