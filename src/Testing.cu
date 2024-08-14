@@ -22,6 +22,7 @@
 * Test 11 Wet/dry Instability test with Conserve Elevation
 * Test 12 Calendar time to second conversion
 * Test 13 Multi bathy and roughness map input
+* Test 14 Test AOI bnds aswall to start with
 
 * Test 99 Run all the test with test number < 99.
 
@@ -260,27 +261,6 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		log("\t\tCalendar time test : " + result);
 	}
 
-
-	if (mytest == 14)
-	{
-		/* Test 14  This test AOI bnds aswall to start with
-
-		*/
-		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
-		log("\t###AOI bnd wall test ###");
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tBBox bnd wall test : " + result);
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tAOI bnd wall test : " + result);
-	}
 	if (mytest == 13)
 	{
 		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
@@ -314,6 +294,26 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
 
 
+	}
+	if (mytest == 14)
+	{
+		/* Test 14  This test AOI bnds aswall to start with
+
+		*/
+		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
+		log("\t###AOI bnd wall test ###");
+		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
+		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
+		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
+		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
+		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+		log("\t\tBBox bnd wall test : " + result);
+		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
+		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
+		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
+		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
+		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+		log("\t\tAOI bnd wall test : " + result);
 	}
 		if (mytest == 994)
 		{
