@@ -615,7 +615,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 
 		int shuffle = 1;
 		int deflate = 1;        // This switches compression on (1) or off (0).
-		int deflate_level = 9;  // This is the compression level in range 1 (less) - 9 (more).
+		int deflate_level = 5;  // This is the compression level in range 1 (less) - 9 (more).
 		nc_def_var_deflate(ncid, var_id, shuffle, deflate, deflate_level);
 
 	}
@@ -743,6 +743,345 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 
 template void defncvarBUQ<float>(Param XParam, int* activeblk, int* level, float* blockxo, float* blockyo, std::string varst, int vdim, float* var, outzoneB Xzone);
 template void defncvarBUQ<double>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, int vdim, double* var, outzoneB Xzone);
+
+
+template <class T> void defncvarBUQlev(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, std::string longname, std::string stdname, std::string unit, int vdim, T* var, outzoneB Xzone)
+{
+
+	int smallnc = XParam.smallnc;
+	float scalefactor = XParam.scalefactor;
+	float addoffset = XParam.addoffset;
+	//int nx = ceil(XParam.nx / 16.0) * 16.0;
+	//int ny = ceil(XParam.ny / 16.0) * 16.0;
+	int status;
+	int ncid, var_id;
+	int  var_dimid2D[2];
+	int  var_dimid3D[3];
+	//int  var_dimid4D[4];
+
+	short* varblk_s;
+	float* varblk;
+	int recid, xid, yid;
+	int bl, ibl;
+	//size_t ntheta;// nx and ny are stored in XParam not yet for ntheta
+
+	float fillval = 9.9692e+36f;
+	short fillval_s = (short)round((9.9692e+36f - addoffset) / scalefactor);
+	//short Sfillval = 32767;
+	//short fillval = 32767
+	static size_t start2D[] = { 0, 0 }; // start at first value 
+	//static size_t count2D[] = { ny, nx };
+	static size_t count2D[] = { (size_t)XParam.blkwidth, (size_t)XParam.blkwidth };
+
+	static size_t start3D[] = { 0, 0, 0 }; // start at first value 
+	//static size_t count3D[] = { 1, ny, nx };
+	static size_t count3D[] = { 1, (size_t)XParam.blkwidth, (size_t)XParam.blkwidth };
+	//size_t count3D[3];
+	//count3D[0] = 1;
+	//count3D[1] = XParam.blkwidth;
+	//count3D[2] = XParam.blkwidth;
+
+	//int minlevzone, maxlevzone;
+
+	std::string outfile = Xzone.outname;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+	//Calclevelzone(XParam, minlevzone, maxlevzone, Xzone, level);
+
+
+	nc_type VarTYPE;
+
+	if (smallnc > 0)
+	{
+		VarTYPE = NC_SHORT;
+	}
+	else
+	{
+		VarTYPE = NC_FLOAT;
+	}
+
+	//printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+
+
+	status = nc_open(outfile.c_str(), NC_WRITE, &ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+	status = nc_redef(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+	//Inquire dimensions ids
+	status = nc_inq_unlimdim(ncid, &recid);//time
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	varblk = (float*)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(float));
+	if (smallnc > 0)
+	{
+
+		varblk_s = (short*)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(short));
+	}
+
+
+	std::string xxname, yyname, varname, sign;
+
+	//generate a different variable name for each level and add attribute as necessary
+	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
+	{
+
+		//std::string xxname, yyname, sign;
+
+		lev < 0 ? sign = "N" : sign = "P";
+
+
+		xxname = "xx_" + sign + std::to_string(abs(lev));
+		yyname = "yy_" + sign + std::to_string(abs(lev));
+
+		varname = varst + "_" + sign + std::to_string(abs(lev));
+
+
+		//printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+		status = nc_inq_dimid(ncid, xxname.c_str(), &xid);
+		if (status != NC_NOERR) handle_ncerror(status);
+		status = nc_inq_dimid(ncid, yyname.c_str(), &yid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+
+		var_dimid2D[0] = yid;
+		var_dimid2D[1] = xid;
+
+		var_dimid3D[0] = recid;
+		var_dimid3D[1] = yid;
+		var_dimid3D[2] = xid;
+
+		if (vdim == 2)
+		{
+			status = nc_def_var(ncid, varname.c_str(), VarTYPE, vdim, var_dimid2D, &var_id);
+			if (status != NC_NOERR) handle_ncerror(status);
+		}
+		else if (vdim == 3)
+		{
+			status = nc_def_var(ncid, varname.c_str(), VarTYPE, vdim, var_dimid3D, &var_id);
+			if (status != NC_NOERR) handle_ncerror(status);
+		}
+
+		if (smallnc > 0)
+		{
+
+			status = nc_put_att_short(ncid, var_id, "_FillValue", NC_SHORT, 1, &fillval_s);
+			if (status != NC_NOERR) handle_ncerror(status);
+			status = nc_put_att_short(ncid, var_id, "missingvalue", NC_SHORT, 1, &fillval_s);
+
+			if (status != NC_NOERR) handle_ncerror(status);
+		}
+		else
+		{
+			status = nc_put_att_float(ncid, var_id, "_FillValue", NC_FLOAT, 1, &fillval);
+			if (status != NC_NOERR) handle_ncerror(status);
+			status = nc_put_att_float(ncid, var_id, "missingvalue", NC_FLOAT, 1, &fillval);
+
+			if (status != NC_NOERR) handle_ncerror(status);
+		}
+
+
+		if (smallnc > 0)
+		{
+
+			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
+			if (status != NC_NOERR) handle_ncerror(status);
+			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
+			if (status != NC_NOERR) handle_ncerror(status);
+		}
+
+
+		status = nc_put_att_text(ncid, var_id, "standard_name", stdname.size(), stdname.c_str());
+		status = nc_put_att_text(ncid, var_id, "long_name", longname.size(), longname.c_str());
+		status = nc_put_att_text(ncid, var_id, "units", unit.size(), unit.c_str());
+
+		std::string crsstrname = "crs";
+		status = nc_put_att_text(ncid, var_id, "grid_mapping", crsstrname.size(), crsstrname.c_str());
+
+
+		int shuffle = 1;
+		int deflate = 1;        // This switches compression on (1) or off (0).
+		int deflate_level = 5;  // This is the compression level in range 1 (less) - 9 (more).
+		nc_def_var_deflate(ncid, var_id, shuffle, deflate, deflate_level);
+
+	}
+	// End definition
+	status = nc_enddef(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	//printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+
+	// Now write the initial value of the Variable out
+
+	//std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+
+	//####################
+	// Create empty array for each levels
+	std::vector<outP> varlayers;
+	int nx, ny;
+	for (int levi = Xzone.minlevel; levi <= Xzone.maxlevel; levi++)
+	{
+		varlayers.push_back(outP());
+		int levindex = (levi - Xzone.minlevel);
+
+		Calcnxnyzone(XParam, levi, nx, ny, Xzone);
+		varlayers[levindex].z = (float*)malloc(nx * ny * sizeof(float));
+		if (smallnc > 0)
+		{
+
+			varlayers[levindex].z_s = (short*)malloc(nx * ny * sizeof(short));
+		}
+		varlayers[levindex].level = levi;
+
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				int n = i + j * nx;
+
+				varlayers[levindex].z[n] = fillval;
+				if (smallnc > 0)
+				{
+					varlayers[levindex].z_s[n] = fillval_s;
+				}
+			}
+		}
+	}
+
+	//std::string xxname, yyname, varname, sign;
+	//std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+
+
+	//int lev, bl;
+	for (int ibl = 0; ibl < Xzone.nblk; ibl++)
+	{
+		//bl = activeblk[Xzone.blk[ibl]];
+	//for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	//{
+		bl = activeblkzone[ibl];
+		int lev = level[bl];
+
+		double  xxmin, yymin;
+		int nxlev, nylev;
+		//double xxmax, yymax;
+		double initdx = calcres(XParam.dx, XParam.initlevel);
+
+		int io, jo;
+		//xxmax = Xzone.xmax - calcres(XParam.dx, lev) / 2.0;
+		//yymax = Xzone.ymax - calcres(XParam.dx, lev) / 2.0;
+
+		int levindex = (lev - Xzone.minlevel);
+
+		Calcnxnyzone(XParam, lev, nxlev, nylev, Xzone);
+		xxmin = Xzone.xo + calcres(XParam.dx, lev) / 2.0;
+		yymin = Xzone.yo + calcres(XParam.dx, lev) / 2.0;
+
+
+
+		jo = round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+		io = round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+
+
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth + XParam.outishift) + (j + XParam.halowidth + XParam.outjshift) * XParam.blkmemwidth + bl * XParam.blksize;
+				int r = (io + i) + (jo + j) * nxlev;
+				if (smallnc > 0)
+				{
+					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
+					varlayers[levindex].z_s[r] = (short)round((var[n] - addoffset) / scalefactor);
+				}
+				else
+				{
+					varlayers[levindex].z[r] = (float)var[n];
+				}
+			}
+		}
+
+	}
+
+
+	for (int levi = Xzone.minlevel; levi <= Xzone.maxlevel; levi++)
+	{
+		int nxlev, nylev;
+		Calcnxnyzone(XParam, levi, nxlev, nylev, Xzone);
+		//double  xxmin, yymin;
+		levi < 0 ? sign = "N" : sign = "P";
+		varname = varst + "_" + sign + std::to_string(abs(levi));
+
+		status = nc_inq_varid(ncid, varname.c_str(), &var_id);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		//xxmin = Xzone.xo + calcres(XParam.dx, levi) / 2.0;
+		//yymin = Xzone.yo + calcres(XParam.dx, levi) / 2.0;
+
+		int levindex = (levi - Xzone.minlevel);
+
+		if (vdim == 2)
+		{
+
+
+			start2D[0] = 0; // (size_t)round((XParam.yo - yymin) / calcres(XParam.dx, levi));
+			start2D[1] = 0; // (size_t)round((XParam.xo - xxmin) / calcres(XParam.dx, levi));
+
+			count2D[0] = (size_t)nylev;
+			count2D[1] = (size_t)nxlev;
+
+			if (smallnc > 0)
+			{
+
+				status = nc_put_vara_short(ncid, var_id, start2D, count2D, varlayers[levindex].z_s);
+				if (status != NC_NOERR) handle_ncerror(status);
+			}
+			else
+			{
+				status = nc_put_vara_float(ncid, var_id, start2D, count2D, varlayers[levindex].z);
+				if (status != NC_NOERR) handle_ncerror(status);
+			}
+		}
+		else if (vdim == 3)
+		{
+			start3D[1] = 0;// (size_t)round((XParam.yo - yymin) / calcres(XParam.dx, levi));
+			start3D[2] = 0;// (size_t)round((XParam.xo - xxmin) / calcres(XParam.dx, levi));
+
+			count3D[1] = (size_t)nylev;
+			count3D[2] = (size_t)nxlev;
+
+			if (smallnc > 0)
+			{
+				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varlayers[levindex].z_s);
+				if (status != NC_NOERR) handle_ncerror(status);
+			}
+			else
+			{
+				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varlayers[levindex].z);
+				if (status != NC_NOERR) handle_ncerror(status);
+				//printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+				//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
+				//printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+				//printf("\n ib=%d; level=%d; blockxo[ib]=%f blockyo[ib]=%f \n", bl, lev, blockxo[bl], blockyo[bl]);
+			}
+
+		}
+
+	}
+
+	for (int levi = Xzone.minlevel; levi <= Xzone.maxlevel; levi++)
+	{
+		int levindex = (levi - Xzone.minlevel);
+		if (smallnc > 0)
+		{
+
+			free(varlayers[levindex].z_s);
+		}
+		free(varlayers[levindex].z);
+	}
+	//close and save new file
+	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+}
+
 
 
 
@@ -915,6 +1254,219 @@ extern "C" void writenctimestep(std::string outfile, double totaltime)
 	if (status != NC_NOERR) handle_ncerror(status);
 }
 
+
+template <class T> void writencvarstepBUQlev(Param XParam, int vdim, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, T* var, outzoneB Xzone)
+{
+	int status, ncid, recid, var_id;
+	static size_t nrec;
+	short* varblk_s;
+	float* varblk;
+	//int nx, ny;
+	//int dimids[NC_MAX_VAR_DIMS];
+	//size_t  *ddim, *start, *count;
+	//XParam.outfile.c_str()
+
+
+	float fillval = 9.9692e+36f;
+	short fillval_s = (short)round((9.9692e+36f - XParam.addoffset) / XParam.scalefactor);
+
+	static size_t start2D[] = { 0, 0 }; // start at first value 
+	//static size_t count2D[] = { ny, nx };
+	static size_t count2D[] = { (size_t)XParam.blkwidth, (size_t)XParam.blkwidth };
+
+	static size_t start3D[] = { 0, 0, 0 }; // start at first value // This is updated to nrec-1 further down
+	//static size_t count3D[] = { 1, ny, nx };
+	static size_t count3D[] = { 1, (size_t)XParam.blkwidth, (size_t)XParam.blkwidth };
+
+	int smallnc = XParam.smallnc;
+	float scalefactor = XParam.scalefactor;
+	float addoffset = XParam.addoffset;
+
+	status = nc_open(Xzone.outname.c_str(), NC_WRITE, &ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+	//read id from time dimension
+	status = nc_inq_unlimdim(ncid, &recid);
+	if (status != NC_NOERR) handle_ncerror(status);
+	status = nc_inq_dimlen(ncid, recid, &nrec);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	start3D[0] = nrec - 1;
+
+
+	// Create empty array for each levels
+	std::vector<outP> varlayers;
+	int nx, ny;
+	for (int levi = Xzone.minlevel; levi <= Xzone.maxlevel; levi++)
+	{
+		varlayers.push_back(outP());
+		int levindex = (levi - Xzone.minlevel);
+
+		Calcnxnyzone(XParam, levi, nx, ny, Xzone);
+		varlayers[levindex].z = (float*)malloc(nx * ny * sizeof(float));
+		if (smallnc > 0)
+		{
+
+			varlayers[levindex].z_s = (short*)malloc(nx * ny * sizeof(short));
+		}
+		varlayers[levindex].level = levi;
+
+		for (int j = 0; j < ny; j++)
+		{
+			for (int i = 0; i < nx; i++)
+			{
+				int n = i + j * nx;
+
+				varlayers[levindex].z[n] = fillval;
+				if (smallnc > 0)
+				{
+					varlayers[levindex].z_s[n] = fillval_s;
+				}
+			}
+		}
+	}
+
+	std::string xxname, yyname, varname, sign;
+	std::vector<int> activeblkzone = Calcactiveblockzone(XParam, activeblk, Xzone);
+
+
+	int lev, bl;
+	for (int ibl = 0; ibl < Xzone.nblk; ibl++)
+	{
+		//bl = activeblk[Xzone.blk[ibl]];
+	//for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	//{
+		bl = activeblkzone[ibl];
+		lev = level[bl];
+		
+		double  xxmin, yymin;
+		int nxlev, nylev;
+		//double xxmax, yymax;
+		double initdx = calcres(XParam.dx, XParam.initlevel);
+
+		int io, jo;
+		//xxmax = Xzone.xmax - calcres(XParam.dx, lev) / 2.0;
+		//yymax = Xzone.ymax - calcres(XParam.dx, lev) / 2.0;
+
+		int levindex = (lev - Xzone.minlevel);
+
+		Calcnxnyzone(XParam, lev, nxlev, nylev, Xzone);
+		xxmin = Xzone.xo + calcres(XParam.dx, lev) / 2.0;
+		yymin = Xzone.yo + calcres(XParam.dx, lev) / 2.0;
+
+		
+
+		jo = round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+		io = round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
+		
+
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth + XParam.outishift) + (j + XParam.halowidth + XParam.outjshift) * XParam.blkmemwidth + bl * XParam.blksize;
+				int r = (io + i) + (jo + j) * nxlev;
+				if (smallnc > 0)
+				{
+					// packed_data_value = nint((unpacked_data_value - add_offset) / scale_factor)
+					varlayers[levindex].z_s[r] = (short)round((var[n] - addoffset) / scalefactor);
+				}
+				else
+				{
+					varlayers[levindex].z[r] = (float)var[n];
+				}
+			}
+		}
+
+	}
+
+
+	for (int levi = Xzone.minlevel; levi <= Xzone.maxlevel; levi++)
+	{
+		int nxlev, nylev;
+		Calcnxnyzone(XParam, levi, nxlev, nylev, Xzone);
+		//double  xxmin, yymin;
+		levi < 0 ? sign = "N" : sign = "P";
+		varname = varst + "_" + sign + std::to_string(abs(levi));
+
+		status = nc_inq_varid(ncid, varname.c_str(), &var_id);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		//xxmin = Xzone.xo + calcres(XParam.dx, levi) / 2.0;
+		//yymin = Xzone.yo + calcres(XParam.dx, levi) / 2.0;
+
+		int levindex = (levi - Xzone.minlevel);
+
+		if (vdim == 2)
+		{
+			
+
+			start2D[0] = 0; // (size_t)round((XParam.yo - yymin) / calcres(XParam.dx, levi));
+			start2D[1] = 0; // (size_t)round((XParam.xo - xxmin) / calcres(XParam.dx, levi));
+			
+			count2D[0] = (size_t)nylev;
+			count2D[1] = (size_t)nxlev;
+
+			if (smallnc > 0)
+			{
+
+				status = nc_put_vara_short(ncid, var_id, start2D, count2D, varlayers[levindex].z_s);
+				if (status != NC_NOERR) handle_ncerror(status);
+			}
+			else
+			{
+				status = nc_put_vara_float(ncid, var_id, start2D, count2D, varlayers[levindex].z);
+				if (status != NC_NOERR) handle_ncerror(status);
+			}
+		}
+		else if (vdim == 3)
+		{
+			start3D[1] = 0;// (size_t)round((XParam.yo - yymin) / calcres(XParam.dx, levi));
+			start3D[2] = 0;// (size_t)round((XParam.xo - xxmin) / calcres(XParam.dx, levi));
+
+			count3D[1] = (size_t)nylev;
+			count3D[2] = (size_t)nxlev;
+
+			if (smallnc > 0)
+			{
+				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varlayers[levindex].z_s);
+				if (status != NC_NOERR) handle_ncerror(status);
+			}
+			else
+			{
+				status = nc_put_vara_float(ncid, var_id, start3D, count3D, varlayers[levindex].z);
+				if (status != NC_NOERR) handle_ncerror(status);
+				//printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, start3D[0], start3D[1], start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+				//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
+				//printf("\n ib=%d count3D=[%d,%d,%d]\n", count3D[0], count3D[1], count3D[2]);
+				//printf("\n ib=%d; level=%d; blockxo[ib]=%f blockyo[ib]=%f \n", bl, lev, blockxo[bl], blockyo[bl]);
+			}
+
+		}
+
+	}
+
+	for (int levi = Xzone.minlevel; levi <= Xzone.maxlevel; levi++)
+	{
+		int levindex = (levi - Xzone.minlevel);
+		if (smallnc > 0)
+		{
+
+			free(varlayers[levindex].z_s);
+		}
+		free(varlayers[levindex].z);
+	}
+	//close and save new file
+	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+}
+
+// Scope for compiler to know what function to compile
+
+template void writencvarstepBUQlev<float>(Param XParam, int vdim, int* activeblk, int* level, float* blockxo, float* blockyo, std::string varst, float* var, outzoneB Xzone);
+template void writencvarstepBUQlev<double>(Param XParam, int vdim, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, double* var, outzoneB Xzone);
+
+
+
 //Initialise netcdf files
 template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 {
@@ -929,7 +1481,16 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
 				std::string varstr = XParam.outvars[ivar];
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr,XModel.Outvarlongname[varstr],XModel.Outvarstdname[varstr],XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+				if (XParam.savebyblk)
+				{
+					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+
+				}
+				else
+				{
+					defncvarBUQlev(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+
+				}
 			}
 		}*/
 	}
@@ -987,7 +1548,6 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T>& XModel
 			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[indLoc];
 			if (abs(XLoop.nextoutputtime - NextZoneOutTime) < tiny)
 			{
-				//maps +=  + ", ";
 				log("Output to map: " + XModel.blocks.outZone[o].outname + ", Totaltime = " + std::to_string(XLoop.totaltime) + " s; Mean dt = " + str + " s");
 
 				writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
@@ -1000,7 +1560,14 @@ template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T>& XModel
 					}
 					else
 					{
-						writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+            if (XParam.savebyblk)
+				{
+					writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				}
+				else
+				{
+					writencvarstepBUQlev(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+				}
 					}
 				}
 				XModel.blocks.outZone[o].index_next_OutputT++;
