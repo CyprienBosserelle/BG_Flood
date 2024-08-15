@@ -128,9 +128,10 @@ struct AdaptP
 
 struct BndblockP
 {
-	int nblkriver, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
+	int nblkriver, nblkculvert, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
 	int* river;
 	int* Tsout;
+	int* culvert;
 	//int * DrainSink;
 	//int * DrainSource;
 	//int * Bridges;
@@ -147,10 +148,6 @@ struct BndblockP
 
 
 
-
-
-
-
 template <class T>
 struct TimeP
 {
@@ -159,6 +156,17 @@ struct TimeP
 	T* dtmax;
 	T* arrmax, *arrmin;
 };
+
+
+template <class T>
+struct CulvertH
+{
+	T* h1;
+	T* h2;
+	T* dh; //positive if P1 toward P2
+};
+
+
 
 template <class T>
 struct Model
@@ -169,6 +177,9 @@ struct Model
 	GradientsP<T> grad;
 	FluxP<T> flux;
 	AdvanceP<T> adv;
+
+	//Culverts
+	CulvertH culvertsh;
 	
 	//external forcing
 	T* zb;

@@ -1344,7 +1344,8 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
 	XParam.nrivers = int(XForcing.rivers.size());
-
+	// Same for culverts
+	XParam.nculverts = int(XForcing.culverts.size());
 
 
 	// Check whether endtime was specified by the user

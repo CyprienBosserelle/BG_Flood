@@ -51,7 +51,7 @@ template void AllocateCPU<double>(int nx, int ny, double *&zs, double *&h, doubl
 template void AllocateCPU<float>(int nx, int ny, float *&zs, float *&h, float *&u, float *&v);
 template void AllocateCPU<int>(int nx, int ny, int *&zs, int *&h, int *&u, int *&v);
 
-template <class T> __host__ void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+template <class T> __host__ void AllocTSstoreateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
 {
 
 	AllocateCPU(nx, ny, zs);
@@ -203,6 +203,16 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		//this will be eventually reallocated later
 		AllocateCPU(1, 1, XModel.bndblk.river);
 		XModel.bndblk.nblkriver = 1;
+	}
+
+	if (XParam.nculverts > 0) 
+	{
+		AllocateCPU(1, 1, XModel.bndblk.culvert);
+		XModel.bndblk.nblkculvert = 1;
+		culv_num = XParam.nrivers;
+		AllocateCPU(culv_num, 1, XModel.culvertsh.dh);
+		AllocateCPU(culv_num, 1, XModel.culvertsh.h1);
+		AllocateCPU(culv_num, 1, XModel.culvertsh.h2);
 	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later

@@ -111,10 +111,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
-	//if (XForcing.culverts.size() > 0)
-	//{
-	//	AddCulverts(XParam, XLoop, XForcing.culverts, XModel);
-	//}
+	if (XForcing.culverts.size() > 0)
+	{
+		AddCulvertsCPU(XParam, XLoop, XForcing.culverts, XModel);
+	}
 
 	//============================================
 	//Update evolving variable by 1/2 time step
@@ -186,7 +186,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv_o, XModel.flux, XModel.adv);
 	
 	//============================================
-	// Add forcing (Rain, Wind)
+	// Add forcing (Rain, Wind, Culverts)
 	//if (!XForcing.Rain.inputfile.empty())
 	//{
 	//	AddrainforcingCPU(XParam, XModel.blocks, XForcing.Rain, XModel.adv);
@@ -198,6 +198,10 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	if (XForcing.rivers.size() > 0)
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
+	}
+	if (XForcing.culverts.size() > 0)
+	{
+		AddCulvertsCPU(XParam, XLoop, XForcing.culverts, XModel);
 	}
 
 	//============================================

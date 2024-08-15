@@ -400,6 +400,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		int ib;
 		double levdx, dxblk;
 		double blkxmin, blkxmax, blkymin, blkymax;
+
 		log("\tInitializing culverts");
 		//For each culvert
 		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
@@ -445,6 +446,25 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			}
 		}
 
+		//Now identify sort and unique blocks where culverts are being inserted
+		std::vector<int> activeCulvertBlk;
+
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block1);
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block2);
+		}
+		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
+		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
+		if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
+		{
+			ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
+			XModel.bndblk.nblkculvert = int(activeCulvertBlk.size());
+		}
+		for (int b = 0; b < activeCulvertBlk.size(); b++)
+		{
+			XModel.bndblk.culvert[b] = activeCulvertBlk[b];
+		}
 
 
 		//Calculate the friction coefficient (L=0.3164*Re^(-0.25) if Re<100000 eq de Blasius)
