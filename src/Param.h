@@ -82,7 +82,7 @@ public:
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
 
-	Toutput Toutput; /* Flexible time definition for outputs (nc files)
+	T_output Toutput; /* Flexible time definition for outputs (nc files)
 	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"
 	Default = First and last timne steps*/
 

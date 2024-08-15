@@ -1356,7 +1356,7 @@ template <class T> void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T
 }
 
 // Create a vector of times steps from the input structure Toutput
-std::vector<double> GetTimeOutput(Toutput time_info)
+std::vector<double> GetTimeOutput(T_output time_info)
 {
 	std::vector<double> time_vect;
 	double time;

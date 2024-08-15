@@ -1552,7 +1552,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 }
 
 //Initialise default values for Toutput (output times for map outputs)
-void InitialiseToutput(Toutput& Toutput_loc, Param XParam)
+void InitialiseToutput(T_output& Toutput_loc, Param XParam)
 {
 	if (std::isnan(Toutput_loc.init))
 	{

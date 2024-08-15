@@ -13,7 +13,7 @@ public:
 };
 
 // Flexible definition of time outputs
-class Toutput {
+class T_output {
 public: 
 	double init = NAN;
 	double tstep = NAN;
@@ -28,7 +28,7 @@ public:
 	double xstart, xend, ystart, yend; // definition of the zone needed for special nc output (rectangular zone) by the user
 	//double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)
 	std::string outname; // name for the output file (one for each zone)
-	Toutput Toutput; // time for outputs for the zone
+	T_output Toutput; // time for outputs for the zone
 };
 
 class Flowin {
