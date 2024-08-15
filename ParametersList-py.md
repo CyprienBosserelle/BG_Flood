@@ -16,7 +16,6 @@ BG_flood user interface consists in a text file, associating key words to user c
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |frictionmodel|frictionmodel| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 |Toutput|Toutput| 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
-|savebyblk| savebyblk , writebyblk , saveperblk , writeperblk , savebyblock , writebyblock , saveperblock , writeperblock | 0|Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for flow model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |il| il , Rain_il , initialloss | 0.0|Initial Loss (if constant)|
@@ -72,7 +71,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 ### Outputs
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
-|TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position <br>(which will be converted to nearest grid position). <br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
+|TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position<br>(which will be converted to nearest grid position).<br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
 |outfile|outfile| "Output.nc"|netcdf output file name|
 |outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";<br>|
 |outzone|outzone|Full domain<br>|Zoned output (netcdf file), giving a file name and the position of two corner points<br>(which will be converted to a rectagle containing full blocks).<br>Time vector or values can also be added to specified special outputs for this one in particular.<br>This keyword can be used multiple times to output maps of different areas.<br>Example: "outzone=zoomed.nc,5.3,5.4,0.5,0.8;" (*filename,x1,x2,y1,y2*) or "outzone=zoomed.nc,5.3,5.4,0.5,0.8, 3600:360:7200;" (*filename,x1,x2,y1,y2, t_init:t_step:t_end*)<br>|
@@ -97,6 +96,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |rainbnd| rainbnd , rainonbnd | false|when false it force the rain foring on the bnd cells to be null.|
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
 |reftime| reftime , referencetime , timeref | ""|Reference time string as yyyy-mm-ddTHH:MM:SS|
+|savebyblk| savebyblk , writebyblk , saveperblk , writeperblk , savebyblock , writebyblock , saveperblock , writeperblock | true||
 ---
 
 ## List of the Forcings' inputs
