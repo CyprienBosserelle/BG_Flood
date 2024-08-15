@@ -61,6 +61,8 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Initial forcing
 	InitRivers(XParam, XForcing, XModel);
 
+	InitCulverts(XParam, XForcing, XModel);
+
 	//=====================================
 	// Initial bndinfo
 	//Calcbndblks(XParam, XForcing, XModel.blocks);
@@ -384,6 +386,74 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 template void InitRivers<float>(Param XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitRivers<double>(Param XParam, Forcing<float> &XForcing, Model<double> &XModel);
+
+
+template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Model<T>& XModel)
+{
+	//========================
+	// Culvert set-up
+
+	if (XForcing.culverts.size() > 0)
+	{
+		//
+		double xl, yb, xr, yt, xi, yi;
+		int ib;
+		double levdx, levdelta;
+		log("\tInitializing culverts");
+		//For each culvert
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			/*dischargeArea = 0.0;*/
+			// find the cell where the culvert well / source will be applied
+			std::vector<int> idis, jdis, blockdis;
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
+			{
+				ib = XModel.blocks.active[ibl];
+				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+				levdelta = calcres(XParam.delta, XModel.blocks.level[ib]);
+				for (int j = 0; j < XParam.blkwidth; j++)
+				{
+					for (int i = 0; i < XParam.blkwidth; i++)
+					{
+						//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+						xi = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
+						yi = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
+
+
+						xl = xi - 0.5 * levdx;
+						yb = yi - 0.5 * levdx;
+						xr = xi + 0.5 * levdx;
+						yt = yi + 0.5 * levdx;
+						
+						//Identify where the edges of the culvert are located
+						if (OBBdetect(xl, xr, yb, yt, XForcing.culverts[cc].x1, XForcing.culverts[cc].x2, XForcing.culverts[cc].y1, XForcing.culverts[cc].y2))
+						{
+							XForcing.culverts[cc].i = i;
+							XForcing.culverts[cc].j = j;
+							XForcing.culverts[cc].block = ib;
+						}
+					}
+				}
+			}
+		}
+
+		//Calculate the length of the culvert
+		if (XForcing.culverts[cc].type > 0)
+		{
+			XForcing.culverts[cc].length = sqrt(pow(x2 - x1) + pow(y2 - y1));
+		}
+
+		//Calculate the friction coefficient (L=0.3164*Re^(-0.25) if Re<100000 eq de Blasius)
+		// and the Head Loss coeff (coeff * V^2)
+
+	}
+
+
+}
+
+template void InitCulverts<float>(Param XParam, Forcing<float>& XForcing, Model<float>& XModel);
+template void InitCulverts<double>(Param XParam, Forcing<float>& XForcing, Model<double>& XModel);
+
 
 
 template<class T> void Initmaparray(Model<T>& XModel)

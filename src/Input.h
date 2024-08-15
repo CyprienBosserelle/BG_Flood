@@ -33,7 +33,7 @@ public:
 
 class River {
 public:
-	std::vector<int> i, j, block; // one river can spring across multiple cells
+	int i, j, block; // one river can spring across multiple cells
 	double disarea; // discharge area
 	double xstart,xend, ystart,yend; // location of the discharge as a rectangle
 	double to, tmax;
@@ -45,8 +45,11 @@ public:
 class Culvert {
 public:
 	int type = 0; //Type of culvert
-	double xstart, xend, ystart, yend; // location of the input and outputs
+	double x1, x2, y1, y2; // location of the input and outputs (or 2 points defining the culvert)
 	double section = 1.0; //Section of the culvert in m.
+	double length=2.0; //Length of the culvert in m.
+	int i1, j1, block1, i2, j2, block2; // start and end of the culvert cells
+	double Qmax = 3.0; //Maximum discharge for the culvert in m3/s.
 };
 
 class inputmap {
