@@ -252,73 +252,73 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t\tWet/dry Instability test : " + result);
 		}
 
-	if (mytest == 12)
-	{
-		/* Test 12 is to test the calendar time to second conversion
-			This test will fail if the system or compiler does not suport long long 
-			 
-		*/
-		bool timetest;
-		timetest = testime1(1) && testime2(2);
-		result = timetest ? "successful" : "failed";
-		log("\t\tCalendar time test : " + result);
-	}
+		if (mytest == 12)
+		{
+			/* Test 12 is to test the calendar time to second conversion
+				This test will fail if the system or compiler does not suport long long
 
-	if (mytest == 13)
-	{
-		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
-			Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
-				The max / min values are check to see if the z/z0 maps are created as expected
-			Test2: A roughness file name is changed to have a number in first position. We check that the 
-				file is read and not the number taken as z0 value.
-			Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
-			Test4 :  Test value input for initial loss / continuous loss
-		*/
-		bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
-		log("\t### Different bathy and different roughness file inputs ###");
-		RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughBathyresult ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
-		RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughInput ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Roughness file name test : " + result + "\n");
-		RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughtInputnumber ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Roughness value input test : " + result + "\n");
-		log("\t\t ##### \n");
-		ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = ILCLInputnumber ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
-		log("\t\t ##### \n");
-		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
-	}
-    
-	if (mytest == 14)
-	{
-		/* Test 14  This test AOI bnds aswall to start with
+			*/
+			bool timetest;
+			timetest = testime1(1) && testime2(2);
+			result = timetest ? "successful" : "failed";
+			log("\t\tCalendar time test : " + result);
+		}
 
-		*/
-		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
-		log("\t###AOI bnd wall test ###");
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tBBox bnd wall test : " + result);
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tAOI bnd wall test : " + result);
-	}
-    
-  if (mytest == 15)
+		if (mytest == 13)
+		{
+			/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
+				Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
+					The max / min values are check to see if the z/z0 maps are created as expected
+				Test2: A roughness file name is changed to have a number in first position. We check that the
+					file is read and not the number taken as z0 value.
+				Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
+				Test4 :  Test value input for initial loss / continuous loss
+			*/
+			bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
+			log("\t### Different bathy and different roughness file inputs ###");
+			RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughBathyresult ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
+			RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughInput ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Roughness file name test : " + result + "\n");
+			RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughtInputnumber ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Roughness value input test : " + result + "\n");
+			log("\t\t ##### \n");
+			ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = ILCLInputnumber ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
+			log("\t\t ##### \n");
+			isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
+		}
+
+		if (mytest == 14)
+		{
+			/* Test 14  This test AOI bnds aswall to start with
+
+			*/
+			bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
+			log("\t###AOI bnd wall test ###");
+			wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
+			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
+			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
+			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
+			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+			log("\t\tBBox bnd wall test : " + result);
+			wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
+			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
+			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
+			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
+			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+			log("\t\tAOI bnd wall test : " + result);
+		}
+
+		if (mytest == 15)
 			/* Test 15 is to test the input of flexible times outputs (general and in zone_outputs)
 				Test1: Test of times in second/durations (for general and zone_outputs)
 					The data is read from paramfile and we test the reading and nc files created.
@@ -334,7 +334,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			isfailed = (!FlexibleOutTime || isfailed) ? true : false;
 
 		}
-    
+
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -352,7 +352,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		{
 			TestGradientSpeed(XParam, XModel, XModel_g);
 		}
-		
+
 		if (mytest == 998)
 		{
 			//
@@ -4624,7 +4624,7 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 		result = false;
 	if (!XParam.Toutput.val[1] == 9.5)
 		result = false;
-	if (!XParam.outzone[2].Toutput.init == 0.0 )
+	if (!XParam.outzone[2].Toutput.init == 0.0)
 		result = false;
 	if (!XParam.outzone[3].Toutput.tstep == 11.0)
 		result = false;
@@ -4636,7 +4636,7 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 		result = false;
 	if (!XModel.blocks.outZone[0].OutputT.size() == 9)
 		result = false;
-	
+
 	return result;
 }
 
@@ -4781,7 +4781,7 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 }
 
 
-template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop,bool flip, bool withaoi)
+template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop, bool flip, bool withaoi)
 {
 	Forcing<float> XForcing;
 
@@ -4817,16 +4817,16 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	XParam.aoibnd = 0;
 
 	XParam.outputtimestep = XParam.endtime;
-	
+
 	std::ofstream aoi_file(
 		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
 	aoi_file << "5.0 3.0" << std::endl;
 	aoi_file << "27.0 3.0" << std::endl;
-	aoi_file << "27.0 27.0"<< std::endl;
+	aoi_file << "27.0 27.0" << std::endl;
 	aoi_file << "5.0 27.0" << std::endl;
 	aoi_file << "5.0 3.0" << std::endl;
 	aoi_file.close(); //destructor implicitly does it
-	
+
 	/*
 	std::ofstream aoi_file(
 		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
@@ -4838,7 +4838,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	aoi_file.close(); //destructor implicitly does it
 	*/
 	if (withaoi)
-	{	
+	{
 		XForcing.AOI.file = "testaoi.tmp";
 		XForcing.AOI.active = true;
 		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
@@ -4871,7 +4871,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	XParam.Adapt_arg1 = "";
 	XParam.Adapt_arg2 = "";
 	XParam.Adapt_arg3 = "";
-	
+
 	StaticForcingP<int> targetlevel;
 	XForcing.targetadapt.push_back(targetlevel);
 
@@ -4911,7 +4911,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	thisriver.xstart = 10;
 	thisriver.xend = 12;
 	thisriver.ystart = 10;
-	thisriver.yend =12;
+	thisriver.yend = 12;
 
 	XForcing.rivers.push_back(thisriver);
 
@@ -4949,7 +4949,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
 	T TheoryInput = Q * XParam.endtime;
-	
+
 
 	T SimulatedVolume = T(0.0);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -4962,7 +4962,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 			{
 				int i = memloc(XParam, ix, iy, ib);
 				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
-				
+
 			}
 		}
 	}
@@ -4973,7 +4973,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 
 	int modelgood = error / TheoryInput < 0.001;
 
-	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput)*100);
+	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput) * 100);
 
 	//log("#####");
 	return modelgood;

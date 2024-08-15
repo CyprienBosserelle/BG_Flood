@@ -31,7 +31,7 @@ public:
 
 	bool conserveElevation = false; //Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks
 	bool wetdryfix = true; // Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)
-  
+
 
 	double Pa2m = 0.00009916; // Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)
 	double Paref = 101300.0; // Reference pressure in Pa (if unit is hPa then user should use 1013.0)
@@ -52,7 +52,7 @@ public:
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
 	int halowidth = 1; // Use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
-	
+
 
 	double xo = nan(""); // Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
@@ -83,11 +83,11 @@ public:
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
 
 	Toutput Toutput; /* Flexible time definition for outputs (nc files)
-	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100" 
+	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"
 	Default = First and last timne steps*/
 
-  //*Boundaries
-  bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
+	//*Boundaries
+	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
@@ -122,9 +122,9 @@ public:
 
 
 	//Timeseries output (save as a vector containing information for each Time Serie output)
-	std::vector<TSoutnode> TSnodesout; 
-	/*Time serie output, giving a file name and a (x,y) position 
-	(which will be converted to nearest grid position). 
+	std::vector<TSoutnode> TSnodesout;
+	/*Time serie output, giving a file name and a (x,y) position
+	(which will be converted to nearest grid position).
 	This keyword can be used multiple times to extract time series at different locations.
 	The data is stocked for each timestep and written by flocs.
 	The resulting file contains (t,zs,h,u,v)
@@ -133,14 +133,14 @@ public:
 	*/
 
 	std::string outfile = "Output.nc"; // netcdf output file name
-	std::vector<std::string> outvars; 
+	std::vector<std::string> outvars;
 	/*List of names of the variables to output (for 2D maps)
 	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
 	Default: "zb", "zs", "u", "v", "h"
 	*/
 	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
-	
-	std::vector<outzoneP> outzone; 
+
+	std::vector<outzoneP> outzone;
 	/*Zoned output (netcdf file), giving a file name and the position of two corner points
 	(which will be converted to a rectagle containing full blocks).
 	Time vector or values can also be added to specified special outputs for this one in particular.
@@ -190,13 +190,13 @@ public:
 	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs
 
 #ifdef USE_CATALYST
-        //* ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)
-        int use_catalyst = 0; // Switch to use ParaView Catalyst
-        int catalyst_python_pipeline = 0; //Pipeline to use ParaView Catalyst
-        int vtk_output_frequency = 0; // Output frequency for ParaView Catalyst
-        double vtk_output_time_interval = 1.0; // Output time step for ParaView Catalyst
-        std::string vtk_outputfile_root = "bg_out"; //output file name for ParaView Catalyst
-        std::string python_pipeline = "coproc.py"; //python pipeline for ParaView Catalyst
+		//* ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)
+	int use_catalyst = 0; // Switch to use ParaView Catalyst
+	int catalyst_python_pipeline = 0; //Pipeline to use ParaView Catalyst
+	int vtk_output_frequency = 0; // Output frequency for ParaView Catalyst
+	double vtk_output_time_interval = 1.0; // Output time step for ParaView Catalyst
+	std::string vtk_outputfile_root = "bg_out"; //output file name for ParaView Catalyst
+	std::string python_pipeline = "coproc.py"; //python pipeline for ParaView Catalyst
 #endif
 
 
@@ -227,7 +227,7 @@ public:
 	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
 
 
-	bool savebyblk=true;
+	bool savebyblk = true;
 
 };
 
