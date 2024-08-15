@@ -4536,7 +4536,6 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 * This function creates a case set-up with a param file, read it.
 * It tests the reading and default values used for times outputs.
 * It checks the vectors for time outputs.
-* It then test the nc saving of the user selected good times.
 *
 */
 template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
