@@ -126,6 +126,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |depfile|depfile|
 |bnd| bnd , bndseg |
 |cavity|cavity|
+|culvert|culvert|
 ---
 
 *Note* : The keys are not case sensitive.
