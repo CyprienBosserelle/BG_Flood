@@ -1107,9 +1107,9 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			if (culvertpar.size() > 1)
 				myculvert.x1 = std::stof(culvertpar[1]);
 			if (culvertpar.size() > 2)
-				myculvert.x2 = std::stof(culvertpar[2]);
+				myculvert.y1 = std::stof(culvertpar[2]);
 			if (culvertpar.size() > 3)
-				myculvert.y1 = std::stof(culvertpar[3]);
+				myculvert.x2 = std::stof(culvertpar[3]);
 			if (culvertpar.size() > 4)
 				myculvert.y2 = std::stof(culvertpar[4]);
 			if (culvertpar.size() > 5)

@@ -396,52 +396,56 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 	if (XForcing.culverts.size() > 0)
 	{
 		//
-		double xl, yb, xr, yt, xi, yi;
+		double x1,x2,y1,y2;
 		int ib;
-		double levdx, levdelta;
+		double levdx, dxblk;
+		double blkxmin, blkxmax, blkymin, blkymax;
 		log("\tInitializing culverts");
 		//For each culvert
 		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
 		{
-			/*dischargeArea = 0.0;*/
 			// find the cell where the culvert well / source will be applied
-			std::vector<int> idis, jdis, blockdis;
+
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
 				ib = XModel.blocks.active[ibl];
 				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
-				levdelta = calcres(XParam.delta, XModel.blocks.level[ib]);
-				for (int j = 0; j < XParam.blkwidth; j++)
+
+				x1 = (T)XForcing.culverts[cc].x1;
+				x2 = (T)XForcing.culverts[cc].x2;
+				y1 = (T)XForcing.culverts[cc].y1;
+				y2 = (T)XForcing.culverts[cc].y2;
+
+				dxblk = (T)(XParam.blkwidth) * levdx;
+
+				blkxmin = ((T)XParam.xo + XModel.blocks.xo[ib] - T(0.5) * levdx);
+				blkymin = ((T)XParam.yo + XModel.blocks.yo[ib] - T(0.5) * levdx);
+
+				blkxmax = (blkxmin + dxblk);
+				blkymax = (blkymin + dxblk);
+
+				if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
 				{
-					for (int i = 0; i < XParam.blkwidth; i++)
-					{
-						//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-						xi = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
-						yi = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
-
-
-						xl = xi - 0.5 * levdx;
-						yb = yi - 0.5 * levdx;
-						xr = xi + 0.5 * levdx;
-						yt = yi + 0.5 * levdx;
-						
-						//Identify where the edges of the culvert are located
-						if (OBBdetect(xl, xr, yb, yt, XForcing.culverts[cc].x1, XForcing.culverts[cc].x2, XForcing.culverts[cc].y1, XForcing.culverts[cc].y2))
-						{
-							XForcing.culverts[cc].i = i;
-							XForcing.culverts[cc].j = j;
-							XForcing.culverts[cc].block = ib;
-						}
-					}
+					XForcing.culverts[cc].block1 = ib;
+					XForcing.culverts[cc].i1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].j1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
 				}
+
+				if (x2 > blkxmin && x2 <= blkxmax && y2 > blkymin && y2 <= blkymax)
+				{
+					XForcing.culverts[cc].block2 = ib;
+					XForcing.culverts[cc].i2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].j2 = min(max((int)round((y2 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+				}
+			}
+			//Calculate the length of the culvert
+			if (XForcing.culverts[cc].type > 0)
+			{
+				XForcing.culverts[cc].length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 			}
 		}
 
-		//Calculate the length of the culvert
-		if (XForcing.culverts[cc].type > 0)
-		{
-			XForcing.culverts[cc].length = sqrt(pow(x2 - x1) + pow(y2 - y1));
-		}
+
 
 		//Calculate the friction coefficient (L=0.3164*Re^(-0.25) if Re<100000 eq de Blasius)
 		// and the Head Loss coeff (coeff * V^2)

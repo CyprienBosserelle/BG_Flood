@@ -241,7 +241,7 @@ struct Forcing
 	(calculated from the section, distance and other parameter such as water level on each side depending on the type of culvert).
 	To add multiple culverts, just add different lines in the input file (one by culvert).
 	Ex: culvert = 0,1867430,1867455,3914065,3914090, 1;
-	Ex: river = *type*, *xstart*, *xend*, *ystart*, *yend*, *section*;
+	Ex: river = *type*, *x1*, *y1*, *x2*, *y2*, *section*;
 	Default: None
 	*/
 
