@@ -42,6 +42,13 @@ public:
 	
 };
 
+class Culvert {
+public:
+	int type = 0; //Type of culvert
+	double xstart, xend, ystart, yend; // location of the input and outputs
+	double section = 1.0; //Section of the culvert in m.
+};
+
 class inputmap {
 public:
 	int nx = 0;

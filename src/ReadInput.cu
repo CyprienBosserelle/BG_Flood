@@ -1094,6 +1094,39 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}
 
+	parameterstr = "culvert";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> culvertpar = split(parametervalue, ',');
+
+		if (!culvertpar.empty())
+		{
+			Culvert myculvert;
+			myculvert.type = std::stoi(culvertpar[0]);
+			if (culvertpar.size() > 1)
+				myculvert.xstart = std::stof(culvertpar[1]);
+			if (culvertpar.size() > 2)
+				myculvert.xend = std::stof(culvertpar[2]);
+			if (culvertpar.size() > 3)
+				myculvert.ystart = std::stof(culvertpar[3]);
+			if (culvertpar.size() > 4)
+				myculvert.yend = std::stof(culvertpar[4]);
+			if (culvertpar.size() > 5)
+				myculvert.section = std::stof(culvertpar[5]);
+
+			forcing.culverts.push_back(myculvert);
+		}
+		else
+		{
+			//Failed there should be 5 arguments (comma separated) when inputing a river: type, xstart,xend,ystart,yend;
+			std::cerr << "Culvert input failed there should be 5 arguments (comma separated) when inputing a river: culvert = type, xstart,xend,ystart,yend; see log file for details" << std::endl;
+
+			log("Culvert input below failed there should be 5 arguments (comma separated) when inputing a culvert: culvert = type, xstart,xend,ystart,yend;");
+			log(parametervalue);
+		}
+	}
+
 	return forcing;
 }
 
