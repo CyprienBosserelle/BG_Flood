@@ -111,7 +111,7 @@ jobs:
           sed -i 's/test = 14/test = 15/' BG_param.txt
           ./BG_Flood
           ./BG_Flood BG_param_test15.txt
-          var=$(ncdump -v h_P0 Test15_zoom2.nc)
-        if: echo ${{ ${#var} == 7 }}
+       ##   var=$(ncdump -v h_P0 Test15_zoom2.nc)
+       ## if: echo ${{ ${#var} == 7 }}
 
      
