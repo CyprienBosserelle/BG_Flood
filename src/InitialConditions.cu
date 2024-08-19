@@ -836,6 +836,7 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.nblk = XParam.nblk;
 		XzoneB.maxlevel = XParam.maxlevel;
 		XzoneB.minlevel = XParam.minlevel;
+		XzoneB.OutputT = { XParam.totaltime, XParam.endtime };
 		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
 		int I = 0;
 		for (int ib = 0; ib < XParam.nblk; ib++)
@@ -1408,6 +1409,11 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 			XBlock.outZone[ii].OutputT = times_partial;
 		}
 	}
+	else //If not zoneoutput, output zone saved in zoneoutput structure
+	{
+		XBlock.outZone[0].OutputT = times_partial;
+	}
+
 	// Sort the times for output
 	sort(times.begin(), times.end());
 	// remove duplicate

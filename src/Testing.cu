@@ -85,7 +85,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t\tCPU test: " + result);
 			isfailed = (!rivertest || isfailed) ? true : false;
 
-			log(" \t\t\t GPU device= " + XParam.GPUDEVICE);
+			log(" \t\t\t GPU device= " + std::to_string(XParam.GPUDEVICE));
 
 			if (XParam.GPUDEVICE >= 0)
 			{
@@ -835,7 +835,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 		//Save2Netcdf(XParam, XLoop, XModel);
 
-		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001))
 		{
 			if (XParam.GPUDEVICE >= 0)
 			{
