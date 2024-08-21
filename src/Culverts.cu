@@ -5,45 +5,51 @@
 
 template <class T> __host__ void AddCulverts(Param XParam, Loop<T> XLoop, std::vector<Culvert> XCulverts, Model<T> XModel)
 {
-	dim3 gridDimRiver(XModel.bndblk.nblkriver, 1, 1);
+	dim3 gridDimCulvert(XModel.bndblk.nblkcluvert, 1, 1);
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
-	T qnow;
+	//T qnow;
 
-	// Get the elevation for each culvert edge
+	// Get the elevation for each culvert edge and put it in the culvert structure
 
-	// Calculation of the transfert of water
-	// Application of the result to h
+	// Calculation of the transfert of water (depending of the type of culvert)
 
 
-	for (int cc = 0; cc < XCulverts.size(); cc++)
-	{
+	/*
+
+	Application of the result to h
+
+	*/
+
+
+	//for (int cc = 0; cc < XCulverts.size(); cc++)
+	//{
 		//
-		int bndstep = 0;
+		/*int bndstep = 0;
 		double difft = XRivers[Rin].flowinput[bndstep].time - XLoop.totaltime;
 		while (difft <= 0.0) // danger?
 		{
 			bndstep++;
 			difft = XRivers[Rin].flowinput[bndstep].time - XLoop.totaltime;
-		}
+		}*/
 
-		qnow = T(interptime(XRivers[Rin].flowinput[bndstep].q, XRivers[Rin].flowinput[max(bndstep - 1, 0)].q, XRivers[Rin].flowinput[bndstep].time - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time, XLoop.totaltime - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time));
+		//qnow = T(interptime(XRivers[Rin].flowinput[bndstep].q, XRivers[Rin].flowinput[max(bndstep - 1, 0)].q, XRivers[Rin].flowinput[bndstep].time - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time, XLoop.totaltime - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time));
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			InjectRiverGPU << <gridDimRiver, blockDim, 0 >> > (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
+			InjectCulvertGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, XRivers[Rin], XModel.bndblk.culvert, XModel.blocks, XModel.adv);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
 		{
-			InjectRiverCPU(XParam, XRivers[Rin], qnow, XModel.bndblk.nblkriver, XModel.bndblk.river, XModel.blocks, XModel.adv);
+			InjectRiverCPU(XParam, XRivers[Rin], XModel.bndblk.nblkculvert, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
 		}
-	}
+	//}
 }
-template __host__ void AddRiverForcing<float>(Param XParam, Loop<float> XLoop, std::vector<River> XRivers, Model<float> XModel);
-template __host__ void AddRiverForcing<double>(Param XParam, Loop<double> XLoop, std::vector<River> XRivers, Model<double> XModel);
+template __host__ void AddCulverts<float>(Param XParam, Loop<float> XLoop, std::vector<Culvert> XRivers, Model<float> XModel);
+template __host__ void AddCulverts<double>(Param XParam, Loop<double> XLoop, std::vector<Culvert> XRivers, Model<double> XModel);
 
 
-template <class T> __global__ void InjectRiverGPU(Param XParam, River XRiver, T qnow, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
+template <class T> __global__ void InjectCulvertGPU(Param XParam, Culvert XCulvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
@@ -66,6 +72,8 @@ template <class T> __global__ void InjectRiverGPU(Param XParam, River XRiver, T 
 
 	xr = xllo + ix * delta + 0.5 * delta;
 	yt = yllo + iy * delta + 0.5 * delta;
+
+
 	// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 	// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
 	//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
@@ -79,10 +87,10 @@ template <class T> __global__ void InjectRiverGPU(Param XParam, River XRiver, T 
 
 
 }
-template __global__ void InjectRiverGPU<float>(Param XParam, River XRiver, float qnow, int* Riverblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
-template __global__ void InjectRiverGPU<double>(Param XParam, River XRiver, double qnow, int* Riverblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
+template __global__ void InjectCulvertGPU<float>(Param XParam, River XCulvert,  int* Culvertblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
+template __global__ void InjectCulvertGPU<double>(Param XParam, River XCulvert,  int* Culvertlks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
-template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qnow, int nblkriver, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
+template <class T> __host__ void InjectCulvertCPU(Param XParam, River XCulvert, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	unsigned int ib;
 	int halowidth = XParam.halowidth;
@@ -133,5 +141,5 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 
 
 }
-template __host__ void InjectRiverCPU<float>(Param XParam, River XRiver, float qnow, int nblkriver, int* Riverblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
-template __host__ void InjectRiverCPU<double>(Param XParam, River XRiver, double qnow, int nblkriver, int* Riverblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
+template __host__ void InjectCulvertCPU<float>(Param XParam, Culvert XCulvert, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
+template __host__ void InjectCulvertCPU<double>(Param XParam, Culvert XCulvert, int nblkculvert, int* Culvertblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
