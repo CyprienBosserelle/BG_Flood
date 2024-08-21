@@ -159,11 +159,11 @@ struct TimeP
 
 
 template <class T>
-struct CulvertH
+struct CulvertF
 {
-	T* h1;
-	T* h2;
-	T* dh; //positive if P1 toward P2
+	T* zs1;
+	T* zs2;
+	T* dq; //positive if frow from P1 toward P2
 };
 
 
@@ -178,7 +178,7 @@ struct Model
 	AdvanceP<T> adv;
 
 	//Culverts
-	CulvertH culvertsh;
+	CulvertF culvertsF;
 	
 	//external forcing
 	T* zb;

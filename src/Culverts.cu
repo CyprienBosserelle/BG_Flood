@@ -7,43 +7,66 @@ template <class T> __host__ void AddCulverts(Param XParam, Loop<T> XLoop, std::v
 {
 	dim3 gridDimCulvert(XModel.bndblk.nblkcluvert, 1, 1);
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
-	//T qnow;
+	T Qmax, Vol1, delta1, Q;
+
+	unsigned int ib = Culvertblks[ibl];
 
 	// Get the elevation for each culvert edge and put it in the culvert structure
 
+
+
 	// Calculation of the transfert of water (depending of the type of culvert)
+	for (int cc = 0; cc < XCulverts.size(); cc++)
+	{
+		XCulvertF = XModel.culvertsF[cc];
+
+		//Pump system
+		if (XCulverts.type == 0)
+		{
+			Qmax = XCulverts.Qmax;
+			delta1 = calcres(T(XParam.dx), XBlock.level[ib]);
+			Vol1 = XCulvertF.h1 * delta1 * delta1;
+			Q = Vol1 * XLoop.dt;
+			if (Q > Qmax)
+			{
+				XCulvertF.dq = Qmax;
+			}
+			else
+			{
+				XCulvertF.dq = Q;
+			}
+		}
+		/*
+		//One way (clapped) culvert
+		if (XCulverts.type == 1)
+		
+		//Basic 2way culvert
+		if (XCulverts.type == 2)
+		*/
+	}
+
+
 
 
 	/*
 
-	Application of the result to h
+	Application of the result to h:
+	Loop on blocks first or on culverts first?
 
 	*/
 
-
-	//for (int cc = 0; cc < XCulverts.size(); cc++)
-	//{
-		//
-		/*int bndstep = 0;
-		double difft = XRivers[Rin].flowinput[bndstep].time - XLoop.totaltime;
-		while (difft <= 0.0) // danger?
-		{
-			bndstep++;
-			difft = XRivers[Rin].flowinput[bndstep].time - XLoop.totaltime;
-		}*/
-
-		//qnow = T(interptime(XRivers[Rin].flowinput[bndstep].q, XRivers[Rin].flowinput[max(bndstep - 1, 0)].q, XRivers[Rin].flowinput[bndstep].time - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time, XLoop.totaltime - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time));
-
+	for (int cc = 0; cc < XCulverts.size(); cc++)
+	{
 		if (XParam.GPUDEVICE >= 0)
 		{
-			InjectCulvertGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, XRivers[Rin], XModel.bndblk.culvert, XModel.blocks, XModel.adv);
+			InjectCulvertGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, XCulverts[cc], XModel.bndblk.culvert, XModel.blocks, XModel.adv);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
 		{
-			InjectRiverCPU(XParam, XRivers[Rin], XModel.bndblk.nblkculvert, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
+			InjectCulvertCPU(XParam, XCulvert[cc], XModel.bndblk.nblkculvert, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
 		}
-	//}
+	}
 }
 template __host__ void AddCulverts<float>(Param XParam, Loop<float> XLoop, std::vector<Culvert> XRivers, Model<float> XModel);
 template __host__ void AddCulverts<double>(Param XParam, Loop<double> XLoop, std::vector<Culvert> XRivers, Model<double> XModel);
@@ -57,84 +80,63 @@ template <class T> __global__ void InjectCulvertGPU(Param XParam, Culvert XCulve
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
-	unsigned int ib = Riverblks[ibl];
+	unsigned int ib = Culvertblks[ibl];
 
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
-	T xl, yb, xr, yt, xllo, yllo;
-	xllo = XParam.xo + XBlock.xo[ib];
-	yllo = XParam.yo + XBlock.yo[ib];
-
-	xl = xllo + ix * delta - 0.5 * delta;
-	yb = yllo + iy * delta - 0.5 * delta;
-
-	xr = xllo + ix * delta + 0.5 * delta;
-	yt = yllo + iy * delta + 0.5 * delta;
 
 
-	// the conditions are that the discharge area as defined by the user have to include at least a model grid node
-	// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-	//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
-	if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart), T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
+
+	if (i == XCulvert.i1)
 	{
-
-		XAdv.dh[i] += qnow / XRiver.disarea;
-
+		XAdv.dh[i] -= CulvertF.dq/(delta*delta);
+	}
+	if (i == XCulvert.i2)
+	{
+		XAdv.dh[i] += CulvertF.dq/(delta*delta);
 	}
 
 
 
 }
-template __global__ void InjectCulvertGPU<float>(Param XParam, River XCulvert,  int* Culvertblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
-template __global__ void InjectCulvertGPU<double>(Param XParam, River XCulvert,  int* Culvertlks, BlockP<double> XBlock, AdvanceP<double> XAdv);
+template __global__ void InjectCulvertGPU<float>(Param XParam, Culvert XCulvert,  int* Culvertblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
+template __global__ void InjectCulvertGPU<double>(Param XParam, Culvert XCulvert,  int* Culvertlks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
-template <class T> __host__ void InjectCulvertCPU(Param XParam, River XCulvert, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
+template <class T> __host__ void InjectCulvertCPU(Param XParam, Culvert XCulvert, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	unsigned int ib;
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	T xllo, yllo, xl, yb, xr, yt, levdx;
+	T delta, levdx;
+	int i, ix, iy, ibl;
 
-	for (int ibl = 0; ibl < nblkriver; ibl++)
+	for (ibl = 0; ibl < nblkculvert; ibl++)
 	{
-		ib = Riverblks[ibl];
+		ib = Culvertblks[ibl];
 
 		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
 
-		xllo = T(XParam.xo + XBlock.xo[ib]);
-		yllo = T(XParam.yo + XBlock.yo[ib]);
-
-
-
-		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		for (iy = 0; iy < XParam.blkwidth; iy++)
 		{
-			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			for (ix = 0; ix < XParam.blkwidth; ix++)
 			{
 
-				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-				//T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+				delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
-				//T x = XParam.xo + XBlock.xo[ib] + ix * delta;
-				//T y = XParam.yo + XBlock.yo[ib] + iy * delta;
-
-				//if (x >= XRiver.xstart && x <= XRiver.xend && y >= XRiver.ystart && y <= XRiver.yend)
-				xl = xllo + ix * levdx - T(0.5) * levdx;
-				yb = yllo + iy * levdx - T(0.5) * levdx;
-
-				xr = xllo + ix * levdx + T(0.5) * levdx;
-				yt = yllo + iy * levdx + T(0.5) * levdx;
-				// the conditions are that the discharge area as defined by the user have to include at least a model grid node
-				// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
-				//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
-				if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart), T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
+				if (i == XCulvert.i1)
 				{
-					XAdv.dh[i] += qnow / T(XRiver.disarea);
-
+					XAdv.dh[i] -= CulvertF.dq / (delta * delta);
 				}
+				if (i == XCulvert.i2)
+				{
+					XAdv.dh[i] += CulvertF.dq / (delta * delta);
+				}
+
 			}
 		}
 	}
