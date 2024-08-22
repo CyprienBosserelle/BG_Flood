@@ -37,7 +37,7 @@ bool readparambool(std::string paramstr, bool defaultval);
 void InitialiseToutput(T_output& Toutput, Param XParam);
 bndsegment readbndline(std::string parametervalue);
 bndsegment readbndlineside(std::string parametervalue, std::string side);
-
+T_output ReadToutput(std::string paramstr);
 //inline bool fileexists(const std::string& name);
 
 // End of global definition
