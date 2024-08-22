@@ -506,20 +506,30 @@ Param readparamstr(std::string line, Param param)
 			std::vector<std::string> Toutputpar_vect = split_full(zoneitems[5], ':');
 			if (Toutputpar_vect.size() == 3)
 			{
+				double init, tstep, end;
+				double tiny = 0.000001;
 				if (!Toutputpar_vect[0].empty()) {
-					zone.Toutput.init = std::stod(Toutputpar_vect[0]);
+					init = std::stod(Toutputpar_vect[0]);
 				}
 				if (!Toutputpar_vect[1].empty()) {
-					zone.Toutput.tstep = std::stod(Toutputpar_vect[1]);
+					tstep = std::max(std::stod(Toutputpar_vect[1]),tiny);
 				}
 				if (!Toutputpar_vect[2].empty()) {
-					zone.Toutput.end = std::stod(Toutputpar_vect[2]);
+					end = std::stod(Toutputpar_vect[2]);
 				}
+
+				int nstep = (end - init) / tstep + 1;
+
+				for (int k = 0; k < nstep; k++)
+				{
+					zone.Toutput.val.push_back(std::min(init + tstep * k,end));
+				}
+
 			}
 			else if (Toutputpar_vect.size() > 1)
 			{
 				//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
-				std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
+				std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in first position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
 
 				log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
 				log(parametervalue);
@@ -811,6 +821,7 @@ Param readparamstr(std::string line, Param param)
 			std::vector<std::string> Toutputpar_vect = split_full(Toutputpar[0], ':');
 			if (Toutputpar_vect.size() == 3)
 			{
+				/*
 				if (!Toutputpar_vect[0].empty()) {
 					param.Toutput.init = std::stod(Toutputpar_vect[0]);
 				}
@@ -820,6 +831,26 @@ Param readparamstr(std::string line, Param param)
 				if (!Toutputpar_vect[2].empty()) {
 					param.Toutput.end = std::stod(Toutputpar_vect[2]);
 				}
+				*/
+				double init, tstep, end;
+				double tiny = 0.000001;
+				if (!Toutputpar_vect[0].empty()) {
+					init = std::stod(Toutputpar_vect[0]);
+				}
+				if (!Toutputpar_vect[1].empty()) {
+					tstep = std::max(std::stod(Toutputpar_vect[1]), tiny);
+				}
+				if (!Toutputpar_vect[2].empty()) {
+					end = std::stod(Toutputpar_vect[2]);
+				}
+
+				int nstep = (end - init) / tstep + 1;
+
+				for (int k = 0; k < nstep; k++)
+				{
+					param.Toutput.val.push_back(std::min(init + tstep * k, end));
+				}
+
 			}
 			else if (Toutputpar_vect.size() > 1)
 			{

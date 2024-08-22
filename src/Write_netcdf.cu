@@ -1499,7 +1499,7 @@ template void InitSave2Netcdf<float>(Param& XParam, Model<float>& XModel);
 template void InitSave2Netcdf<double>(Param& XParam, Model<double>& XModel);
 
 //Save initialisation in maps outpout if require
-template <class T> void SaveInitialisation2Netcdf(Param& XParam, Model<T>& XModel)
+/*template <class T> void SaveInitialisation2Netcdf(Param& XParam, Model<T>& XModel)
 {
 	double NextZoneOutTime;
 
@@ -1527,7 +1527,7 @@ template <class T> void SaveInitialisation2Netcdf(Param& XParam, Model<T>& XMode
 }
 template void SaveInitialisation2Netcdf<float>(Param& XParam, Model<float>& XModel);
 template void SaveInitialisation2Netcdf<double>(Param& XParam, Model<double>& XModel);
-
+*/
 
 template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XModel)
 {

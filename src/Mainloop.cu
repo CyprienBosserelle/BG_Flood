@@ -235,7 +235,7 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 {
 	XLoop.nstepout++;
 	double tiny = 0.0000001;
-
+	/*
 	if  (abs(XLoop.nextoutputtime - XParam.totaltime) < tiny)
 	{
 		if (XParam.GPUDEVICE >= 0)
@@ -258,8 +258,8 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 		XLoop.nstepout = 0;
 
 	}
-
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.5))
+	*/
+	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * tiny)
 	{
 		if (XParam.GPUDEVICE >= 0)
 		{

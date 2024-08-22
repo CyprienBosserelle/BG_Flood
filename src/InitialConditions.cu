@@ -1393,6 +1393,13 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 	std::vector<double> times_partial;
 
 	times_partial = GetTimeOutput(XParam.Toutput);
+	printf("Time partial:\n");
+	for (int k = 0; k < times_partial.size(); k++)
+	{
+		printf("%f, ", times_partial[k]);
+	}
+	printf("\n");
+
 	times.insert(times.end(), times_partial.begin(), times_partial.end());
 
 	// if zoneOutputs, add their contribution
@@ -1401,21 +1408,31 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 		for (int ii = 0; ii < XParam.outzone.size(); ii++)
 		{
 			times_partial = GetTimeOutput(XParam.outzone[ii].Toutput);
+			
 			//Add to main vector
 			times.insert(times.end(), times_partial.begin(), times_partial.end());
 			//Sort and remove duplicate before saving in outZone struct
-			sort(times_partial.begin(), times_partial.end());
+			std::sort(times_partial.begin(), times_partial.end());
 			times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
+			std::sort(times_partial.begin(), times_partial.end());
 			XBlock.outZone[ii].OutputT = times_partial;
 		}
 	}
 	else //If not zoneoutput, output zone saved in zoneoutput structure
 	{
+		std::sort(times_partial.begin(), times_partial.end());
 		XBlock.outZone[0].OutputT = times_partial;
 	}
 
 	// Sort the times for output
-	sort(times.begin(), times.end());
+	std::sort(times.begin(), times.end());
+	printf("Times:\n");
+	for (int k = 0; k < times.size(); k++)
+	{
+		printf("%f, ", times[k]);
+	}
+	printf("\n");
+	
 	// remove duplicate
 	times.erase( unique ( times.begin(), times.end()), times.end());
 
