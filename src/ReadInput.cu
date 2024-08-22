@@ -1517,12 +1517,23 @@ void InitialiseToutput(T_output& Toutput_loc, Param XParam)
 		Toutput_loc.tstep = XParam.outputtimestep;
 	}*/
 
+	// Make sure Toutput is not empty and that all values are >= totaltime and <= endtime
 	if (Toutput_loc.val.empty())
 	{
-		copy(XParam.Toutput.val.begin(), XParam.Toutput.val.end(), back_inserter(Toutput_loc.val));
-		//Toutput_loc.val = XParam.Toutput.val;
+		for (int i = 0; i < XParam.Toutput.val.size(); i++)
+		{
+			Toutput_loc.val.push_back(std::min(std::max(XParam.totaltime, XParam.Toutput.val[i]), XParam.endtime));
+		}
+	}
+	else
+	{
+		for (int i = 0; i < Toutput_loc.val.size(); i++)
+		{
+			Toutput_loc.val[i] = std::min(std::max(XParam.totaltime, Toutput_loc.val[i]), XParam.endtime);
+		}
 	}
 	
+	// This may seem redundant but the uniq function used in the initial condition should clean out duplicate
 	Toutput_loc.val.push_back(XParam.totaltime);
 	Toutput_loc.val.push_back(XParam.endtime);
 
@@ -1912,56 +1923,52 @@ T_output ReadToutput(std::string paramstr)
 
 	if (!Toutputpar.empty())
 	{
-		std::vector<std::string> Toutputpar_vect = split_full(Toutputpar[0], ':');
-		if (Toutputpar_vect.size() == 3)
+		for (int ipa = 0; ipa < Toutputpar.size(); ipa++)
 		{
-			/*
-			if (!Toutputpar_vect[0].empty()) {
-				param.Toutput.init = std::stod(Toutputpar_vect[0]);
-			}
-			if (!Toutputpar_vect[1].empty()) {
-				param.Toutput.tstep = std::stod(Toutputpar_vect[1]);
-			}
-			if (!Toutputpar_vect[2].empty()) {
-				param.Toutput.end = std::stod(Toutputpar_vect[2]);
-			}
-			*/
-			double init, tstep, end;
-			double tiny = 0.000001;
-			if (!Toutputpar_vect[0].empty()) {
-				init = std::stod(Toutputpar_vect[0]);
-			}
-			if (!Toutputpar_vect[1].empty()) {
-				tstep = std::max(std::stod(Toutputpar_vect[1]), tiny);
-			}
-			if (!Toutputpar_vect[2].empty()) {
-				end = std::stod(Toutputpar_vect[2]);
-			}
-
-			int nstep = (end - init) / tstep + 1;
-
-			for (int k = 0; k < nstep; k++)
+			std::vector<std::string> Toutputpar_vect = split_full(Toutputpar[ipa], ':');
+			if (Toutputpar_vect.size() == 3)
 			{
-				tout.val.push_back(std::min(init + tstep * k, end));
+				/*
+				if (!Toutputpar_vect[0].empty()) {
+					param.Toutput.init = std::stod(Toutputpar_vect[0]);
+				}
+				if (!Toutputpar_vect[1].empty()) {
+					param.Toutput.tstep = std::stod(Toutputpar_vect[1]);
+				}
+				if (!Toutputpar_vect[2].empty()) {
+					param.Toutput.end = std::stod(Toutputpar_vect[2]);
+				}
+				*/
+				double init, tstep, end;
+				double tiny = 0.000001;
+				if (!Toutputpar_vect[0].empty()) {
+					init = std::stod(Toutputpar_vect[0]);
+				}
+				if (!Toutputpar_vect[1].empty()) {
+					tstep = std::max(std::stod(Toutputpar_vect[1]), tiny);
+				}
+				if (!Toutputpar_vect[2].empty()) {
+					end = std::stod(Toutputpar_vect[2]);
+				}
+
+				int nstep = (end - init) / tstep + 1;
+
+				for (int k = 0; k < nstep; k++)
+				{
+					tout.val.push_back(std::min(init + tstep * k, end));
+				}
+
 			}
-
-		}
-		else if (Toutputpar_vect.size() > 1)
-		{
-			//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
-			std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
-
-			log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
-			log(paramstr);
-		}
-		else {
-			tout.val.push_back(std::stod(Toutputpar_vect[0]));
-		}
-		if (Toutputpar.size() > 1)
-		{
-			for (int ii = 1; ii < Toutputpar.size(); ii++)
+			else if (Toutputpar_vect.size() > 1)
 			{
-				tout.val.push_back(std::stod(Toutputpar[ii]));
+				//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
+				std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
+
+				log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
+				log(paramstr);
+			}
+			else {
+				tout.val.push_back(std::stod(Toutputpar_vect[0]));
 			}
 		}
 	}

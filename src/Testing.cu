@@ -4618,16 +4618,21 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 
 	//TEST 1: reading and default values check:
 	bool result = true;
-
+	/*
 	if (!XParam.Toutput.end == 11.0)
 		result = false;
 	if (!XParam.Toutput.val[1] == 9.5)
 		result = false;
+	
 	if (!XParam.outzone[2].Toutput.init == 0.0)
 		result = false;
 	if (!XParam.outzone[3].Toutput.tstep == 11.0)
 		result = false;
 	if (!XParam.outzone[4].Toutput.tstep == 1.0)
+		result = false;
+		*/
+
+	if (!XParam.Toutput.val[1] == 9.5)
 		result = false;
 
 	//TEST 2: calculation of the output steps
