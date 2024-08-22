@@ -1359,27 +1359,27 @@ template <class T> void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T
 // Create a vector of times steps from the input structure Toutput
 std::vector<double> GetTimeOutput(T_output time_info)
 {
-	std::vector<double> time_vect;
-	double time;
+	//std::vector<double> time_vect;
+	//double time;
 	
 	//Add independant values
-	if (!time_info.val.empty())
-	{
-		time_vect = time_info.val;
-	}
+	//if (!time_info.val.empty())
+	//{
+	//	time_vect = time_info.val;
+	//}
 	
 	//Add timesteps from the vector 
-	time = time_info.init;
-	while (time < time_info.end)
-	{
-		time_vect.push_back(time);
-		time += time_info.tstep;
-	}
+	//time = time_info.init;
+	//while (time < time_info.end)
+	//{
+	//	time_vect.push_back(time);
+	//	time += time_info.tstep;
+	//}
 
 	//Add last timesteps from the vector definition
-	time_vect.push_back(time_info.end);
+	//time_vect.push_back(time_info.end);
 
-	return(time_vect);
+	return(time_info.val);
 }
 
 
@@ -1412,7 +1412,7 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 			//Add to main vector
 			times.insert(times.end(), times_partial.begin(), times_partial.end());
 			//Sort and remove duplicate before saving in outZone struct
-			std::sort(times_partial.begin(), times_partial.end());
+			
 			times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
 			std::sort(times_partial.begin(), times_partial.end());
 			XBlock.outZone[ii].OutputT = times_partial;
@@ -1420,11 +1420,13 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 	}
 	else //If not zoneoutput, output zone saved in zoneoutput structure
 	{
+		times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
 		std::sort(times_partial.begin(), times_partial.end());
 		XBlock.outZone[0].OutputT = times_partial;
 	}
 
 	// Sort the times for output
+	times.erase(unique(times.begin(), times.end()), times.end());
 	std::sort(times.begin(), times.end());
 	printf("Times:\n");
 	for (int k = 0; k < times.size(); k++)
@@ -1433,8 +1435,7 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 	}
 	printf("\n");
 	
-	// remove duplicate
-	times.erase( unique ( times.begin(), times.end()), times.end());
+	
 
 	OutputT = times;
 }
