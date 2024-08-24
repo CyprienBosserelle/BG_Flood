@@ -1385,8 +1385,31 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	//Initialisation of the main time output vector
 	//Initialise default values for Toutput (output times for map outputs)
 	InitialiseToutput(XParam.Toutput, XParam);
-	XParam.Toutput.val.push_back(XParam.totaltime);
-	XParam.Toutput.val.push_back(XParam.endtime);
+	if (XParam.Toutput.val.empty())
+	{
+		if (abs(XParam.outputtimestep - DefaultParams.outputtimestep) <= tiny)
+		{
+			XParam.Toutput.val.push_back(XParam.totaltime);
+			XParam.Toutput.val.push_back(XParam.endtime);
+		}
+		else
+		{
+			int nstep = (XParam.endtime - XParam.totaltime) / XParam.outputtimestep + 1;
+
+			for (int k = 0; k < nstep; k++)
+			{
+				XParam.Toutput.val.push_back(std::min(XParam.totaltime + XParam.outputtimestep * k, XParam.endtime));
+			}
+
+		}
+	}
+	else
+	{
+
+		XParam.Toutput.val.push_back(XParam.totaltime);
+		XParam.Toutput.val.push_back(XParam.endtime);
+	}
+	
 
 	// Initialisation of the time output vector for the zones outputs
 	if (XParam.outzone.size() > 0)
@@ -1910,11 +1933,11 @@ double ReadTvalstr(std::string timestr,double start, double end,std::string reft
 
 	bool isdatest = timestr.find('T') != std::string::npos;
 
-	if (case_insensitive_compare(timestr, STstr))
+	if (case_insensitive_compare(timestr, STstr) == 0)
 	{
 		time = start;
 	}
-	else if (case_insensitive_compare(timestr, ENstr))
+	else if (case_insensitive_compare(timestr, ENstr) == 0)
 	{
 		time = end;
 	}
@@ -1950,7 +1973,7 @@ std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start
 	bool isdatelast = laststr.find('T') != std::string::npos;
 
 	
-	if (case_insensitive_compare(initstr, STstr) || initstr.empty())
+	if (case_insensitive_compare(initstr, STstr) == 0 || initstr.empty())
 	{
 		init = start;
 	}
@@ -1963,7 +1986,7 @@ std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start
 		init = date_string_to_s(initstr, reftime);
 	}
 	
-	if (case_insensitive_compare(laststr, ENstr) || laststr.empty())
+	if (case_insensitive_compare(laststr, ENstr) == 0 || laststr.empty())
 	{
 		last = end;
 	}
@@ -2011,9 +2034,9 @@ double readApproxtimestr(std::string input)
 	// first split the digit from the string
 	for (auto e : input)
 	{
-		if (isalpha(e))
+		if (isalpha(e) && e!='.')
 			unit.push_back(e);
-		else if (isdigit(e))
+		else if (isdigit(e) || e == '.')
 			numberst.push_back(e);
 	}
 

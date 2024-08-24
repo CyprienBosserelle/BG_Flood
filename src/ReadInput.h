@@ -39,7 +39,7 @@ bndsegment readbndline(std::string parametervalue);
 bndsegment readbndlineside(std::string parametervalue, std::string side);
 
 //T_output ReadToutput(std::vector<std::string> paramstr, Param XParam);
-std::vector<double> ReadToutput(std::vector<std::string> paramstr, Param XParam)
+std::vector<double> ReadToutput(std::vector<std::string> paramstr, Param XParam);
 
 std::vector<std::string> ReadToutSTR(std::string paramstr);
 double ReadTvalstr(std::string timestr, double start, double end, std::string reftime);
