@@ -515,13 +515,13 @@ Param readparamstr(std::string line, Param param)
 				}
 
 			}
-			zone.Toutput = ReadToutput(constr);
+			zone.Toutput.inputstr = ReadToutSTR(constr);
 			
 			
 		}
 		else if (zoneitems.size() == 5)//No time input in the zone area
 		{
-			zone.Toutput = param.Toutput; // Thats needs to move to sanity check
+			zone.Toutput.inputstr = ReadToutSTR(""); // Thats needs to move to sanity check
 		}
 		else
 		{
@@ -788,7 +788,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.Toutput = ReadToutput(parametervalue);
+		param.Toutput.inputstr = ReadToutSTR(parametervalue);
 	}
 
 	paramvec = { "savebyblk", "writebyblk","saveperblk", "writeperblk","savebyblock", "writebyblock","saveperblock", "writeperblock" };
@@ -1369,6 +1369,8 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 
 	// Check that outputtimestep is not zero, so at least the first and final time step are saved
 	// If only the model stepup is needed than just run with endtime=0.0
+	/*
+	// No longer needed
 	if (abs(XParam.outputtimestep - DefaultParams.outputtimestep) <= tiny)
 	{
 		XParam.outputtimestep = XParam.endtime;
@@ -1379,11 +1381,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		XParam.outputtimestep = XParam.endtime;
 		//otherwise, no final output
 	}
-
+	*/
 	//Initialisation of the main time output vector
 	//Initialise default values for Toutput (output times for map outputs)
 	InitialiseToutput(XParam.Toutput, XParam);
-
+	XParam.Toutput.val.push_back(XParam.totaltime);
+	XParam.Toutput.val.push_back(XParam.endtime);
 
 	// Initialisation of the time output vector for the zones outputs
 	if (XParam.outzone.size() > 0)
@@ -1503,20 +1506,8 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 //Initialise default values for Toutput (output times for map outputs)
 void InitialiseToutput(T_output& Toutput_loc, Param XParam)
 {
-	/*
-	if (std::isnan(Toutput_loc.init))
-	{
-		Toutput_loc.init = XParam.totaltime;
-	}
-	if (std::isnan(Toutput_loc.end))
-	{
-		Toutput_loc.end = XParam.endtime;
-	}
-	if (std::isnan(Toutput_loc.tstep))
-	{
-		Toutput_loc.tstep = XParam.outputtimestep;
-	}*/
-
+	
+	Toutput_loc.val = ReadToutput(Toutput_loc.inputstr, XParam);
 	// Make sure Toutput is not empty and that all values are >= totaltime and <= endtime
 	if (Toutput_loc.val.empty())
 	{
@@ -1525,17 +1516,9 @@ void InitialiseToutput(T_output& Toutput_loc, Param XParam)
 			Toutput_loc.val.push_back(std::min(std::max(XParam.totaltime, XParam.Toutput.val[i]), XParam.endtime));
 		}
 	}
-	else
-	{
-		for (int i = 0; i < Toutput_loc.val.size(); i++)
-		{
-			Toutput_loc.val[i] = std::min(std::max(XParam.totaltime, Toutput_loc.val[i]), XParam.endtime);
-		}
-	}
 	
 	// This may seem redundant but the uniq function used in the initial condition should clean out duplicate
-	Toutput_loc.val.push_back(XParam.totaltime);
-	Toutput_loc.val.push_back(XParam.endtime);
+	
 
 	
 }
@@ -1911,67 +1894,214 @@ bool readparambool(std::string paramstr, bool defaultval)
 //}
 
 
-T_output ReadToutput(std::string paramstr)
+std::vector<std::string> ReadToutSTR(std::string paramstr)
+{
+	std::vector<std::string> Toutputpar = split(paramstr, ',');
+	return Toutputpar;
+
+}
+
+
+double ReadTvalstr(std::string timestr,double start, double end,std::string reftime)
+{
+	double time = 0.0;
+	std::vector<std::string> STstr = { "start","begin" };
+	std::vector<std::string> ENstr = { "end","finish" };
+
+	bool isdatest = timestr.find('T') != std::string::npos;
+
+	if (case_insensitive_compare(timestr, STstr))
+	{
+		time = start;
+	}
+	else if (case_insensitive_compare(timestr, ENstr))
+	{
+		time = end;
+	}
+	else if (!isdatest)
+	{
+		time = start + readApproxtimestr(timestr);
+	}
+	else
+	{
+		time = date_string_to_s(timestr, reftime);
+	}
+
+	return time = std::min(std::max(start, time), end);
+
+}
+
+std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start, double end, std::string reftime)
+{
+	double init = 0.0;
+	double step = 0.0;
+	double last = 0.0;
+
+	std::vector<std::string> STstr = { "start","begin" };
+
+	std::vector<std::string> ENstr = { "end","finish" };
+
+	std::string initstr = timestr[0];
+	std::string stepstr = timestr[1];
+	std::string laststr = timestr[2];
+
+	bool isdateinit = initstr.find('T') != std::string::npos;
+	
+	bool isdatelast = laststr.find('T') != std::string::npos;
+
+	
+	if (case_insensitive_compare(initstr, STstr) || initstr.empty())
+	{
+		init = start;
+	}
+	else if (!isdateinit)
+	{
+		init = start + readApproxtimestr(initstr);
+	}
+	else
+	{
+		init = date_string_to_s(initstr, reftime);
+	}
+	
+	if (case_insensitive_compare(laststr, ENstr) || laststr.empty())
+	{
+		last = end;
+	}
+	else if (!isdatelast)
+	{
+		last = start + readApproxtimestr(laststr);
+	}
+	else
+	{
+		last = date_string_to_s(laststr, reftime);
+	}
+
+	if (stepstr.empty())
+	{
+		step = 3600.0;
+	}
+	else
+	{
+		step = readApproxtimestr(stepstr);
+	}
+
+	std::vector<double> tout;
+	int nstep = (last - init) / step + 1;
+
+	for (int k = 0; k < nstep; k++)
+	{
+		tout.push_back(std::min(init + step * k, last));
+	}
+
+
+	return tout;
+
+}
+
+
+double readApproxtimestr(std::string input)
+{
+	double time = 0.0;
+
+	double fac = 1.0;
+
+	std::string numberst;
+	std::string unit;
+	
+	// first split the digit from the string
+	for (auto e : input)
+	{
+		if (isalpha(e))
+			unit.push_back(e);
+		else if (isdigit(e))
+			numberst.push_back(e);
+	}
+
+	double number = std::stod(numberst);
+
+	std::vector<std::string> secondvec = { "seconds","second","sec","s" };
+	std::vector<std::string> minutevec = { "minutes","minute","min","m" };
+	std::vector<std::string> hourvec = { "hours","hour","hrs","hr","h" };
+	std::vector<std::string> dayvec = { "days","day","d" };
+	std::vector<std::string> monthvec = { "months","month","mths", "mth", "mon" };
+	std::vector<std::string> yearvec = { "years","year","yrs", "yr", "y" };
+
+
+	std::size_t found;
+	found = case_insensitive_compare(unit, secondvec);
+	if (found == 0)
+		fac = 1.0;
+
+	found = case_insensitive_compare(unit, minutevec);
+	if (found == 0)
+		fac = 60.0;
+
+	found = case_insensitive_compare(unit, hourvec);
+	if (found == 0)
+		fac = 3600.0;
+
+	found = case_insensitive_compare(unit, dayvec);
+	if (found == 0)
+		fac = 3600.0 * 24.0;
+
+	found = case_insensitive_compare(unit, monthvec);
+	if (found == 0)
+		fac = 3600.0 * 24.0 * 30.4375;
+
+	found = case_insensitive_compare(unit, yearvec);
+	if (found == 0)
+		fac = 3600.0 * 24.0 * 365.25;
+
+	// If unit is not understood it will return number
+	time = fac * number;
+
+	return time;
+}
+
+
+std::vector<double> ReadToutput(std::vector<std::string> paramstr,Param XParam)
 {
 	//
 
 	T_output tout;
+	double Xstart = XParam.totaltime;
+	double Xend = XParam.endtime;
+	std::string reftime = XParam.reftime;
+	
 
-	std::vector<std::string> Toutputpar = split(paramstr, ',');
-
-
-
-	if (!Toutputpar.empty())
+	for (int ipa = 0; ipa < paramstr.size(); ipa++)
 	{
-		for (int ipa = 0; ipa < Toutputpar.size(); ipa++)
+
+		//Check if it is a range or a single value
+
+
+		std::vector<std::string> Toutputpar_vect = split_full(paramstr[ipa], '|');
+
+		if (Toutputpar_vect.size() == 3)
 		{
-			std::vector<std::string> Toutputpar_vect = split_full(Toutputpar[ipa], ':');
-			if (Toutputpar_vect.size() == 3)
-			{
-				/*
-				if (!Toutputpar_vect[0].empty()) {
-					param.Toutput.init = std::stod(Toutputpar_vect[0]);
-				}
-				if (!Toutputpar_vect[1].empty()) {
-					param.Toutput.tstep = std::stod(Toutputpar_vect[1]);
-				}
-				if (!Toutputpar_vect[2].empty()) {
-					param.Toutput.end = std::stod(Toutputpar_vect[2]);
-				}
-				*/
-				double init, tstep, end;
-				double tiny = 0.000001;
-				if (!Toutputpar_vect[0].empty()) {
-					init = std::stod(Toutputpar_vect[0]);
-				}
-				if (!Toutputpar_vect[1].empty()) {
-					tstep = std::max(std::stod(Toutputpar_vect[1]), tiny);
-				}
-				if (!Toutputpar_vect[2].empty()) {
-					end = std::stod(Toutputpar_vect[2]);
-				}
 
-				int nstep = (end - init) / tstep + 1;
+			// It is range
+			std::vector<double> rgvals = ReadTRangestr(Toutputpar_vect, Xstart, Xend, reftime);
+			//a.insert(a.end(), b.begin(), b.end());
+			tout.val.insert(tout.val.end(), rgvals.begin(), rgvals.end());
+			
 
-				for (int k = 0; k < nstep; k++)
-				{
-					tout.val.push_back(std::min(init + tstep * k, end));
-				}
+		}
+		else if (Toutputpar_vect.size() > 1)
+		{
+			//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
+			std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
 
-			}
-			else if (Toutputpar_vect.size() > 1)
-			{
-				//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
-				std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
-
-				log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
-				log(paramstr);
-			}
-			else {
-				tout.val.push_back(std::stod(Toutputpar_vect[0]));
-			}
+			log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
+			log(paramstr[ipa]);
+		}
+		else {
+			tout.val.push_back(ReadTvalstr(paramstr[ipa],Xstart, Xend, reftime));
 		}
 	}
-	return tout;
+	
+	return tout.val;
 }
+
+
 

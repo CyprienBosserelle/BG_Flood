@@ -18,6 +18,7 @@ public:
 	double init = NAN;
 	double tstep = NAN;
 	double end = NAN;
+	std::vector<std::string> inputstr;
 	std::vector<double> val;
 };
 

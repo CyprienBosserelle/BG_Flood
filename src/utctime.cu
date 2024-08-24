@@ -256,16 +256,27 @@ double date_string_to_s(std::string datetime, std::string refdate)
 	//UTCTime ttime = date_string_to_time(datetime);
 	//UTCTime reftime = date_string_to_time(refdate);
 
-	long long ttime = date_string_to_time(datetime);
-	long long reftime = date_string_to_time(refdate);
+	double diff;
 
-	//double diff = difftime(ttime, reftime);
+	std::string::size_type n = datetime.find('T');
+	if (std::string::npos == n)
+	{
+		diff = std::stod(datetime);
+	}
+	else
+	{
 
-	//std::chrono::microseconds timeDiff = ttime - reftime;
+		long long ttime = date_string_to_time(datetime);
+		long long reftime = date_string_to_time(refdate);
 
-	//double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+		//double diff = difftime(ttime, reftime);
 
-	double diff = (double)(ttime - reftime);
+		//std::chrono::microseconds timeDiff = ttime - reftime;
+
+		//double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+
+		diff = (double)(ttime - reftime);
+	}
 
 	return diff;
 }
