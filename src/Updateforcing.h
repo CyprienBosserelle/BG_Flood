@@ -37,7 +37,7 @@ template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, st
 template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel, Model<T> XModel_g);
 
 template <class T> __global__ void InjectRiverGPU(Param XParam, River XRiver, T qnow, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv);
-template <class T> __global__ void  AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb);
+template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb);
 
 
 #endif

@@ -113,7 +113,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	}
 	if (XForcing.culverts.size() > 0)
 	{
-		AddCulvertsCPU(XParam, XLoop, XForcing.culverts, XModel);
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
 	}
 
 	//============================================
@@ -201,7 +201,7 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	}
 	if (XForcing.culverts.size() > 0)
 	{
-		AddCulvertsCPU(XParam, XLoop, XForcing.culverts, XModel);
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
 	}
 
 	//============================================

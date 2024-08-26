@@ -160,9 +160,9 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
-	if (!XForcing.culverts.size())
+	if (XForcing.culverts.size() > 0)
 	{
-		AddCulvertsGPU << < gridDim, blockDim, 0 >> > (XParam, Xloop, XForcing.culverts, XModel);
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
@@ -254,9 +254,9 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
-	if (!XForcing.culverts.size())
+	if (XForcing.culverts.size() > 0)
 	{
-		AddCulvertsGPU << < gridDim, blockDim, 0 >> > (XParam, Xloop, XForcing.culverts, XModel);
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
@@ -464,9 +464,9 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
-	if (!XForcing.culverts.size())
+	if (XForcing.culverts.size() > 0)
 	{
-		AddCulvertsGPU << < gridDim, blockDim, 0 >> > (XParam, Xloop, XForcing.culverts, XModel);
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 

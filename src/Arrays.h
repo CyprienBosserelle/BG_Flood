@@ -163,6 +163,8 @@ struct CulvertF
 {
 	T* zs1;
 	T* zs2;
+	T* h1;
+	T* h2;
 	T* dq; //positive if frow from P1 toward P2
 };
 
@@ -178,7 +180,7 @@ struct Model
 	AdvanceP<T> adv;
 
 	//Culverts
-	CulvertF culvertsF;
+	CulvertF<T> culvertsF;
 	
 	//external forcing
 	T* zb;

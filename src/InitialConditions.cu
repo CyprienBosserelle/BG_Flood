@@ -458,8 +458,14 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
 		if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
 		{
-			ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
+			ReallocArray(activeCulvertBlk.size(), 1, XModel.bndblk.culvert);
 			XModel.bndblk.nblkculvert = int(activeCulvertBlk.size());
+
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.dq);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h1);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h2);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs1);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs2);
 		}
 		for (int b = 0; b < activeCulvertBlk.size(); b++)
 		{

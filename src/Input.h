@@ -48,8 +48,9 @@ public:
 	double x1, x2, y1, y2; // location of the input and outputs (or 2 points defining the culvert)
 	double section = 1.0; //Section of the culvert in m.
 	double length = 2.0; //Length of the culvert in m.
-	int i1, j1, block1, i2, j2, block2; // start and end of the culvert cells
+	int i1, block1, i2, block2; // start and end of the culvert cells.
 	double Qmax = 3.0; //Maximum discharge for the culvert in m3/s.
+	double z1, z2; //Elevation of the inlet / outlet given by the user.
 };
 
 class inputmap {
