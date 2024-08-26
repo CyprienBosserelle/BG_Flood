@@ -13,15 +13,15 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 
 	// Get the elevation/water column for each culvert edge and put it in the culvert structure (loop on concerned blocks)
 	
-	if (XParam.GPUDEVICE >= 0)
+	/*if (XParam.GPUDEVICE >= 0)
 	{
 		GetCulvertElevGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, XCulverts, XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
-	{
+	{*/
 		GetCulvertElevCPU(XParam, XCulverts, XModel.culvertsF, XModel.bndblk.nblkculvert, XModel.bndblk.culvert, XModel.blocks, XModel.evolv);
-	}
+	//}
 
 
 	// Calculation of the transfert of water (depending of the type of culvert)(loop on culverts)
@@ -62,20 +62,20 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 
 	*/
 
-	if (XParam.GPUDEVICE >= 0)
+	/*if (XParam.GPUDEVICE >= 0)
 	{
 		InjectCulvertGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, XCulverts, XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
-	{
+	{*/
 		InjectCulvertCPU(XParam, XCulverts, XModel.culvertsF, XModel.bndblk.nblkculvert, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
-	}
+	//}
 }
 template __host__ void AddCulverts<float>(Param XParam, double dt, std::vector<Culvert> XCulverts, Model<float> XModel);
 template __host__ void AddCulverts<double>(Param XParam, double dt, std::vector<Culvert> XCulverts, Model<double> XModel);
 
-
+/*
 template <class T> __global__ void InjectCulvertGPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T> XCulvertF, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T>& XAdv)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -105,6 +105,7 @@ template <class T> __global__ void InjectCulvertGPU(Param XParam, std::vector<Cu
 }
 template __global__ void InjectCulvertGPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float> XCulvertF, int* Culvertblks, BlockP<float> XBlock, AdvanceP<float>& XAdv);
 template __global__ void InjectCulvertGPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double> XCulvertF, int* Culvertlks, BlockP<double> XBlock, AdvanceP<double>& XAdv);
+*/
 
 template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T>& XAdv)
 {
@@ -151,7 +152,7 @@ template __host__ void InjectCulvertCPU<float>(Param XParam, std::vector<Culvert
 template __host__ void InjectCulvertCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<double> XBlock, AdvanceP<double>& XAdv);
 
 
-
+/*
 template <class T> __global__ void GetCulvertElevGPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -183,6 +184,7 @@ template <class T> __global__ void GetCulvertElevGPU(Param XParam, std::vector<C
 }
 template __global__ void GetCulvertElevGPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float>& XCulvertF, int* Culvertblks, BlockP<float> XBlock, EvolvingP<float> XEv);
 template __global__ void GetCulvertElevGPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF, int* Culvertlks, BlockP<double> XBlock, EvolvingP<double> XEv);
+*/
 
 template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)
 {
