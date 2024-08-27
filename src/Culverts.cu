@@ -107,7 +107,7 @@ template __global__ void InjectCulvertGPU<float>(Param XParam, std::vector<Culve
 template __global__ void InjectCulvertGPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double> XCulvertF, int* Culvertlks, BlockP<double> XBlock, AdvanceP<double>& XAdv);
 */
 
-template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T>& XAdv)
+template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	unsigned int ib;
 	int halowidth = XParam.halowidth;
@@ -148,8 +148,8 @@ template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culv
 
 
 }
-template __host__ void InjectCulvertCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, AdvanceP<float>& XAdv);
-template __host__ void InjectCulvertCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<double> XBlock, AdvanceP<double>& XAdv);
+template __host__ void InjectCulvertCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
+template __host__ void InjectCulvertCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
 
 /*
@@ -186,7 +186,7 @@ template __global__ void GetCulvertElevGPU<float>(Param XParam, std::vector<Culv
 template __global__ void GetCulvertElevGPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF, int* Culvertlks, BlockP<double> XBlock, EvolvingP<double> XEv);
 */
 
-template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)
+template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)
 {
 	unsigned int ib;
 	int halowidth = XParam.halowidth;
@@ -225,5 +225,5 @@ template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Cul
 		}
 	}
 }
-template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, EvolvingP<float> XEv);
-template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
+template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, EvolvingP<float> XEv);
+template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double> XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
