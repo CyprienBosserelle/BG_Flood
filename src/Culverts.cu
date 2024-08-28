@@ -7,7 +7,7 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 	dim3 gridDimCulvert(XModel.bndblk.nblkculvert, 1, 1);
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	T Qmax, Vol1, delta1, Q;
-	int ibl, cc;
+	int ib1, cc;
 
 
 	// Get the elevation/water column for each culvert edge and put it in the culvert structure (loop on concerned blocks)
@@ -30,15 +30,15 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 	for (cc = 0; cc < XCulverts.size(); cc++)
 	{
 
-		unsigned int ib1 = XCulverts[cc].block1;
+		ib1 = XCulverts[cc].block1;
 
 		//Pump system
 		if (XCulverts[cc].type == 0)
 		{
-			Qmax = XCulverts[cc].Qmax;
+			Qmax = T(XCulverts[cc].Qmax);
 			delta1 = calcres(T(XParam.dx), XModel.blocks.level[ib1]);
 			Vol1 = XModel.culvertsF.h1[cc] * delta1 * delta1;
-			Q = Vol1 * dt;
+			Q = T(Vol1 * dt);
 			if (Q > Qmax)
 			{
 				XModel.culvertsF.dq[cc] = Qmax;
@@ -115,23 +115,20 @@ template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culv
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	T delta, levdx;
+	T delta;
 	int i, ix, iy, ibl, cc;
 
 	for (ibl = 0; ibl < nblkculvert; ibl++)
 	{
 		ib = Culvertblks[ibl];
 
-		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
+		delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 		for (iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (ix = 0; ix < XParam.blkwidth; ix++)
 			{
-
 				i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-
-				delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 				for (cc = 0; cc < XCulverts.size(); cc++)
 				{
@@ -189,14 +186,11 @@ template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Cul
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	T delta, levdx;
 	int i, ix, iy, ibl, cc;
 
 	for (ibl = 0; ibl < nblkculvert; ibl++)
 	{
 		ib = Culvertblks[ibl];
-
-		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
 
 		for (iy = 0; iy < XParam.blkwidth; iy++)
 		{
