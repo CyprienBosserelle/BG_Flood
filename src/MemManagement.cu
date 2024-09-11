@@ -51,7 +51,7 @@ template void AllocateCPU<double>(int nx, int ny, double *&zs, double *&h, doubl
 template void AllocateCPU<float>(int nx, int ny, float *&zs, float *&h, float *&u, float *&v);
 template void AllocateCPU<int>(int nx, int ny, int *&zs, int *&h, int *&u, int *&v);
 
-template <class T> __host__ void AllocTSstoreateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+template <class T> __host__ void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
 {
 
 	AllocateCPU(nx, ny, zs);
