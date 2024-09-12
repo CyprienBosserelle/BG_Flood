@@ -162,6 +162,9 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	status = nc_put_att_double(ncid, NC_GLOBAL, "ymax", NC_DOUBLE, 1, &ymax);
 	if (status != NC_NOERR) handle_ncerror(status);
 
+	status = nc_put_att_text(ncid, NC_GLOBAL, "Conventions", 14,"CF-1.11-draft");
+	if (status != NC_NOERR) handle_ncerror(status);
+
 
 	// Define time variable 
 	status = nc_def_dim(ncid, "time", NC_UNLIMITED, &time_dim);
@@ -229,6 +232,13 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	}
 
 	if (status != NC_NOERR) handle_ncerror(status);
+
+	int bgfid;
+
+	// Model variable to store parameters
+	status = nc_def_var(ncid, "BGFlood", NC_INT, 0, tdim, &bgfid);
+	saveparam2netCDF(ncid, bgfid, XParam);
+
 
 	// Define dimensions and variables to store block id, status, level xo, yo
 
