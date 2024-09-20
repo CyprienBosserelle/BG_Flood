@@ -360,9 +360,8 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		ReallocArray(nblk, blksize, XModel.wettime);
 	}
+
 	//ReallocArray(nx, ny, XModel.);
-
-
 
 }
 
@@ -490,7 +489,14 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateGPU(nblk, blksize, XModel.wettime);
 	}
-
+	if (XParam.nculverts)
+	{
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zs1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zs2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dq);
+	}
 	
 	/*if (XParam.outvort)
 	{

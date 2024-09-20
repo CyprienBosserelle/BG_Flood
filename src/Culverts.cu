@@ -16,7 +16,7 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 	{
 		for (cc = 0; cc < XCulverts.size(); cc++)
 		{
-			GetCulvertElevGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.evolv);
+			GetCulvertElevGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.evolv);
 		}
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
@@ -68,7 +68,7 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 	{
 		for (cc = 0; cc < XCulverts.size(); cc++)
 		{
-			InjectCulvertGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
+			InjectCulvertGPU <<<gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
 		}
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
@@ -111,40 +111,17 @@ template __global__ void InjectCulvertGPU<double>(Param XParam, int cc, Culvert 
 
 template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
-	unsigned int ib;
-	int halowidth = XParam.halowidth;
-	int blkmemwidth = XParam.blkmemwidth;
 
-	T delta;
-	int i, ix, iy, ibl, cc;
+	T delta1, delta2;
+	int cc;
 
-	for (ibl = 0; ibl < nblkculvert; ibl++)
+	for (cc = 0; cc < XCulverts.size(); cc++)
 	{
-		ib = Culvertblks[ibl];
-
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
-
-		for (iy = 0; iy < XParam.blkwidth; iy++)
-		{
-			for (ix = 0; ix < XParam.blkwidth; ix++)
-			{
-				i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-
-				for (cc = 0; cc < XCulverts.size(); cc++)
-				{
-					if (i == XCulverts[cc].i1)
-					{
-						XAdv.dh[i] -= XCulvertF.dq[cc] / (delta * delta);
-					}
-					if (i == XCulverts[cc].i2)
-					{
-						XAdv.dh[i] += XCulvertF.dq[cc] / (delta * delta);
-					}
-				}
-			}
-		}
+		delta1 = calcres(T(XParam.dx), XBlock.level[XCulverts[cc].block1]);
+		delta2 = calcres(T(XParam.dx), XBlock.level[XCulverts[cc].block2]);
+		XAdv.dh[XCulverts[cc].i1] -= XCulvertF.dq[cc] / (delta1 * delta1);
+		XAdv.dh[XCulverts[cc].i2] += XCulvertF.dq[cc] / (delta2 * delta2);
 	}
-
 
 }
 template __host__ void InjectCulvertCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
@@ -180,41 +157,19 @@ template __global__ void GetCulvertElevGPU<float>(Param XParam, int cc, Culvert 
 template __global__ void GetCulvertElevGPU<double>(Param XParam, int cc, Culvert XCulvert, CulvertF<double>& XCulvertF, int* Culvertlks, BlockP<double> XBlock, EvolvingP<double> XEv);
 
 
-template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)
+template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)
 {
-	unsigned int ib;
-	int halowidth = XParam.halowidth;
-	int blkmemwidth = XParam.blkmemwidth;
+	int cc;
 
-	int i, ix, iy, ibl, cc;
-
-	for (ibl = 0; ibl < nblkculvert; ibl++)
+	for (cc = 0; cc < XCulverts.size(); cc++)
 	{
-		ib = Culvertblks[ibl];
+		XCulvertF.h1[cc] = XEv.h[XCulverts[cc].i1];
+		XCulvertF.zs1[cc] = XEv.zs[XCulverts[cc].i1];
 
-		for (iy = 0; iy < XParam.blkwidth; iy++)
-		{
-			for (ix = 0; ix < XParam.blkwidth; ix++)
-			{
-
-				i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-
-				for (cc = 0; cc < XCulverts.size(); cc++)
-				{
-					if (i == XCulverts[cc].i1)
-					{
-						XCulvertF.h1[cc] = XEv.h[i];
-						XCulvertF.zs1[cc] = XEv.zs[i];
-					}
-					if (i == XCulverts[cc].i2)
-					{
-						XCulvertF.h2[cc] = XEv.h[i];
-						XCulvertF.zs2[cc] = XEv.zs[i];
-					}
-				}
-			}
-		}
+		XCulvertF.h2[cc] = XEv.h[XCulverts[cc].i2];
+		XCulvertF.zs2[cc] = XEv.zs[XCulverts[cc].i2];
 	}
+
 }
-template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float> XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, EvolvingP<float> XEv);
-template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double> XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
+template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, EvolvingP<float> XEv);
+template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
