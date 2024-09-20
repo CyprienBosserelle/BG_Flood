@@ -204,6 +204,17 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(1, 1, XModel.bndblk.river);
 		XModel.bndblk.nblkriver = 1;
 	}
+
+	if (XParam.nculverts > 0) 
+	{
+		AllocateCPU(1, 1, XModel.bndblk.culvert);
+		XModel.bndblk.nblkculvert = 1;
+		AllocateCPU(1, 1, XModel.culvertsF.dq);
+		AllocateCPU(1, 1, XModel.culvertsF.h1);
+		AllocateCPU(1, 1, XModel.culvertsF.h2);
+		AllocateCPU(1, 1, XModel.culvertsF.zs1);
+		AllocateCPU(1, 1, XModel.culvertsF.zs2);
+	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later
 	//AllocateCPU(1, 1, XModel.bndblk.left);
@@ -349,9 +360,8 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		ReallocArray(nblk, blksize, XModel.wettime);
 	}
+
 	//ReallocArray(nx, ny, XModel.);
-
-
 
 }
 
@@ -479,7 +489,14 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateGPU(nblk, blksize, XModel.wettime);
 	}
-
+	if (XParam.nculverts)
+	{
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zs1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zs2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dq);
+	}
 	
 	/*if (XParam.outvort)
 	{
@@ -496,6 +513,8 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		int storage = XParam.maxTSstorage;
 		AllocateGPU(storage, 1, XModel.TSstore);
 	}
+
+
 
 	// Allocate textures for boundary and forcing is done in init forcing
 
