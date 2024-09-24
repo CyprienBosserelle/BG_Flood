@@ -2001,7 +2001,7 @@ std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start
 
 	if (stepstr.empty())
 	{
-		step = 3600.0;
+		step = (last - init);
 	}
 	else
 	{

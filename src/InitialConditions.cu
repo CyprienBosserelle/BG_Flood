@@ -1393,12 +1393,12 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 	std::vector<double> times_partial;
 
 	times_partial = GetTimeOutput(XParam.Toutput);
-	printf("Time partial:\n");
-	for (int k = 0; k < times_partial.size(); k++)
-	{
-		printf("%f, ", times_partial[k]);
-	}
-	printf("\n");
+	//printf("Time partial:\n");
+	//for (int k = 0; k < times_partial.size(); k++)
+	//{
+	//	printf("%f, ", times_partial[k]);
+	//}
+	//printf("\n");
 
 	times.insert(times.end(), times_partial.begin(), times_partial.end());
 
@@ -1430,7 +1430,7 @@ template <class T> void initOutputTimes(Param XParam, std::vector<double>& Outpu
 	std::sort(times.begin(), times.end());
 	times.erase(unique(times.begin(), times.end()), times.end());
 	
-	printf("Times:\n");
+	printf("Output Times:\n");
 	for (int k = 0; k < times.size(); k++)
 	{
 		printf("%e, ", times[k]);

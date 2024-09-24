@@ -4582,16 +4582,17 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 
 	//Add endtime and outputvar
 	param_file << "endtime = 11.0 ;" << std::endl;
+	param_file << "reftime = 2020-01-01T00:00:00 ;" << std::endl;
 	param_file << "outvars = zs,h,u,v,zb;" << std::endl;
 	param_file << "dx = 0.05;" << std::endl;
 	param_file << "zsinit = 0.1;" << std::endl;
 	param_file << "smallnc = 0;" << std::endl;
 	param_file << "doubleprecision = 1;" << std::endl;
-	param_file << "Toutput = 1:1:, 8.5,  9.5;" << std::endl;
-	param_file << "outzone = Test15_zoom1.nc,0.2,0.6,-0.2,0.2, 2:0.5:5, 5.6,6.9;" << std::endl;
-	param_file << "outzone = Test15_zoom2.nc,0.2,0.6,-0.2,0.2, 8:0.7:, 5.6;" << std::endl;
-	param_file << "outzone = Test15_zoom3.nc,0.2,0.6,-0.2,0.2, :0.8:2;" << std::endl;
-	param_file << "outzone = Test15_zoom4.nc,0.2,0.6,-0.2,0.2, 8::9;" << std::endl;
+	param_file << "Toutput = 1|2|5, 2020-01-01T00:00:08,  9.5;" << std::endl;
+	param_file << "outzone = Test15_zoom1.nc,0.2,0.6,-0.2,0.2, 2020-01-01T00:00:02|0.008min|2020-01-01T00:00:03, 5.6,6.9;" << std::endl;
+	param_file << "outzone = Test15_zoom2.nc,0.2,0.6,-0.2,0.2, 8.1|0.7|, 5.6;" << std::endl;
+	param_file << "outzone = Test15_zoom3.nc,0.2,0.6,-0.2,0.2, |0.8|2;" << std::endl;
+	param_file << "outzone = Test15_zoom4.nc,0.2,0.6,-0.2,0.2, 8.2||9;" << std::endl; // Here the step in not given so assumed infinite
 	param_file << "outzone = Test15_zoom5.nc,0.2,0.6,-0.2,0.2;" << std::endl;
 	param_file.close();
 
@@ -4617,7 +4618,13 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 	//MainLoop(XParam, XForcing, XModel, XModel_g);
 
 	//TEST 1: reading and default values check:
-	bool result = true;
+	bool result = false;
+
+	if (XModel.OutputT.size()==20)
+	{
+		result = true;
+	}
+
 	/*
 	if (!XParam.Toutput.end == 11.0)
 		result = false;
@@ -4632,14 +4639,7 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 		result = false;
 		*/
 
-	if (!XParam.Toutput.val[1] == 9.5)
-		result = false;
-
-	//TEST 2: calculation of the output steps
-	if (!XModel.OutputT.size() == 26)
-		result = false;
-	if (!XModel.blocks.outZone[0].OutputT.size() == 9)
-		result = false;
+	
 
 	return result;
 }
