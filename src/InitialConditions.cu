@@ -412,11 +412,13 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
 
 
-		std::vector<int> blocksalreadyin(nribmax, std::vector<int>(1, 1));
-
+		std::vector<RiverBlk> blocksalreadyin;
+		RiverBlk emptyvec;
 		for (int iblk = 0; iblk < nribmax; iblk++)
 		{
-			blocksalreadyin[iblk][0] = -1;
+
+			blocksalreadyin.push_back(emptyvec);
+			
 		}
 		
 
@@ -436,7 +438,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				for (int iribm = 0; iribm < nribmax; iribm++)
 				{
 
-					if (std::find(blocksalreadyin[iribm].begin(), blocksalreadyin[iribm].end(), uniqblockforriver[bir]) != blocksalreadyin[iribm].end())
+					if (std::find(blocksalreadyin[iribm].block.begin(), blocksalreadyin[iribm].block.end(), uniqblockforriver[bir]) != blocksalreadyin[iribm].block.end())
 					{
 						//Found;
 
@@ -447,6 +449,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 						//not found;
 
 						// add it to the list 
+						blocksalreadyin[iribm].block.push_back(uniqblockforriver[bir]);
+
 						// write to the array
 						break;
 					}

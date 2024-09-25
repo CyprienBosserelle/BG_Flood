@@ -155,7 +155,10 @@ struct BndblockP
 
 };
 
-
+struct RiverBlk
+{
+	std::vector<int> block;
+};
 
 
 
