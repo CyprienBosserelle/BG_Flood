@@ -409,7 +409,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 		// Fill them with a flag value 
 		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
-		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xridib);
 
 
 		std::vector<RiverBlk> blocksalreadyin;
@@ -421,8 +421,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			
 		}
 		
-
-
+		//(n, 10)
+		std::vector<int> iriv(nribmax,0);
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
 			std::vector<int> uniqblockforriver = XForcing.rivers[Rin].block;
@@ -447,6 +447,11 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 					else
 					{
 						//not found;
+
+						XModel.bndblk.Riverinfo.Xbidir[iriv[iribm] + iribm * nburmax] = uniqblockforriver[bir];
+						XModel.bndblk.Riverinfo.Xridib[iriv[iribm] + iribm * nburmax] = Rin;
+
+						iriv[iribm] = iriv[iribm] + 1;
 
 						// add it to the list 
 						blocksalreadyin[iribm].block.push_back(uniqblockforriver[bir]);
