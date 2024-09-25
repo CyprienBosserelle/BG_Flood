@@ -400,19 +400,19 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				}
 
 			}
-			nribmax=max(nribmax, nriverinblock)
+			nribmax = max(nribmax, nriverinblock);
 		}
 
 		// Allocate XXbidir and Xridib
-		AllocateCPU(nribmax, nburmax, XModel.bndblk.XRiverinfo.Xbidir);
-		AllocateCPU(nribmax, nburmax, XModel.bndblk.XRiverinfo.Xridib);
+		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
+		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib);
 
 		// Fill them with a flag value 
-		FillCPU(nribmax, nburmax, -1, XModel.bndblk.XRiverinfo.Xbidir);
-		FillCPU(nribmax, nburmax, -1, XModel.bndblk.XRiverinfo.Xbidir);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
 
 
-		std::vector<vector<int>> blocksalreadyin(nribmax, vector<int>(1, 1));
+		std::vector<int> blocksalreadyin(nribmax, std::vector<int>(1, 1));
 
 		for (int iblk = 0; iblk < nribmax; iblk++)
 		{

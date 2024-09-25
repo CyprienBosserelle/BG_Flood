@@ -150,7 +150,7 @@ struct BndblockP
 	int* top;
 	int* bot;
 
-
+	RiverInfo Riverinfo;
 
 
 };
