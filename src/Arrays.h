@@ -87,8 +87,8 @@ struct RiverInfo
 	int nbir;
 	int nburmax; // size of (max number of) unique block with rivers  
 	int nribmax; // size of (max number of) rivers in one block
-	int* Xbidir; // array of block id for each river size()
-	int* Xridib; // array of river id in each block
+	int* Xbidir; // array of block id for each river size(nburmax,nribmax)
+	int* Xridib; // array of river id in each block size(nburmax,nribmax)
 
 };
 
