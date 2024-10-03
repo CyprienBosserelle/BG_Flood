@@ -404,8 +404,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		}
 
 		// Allocate XXbidir and Xridib
-		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
-		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib);
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib);
 
 		// Fill them with a flag value 
 		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
@@ -440,14 +440,14 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 					if (std::find(blocksalreadyin[iribm].block.begin(), blocksalreadyin[iribm].block.end(), uniqblockforriver[bir]) != blocksalreadyin[iribm].block.end())
 					{
-						//Found;
+						//block found already listed in that line;
 
 						continue;
 					}
 					else
 					{
 						//not found;
-
+						// write to the array
 						XModel.bndblk.Riverinfo.Xbidir[iriv[iribm] + iribm * nburmax] = uniqblockforriver[bir];
 						XModel.bndblk.Riverinfo.Xridib[iriv[iribm] + iribm * nburmax] = Rin;
 
@@ -456,7 +456,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 						// add it to the list 
 						blocksalreadyin[iribm].block.push_back(uniqblockforriver[bir]);
 
-						// write to the array
+						
+
 						break;
 					}
 				}

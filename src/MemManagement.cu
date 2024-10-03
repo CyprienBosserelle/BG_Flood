@@ -203,6 +203,9 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		//this will be eventually reallocated later
 		AllocateCPU(1, 1, XModel.bndblk.river);
 		XModel.bndblk.nblkriver = 1;
+
+		AllocateCPU(1, 1, XModel.bndblk.Riverinfo.Xbidir);
+		AllocateCPU(1, 1, XModel.bndblk.Riverinfo.Xridib);
 	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later
