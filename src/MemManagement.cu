@@ -370,7 +370,7 @@ template void ReallocArray<double>(int nblk, int blksize, Param XParam, Model<do
 
 template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z)
 {
-
+	bool bPinGenericMemory;
 	cudaDeviceProp deviceProp;
 #if defined(__APPLE__) || defined(MACOSX)
 	bPinGenericMemory = false;  // Generic Pinning of System Paged memory is not currently supported on Mac OSX
@@ -416,8 +416,8 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z
 	else
 	{
 
-		flags = cudaHostAllocMapped;
-		checkCudaErrors(cudaHostAlloc((void**)&z, bytes, flags));
+		//flags = cudaHostAllocMapped;
+		checkCudaErrors(cudaHostAlloc((void**)&z, bytes, cudaHostAllocMapped));
 		
 
 	}
