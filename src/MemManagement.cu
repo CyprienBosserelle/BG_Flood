@@ -1,6 +1,10 @@
 
 #include "MemManagement.h"
 
+
+#define MEMORY_ALIGNMENT  4096
+#define ALIGN_UP(x,size) ( ((size_t)x+(size-1))&(~(size-1)) )
+
 __host__ int memloc(Param XParam, int i, int j, int ib)
 {
 	return (i+XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
@@ -360,6 +364,71 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 template void ReallocArray<float>(int nblk, int blksize, Param XParam, Model<float>& XModel);
 template void ReallocArray<double>(int nblk, int blksize, Param XParam, Model<double>& XModel);
+
+
+
+
+template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z)
+{
+
+	cudaDeviceProp deviceProp;
+#if defined(__APPLE__) || defined(MACOSX)
+	bPinGenericMemory = false;  // Generic Pinning of System Paged memory is not currently supported on Mac OSX
+#else
+	bPinGenericMemory = true;
+#endif
+
+	// Here there should be a limit for cudar version less than 4.000
+
+
+	if (bPinGenericMemory)
+	{
+		printf("> Using Generic System Paged Memory (malloc)\n");
+	}
+	else
+	{
+		printf("> Using CUDA Host Allocated (cudaHostAlloc)\n");
+	}
+	cudaGetDeviceProperties(&deviceProp, gpudevice);
+
+	if (!deviceProp.canMapHostMemory)
+	{
+		fprintf(stderr, "Device %d does not support mapping CPU host memory!\n", gpudevice);
+		bPinGenericMemory = false;
+	}
+
+	if (bPinGenericMemory)
+	{
+
+		size_t bytes = nx * ny * sizeof(T);
+
+		T* a_UA = (float*)malloc(bytes + MEMORY_ALIGNMENT);
+		
+
+		// We need to ensure memory is aligned to 4K (so we will need to padd memory accordingly)
+		z = (float*)ALIGN_UP(a_UA, MEMORY_ALIGNMENT);
+		
+
+		checkCudaErrors(cudaHostRegister(z, bytes, cudaHostRegisterMapped));
+		
+
+	}
+	else
+	{
+
+		flags = cudaHostAllocMapped;
+		checkCudaErrors(cudaHostAlloc((void**)&z, bytes, flags));
+		
+
+	}
+
+
+}
+
+template <class T> void AllocateMappedMemGPU(int nx, int ny, int gpudevice, T*& z_g, T* z)
+{
+	checkCudaErrors(cudaHostGetDevicePointer((void**)&z_g, (void*)z, 0));
+}
 
 
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g)
