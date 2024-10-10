@@ -82,6 +82,16 @@ struct maskinfo
 
 };
 
+struct RiverInfo
+{
+	int nbir;
+	int nburmax; // size of (max number of) unique block with rivers  
+	int nribmax; // size of (max number of) rivers in one block
+	int* Xbidir; // array of block id for each river size(nburmax,nribmax)
+	int* Xridib; // array of river id in each block size(nburmax,nribmax)
+
+};
+
 
 // outzone info used to actually write the nc files (one nc file by zone, the default zone is the full domain)
 struct outzoneB 
@@ -140,12 +150,15 @@ struct BndblockP
 	int* top;
 	int* bot;
 
-
+	RiverInfo Riverinfo;
 
 
 };
 
-
+struct RiverBlk
+{
+	std::vector<int> block;
+};
 
 
 

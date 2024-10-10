@@ -336,7 +336,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				XForcing.rivers[Rin].i = idis;
 				XForcing.rivers[Rin].j = jdis;
 				XForcing.rivers[Rin].block = blockdis;
-				XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+				XForcing.rivers[Rin].disarea = dischargeArea; // That is valid for spherical grids
 			
 
 			
@@ -352,8 +352,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			}
 		}
 
-
-
+		
 		//Now identify sort and unique blocks where rivers are being inserted
 		std::vector<int> activeRiverBlk;
 
@@ -376,6 +375,98 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		{
 			XModel.bndblk.river[b] = activeRiverBlk[b];
 		}
+
+		// Setup the river info
+
+		int nburmax = activeRiverBlk.size();
+		int nribmax = 0;
+		for (int b = 0; b < activeRiverBlk.size(); b++)
+		{
+			int bur = activeRiverBlk[b];
+			int nriverinblock = 0;
+			for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+			{
+				std::vector<int> uniqblockforriver = XForcing.rivers[Rin].block;
+
+				std::sort(uniqblockforriver.begin(), uniqblockforriver.end());
+				uniqblockforriver.erase(std::unique(uniqblockforriver.begin(), uniqblockforriver.end()), uniqblockforriver.end());
+
+				for (int bir = 0; bir < uniqblockforriver.size(); bir++)
+				{
+					if (uniqblockforriver[bir] == bur)
+					{
+						nriverinblock = nriverinblock + 1;
+					}
+				}
+
+			}
+			nribmax = max(nribmax, nriverinblock);
+		}
+
+		// Allocate XXbidir and Xridib
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib);
+
+		// Fill them with a flag value 
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xridib);
+
+
+		std::vector<RiverBlk> blocksalreadyin;
+		RiverBlk emptyvec;
+		for (int iblk = 0; iblk < nribmax; iblk++)
+		{
+
+			blocksalreadyin.push_back(emptyvec);
+			
+		}
+		
+		//(n, 10)
+		std::vector<int> iriv(nribmax,0);
+		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+		{
+			std::vector<int> uniqblockforriver = XForcing.rivers[Rin].block;
+
+			std::sort(uniqblockforriver.begin(), uniqblockforriver.end());
+			uniqblockforriver.erase(std::unique(uniqblockforriver.begin(), uniqblockforriver.end()), uniqblockforriver.end());
+
+			
+
+			for (int bir = 0; bir < uniqblockforriver.size(); bir++)
+			{
+
+				for (int iribm = 0; iribm < nribmax; iribm++)
+				{
+
+					if (std::find(blocksalreadyin[iribm].block.begin(), blocksalreadyin[iribm].block.end(), uniqblockforriver[bir]) != blocksalreadyin[iribm].block.end())
+					{
+						//block found already listed in that line;
+
+						continue;
+					}
+					else
+					{
+						//not found;
+						// write to the array
+						XModel.bndblk.Riverinfo.Xbidir[iriv[iribm] + iribm * nburmax] = uniqblockforriver[bir];
+						XModel.bndblk.Riverinfo.Xridib[iriv[iribm] + iribm * nburmax] = Rin;
+
+						iriv[iribm] = iriv[iribm] + 1;
+
+						// add it to the list 
+						blocksalreadyin[iribm].block.push_back(uniqblockforriver[bir]);
+
+						
+
+						break;
+					}
+				}
+					
+			}
+
+		}
+
+		
 		
 	}
 
