@@ -315,6 +315,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
 		log("\t\tAOI bnd wall test : " + result);
 	}
+
+	if (mytest == 993)
+	{
+		//pinned pageable Memory test
+		TestPinMem(XParam, XModel, XModel_g);
+	}
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -4845,6 +4851,82 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	//log("#####");
 	return modelgood;
 }
+
+
+template <class T> __global__ void vectoroffsetGPU(int nx, T offset, T* z)
+{
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+	if (idx < nx)
+	{
+		z[idx] = z[idx] + offset;
+	}
+}
+
+template <class T> int TestPinMem(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	T* zf, *zf_g, * zf_recov;
+	
+
+	int nx = 32;
+	int ny = 1;
+
+	int nelem = nx * ny;
+
+
+	AllocateMappedMemCPU(nx, ny, XParam.GPUDEVICE, zf);
+	
+
+	AllocateCPU(nx, ny, zf_recov);
+
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			zf[i + j * nx] = i + j * nx +T(0.25);
+			
+		}
+	}
+
+	AllocateMappedMemGPU(nx, ny, XParam.GPUDEVICE, zf_g, zf);
+	
+
+
+	dim3 block(16);
+	dim3 grid((unsigned int)ceil(nelem / (float)block.x));
+
+	vectoroffsetGPU << <grid, block >> > (nelem, T(1.0), zf_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CUDA_CHECK(cudaMemcpy(zf_recov, zf_g, nx*ny * sizeof(T), cudaMemcpyDeviceToHost));
+
+	T checkrem = T(0.0);
+
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+
+			checkrem = checkrem + abs(zf[i + j * nx] - zf_recov[i + j * nx]);
+		}
+	}
+
+	int modelgood = checkrem < 1.e-6f;
+
+	if (checkrem > 1.e-6f)
+	{
+		printf("\n Test Failed error = %e \n", checkrem);
+	}
+	else
+	{
+		printf("\n Test Success error = %e \n", checkrem);
+	}
+	return modelgood;
+}
+template int TestPinMem<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
+template int TestPinMem<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
+
+
 
 
 template <class T> Forcing<float> MakValleyBathy(Param XParam, T slope, bool bottop, bool flip)

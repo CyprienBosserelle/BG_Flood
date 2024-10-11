@@ -396,20 +396,20 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z
 		fprintf(stderr, "Device %d does not support mapping CPU host memory!\n", gpudevice);
 		bPinGenericMemory = false;
 	}
-
+	size_t bytes = nx * ny * sizeof(T);
 	if (bPinGenericMemory)
 	{
 
-		size_t bytes = nx * ny * sizeof(T);
+		
 
-		T* a_UA = (float*)malloc(bytes + MEMORY_ALIGNMENT);
+		T* a_UA = (T*)malloc(bytes + MEMORY_ALIGNMENT);
 		
 
 		// We need to ensure memory is aligned to 4K (so we will need to padd memory accordingly)
-		z = (float*)ALIGN_UP(a_UA, MEMORY_ALIGNMENT);
+		z = (T*)ALIGN_UP(a_UA, MEMORY_ALIGNMENT);
 		
 
-		checkCudaErrors(cudaHostRegister(z, bytes, cudaHostRegisterMapped));
+		CUDA_CHECK(cudaHostRegister(z, bytes, cudaHostRegisterMapped));
 		
 
 	}
@@ -417,18 +417,24 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z
 	{
 
 		//flags = cudaHostAllocMapped;
-		checkCudaErrors(cudaHostAlloc((void**)&z, bytes, cudaHostAllocMapped));
+		CUDA_CHECK(cudaHostAlloc((void**)&z, bytes, cudaHostAllocMapped));
 		
 
 	}
 
 
 }
+template void AllocateMappedMemCPU<int>(int nx, int ny, int gpudevice, int*& z);
+template void AllocateMappedMemCPU<float>(int nx, int ny, int gpudevice, float*& z);
+template void AllocateMappedMemCPU<double>(int nx, int ny, int gpudevice, double*& z);
 
 template <class T> void AllocateMappedMemGPU(int nx, int ny, int gpudevice, T*& z_g, T* z)
 {
-	checkCudaErrors(cudaHostGetDevicePointer((void**)&z_g, (void*)z, 0));
+	CUDA_CHECK(cudaHostGetDevicePointer((void**)&z_g, (void*)z, 0));
 }
+template void AllocateMappedMemGPU<int>(int nx, int ny, int gpudevice, int*& z_g, int* z);
+template void AllocateMappedMemGPU<float>(int nx, int ny, int gpudevice,float*& z_g, float* z);
+template void AllocateMappedMemGPU<double>(int nx, int ny, int gpudevice, double*& z_g, double* z);
 
 
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g)
