@@ -383,11 +383,11 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z
 
 	if (bPinGenericMemory)
 	{
-		printf("> Using Generic System Paged Memory (malloc)\n");
+		//printf("> Using Generic System Paged Memory (malloc)\n");
 	}
 	else
 	{
-		printf("> Using CUDA Host Allocated (cudaHostAlloc)\n");
+		//printf("> Using CUDA Host Allocated (cudaHostAlloc)\n");
 	}
 	cudaGetDeviceProperties(&deviceProp, gpudevice);
 

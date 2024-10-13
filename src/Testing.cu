@@ -4916,11 +4916,15 @@ template <class T> int TestPinMem(Param XParam, Model<T> XModel, Model<T> XModel
 	if (checkrem > 1.e-6f)
 	{
 		printf("\n Test Failed error = %e \n", checkrem);
+		return modelgood;
 	}
 	else
 	{
 		printf("\n Test Success error = %e \n", checkrem);
 	}
+
+
+
 	return modelgood;
 }
 template int TestPinMem<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
