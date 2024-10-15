@@ -4888,29 +4888,34 @@ template <class T> int TestPinMem(Param XParam, Model<T> XModel, Model<T> XModel
 		}
 	}
 
-	AllocateMappedMemGPU(nx, ny, XParam.GPUDEVICE, zf_g, zf);
-	
-
-
-	dim3 block(16);
-	dim3 grid((unsigned int)ceil(nelem / (float)block.x));
-
-	vectoroffsetGPU << <grid, block >> > (nelem, T(1.0), zf_g);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	CUDA_CHECK(cudaMemcpy(zf_recov, zf_g, nx*ny * sizeof(T), cudaMemcpyDeviceToHost));
-
 	T checkrem = T(0.0);
 
-	for (int i = 0; i < nx; i++)
+	if (XParam.GPUDEVICE >= 0)
 	{
-		for (int j = 0; j < ny; j++)
-		{
+		AllocateMappedMemGPU(nx, ny, XParam.GPUDEVICE, zf_g, zf);
 
-			checkrem = checkrem + abs(zf[i + j * nx] - zf_recov[i + j * nx]);
+
+
+		dim3 block(16);
+		dim3 grid((unsigned int)ceil(nelem / (float)block.x));
+
+		vectoroffsetGPU << <grid, block >> > (nelem, T(1.0), zf_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		CUDA_CHECK(cudaMemcpy(zf_recov, zf_g, nx * ny * sizeof(T), cudaMemcpyDeviceToHost));
+
+
+		
+
+		for (int i = 0; i < nx; i++)
+		{
+			for (int j = 0; j < ny; j++)
+			{
+
+				checkrem = checkrem + abs(zf[i + j * nx] - zf_recov[i + j * nx]);
+			}
 		}
 	}
-
 	int modelgood = checkrem < 1.e-6f;
 
 	if (checkrem > 1.e-6f)
