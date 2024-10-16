@@ -100,6 +100,21 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			XModel_g.bndblk.nblkriver = XModel.bndblk.nblkriver;
 			AllocateGPU(XModel.bndblk.nblkriver, 1, XModel_g.bndblk.river);
 			CopytoGPU(XModel.bndblk.nblkriver, 1, XModel.bndblk.river, XModel_g.bndblk.river);
+
+			int nribmax = XModel.bndblk.Riverinfo.nribmax;
+			int nburmax = XModel.bndblk.Riverinfo.nburmax;
+
+			XModel_g.bndblk.Riverinfo.nribmax = nribmax;
+			XModel_g.bndblk.Riverinfo.nburmax = nburmax;
+
+
+			AllocateMappedMemGPU(XForcing.rivers.size(), 1, XModel_.bndblk.Riverinfo.qnow);
+
+
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xbidir);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xridib);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir, XModel_g.bndblk.Riverinfo.Xbidir);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib, XModel_g.bndblk.Riverinfo.Xridib);
 		}
 
 		// Reset GPU mean and max arrays

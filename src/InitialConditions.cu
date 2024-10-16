@@ -403,6 +403,9 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			nribmax = max(nribmax, nriverinblock);
 		}
 
+		// Allocate Qnow as pinned memory
+		AllocateMappedMemCPU(XForcing.rivers.size(), 1, XModel.bndblk.Riverinfo.qnow);
+
 		// Allocate XXbidir and Xridib
 		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
 		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib);
@@ -411,6 +414,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
 		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xridib);
 
+		XModel.bndblk.Riverinfo.nribmax = nribmax;
+		XModel.bndblk.Riverinfo.nburmax = nburmax;
 
 		std::vector<RiverBlk> blocksalreadyin;
 		RiverBlk emptyvec;
