@@ -390,12 +390,15 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z
 	{
 		//printf("> Using CUDA Host Allocated (cudaHostAlloc)\n");
 	}
-	cudaGetDeviceProperties(&deviceProp, gpudevice);
-
-	if (!deviceProp.canMapHostMemory)
+	if (gpudevice >= 0)
 	{
-		fprintf(stderr, "Device %d does not support mapping CPU host memory!\n", gpudevice);
-		bPinGenericMemory = false;
+		cudaGetDeviceProperties(&deviceProp, gpudevice);
+
+		if (!deviceProp.canMapHostMemory)
+		{
+			fprintf(stderr, "Device %d does not support mapping CPU host memory!\n", gpudevice);
+			bPinGenericMemory = false;
+		}
 	}
 	size_t bytes = nx * ny * sizeof(T);
 	if (bPinGenericMemory)
@@ -409,9 +412,10 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z
 		// We need to ensure memory is aligned to 4K (so we will need to padd memory accordingly)
 		z = (T*)ALIGN_UP(a_UA, MEMORY_ALIGNMENT);
 		
-
-		CUDA_CHECK(cudaHostRegister(z, bytes, cudaHostRegisterMapped));
-		
+		if (gpudevice >= 0)
+		{
+			CUDA_CHECK(cudaHostRegister(z, bytes, cudaHostRegisterMapped));
+		}
 
 	}
 	else
