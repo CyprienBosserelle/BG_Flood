@@ -82,6 +82,7 @@ struct maskinfo
 
 };
 
+template <class T>
 struct RiverInfo
 {
 	int nbir;
@@ -89,7 +90,12 @@ struct RiverInfo
 	int nribmax; // size of (max number of) rivers in one block
 	int* Xbidir; // array of block id for each river size(nburmax,nribmax)
 	int* Xridib; // array of river id in each block size(nburmax,nribmax)
-	float* qnow;
+	T* xstart;
+	T* xend;
+	T* ystart;
+	T *yend;
+	T* qnow; // qnow is a pin mapped and so both pointers are needed here
+	T* qnow_g; // this simplify the code later
 
 };
 
@@ -136,7 +142,7 @@ struct AdaptP
 
 
 
-
+template <class T>
 struct BndblockP
 {
 	int nblkriver, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
@@ -151,7 +157,7 @@ struct BndblockP
 	int* top;
 	int* bot;
 
-	RiverInfo Riverinfo;
+	RiverInfo<T> Riverinfo;
 
 
 };
@@ -222,7 +228,7 @@ struct Model
 
 	AdaptP adapt;
 
-	BndblockP bndblk;
+	BndblockP<T> bndblk;
 
 
 	

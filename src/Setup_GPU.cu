@@ -108,13 +108,25 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			XModel_g.bndblk.Riverinfo.nburmax = nburmax;
 
 
-			AllocateMappedMemGPU(XForcing.rivers.size(), 1, XModel_.bndblk.Riverinfo.qnow);
+			AllocateMappedMemGPU(XForcing.rivers.size(), 1, XModel_g.bndblk.Riverinfo.qnow_g);
+			XModel_g.bndblk.Riverinfo.qnow = XModel.bndblk.Riverinfo.qnow;
 
 
 			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xbidir);
 			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xridib);
 			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir, XModel_g.bndblk.Riverinfo.Xbidir);
 			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib, XModel_g.bndblk.Riverinfo.Xridib);
+
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.xstart);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.xend);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.ystart);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.yend);
+
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel_g.bndblk.Riverinfo.xstart);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xend, XModel_g.bndblk.Riverinfo.xend);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.ystart, XModel_g.bndblk.Riverinfo.ystart);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.yend, XModel_g.bndblk.Riverinfo.yend);
+
 		}
 
 		// Reset GPU mean and max arrays

@@ -404,7 +404,14 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		}
 
 		// Allocate Qnow as pinned memory
-		AllocateMappedMemCPU(XForcing.rivers.size(), 1, XModel.bndblk.Riverinfo.qnow);
+		AllocateMappedMemCPU(XForcing.rivers.size(), 1, XParam.GPUDEVICE,XModel.bndblk.Riverinfo.qnow);
+		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel.bndblk.Riverinfo.xend, XModel.bndblk.Riverinfo.ystart, XModel.bndblk.Riverinfo.yend);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.xstart);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.xend);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.ystart);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.yend);
+
+
 
 		// Allocate XXbidir and Xridib
 		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
@@ -470,6 +477,22 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			}
 
 		}
+		for (int iribm = 0; iribm < nribmax; iribm++)
+		{
+			for (int ibur = 0; ibur < nburmax; ibur++)
+			{
+				int indx = ibur + iribm * nburmax;
+				int Rin = XModel.bndblk.Riverinfo.Xridib[indx];
+				if (Rin > -1)
+				{
+					XModel.bndblk.Riverinfo.xstart[indx] = XForcing.rivers[Rin].xstart;
+					XModel.bndblk.Riverinfo.xend[indx] = XForcing.rivers[Rin].xend;
+					XModel.bndblk.Riverinfo.ystart[indx] = XForcing.rivers[Rin].ystart;
+					XModel.bndblk.Riverinfo.yend[indx] = XForcing.rivers[Rin].yend;
+				}
+			}
+		}
+
 
 		
 		
