@@ -108,7 +108,7 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			XModel_g.bndblk.Riverinfo.nburmax = nburmax;
 
 
-			AllocateMappedMemGPU(XForcing.rivers.size(), 1,XParam.GPUDEVICE, XModel.bndblk.Riverinfo.qnow,XModel_g.bndblk.Riverinfo.qnow_g);
+			AllocateMappedMemGPU(XForcing.rivers.size(), 1,XParam.GPUDEVICE, XModel_g.bndblk.Riverinfo.qnow_g,XModel.bndblk.Riverinfo.qnow);
 			XModel_g.bndblk.Riverinfo.qnow = XModel.bndblk.Riverinfo.qnow;
 
 
