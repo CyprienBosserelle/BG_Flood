@@ -216,7 +216,7 @@ void InitTSOutput(Param XParam)
 	}
 }
 
-template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP & bnd)
+template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP<T> & bnd)
 {
 	int ib;
 	T levdx,x,y,blkxmin,blkxmax,blkymin,blkymax,dxblk;
@@ -263,8 +263,8 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 	
 
 }
-template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock, BndblockP& bnd);
-template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock, BndblockP& bnd);
+template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock, BndblockP<float>& bnd);
+template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock, BndblockP<double>& bnd);
 
 
 
@@ -406,10 +406,10 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		// Allocate Qnow as pinned memory
 		AllocateMappedMemCPU(XForcing.rivers.size(), 1, XParam.GPUDEVICE,XModel.bndblk.Riverinfo.qnow);
 		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel.bndblk.Riverinfo.xend, XModel.bndblk.Riverinfo.ystart, XModel.bndblk.Riverinfo.yend);
-		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.xstart);
-		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.xend);
-		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.ystart);
-		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.yend);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xstart);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xend);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.ystart);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.yend);
 
 
 

@@ -224,7 +224,7 @@ template <class T> __global__ void InjectManyRiversGPU(Param XParam,int irib, Ri
 	{
 		
 		i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-		rid = XRin.Xridib[index];
+		rid = XRin.Xridib[indx];
 
 		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
 
