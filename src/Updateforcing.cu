@@ -362,6 +362,8 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 
 	T Rainhh;
 
+	T hi = XEv.h[i];
+
 	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 	if (Rain.uniform)
@@ -374,12 +376,15 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 	}
 
 	
+	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)) * XBlock.activeCell[i]; // convert from mm/hrs to m/s and 
 
-	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt,T(0.0)); // convert from mm/hrs to m/s
+	T qvol = hi / (hi + Rainhh);
 
-	
-	XEv.h[i] += Rainhh * XBlock.activeCell[i];
-	XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+	XEv.h[i] = hi + Rainhh;
+	XEv.zs[i] += Rainhh;
+
+	XEv.u[i] = XEv.u[i] * qvol;
+	XEv.v[i] = XEv.v[i] * qvol;
 
 }
 template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
@@ -453,6 +458,8 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 
 				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
+				T hi = XEv.h[i];
+
 				T Rainhh;
 
 				T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
@@ -468,10 +475,15 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 				}
 
 
-				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)); // convert from mm/hrs to m/s
+				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)) * XBlock.activeCell[i]; // convert from mm/hrs to m/s and 
 
-				XEv.h[i] += Rainhh * XBlock.activeCell[i];
-				XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+				T qvol = hi/(hi + Rainhh);
+
+				XEv.h[i] = hi + Rainhh;
+				XEv.zs[i] += Rainhh;
+
+				XEv.u[i] = XEv.u[i] * qvol;
+				XEv.v[i] = XEv.v[i] * qvol;
 			}
 		}
 	}
