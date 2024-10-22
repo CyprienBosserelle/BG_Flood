@@ -382,10 +382,11 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 
 	XEv.h[i] = hi + Rainhh;
 	XEv.zs[i] += Rainhh;
-
-	XEv.u[i] = XEv.u[i] * qvol;
-	XEv.v[i] = XEv.v[i] * qvol;
-
+	if (hi > XParam.eps)
+	{
+		XEv.u[i] = XEv.u[i] * qvol;
+		XEv.v[i] = XEv.v[i] * qvol;
+	}
 }
 template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __global__ void AddrainforcingImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
@@ -482,8 +483,11 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 				XEv.h[i] = hi + Rainhh;
 				XEv.zs[i] += Rainhh;
 
-				XEv.u[i] = XEv.u[i] * qvol;
-				XEv.v[i] = XEv.v[i] * qvol;
+				if (hi > XParam.eps)
+				{
+					XEv.u[i] = XEv.u[i] * qvol;
+					XEv.v[i] = XEv.v[i] * qvol;
+				}
 			}
 		}
 	}
