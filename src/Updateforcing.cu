@@ -384,8 +384,8 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 	XEv.zs[i] += Rainhh;
 	if (hi > XParam.eps)
 	{
-		XEv.u[i] = XEv.u[i] * qvol;
-		XEv.v[i] = XEv.v[i] * qvol;
+		//XEv.u[i] = XEv.u[i] * qvol;
+		//XEv.v[i] = XEv.v[i] * qvol;
 	}
 }
 template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
