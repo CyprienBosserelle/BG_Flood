@@ -421,6 +421,14 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
 		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xridib);
 
+		//Xbidir is an array that stores block id where n rivers apply
+		//along the row of Xbidir block id is unique. meaning that a block id ith two river injection will appear on two seperate row of Xbidir
+		//The number of column (size of row 1) in xbidir is nburmax = length(uniq(blockwith river injected))
+		//
+
+		//Xridib is an array that stores River id that a river is injected for the corresponding block id in Xbidir
+
+
 		XModel.bndblk.Riverinfo.nribmax = nribmax;
 		XModel.bndblk.Riverinfo.nburmax = nburmax;
 
@@ -434,6 +442,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		}
 		
 		//(n, 10)
+		// 
 		std::vector<int> iriv(nribmax,0);
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
