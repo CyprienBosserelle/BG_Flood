@@ -33,6 +33,14 @@ struct EvolvingP
 	T* v;
 };
 
+template <class T>
+struct EvolvingMLP
+{
+	T* h;
+	T* u;
+	T* v;
+};
+
 //subclass inheriting from EvolvingP for Mean/Max
 template <class T>
 struct EvolvingP_M : public EvolvingP<T>
@@ -212,6 +220,62 @@ struct Model
 
 
 	
+
+};
+
+template <class T>
+struct ModelML
+{
+
+	T* zs; //eta
+	EvolvingMLP<T> evolv;
+	
+
+	GradientsP<T> grad;
+	
+	
+
+	//external forcing
+	T* zb;
+	T* cf;
+	T* il;
+	T* cl;
+
+	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
+	T* hgw;
+
+	// Used for external forcing too
+	// May need a better placeholder
+	T* Patm, * datmpdx, * datmpdy;
+
+	TimeP<T> time;
+
+
+
+	// 
+	std::map<std::string, T*> OutputVarMap;
+	std::map<std::string, std::string> Outvarlongname;
+	std::map<std::string, std::string> Outvarstdname;
+	std::map<std::string, std::string> Outvarunits;
+
+
+	//other output
+	//std::vector< std::vector< Pointout > > TSallout;
+	T* TSstore;//buffer for TS data so not to save to disk too often
+	//T* vort;
+	//T* U;
+	
+	T* wettime; //Inundation duration (h > 0.1)
+
+	//Block information
+	BlockP<T> blocks;
+
+	AdaptP adapt;
+
+	BndblockP bndblk;
+
+
+
 
 };
 
