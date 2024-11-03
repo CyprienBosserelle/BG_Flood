@@ -23,6 +23,8 @@
 * Test 12 Calendar time to second conversion
 * Test 13 Multi bathy and roughness map input
 * Test 14 Test AOI bnds aswall to start with
+* Test 15 Flexible times reading
+
 
 * Test 99 Run all the test with test number < 99.
 
@@ -83,7 +85,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t\tCPU test: " + result);
 			isfailed = (!rivertest || isfailed) ? true : false;
 
-			log(" \t\t\t GPU device= " + XParam.GPUDEVICE);
+			log(" \t\t\t GPU device= " + std::to_string(XParam.GPUDEVICE));
 
 			if (XParam.GPUDEVICE >= 0)
 			{
@@ -93,7 +95,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 				isfailed = (!rivertest || isfailed) ? true : false;
 			}
 
-			rivertest=RiverVolumeAdapt(XParam, T(0.4));
+			rivertest = RiverVolumeAdapt(XParam, T(0.4));
 			result = rivertest ? "successful" : "failed";
 			log("\t\tRiver Volume Adapt: " + result);
 			isfailed = (!rivertest || isfailed) ? true : false;
@@ -240,81 +242,99 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			result = testrainlossesCPU ? "successful" : "failed";
 			log("\n\n\t IL-CL Rain losses test CPU: " + result);
 			isfailed = (!testrainlossesCPU || !testrainlossesGPU || isfailed) ? true : false;
-    }
-    if (mytest == 11)
-	  {
+		}
+		if (mytest == 11)
+		{
 			bool instab;
 			log("\t### Wet/dry Instability test with Conserve Elevation ###");
-			instab=TestInstability(XParam, XModel, XModel_g);
+			instab = TestInstability(XParam, XModel, XModel_g);
 			result = instab ? "successful" : "failed";
 			log("\t\tWet/dry Instability test : " + result);
 		}
-	if (mytest == 12)
-	{
-		/* Test 12 is to test the calendar time to second conversion
-			This test will fail if the system or compiler does not suport long long 
-			 
-		*/
-		bool timetest;
-		timetest = testime1(1) && testime2(2);
-		result = timetest ? "successful" : "failed";
-		log("\t\tCalendar time test : " + result);
-	}
 
-	if (mytest == 13)
-	{
-		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
-			Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
-				The max / min values are check to see if the z/z0 maps are created as expected
-			Test2: A roughness file name is changed to have a number in first position. We check that the 
-				file is read and not the number taken as z0 value.
-			Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
-			Test4 :  Test value input for initial loss / continuous loss
-		*/
-		bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
-		log("\t### Different bathy and different roughness file inputs ###");
-		RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughBathyresult ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
-		RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughInput ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Roughness file name test : " + result + "\n");
-		RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughtInputnumber ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Roughness value input test : " + result + "\n");
-		log("\t\t ##### \n");
-		ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = ILCLInputnumber ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
-		log("\t\t ##### \n");
-		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
+		if (mytest == 12)
+		{
+			/* Test 12 is to test the calendar time to second conversion
+				This test will fail if the system or compiler does not suport long long
 
+			*/
+			bool timetest;
+			timetest = testime1(1) && testime2(2);
+			result = timetest ? "successful" : "failed";
+			log("\t\tCalendar time test : " + result);
+		}
 
-	}
-	if (mytest == 14)
-	{
-		/* Test 14  This test AOI bnds aswall to start with
+		if (mytest == 13)
+		{
+			/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
+				Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
+					The max / min values are check to see if the z/z0 maps are created as expected
+				Test2: A roughness file name is changed to have a number in first position. We check that the
+					file is read and not the number taken as z0 value.
+				Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
+				Test4 :  Test value input for initial loss / continuous loss
+			*/
+			bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
+			log("\t### Different bathy and different roughness file inputs ###");
+			RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughBathyresult ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
+			RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughInput ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Roughness file name test : " + result + "\n");
+			RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughtInputnumber ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Roughness value input test : " + result + "\n");
+			log("\t\t ##### \n");
+			ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = ILCLInputnumber ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
+			log("\t\t ##### \n");
+			isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
+		}
 
-		*/
-		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
-		log("\t###AOI bnd wall test ###");
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tBBox bnd wall test : " + result);
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tAOI bnd wall test : " + result);
-	}
+		if (mytest == 14)
+		{
+			/* Test 14  This test AOI bnds aswall to start with
+
+			*/
+			bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
+			log("\t###AOI bnd wall test ###");
+			wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
+			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
+			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
+			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
+			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+			log("\t\tBBox bnd wall test : " + result);
+			wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
+			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
+			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
+			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
+			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+			log("\t\tAOI bnd wall test : " + result);
+		}
+
+		if (mytest == 15)
+			/* Test 15 is to test the input of flexible times outputs (general and in zone_outputs)
+				Test1: Test of times in second/durations (for general and zone_outputs)
+					The data is read from paramfile and we test the reading and nc files created.
+			*/
+		{
+			bool FlexibleOutTime;
+			log("\t### Tests for flexible time outputs (general and zones outputs) ###");
+			FlexibleOutTime = TestFlexibleOutputTimes(0, 0.0, 0);
+			result = FlexibleOutTime ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Flexible output times reading test : " + result + "\n");
+			log("\t\t ##### \n");
+			isfailed = (!FlexibleOutTime || isfailed) ? true : false;
+
+		}
+
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -326,14 +346,13 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		}
 		if (mytest == 996)
 		{
-			TestHaloSpeed(XParam,XModel,XModel_g);
+			TestHaloSpeed(XParam, XModel, XModel_g);
 		}
 		if (mytest == 997)
 		{
 			TestGradientSpeed(XParam, XModel, XModel_g);
-
 		}
-		
+
 		if (mytest == 998)
 		{
 			//
@@ -341,7 +360,6 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t### CPU vs GPU Test ###");
 			testresults = CPUGPUtest(XParam, XModel, XModel_g);
 			isfailed = (!testresults || isfailed) ? true : false;
-
 			if (testresults)
 			{
 				exit(0);
@@ -600,7 +618,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 				// Theoretical size is 255x255
 				nbx = 256 / 16;
-				
+
 
 				ibx = ftoi(floor(ii / XParam.blkwidth));
 				iby = ftoi(floor(jj / XParam.blkwidth));
@@ -686,7 +704,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx", "twet", "hUmax", "Umean"};
+	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx", "twet", "hUmax", "Umean" };
 	XParam.outvars = outv;
 
 	XParam.outmax = true;
@@ -817,7 +835,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 		//Save2Netcdf(XParam, XLoop, XModel);
 
-		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001))
 		{
 			if (XParam.GPUDEVICE >= 0)
 			{
@@ -1191,7 +1209,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	{
 		char buffer[256]; sprintf(buffer, "%e", abs(reducedt - mininput));
 		std::string str(buffer);
-		log("\t\t CPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt)+ ";  error=" +str);
+		log("\t\t CPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt) + ";  error=" + str);
 	}
 
 	if (XParam.GPUDEVICE >= 0)
@@ -1535,7 +1553,7 @@ template <class T> T ThackerBathy(T x, T y, T L, T D)
 
 /*! \fn
 * \brief	Simulate the Lake-at-rest in a parabolic bassin
-* 
+*
 * This function creates a parabolic bassin filled to a given level and run the modle for a while and checks that the velocities in the lake remain very small
 * thus verifying the well-balancedness of teh engine and the Lake-at-rest condition.
 *
@@ -1545,11 +1563,11 @@ template <class T> T ThackerBathy(T x, T y, T L, T D)
 * Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
 * structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
 */
-template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
+template <class T> bool ThackerLakeAtRest(Param XParam, T zsinit)
 {
 	bool test = true;
 	// Make a Parabolic bathy
-	
+
 	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
 	Model<decltype(modeltype)> XModel; // For CPU pointers
 	Model<decltype(modeltype)> XModel_g; // For GPU pointers
@@ -1605,7 +1623,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 	XParam.zsinit = zsinit;
 	XParam.endtime = 1390.0;
 
-	XParam.outputtimestep = XParam.endtime; 
+	XParam.outputtimestep = XParam.endtime;
 
 	checkparamsanity(XParam, XForcing);
 
@@ -1615,7 +1633,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 
 	InitialAdaptation(XParam, XForcing, XModel);
 
-	
+
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
@@ -1644,7 +1662,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 
 	return test;
 }
-template bool ThackerLakeAtRest<float>(Param XParam,float zsinit);
+template bool ThackerLakeAtRest<float>(Param XParam, float zsinit);
 template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
 
 
@@ -1658,7 +1676,7 @@ template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
 * * flow from fine to coarse
 *
 * and account for different flow direction
-* 
+*
 */
 template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 {
@@ -1673,12 +1691,12 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 	XParam.minlevel = 1;
 	XParam.maxlevel = 1;
 	XParam.initlevel = 1;
-	
-	
-	UnitestA=RiverVolumeAdapt(XParam, maxslope, false, false);
-	UnitestB=RiverVolumeAdapt(XParam, maxslope, true, false);
-	UnitestC=RiverVolumeAdapt(XParam, maxslope, false, true);
-	UnitestD=RiverVolumeAdapt(XParam, maxslope, true, true);
+
+
+	UnitestA = RiverVolumeAdapt(XParam, maxslope, false, false);
+	UnitestB = RiverVolumeAdapt(XParam, maxslope, true, false);
+	UnitestC = RiverVolumeAdapt(XParam, maxslope, false, true);
+	UnitestD = RiverVolumeAdapt(XParam, maxslope, true, true);
 
 	if (UnitestA && UnitestB && UnitestC && UnitestD)
 	{
@@ -1688,7 +1706,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 	{
 		log("River Volume Conservation Test: Uniform mesh: Failed");
 		details = UnitestA ? "successful" : "failed";
-		log("\t Uniform mesh A :"+ details);
+		log("\t Uniform mesh A :" + details);
 		details = UnitestB ? "successful" : "failed";
 		log("\t Uniform mesh B :" + details);
 		details = UnitestC ? "successful" : "failed";
@@ -1808,11 +1826,11 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 		}
 	}
 
-	
+
 
 	// Overrule whatever is set in the river forcing
 	T Q = T(1.0);
-	
+
 	double upstream = !flip ? 24.0 : 8;
 	double riverx = !bottop ? upstream : center;
 	double rivery = !bottop ? center : upstream;
@@ -1845,7 +1863,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 	XParam.dx = XForcing.Bathy[0].dx;
 
-	XParam.zsinit = mintopo+0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
 	XParam.endtime = 20.0;
 
 	XParam.outputtimestep = XParam.endtime;
@@ -1877,7 +1895,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
-	
+
 	T TheoryInput = Q * XParam.endtime;
 
 
@@ -1913,7 +1931,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 * and on all orientations
 *
 */
-template <class T> bool testboundaries(Param XParam,T maxslope)
+template <class T> bool testboundaries(Param XParam, T maxslope)
 {
 	//T maxslope = 0.45; // the mass conservation is better with smaller slopes 
 
@@ -1925,7 +1943,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 	std::string details;
 	int Bound_type;
 
-	
+
 	XParam.GPUDEVICE = 0;
 	maxslope = 0.0;
 	//Dir = 3;
@@ -2032,7 +2050,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 * * flowing to the bottom: Dir=3;
 *
 */
-template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound_type)
+template <class T> bool RiverOnBoundary(Param XParam, T slope, int Dir, int Bound_type)
 {
 	//bool test = true;
 	// Make a Parabolic bathy
@@ -2173,9 +2191,9 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	// Overrule whatever is set in the river forcing
 	T Q = T(1.0);
 
-	double riverx = (Dir == 0 | Dir == 2)? 6.0 : 25.0; //Dir=1 =>leftward
-	double rivery = (Dir == 2 | Dir == 1)? 6.0 : 25.0; //Dir=2 =>topward
-	
+	double riverx = (Dir == 0 | Dir == 2) ? 6.0 : 25.0; //Dir=1 =>leftward
+	double rivery = (Dir == 2 | Dir == 1) ? 6.0 : 25.0; //Dir=2 =>topward
+
 	//Create a temporary file with river fluxes
 	std::ofstream river_file(
 		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
@@ -2274,7 +2292,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 	printf("error : %f \n", error);
 	printf("Theory input : %f \n", TheoryInput);
-	printf("return : %f \n", (error/TheoryInput));
+	printf("return : %f \n", (error / TheoryInput));
 
 
 	return error / TheoryInput < 0.01;
@@ -2304,7 +2322,7 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 
 	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
-	
+
 
 
 
@@ -2379,13 +2397,13 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 
 					printf("Fhu[i]=%f\n", XModel.flux.Fhu[i]);
 
-					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n",XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
+					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n", XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
 
-					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib,ix,iy);
+					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib, ix, iy);
 					testButtingerX(XParam, ib, ix, iy, XModel);
 
-					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix+1, iy);
-					testButtingerX(XParam, ib, ix+1, iy, XModel);
+					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix + 1, iy);
+					testButtingerX(XParam, ib, ix + 1, iy, XModel);
 
 				}
 
@@ -2457,7 +2475,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 	levLB = XModel.blocks.level[LB];
 	RBLB = XModel.blocks.RightBot[LB];
 
-	
+
 	T cm = T(1.0);
 	T fmu = T(1.0);
 
@@ -2537,7 +2555,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 		dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, ul, ur, fh, fu);
 		//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
 
-		
+
 
 		fv = (fh > 0. ? vl : vr) * fh;
 
@@ -2566,7 +2584,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 		sr = ga * (hCNl + hn) * (zn - zCN);
 
 
-		printf("dt=%f; etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n",dt, etar,etal,zCN,zi,zn,zA, zr,zl);
+		printf("dt=%f; etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n", dt, etar, etal, zCN, zi, zn, zA, zr, zl);
 
 
 		printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hCNl=%f; hCNr=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", hi, hn, fh, fu, sl, sr, hCNl, hCNr, hr, hl, zr, zl);
@@ -2816,7 +2834,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
-	TheoryInput = Q/ T(1000.0) / T(3600.0) * XParam.endtime;
+	TheoryInput = Q / T(1000.0) / T(3600.0) * XParam.endtime;
 
 
 	T SimulatedVolume = T(0.0);
@@ -2838,7 +2856,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	T error = abs(SimulatedVolume - TheoryInput);
 
-	T modelgood= error / TheoryInput < 0.05;
+	T modelgood = error / TheoryInput < 0.05;
 
 	//log("#####");
 	return modelgood;
@@ -2850,7 +2868,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 * This function tests the different inputs for rain forcing.
 * This test is based on the paper Aureli2020, the 3 slopes test
 * with regional rain. The experiment has been presented in Iwagaki1955.
-* The first test compares a time varying rain input using a uniform time serie 
+* The first test compares a time varying rain input using a uniform time serie
 * forcing and a time varying 2D field (with same value).
 * The second test check the 3D rain forcing (comparing it to expected values).
 */
@@ -2862,8 +2880,8 @@ bool Raintestinput(int gpu)
 	//int dim_flux;
 	std::vector<float> Flux1D, Flux3DUni, Flux3D, Flux_obs;
 	float diff, ref, error;
-	
-	
+
+
 	//Comparison between the 1D forcing and the 3D hommgeneous forcing
 	Flux1D = Raintestmap(gpu, 1, -0.03);
 	Flux3DUni = Raintestmap(gpu, 31, -0.03);
@@ -2928,7 +2946,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	double* yRain;
 	double* tRain;
 	double* rainForcing;
-	
+
 
 	Param XParam;
 	T delta;
@@ -2937,7 +2955,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XParam.xo = 0;
 	XParam.yo = 0;
 	XParam.ymax = 0.196;
-	XParam.dx=(XParam.ymax - XParam.yo) / (1 << 1);
+	XParam.dx = (XParam.ymax - XParam.yo) / (1 << 1);
 	XParam.delta = XParam.dx;
 	double Xmax_exp = 28.0; //minimum Xmax position (adjust to have a "full blocks" config)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
@@ -3081,7 +3099,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				{
 					for (int i = 0; i < NX; i++)
 					{
-						if (tRain[k] < rainDuration+eps)
+						if (tRain[k] < rainDuration + eps)
 						{
 							if (xRain[i] < 8.0)
 							{
@@ -3141,10 +3159,10 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		}
 		/*
 		//2D forcing (map without time variation is not working)
-		else if (dimf == 2)//dimf==2 for rain forcing 
+		else if (dimf == 2)//dimf==2 for rain forcing
 		{
 
-			//Create a non-uniform time-constant rain forcing 
+			//Create a non-uniform time-constant rain forcing
 			rainForcing = (double*)malloc(sizeof(double) * NY * NX);
 
 			//Create the rain forcing:
@@ -3187,7 +3205,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		XForcing.Rain = readfileinfo("rainTemp.nc", XForcing.Rain);
 		XForcing.Rain.uniform = 0;
 		XForcing.Rain.varname = "myrainforcing";
-		
+
 
 		InitDynforcing(gpgpu, XParam, XForcing.Rain);
 
@@ -3277,7 +3295,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			}
 
 			Save2Netcdf(XParam, XLoop, XModel);
-			
+
 
 			//Calculation of the flux at the bottom of the slope (x=24m)
 			ib = XModel.blocks.active[bl];
@@ -3288,7 +3306,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				int n = memloc(XParam, ixx, iy, ib);
 				finalFlux = finalFlux + XModel.evolv.h[n] * XModel.evolv.u[n] * delta;
 			}
-			finalFlux = finalFlux / float(XParam.ymax - XParam.yo)*100.0f*100.0f;
+			finalFlux = finalFlux / float(XParam.ymax - XParam.yo) * 100.0f * 100.0f;
 			Flux.push_back(finalFlux);
 			XLoop.nextoutputtime = XLoop.nextoutputtime + XParam.outputtimestep;
 			printf("\tTime = %f, Flux at bottom end of slope : %f \n", XLoop.totaltime, finalFlux);
@@ -3317,10 +3335,10 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	log("#####");
 
 	Param XParam;
-	Forcing<float> XForcing; 
+	Forcing<float> XForcing;
 
-	
-	if (nzones  == 3)
+
+	if (nzones == 3)
 	{
 		// read param file
 		//readforcing(XParam, XForcing);
@@ -3332,8 +3350,8 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 		zone.yend = 10;
 		XParam.outzone.push_back(zone);
 		zone.outname = "zoomed.nc";
-		zone.xstart =1;
-		zone.xend =2;
+		zone.xstart = 1;
+		zone.xend = 2;
 		zone.ystart = -2;
 		zone.yend = 2;
 		XParam.outzone.push_back(zone);
@@ -3398,7 +3416,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
-	
+
 	float rs, x, y, r, hm;
 	rs = 20; //hill radio 
 	hm = 5; //hill top
@@ -3411,7 +3429,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 			r = sqrt(x * x + y * y);
 			if (r < rs)
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm*(1-r/rs);
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm * (1 - r / rs);
 			}
 			if (x < -4.7 | x > 4.7 | y < -4.7 | y > 4.7)
 			{
@@ -3422,7 +3440,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 
 	//Adaptation
 	XParam.AdaptCrit = "Targetlevel";
-	
+
 	StaticForcingP<int> Target;
 	XForcing.targetadapt.push_back(Target);
 
@@ -3507,7 +3525,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 	{
 		std::ifstream fs(XModel.blocks.outZone[o].outname);
-		if (fs.fail()) 
+		if (fs.fail())
 		{
 			error++;
 		}
@@ -3522,7 +3540,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 		}
 	}
 
-	bool modelgood = (1-abs(error)) < 0.05;
+	bool modelgood = (1 - abs(error)) < 0.05;
 
 	//log("#####");
 	return modelgood;
@@ -3547,7 +3565,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	double* yLoss;
 	double* ilForcing;
 	double* clForcing;
-	
+
 	log("#####");
 	Param XParam;
 	T initVol, TheoryInput;
@@ -3610,7 +3628,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 
-	
+
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
@@ -3618,7 +3636,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(0.0);
 		}
 	}
-	
+
 
 	// Add wall boundary conditions
 	XForcing.right.type = 0;
@@ -3685,7 +3703,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	}
 
 	XForcing.il = readfileinfo("ilrainlossTempt.nc", XForcing.il);
-    XForcing.il.varname = "initialloss";
+	XForcing.il.varname = "initialloss";
 	XForcing.cl = readfileinfo("clrainlossTempt.nc", XForcing.cl);
 	XForcing.cl.varname = "continuousloss";
 	readstaticforcing(XForcing.il);
@@ -3698,7 +3716,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 
 	//XParam.infiltration = false;
 
-    //// General code
+	//// General code
 	checkparamsanity(XParam, XForcing);
 	//printf("h: %f \n", XModel.evolv.h[10]);
 	InitMesh(XParam, XForcing, XModel);
@@ -3775,7 +3793,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
-	dim3 blockDimX2(XParam.blkwidth + XParam.halowidth*2, XParam.blkwidth + XParam.halowidth * 2, 1);
+	dim3 blockDimX2(XParam.blkwidth + XParam.halowidth * 2, XParam.blkwidth + XParam.halowidth * 2, 1);
 
 
 
@@ -3805,7 +3823,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	cudaEventCreate(&startA);
 
-	
+
 	cudaEventCreate(&stopA);
 
 	// Record the start event
@@ -3872,7 +3890,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	cudaEventDestroy(stopC);
 
 
-	
+
 
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudx, XModel_g.grad.dzbdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudy, XModel_g.grad.dzbdy);
@@ -3896,7 +3914,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	}
 
 	diffArray(XParam, XLoop, XModel.blocks, "SMdx", false, XModel.grad.dzbdx, XModel_g.grad.dzsdx, XModel.time.arrmax, XModel.grad.dzsdx);
-	
+
 
 	diffArray(XParam, XLoop, XModel.blocks, "SMBdx", false, XModel.grad.dzbdx, XModel_g.grad.dhdx, XModel.time.arrmax, XModel.grad.dhdx);
 
@@ -3914,7 +3932,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	maxdiffsmby = T(0.0);
 	T diffsm, diffsmb;
 
-	
+
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -3934,7 +3952,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 				maxdiffx = max(maxdiffx, diffsm);
 
 				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dzsdx[i]);
-				
+
 				maxdiffsmx = max(maxdiffsmx, diffsm);
 
 				diffsm = abs(XModel.grad.dzbdy[i] - XModel.grad.dzsdy[i]);
@@ -3944,14 +3962,14 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dhdx[i]);
 				maxdiffsmbx = max(maxdiffsmbx, diffsm);
 
-				diffsm =  abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]);
+				diffsm = abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]);
 				maxdiffsmby = max(maxdiffsmby, diffsm);
 				//
 			}
 		}
 	}
 
-	
+
 	printf("max error : normx=%e, normy=%e, smx=%e, smy=%e,  smbx=%e, smby=%e in m\n", maxdiffx, maxdiffy, maxdiffsmx, maxdiffsmy, maxdiffsmbx, maxdiffsmby);
 
 
@@ -4008,7 +4026,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	CompareCPUvsGPU(XParam, XModel, XModel_g, { "dhdx","dhdy", "dzsdx","dzsdy","dudx","dudy","dvdx","dvdy" }, true);
 
 	printf("Runtime : old gradient=%f, new Gradient=%f in msec\n", msecTotalG, msecTotalGnew);
-	
+
 	return fastest;
 
 }
@@ -4070,7 +4088,7 @@ template <class T> bool TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XM
 
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
-	
+
 
 
 	// Copy zs from CPU to GPU ... again
@@ -4186,7 +4204,7 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 	// Run first full step (i.e. 2 half steps)
 
 	Loop<T> XLoop = InitLoop(XParam, XModel);
-	
+
 	//FlowCPU(XParam, XLoop, XForcing, XModel);
 	HalfStepCPU(XParam, XLoop, XForcing, XModel);
 
@@ -4232,7 +4250,7 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 
 //TestMultiBathyRough(int gpu, T ref, int scenario)
-/*! \fn 
+/*! \fn
 *
 * This function creates bathy and roughtness files and tests their reading (and interpolation)
 * The objectif is particularly to test multi bathy/roughness inputs and value/file input.
@@ -4276,7 +4294,7 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 		}
 	}
 	create2dnc("Z0_map.nc", NX, NY, xz, yz, map, "z");
-	
+
 	//Creation of a smaller Bathy file
 
 	//xz = (double*)malloc(sizeof(double) * NX);
@@ -4413,7 +4431,7 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	Readparamfile(XParam, XForcing, "BG_param_test13.txt"); // "BG_param_test13.txt");
 
 	//readforcing
-    readforcing(XParam, XForcing);
+	readforcing(XParam, XForcing);
 
 	checkparamsanity(XParam, XForcing);
 
@@ -4432,10 +4450,10 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 
 	//if XModel.cf[0]
 	//	XModel.zb
-	
-	T maxz = T(-1.0)*std::numeric_limits<float>::max();
+
+	T maxz = T(-1.0) * std::numeric_limits<float>::max();
 	T minz = std::numeric_limits<float>::max();
-	T maxr = T(-1.0)*std::numeric_limits<float>::max();
+	T maxr = T(-1.0) * std::numeric_limits<float>::max();
 	T minr = std::numeric_limits<float>::max();
 
 
@@ -4461,7 +4479,7 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	bool result = false;
 	eps = 0.0000001;
 
-	if ((abs(maxz - Z1)<eps) && (abs(maxr - R1)<eps) && (abs(minz - Z0)<eps) && (abs(minr - R0)<eps))
+	if ((abs(maxz - Z1) < eps) && (abs(maxr - R1) < eps) && (abs(minz - Z0) < eps) && (abs(minr - R0) < eps))
 	{
 		result = true;
 	}
@@ -4506,15 +4524,134 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 			result = true;
 		}
 	}
-	
+
 	return result;
 }
 
 
 
+//TestFlexibleOutputTimes(int gpu, T ref, int scenario)
+/*! \fn
+*
+* This function creates a case set-up with a param file, read it.
+* It tests the reading and default values used for times outputs.
+* It checks the vectors for time outputs.
+*
+*/
+template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
+{
+	T Z0 = ref + 0.0;
+	T Z1 = ref + 2.0;
+	T eps;
+	int NX = 21;
+	int NY = 21;
+	double* xz;
+	double* yz;
+	double* map;
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+	char* name_file_R1;
+
+
+	//Creation of a Bathy file
+
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = Z0; //+ (yz[j] + 1) * 0.5;
+		}
+	}
+	create2dnc("Z0_map.nc", NX, NY, xz, yz, map, "z");
+
+
+	// Creation of BG_param_test13.txt file
+	std::ofstream param_file(
+		"BG_param_test15.txt", std::ios_base::out | std::ios_base::trunc);
+	//Add Bathymetries to the file
+	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
+
+	//Add endtime and outputvar
+	param_file << "endtime = 11.0 ;" << std::endl;
+	param_file << "reftime = 2020-01-01T00:00:00 ;" << std::endl;
+	param_file << "outvars = zs,h,u,v,zb;" << std::endl;
+	param_file << "dx = 0.05;" << std::endl;
+	param_file << "zsinit = 0.1;" << std::endl;
+	param_file << "smallnc = 0;" << std::endl;
+	param_file << "doubleprecision = 1;" << std::endl;
+	param_file << "Toutput = 1|2|5, 2020-01-01T00:00:08,  9.5;" << std::endl;
+	param_file << "outzone = Test15_zoom1.nc,0.2,0.6,-0.2,0.2, 2020-01-01T00:00:02|0.008min|2020-01-01T00:00:03, 5.6,6.9;" << std::endl;
+	param_file << "outzone = Test15_zoom2.nc,0.2,0.6,-0.2,0.2, 8.1|0.7|, 5.6;" << std::endl;
+	param_file << "outzone = Test15_zoom3.nc,0.2,0.6,-0.2,0.2, |0.8|2;" << std::endl;
+	param_file << "outzone = Test15_zoom4.nc,0.2,0.6,-0.2,0.2, 8.2||9;" << std::endl; // Here the step in not given so assumed infinite
+	param_file << "outzone = Test15_zoom5.nc,0.2,0.6,-0.2,0.2;" << std::endl;
+	param_file.close();
+
+	//read param file
+	Readparamfile(XParam, XForcing, "BG_param_test15.txt"); // "BG_param_test13.txt");
+
+	//readforcing
+	readforcing(XParam, XForcing);
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	//Loop<T> XLoop = InitLoop(XParam, XModel);
+	//MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	//TEST 1: reading and default values check:
+	bool result = false;
+
+	if (XModel.OutputT.size()==20)
+	{
+		result = true;
+	}
+
+	/*
+	if (!XParam.Toutput.end == 11.0)
+		result = false;
+	if (!XParam.Toutput.val[1] == 9.5)
+		result = false;
+	
+	if (!XParam.outzone[2].Toutput.init == 0.0)
+		result = false;
+	if (!XParam.outzone[3].Toutput.tstep == 11.0)
+		result = false;
+	if (!XParam.outzone[4].Toutput.tstep == 1.0)
+		result = false;
+		*/
+
+	
+
+	return result;
+}
+
+
+
+
+
+
 template <class T> void TestFirsthalfstep(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	
+
 	// Setup Model(s)
 
 	XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy", "dzbdx", "dzbdy" };
@@ -4570,7 +4707,7 @@ template <class T> void TestFirsthalfstep(Param XParam, Forcing<float> XForcing,
 	bool test = false;
 
 	//test = true;
-	
+
 	InitSave2Netcdf(XParam, XModel);
 
 }
@@ -4597,14 +4734,14 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
-	
+
 	//FlowCPU(XParam, XLoop, XForcing, XModel);
 	//HalfStepCPU(XParam, XLoop, XForcing, XModel);
 	if (XParam.conserveElevation)
 	{
 		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	}
-	
+
 	//HalfStepGPU(XParam, XLoop, XForcing, XModel_g);
 
 	if (XParam.conserveElevation)
@@ -4643,12 +4780,12 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 
 	//InitSave2Netcdf(XParam, XModel);
 
-	
+
 
 }
 
 
-template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop,bool flip, bool withaoi)
+template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop, bool flip, bool withaoi)
 {
 	Forcing<float> XForcing;
 
@@ -4684,16 +4821,16 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	XParam.aoibnd = 0;
 
 	XParam.outputtimestep = XParam.endtime;
-	
+
 	std::ofstream aoi_file(
 		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
 	aoi_file << "5.0 3.0" << std::endl;
 	aoi_file << "27.0 3.0" << std::endl;
-	aoi_file << "27.0 27.0"<< std::endl;
+	aoi_file << "27.0 27.0" << std::endl;
 	aoi_file << "5.0 27.0" << std::endl;
 	aoi_file << "5.0 3.0" << std::endl;
 	aoi_file.close(); //destructor implicitly does it
-	
+
 	/*
 	std::ofstream aoi_file(
 		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
@@ -4705,7 +4842,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	aoi_file.close(); //destructor implicitly does it
 	*/
 	if (withaoi)
-	{	
+	{
 		XForcing.AOI.file = "testaoi.tmp";
 		XForcing.AOI.active = true;
 		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
@@ -4738,7 +4875,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	XParam.Adapt_arg1 = "";
 	XParam.Adapt_arg2 = "";
 	XParam.Adapt_arg3 = "";
-	
+
 	StaticForcingP<int> targetlevel;
 	XForcing.targetadapt.push_back(targetlevel);
 
@@ -4778,7 +4915,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	thisriver.xstart = 10;
 	thisriver.xend = 12;
 	thisriver.ystart = 10;
-	thisriver.yend =12;
+	thisriver.yend = 12;
 
 	XForcing.rivers.push_back(thisriver);
 
@@ -4816,7 +4953,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
 	T TheoryInput = Q * XParam.endtime;
-	
+
 
 	T SimulatedVolume = T(0.0);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -4829,7 +4966,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 			{
 				int i = memloc(XParam, ix, iy, ib);
 				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
-				
+
 			}
 		}
 	}
@@ -4840,7 +4977,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 
 	int modelgood = error / TheoryInput < 0.001;
 
-	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput)*100);
+	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput) * 100);
 
 	//log("#####");
 	return modelgood;
@@ -4990,7 +5127,7 @@ void alloc_init2Darray(float** arr, int NX, int NY)
 }
 
 /*! \fn void init3Darray(float*** arr, int rows, int cols, int depths)
-* This function fill a 3D array with zero values 
+* This function fill a 3D array with zero values
 *
 *
 */
@@ -5010,7 +5147,7 @@ void init3Darray(float*** arr, int rows, int cols, int depths)
 /*! \fn void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
 * This function fill an array with random values (0 - 1)
 *
-* 
+*
 */
 template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
 {
@@ -5034,7 +5171,7 @@ template void fillrandom<double>(Param XParam, BlockP<double> XBlock, double* z)
 
 /*! \fn void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
 * This function fill an array with a gaussian bump
-* 
+*
 * borrowed/adapted from Basilisk test (?)
 */
 template <class T> void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
@@ -5216,7 +5353,7 @@ template void copyBlockinfo2var<double>(Param XParam, BlockP<double> XBlock, int
 * This function compares the Valiables in a CPU model and a GPU models
 * This function is quite useful when checking both are identical enough
 * one needs to provide a list (vector<string>) of variable to check
-* 
+*
 */
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo)
 {
@@ -5315,7 +5452,7 @@ template <class T> void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* outp
 }
 
 /*! \fn void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* Su, T* output)
-* This function Calculate The source term of the equation. 
+* This function Calculate The source term of the equation.
 * This function is quite useful when checking for Lake-at-Rest states
 * This function requires an outputCPU pointers to save the result of teh calculation
 */

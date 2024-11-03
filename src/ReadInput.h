@@ -8,6 +8,7 @@
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "utctime.h"
+#include "Input.h"
 #include "ReadForcing.h"
 
 
@@ -21,19 +22,29 @@ Param readparamstr(std::string line, Param param);
 
 template <class T>Forcing<T> readparamstr(std::string line, Forcing<T> forcing);
 void checkparamsanity(Param& XParam, Forcing<float>& XForcing);
-double setendtime(Param XParam,Forcing<float> XForcing);
+double setendtime(Param XParam, Forcing<float> XForcing);
 std::string findparameter(std::vector<std::string> parameterstr, std::string line);
 std::string findparameter(std::string parameterstr, std::string line);
-void split(const std::string &s, char delim, std::vector<std::string> &elems);
-std::vector<std::string> split(const std::string &s, char delim);
+void split(const std::string& s, char delim, std::vector<std::string>& elems);
+std::vector<std::string> split(const std::string& s, char delim);
+void split_full(const std::string& s, char delim, std::vector<std::string>& elems);
+std::vector<std::string> split_full(const std::string& s, char delim);
 std::vector<std::string> split(const std::string s, const std::string delim);
 std::string trim(const std::string& str, const std::string& whitespace);
 std::size_t case_insensitive_compare(std::string s1, std::string s2);
 std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> vecstr);
 bool readparambool(std::string paramstr, bool defaultval);
+void InitialiseToutput(T_output& Toutput, Param XParam);
 bndsegment readbndline(std::string parametervalue);
-
 bndsegment readbndlineside(std::string parametervalue, std::string side);
+
+//T_output ReadToutput(std::vector<std::string> paramstr, Param XParam);
+std::vector<double> ReadToutput(std::vector<std::string> paramstr, Param XParam);
+
+std::vector<std::string> ReadToutSTR(std::string paramstr);
+double ReadTvalstr(std::string timestr, double start, double end, std::string reftime);
+std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start, double end, std::string reftime);
+double readApproxtimestr(std::string input);
 
 //inline bool fileexists(const std::string& name);
 
