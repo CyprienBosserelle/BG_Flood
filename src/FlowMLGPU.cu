@@ -9,8 +9,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	//Calculate barotropic acceleration
 
 	// Compute face value
-
-	
+		
 	// Acceleration
 	
 	// Pressure

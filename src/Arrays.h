@@ -23,6 +23,20 @@ struct GradientsP
 	T* dzbdy;
 };
 
+template <class T>
+struct GradientsMLP
+{
+	
+	T* dhdx;
+	T* dudx;
+	T* dvdx;
+
+	
+	T* dhdy;
+	T* dudy;
+	T* dvdy;
+};
+
 
 template <class T>
 struct EvolvingP
@@ -231,7 +245,9 @@ struct ModelML
 	EvolvingMLP<T> evolv;
 	
 
-	GradientsP<T> grad;
+	GradientsMLP<T> grad;
+	
+	//T*dzsdx,*dzsdy;
 	
 	
 
