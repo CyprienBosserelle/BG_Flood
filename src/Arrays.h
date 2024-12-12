@@ -73,6 +73,17 @@ struct FluxP
 };
 
 template <class T>
+struct FluxMLP
+{
+	//
+	T* hu, * hv;
+	T* hfu, * hfv;
+	T* hau, * hav;
+	T* Fu, * Fv;
+
+};
+
+template <class T>
 struct AdvanceP
 {
 	T* dh;

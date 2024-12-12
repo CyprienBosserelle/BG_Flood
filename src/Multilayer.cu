@@ -180,6 +180,11 @@ template <class T> __global__ void AdvecMLU(Param XParam, BlockP<T> XBlock, Evol
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+
+
 	//For each layer
 	{
 		T un = dt * XFlux.hu[i] / ((XFlux.hfu[i] + dry) * delta);
@@ -217,4 +222,67 @@ template <class T> __global__ void AdvecMLU(Param XParam, BlockP<T> XBlock, Evol
 		XFlux.Fv[i] = sv2 * XFlux.hv[i];
 
 	}
+}
+
+template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+	T dry = eps;
+	T delta = calcres(T(XParam.delta), lev);
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+	int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+	int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T fmu = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+	T fmup = T(1.0);
+	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
+
+	T cmdinv, ga;
+
+	cmdinv = T(1.0) / (cm * delta);
+	ga = T(0.5) * g;
+
+	//For each layer
+	{
+
+		T uui = XEv.u[i];
+		T vvi = XEv.v[i]
+		//
+		XFlux.dh[i] += dt * (XFlux.hau[i]+XFlux.hav[i]);
+		
+		uui += dt * (XFlux.hau[i] + XFlux.hau[iright])/(XFlux.hfu[i]+XFlux.hfu[iright]+dry);
+		vvi += dt * (XFlux.hav[i] + XFlux.hav[itop]) / (XFlux.hfv[i] + XFlux.hfv[itop] + dry);
+
+		T dmdl = (fmup - fmu) * cmdinv;// absurd if not spherical!
+		T dmdt = (fmvp - fmv) * cmdinv;
+		T fG = vvi * dmdl - uui * dmdt;
+
+		uui += dt * fG * vvi;
+		vvi -= dt * fG * uui;
+
+		XEv.u[i] = uui;
+		XEv.v[i] = vvi;
+	}
+	
+
+
 }
