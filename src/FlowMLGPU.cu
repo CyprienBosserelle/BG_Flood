@@ -17,16 +17,24 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Set max timestep
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XLoop.hugeposval, XModel.time.dtmax);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XLoop.hugeposval, XModel.time.dtmax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	//Calculate barotropic acceleration
-
 	// Compute face value
-		
-	// Acceleration
+	CalcfaceValX << < gridDim, blockDim, 0 >> > (XLoop.dt, XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CalcfaceValY << < gridDim, blockDim, 0 >> > (XLoop.dt, XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Timestep reduction
+	XLoop.dt = double(CalctimestepGPU(XParam, XLoop, XModel.blocks, XModel.time));
+	XLoop.dtmax = XLoop.dt;
 	
+	// Acceleration
 	// Pressure
+	pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Advection
 
