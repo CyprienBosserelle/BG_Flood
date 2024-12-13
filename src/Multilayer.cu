@@ -8,7 +8,7 @@
 //	a_baro[i] (G*gmetric*(eta[i-1] - eta[i])/Delta)
 //}
 
-template <class T> __global__ void CalcfaceVal(T pdt,Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax,T* zb)
+template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax,T* zb)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -65,8 +65,8 @@ template <class T> __global__ void CalcfaceVal(T pdt,Param XParam, BlockP<T> XBl
 		
 		
 		//XFlux.hu[i] = hl > 0. || hr > 0. ? (hl * XEv.u[ileft] + hr * XEvu[i]) / (hl + hr) : 0.;
-		T hui = hl > 0. || hr > 0. ? (hl * XEv.u[ileft] + hr * XEvu[i]) / (hl + hr) : 0.;
-
+		T hui = hl > 0. || hr > 0. ? (hl * XEv.u[ileft] + hr * XEv.u[i]) / (hl + hr) : 0.;
+		
 		T hff;
 
 		if (Hl <= dry)
@@ -96,7 +96,7 @@ template <class T> __global__ void CalcfaceVal(T pdt,Param XParam, BlockP<T> XBl
 	if (H > dry) {
 		T c = um / CFL + sqrt(g*H) / CFL_H;//um / CFL + sqrt(g * (hydrostatic ? H : delta * tanh(H / delta))) / CFL_H;
 		if (c > 0.) {
-			double dtmax[i] = delta / (c * fmu);
+			double dtmax[i] = min(delta / (c * fmu),dtmax[i]);
 			//if (dt < dtmax)
 			//	dtmax = dt;
 		}
@@ -104,7 +104,103 @@ template <class T> __global__ void CalcfaceVal(T pdt,Param XParam, BlockP<T> XBl
 	//pdt = dt = dtnext(dtmax);
 }
 
-template <class T> __global__ void CheckadvecMLU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
+template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+	T dry = eps;
+	T delta = calcres(T(XParam.delta), lev);
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+
+	T CFL_H = T(0.5);
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int ibot = memloc(halowidth, blkmemwidth, ix, iy-1, ib);
+
+	T zsi = XEv.zs[i];
+
+	T zsn = XEv.zs[ibot];
+
+	T zbi = zb[i];
+	T zbn = zb[ibot];
+
+
+	T fmu = T(1.0);
+	T cm = T(1.0);//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T gmetric = T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
+
+	T ax = (G * gmetric * (zsn - zsi) / delta);
+
+	T H = 0.;
+	T um = 0.;
+	T Hr = 0.;
+	T Hl = 0.;
+
+
+	//foreach_layer() {
+	{
+		T hi = XEv.h[i];
+		T hn = XEv.h[ibot];
+		Hr += hi;
+		Hl += hn;
+		T hl = hn > dry ? hn : 0.;
+		T hr = hi > dry ? hi : 0.;
+
+
+
+		//XFlux.hu[i] = hl > 0. || hr > 0. ? (hl * XEv.u[ileft] + hr * XEvu[i]) / (hl + hr) : 0.;
+		T hvi = hl > 0. || hr > 0. ? (hl * XEv.v[ibot] + hr * XEv.v[i]) / (hl + hr) : 0.;
+
+		T hff;
+
+		if (Hl <= dry)
+			hff = fmax(fmin(zbi + Hr - zbi, hi), 0.);
+		else if (Hr <= dry)
+			hff = fmax(fmin(zbn + Hl - zbi, hn), 0.);
+		else
+		{
+			T vn = pdt * (hvi + pdt * ax) / delta;
+			auto a = sign(vn);
+			int iu = vn >= 0.0 ? ibot : i;// -(a + 1.) / 2.;
+			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
+
+			hff = h[iu] + a * (1. - a * vn) * dhdy[iu] * delta / 2.;
+		}
+		XFlux.hfv[i] = fmu * hff;
+
+		if (fabs(hvi) > um)
+			um = fabs(hvi);
+
+		XFlux.hv[i] *= XFlux.hfv[i];
+		XFlux.hav[i] = XFlux.hfv[i] * ax;
+
+		H += hff;
+	}
+
+	if (H > dry) {
+		T c = um / CFL + sqrt(g * H) / CFL_H;//um / CFL + sqrt(g * (hydrostatic ? H : delta * tanh(H / delta))) / CFL_H;
+		if (c > 0.) {
+			double dtmax[i] = min(delta / (c * fmu), dtmax[i]);
+			//if (dt < dtmax)
+			//	dtmax = dt;
+		}
+	}
+	//pdt = dt = dtnext(dtmax);
+}
+
+template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -159,6 +255,62 @@ template <class T> __global__ void CheckadvecMLU(Param XParam, BlockP<T> XBlock,
 
 
 }
+template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+	T dry = eps;
+	T delta = calcres(T(XParam.delta), lev);
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+
+	T CFL_H = T(0.5);
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int ibot = memloc(halowidth, blkmemwidth, ix, iy-1, ib);
+
+	//For each layer
+	{
+		T hvl = XFlux.hv[i];
+		T hi = XEv.h[i];
+		T hn = XEv.h[ibot];
+
+		T cmn = T(1.0);//cm[-1]
+		T cmi = T(1.0);//cm[]
+
+		if (hvl * dt / (delta * cmn) > CFL * hn)
+		{
+			hvl = CFL * hn * delta * cmn / dt;
+		}
+		else if (-hvl * dt / (delta * cm) > CFL * hi)
+		{
+			hvl = -CFL * hn * delta * cm / dt;
+		}
+
+		if (hvl != XFlux.hv[i])
+		{
+			/*if (l < nl - 1)
+			{
+				hu.x[0, 0, 1] += hu.x[] - hul;
+			}*/
+			XFlux.hv[i] = hvl;
+		}
+	}
+
+
+}
+
 
 template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
@@ -347,3 +499,7 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock, Ev
 }
 
 
+template <class T> __global__ void CleanupML()
+{
+
+}
