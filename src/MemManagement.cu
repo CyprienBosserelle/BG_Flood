@@ -101,11 +101,17 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	AllocateCPU(nblk, blksize, XModel.grad.dzbdx);
 	AllocateCPU(nblk, blksize, XModel.grad.dzbdy);
+	if (XParam.engine==5)
+	{
+		AllocateCPU(nblk, blksize, XModel.fluxml.Fu, XModel.fluxml.Fv, XModel.fluxml.hau, XModel.fluxml.hav);
+		AllocateCPU(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+	}
+	else
+	{
+		AllocateCPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
-	AllocateCPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
-
-	AllocateCPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
-
+		AllocateCPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+	}
 	AllocateCPU(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
 
 	AllocateCPU(nblk, blksize, XModel.cf, XModel.time.arrmax, XModel.time.arrmin, XModel.time.dtmax);
@@ -421,10 +427,17 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateGPU(nblk, blksize, XModel.evolv_o);
 
 	AllocateGPU(nblk, blksize, XModel.grad);
-	AllocateGPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
+	if (XParam.engine == 5)
+	{
+		AllocateGPU(nblk, blksize, XModel.fluxml.Fu, XModel.fluxml.Fv, XModel.fluxml.hau, XModel.fluxml.hav);
+		AllocateGPU(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+	}
+	else
+	{
+		AllocateGPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
-	AllocateGPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
-
+		AllocateGPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+	}
 	AllocateGPU(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
 
 	AllocateGPU(nblk, blksize, XModel.cf, XModel.time.arrmax, XModel.time.arrmin, XModel.time.dtmax);
