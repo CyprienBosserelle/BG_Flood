@@ -21,10 +21,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Compute face value
-	CalcfaceValX << < gridDim, blockDim, 0 >> > (XLoop.dt, XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	CalcfaceValX << < gridDim, blockDim, 0 >> > (XLoop.dt, XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	CalcfaceValY << < gridDim, blockDim, 0 >> > (XLoop.dt, XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+	CalcfaceValY << < gridDim, blockDim, 0 >> > (XLoop.dt, XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Timestep reduction
@@ -32,24 +32,24 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	XLoop.dtmax = XLoop.dt;
 
 	// Check hu/hv
-	CheckadvecMLY << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.flux);
+	CheckadvecMLY << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	CheckadvecMLX << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.flux);
+	CheckadvecMLX << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
 	
 	// Acceleration
 	// Pressure
-	pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.flux);
+	pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Advection
-	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.flux);
+	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	AdvecEv << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.flux);
+	AdvecEv << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XLoop.dt, XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }

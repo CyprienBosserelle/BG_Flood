@@ -45,7 +45,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	T cm = T(1.0);//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T gmetric = T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
 
-	T ax = (G * gmetric * (zsn - zsi) / delta);
+	T ax = (g * gmetric * (zsn - zsi) / delta);
 
 	T H = 0.;
 	T um = 0.;
@@ -80,7 +80,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 			int iu = un >= 0.0 ? ileft : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
 			
-			hff = h[iu] + a * (1. - a * un) * dhdx[iu] * delta / 2.;
+			hff = XEv.h[iu] + a * (1. - a * un) * XGrad.dhdx[iu] * delta / 2.;
 		}
 		XFlux.hfu[i] = fmu * hff;
 
@@ -96,7 +96,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	if (H > dry) {
 		T c = um / CFL + sqrt(g*H) / CFL_H;//um / CFL + sqrt(g * (hydrostatic ? H : delta * tanh(H / delta))) / CFL_H;
 		if (c > 0.) {
-			double dtmax[i] = min(delta / (c * fmu),dtmax[i]);
+			dtmax[i] = min(delta / (c * fmu),dtmax[i]);
 			//if (dt < dtmax)
 			//	dtmax = dt;
 		}
@@ -141,7 +141,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	T cm = T(1.0);//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T gmetric = T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
 
-	T ax = (G * gmetric * (zsn - zsi) / delta);
+	T ax = (g * gmetric * (zsn - zsi) / delta);
 
 	T H = 0.;
 	T um = 0.;
@@ -176,7 +176,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 			int iu = vn >= 0.0 ? ibot : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
 
-			hff = h[iu] + a * (1. - a * vn) * dhdy[iu] * delta / 2.;
+			hff = XEv.h[iu] + a * (1. - a * vn) * XGrad.dhdy[iu] * delta / 2.;
 		}
 		XFlux.hfv[i] = fmu * hff;
 
@@ -192,7 +192,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	if (H > dry) {
 		T c = um / CFL + sqrt(g * H) / CFL_H;//um / CFL + sqrt(g * (hydrostatic ? H : delta * tanh(H / delta))) / CFL_H;
 		if (c > 0.) {
-			double dtmax[i] = min(delta / (c * fmu), dtmax[i]);
+			dtmax[i] = min(delta / (c * fmu), dtmax[i]);
 			//if (dt < dtmax)
 			//	dtmax = dt;
 		}
@@ -234,13 +234,13 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 		T cmn = T(1.0);//cm[-1]
 		T cmi = T(1.0);//cm[]
 
-		if (hul * dt / (Delta * cmn) > CFL * hn)
+		if (hul * dt / (delta * cmn) > CFL * hn)
 		{
-			hul = CFL * hn * Delta * cmn / dt;
+			hul = CFL * hn * delta * cmn / dt;
 		}
-		else if (-hul * dt / (Delta * cm) > CFL * hi)
+		else if (-hul * dt / (delta * cmi) > CFL * hi)
 		{
-			hul = -CFL * hn * Delta * cm / dt;
+			hul = -CFL * hn * delta * cmi / dt;
 		}
 
 		if (hul != XFlux.hu[i])
@@ -344,8 +344,8 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		auto au = sign(un);
 		auto av = sign(vn);
 
-		int ixshft = un >= 0.0 ? -1, 0;
-		int iyshft = vn >= 0.0 ? -1, 0;
+		int ixshft = un >= 0.0 ? -1: 0;
+		int iyshft = vn >= 0.0 ? -1: 0;
 		//int iu = un >= 0.0 ? ileft : i;//-(a + 1.) / 2.;
 		int iu = memloc(halowidth, blkmemwidth, ix + ixshft, iy, ib);
 		int iut = memloc(halowidth, blkmemwidth, ix + ixshft, iy + 1, ib);
@@ -353,20 +353,20 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 
 		int iv = memloc(halowidth, blkmemwidth, ix, iy + iyshft, ib);
 		int ivr = memloc(halowidth, blkmemwidth, ix +1, iy + iyshft, ib);
-		int iul = memloc(halowidth, blkmemwidth, ix -1, iy + iyshft, ib);
+		int ivl = memloc(halowidth, blkmemwidth, ix -1, iy + iyshft, ib);
 
-		T su2 = XEv.u[iu] + au * (1. - au * un) * dudx[iu] * delta / 2.0;
-		T sv2 = XEv.v[iv] + av * (1. - av * vn) * dvdy[iv] * delta / 2.0;
+		T su2 = XEv.u[iu] + au * (1. - au * un) * XGrad.dudx[iu] * delta / 2.0;
+		T sv2 = XEv.v[iv] + av * (1. - av * vn) * XGrad.dvdy[iv] * delta / 2.0;
 		if (XFlux.hfv[iu] + XFlux.hfv[iut] > dry)
 		{
 			T vvn = (XFlux.hv[iu] + XFlux.hv[iut]) / (XFlux.hfv[iu] + XFlux.hfv[iut]);
-			T syy = dudy[iu] != 0.0 ? dudy[iu] : vn < 0.0 ? XEv.u[iut] - XEv.u[iu] : XEv.u[iu] - XEv.u[iub];
+			T syy = XGrad.dudy[iu] != 0.0 ? XGrad.dudy[iu] : vn < 0.0 ? XEv.u[iut] - XEv.u[iu] : XEv.u[iu] - XEv.u[iub];
 			su2 -= dt * vvn * syy / (2. * delta);
 		}
 		if (XFlux.hfu[iv] + XFlux.hfv[ivr] > dry)
 		{
 			T uun = (XFlux.hv[iv] + XFlux.hv[ivr]) / (XFlux.hfv[iv] + XFlux.hfv[ivr]);
-			T syy = dvdx[iv] != 0.0 ? dvdx[iv] : uun < 0.0 ? XEv.v[ivr] - XEv.v[iv] : XEv.v[iv] - XEv.v[ivl];
+			T syy = XGrad.dvdx[iv] != 0.0 ? XGrad.dvdx[iv] : uun < 0.0 ? XEv.v[ivr] - XEv.v[iv] : XEv.v[iv] - XEv.v[ivl];
 			sv2 -= dt * uun * syy / (2. * delta);
 		}
 
@@ -407,15 +407,18 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 		T vvi = XEv.v[i];
 		T hi = XEv.h[i];
 
-		uui *= hhi;
-		vvi *= hhi;
+		uui *= hi;
+		vvi *= hi;
 
-		uui += dt * (Flux.Fu[i] - Flux.Fu[iright]) / (delta * cmu);
-		vvi += dt * (Flux.Fv[i] - Flux.Fv[itop]) / (delta * cmv);
+		T cmu = T(1.0);
+		T cmv = T(0.0);
 
-		T h1 = hhi;
-		h1 += dt * (XFlux.hu[i] - XFlux.hu[iright) / (delta * cmu);
-		h1 += dt * (XFlux.hv[i] - XFlux.hv[itop) / (delta * cmv);
+		uui += dt * (XFlux.Fu[i] - XFlux.Fu[iright]) / (delta * cmu);
+		vvi += dt * (XFlux.Fv[i] - XFlux.Fv[itop]) / (delta * cmv);
+
+		T h1 = hi;
+		h1 += dt * (XFlux.hu[i] - XFlux.hu[iright]) / (delta * cmu);
+		h1 += dt * (XFlux.hv[i] - XFlux.hv[itop]) / (delta * cmv);
 
 		XEv.h[i] = max(h1, T(0.0));
 
@@ -461,11 +464,11 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 	int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 	int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
-	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T cm = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
-	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+	T fmv = T(1.0);// XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
 	T fmup = T(1.0);
-	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
+	T fmvp = T(1.0);// XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
 
 	T cmdinv, ga;
 

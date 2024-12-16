@@ -8,6 +8,15 @@
 #include "MemManagement.h"
 #include "Spherical.h"
 
+template <class T> __global__ void CalcfaceValX(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb);
+template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb);
+
+template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
+template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
+template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
+template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
+template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
+
 
 // End of global definition
 #endif

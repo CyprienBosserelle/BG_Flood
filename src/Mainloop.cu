@@ -35,6 +35,10 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
+		if (XParam.engine == 5)
+		{
+			FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+		}
 				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;

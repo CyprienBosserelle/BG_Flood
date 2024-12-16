@@ -7,14 +7,9 @@
 #include "Forcing.h"
 #include "Util_CPU.h"
 #include "MemManagement.h"
-#include "Gradients.h"
-#include "Kurganov.h"
-#include "Advection.h"
-#include "Friction.h"
-#include "Updateforcing.h"
-#include "Reimann.h"
-#include "Boundary.h"
+#include "Multilayer.h"
 
+template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel);
 
 
 // End of global definition
