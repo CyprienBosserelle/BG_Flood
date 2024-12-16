@@ -315,6 +315,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
 		log("\t\tAOI bnd wall test : " + result);
 	}
+	if (mytest == 900)
+	{
+		GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+	}
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -381,6 +385,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	T x, y, delta;
 	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
 
+	//XParam.engine = 2;
 
 	T a = T(1.0); //Gaussian wave amplitude
 
@@ -548,7 +553,14 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+			if (XParam.engine == 5)
+			{
+				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+			}
+			else
+			{
+				FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+			}
 			XLoop.dt = XLoop_g.dt;
 		}
 		else

@@ -426,7 +426,7 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 		vvi *= hi;
 
 		T cmu = T(1.0);
-		T cmv = T(0.0);
+		T cmv = T(1.0);
 
 		uui += dt * (XFlux.Fu[i] - XFlux.Fu[iright]) / (delta * cmu);
 		vvi += dt * (XFlux.Fv[i] - XFlux.Fv[itop]) / (delta * cmv);

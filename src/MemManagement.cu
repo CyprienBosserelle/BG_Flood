@@ -298,10 +298,17 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	ReallocArray(nblk, blksize, XModel.grad.dzbdx);
 	ReallocArray(nblk, blksize, XModel.grad.dzbdy);
+	if (XParam.engine == 5)
+	{
+		ReallocArray(nblk, blksize, XModel.fluxml.Fu, XModel.fluxml.Fv, XModel.fluxml.hau, XModel.fluxml.hav);
+		ReallocArray(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+	}
+	else
+	{
+		ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
-	ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
-
-	ReallocArray(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+		ReallocArray(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+	}
 
 	ReallocArray(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
 
