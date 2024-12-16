@@ -253,8 +253,8 @@ struct ModelML
 {
 
 	T* zs; //eta
-	EvolvingMLP<T> evolv;
-	
+	EvolvingP<T> evolv;
+	FluxMLP<T> flux;
 
 	GradientsMLP<T> grad;
 	
