@@ -7,6 +7,7 @@
 #include "Forcing.h"
 #include "MemManagement.h"
 #include "Spherical.h"
+#include "Util_CPU.h"
 
 template <class T> __global__ void CalcfaceValX(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb);
 template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb);

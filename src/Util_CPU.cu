@@ -218,4 +218,11 @@ template <class T> int ftoi(T value) {
 template int ftoi<float>(float value);
 template int ftoi<double>(double value);
 
-
+template <class T> __host__ __device__ T signof(T a)
+{
+	
+	return a >= T(0.0) ? T(1.0) : T(-1.0);
+}
+template int signof(int a);
+template float signof(float a);
+template double signof(double a);

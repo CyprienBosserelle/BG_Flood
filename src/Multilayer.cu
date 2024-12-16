@@ -70,13 +70,13 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 		T hff;
 
 		if (Hl <= dry)
-			hff = fmax(fmin(zbi + Hr - zbi, hi), 0.);
+			hff = max(min(zbi + Hr - zbi, hi), T(0.0));
 		else if (Hr <= dry)
-			hff = fmax(fmin(zbn + Hl - zbi, hn), 0.);
+			hff = max(min(zbn + Hl - zbi, hn), T(0.0));
 		else
 		{
 			T un = pdt * (hui + pdt * ax) / delta;
-			auto a = sign(un);
+			T a =  signof(un);
 			int iu = un >= 0.0 ? ileft : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
 			
@@ -103,6 +103,8 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	}
 	//pdt = dt = dtnext(dtmax);
 }
+template __global__ void CalcfaceValX<float>(float pdt, Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux, float* dtmax, float* zb);
+template __global__ void CalcfaceValX<double>(double pdt, Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux, double* dtmax, double* zb);
 
 template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb)
 {
@@ -166,13 +168,13 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 		T hff;
 
 		if (Hl <= dry)
-			hff = fmax(fmin(zbi + Hr - zbi, hi), 0.);
+			hff = max(min(zbi + Hr - zbi, hi), 0.);
 		else if (Hr <= dry)
-			hff = fmax(fmin(zbn + Hl - zbi, hn), 0.);
+			hff = max(min(zbn + Hl - zbi, hn), 0.);
 		else
 		{
 			T vn = pdt * (hvi + pdt * ax) / delta;
-			auto a = sign(vn);
+			T a = signof(vn);
 			int iu = vn >= 0.0 ? ibot : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
 
@@ -199,6 +201,10 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	}
 	//pdt = dt = dtnext(dtmax);
 }
+template __global__ void CalcfaceValY<float>(float pdt, Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux, float* dtmax, float* zb);
+template __global__ void CalcfaceValY<double>(double pdt, Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux, double* dtmax, double* zb);
+
+
 
 template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
@@ -255,6 +261,9 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 
 
 }
+template __global__ void CheckadvecMLX<float>(Param XParam, BlockP<float> XBlock, float dt, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux);
+template __global__ void CheckadvecMLX<double>(Param XParam, BlockP<double> XBlock, double dt, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux);
+
 template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
 	int halowidth = XParam.halowidth;
@@ -310,6 +319,9 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 
 
 }
+template __global__ void CheckadvecMLY<float>(Param XParam, BlockP<float> XBlock, float dt, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux);
+template __global__ void CheckadvecMLY<double>(Param XParam, BlockP<double> XBlock, double dt, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux);
+
 
 
 template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
@@ -341,8 +353,8 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 	{
 		T un = dt * XFlux.hu[i] / ((XFlux.hfu[i] + dry) * delta);
 		T vn = dt * XFlux.hv[i] / ((XFlux.hfv[i] + dry) * delta);
-		auto au = sign(un);
-		auto av = sign(vn);
+		T au = signof(un);
+		T av = signof(vn);
 
 		int ixshft = un >= 0.0 ? -1: 0;
 		int iyshft = vn >= 0.0 ? -1: 0;
@@ -375,6 +387,9 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 
 	}
 }
+template __global__ void AdvecFluxML<float>(Param XParam, BlockP<float> XBlock, float dt, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux);
+template __global__ void AdvecFluxML<double>(Param XParam, BlockP<double> XBlock, double dt, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux);
+
 
 template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
@@ -437,6 +452,10 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 	}
 
 }
+template __global__ void AdvecEv<float>(Param XParam, BlockP<float> XBlock, float dt, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux);
+template __global__ void AdvecEv<double>(Param XParam, BlockP<double> XBlock, double dt, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux);
+
+
 
 template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
@@ -501,6 +520,9 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 
 
 }
+template __global__ void pressureML<float>(Param XParam, BlockP<float> XBlock, float dt, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux);
+template __global__ void pressureML<double>(Param XParam, BlockP<double> XBlock, double dt, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux);
+
 
 
 template <class T> __global__ void CleanupML()
