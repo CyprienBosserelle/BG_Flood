@@ -8,6 +8,8 @@
 #include "Util_CPU.h"
 #include "MemManagement.h"
 #include "Multilayer.h"
+#include "FlowGPU.h"
+#include "Advection.h"
 
 template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel);
 
