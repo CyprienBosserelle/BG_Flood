@@ -293,9 +293,9 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 		{
 			hvl = CFL * hn * delta * cmn / dt;
 		}
-		else if (-hvl * dt / (delta * cm) > CFL * hi)
+		else if (-hvl * dt / (delta * cmi) > CFL * hi)
 		{
-			hvl = -CFL * hn * delta * cm / dt;
+			hvl = -CFL * hn * delta * cmi / dt;
 		}
 
 		if (hvl != XFlux.hv[i])
