@@ -16,6 +16,7 @@ template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
 template <class T> void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
+template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, T* z);
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev,T*zb);
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev);

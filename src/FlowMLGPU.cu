@@ -7,14 +7,20 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
+	// fill halo for zs,h,u and v 
+
 	//============================================
 	//  Fill the halo for gradient reconstruction & Recalculate zs
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv, XModel.zb);
 	
-
+	// calculate grad for dhdx dhdy only
+	
 	//============================================
 	// Calculate gradient for evolving parameters for predictor step
-	gradientGPUnew(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	//gradientGPUnew(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
 
 	//============================================
 	// Synchronise all ongoing streams
@@ -42,16 +48,42 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CheckadvecMLX << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	//Fill flux Halo for ha and hf
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hfu);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hfv);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hau);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hav);
 
-	
 	// Acceleration
 	// Pressure
 	pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	// Fill halo u and v calc grd for u and v and fill halo for hu and hv
+	// 
+
+	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.u);
+	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.v);
+
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hu);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hv);
+
+	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	
 	// Advection
 	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Fill halo for Fu and Fv
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fu);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fv);
 
 	AdvecEv << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
