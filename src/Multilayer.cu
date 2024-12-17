@@ -87,7 +87,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 		if (fabs(hui) > um)
 			um = fabs(hui);
 
-		XFlux.hu[i] *= XFlux.hfu[i];
+		XFlux.hu[i] = hui*XFlux.hfu[i];
 		XFlux.hau[i] = XFlux.hfu[i] * ax;
 
 		H += hff;
@@ -185,7 +185,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 		if (fabs(hvi) > um)
 			um = fabs(hvi);
 
-		XFlux.hv[i] *= XFlux.hfv[i];
+		XFlux.hv[i] = hvi* XFlux.hfv[i];
 		XFlux.hav[i] = XFlux.hfv[i] * ax;
 
 		H += hff;
@@ -503,7 +503,7 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 		XFlux.hu[i] += dt * XFlux.hau[i];
 		XFlux.hv[i] += dt * XFlux.hav[i];
 		
-		uui += dt * (XFlux.hau[i] + XFlux.hau[iright])/(XFlux.hfu[i]+XFlux.hfu[iright]+dry);
+		uui += dt * (XFlux.hau[i] + XFlux.hau[iright]) / (XFlux.hfu[i] + XFlux.hfu[iright] + dry);
 		vvi += dt * (XFlux.hav[i] + XFlux.hav[itop]) / (XFlux.hfv[i] + XFlux.hfv[itop] + dry);
 
 		T dmdl = (fmup - fmu) * cmdinv;// absurd if not spherical!
