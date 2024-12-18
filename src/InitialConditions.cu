@@ -606,7 +606,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarstdname["hau"] = "Acceleration_term_hau_x_direction";
 	XModel.Outvarunits["hau"] = "m2 s-2";
 
-	XModel.OutputVarMap["hav"] = XModel.fluxml.hau;
+	XModel.OutputVarMap["hav"] = XModel.fluxml.hav;
 	XModel.Outvarlongname["hav"] = "Acceleration term hav y-direction";
 	XModel.Outvarstdname["hav"] = "Acceleration_term_hav_y_direction";
 	XModel.Outvarunits["hav"] = "m2 s-2";

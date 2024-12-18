@@ -77,7 +77,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 		{
 			T un = pdt * (hui + pdt * ax) / delta;
 			T a =  signof(un);
-			int iu = un >= 0.0 ? ileft : i;// -(a + 1.) / 2.;
+			int iu = un > 0.0 ? ileft : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
 			
 			hff = XEv.h[iu] + a * (1. - a * un) * XGrad.dhdx[iu] * delta / 2.;
@@ -87,8 +87,8 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 		if (fabs(hui) > um)
 			um = fabs(hui);
 
-		XFlux.hu[i] = hui*XFlux.hfu[i];
-		XFlux.hau[i] = XFlux.hfu[i] * ax;
+		XFlux.hu[i] = hui* fmu * hff;
+		XFlux.hau[i] = fmu * hff * ax;
 
 		H += hff;
 	}
@@ -175,7 +175,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 		{
 			T vn = pdt * (hvi + pdt * ax) / delta;
 			T a = signof(vn);
-			int iu = vn >= 0.0 ? ibot : i;// -(a + 1.) / 2.;
+			int iu = vn > 0.0 ? ibot : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
 
 			hff = XEv.h[iu] + a * (1. - a * vn) * XGrad.dhdy[iu] * delta / 2.;
@@ -185,8 +185,8 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 		if (fabs(hvi) > um)
 			um = fabs(hvi);
 
-		XFlux.hv[i] = hvi* XFlux.hfv[i];
-		XFlux.hav[i] = XFlux.hfv[i] * ax;
+		XFlux.hv[i] = hvi* fmu * hff;
+		XFlux.hav[i] = fmu * hff * ax;
 
 		H += hff;
 	}
@@ -356,16 +356,16 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		T au = signof(un);
 		T av = signof(vn);
 
-		int ixshft = un >= 0.0 ? -1: 0;
-		int iyshft = vn >= 0.0 ? -1: 0;
+		int ixshft = un > 0.0 ? -1: 0;
+		int iyshft = vn > 0.0 ? -1: 0;
 		//int iu = un >= 0.0 ? ileft : i;//-(a + 1.) / 2.;
 		int iu = memloc(halowidth, blkmemwidth, ix + ixshft, iy, ib);
-		int iut = memloc(halowidth, blkmemwidth, ix + ixshft, iy + 1, ib);
-		int iub = memloc(halowidth, blkmemwidth, ix + ixshft, iy - 1, ib);
+		int iut = memloc(halowidth, blkmemwidth, ix , iy + 1, ib);
+		int iub = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
 		int iv = memloc(halowidth, blkmemwidth, ix, iy + iyshft, ib);
-		int ivr = memloc(halowidth, blkmemwidth, ix +1, iy + iyshft, ib);
-		int ivl = memloc(halowidth, blkmemwidth, ix -1, iy + iyshft, ib);
+		int ivr = memloc(halowidth, blkmemwidth, ix +1, iy , ib);
+		int ivl = memloc(halowidth, blkmemwidth, ix -1, iy , ib);
 
 		T su2 = XEv.u[iu] + au * (1. - au * un) * XGrad.dudx[iu] * delta / 2.0;
 		T sv2 = XEv.v[iv] + av * (1. - av * vn) * XGrad.dvdy[iv] * delta / 2.0;
