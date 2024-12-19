@@ -360,12 +360,46 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		int iyshft = vn > 0.0 ? -1: 0;
 		//int iu = un >= 0.0 ? ileft : i;//-(a + 1.) / 2.;
 		int iu = memloc(halowidth, blkmemwidth, ix + ixshft, iy, ib);
-		int iut = memloc(halowidth, blkmemwidth, ix , iy + 1, ib);
-		int iub = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+
+		int iut, iub;
+		if (ix == 0 && iy == 15)
+		{
+			iut = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+		}
+		else
+		{
+			iut = memloc(halowidth, blkmemwidth, ix + ixshft, iy + 1, ib);
+		}
+		if (ix == 0 && iy == 0)
+		{
+			iub = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+		}
+		else
+		{
+			iub = memloc(halowidth, blkmemwidth, ix + ixshft, iy - 1, ib);
+		}
 
 		int iv = memloc(halowidth, blkmemwidth, ix, iy + iyshft, ib);
-		int ivr = memloc(halowidth, blkmemwidth, ix +1, iy , ib);
-		int ivl = memloc(halowidth, blkmemwidth, ix -1, iy , ib);
+
+		int ivr, ivl;
+
+		if (iy == 0 && ix == 15)
+		{
+			ivr = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+		}
+		else
+		{
+			ivr = memloc(halowidth, blkmemwidth, ix + 1, iy + iyshft, ib);
+		}
+		
+		if (iy == 0 && ix == 0)
+		{
+			ivl = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+		}
+		else
+		{
+			ivl = memloc(halowidth, blkmemwidth, ix - 1, iy+iyshft, ib);
+		}
 
 		T su2 = XEv.u[iu] + au * (1. - au * un) * XGrad.dudx[iu] * delta / 2.0;
 		T sv2 = XEv.v[iv] + av * (1. - av * vn) * XGrad.dvdy[iv] * delta / 2.0;
