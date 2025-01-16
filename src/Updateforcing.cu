@@ -98,7 +98,9 @@ void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynFor
 		// Interpolate the forcing array to this time 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			InterpstepGPU << <gridDimDF, blockDimDF, 0 >> > (XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, float(totaltime), float(XDynForcing.dt), XDynForcing.now_g, XDynForcing.before_g, XDynForcing.after_g);
+			float bftime = float(XDynForcing.to+XDynForcing.dt*(XDynForcing.instep-1));
+			float aftime = float(XDynForcing.to + XDynForcing.dt * (XDynForcing.instep));
+			InterpstepGPU << <gridDimDF, blockDimDF, 0 >> > (XDynForcing.nx, XDynForcing.ny, float(totaltime), bftime,aftime, XDynForcing.now_g, XDynForcing.before_g, XDynForcing.after_g);
 			CUDA_CHECK(cudaDeviceSynchronize());
 
 			CUDA_CHECK(cudaMemcpyToArray(XDynForcing.GPU.CudArr, 0, 0, XDynForcing.now_g, XDynForcing.nx * XDynForcing.ny * sizeof(float), cudaMemcpyDeviceToDevice));
@@ -377,7 +379,7 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 
 	
 	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)) * XBlock.activeCell[i]; // convert from mm/hrs to m/s and 
-
+	//printf("%f\n", Rainhh);
 	T qvol = hi / (hi + Rainhh);
 
 	XEv.h[i] = hi + Rainhh;
