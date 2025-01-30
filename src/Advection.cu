@@ -251,7 +251,7 @@ template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, 
 	T ho, uo, vo;
 	T dhi = XAdv.dh[i];
 
-	T edt = dt;// dhi >= T(0.0) ? dt : min(dt, max(hold, XParam.eps) / abs(dhi));
+	T edt = dhi >= T(0.0) ? dt : min(dt, max(hold, XParam.eps) / abs(dhi));
 
 	//ho = max(hold + edt * dhi,T(0.0));
 	ho = hold + edt * dhi;
@@ -307,7 +307,7 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 
 				dhi = XAdv.dh[i];
 
-				T edt = dt;// dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
+				T edt = dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
 
 				ho = hold + edt * dhi;
 
