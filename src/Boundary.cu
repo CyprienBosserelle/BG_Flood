@@ -290,9 +290,9 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	}
 
 	
-
 	
-
+	zsbnd = zsbnd + XParam.zsoffset;
+	
 
 	int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
 
@@ -443,6 +443,9 @@ template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, Blo
 				zsbnd = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Zsmap);
 			}
 
+			
+			zsbnd = zsbnd + XParam.zsoffset;
+			
 
 			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 			int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);

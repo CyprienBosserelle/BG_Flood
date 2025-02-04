@@ -30,7 +30,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		hotstartsucess = readhotstartfile(XParam, XBlock, XEv, zb);
 
 		//add offset if present
-		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
+		if (T(XParam.zsoffset) != T(0.0)) // apply specified zsoffset
 		{
 			printf("\t\tadd offset to zs and hh... ");
 			//
@@ -104,7 +104,7 @@ template <class T>
 int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 {
 	T zzini = std::isnan(XParam.zsinit)? T(0.0): T(XParam.zsinit);
-	T zzoffset = std::isnan(XParam.zsoffset) ? T(0.0) : T(XParam.zsoffset);
+	T zzoffset = T(XParam.zsoffset);
 	
 
 	

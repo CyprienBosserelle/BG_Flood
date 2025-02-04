@@ -1136,6 +1136,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	XParam.blksize = utils::sq(XParam.blkmemwidth);
 
 	///////////////////////////////////////////
+	// zsoffset
+	///////////////////////////////////////////
+
+	XParam.zsoffset = std::isnan(XParam.zsoffset) ? 0.0 : XParam.zsoffset;
+
+	///////////////////////////////////////////
 	//  Read Bathy Information
 	///////////////////////////////////////////
 
