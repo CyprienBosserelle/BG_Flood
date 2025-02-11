@@ -144,14 +144,14 @@ template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
 
 	cudaStreamDestroy(streams[0]);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);

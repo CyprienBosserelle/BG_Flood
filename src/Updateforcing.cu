@@ -81,7 +81,7 @@ void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynFor
 			}
 			
 			
-			//NextHDstep << <gridDimRain, blockDimRain, 0 >> > (XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g, Rainaft_g);
+			//NextHDstep <<<gridDimRain, blockDimRain, 0 >>> (XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g, Rainaft_g);
 			//CUDA_CHECK(cudaDeviceSynchronize());
 
 			// Read the actual file data
@@ -100,7 +100,7 @@ void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynFor
 		{
 			float bftime = float(XDynForcing.to+XDynForcing.dt*(XDynForcing.instep-1));
 			float aftime = float(XDynForcing.to + XDynForcing.dt * (XDynForcing.instep));
-			InterpstepGPU << <gridDimDF, blockDimDF, 0 >> > (XDynForcing.nx, XDynForcing.ny, float(totaltime), bftime,aftime, XDynForcing.now_g, XDynForcing.before_g, XDynForcing.after_g);
+			InterpstepGPU <<<gridDimDF, blockDimDF, 0 >>> (XDynForcing.nx, XDynForcing.ny, float(totaltime), bftime,aftime, XDynForcing.now_g, XDynForcing.before_g, XDynForcing.after_g);
 			CUDA_CHECK(cudaDeviceSynchronize());
 
 			CUDA_CHECK(cudaMemcpyToArray(XDynForcing.GPU.CudArr, 0, 0, XDynForcing.now_g, XDynForcing.nx * XDynForcing.ny * sizeof(float), cudaMemcpyDeviceToDevice));
@@ -147,7 +147,7 @@ template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, st
 		{
 			//InjectRiverGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
 			//CUDA_CHECK(cudaDeviceSynchronize());
-			InjectManyRiversGPU << <gridDimRiver, blockDim, 0 >> > (XParam, irib, XModel.bndblk.Riverinfo, XModel.blocks, XModel.adv);
+			InjectManyRiversGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, irib, XModel.bndblk.Riverinfo, XModel.blocks, XModel.adv);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		

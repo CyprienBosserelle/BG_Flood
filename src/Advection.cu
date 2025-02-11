@@ -475,7 +475,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 
 	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
 	// This was successfully tested with a range of grid size
-	//reducemax3 << <gridDimLine, blockDimLine, 64*sizeof(float) >> >(dtmax_g, arrmax_g, nx*ny)
+	//reducemax3 <<<gridDimLine, blockDimLine, 64*sizeof(float) >>>(dtmax_g, arrmax_g, nx*ny)
 	
 	int maxThreads = 256;
 	int threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
@@ -485,7 +485,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 	dim3 gridDimLine(blocks, 1, 1);
 
 	
-	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
+	reducemin3 <<<gridDimLine, blockDimLine, smemSize >>> (XTime.dtmax, XTime.arrmin, s);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
@@ -503,7 +503,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 
 		CUDA_CHECK(cudaMemcpy(XTime.dtmax, XTime.arrmin, s * sizeof(T), cudaMemcpyDeviceToDevice));
 
-		reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
+		reducemin3 <<<gridDimLineS, blockDimLineS, smemSize >>> (XTime.dtmax, XTime.arrmin, s);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		s = (s + (threads * 2 - 1)) / (threads * 2);
