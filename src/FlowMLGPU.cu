@@ -128,6 +128,43 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	AdvecEv << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+
+	if (XForcing.rivers.size() > 0)
+	{
+		//Add River ML
+	}
+
+
+	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv);
+	//XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
+
+
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	if (XForcing.rivers.size() > 0)
+	{
+		//Add River ML
+	}
+
+
+	if (!XForcing.Rain.inputfile.empty())
+	{
+		AddrainforcingImplicitGPU << < gridDim, blockDim, 0 >> > (XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
+	if (XParam.infiltration)
+	{
+		AddinfiltrationImplicitGPU << < gridDim, blockDim, 0 >> > (XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
+	if (XParam.VelThreshold > 0.0)
+	{
+		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
 }
 template void FlowMLGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void FlowMLGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
