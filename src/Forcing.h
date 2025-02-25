@@ -235,6 +235,17 @@ struct Forcing
 	Default: None
 	*/
 
+	std::vector<Culvert> culverts;
+	/*The culvert is added as a transfer of fluid between two cells (or area depending of the types of culvert).
+	The water is transfer considering a maximum discharge at least based on the resistance to the flow 
+	(calculated from the section, distance and other parameter such as water level on each side depending on the type of culvert).
+	To add multiple culverts, just add different lines in the input file (one by culvert).
+	Ex: culvert = 0,1867430,1867455,3914065,3914090, 1;
+	Ex: river = *type*, *x1*, *y1*, *x2*, *y2*, *section*;
+	Default: None
+	*/
+
+
 	bndparam left;
 	/* 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)
 	For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first column containing time (with possibly variable time steps) and forcing values in the following columns (1 column of values corresponding to a constant value along the boundary, 2 columns correspond to values at boundary edges with linear evolution in between, n columns correspond to n regularly spaced values applied along the boundary)
