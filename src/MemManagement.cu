@@ -361,7 +361,6 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		ReallocArray(nblk, blksize, XModel.wettime);
 	}
 
-	//ReallocArray(nx, ny, XModel.);
 
 }
 
@@ -513,8 +512,6 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		int storage = XParam.maxTSstorage;
 		AllocateGPU(storage, 1, XModel.TSstore);
 	}
-
-
 
 	// Allocate textures for boundary and forcing is done in init forcing
 

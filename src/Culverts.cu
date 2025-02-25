@@ -6,8 +6,8 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 {
 	dim3 gridDimCulvert(XModel.bndblk.nblkculvert, 1, 1);
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
-	T Qmax, Vol1, delta1, Q;
-	int ib1, cc;
+	T Qmax, Vol1, Q;
+	int cc;
 
 
 	// Get the elevation/water column for each culvert edge and put it in the culvert structure (loop on concerned blocks)
@@ -30,14 +30,13 @@ template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vecto
 	for (cc = 0; cc < XCulverts.size(); cc++)
 	{
 
-		ib1 = XCulverts[cc].block1;
+		//ib1 = XCulverts[cc].block1;
 
 		//Pump system
 		if (XCulverts[cc].type == 0)
 		{
 			Qmax = T(XCulverts[cc].Qmax);
-			delta1 = calcres(T(XParam.dx), XModel.blocks.level[ib1]);
-			Vol1 = XModel.culvertsF.h1[cc] * delta1 * delta1;
+			Vol1 = XModel.culvertsF.h1[cc];// *XCulverts[cc].dx1* XCulverts[cc].dx1;
 			Q = T(Vol1 * dt);
 			if (Q > Qmax)
 			{
@@ -92,16 +91,14 @@ template <class T> __global__ void InjectCulvertGPU(Param XParam, int cc, Culver
 	unsigned int ib = Culvertblks[ibl];
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
-
 
 	if (i == XCulvert.i1)
 	{
-		XAdv.dh[i] -= XCulvertF.dq[cc] / (delta * delta);
+		XAdv.dh[i] -= XCulvertF.dq[cc] / (XCulvert.dx1 * XCulvert.dx1);
 	}
 	if (i == XCulvert.i2)
 	{
-		XAdv.dh[i] += XCulvertF.dq[cc] / (delta * delta);
+		XAdv.dh[i] += XCulvertF.dq[cc] / (XCulvert.dx2 * XCulvert.dx2);
 	}
 
 }

@@ -429,14 +429,14 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 				{
 					XForcing.culverts[cc].block1 = ib;
 					XForcing.culverts[cc].i1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
-					//XForcing.culverts[cc].j1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].dx1 = levdx;
 				}
 
 				if (x2 > blkxmin && x2 <= blkxmax && y2 > blkymin && y2 <= blkymax)
 				{
 					XForcing.culverts[cc].block2 = ib;
 					XForcing.culverts[cc].i2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
-					//XForcing.culverts[cc].j2 = min(max((int)round((y2 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].dx2 = levdx;
 				}
 			}
 			//Calculate the length of the culvert

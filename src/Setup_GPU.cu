@@ -120,6 +120,11 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			XModel_g.bndblk.nblkculvert = XModel.bndblk.nblkculvert;
 			AllocateGPU(XModel.bndblk.nblkculvert, 1, XModel_g.bndblk.culvert);
 			CopytoGPU(XModel.bndblk.nblkculvert, 1, XModel.bndblk.culvert, XModel_g.bndblk.culvert);
+			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.dq);
+			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.zs1);
+			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.zs2);
+			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.h1);
+			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.h2);
 		}
 
 

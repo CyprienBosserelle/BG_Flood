@@ -160,6 +160,8 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
+
+
 	if (XForcing.culverts.size() > 0)
 	{
 		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
