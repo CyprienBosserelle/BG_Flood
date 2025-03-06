@@ -100,7 +100,7 @@ template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<
 		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
 		cudaStreamDestroy(XLoop.streams[0]);
 
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
@@ -280,7 +280,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 			XLoop.TSAllout[o].push_back(stepread);
 					
 			
-			storeTSout << <gridDim, blockDim, 0 >> > (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
+			storeTSout <<<gridDim, blockDim, 0 >>> (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		//CUDA_CHECK(cudaDeviceSynchronize());
