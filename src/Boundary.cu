@@ -112,7 +112,7 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 
 			if (XParam.bndtaper > 0.0)
 			{
-				taper = min(totaltime / XParam.bndtaper, 1.0);
+				taper = min((totaltime - XParam.inittime) / XParam.bndtaper, 1.0);
 			}
 		}
 		else

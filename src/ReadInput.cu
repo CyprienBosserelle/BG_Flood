@@ -1342,8 +1342,10 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		XParam.reftime = "2000-01-01T00:00:00";
 	}
 
+	XParam.inittime = XParam.totaltime;
+
 	log("Reference time: " + XParam.reftime);
-	log("Model Initial time: " + std::to_string(XParam.totaltime));
+	log("Model Initial time: " + std::to_string(XParam.totaltime) + " ; " );
 
 	log("Model end time: " + std::to_string(XParam.endtime));
 
