@@ -336,6 +336,21 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	parameterstr = "bndrelaxtime";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndrelaxtime = std::stod(parametervalue);
+
+	}
+	parameterstr = "bndfiltertime";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndfiltertime = std::stod(parametervalue);
+
+	}
+
 	parameterstr = "CFL";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
