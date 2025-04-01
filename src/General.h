@@ -3,7 +3,7 @@
 #define GENERAL_H
 // includes, system
 
-#define pi 3.14159265
+constexpr auto pi=3.14159265
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
