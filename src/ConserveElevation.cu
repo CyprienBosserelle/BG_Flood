@@ -1,4 +1,5 @@
-﻿#include "ConserveElevation.h"
+
+#include "ConserveElevation.h"
 
 
 template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
