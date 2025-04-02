@@ -1,5 +1,3 @@
-﻿
-
 
 #include "Adaptation.h"
 

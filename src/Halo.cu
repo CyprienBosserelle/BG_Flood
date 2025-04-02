@@ -1,4 +1,5 @@
-﻿#include "Halo.h"
+
+#include "Halo.h"
 
 
 /*! \fn void void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)

@@ -1,4 +1,3 @@
-﻿
 
 
 #include "AdaptCriteria.h"
