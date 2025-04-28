@@ -1077,6 +1077,8 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		}
 		XForcing.bndseg[s].nblk = segcount;
 
+		log("\nBoundary Segment " + std::to_string(s) + " : " + XForcing.bndseg[s].inputfile + " has " + std::to_string(segcount) + " blocks ");
+
 		XForcing.bndseg[s].left.nblk = leftcount;
 		XForcing.bndseg[s].right.nblk = rightcount;
 		XForcing.bndseg[s].top.nblk = topcount;
