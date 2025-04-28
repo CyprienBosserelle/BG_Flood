@@ -95,6 +95,11 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 	T taper=T(1.0);
 	if (bndseg.on)
 	{
+		if (XParam.bndtaper > 0.0)
+		{
+			taper = min((totaltime - XParam.inittime) / XParam.bndtaper, 1.0);
+		}
+
 		if (bndseg.uniform)
 		{
 			int SLstepinbnd = 1;
@@ -110,10 +115,7 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 			zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
 
 
-			if (XParam.bndtaper > 0.0)
-			{
-				taper = min((totaltime - XParam.inittime) / XParam.bndtaper, 1.0);
-			}
+			
 		}
 		else
 		{
