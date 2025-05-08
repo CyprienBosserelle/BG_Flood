@@ -23,7 +23,8 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing);
 template <class T, class F> T interp2BUQ(T x, T y, T dx, F forcing);
 
 template <class T, class F> void InterpstepCPU(int nx, int ny, int hdstep, F totaltime, F hddt, T*& Ux, T* Uo, T* Un);
-template <class T> __global__ void InterpstepGPU(int nx, int ny, int hdstp, T totaltime, T hddt, T* Ux, T* Uo, T* Un);
+//template <class T> __global__ void InterpstepGPU(int nx, int ny, int hdstp, T totaltime, T hddt, T* Ux, T* Uo, T* Un);
+template <class T> __global__ void InterpstepGPU(int nx, int ny, T totaltime, T beforetime, T aftertime, T* Ux, T* Uo, T* Un);
 
 template <class T> void Copy2CartCPU(int nx, int ny, T* dest, T* src);
 

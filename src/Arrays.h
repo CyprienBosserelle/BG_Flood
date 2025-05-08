@@ -82,6 +82,23 @@ struct maskinfo
 
 };
 
+template <class T>
+struct RiverInfo
+{
+	int nbir;
+	int nburmax; // size of (max number of) unique block with rivers  
+	int nribmax; // size of (max number of) rivers in one block
+	int* Xbidir; // array of block id for each river size(nburmax,nribmax)
+	int* Xridib; // array of river id in each block size(nburmax,nribmax)
+	T* xstart;
+	T* xend;
+	T* ystart;
+	T *yend;
+	T* qnow; // qnow is a pin mapped and so both pointers are needed here
+	T* qnow_g; // this simplify the code later
+
+};
+
 
 // outzone info used to actually write the nc files (one nc file by zone, the default zone is the full domain)
 struct outzoneB 
@@ -125,7 +142,7 @@ struct AdaptP
 
 
 
-
+template <class T>
 struct BndblockP
 {
 	int nblkriver, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
@@ -140,12 +157,15 @@ struct BndblockP
 	int* top;
 	int* bot;
 
-
+	RiverInfo<T> Riverinfo;
 
 
 };
 
-
+struct RiverBlk
+{
+	std::vector<int> block;
+};
 
 
 
@@ -208,7 +228,7 @@ struct Model
 
 	AdaptP adapt;
 
-	BndblockP bndblk;
+	BndblockP<T> bndblk;
 
 
 	

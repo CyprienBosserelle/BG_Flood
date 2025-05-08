@@ -31,13 +31,13 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 
-	conserveElevationLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationLeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationRight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
@@ -329,13 +329,13 @@ template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, Ev
 
 	//WetDryProlongationGPUBot
 
-	WetDryProlongationGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPULeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPURight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPUTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPUBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
@@ -350,13 +350,13 @@ template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, Evo
 
 	//WetDryProlongationGPUBot
 
-	WetDryRestrictionGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPULeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPURight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPUTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPUBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }

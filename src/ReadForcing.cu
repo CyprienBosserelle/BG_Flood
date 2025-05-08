@@ -671,7 +671,72 @@ Polygon readbndpolysegment(bndsegment bnd, Param XParam)
 	double yo = XParam.yo;
 	double ymax = XParam.ymax;
 
-	if (case_insensitive_compare(bnd.polyfile,"left")==0)
+
+	if (case_insensitive_compare(bnd.polyfile, "all") == 0)
+	{
+		va.x = xo - epsbnd; va.y = yo - epsbnd;
+		vb.x = xmax + epsbnd; vb.y = yo - epsbnd;
+		vc.x = xmax + epsbnd; vc.y = ymax + epsbnd;
+		vd.x = xo - epsbnd; vd.y = ymax + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = va.x;
+		bndpoly.xmax = vb.x;
+		bndpoly.ymin = va.y;
+		bndpoly.ymax = vd.y;
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "file") == 0)
+	{
+		if (bnd.WLmap.uniform == 1)
+		{
+
+			log("Warning: 'file' keyword used for uniform boundary, using 'all' instead");
+
+			va.x = xo - epsbnd; va.y = yo - epsbnd;
+			vb.x = xmax + epsbnd; vb.y = yo - epsbnd;
+			vc.x = xmax + epsbnd; vc.y = ymax + epsbnd;
+			vd.x = xo - epsbnd; vd.y = ymax + epsbnd;
+
+			bndpoly.vertices.push_back(va);
+			bndpoly.vertices.push_back(vb);
+			bndpoly.vertices.push_back(vc);
+			bndpoly.vertices.push_back(vd);
+			bndpoly.vertices.push_back(va);
+			bndpoly.xmin = va.x;
+			bndpoly.xmax = vb.x;
+			bndpoly.ymin = va.y;
+			bndpoly.ymax = vd.y;
+		}
+		else
+		{
+			DynForcingP<float> Df = readforcinghead(bnd.WLmap, XParam);
+		
+
+		
+
+			va.x = Df.xo - epsbnd; va.y = Df.yo - epsbnd;
+			vb.x = Df.xmax + epsbnd; vb.y = Df.yo - epsbnd;
+			vc.x = Df.xmax + epsbnd; vc.y = Df.ymax + epsbnd;
+			vd.x = Df.xo - epsbnd; vd.y = Df.ymax + epsbnd;
+
+			bndpoly.vertices.push_back(va);
+			bndpoly.vertices.push_back(vb);
+			bndpoly.vertices.push_back(vc);
+			bndpoly.vertices.push_back(vd);
+			bndpoly.vertices.push_back(va);
+			bndpoly.xmin = va.x;
+			bndpoly.xmax = vb.x;
+			bndpoly.ymin = va.y;
+			bndpoly.ymax = vd.y;
+		
+		}
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile,"left")==0)
 	{
 		va.x = xo - epsbnd; va.y = yo;
 		vb.x = xo + epsbnd; vb.y = yo;
