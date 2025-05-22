@@ -32,10 +32,10 @@ public:
 	bool conserveElevation = false; //Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks
 	bool wetdryfix = true; // Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)
 
-	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
-	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
-	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
-	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
+	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
+	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
+	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
+	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
 
 	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
 
