@@ -546,6 +546,7 @@ int readnctime2(int ncid,char * timecoordname,std::string refdate,size_t nt, dou
 	for (int it = 0; it < nt; it++)
 	{
 		time[it] = time[it] * fac + offset;
+		//printf("%f\n", time[it]);
 	}
 
 	///status = nc_close(ncid);
