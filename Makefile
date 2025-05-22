@@ -214,7 +214,7 @@ ALL_LDFLAGS += $(shell nc-config --libs)
 ################################################################################
 
 # Gencode arguments
-SMS ?= 52 60 75
+SMS ?= 50 52 60 75
 #SMS ?= 20 30 35
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
