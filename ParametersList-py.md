@@ -57,8 +57,6 @@ BG_flood user interface consists in a text file, associating key words to user c
 |totaltime| totaltime , inittime , starttime , start_time , init_time , start , init | 0.0|Total simulation time in s|
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
 |dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
-|bndrelaxtime|bndrelaxtime| 3600.0|Realxation time for absorbing boundary|
-|bndfiltertime|bndfiltertime| 60.0|Filtering time for absorbing boundary|
 ###  Initialisation
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
