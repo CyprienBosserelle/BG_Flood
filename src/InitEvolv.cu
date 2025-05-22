@@ -511,7 +511,7 @@ int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb
 
 	status = nc_get_att_int(ncid, NC_GLOBAL, "BG_Flood", &BG_vers);
 
-	isBG_Flood = BG_vers >= 0)
+	//isBG_Flood = BG_vers >= 0)
 	
 	status = nc_close(ncid);
 	
