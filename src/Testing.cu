@@ -699,6 +699,8 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XParam.outmean = true;
 	XParam.outtwet = true;
 
+	XParam.ForceMassConserve = true;
+
 	// create Model setup
 	Model<T> XModel;
 	Model<T> XModel_g;
@@ -923,6 +925,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XParam.frictionmodel = 1;
 
 	XParam.conserveElevation = false;
+	XParam.ForceMassConserve = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
@@ -1679,6 +1682,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 	XParam.minlevel = 1;
 	XParam.maxlevel = 1;
 	XParam.initlevel = 1;
+	XParam.ForceMassConserve = true;
 	
 	
 	UnitestA=RiverVolumeAdapt(XParam, maxslope, false, false);
@@ -2217,6 +2221,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	XParam.mask = 999.0;
 	XParam.outishift = 0;
 	XParam.outjshift = 0;
+	XParam.ForceMassConserve = true;
 
 
 	XParam.outputtimestep = 10.0;// XParam.endtime;
@@ -2726,6 +2731,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	//Specification of the test
 	//XParam.test = 7;
 	XParam.rainforcing = true;
+	XParam.ForceMassConserve = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
