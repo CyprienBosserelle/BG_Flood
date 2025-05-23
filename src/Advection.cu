@@ -307,7 +307,7 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 
 				dhi = XAdv.dh[i];
 
-				T edt = dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
+				T edt = XParam.ForceMassConserve ? dt : dhi >= T(0.0) ? dt : min(dt, max(hold, XParam.eps) / abs(dhi));
 
 				ho = hold + edt * dhi;
 
