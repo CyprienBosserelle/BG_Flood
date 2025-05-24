@@ -31,7 +31,7 @@ public:
 
 	bool conserveElevation = false; //Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks
 	bool wetdryfix = true; // Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)
-	bool ForceMassConserve = false; // Switch to enforce mass conservation 
+	bool ForceMassConserve = false; // Switch to enforce mass conservation only useful on steep slope
 
 	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
 	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
