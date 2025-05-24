@@ -391,6 +391,17 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	paramvec = { "MassConservation", "MassCon","forcemassconservation","forcevolumeconservation","Volumeconservation","VolumeCon", "ForceMassConserve", "ForceVolConserve" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//param.totaltime = std::stod(parametervalue);
+		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
+		param.ForceMassConserve = readparambool(parametervalue, param.ForceMassConserve);
+
+	}
+
+
 	parameterstr = "dtinit";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
