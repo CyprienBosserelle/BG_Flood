@@ -31,11 +31,12 @@ public:
 
 	bool conserveElevation = false; //Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks
 	bool wetdryfix = true; // Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)
+	bool ForceMassConserve = false; // Switch to enforce mass conservation only useful on steep slope
 
-	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
-	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
-	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
-	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
+	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
+	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
+	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
+	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman) // Not in use anymore
 
 	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
 
@@ -84,6 +85,7 @@ public:
 	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for none
 	double endtime = std::numeric_limits<double>::max(); // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
+	double inittime = 0.0; // initital model time. At start of simulation inittime==totaltime
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
 	double bndrelaxtime = 3600.0; // Realxation time for absorbing boundary
