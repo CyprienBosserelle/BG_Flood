@@ -315,6 +315,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
 		log("\t\tAOI bnd wall test : " + result);
 	}
+
+	if (mytest == 993)
+	{
+		//pinned pageable Memory test
+		TestPinMem(XParam, XModel, XModel_g);
+	}
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -693,6 +699,8 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	XParam.outmean = true;
 	XParam.outtwet = true;
 
+	XParam.ForceMassConserve = true;
+
 	// create Model setup
 	Model<T> XModel;
 	Model<T> XModel_g;
@@ -917,6 +925,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XParam.frictionmodel = 1;
 
 	XParam.conserveElevation = false;
+	XParam.ForceMassConserve = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
@@ -1197,7 +1206,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	if (XParam.GPUDEVICE >= 0)
 	{
 
-		reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
+		reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.time.dtmax, XModel_g.time.dtmax);
@@ -1252,7 +1261,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
 
 
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.zb);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	// Create some usefull vectors
 	std::string evolvst[4] = { "h","zs","u","v" };
@@ -1308,15 +1317,15 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//GPU gradients
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
@@ -1361,14 +1370,14 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 
 	//GPU part
-	updateKurgXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
+	updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
 	// Y- direction
 	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 
-	updateKurgYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
+	updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, fluxVar, false);
@@ -1391,7 +1400,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 		advVar.push_back(advst[nv]);
 	}
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
-	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.flux, XModel_g.adv);
+	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.flux, XModel_g.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, advVar, false);
@@ -1407,7 +1416,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 		evoVar.push_back(evost[nv]);
 	}
 	AdvkernelCPU(XParam, XModel.blocks, T(0.0005), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
-	AdvkernelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(0.0005), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
+	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.0005), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
@@ -1417,7 +1426,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	bottomfrictionCPU(XParam, XModel.blocks, T(0.5), XModel.cf, XModel.evolv_o);
 
-	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(0.5), XModel_g.cf, XModel_g.evolv_o);
+	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.5), XModel_g.cf, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
@@ -1466,10 +1475,10 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.u);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.u);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	Forcing<float> XForcing;
@@ -1673,6 +1682,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 	XParam.minlevel = 1;
 	XParam.maxlevel = 1;
 	XParam.initlevel = 1;
+	XParam.ForceMassConserve = true;
 	
 	
 	UnitestA=RiverVolumeAdapt(XParam, maxslope, false, false);
@@ -2211,6 +2221,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	XParam.mask = 999.0;
 	XParam.outishift = 0;
 	XParam.outjshift = 0;
+	XParam.ForceMassConserve = true;
 
 
 	XParam.outputtimestep = 10.0;// XParam.endtime;
@@ -2720,6 +2731,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	//Specification of the test
 	//XParam.test = 7;
 	XParam.rainforcing = true;
+	XParam.ForceMassConserve = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
@@ -3810,7 +3822,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startA, NULL);
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3833,7 +3845,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startB, NULL);
-	gradientSM << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientSM <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3856,7 +3868,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startC, NULL);
-	gradientSMC << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientSMC <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -4845,6 +4857,91 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	//log("#####");
 	return modelgood;
 }
+
+
+template <class T> __global__ void vectoroffsetGPU(int nx, T offset, T* z)
+{
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+	if (idx < nx)
+	{
+		z[idx] = z[idx] + offset;
+	}
+}
+
+template <class T> int TestPinMem(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	T* zf, *zf_g, * zf_recov;
+	
+
+	int nx = 32;
+	int ny = 1;
+
+	int nelem = nx * ny;
+
+
+	AllocateMappedMemCPU(nx, ny, XParam.GPUDEVICE, zf);
+	
+
+	AllocateCPU(nx, ny, zf_recov);
+
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			zf[i + j * nx] = i + j * nx +T(0.25);
+			
+		}
+	}
+
+	T checkrem = T(0.0);
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		AllocateMappedMemGPU(nx, ny, XParam.GPUDEVICE, zf_g, zf);
+
+
+
+		dim3 block(16);
+		dim3 grid((unsigned int)ceil(nelem / (float)block.x));
+
+		vectoroffsetGPU <<<grid, block >>> (nelem, T(1.0), zf_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		CUDA_CHECK(cudaMemcpy(zf_recov, zf_g, nx * ny * sizeof(T), cudaMemcpyDeviceToHost));
+
+
+		
+
+		for (int i = 0; i < nx; i++)
+		{
+			for (int j = 0; j < ny; j++)
+			{
+
+				checkrem = checkrem + abs(zf[i + j * nx] - zf_recov[i + j * nx]);
+			}
+		}
+	}
+	int modelgood = checkrem < 1.e-6f;
+
+	if (checkrem > 1.e-6f)
+	{
+		printf("\n Test Failed error = %e \n", checkrem);
+		return modelgood;
+	}
+	else
+	{
+		printf("\n Test Success error = %e \n", checkrem);
+	}
+
+
+
+	return modelgood;
+}
+template int TestPinMem<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
+template int TestPinMem<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
+
+
 
 
 template <class T> Forcing<float> MakValleyBathy(Param XParam, T slope, bool bottop, bool flip)
