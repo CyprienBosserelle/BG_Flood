@@ -41,6 +41,7 @@ template <class T> bool testboundaries(Param XParam, T maxslope);
 template <class T> bool ZoneOutputTest(int nzones, T zsinit);
 template <class T> bool Rainlossestest(T zsnit, int gpu, float alpha);
 template <class T> bool TestMultiBathyRough(int gpu, T ref, int secnario);
+template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario);
 
 // End of global definition
 #endif
