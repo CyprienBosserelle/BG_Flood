@@ -1258,10 +1258,10 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
 		XForcing.bndseg[iseg].poly= readbndpolysegment(XForcing.bndseg[iseg], XParam);
-		if (XForcing.bndseg[iseg].type == 2)
-		{
-			XForcing.bndseg[iseg].type = 3;
-		}
+		//if (XForcing.bndseg[iseg].type == 2)
+		//{
+		//	XForcing.bndseg[iseg].type = 3;
+		//}
 
 
 		XForcing.bndseg[iseg].left.isright = -1;

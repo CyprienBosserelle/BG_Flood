@@ -509,6 +509,21 @@ template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, Blo
 				}
 				side.qmean[iq] = qmean;
 			}
+			else if (type == 2)
+			{
+				if (h[i] > XParam.eps || zsX > zsi)
+				{
+					//ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
+					//qmean = T(0.0);
+					Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+				}
+				else
+				{
+					noslipbndQ(F, G, S);
+					qmean = T(0.0);
+				}
+				side.qmean[iq] = qmean;
+			}
 
 
 			// write the results
@@ -1571,6 +1586,20 @@ template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T 
 	zs = zsinside;
 	//ut[i] = ut[inside];
 	h = hinside;
+}
+
+template <class T> __device__ __host__ void Dirichlet1Q(T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T& q)
+{
+	// Is this even the right formulation?.
+	// I don't really like this formulation. while a bit less dissipative then abs1D with 0 unbnd (but worse if forcing uniside with 0) it is very reflective an not stable  
+	T zbinside = zsinside - hinside;
+	T un = sign * T(2.0) * (sqrt(g * max(hinside, T(0.0))) - sqrt(g * max(zsbnd - zbinside, T(0.0)))) + uninside;
+	T ut = T(0.0);
+	//zs = zsinside;
+	//ut[i] = ut[inside];
+	//h = hinside;
+
+	q = un * hinside;
 }
 
 
