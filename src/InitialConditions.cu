@@ -61,6 +61,8 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Initial forcing
 	InitRivers(XParam, XForcing, XModel);
 
+	InitCulverts(XParam, XForcing, XModel);
+
 	//=====================================
 	// Initial bndinfo
 	//Calcbndblks(XParam, XForcing, XModel.blocks);
@@ -384,6 +386,104 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 template void InitRivers<float>(Param XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitRivers<double>(Param XParam, Forcing<float> &XForcing, Model<double> &XModel);
+
+
+template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Model<T>& XModel)
+{
+	//========================
+	// Culvert set-up
+
+	if (XForcing.culverts.size() > 0)
+	{
+		//
+		double x1,x2,y1,y2;
+		int ib;
+		double levdx, dxblk;
+		double blkxmin, blkxmax, blkymin, blkymax;
+
+		log("\tInitializing culverts");
+		//For each culvert
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			// find the cell where the culvert well / source will be applied
+
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
+			{
+				ib = XModel.blocks.active[ibl];
+				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+				x1 = (T)XForcing.culverts[cc].x1;
+				x2 = (T)XForcing.culverts[cc].x2;
+				y1 = (T)XForcing.culverts[cc].y1;
+				y2 = (T)XForcing.culverts[cc].y2;
+
+				dxblk = (T)(XParam.blkwidth) * levdx;
+
+				blkxmin = ((T)XParam.xo + XModel.blocks.xo[ib] - T(0.5) * levdx);
+				blkymin = ((T)XParam.yo + XModel.blocks.yo[ib] - T(0.5) * levdx);
+
+				blkxmax = (blkxmin + dxblk);
+				blkymax = (blkymin + dxblk);
+
+				if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
+				{
+					XForcing.culverts[cc].block1 = ib;
+					XForcing.culverts[cc].i1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].dx1 = levdx;
+				}
+
+				if (x2 > blkxmin && x2 <= blkxmax && y2 > blkymin && y2 <= blkymax)
+				{
+					XForcing.culverts[cc].block2 = ib;
+					XForcing.culverts[cc].i2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].dx2 = levdx;
+				}
+			}
+			//Calculate the length of the culvert
+			if (XForcing.culverts[cc].type > 0)
+			{
+				XForcing.culverts[cc].length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+			}
+		}
+
+		//Now identify sort and unique blocks where culverts are being inserted
+		std::vector<int> activeCulvertBlk;
+
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block1);
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block2);
+		}
+		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
+		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
+		if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
+		{
+			ReallocArray(activeCulvertBlk.size(), 1, XModel.bndblk.culvert);
+			XModel.bndblk.nblkculvert = int(activeCulvertBlk.size());
+
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.dq);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h1);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h2);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs1);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs2);
+		}
+		for (int b = 0; b < activeCulvertBlk.size(); b++)
+		{
+			XModel.bndblk.culvert[b] = activeCulvertBlk[b];
+		}
+
+
+		//Calculate the friction coefficient (L=0.3164*Re^(-0.25) if Re<100000 eq de Blasius)
+		// and the Head Loss coeff (coeff * V^2)
+
+	}
+
+
+}
+
+template void InitCulverts<float>(Param XParam, Forcing<float>& XForcing, Model<float>& XModel);
+template void InitCulverts<double>(Param XParam, Forcing<float>& XForcing, Model<double>& XModel);
+
 
 
 template<class T> void Initmaparray(Model<T>& XModel)
