@@ -6,30 +6,52 @@ name: Documentation
 # events but only for the master branch
 on:
   push:
-    branches: [ development ]
+    branches: [ development, main ]
 
 jobs:
   build-documentation:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repository
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it 
+      uses: actions/checkout@v4
+
+    - name: Install Doxygen and dependencies
+      # Installs Doxygen on the runner
+      run: |
+        sudo apt-get update && sudo apt-get install -y doxygen graphviz   
+        pip install sphinx breathe furo myst-parser
     
-    # Build the HTML documentation
-    - name: Doxygen Action
-      uses: mattnotmitt/doxygen-action@v1.9.5
+
+    - name: Genrate documentation
+      # Generates the documentation using Doxygen
+      run: doxygen Doxygenfile
       with:
           doxyfile-path: ./Doxygenfile
           working-directory: .
           enable-latex: true
+
+    - name: Generate Sphinx documentation
+      # Generates the Sphinx documentation
+      run: sphinx-build -b html doc/html doc/_build/html     
+
+    - name: Upload artifact 
+      # Uploads the generated HTML documentation as an artifact
+      # This allows you to download it from the Actions tab in GitHub
+      uses: actions/upload-artifact@v4
+      with:
+        name: HLMLDocs
+        path: doc/_build/html/
+
     
     # Deploy the HTML documentation to GitHub Pages
-    - name: GH Pages Deployment
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Deploy to GitHub pages
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./doc/html/
-        enable_jekyll: false
-        allow_empty_commit: false
-        force_orphan: true
+        publish_dir: ./doc/_build/html/
+        #enable_jekyll: false
+        #allow_empty_commit: false
+        #force_orphan: true
         publish_branch: gh-pages
