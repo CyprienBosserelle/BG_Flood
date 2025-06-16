@@ -6,18 +6,18 @@ name: Documentation
 # events but only for the master branch
 on:
   push:
-    branches: [ development, documentation ]
+    branches: [ development, documentation2, main ]
 
 jobs:
   build-documentation:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     
     # Build the HTML documentation
     - name: Doxygen Action
-      uses: mattnotmitt/doxygen-action@v1.9.5
+      uses: mattnotmitt/doxygen-action@v3
       with:
           doxyfile-path: ./Doxygenfile
           working-directory: .
@@ -25,7 +25,7 @@ jobs:
     
     # Deploy the HTML documentation to GitHub Pages
     - name: GH Pages Deployment
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./doc/html/
