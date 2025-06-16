@@ -1,4 +1,5 @@
-# This is a basic workflow to help you get started with Actions
+# This workflow builds the Doxygen documentation and deploys it to GitHub Pages.
+# It is triggered on pushes to the development, documentation2, or main branches.
 
 name: Documentation
 
@@ -14,14 +15,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+    # Install Doxygen
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
     # Build the HTML documentation
-    - name: Doxygen Action
-      uses: mattnotmitt/doxygen-action@v3
-      with:
-          doxyfile-path: ./Doxygenfile
-          working-directory: .
-          enable-latex: true
+    - name: Build Doxygen Documentation
+      run: doxygen ./Doxygenfile
     
     # Deploy the HTML documentation to GitHub Pages
     - name: GH Pages Deployment
