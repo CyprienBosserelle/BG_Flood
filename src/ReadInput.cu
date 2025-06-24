@@ -1539,7 +1539,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 {
 	std::size_t found;
 	std::string parameternumber,left,right;
-	std::vector<std::string> splittedstr;
+	std::vector<std::string> splittedstr, splittedstrnohash;
 	
 	// first look for an equal sign
 	// No equal sign mean not a valid line so skip
@@ -1562,7 +1562,12 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		{
 			//std::cout <<"found LonMin at : "<< found << std::endl;
 			//Numberstart = found + parameterstr.length();
-			splittedstr = split(right, ';');
+
+			
+			splittedstrnohash = split(right, '#');
+			
+			splittedstr = split(splittedstrnohash[0], ';');
+
 			if (splittedstr.size() >= 1)
 			{
 				parameternumber = splittedstr[0];
