@@ -198,7 +198,7 @@ ALL_CCFLAGS += $(addprefix -Xcompiler ,$(EXTRA_CCFLAGS))
 
 SAMPLE_ENABLED := 1
 
-ALL_LDFLAGS := -lnetcdf -I
+ALL_LDFLAGS := -I
 ALL_LDFLAGS += $(ALL_CCFLAGS)
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
@@ -207,10 +207,14 @@ ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
 INCLUDES  := -I/usr/includes
 LIBRARIES :=
 
+# Add NetCDF include library
+INCLUDES += $(shell nc-config --cflags)
+ALL_LDFLAGS += $(shell nc-config --libs)
+
 ################################################################################
 
 # Gencode arguments
-SMS ?= 35 50 52 60
+SMS ?= 50 52 60 75
 #SMS ?= 20 30 35
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
@@ -318,7 +322,7 @@ ReadInput.o:./src/ReadInput.cu
 
 Read_netcdf.o:./src/Read_netcdf.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
-	
+
 Reimann.o:./src/Reimann.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
@@ -338,8 +342,7 @@ Write_netcdf.o:./src/Write_netcdf.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
 Write_txtlog.o:./src/Write_txtlog.cpp
-	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
-	
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<	
 
 Spherical.o:./src/Spherical.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
