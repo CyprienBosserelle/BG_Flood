@@ -67,6 +67,27 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// Read bnd files
 	log("\nReading boundary data...");
 
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on)
+		{
+			//XForcing.bndseg[iseg].data = readbndfile(XForcing.bndseg[iseg].inputfile, XParam);
+
+			if (XForcing.bndseg[iseg].uniform == 1)
+			{
+				// grid uniform time varying rain input
+				XForcing.bndseg[iseg].data = readINfileUNI(XForcing.bndseg[iseg].inputfile, XParam.reftime);
+			}
+			else
+			{
+				XForcing.bndseg[iseg].WLmap.denanval = 0.0;
+				InitDynforcing(gpgpu, XParam, XForcing.bndseg[iseg].WLmap);
+				//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			}
+		}
+	}
+
+	/*
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 	
 
@@ -115,6 +136,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			AllocateBndTEX(XForcing.bot);
 		}
 	}
+	*/
+
+
 
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
 	// Removed. This is better done in the sanity check!
@@ -125,15 +149,29 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//==================
 	// Friction maps 
 		
-	if (!XForcing.cf.inputfile.empty())
+	if (!XForcing.cf.empty())
 	{
-		XForcing.cf.denanval = 0.0000001;
+		//denanval = 0.0000001;
 		log("\nRead Roughness map (cf) data...");
 		// roughness map was specified!
-		readstaticforcing(XForcing.cf);
-
+		//readstaticforcing(XForcing.cf);
 		//log("...done");
+		// Here we are not using the automated denaning because we want to preserve the Nan in all but the "main/first" listed roughness map. 
+		// This mean that subsequently listed roughness map can have large NAN holes in them.
+		for (int ib = 0; ib < XForcing.cf.size(); ib++)
+		{
+			
+			readstaticforcing(XForcing.cf[ib]);
+			if (ib == 0) // Fill Nan for only the first map listed, the others will use values from original bathy topo.
+			{
+				denan(XForcing.cf[ib].nx, XForcing.cf[ib].ny, T(0.0000001), XForcing.cf[ib].val);
+			}
+		}
 	}
+
+
+
+
 
 	//==================
 	// Rain losses maps
@@ -522,6 +560,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 	char* crs_wkt;
 	std::string crs_ref2;
 	
+	crs_wkt = "";
 
 	if (!Sforcing.inputfile.empty())
 	{
@@ -609,7 +648,7 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 			{
 				printf("CRS_info detected but not understood reverting to default CRS\n Rename attribute in grid-mapping variable\n");
 
-				crs_wkt = "";
+				//crs_wkt = ""; //Move to the top of the file for initialisation
 			}
 
 		}
@@ -622,11 +661,100 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 	return crs_wkt;
 }
 
+Polygon readbndpolysegment(bndsegment bnd, Param XParam)
+{
+	Polygon bndpoly;
+	Vertex va,vb,vc,vd;
+	double epsbnd = calcres(XParam.dx,XParam.initlevel);
+	double xo = XParam.xo;
+	double xmax = XParam.xmax;
+	double yo = XParam.yo;
+	double ymax = XParam.ymax;
+
+	if (case_insensitive_compare(bnd.polyfile,"left")==0)
+	{
+		va.x = xo - epsbnd; va.y = yo;
+		vb.x = xo + epsbnd; vb.y = yo;
+		vc.x = xo + epsbnd; vc.y = ymax;
+		vd.x = xo - epsbnd; vd.y = ymax;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo - epsbnd;
+		bndpoly.xmax = xo + epsbnd;
+		bndpoly.ymin = yo;
+		bndpoly.ymax = ymax;
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "bot") == 0)
+	{
+		va.x = xo ; va.y = yo - epsbnd;
+		vb.x = xmax; vb.y = yo - epsbnd;
+		vc.x = xmax; vc.y = yo + epsbnd;
+		vd.x = xo; vd.y = yo + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo ;
+		bndpoly.xmax = xmax;
+		bndpoly.ymin = yo - epsbnd;
+		bndpoly.ymax = yo + epsbnd;
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "right") == 0)
+	{
+		va.x = xmax - epsbnd; va.y = yo;
+		vb.x = xmax + epsbnd; vb.y = yo;
+		vc.x = xmax + epsbnd; vc.y = ymax;
+		vd.x = xmax - epsbnd; vd.y = ymax;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xmax - epsbnd;
+		bndpoly.xmax = xmax + epsbnd;
+		bndpoly.ymin = yo;
+		bndpoly.ymax = ymax;
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "top") == 0)
+	{
+
+		va.x = xo; va.y = ymax - epsbnd;
+		vb.x = xmax; vb.y = ymax - epsbnd;
+		vc.x = xmax; vc.y = ymax + epsbnd;
+		vd.x = xo; vd.y = ymax + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo;
+		bndpoly.xmax = xmax;
+		bndpoly.ymin = ymax - epsbnd;
+		bndpoly.ymax = ymax + epsbnd;
+	}
+	else
+	{
+		bndpoly = readPolygon(bnd.polyfile);
+	}
+
+	return bndpoly;
+}
+
 /*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 * Read boundary forcing files
 * 
 */
-std::vector<SLTS> readbndfile(std::string filename,Param & XParam, int side)
+std::vector<SLTS> readbndfile(std::string filename,Param & XParam)
 {
 	// read bnd or nest file
 	// side is for deciding whether we are talking about a left(side=0) bot (side =1) right (side=2) or top (side=3)
@@ -1088,7 +1216,7 @@ std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate)
 
 	if (fs.fail()) {
 		//std::cerr << filename << "ERROR: Atm presssure / Rainfall file could not be opened" << std::endl;
-		log("ERROR: Atm presssure / Rainfall file could not be opened : " + filename);
+		log("ERROR: Bnd file / Atm presssure / Rainfall file could not be opened : " + filename);
 		exit(1);
 	}
 

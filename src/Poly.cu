@@ -212,7 +212,7 @@ Polygon CounterCWPoly(Polygon Poly)
 	if (sum > 0.0)
 	{
 		log(" Reversing Polygon handedness");
-		for (int i = Poly.vertices.size(); i > 0; i--)
+		for (int i = Poly.vertices.size()-1; i > 0; i--)
 		{
 			//
 			
@@ -395,6 +395,7 @@ bool PolygonIntersect(Polygon P, Polygon Q)
 * ## Description
 * Check whether a block is inside or intersectin a polygon
 * 
+* ## Usage blockinpoly( blockxo,  blockyo,  blockdx, blkwidth, Polygon)
 *
 */
 template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly)

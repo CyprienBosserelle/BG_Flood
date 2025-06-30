@@ -279,7 +279,8 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 		//size_t start[] = { 0 };
 		//size_t count[] = { (size_t)nt };
 		//status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
-		status = readnctime2(ncid, reftime, nt, ttempvar);
+
+		status = readnctime2(ncid, coordname, reftime, nt, ttempvar);
 
 		to = ttempvar[0];
 		tmax= ttempvar[nt-1];
@@ -426,7 +427,7 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
-int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
+int readnctime2(int ncid,char * timecoordname,std::string refdate,size_t nt, double*& time)
 {
 
 	int status, varid;
@@ -453,13 +454,13 @@ int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
 	///	//varstr = "time";
 	///}
 
-	// Warning this could be more robust by taking the unlimited dimention if time does not exist!
-	std::string Varname = "time";
+	// Warning this could be more robust by taking the unlimited dimension if time does not exist!
+	//std::string Varname = "time";
 
 	///status = nc_open(ncfilestr.c_str(), 0, &ncid);
 	///if (status != NC_NOERR) handle_ncerror(status);
 
-	status = nc_inq_varid(ncid, Varname.c_str(), &varid);
+	status = nc_inq_varid(ncid, timecoordname, &varid);
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	// inquire unit of time
@@ -487,16 +488,22 @@ int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
 		// convert to string
 		tunitstr = std::string(tunit);
 
-		// Try to make sense of the unit
-		// The word "since" should be in the center
-		// e.g. hour since 2000-01-01 00:00:00 
-		std::vector<std::string> nodeitems = split(tunitstr, "since");
-		std::string ncstepunit = trim(nodeitems[0]," ");
-		std::string ncrefdatestr = trim(nodeitems[1], " ");
+		std::string ncstepunit= tunitstr;
 
-		//time_t ncrefdate = date_string_to_time(ncrefdatestr);
-		offset = date_string_to_s(ncrefdatestr, refdate);
+		if (tunitstr.find("since") != std::string::npos)
+		{
 
+			// Try to make sense of the unit
+			// The word "since" should be in the center
+			// e.g. hour since 2000-01-01 00:00:00 
+			std::vector<std::string> nodeitems = split(tunitstr, "since");
+			ncstepunit = trim(nodeitems[0], " ");
+			std::string ncrefdatestr = trim(nodeitems[1], " ");
+
+			//time_t ncrefdate = date_string_to_time(ncrefdatestr);
+			offset = date_string_to_s(ncrefdatestr, refdate);
+		}
+	
 		std::vector<std::string> secondvec = { "seconds","second","sec","s" };
 		std::vector<std::string> minutevec = { "minutes","minute","min","m" };
 		std::vector<std::string> hourvec = { "hours","hour","hrs","hr","h" };
@@ -529,7 +536,7 @@ int readnctime2(int ncid,std::string refdate,size_t nt, double*& time)
 		found = case_insensitive_compare(ncstepunit, yearvec);
 		if (found == 0)
 			fac = 3600.0 * 24.0 * 365.25;
-
+		
 
 	}
 

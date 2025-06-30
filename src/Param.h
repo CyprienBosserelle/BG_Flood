@@ -22,6 +22,8 @@ public:
 	int frictionmodel = 0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)
 	double cf = 0.0001; // Bottom friction coefficient for flow model (if constant)
 	double Cd = 0.002; // Wind drag coefficient
+	double il = 0.0; //Initial Loss (if constant)
+	double cl = 0.0; //Continuous Loss (if constant)
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
@@ -34,6 +36,8 @@ public:
 	bool rightbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool topbnd = false; // bnd is forced (i.e. not a wall or neuman)
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
+
+	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
 
 	double Pa2m = 0.00009916; // Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)
 	double Paref = 101300.0; // Reference pressure in Pa (if unit is hPa then user should use 1013.0)
@@ -54,6 +58,7 @@ public:
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
 	int halowidth = 1; // Use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
+	
 
 	double xo = nan(""); // Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
@@ -81,6 +86,9 @@ public:
 	double totaltime = 0.0; // Total simulation time in s
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
+	double bndrelaxtime = 3600.0; // Realxation time for absorbing boundary
+	double bndfiltertime = 60.0; // Filtering time for absorbing boundary
+
 
 	//* Initialisation
 	double zsinit = nan(""); //Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0
@@ -93,6 +101,9 @@ public:
 	*/
 	//std::string deformfile;
 	int hotstep = 0; //Step to read if hotstart file has multiple steps (step and not (computation) time)
+
+
+	double bndtaper = 0.0; // number of second to taper boundary values to smooth transition with initial conditions default is no tapering but 600s is good practice
 	//other
 	clock_t startcputime, endcputime, setupcputime;
 	size_t GPU_initmem_byte, GPU_totalmem_byte;
@@ -206,6 +217,9 @@ public:
 
 	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
 	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
+
+
+	bool savebyblk=true;
 
 };
 

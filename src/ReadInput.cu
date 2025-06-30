@@ -216,7 +216,7 @@ Param readparamstr(std::string line, Param param)
 		param.conserveElevation = readparambool(parametervalue, param.conserveElevation);
 	}
 
-	paramvec = { "wetdryfix","reminstab" };
+	paramvec = { "wetdryfix","reminstab","fixinstab" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -247,9 +247,31 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == true)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
 		{
 			param.cf = std::stod(parametervalue);
+		}
+	}
+
+	paramvec = { "il","Rain_il","initialloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.il = std::stod(parametervalue);
+			param.infiltration = true;
+		}
+	}
+
+	paramvec = { "cl","Rain_cl","continuousloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.cl = std::stod(parametervalue);
+			param.infiltration = true;
 		}
 	}
 
@@ -304,6 +326,13 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.dtmin = std::stod(parametervalue);
+
+	}
+	parameterstr = "bndtaper";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndtaper = std::stod(parametervalue);
 
 	}
 
@@ -417,7 +446,7 @@ Param readparamstr(std::string line, Param param)
 			//Verify that the variable name makes sense?
 			//Need to add more here
 
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf", "Patm", "datmpdx", "datmpdy", "il", "cl", "hgw"};
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw"};
 
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
@@ -736,6 +765,13 @@ Param readparamstr(std::string line, Param param)
 		param.crs_ref = parametervalue;
 	}
 
+	paramvec = { "savebyblk", "writebyblk","saveperblk", "writeperblk","savebyblock", "writebyblock","saveperblock", "writeperblock" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.savebyblk = readparambool(parametervalue, param.savebyblk);
+	}
+
 	return param;
 }
 
@@ -764,8 +800,6 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	paramvec = { "AOI","aoipoly" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "bathy";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		forcing.AOI.file= parametervalue;
@@ -809,7 +843,10 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.left = readbndline(parametervalue);
+		//forcing.left = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "left"));
+
+		
 			
 	}
 	
@@ -817,7 +854,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.right = readbndline(parametervalue);
+		//forcing.right = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "right"));
 
 	}
 
@@ -825,14 +863,24 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.top = readbndline(parametervalue);
+		//forcing.top = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "top"));
 	}
 
 	paramvec = { "bot","botbndfile","botbnd","bottom" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		forcing.bot = readbndline(parametervalue);
+		//forcing.bot = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "bot"));
+	}
+
+	paramvec = { "bnd","bndseg" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//forcing.bot = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndline(parametervalue));
 	}
 
 
@@ -923,18 +971,27 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
-			forcing.cf = readfileinfo(parametervalue, forcing.cf);
+			//forcing.cf = readfileinfo(parametervalue, forcing.cf);
+			StaticForcingP<float> infoRoughness;
+			forcing.cf.push_back(readfileinfo(parametervalue, infoRoughness));
 		}
 	}
+
+
+	//if (!parametervalue.empty())
+	//{
+	//
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	//}
 
 	// Rain losses, initial and continuous loss
 	paramvec = { "il","Rain_il","initialloss" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.il = readfileinfo(parametervalue, forcing.il);
 		}
@@ -943,7 +1000,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		if (std::isdigit(parametervalue[0]) == false)
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.cl = readfileinfo(parametervalue, forcing.cl);
 		}
@@ -1165,7 +1222,65 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		}
 	}
 
+	// Read/setup bdn segment polygon. Note this can't be part of the "readforcing" step because xmin, xmax ymin ymax are not known then
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		XForcing.bndseg[iseg].poly= readbndpolysegment(XForcing.bndseg[iseg], XParam);
+		if (XForcing.bndseg[iseg].type == 2)
+		{
+			XForcing.bndseg[iseg].type = 3;
+		}
+
+
+		XForcing.bndseg[iseg].left.isright = -1;
+		XForcing.bndseg[iseg].left.istop = 0;
+
+		XForcing.bndseg[iseg].right.isright = 1;
+		XForcing.bndseg[iseg].right.istop = 0;
+
+		XForcing.bndseg[iseg].top.isright = 0;
+		XForcing.bndseg[iseg].top.istop = 1;
+
+		XForcing.bndseg[iseg].bot.isright = 0;
+		XForcing.bndseg[iseg].bot.istop = -1;
+	}
+
+	bndsegment remainderblk;
+
+	remainderblk.left.isright = -1;
+	remainderblk.left.istop = 0;
+
+	remainderblk.right.isright = 1;
+	remainderblk.right.istop = 0;
+
+	remainderblk.top.isright = 0;
+	remainderblk.top.istop = 1;
+
+	remainderblk.bot.isright = 0;
+	remainderblk.bot.istop = -1;
+	remainderblk.type = XParam.aoibnd;
+
+	XForcing.bndseg.push_back(remainderblk);
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].left.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].right.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].top.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].bot.blk);
+
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].left.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].right.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].top.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].bot.qmean);
+	}
+
+	
+	
+	
+	
 	//setup extra infor about boundaries
+	// This is not needed anymore
 	XForcing.left.side = 3;
 	XForcing.left.isright = -1;
 	XForcing.left.istop = 0;
@@ -1181,6 +1296,9 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	XForcing.bot.side = 2;
 	XForcing.bot.isright = 0;
 	XForcing.bot.istop = -1;
+
+
+	//
 
 	XForcing.Atmp.clampedge = float(XParam.Paref);
 
@@ -1308,7 +1426,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	}
 
 	//Check that the Initial Loss/ Continuing Loss model is used if il, cl or hgw output are asked by user.
-	if (XForcing.il.inputfile.empty() || XForcing.cl.inputfile.empty())
+	if (!XParam.infiltration) // (XForcing.il.inputfile.empty() && XForcing.cl.inputfile.empty() && (XParam.il == 0.0) && (XParam.cl == 0.0))
 	{
 		std::vector<std::string> namestr = { "il","cl","hgw"};
 		for (int ii = 0; ii < namestr.size(); ii++)
@@ -1540,9 +1658,67 @@ std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> ve
 	return found;
 }
 
-bndparam readbndline(std::string parametervalue)
+
+bndsegment readbndlineside(std::string parametervalue, std::string side)
 {
-	bndparam bnd;
+	bndsegment bnd;
+
+
+	std::vector<std::string> items = split(parametervalue, ',');
+
+	if (items.size() == 1)
+	{
+		bnd.type = std::stoi(items[0]);
+
+	}
+	else if (items.size() >= 2)
+	{
+		const char* cstr = items[1].c_str();
+		
+		if (isdigit(cstr[0]))
+		{
+			//?
+			bnd.type = std::stoi(items[1]);
+			bnd.inputfile = items[0];
+			bnd.on = true;
+			
+			
+			
+		}
+		else
+		{
+			bnd.type = std::stoi(items[0]);
+			bnd.inputfile = items[1];
+			bnd.on = true;
+		}
+		
+	}
+	bnd.polyfile = side;
+	if (bnd.on)
+	{
+		bnd.WLmap = readfileinfo(bnd.inputfile, bnd.WLmap);
+
+		//set the expected type of input
+
+		if (bnd.WLmap.extension.compare("nc") == 0)
+		{
+			bnd.WLmap.uniform = 0;
+			bnd.uniform = 0;
+		}
+		else
+		{
+			bnd.WLmap.uniform = 1;
+			bnd.uniform = 1;
+		}
+	}
+	return bnd;
+}
+
+
+bndsegment readbndline(std::string parametervalue)
+{
+	//bndseg = area.txt, waterlevelforcing, 1;
+	bndsegment bnd;
 	std::vector<std::string> items = split(parametervalue, ',');
 	if (items.size() == 1)
 	{
@@ -1552,26 +1728,46 @@ bndparam readbndline(std::string parametervalue)
 	else if (items.size() >= 2)
 	{
 		const char* cstr = items[1].c_str();
-		if (items[1].length()<2)
+		if (items[1].length()>2)
 		{
-			if (!isdigit(cstr[0]))
-			{
-				// Error
-				//exit?
-			}
-			bnd.type = std::stoi(items[1]);
-			bnd.inputfile = items[0];
+			bnd.polyfile = items[0];
+			bnd.type = std::stoi(items[2]);
+			bnd.inputfile = items[1];
 			bnd.on = true;
+			
 		}
 		else
 		{
-			bnd.type = std::stoi(items[0]);
-			bnd.inputfile = items[1];
-			bnd.on = true;
+			bnd.polyfile = items[0];
+			bnd.type = std::max(std::stoi(items[1]),1); // only 2 param implies that it is either a wall or Neumann bnd
+	
+		}
+	}
+	
+
+	//set the expected type of input
+
+	if (bnd.on)
+	{
+		bnd.WLmap = readfileinfo(bnd.inputfile, bnd.WLmap);
+
+		//set the expected type of input
+
+		if (bnd.WLmap.extension.compare("nc") == 0)
+		{
+			bnd.WLmap.uniform = 0;
+			bnd.uniform = 0;
+		}
+		else
+		{
+			bnd.WLmap.uniform = 1;
+			bnd.uniform = 1;
 		}
 	}
 	return bnd;
 }
+
+
 
 bool readparambool(std::string paramstr,bool defaultval)
 {
@@ -1590,4 +1786,13 @@ bool readparambool(std::string paramstr,bool defaultval)
 
 	return out;
 }
+
+
+
+
+//inline bool fileexists(const std::string& name) {
+//	struct stat buffer;
+//	return (stat(name.c_str(), &buffer) == 0);
+//}
+
 

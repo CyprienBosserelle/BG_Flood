@@ -20,7 +20,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+		//updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
 
 
 		// Calculate dynamic forcing at this step
@@ -205,19 +205,25 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 
 template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	if (XParam.GPUDEVICE >= 0)
+	for (int ibndseg = 0; ibndseg < XForcing.bndseg.size(); ibndseg++)
 	{
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XForcing.Atmp, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XForcing.Atmp, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XForcing.Atmp, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XForcing.Atmp, XModel_g.evolv);
-	}
-	else
-	{
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv);
+		if (XParam.GPUDEVICE >= 0)
+		{
+
+
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XForcing.Atmp, XModel_g.evolv);
+
+		}
+		else
+		{
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv);
+		}
 	}
 }
 
@@ -480,7 +486,7 @@ template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XM
 		log(" \n ");
 		log("\t\tModel CRASHED: time steps (" + std::to_string(XLoop.dt) + ") inferior to " + std::to_string(XParam.dtmin) + "\n");
 
-		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho", "vo", "uo", "zso" };
+		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho","vo","uo","zso" };
 		std::vector<std::string> outvold = XParam.outvars;
 		if (XParam.GPUDEVICE >= 0)
 		{
