@@ -1,7 +1,7 @@
 ﻿#include "ConserveElevation.h"
 
 
-template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0)
+template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start)
 {
 	int ib;
 	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
@@ -22,8 +22,8 @@ template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, Evolvi
 		
 	}
 }
-template void conserveElevation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
-template void conserveElevation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+template void conserveElevation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb, int nblk_local_start);
+template void conserveElevation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb, int nblk_local_start);
 
 template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
@@ -45,7 +45,7 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
-template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0)
+template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start)
 {
 	int ib, ibLB, ibTL, ibBL, ibRB,ibn;
 	int ihalo, jhalo, ip, jp;
@@ -170,10 +170,10 @@ template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, Evolv
 	}
 
 }
-template void WetDryProlongation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
-template void WetDryProlongation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
+template void WetDryProlongation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb, int nblk_local_start);
+template void WetDryProlongation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb, int nblk_local_start);
 
-template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0)
+template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start)
 {
 	int ib, ibLB, ibTL, ibBL, ibRB, ibLT, ibRT, ibTR, ibBR, ibn;
 	int ihalo, jhalo, ir, jr, lev;
@@ -321,8 +321,8 @@ template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, Evolvi
 	}
 
 }
-template void WetDryRestriction<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
-template void WetDryRestriction<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
+template void WetDryRestriction<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb, int nblk_local_start);
+template void WetDryRestriction<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb, int nblk_local_start);
 
 template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
@@ -643,8 +643,8 @@ template <class T> void conserveElevationGradHaloGPU(Param XParam, BlockP<T> XBl
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 }
-template void conserveElevationGradHaloGPU<float>(Param XParam, BlockP<float> XBlock, float* h, float* zs, float* zb, float* dhdx, float* dzsdx, float* dhdy, float* dzsdy);
-template void conserveElevationGradHaloGPU<double>(Param XParam, BlockP<double> XBlock, double* h, double* zs, double* zb, double* dhdx, double* dzsdx, double* dhdy, double* dzsdy);
+template void conserveElevationGradHaloGPU<float>(Param XParam, BlockP<float> XBlock, float* h, float* zs, float* zb, float* dhdx, float* dzsdx, float* dhdy, float* dzsdy, int nblk_local_start);
+template void conserveElevationGradHaloGPU<double>(Param XParam, BlockP<double> XBlock, double* h, double* zs, double* zb, double* dhdx, double* dzsdx, double* dhdy, double* dzsdy, int nblk_local_start);
 
 template <class T> __host__ __device__ void conserveElevationGradHalo(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo,int i, int j, T* h, T* dhdx, T* dhdy)
 {
