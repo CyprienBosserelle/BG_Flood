@@ -231,8 +231,8 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 		}
 	}
 }
-template __host__ void updateEVCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, FluxP<float> XFlux, AdvanceP<float> XAdv);
-template __host__ void updateEVCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, FluxP<double> XFlux, AdvanceP<double> XAdv);
+template __host__ void updateEVCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, FluxP<float> XFlux, AdvanceP<float> XAdv, int nblk_local_start);
+template __host__ void updateEVCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, FluxP<double> XFlux, AdvanceP<double> XAdv, int nblk_local_start);
 
 
 template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, T dt ,T* zb, EvolvingP<T> XEv, AdvanceP<T> XAdv, EvolvingP<T> XEv_o)
@@ -337,8 +337,8 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 	}
 
 }
-template __host__ void AdvkernelCPU<float>(Param XParam, BlockP<float> XBlock, float dt, float* zb, EvolvingP<float> XEv, AdvanceP<float> XAdv, EvolvingP<float> XEv_o);
-template __host__ void AdvkernelCPU<double>(Param XParam, BlockP<double> XBlock, double dt, double* zb, EvolvingP<double> XEv, AdvanceP<double> XAdv, EvolvingP<double> XEv_o);
+template __host__ void AdvkernelCPU<float>(Param XParam, BlockP<float> XBlock, float dt, float* zb, EvolvingP<float> XEv, AdvanceP<float> XAdv, EvolvingP<float> XEv_o, int nblk_local_start);
+template __host__ void AdvkernelCPU<double>(Param XParam, BlockP<double> XBlock, double dt, double* zb, EvolvingP<double> XEv, AdvanceP<double> XAdv, EvolvingP<double> XEv_o, int nblk_local_start);
 
 
 
@@ -393,8 +393,8 @@ template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, Evol
 	}
 
 }
-template __host__ void cleanupCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, EvolvingP<float> XEv_o);
-template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, EvolvingP<double> XEv_o);
+template __host__ void cleanupCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, EvolvingP<float> XEv_o, int nblk_local_start);
+template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, EvolvingP<double> XEv_o, int nblk_local_start);
 
 
 template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime, int nblk_local_start)
@@ -427,8 +427,8 @@ template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, 
 
 	return dt;
 }
-template __host__ float timestepreductionCPU(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
-template __host__ double timestepreductionCPU(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
+template __host__ float timestepreductionCPU(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime, int nblk_local_start);
+template __host__ double timestepreductionCPU(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime, int nblk_local_start);
 
 template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
@@ -587,6 +587,7 @@ template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_
 	g_odata[o] = g_idata[i];
 }
 
+/*
 template __host__ void updateEVCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, FluxP<float> XFlux, AdvanceP<float> XAdv, int nblk_local_start);
 template __host__ void updateEVCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, FluxP<double> XFlux, AdvanceP<double> XAdv, int nblk_local_start);
 
@@ -598,3 +599,4 @@ template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, E
 
 template __host__ float timestepreductionCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime, int nblk_local_start);
 template __host__ double timestepreductionCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime, int nblk_local_start);
+*/
