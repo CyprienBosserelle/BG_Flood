@@ -151,6 +151,8 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 template void InitMesh<float>(Param &XParam, Forcing<float>& XForcing, Model<float> &XModel);
 template void InitMesh<double>(Param &XParam, Forcing<float>& XForcing, Model<double> &XModel);
 
+#include <mpi.h> // Required for MPI functions
+
 template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, BlockP<T>& XBlock)
 {
 	//============================
@@ -163,13 +165,67 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, B
 	{
 		XBlock.active[ib] = -1;
 		XBlock.level[ib] = XParam.initlevel;
+		// Initialize owner_rank as -1 (or some other indicator for unowned/inactive)
+		if (XBlock.owner_rank != nullptr) { // owner_rank is allocated in AllocateCPU in InitMesh
+            XBlock.owner_rank[ib] = -1;
+        }
 	}
 	
 	
 
 	//============================
 	// Init xo, yo and active blk
+	// This populates XBlock.active with the global IDs of blocks that are active.
+	// The total number of such blocks is XParam.nblk (global total).
 	InitBlockxoyo(XParam, XForcing, XBlock);
+
+	//============================
+	// Determine block ownership and distribute the map
+	if (XParam.size > 1) {
+		// 1. Each rank determines which global block IDs it will own.
+		//    This logic should mirror how blocks are distributed in FlowCPU.
+		int nblk_per_process = XParam.nblk / XParam.size;
+		int remainder_blks = XParam.nblk % XParam.size;
+		int local_start_idx, local_end_idx;
+
+		if (XParam.rank < remainder_blks) {
+			local_start_idx = XParam.rank * (nblk_per_process + 1);
+			local_end_idx = local_start_idx + nblk_per_process + 1;
+		} else {
+			local_start_idx = XParam.rank * nblk_per_process + remainder_blks;
+			local_end_idx = local_start_idx + nblk_per_process;
+		}
+
+		// Temporary array to store ranks for blocks this process owns
+		int* local_ownership = new int[XParam.nblkmem];
+		for(int i = 0; i < XParam.nblkmem; ++i) local_ownership[i] = -1; // Initialize
+
+		for (int i = local_start_idx; i < local_end_idx; ++i) {
+			int global_block_id = XBlock.active[i];
+			if (global_block_id != -1) { // Should always be true for active blocks
+				local_ownership[global_block_id] = XParam.rank;
+			}
+		}
+
+		// 2. Use MPI_Allreduce with MPI_MAX to create the global XBlock.owner_rank map.
+        //    Each element in XBlock.owner_rank will be the MAX of what all processes send for that block.
+        //    Since only one process will claim ownership (with its rank) and others send -1, MAX will pick the owner.
+        if (XBlock.owner_rank != nullptr) {
+            MPI_Allreduce(local_ownership, XBlock.owner_rank, XParam.nblkmem, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+        }
+		delete[] local_ownership;
+
+	} else { // Single process
+        if (XBlock.owner_rank != nullptr) {
+            for (int ibl = 0; ibl < XParam.nblk; ++ibl) {
+                int global_block_id = XBlock.active[ibl];
+                if (global_block_id != -1) {
+                    XBlock.owner_rank[global_block_id] = 0;
+                }
+            }
+        }
+	}
+
 
 	//============================
 	// Init neighbours

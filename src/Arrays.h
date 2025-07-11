@@ -128,6 +128,8 @@ struct BlockP
 	maskinfo mask;
 	
 	std::vector<outzoneB> outZone;
+
+	int* owner_rank; // MPI rank that owns each block_id. Size: XParam.nblkmem
 };
 
 

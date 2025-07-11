@@ -135,7 +135,7 @@ template __global__ void updateEVGPU<float>(Param XParam, BlockP<float> XBlock, 
 template __global__ void updateEVGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, FluxP<double> XFlux, AdvanceP<double> XAdv);
 
 
-template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv)
+template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv, int nblk_local_start = 0)
 {
 
 	//T eps = T(XParam.eps);
@@ -149,13 +149,14 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		lev = XBlock.level[ib];
 		delta = calcres(T(XParam.delta), lev);
 
-		ybo = (T)XParam.yo + XBlock.yo[ib];
+		ybo = (T)XParam.yo + XBlock.yo[ib]; // Global XParam.yo is correct here
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -281,7 +282,7 @@ template __global__ void AdvkernelGPU<float>(Param XParam, BlockP<float> XBlock,
 template __global__ void AdvkernelGPU<double>(Param XParam, BlockP<double> XBlock, double dt, double* zb, EvolvingP<double> XEv, AdvanceP<double> XAdv, EvolvingP<double> XEv_o);
 
 
-template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T dt, T* zb, EvolvingP<T> XEv, AdvanceP<T> XAdv, EvolvingP<T> XEv_o)
+template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T dt, T* zb, EvolvingP<T> XEv, AdvanceP<T> XAdv, EvolvingP<T> XEv_o, int nblk_local_start = 0)
 {
 	T eps = T(XParam.eps);
 	
@@ -291,9 +292,10 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 	//int halowidth = XParam.halowidth;
 	//int blkmemwidth = XParam.blkmemwidth;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
@@ -364,15 +366,16 @@ template __global__ void cleanupGPU<double>(Param XParam, BlockP<double> XBlock,
 
 
 
-template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, EvolvingP<T> XEv_o)
+template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, EvolvingP<T> XEv_o, int nblk_local_start = 0)
 {
 	int ib;
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -394,7 +397,7 @@ template __host__ void cleanupCPU<float>(Param XParam, BlockP<float> XBlock, Evo
 template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, EvolvingP<double> XEv_o);
 
 
-template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
+template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime, int nblk_local_start = 0)
 {
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -404,9 +407,10 @@ template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, 
 
 	T dt = T(1.0) / epsi;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{

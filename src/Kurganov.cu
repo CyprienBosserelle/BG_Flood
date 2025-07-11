@@ -414,7 +414,7 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 template __global__ void AddSlopeSourceXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* zb);
 template __global__ void AddSlopeSourceXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* zb);
 
-template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb)
+template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb, int nblk_local_start = 0)
 {
 
 	
@@ -430,13 +430,14 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 	int RB, LBRB, LB, RBLB, levRB, levLB;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		int lev = XBlock.level[ib];
 		delta = calcres(T(XParam.delta), lev);
 
-		ybo = T(XParam.yo + XBlock.yo[ib]);
+		ybo = T(XParam.yo + XBlock.yo[ib]); // Global XParam.yo is correct
 
 		// neighbours for source term
 		
@@ -585,7 +586,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 template __host__ void updateKurgXCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
 template __host__ void updateKurgXCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
-template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb,T* Patm,T*dPdx)
+template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb,T* Patm,T*dPdx, int nblk_local_start = 0)
 {
 
 
@@ -759,7 +760,7 @@ template __host__ void updateKurgXATMCPU<float>(Param XParam, BlockP<float> XBlo
 template __host__ void updateKurgXATMCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdx);
 
 
-template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
+template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb, int nblk_local_start = 0)
 {
 	T delta;
 	//T g = T(XParam.g);
@@ -771,9 +772,10 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		int lev = XBlock.level[ib];
 		delta = T(calcres(XParam.delta, lev));
 
@@ -1258,7 +1260,7 @@ template __global__ void AddSlopeSourceYGPU<double>(Param XParam, BlockP<double>
 
 
 
-template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax,T*zb)
+template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax,T*zb, int nblk_local_start = 0)
 {
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
@@ -1275,9 +1277,10 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 
 	int TL, BLTL, BL, TLBL, levTL, levBL, lev;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		
 
 
@@ -1404,7 +1407,7 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 template __host__ void updateKurgYCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
 template __host__ void updateKurgYCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
-template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm, T* dPdy)
+template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm, T* dPdy, int nblk_local_start = 0)
 {
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
@@ -1559,7 +1562,7 @@ template __host__ void updateKurgYATMCPU<float>(Param XParam, BlockP<float> XBlo
 template __host__ void updateKurgYATMCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdy);
 
 
-template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
+template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb, int nblk_local_start = 0)
 {
 	T delta;
 	T g = T(XParam.g);
@@ -1573,9 +1576,10 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		
 
 		int lev = XBlock.level[ib];

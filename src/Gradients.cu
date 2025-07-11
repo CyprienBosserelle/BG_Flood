@@ -811,7 +811,7 @@ template __global__ void gradientedgeY<double>(int halowidth, int* active, int* 
 
 
 
-template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx, T* dady)
+template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx, T* dady, int nblk_local_start = 0)
 {
 
 	int i,ib;
@@ -819,10 +819,11 @@ template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx,
 
 	T delta;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
-		delta = calcres(T(XParam.delta), XBlock.level[ib]);
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
+		delta = calcres(T(XParam.delta), XBlock.level[ib]); // Global XParam.delta is fine
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
@@ -848,29 +849,29 @@ template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx,
 
 
 }
-template void gradientC<float>(Param XParam, BlockP<float> XBlock, float* a, float* dadx, float* dady);
-template void gradientC<double>(Param XParam, BlockP<double> XBlock, double* a, double* dadx, double* dady);
+template void gradientC<float>(Param XParam, BlockP<float> XBlock, float* a, float* dadx, float* dady, int nblk_local_start);
+template void gradientC<double>(Param XParam, BlockP<double> XBlock, double* a, double* dadx, double* dady, int nblk_local_start);
 
-template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb, int nblk_local_start = 0)
 {
+	// XParam here is XParam_local from FlowCPU
 
-
-	std::thread t0(&gradientC<T>, XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	std::thread t1(&gradientC<T>, XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	std::thread t2(&gradientC<T>, XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-	std::thread t3(&gradientC<T>, XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	std::thread t0(&gradientC<T>, XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy, nblk_local_start);
+	std::thread t1(&gradientC<T>, XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy, nblk_local_start);
+	std::thread t2(&gradientC<T>, XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy, nblk_local_start);
+	std::thread t3(&gradientC<T>, XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy, nblk_local_start);
 
 	t0.join();
 	t1.join();
 	t2.join();
 	t3.join();
 
-	//fillHalo(XParam, XBlock, XGrad);
+	//fillHalo(XParam, XBlock, XGrad); // This will need to be MPI_Aware for step 3
 	
-	gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-	gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy, nblk_local_start); // MPI_Aware for step 3
+	gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy, nblk_local_start); // MPI_Aware for step 3
+	gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy, nblk_local_start); // MPI_Aware for step 3
+	gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy, nblk_local_start); // MPI_Aware for step 3
 	
 	if (XParam.conserveElevation)
 	{
@@ -892,22 +893,22 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 		WetDryProlongation(XParam, XBlock, XEv, zb);
 	}
 
-	RecalculateZs(XParam, XBlock, XEv, zb);
+	RecalculateZs(XParam, XBlock, XEv, zb, nblk_local_start); // Assuming RecalculateZs needs similar modification
 	
-	std::thread t4(&gradientC<T>, XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	std::thread t5(&gradientC<T>, XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	std::thread t6(&gradientC<T>, XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-	std::thread t7(&gradientC<T>, XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	std::thread t4(&gradientC<T>, XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy, nblk_local_start);
+	std::thread t5(&gradientC<T>, XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy, nblk_local_start);
+	std::thread t6(&gradientC<T>, XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy, nblk_local_start);
+	std::thread t7(&gradientC<T>, XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy, nblk_local_start);
 
 	t4.join();
 	t5.join();
 	t6.join();
 	t7.join();
 
-	gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-	gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
-	gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
-	gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	gradientHalo(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy, nblk_local_start); // MPI_Aware for step 3
+	gradientHalo(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy, nblk_local_start); // MPI_Aware for step 3
+	gradientHalo(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy, nblk_local_start); // MPI_Aware for step 3
+	gradientHalo(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy, nblk_local_start); // MPI_Aware for step 3
 
 	if (XParam.conserveElevation)
 	{
@@ -917,12 +918,12 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 	
 	if (XParam.engine == 1)
 	{
-		WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb);
+		WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb, nblk_local_start);
 
-		WetsloperesetHaloLeftCPU(XParam, XBlock, XEv, XGrad, zb);
-		WetsloperesetHaloRightCPU(XParam, XBlock, XEv, XGrad, zb);
-		WetsloperesetHaloBotCPU(XParam, XBlock, XEv, XGrad, zb);
-		WetsloperesetHaloTopCPU(XParam, XBlock, XEv, XGrad, zb);
+		WetsloperesetHaloLeftCPU(XParam, XBlock, XEv, XGrad, zb, nblk_local_start);
+		WetsloperesetHaloRightCPU(XParam, XBlock, XEv, XGrad, zb, nblk_local_start);
+		WetsloperesetHaloBotCPU(XParam, XBlock, XEv, XGrad, zb, nblk_local_start);
+		WetsloperesetHaloTopCPU(XParam, XBlock, XEv, XGrad, zb, nblk_local_start);
 	}
 
 
@@ -936,19 +937,21 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 
 }
 template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb);
-template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb);
+template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb, int nblk_local_start);
+template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb, int nblk_local_start);
 
-template <class T> void WetsloperesetCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+template <class T> void WetsloperesetCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb, int nblk_local_start = 0)
 {
 	int i, ib;
 	int xplus, xminus, yminus;
 
 	T delta;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
-		delta = calcres(T(XParam.delta), XBlock.level[ib]);
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
+		delta = calcres(T(XParam.delta), XBlock.level[ib]); // Global XParam.delta is fine
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
@@ -1227,7 +1230,7 @@ template <class T> __global__ void WetsloperesetHaloLeftGPU(Param XParam, BlockP
 
 }
 
-template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb, int nblk_local_start = 0)
 {
 
 
@@ -1235,10 +1238,10 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = -1;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-
-		unsigned int ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		unsigned int ib = XBlock.active[ibl_global];
 
 		int lev = XBlock.level[ib];
 
@@ -1537,22 +1540,22 @@ template <class T> __global__ void WetsloperesetHaloRightGPU(Param XParam, Block
 
 }
 
-template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb, int nblk_local_start = 0)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
 	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int ix = XParam.blkwidth;
 	
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-
+		int ibl_global = nblk_local_start + ibl_local;
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 
 
 			
-			unsigned int ib = XBlock.active[ibl];
+			unsigned int ib = XBlock.active[ibl_global];
 			int i, jj, ii, ir, it, itr;
 			int read;
 
@@ -1852,18 +1855,18 @@ template <class T> __global__ void WetsloperesetHaloBotGPU(Param XParam, BlockP<
 
 }
 
-template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb, int nblk_local_start = 0)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
 	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = -1;
 	
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
 
-		
-		unsigned int ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		unsigned int ib = XBlock.active[ibl_global];
 
 		 
 
@@ -2168,16 +2171,17 @@ template <class T> __global__ void WetsloperesetHaloTopGPU(Param XParam, BlockP<
 
 
 
-template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb, int nblk_local_start = 0)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
 	//unsigned int blksize = XParam.blkmemwidth * XParam.blkmemwidth;
 	int iy = XParam.blkwidth;
 	
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		unsigned int ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		unsigned int ib = XBlock.active[ibl_global];
 
 		int i, jj, ii, ir, it, itr;
 
@@ -2327,18 +2331,24 @@ template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, 
 }
 
 
-template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
+template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady, int nblk_local_start = 0)
 {
 	int ib;
 	//int xplus;
 
 	//T delta;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	// Note: XParam.nblk here is XParam_local.nblk passed from gradientCPU
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++)
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
+			// These functions operate on a single block (ib) and its direct neighbors.
+			// MPI communication will be needed if a neighbor is on another process.
+			// For now, we assume they correctly fetch neighbor data if local.
+			// XParam passed to these helpers is XParam_local, which is fine as they don't loop over XParam.nblk.
 			gradientHaloLeft(XParam, XBlock, ib, iy, a, dadx, dady);
 			gradientHaloRight(XParam, XBlock, ib, iy, a, dadx, dady);
 		}

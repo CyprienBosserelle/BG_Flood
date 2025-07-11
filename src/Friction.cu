@@ -62,7 +62,7 @@ template __global__ void bottomfrictionGPU<double>(Param XParam, BlockP<double> 
 
 
 
-template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock,T dt, T* cf, EvolvingP<T> XEvolv)
+template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock,T dt, T* cf, EvolvingP<T> XEvolv, int nblk_local_start = 0)
 {
 	T eps = T(XParam.eps);
 	T g = T(XParam.g);
@@ -75,9 +75,10 @@ template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBloc
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -131,7 +132,7 @@ template __host__ void bottomfrictionCPU<double>(Param XParam, BlockP<double> XB
 * 
 *
 */
-template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv, EvolvingP<T> XEvolv_o)
+template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv, EvolvingP<T> XEvolv_o, int nblk_local_start = 0)
 {
 	T eps = T(XParam.eps);
 	T g = T(XParam.g);
@@ -144,9 +145,10 @@ template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, 
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -336,7 +338,7 @@ template __global__ void TheresholdVelGPU<double>(Param XParam, BlockP<double> X
 *
 * The function wraps teh main functio for the CPU.
 */
-template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
+template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv, int nblk_local_start = 0)
 {
 
 	T ui, vi;
@@ -347,9 +349,10 @@ template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock
 
 	
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{

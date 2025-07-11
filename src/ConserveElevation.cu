@@ -1,12 +1,13 @@
 ﻿#include "ConserveElevation.h"
 
 
-template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0)
 {
 	int ib;
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 
 		//int ii = memloc(XParam, -1, 5, 46);
 
@@ -44,14 +45,15 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
-template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0)
 {
 	int ib, ibLB, ibTL, ibBL, ibRB,ibn;
 	int ihalo, jhalo, ip, jp;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 
 		ibLB = XBlock.LeftBot[ib];
 		ibRB = XBlock.RightBot[ib];
@@ -171,14 +173,15 @@ template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, Evolv
 template void WetDryProlongation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 template void WetDryProlongation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
-template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
+template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0)
 {
 	int ib, ibLB, ibTL, ibBL, ibRB, ibLT, ibRT, ibTR, ibBR, ibn;
 	int ihalo, jhalo, ir, jr, lev;
 
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 
 		ibLB = XBlock.LeftBot[ib];
 		ibLT = XBlock.LeftTop[ib];
@@ -603,12 +606,15 @@ template <class T> __host__ __device__ void conserveElevation(T zb, T& zswet, T&
 	zswet = hwet + zb;
 }
 
-template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy)
+template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy, int nblk_local_start = 0)
 {
 	int ib;
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
+		// These helper functions are called with the global block index 'ib'
+		// and the local XParam. This is fine as they don't loop over XParam.nblk.
 		conserveElevationGHLeft(XParam, ib, XBlock.LeftBot[ib], XBlock.LeftTop[ib], XBlock, h, zs, zb, dhdx, dzsdx);
 		conserveElevationGHRight(XParam, ib, XBlock.RightBot[ib], XBlock.RightTop[ib], XBlock, h, zs, zb, dhdx, dzsdx);
 		conserveElevationGHTop(XParam, ib, XBlock.TopLeft[ib], XBlock.TopRight[ib], XBlock, h, zs, zb, dhdy, dzsdy);

@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 // includes, system
-
+#include <mpi.h>
 #include "BG_Flood.h"
 
 
@@ -48,6 +48,14 @@
 */
 int main(int argc, char* argv[])
 {
+	// Initialize MPI
+	MPI_Init(&argc, &argv);
+
+	// Get rank and size
+	int rank, size;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+
 	//===========================================
 	// Read model argument (filename). If one is not given use the default name
 	std::string ParamFile;
@@ -66,13 +74,17 @@ int main(int argc, char* argv[])
 	//===========================================
 	//  Define the main parameter controling the model (XModels class at produced later) 
 	Param XParam;
+	XParam.rank = rank;
+	XParam.size = size;
 	Forcing<float> XForcing; // for reading and storing forcing data (CPU only) // by default we read only float precision!
 	// Start timer to keep track of time
 	XParam.startcputime = clock();
 
 	
 	// Create/overwrite existing 
-	create_logfile();
+	if (rank == 0) {
+		create_logfile();
+	}
 
 	//============================================
 	// Read Operational file
@@ -102,10 +114,15 @@ int main(int argc, char* argv[])
 		mainwork(XParam, XForcing, XModel_d, XModel_gd);
 	}
 
+	MPI_Finalize();
+	return 0;
 }
 
 template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
+	if (XParam.rank == 0) {
+		log("BG_Flood initiated");
+	}
 	//============================================
 	// Read the forcing data (Including bathymetry)
 	readforcing(XParam, XForcing);
