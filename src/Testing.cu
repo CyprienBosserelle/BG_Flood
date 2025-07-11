@@ -1399,7 +1399,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	{
 		advVar.push_back(advst[nv]);
 	}
-	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
+	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv, 0); // Added nblk_local_start = 0
 	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.flux, XModel_g.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -1415,7 +1415,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	{
 		evoVar.push_back(evost[nv]);
 	}
-	AdvkernelCPU(XParam, XModel.blocks, T(0.0005), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	AdvkernelCPU(XParam, XModel.blocks, T(0.0005), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o, 0); // Added nblk_local_start = 0
 	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.0005), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 

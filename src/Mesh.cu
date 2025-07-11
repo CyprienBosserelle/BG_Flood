@@ -151,7 +151,9 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 template void InitMesh<float>(Param &XParam, Forcing<float>& XForcing, Model<float> &XModel);
 template void InitMesh<double>(Param &XParam, Forcing<float>& XForcing, Model<double> &XModel);
 
+#ifdef USE_MPI
 #include <mpi.h> // Required for MPI functions
+#endif
 
 template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, BlockP<T>& XBlock)
 {
@@ -181,6 +183,7 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, B
 
 	//============================
 	// Determine block ownership and distribute the map
+#ifdef USE_MPI
 	if (XParam.size > 1) {
 		// 1. Each rank determines which global block IDs it will own.
 		//    This logic should mirror how blocks are distributed in FlowCPU.
@@ -215,7 +218,7 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, B
         }
 		delete[] local_ownership;
 
-	} else { // Single process
+	} else { // Single process (still under USE_MPI but size == 1)
         if (XBlock.owner_rank != nullptr) {
             for (int ibl = 0; ibl < XParam.nblk; ++ibl) {
                 int global_block_id = XBlock.active[ibl];
@@ -225,6 +228,16 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, B
             }
         }
 	}
+#else // USE_MPI not defined
+    if (XBlock.owner_rank != nullptr) {
+        for (int ibl = 0; ibl < XParam.nblk; ++ibl) {
+            int global_block_id = XBlock.active[ibl];
+            if (global_block_id != -1) {
+                XBlock.owner_rank[global_block_id] = 0; // Default to rank 0 if MPI is not used
+            }
+        }
+    }
+#endif
 
 
 	//============================

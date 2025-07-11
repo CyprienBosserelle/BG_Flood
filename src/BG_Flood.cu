@@ -21,7 +21,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 // includes, system
+#ifdef USE_MPI
 #include <mpi.h>
+#endif
 #include "BG_Flood.h"
 
 
@@ -48,6 +50,7 @@
 */
 int main(int argc, char* argv[])
 {
+#ifdef USE_MPI
 	// Initialize MPI
 	MPI_Init(&argc, &argv);
 
@@ -55,6 +58,10 @@ int main(int argc, char* argv[])
 	int rank, size;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
+#else
+	int rank = 0;
+	int size = 1;
+#endif
 
 	//===========================================
 	// Read model argument (filename). If one is not given use the default name
@@ -114,7 +121,9 @@ int main(int argc, char* argv[])
 		mainwork(XParam, XForcing, XModel_d, XModel_gd);
 	}
 
+#ifdef USE_MPI
 	MPI_Finalize();
+#endif
 	return 0;
 }
 

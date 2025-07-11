@@ -155,6 +155,36 @@ NVCCFLAGS   := -m${TARGET_SIZE} -std=c++11 -rdc=true
 CCFLAGS     :=
 LDFLAGS     :=
 
+# MPI configuration
+USE_MPI ?= 1
+ifeq ($(USE_MPI),1)
+    NVCCFLAGS += -DUSE_MPI
+    # Add MPI include paths and libraries if necessary
+    # For example:
+    # INCLUDES += $(shell mpicc --showme:incdirs)
+    # LIBRARIES += $(shell mpicc --showme:libdirs) $(shell mpicc --showme:libs)
+    # You might need to adjust these commands based on your MPI implementation
+    # and how it's typically used with nvcc.
+    # Common MPI wrappers like mpicc, mpicxx, or mpiCC often handle these.
+    # If you're using one of those to compile/link, you might not need to add them here explicitly.
+    # However, since NVCC is the primary compiler here, we might need to pass MPI flags to it.
+    # For now, I'm assuming mpicc is in the PATH and nvcc can find MPI headers/libs
+    # or that they are in standard locations.
+    # This part might need refinement based on the specific MPI setup.
+    # Get MPI linker flags (libraries, library paths)
+    MPI_LINK_FLAGS := $(shell mpicc --showme:link)
+
+    # Add MPI include directories to INCLUDES with -I prefix
+    INCLUDES += -I/usr/lib/x86_64-linux-gnu/openmpi/include
+    # Store MPI linker flags for the final linking stage
+    LIBRARIES += $(MPI_LINK_FLAGS)
+    # NVCC remains the primary CUDA compiler
+    NVCC          := nvcc -ccbin $(HOST_COMPILER)
+else
+    # Ensure NVCC is set correctly if not using MPI
+    NVCC          := nvcc -ccbin $(HOST_COMPILER)
+endif
+
 # build flags
 ifeq ($(TARGET_OS),darwin)
     LDFLAGS += -rpath $(CUDA_PATH)/lib
@@ -191,6 +221,7 @@ else
 endif
 
 ALL_CCFLAGS :=
+ALL_CCFLAGS += $(INCLUDES) # Add all include paths first
 ALL_CCFLAGS += $(NVCCFLAGS)
 ALL_CCFLAGS += $(EXTRA_NVCCFLAGS)
 ALL_CCFLAGS += $(addprefix -Xcompiler ,$(CCFLAGS))
@@ -198,18 +229,18 @@ ALL_CCFLAGS += $(addprefix -Xcompiler ,$(EXTRA_CCFLAGS))
 
 SAMPLE_ENABLED := 1
 
-ALL_LDFLAGS := -I
-ALL_LDFLAGS += $(ALL_CCFLAGS)
+ALL_LDFLAGS := # Start clean for linker flags
+# ALL_LDFLAGS += $(ALL_CCFLAGS) # NVCC applies its own CCFLAGS during linking when objects are passed
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
 
 # Common includes and paths for CUDA
-INCLUDES  := -I/usr/includes
-LIBRARIES :=
+INCLUDES  := -I/usr/includes # Base includes
+LIBRARIES := # This will be populated by MPI_LINK_FLAGS and NetCDF
 
 # Add NetCDF include library
 INCLUDES += $(shell nc-config --cflags)
-ALL_LDFLAGS += $(shell nc-config --libs)
+LIBRARIES += $(shell nc-config --libs)
 
 ################################################################################
 

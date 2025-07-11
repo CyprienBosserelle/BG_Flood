@@ -87,7 +87,11 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 	//============================================
 	// Reduce minimum timestep - This requires global reduction (MPI_Allreduce)
 	T local_dt_min = CalctimestepCPU(XParam_local, XLoop, XModel.blocks, XModel.time, nblk_local_start);
+#ifdef USE_MPI
 	MPI_Allreduce(&local_dt_min, &XLoop.dt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD); // Assuming T can be MPI_DOUBLE or MPI_FLOAT
+#else
+	XLoop.dt = local_dt_min;
+#endif
 	XLoop.dtmax = XLoop.dt;
 	XModel.time.dt = T(XLoop.dt);
 
@@ -278,7 +282,11 @@ template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	//============================================
 	// Reduce minimum timestep - Requires MPI_Allreduce
 	T local_dt_min = CalctimestepCPU(XParam_local, XLoop, XModel.blocks, XModel.time, nblk_local_start);
+#ifdef USE_MPI
 	MPI_Allreduce(&local_dt_min, &XLoop.dt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD); // Assuming T can be MPI_DOUBLE or MPI_FLOAT
+#else
+	XLoop.dt = local_dt_min;
+#endif
 	XLoop.dtmax = XLoop.dt;
 	XModel.time.dt = T(XLoop.dt);
 
