@@ -351,6 +351,13 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	paramvec = { "aoibnd","remainderbnd","remainbndtype","aoibndtype" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.aoibnd = std::stoi(parametervalue);
+	}
+
 	parameterstr = "CFL";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
