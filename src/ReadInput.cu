@@ -351,6 +351,8 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+
+
 	parameterstr = "CFL";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
