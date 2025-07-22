@@ -22,6 +22,7 @@ BG_flood user interface consists in a text file, associating key words to user c
 |cl| cl , Rain_cl , continuousloss | 0.0|Continuous Loss (if constant)|
 |conserveElevation|conserveElevation| false|Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks|
 |wetdryfix| wetdryfix , reminstab , fixinstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
+|aoibnd| aoibnd , remainderbnd , remainbndtype , aoibndtype | 0; // Boundary type for AOI: 0=wall; 1 neumann|3 absorbing|
 |Pa2m|Pa2m| 0.00009916|Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)|
 |Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
