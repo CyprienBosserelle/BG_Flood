@@ -87,6 +87,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	int ncid, xx_dim, yy_dim, time_dim, blockid_dim, nblk;
 	double * xval, *yval;
 
+	int BGFloodoutversion = 0;// integer to quickly identify the output as BG_flood or not
+
 	//const int minlevzone = XParam.minlevel;
 	//const int maxlevzone = XParam.maxlevel;
 
@@ -143,6 +145,8 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	ymin = Xzone.yo ;
 	ymax = Xzone.ymax ;
 
+
+
 	// Define global attributes
 	status = nc_put_att_int(ncid, NC_GLOBAL, "maxlevel", NC_INT, 1, &Xzone.maxlevel);
 	if (status != NC_NOERR) handle_ncerror(status);
@@ -160,6 +164,10 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	status = nc_put_att_double(ncid, NC_GLOBAL, "ymax", NC_DOUBLE, 1, &ymax);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	// Define global attribute for identifying BG_Flood
+	status = nc_put_att_int(ncid, NC_GLOBAL, "BG_Flood", NC_INT, 1, &BGFloodoutversion);
 	if (status != NC_NOERR) handle_ncerror(status);
 
 
