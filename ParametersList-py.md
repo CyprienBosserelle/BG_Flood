@@ -100,6 +100,9 @@ BG_flood user interface consists in a text file, associating key words to user c
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
 |reftime| reftime , referencetime , timeref | ""|Reference time string as yyyy-mm-ddTHH:MM:SS|
 |savebyblk| savebyblk , writebyblk , saveperblk , writeperblk , savebyblock , writebyblock , saveperblock , writeperblock | true||
+###  MPI parameters
+|_Reference_|_Keys_|_default_|_Explanation_|
+|---|---|---|---|
 ---
 
 ## List of the Forcings' inputs
