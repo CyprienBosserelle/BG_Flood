@@ -12,11 +12,11 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 	{
 		if (XParam.GPUDEVICE >= 0)
 		{
-			addavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmean.h, XModel_g.evolv.h);
-			addavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmean.zs, XModel_g.evolv.zs);
-			addavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmean.u, XModel_g.evolv.u);
-			addavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmean.v, XModel_g.evolv.v);
-			addUandhU_GPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v, XModel_g.evmean.U, XModel_g.evmean.hU);
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.h, XModel_g.evolv.h);
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.zs, XModel_g.evolv.zs);
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.u, XModel_g.evolv.u);
+			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.v, XModel_g.evolv.v);
+			addUandhU_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v, XModel_g.evmean.U, XModel_g.evmean.hU);
 
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
@@ -39,12 +39,12 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			// devide by number of steps
 			if (XParam.GPUDEVICE >= 0)
 			{
-				divavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.h);
-				divavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.zs);
-				divavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.u);
-				divavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.v);
-				divavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.U);
-				divavg_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.hU);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.h);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.zs);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.u);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.v);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.U);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.hU);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			else
@@ -65,12 +65,12 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 	{
 		if (XParam.GPUDEVICE >= 0)
 		{
-			max_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.h, XModel_g.evolv.h);
-			max_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.zs, XModel_g.evolv.zs);
-			max_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.u, XModel_g.evolv.u);
-			max_varGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.v, XModel_g.evolv.v);
-			max_Norm_GPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.U, XModel_g.evolv.u, XModel_g.evolv.v);
-			max_hU_GPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evmax.hU, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v);
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.h, XModel_g.evolv.h);
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.zs, XModel_g.evolv.zs);
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.u, XModel_g.evolv.u);
+			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.v, XModel_g.evolv.v);
+			max_Norm_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.U, XModel_g.evolv.u, XModel_g.evolv.v);
+			max_hU_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.hU, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
@@ -88,7 +88,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 		if (XParam.GPUDEVICE >= 0)
 		{
 			// Add value GPU
-			addwettime_GPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.wettime, XModel_g.evolv.h, T(XParam.wet_threshold), T(XLoop.dt));
+			addwettime_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.wettime, XModel_g.evolv.h, T(XParam.wet_threshold), T(XLoop.dt));
 		}
 		else
 		{
@@ -169,17 +169,17 @@ template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.h);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.h);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.zs);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.zs);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.u);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.u);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.v);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.U);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.U);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.hU);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.hU);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
@@ -217,12 +217,12 @@ template <class T> void resetmeanGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlo
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 	//
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.h);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.zs);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.u);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.v);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.U);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.hU);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.h);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.zs);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.u);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.v);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.U);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.hU);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
@@ -244,7 +244,7 @@ template <class T> void resetvalGPU(Param XParam, BlockP<T> XBlock, T*& var, T v
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, val, var);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, val, var);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }

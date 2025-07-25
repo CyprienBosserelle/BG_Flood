@@ -336,6 +336,30 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	parameterstr = "bndrelaxtime";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndrelaxtime = std::stod(parametervalue);
+
+	}
+	parameterstr = "bndfiltertime";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndfiltertime = std::stod(parametervalue);
+
+	}
+
+
+	paramvec = { "aoibnd","remainderbnd","remainbndtype","aoibndtype" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.aoibnd = std::stoi(parametervalue);
+	}
+
+
 	parameterstr = "CFL";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -375,6 +399,17 @@ Param readparamstr(std::string line, Param param)
 		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
 
 	}
+
+	paramvec = { "MassConservation", "MassCon","forcemassconservation","forcevolumeconservation","Volumeconservation","VolumeCon", "ForceMassConserve", "ForceVolConserve" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//param.totaltime = std::stod(parametervalue);
+		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
+		param.ForceMassConserve = readparambool(parametervalue, param.ForceMassConserve);
+
+	}
+
 
 	parameterstr = "dtinit";
 	parametervalue = findparameter(parameterstr, line);
@@ -1162,6 +1197,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	XParam.blksize = utils::sq(XParam.blkmemwidth);
 
 	///////////////////////////////////////////
+	// zsoffset
+	///////////////////////////////////////////
+
+	XParam.zsoffset = std::isnan(XParam.zsoffset) ? 0.0 : XParam.zsoffset;
+
+	///////////////////////////////////////////
 	//  Read Bathy Information
 	///////////////////////////////////////////
 
@@ -1251,11 +1292,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Read/setup bdn segment polygon. Note this can't be part of the "readforcing" step because xmin, xmax ymin ymax are not known then
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		XForcing.bndseg[iseg].poly = readbndpolysegment(XForcing.bndseg[iseg], XParam);
-		if (XForcing.bndseg[iseg].type == 2)
-		{
-			XForcing.bndseg[iseg].type = 3;
-		}
+
+		XForcing.bndseg[iseg].poly= readbndpolysegment(XForcing.bndseg[iseg], XParam);
+		//if (XForcing.bndseg[iseg].type == 2)
+		//{
+		//	XForcing.bndseg[iseg].type = 3;
+		//}
 
 
 		XForcing.bndseg[iseg].left.isright = -1;
@@ -1362,8 +1404,10 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 		XParam.reftime = "2000-01-01T00:00:00";
 	}
 
+	XParam.inittime = XParam.totaltime;
+
 	log("Reference time: " + XParam.reftime);
-	log("Model Initial time: " + std::to_string(XParam.totaltime));
+	log("Model Initial time: " + std::to_string(XParam.totaltime) + " ; " );
 
 	log("Model end time: " + std::to_string(XParam.endtime));
 
@@ -1592,8 +1636,10 @@ double setendtime(Param XParam, Forcing<float> XForcing)
 std::string findparameter(std::vector<std::string> parameterstr, std::string line)
 {
 	std::size_t found;
-	std::string parameternumber, left, right;
-	std::vector<std::string> splittedstr;
+
+	std::string parameternumber,left,right;
+	std::vector<std::string> splittedstr, splittedstrnohash;
+	
 
 	// first look for an equal sign
 	// No equal sign mean not a valid line so skip
@@ -1616,7 +1662,12 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		{
 			//std::cout <<"found LonMin at : "<< found << std::endl;
 			//Numberstart = found + parameterstr.length();
-			splittedstr = split(right, ';');
+
+			
+			splittedstrnohash = split(right, '#');
+			
+			splittedstr = split(splittedstrnohash[0], ';');
+
 			if (splittedstr.size() >= 1)
 			{
 				parameternumber = splittedstr[0];
