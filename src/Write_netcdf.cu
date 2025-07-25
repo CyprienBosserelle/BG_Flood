@@ -166,8 +166,12 @@ void creatncfileBUQ(Param& XParam, int* activeblk, int* level, T* blockxo, T* bl
 	status = nc_put_att_double(ncid, NC_GLOBAL, "ymax", NC_DOUBLE, 1, &ymax);
 	if (status != NC_NOERR) handle_ncerror(status);
 
+
+	status = nc_put_att_text(ncid, NC_GLOBAL, "Conventions", 14,"CF-1.11-draft");
+
 	// Define global attribute for identifying BG_Flood
 	status = nc_put_att_int(ncid, NC_GLOBAL, "BG_Flood", NC_INT, 1, &BGFloodoutversion);
+
 	if (status != NC_NOERR) handle_ncerror(status);
 
 
@@ -237,6 +241,13 @@ void creatncfileBUQ(Param& XParam, int* activeblk, int* level, T* blockxo, T* bl
 	}
 
 	if (status != NC_NOERR) handle_ncerror(status);
+
+	int bgfid;
+
+	// Model variable to store parameters
+	status = nc_def_var(ncid, "BGFlood", NC_INT, 0, tdim, &bgfid);
+	saveparam2netCDF(ncid, bgfid, XParam);
+
 
 	// Define dimensions and variables to store block id, status, level xo, yo
 
