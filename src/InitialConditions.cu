@@ -17,6 +17,7 @@
 
 
 #include "InitialConditions.h"
+#include "Input.h"
 
 template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {
@@ -100,14 +101,14 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 		// Initialise infiltration to IL where h is already wet
 		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.hgw);
-
 	}
-
 
 	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
 
+	// Initialise Output times' vector
+	initOutputTimes(XParam, XModel.OutputT, XModel.blocks);
 }
 template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
@@ -963,6 +964,7 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.nblk = XParam.nblk;
 		XzoneB.maxlevel = XParam.maxlevel;
 		XzoneB.minlevel = XParam.minlevel;
+		XzoneB.OutputT = { XParam.totaltime, XParam.endtime };
 		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
 		int I = 0;
 		for (int ib = 0; ib < XParam.nblk; ib++)
@@ -1459,8 +1461,7 @@ template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBl
 	}
 }
 
-template <class T>
-void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
+template <class T> void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 {
 //Initialisation to 0 (cold or hot start)
 
@@ -1483,4 +1484,90 @@ void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 			}
 		}
 	}
+}
+
+// Create a vector of times steps from the input structure Toutput
+std::vector<double> GetTimeOutput(T_output time_info)
+{
+	//std::vector<double> time_vect;
+	//double time;
+	
+	//Add independant values
+	//if (!time_info.val.empty())
+	//{
+	//	time_vect = time_info.val;
+	//}
+	
+	//Add timesteps from the vector 
+	//time = time_info.init;
+	//while (time < time_info.end)
+	//{
+	//	time_vect.push_back(time);
+	//	time += time_info.tstep;
+	//}
+
+	//Add last timesteps from the vector definition
+	//time_vect.push_back(time_info.end);
+
+	return(time_info.val);
+}
+
+
+
+// Creation of a vector for times requiering a map output
+// Compilations of vectors and independent times from the general input
+// and the different zones outputs
+template <class T> void initOutputTimes(Param XParam, std::vector<double>& OutputT, BlockP<T>& XBlock)
+{
+	std::vector<double> times;
+	std::vector<double> times_partial;
+
+	times_partial = GetTimeOutput(XParam.Toutput);
+	//printf("Time partial:\n");
+	//for (int k = 0; k < times_partial.size(); k++)
+	//{
+	//	printf("%f, ", times_partial[k]);
+	//}
+	//printf("\n");
+
+	times.insert(times.end(), times_partial.begin(), times_partial.end());
+
+	// if zoneOutputs, add their contribution
+	if (XParam.outzone.size() > 0)
+	{
+		for (int ii = 0; ii < XParam.outzone.size(); ii++)
+		{
+			times_partial = GetTimeOutput(XParam.outzone[ii].Toutput);
+			
+			//Add to main vector
+			times.insert(times.end(), times_partial.begin(), times_partial.end());
+			//Sort and remove duplicate before saving in outZone struct
+			std::sort(times_partial.begin(), times_partial.end());
+			times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
+			
+			XBlock.outZone[ii].OutputT = times_partial;
+		}
+	}
+	else //If not zoneoutput, output zone saved in zoneoutput structure
+	{
+		std::sort(times_partial.begin(), times_partial.end());
+		times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
+		
+		XBlock.outZone[0].OutputT = times_partial;
+	}
+
+	// Sort the times for output
+	std::sort(times.begin(), times.end());
+	times.erase(unique(times.begin(), times.end()), times.end());
+	
+	printf("Output Times:\n");
+	for (int k = 0; k < times.size(); k++)
+	{
+		printf("%e, ", times[k]);
+	}
+	printf("\n");
+	
+	
+
+	OutputT = times;
 }

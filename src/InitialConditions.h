@@ -33,5 +33,6 @@ template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel);
 
 template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float>& XForcing, T* zb);
 
+template <class T> void initOutputTimes(Param XParam, std::vector<double>& OutputT, BlockP<T>& XBlock);
 // End of global definition;
 #endif

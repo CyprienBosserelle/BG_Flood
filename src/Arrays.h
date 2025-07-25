@@ -109,6 +109,8 @@ struct outzoneB
 	std::string outname; // name for the output file (one for each zone)
 	int maxlevel; // maximum level in the zone
 	int minlevel; //minimum level in the zone
+	std::vector<double> OutputT; //Next time for the output of this zone
+	int index_next_OutputT = 0; //Index of next time output
 };
 
 
@@ -212,7 +214,7 @@ struct Model
 	std::map<std::string, std::string> Outvarlongname;
 	std::map<std::string, std::string> Outvarstdname;
 	std::map<std::string, std::string> Outvarunits;
-
+	std::vector<double> OutputT;
 
 	//other output
 	//std::vector< std::vector< Pointout > > TSallout;
@@ -249,6 +251,8 @@ struct Loop
 	int nstep = 0;
 	//useful for calculating avg timestep
 	int nstepout = 0;
+	// Needed to identify next output time
+	int indNextoutputtime = 0;
 
 	// usefull for Time series output
 	int nTSsteps = 0;
