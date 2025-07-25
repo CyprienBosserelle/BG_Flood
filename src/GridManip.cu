@@ -26,12 +26,14 @@
 
 
 
-template <class T,class F> void InitArrayBUQ(Param XParam, BlockP<F> XBlock,  T initval, T*& Arr)
+template <class T,class F> void InitArrayBUQ(Param XParam, BlockP<F> XBlock,  T initval, T*& Arr, int nblk_local_start = 0)
 {
 	int ib, n;
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	// XParam.nblk here is XParam_local.nblk passed from FlowCPU
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++)
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{

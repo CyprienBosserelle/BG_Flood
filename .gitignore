@@ -4,3 +4,4 @@ CMakeSettings.json
 .vs
 *.dll
 *.exe
+*.o

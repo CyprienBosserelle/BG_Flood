@@ -125,6 +125,7 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	AllocateCPU(nblk, 1, XModel.blocks.xo);
 	AllocateCPU(nblk, 1, XModel.blocks.yo);
+	AllocateCPU(nblk, 1, XModel.blocks.owner_rank); // Added for MPI
 
 	// do allocate 1 mask block (block with at least 1 empty neighbourhood) 
 	// this will be reallocated eventually
