@@ -70,7 +70,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 		T hff;
 
 		if (Hl <= dry)
-			hff = max(min(zbi + Hr - zbi, hi), T(0.0));
+			hff = max(min(zbi + Hr - zbn, hi), T(0.0));
 		else if (Hr <= dry)
 			hff = max(min(zbn + Hl - zbi, hn), T(0.0));
 		else
@@ -168,7 +168,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 		T hff;
 
 		if (Hl <= dry)
-			hff = max(min(zbi + Hr - zbi, hi), 0.);
+			hff = max(min(zbi + Hr - zbn, hi), 0.);
 		else if (Hr <= dry)
 			hff = max(min(zbn + Hl - zbi, hn), 0.);
 		else
