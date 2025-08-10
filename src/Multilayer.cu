@@ -22,7 +22,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-	T eps = T(XParam.eps) + epsi;
+	T eps = T(XParam.eps);// +epsi;
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
@@ -120,7 +120,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-	T eps = T(XParam.eps) + epsi;
+	T eps = T(XParam.eps);// +epsi;
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
@@ -220,7 +220,7 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-	T eps = T(XParam.eps) + epsi;
+	T eps = T(XParam.eps);// +epsi;
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
@@ -278,7 +278,7 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-	T eps = T(XParam.eps) + epsi;
+	T eps = T(XParam.eps);// +epsi;
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
@@ -338,7 +338,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-	T eps = T(XParam.eps) + epsi;
+	T eps = T(XParam.eps);// +epsi;
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
@@ -439,7 +439,7 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-	T eps = T(XParam.eps) + epsi;
+	T eps = T(XParam.eps);// +epsi;
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
@@ -505,7 +505,7 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-	T eps = T(XParam.eps) + epsi;
+	T eps = T(XParam.eps);// +epsi;
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
