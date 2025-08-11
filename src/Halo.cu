@@ -4901,7 +4901,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	{
 		ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, XBlock.RightTop[BR]);
 	}
-	//z[iout] = z[ii];
+	z[iout] = z[ii];
 	
 }
 template __global__ void fillCornersGPU<float>(Param XParam, BlockP<float> XBlock, float*& z);
