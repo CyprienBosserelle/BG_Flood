@@ -4863,7 +4863,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	{
 		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.LeftTop[BL]);
 	}
-	z[iout] = z[ii];
+	//z[iout] = z[ii];
 
 	// Top left corner
 	iout = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth, ib);
@@ -4876,7 +4876,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	{
 		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, XBlock.LeftBot[TL]);
 	}
-	z[iout] = z[ii];
+	//z[iout] = z[ii];
 
 	// Top right corner
 	iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth, ib);
@@ -4888,7 +4888,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	{
 		ii = memloc(halowidth, blkmemwidth, 0, 0, XBlock.TopLeft[RT]);
 	}
-	z[iout] = z[ii];
+	//z[iout] = z[ii];
 
 	
 	// Bot right corner
@@ -4901,7 +4901,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	{
 		ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, XBlock.RightTop[BR]);
 	}
-	z[iout] = z[ii];
+	//z[iout] = z[ii];
 	
 }
 template __global__ void fillCornersGPU<float>(Param XParam, BlockP<float> XBlock, float*& z);
