@@ -4899,7 +4899,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 
 
 			// Bot right corner
-			iout = memloc(halowidth, blkmemwidth, blockDim.x, -1, ib);
+			iout = memloc(halowidth, blkmemwidth,0, 0, ib);
 			if (XBlock.RightTop[BR] == BR)//
 			{
 				ii = memloc(halowidth, blkmemwidth, blockDim.x - 1, 0, ib);
