@@ -4826,3 +4826,83 @@ template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& 
 template void fillCorners<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
 template void fillCorners<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
 
+
+template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock, T*& z)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int halowidth = XParam.halowidth;
+ 	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	//unsigned int iy = blockDim.x-1;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int TL = XBlock.TopLeft[ib];
+	int TR = XBlock.TopRight[ib];
+	int LB = XBlock.LeftBot[ib];
+	int LT = XBlock.LeftTop[ib];
+	int BL = XBlock.BotLeft[ib];
+	int BR = XBlock.BotRight[ib];
+	int RB = XBlock.RightBot[ib];
+	int RT = XBlock.RightTop[ib];
+
+	//int LBTL = XBlock.leftbot[TL];
+	//int BLTL = XBlock.botleft[TL];
+	//int RBTR = XBlock.rightbot[TR];
+
+
+	// Bot left corner
+	//ii = memloc(XParam, 0, XParam.blkwidth - 1, XBlock.RightBot[XBlock.BotRight[ib]]);
+	int iout= memloc(halowidth, blkmemwidth , -1, - 1, ib);
+	int ii;
+	if (XBlock.LeftTop[BL] == BL)//
+	{
+		ii = memloc(halowidth, blkmemwidth, 0, 0, ib);
+	}
+	else
+	{
+		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, XBlock.LeftTop[BL]);
+	}
+	z[iout] = z[ii];
+
+	// Top left corner
+	iout = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth, ib);
+	
+	if (XBlock.LeftBot[TL] == TL)//
+	{
+		ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+	}
+	else
+	{
+		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, XBlock.LeftBot[TL]);
+	}
+	z[iout] = z[ii];
+
+	// Top right corner
+	iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth, ib);
+	if (XBlock.TopLeft[RT] == RT)//
+	{
+		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
+	}
+	else
+	{
+		ii = memloc(halowidth, blkmemwidth, 0, 0, XBlock.TopLeft[RT]);
+	}
+	z[iout] = z[ii];
+
+	
+	// Bot right corner
+	iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, -1, ib);
+	if (XBlock.RightTop[BR] == BR)//
+	{
+		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, ib);
+	}
+	else
+	{
+		ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, XBlock.RightTop[BR]);
+	}
+	z[iout] = z[ii];
+	
+}
+template __global__ void fillCornersGPU<float>(Param XParam, BlockP<float> XBlock, float*& z);
+template __global__ void fillCornersGPU<double>(Param XParam, BlockP<double> XBlock, double*& z);
