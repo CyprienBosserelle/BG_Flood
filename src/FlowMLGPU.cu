@@ -113,7 +113,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	fillCornersGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	/*fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfu);
@@ -126,7 +126,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv.v);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	CUDA_CHECK(cudaDeviceSynchronize());*/
 
 	//hv hfv u hu hfu v
 	
