@@ -362,6 +362,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		int iu = memloc(halowidth, blkmemwidth, ix + ixshft, iy, ib);
 
 		int iut, iub;
+		/*
 		if (ix == 0 && iy == 15)
 		{
 			iut = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
@@ -378,11 +379,15 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		{
 			iub = memloc(halowidth, blkmemwidth, ix + ixshft, iy - 1, ib);
 		}
+		*/
+		iub = memloc(halowidth, blkmemwidth, ix + ixshft, iy - 1, ib);
+		iut = memloc(halowidth, blkmemwidth, ix + ixshft, iy + 1, ib);
+
 
 		int iv = memloc(halowidth, blkmemwidth, ix, iy + iyshft, ib);
 
 		int ivr, ivl;
-
+		/*
 		if (iy == 0 && ix == 15)
 		{
 			ivr = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
@@ -400,6 +405,10 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		{
 			ivl = memloc(halowidth, blkmemwidth, ix - 1, iy+iyshft, ib);
 		}
+		*/
+		ivr = memloc(halowidth, blkmemwidth, ix + 1, iy + iyshft, ib);
+		ivl = memloc(halowidth, blkmemwidth, ix - 1, iy + iyshft, ib);
+
 
 		T su2 = XEv.u[iu] + au * (1. - au * un) * XGrad.dudx[iu] * delta / 2.0;
 		T sv2 = XEv.v[iv] + av * (1. - av * vn) * XGrad.dvdy[iv] * delta / 2.0;
