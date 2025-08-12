@@ -75,7 +75,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 			hff = max(min(zbn + Hl - zbi, hn), T(0.0));
 		else
 		{
-			T un = pdt * (hui + pdt * ax) / delta;
+			T un = pdt * (hui) / delta; //pdt * (hui + pdt * ax) / delta;
 			T a =  signof(un);
 			int iu = un > 0.0 ? ileft : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
@@ -173,7 +173,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 			hff = max(min(zbn + Hl - zbi, hn), 0.);
 		else
 		{
-			T vn = pdt * (hvi + pdt * ax) / delta;
+			T vn = pdt * (hvi) / delta;//pdt * (hvi + pdt * ax) / delta;
 			T a = signof(vn);
 			int iu = vn > 0.0 ? ibot : i;// -(a + 1.) / 2.;
 			//double dhdx = h.gradient ? h.gradient(h[i - 1], h[i], h[i + 1]) / Delta : (h[i + 1] - h[i - 1]) / (2. * Delta);
