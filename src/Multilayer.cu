@@ -246,7 +246,7 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 		}
 		else if (-hul * dt / (delta * cmi) > CFL * hi)
 		{
-			hul = -CFL * hn * delta * cmi / dt;
+			hul = -CFL * hi * delta * cmi / dt;
 		}
 
 		if (hul != XFlux.hu[i])
@@ -304,7 +304,7 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 		}
 		else if (-hvl * dt / (delta * cmi) > CFL * hi)
 		{
-			hvl = -CFL * hn * delta * cmi / dt;
+			hvl = -CFL * hi * delta * cmi / dt;
 		}
 
 		if (hvl != XFlux.hv[i])
