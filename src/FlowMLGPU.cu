@@ -183,7 +183,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
-
+	// Recalculate zs based on h and zb
 
 	CleanupML <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());

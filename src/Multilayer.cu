@@ -416,13 +416,13 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		if (XFlux.hfv[iu] + XFlux.hfv[iut] > dry)
 		{
 			T vvn = (XFlux.hv[iu] + XFlux.hv[iut]) / (XFlux.hfv[iu] + XFlux.hfv[iut]);
-			T syy = XGrad.dudy[iu] != 0.0 ? XGrad.dudy[iu] : vvn < 0.0 ? XEv.u[iut] - XEv.u[iu] : XEv.u[iu] - XEv.u[iub];
+			T syy = XGrad.dudy[iu];// != 0.0 ? XGrad.dudy[iu] : vvn < 0.0 ? XEv.u[iut] - XEv.u[iu] : XEv.u[iu] - XEv.u[iub];
 			su2 -= dt * vvn * syy / (2. * delta);
 		}
 		if (XFlux.hfu[iv] + XFlux.hfu[ivr] > dry)
 		{
 			T uun = (XFlux.hu[iv] + XFlux.hu[ivr]) / (XFlux.hfu[iv] + XFlux.hfu[ivr]);
-			T syy = XGrad.dvdx[iv] != 0.0 ? XGrad.dvdx[iv] : uun < 0.0 ? XEv.v[ivr] - XEv.v[iv] : XEv.v[iv] - XEv.v[ivl];
+			T syy = XGrad.dvdx[iv];// != 0.0 ? XGrad.dvdx[iv] : uun < 0.0 ? XEv.v[ivr] - XEv.v[iv] : XEv.v[iv] - XEv.v[ivl];
 			sv2 -= dt * uun * syy / (2. * delta);
 		}
 
