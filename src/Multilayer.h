@@ -18,6 +18,8 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock, T
 template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
 template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
 
+template <class T> __global__ void CleanupML(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+
 
 // End of global definition
 #endif

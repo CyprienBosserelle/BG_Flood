@@ -353,6 +353,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 	{
 		T un = dt * XFlux.hu[i] / ((XFlux.hfu[i] + dry) * delta);
 		T vn = dt * XFlux.hv[i] / ((XFlux.hfv[i] + dry) * delta);
+		
 		T au = signof(un);
 		T av = signof(vn);
 
@@ -409,7 +410,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		//ivr = memloc(halowidth, blkmemwidth, ix + 1, iy + iyshft, ib);
 		//ivl = memloc(halowidth, blkmemwidth, ix - 1, iy + iyshft, ib);
 
-
+		
 		T su2 = XEv.u[iu] + au * (1. - au * un) * XGrad.dudx[iu] * delta / 2.0;
 		T sv2 = XEv.v[iv] + av * (1. - av * vn) * XGrad.dvdy[iv] * delta / 2.0;
 		if (XFlux.hfv[iu] + XFlux.hfv[iut] > dry)
@@ -568,7 +569,22 @@ template __global__ void pressureML<double>(Param XParam, BlockP<double> XBlock,
 
 
 
-template <class T> __global__ void CleanupML()
+template <class T> __global__ void CleanupML(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv,T* zb)
 {
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+
+	XEv.zs[i] = zb[i] + max(XEv.h[i], 0.0);
 }
+template __global__ void CleanupML<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
+template __global__ void CleanupML<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
+
+

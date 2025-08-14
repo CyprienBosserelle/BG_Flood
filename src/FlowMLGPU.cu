@@ -183,6 +183,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
+
+
+	CleanupML <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.zb);
+	CUDA_CHECK(cudaDeviceSynchronize());
 }
 template void FlowMLGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void FlowMLGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
