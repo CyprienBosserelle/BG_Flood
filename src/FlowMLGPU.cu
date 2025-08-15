@@ -54,11 +54,11 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	XLoop.dtmax = XLoop.dt;
 
 	// Check hu/hv
-	CheckadvecMLY << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//CheckadvecMLY << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	CheckadvecMLX << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//CheckadvecMLX << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	//Fill flux Halo for ha and hf
 	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hfu);
