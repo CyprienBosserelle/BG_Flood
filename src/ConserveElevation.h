@@ -9,13 +9,13 @@
 #include "Arrays.h"
 #include "MemManagement.h"
 
-template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0);
 
 template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 
 
 //template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy);
-template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy);
+template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy, int nblk_local_start = 0);
 //template <class T> void conserveElevationGradHaloGPU(Param XParam, BlockP<T> XBlock, T* h, T* dhdx, T* dhdy);
 template <class T> void conserveElevationGradHaloGPU(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy);
 
@@ -44,7 +44,7 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx);
 
 template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0);
 
 template <class T> __global__ void WetDryProlongationGPURight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 template <class T> __global__ void WetDryProlongationGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
@@ -52,7 +52,7 @@ template <class T> __global__ void WetDryProlongationGPUBot(Param XParam, BlockP
 template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 
 template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
+template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb, int nblk_local_start = 0);
 
 template <class T> __global__ void WetDryRestrictionGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
 template <class T> __global__ void WetDryRestrictionGPUTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);

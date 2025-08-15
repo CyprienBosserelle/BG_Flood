@@ -11,9 +11,9 @@
 #include "Halo.h"
 
 // CPU specific functions
-template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb);
-template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx, T* dady);
-template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
+template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb, int nblk_local_start = 0);
+template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx, T* dady, int nblk_local_start = 0);
+template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady, int nblk_local_start = 0);
 
 // GPU specific functions
 template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb);

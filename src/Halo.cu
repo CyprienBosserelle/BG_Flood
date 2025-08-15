@@ -56,12 +56,13 @@ template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 * ## Warning
 * This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction
 */
-template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb, int nblk_local_start = 0)
 {
 	int ib, n;
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	for (int ibl_local = 0; ibl_local < XParam.nblk; ibl_local++) // XParam.nblk is XParam_local.nblk here
 	{
-		ib = XBlock.active[ibl];
+		int ibl_global = nblk_local_start + ibl_local;
+		ib = XBlock.active[ibl_global];
 		/*
 		//We only need to recalculate zs on the halo side 
 		for (int n = -1; n <= (XParam.blkwidth); n++)

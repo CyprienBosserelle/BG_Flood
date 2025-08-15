@@ -230,6 +230,9 @@ public:
 
 	bool savebyblk = true;
 
+	//* MPI parameters
+	int rank = 0; // MPI rank of the current process
+	int size = 1; // Total number of MPI processes
 };
 
 
