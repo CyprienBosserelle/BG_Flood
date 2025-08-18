@@ -79,7 +79,8 @@ struct FluxMLP
 	T* hu, * hv;
 	T* hfu, * hfv;
 	T* hau, * hav;
-	T* Fu, * Fv;
+	T* Fux, * Fvy;
+	T* Fuy, * Fvx;
 
 };
 

@@ -103,8 +103,10 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateCPU(nblk, blksize, XModel.grad.dzbdy);
 	if (XParam.engine==5)
 	{
-		AllocateCPU(nblk, blksize, XModel.fluxml.Fu, XModel.fluxml.Fv, XModel.fluxml.hau, XModel.fluxml.hav);
+		AllocateCPU(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.Fuy, XModel.fluxml.Fvx);
 		AllocateCPU(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+		AllocateCPU(nblk, blksize, XModel.fluxml.hau);
+		AllocateCPU(nblk, blksize, XModel.fluxml.hav);
 	}
 	else
 	{
@@ -300,8 +302,10 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	ReallocArray(nblk, blksize, XModel.grad.dzbdy);
 	if (XParam.engine == 5)
 	{
-		ReallocArray(nblk, blksize, XModel.fluxml.Fu, XModel.fluxml.Fv, XModel.fluxml.hau, XModel.fluxml.hav);
+		ReallocArray(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.Fuy, XModel.fluxml.Fvx);
 		ReallocArray(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+		ReallocArray(nblk, blksize, XModel.fluxml.hau);
+		ReallocArray(nblk, blksize, XModel.fluxml.hav);
 	}
 	else
 	{
@@ -436,8 +440,10 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateGPU(nblk, blksize, XModel.grad);
 	if (XParam.engine == 5)
 	{
-		AllocateGPU(nblk, blksize, XModel.fluxml.Fu, XModel.fluxml.Fv, XModel.fluxml.hau, XModel.fluxml.hav);
+		AllocateGPU(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.hau, XModel.fluxml.hav);
 		AllocateGPU(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+		AllocateGPU(nblk, blksize, XModel.fluxml.Fuy);
+		AllocateGPU(nblk, blksize, XModel.fluxml.Fvx);
 	}
 	else
 	{

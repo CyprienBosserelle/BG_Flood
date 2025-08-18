@@ -352,13 +352,14 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 	//For each layer
 	{
 		T un = dt * XFlux.hu[i] / ((XFlux.hfu[i] + dry) * delta);
+		//T vn = dt * XFlux.hu[i] / ((XFlux.hfu[i] + dry) * delta);
 		T vn = dt * XFlux.hv[i] / ((XFlux.hfv[i] + dry) * delta);
 		
 		T au = signof(un);
 		T av = signof(vn);
 
 		int ixshft = un > 0.0 ? -1: 0;
-		int iyshft = vn > 0.0 ? -1: 0;
+		int iyshft = vn > 0.0 ? -1 : 0;
 		//int iu = un >= 0.0 ? ileft : i;//-(a + 1.) / 2.;
 		int iu = memloc(halowidth, blkmemwidth, ix + ixshft, iy, ib);
 
@@ -411,8 +412,11 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		//ivl = memloc(halowidth, blkmemwidth, ix - 1, iy + iyshft, ib);
 
 		
-		T su2 =  un + au * (1. - au * un) * XGrad.dudx[iu] * delta / 2.0;
-		T sv2 =  vn + av * (1. - av * vn) * XGrad.dvdy[iv] * delta / 2.0;
+		T sux2 = XEv.u[iu] + au * (1. - au * un) * XGrad.dudx[iu] * delta / 2.0;
+		T suy2 = XEv.u[iv] + av * (1. - av * vn) * XGrad.dudy[iv] * delta / 2.0;
+
+		T svy2 = XEv.v[iv] + av * (1. - av * vn) * XGrad.dvdy[iv] * delta / 2.0;
+		T svx2 = XEv.v[iu] + au * (1. - au * un) * XGrad.dvdx[iu] * delta / 2.0;
 		if (XFlux.hfv[iu] + XFlux.hfv[iut] > dry)
 		{
 			T vvn = (XFlux.hv[iu] + XFlux.hv[iut]) / (XFlux.hfv[iu] + XFlux.hfv[iut]);
@@ -428,8 +432,18 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 			//su2 -= dt * uun * syy / (2. * delta);
 		}
 
-		XFlux.Fu[i] =  su2* XFlux.hu[i];// su2*XFlux.hu[i];
-		XFlux.Fv[i] =  sv2* XFlux.hv[i];// sv2*XFlux.hv[i];
+		XFlux.Fux[i] = sux2 * XFlux.hu[i];
+		XFlux.Fuy[i] = suy2 * XFlux.hv[i];// suy2* XFlux.hv[i];// su2*XFlux.hu[i];
+
+		//XFlux.Fvx[i] = svy2 * XFlux.hv[i];// sv2*XFlux.hv[i];
+		XFlux.Fvx[i] = svx2 * XFlux.hu[i];;// svx2* XFlux.hu[i];// sv2*XFlux.hv[i];
+		XFlux.Fvy[i] = svy2 * XFlux.hv[i];
+		// Confirmed equations
+		//XFlux.Fux[i] = sux2 * XFlux.hu[i];
+		
+		//XFlux.Fvy[i] = svy2 * XFlux.hv[i];
+		
+		
 
 	}
 }
@@ -457,6 +471,9 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
+	T cmu = T(1.0);
+	T cmv = T(1.0);
+
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
@@ -468,16 +485,26 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 		T vvi = XEv.v[i];
 		T hi = XEv.h[i];
 
+		
+
 		uui *= hi;
 		vvi *= hi;
 
-		T cmu = T(1.0);
-		T cmv = T(1.0);
+		
 
-		uui += dt* (XFlux.Fu[i] - XFlux.Fu[iright]) / (delta * cmu);
+		uui += dt * (XFlux.Fux[i] - XFlux.Fux[iright]) / (delta * cmu);
+		uui += dt * (XFlux.Fuy[i] - XFlux.Fuy[itop]) / (delta * cmv);
+
+		vvi += dt * (XFlux.Fvx[i] - XFlux.Fvx[iright]) / (delta * cmu);
+		vvi += dt * (XFlux.Fvy[i] - XFlux.Fvy[itop]) / (delta * cmv);
+
+		
+
+		/*uui += dt* (XFlux.Fu[i] - XFlux.Fu[iright]) / (delta * cmu);
 		uui += dt * (XFlux.Fv[i] - XFlux.Fv[itop]) / (delta * cmv);
 		vvi += dt * (XFlux.Fv[i] - XFlux.Fv[itop]) / (delta * cmv);
-		vvi += dt * (XFlux.Fu[i] - XFlux.Fu[iright]) / (delta * cmu);
+		vvi += dt * (XFlux.Fu[i] - XFlux.Fu[iright]) / (delta * cmu);*/
+		
 
 		T h1 = hi;
 		h1 += dt * (XFlux.hu[i] - XFlux.hu[iright]) / (delta * cmu);

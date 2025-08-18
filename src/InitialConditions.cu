@@ -591,15 +591,25 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarstdname["Sv"] = "Topo_source_y_direction";
 	XModel.Outvarunits["Sv"] = "m2 s-1";
 
-	XModel.OutputVarMap["Fu"] = XModel.fluxml.Fu;
-	XModel.Outvarlongname["Fu"] = "Flux term Fu x-direction";
-	XModel.Outvarstdname["Fu"] = "Flux_term_Fu_x_direction";
-	XModel.Outvarunits["Fu"] = "m3 s-1";
+	XModel.OutputVarMap["Fux"] = XModel.fluxml.Fux;
+	XModel.Outvarlongname["Fux"] = "Flux term Fu x-direction";
+	XModel.Outvarstdname["Fux"] = "Flux_term_Fu_x_direction";
+	XModel.Outvarunits["Fux"] = "m3 s-1";
 
-	XModel.OutputVarMap["Fv"] = XModel.fluxml.Fv;
-	XModel.Outvarlongname["Fv"] = "Flux term Fv y-direction";
-	XModel.Outvarstdname["Fv"] = "Flux_term_Fv_y_direction";
-	XModel.Outvarunits["Fv"] = "m3 s-1";
+	XModel.OutputVarMap["Fuy"] = XModel.fluxml.Fuy;
+	XModel.Outvarlongname["Fuy"] = "Flux term Fu y-direction";
+	XModel.Outvarstdname["Fuy"] = "Flux_term_Fu_y_direction";
+	XModel.Outvarunits["Fuy"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fvx"] = XModel.fluxml.Fvx;
+	XModel.Outvarlongname["Fvx"] = "Flux term Fv x-direction";
+	XModel.Outvarstdname["Fvx"] = "Flux_term_Fv_x_direction";
+	XModel.Outvarunits["Fvx"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fvy"] = XModel.fluxml.Fvy;
+	XModel.Outvarlongname["Fvy"] = "Flux term Fv y-direction";
+	XModel.Outvarstdname["Fvy"] = "Flux_term_Fv_y_direction";
+	XModel.Outvarunits["Fvy"] = "m3 s-1";
 
 	XModel.OutputVarMap["hau"] = XModel.fluxml.hau;
 	XModel.Outvarlongname["hau"] = "Acceleration term hau x-direction";

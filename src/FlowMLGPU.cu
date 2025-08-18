@@ -109,6 +109,12 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudx);
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudy);
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdx);
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdy);
+
 	/*
 	fillCornersGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -134,8 +140,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fu);
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fv);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fux);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fvx);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fuy);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fvy);
 
 	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fu);
 	//CUDA_CHECK(cudaDeviceSynchronize());
