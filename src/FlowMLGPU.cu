@@ -91,6 +91,12 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hu);
 	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hv);
+
+
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+	}
 	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -153,10 +159,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	//HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fv);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-	{
-		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
-	}
+	
 
 	AdvecEv << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
