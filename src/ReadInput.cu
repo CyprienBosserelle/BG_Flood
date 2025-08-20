@@ -1312,7 +1312,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
 	XParam.nrivers = int(XForcing.rivers.size());
 
-
+	// Engine checks
+	if (XParam.engine == 5)
+	{
+		XParam.CFL = utils::max(XParam.CFL, 0.25);
+		//XParam.eps = 0.0000000001;
+	}
 
 	// Check whether endtime was specified by the user
 	//No; i.e. endtimne =0.0
