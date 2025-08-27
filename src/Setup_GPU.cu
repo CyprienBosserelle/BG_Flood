@@ -115,18 +115,19 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 		Initmaparray(XModel_g);
 
 		//InitzbgradientGPU(XParam, XModel_g);
+		
 		if (XForcing.culverts.size() > 0)
 		{
 			XModel_g.bndblk.nblkculvert = XModel.bndblk.nblkculvert;
 			AllocateGPU(XModel.bndblk.nblkculvert, 1, XModel_g.bndblk.culvert);
 			CopytoGPU(XModel.bndblk.nblkculvert, 1, XModel.bndblk.culvert, XModel_g.bndblk.culvert);
-			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.dq);
-			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.zs1);
-			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.zs2);
-			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.h1);
-			AllocateGPU(XForcing.culverts.size(), 1, XModel_g.culvertsF.h2);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.dq);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.zs1);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.zs2);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.h1);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.h2);
 		}
-
+		
 
 	}
 }

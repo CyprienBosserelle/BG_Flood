@@ -360,7 +360,14 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		ReallocArray(nblk, blksize, XModel.wettime);
 	}
-
+	if (XParam.nculverts)
+	{
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.zs1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.zs2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.h1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.h2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.dq);
+	}
 
 }
 

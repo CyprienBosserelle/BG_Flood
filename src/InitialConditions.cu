@@ -407,15 +407,16 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		{
 			// find the cell where the culvert well / source will be applied
 
+			x1 = (T)XForcing.culverts[cc].x1;
+			x2 = (T)XForcing.culverts[cc].x2;
+			y1 = (T)XForcing.culverts[cc].y1;
+			y2 = (T)XForcing.culverts[cc].y2;
+
+
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
 				ib = XModel.blocks.active[ibl];
 				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
-
-				x1 = (T)XForcing.culverts[cc].x1;
-				x2 = (T)XForcing.culverts[cc].x2;
-				y1 = (T)XForcing.culverts[cc].y1;
-				y2 = (T)XForcing.culverts[cc].y2;
 
 				dxblk = (T)(XParam.blkwidth) * levdx;
 
@@ -424,18 +425,50 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 
 				blkxmax = (blkxmin + dxblk);
 				blkymax = (blkymin + dxblk);
+				
+
+				/*
+				for (int iy = 0; iy < XParam.blkwidth; iy++)
+				{
+					for (int ix = 0; ix < XParam.blkwidth; ix++)
+					{
+						int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+						double x = XParam.xo + XBlock.xo[ib] + ix * levdx;
+						double y = XParam.yo + XBlock.yo[ib] + iy * levdx;
+
+						if (abs(x1 - x) <= levdx / 2 && abs(y1 - y) <= levdx / 2)
+							//if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
+						{
+							XForcing.culverts[cc].block1 = ib;
+							XForcing.culverts[cc].i1 = i;
+							//XForcing.culverts[cc].ix1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+							//XForcing.culverts[cc].iy1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+							XForcing.culverts[cc].dx1 = levdx;
+						}
+						if (abs(x2 - x) <= levdx / 2 && abs(y2 - y) <= levdx / 2)
+						{
+							XForcing.culverts[cc].block2 = ib;
+							XForcing.culverts[cc].i2 = i;
+							XForcing.culverts[cc].dx2 = levdx;
+						}
+					}
+				}*/
 
 				if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
 				{
 					XForcing.culverts[cc].block1 = ib;
-					XForcing.culverts[cc].i1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					//XForcing.culverts[cc].i1 = i;
+					XForcing.culverts[cc].ix1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].iy1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
 					XForcing.culverts[cc].dx1 = levdx;
 				}
 
 				if (x2 > blkxmin && x2 <= blkxmax && y2 > blkymin && y2 <= blkymax)
 				{
 					XForcing.culverts[cc].block2 = ib;
-					XForcing.culverts[cc].i2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].ix2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].iy2 = min(max((int)round((y2 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
 					XForcing.culverts[cc].dx2 = levdx;
 				}
 			}
@@ -456,7 +489,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		}
 		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
 		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
-		if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
+		/*if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
 		{
 			ReallocArray(activeCulvertBlk.size(), 1, XModel.bndblk.culvert);
 			XModel.bndblk.nblkculvert = int(activeCulvertBlk.size());
@@ -466,7 +499,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h2);
 			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs1);
 			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs2);
-		}
+		}*/
 		for (int b = 0; b < activeCulvertBlk.size(); b++)
 		{
 			XModel.bndblk.culvert[b] = activeCulvertBlk[b];
@@ -476,10 +509,19 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		//Calculate the friction coefficient (L=0.3164*Re^(-0.25) if Re<100000 eq de Blasius)
 		// and the Head Loss coeff (coeff * V^2)
 
+		//Initialisation of the culvert states variables
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			XModel.culvertsF.dq[cc] = 0.0;
+			XModel.culvertsF.h1[cc] = 0.0;
+			XModel.culvertsF.h2[cc] = 0.0;
+			XModel.culvertsF.zs1[cc] = 0.0;
+			XModel.culvertsF.zs2[cc] = 0.0;
+		}
 	}
 
-
 }
+
 
 template void InitCulverts<float>(Param XParam, Forcing<float>& XForcing, Model<float>& XModel);
 template void InitCulverts<double>(Param XParam, Forcing<float>& XForcing, Model<double>& XModel);
