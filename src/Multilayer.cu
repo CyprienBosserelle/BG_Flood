@@ -68,9 +68,8 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 		T hui = hl > 0. || hr > 0. ? (hl * XEv.u[ileft] + hr * XEv.u[i]) / (hl + hr) : 0.;
 		
 		T hff;
-		if (Hl <= dry && Hr <= dry)
-			hff = T(0.0);
-		else if (Hl <= dry)
+
+		if (Hl <= dry)
 			hff = max(min(zbi + Hr - zbn, hi), T(0.0));
 		else if (Hr <= dry)
 			hff = max(min(zbn + Hl - zbi, hn), T(0.0));
@@ -167,9 +166,8 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 		T hvi = hl > 0. || hr > 0. ? (hl * XEv.v[ibot] + hr * XEv.v[i]) / (hl + hr) : 0.;
 
 		T hff;
-		if (Hl <= dry && Hr <= dry)
-			hff = T(0.0);
-		else if (Hl <= dry)
+
+		if (Hl <= dry)
 			hff = max(min(zbi + Hr - zbn, hi), 0.);
 		else if (Hr <= dry)
 			hff = max(min(zbn + Hl - zbi, hn), 0.);
@@ -500,24 +498,6 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 		vvi *= hi;
 
 
-		T h1 = hi;
-
-		T dhi = (XFlux.hu[i] - XFlux.hu[iright]) / (delta * cmu) + (XFlux.hv[i] - XFlux.hv[itop]) / (delta * cmv);
-
-		T edt = dhi >= T(0.0) ? dt : min(dt, hi / (T(-1.0) * dhi));
-
-		
-		//T h1 = hi;
-		//h1 += dt * (XFlux.hu[i] - XFlux.hu[iright]) / (delta * cmu);
-		//h1 += dt * (XFlux.hv[i] - XFlux.hv[itop]) / (delta * cmv);
-
-		//XEv.h[i] = max(h1, T(0.0));
-
-		h1 += dhi * edt;
-
-		XEv.h[i] = max(h1, T(0.0));
-
-
 		//for debugging
 		//uui += XFlux.Fux[i];
 		//vvi += XFlux.Fvx[i];
@@ -525,18 +505,22 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 
 		//Below is correct
 		
-		uui += edt * (XFlux.Fux[i] - XFlux.Fux[iright]) / (delta * cmu);
-		uui += edt * (XFlux.Fuy[i] - XFlux.Fuy[itop]) / (delta * cmv);
+		uui += dt * (XFlux.Fux[i] - XFlux.Fux[iright]) / (delta * cmu);
+		uui += dt * (XFlux.Fuy[i] - XFlux.Fuy[itop]) / (delta * cmv);
 
-		vvi += edt * (XFlux.Fvx[i] - XFlux.Fvx[iright]) / (delta * cmu);
-		vvi += edt * (XFlux.Fvy[i] - XFlux.Fvy[itop]) / (delta * cmv);
-		
-		
-
+		vvi += dt * (XFlux.Fvx[i] - XFlux.Fvx[iright]) / (delta * cmu);
+		vvi += dt * (XFlux.Fvy[i] - XFlux.Fvy[itop]) / (delta * cmv);
 		
 		
 
 		
+		
+
+		T h1 = hi;
+		h1 += dt * (XFlux.hu[i] - XFlux.hu[iright]) / (delta * cmu);
+		h1 += dt * (XFlux.hv[i] - XFlux.hv[itop]) / (delta * cmv);
+
+		XEv.h[i] = max(h1, T(0.0));
 
 		if (h1 < dry)
 		{
