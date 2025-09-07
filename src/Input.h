@@ -51,7 +51,8 @@ public:
 	int ix1, iy1, block1, ix2, iy2, block2; // start and end of the culvert cells (dx_local).
 	double dx1, dx2;// start and end of the culvert cells (dx_local).
 	double Qmax = 3.0; //Maximum discharge for the culvert in m3/s.
-	double z1, z2; //Elevation of the inlet / outlet given by the user.
+	double zb1 = -999.0; //Bottom elevation of the inlet / outlet given by the user or zb.
+	double zb2 = -999.0; //Bottom elevation of the inlet / outlet given by the user or zb.
 };
 
 class inputmap {

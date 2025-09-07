@@ -209,11 +209,11 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateCPU(1, 1, XModel.bndblk.culvert);
 		XModel.bndblk.nblkculvert = 1;
-		AllocateCPU(1, 1, XModel.culvertsF.dq);
-		AllocateCPU(1, 1, XModel.culvertsF.h1);
-		AllocateCPU(1, 1, XModel.culvertsF.h2);
-		AllocateCPU(1, 1, XModel.culvertsF.zs1);
-		AllocateCPU(1, 1, XModel.culvertsF.zs2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.dq);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.h1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.h2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zs1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zs2);
 	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later

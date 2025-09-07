@@ -427,34 +427,6 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 				blkymax = (blkymin + dxblk);
 				
 
-				/*
-				for (int iy = 0; iy < XParam.blkwidth; iy++)
-				{
-					for (int ix = 0; ix < XParam.blkwidth; ix++)
-					{
-						int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-
-						double x = XParam.xo + XBlock.xo[ib] + ix * levdx;
-						double y = XParam.yo + XBlock.yo[ib] + iy * levdx;
-
-						if (abs(x1 - x) <= levdx / 2 && abs(y1 - y) <= levdx / 2)
-							//if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
-						{
-							XForcing.culverts[cc].block1 = ib;
-							XForcing.culverts[cc].i1 = i;
-							//XForcing.culverts[cc].ix1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
-							//XForcing.culverts[cc].iy1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
-							XForcing.culverts[cc].dx1 = levdx;
-						}
-						if (abs(x2 - x) <= levdx / 2 && abs(y2 - y) <= levdx / 2)
-						{
-							XForcing.culverts[cc].block2 = ib;
-							XForcing.culverts[cc].i2 = i;
-							XForcing.culverts[cc].dx2 = levdx;
-						}
-					}
-				}*/
-
 				if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
 				{
 					XForcing.culverts[cc].block1 = ib;
@@ -476,6 +448,15 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			if (XForcing.culverts[cc].type > 0)
 			{
 				XForcing.culverts[cc].length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+			}
+			//Calculate the bottom elevation of the culvert
+			if (XForcing.culverts[cc].zb1 < -998.0) // i.e. not set by user so use the ground elevation
+			{
+				XForcing.culverts[cc].zb1 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)];
+			}
+			if (XForcing.culverts[cc].zb2 < -998.0) // i.e. not set by user so use the ground elevation
+			{
+				XForcing.culverts[cc].zb2 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)];
 			}
 		}
 
@@ -518,6 +499,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			XModel.culvertsF.zs1[cc] = 0.0;
 			XModel.culvertsF.zs2[cc] = 0.0;
 		}
+		printf("Culvert_init =%f \n", XModel.culvertsF.h1[1]);
 	}
 
 }

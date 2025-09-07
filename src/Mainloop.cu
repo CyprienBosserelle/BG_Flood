@@ -13,6 +13,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
 	
+	printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
 
 	
 	log("\t\tCompleted");
@@ -29,6 +30,10 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Core engine
 		if (XParam.GPUDEVICE >= 0)
 		{
+			printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
+			printf("XCulvertsF h1=%f\n", XModel_g.culvertsF.h1[0]);
+
+
 			FlowGPU(XParam, XLoop, XForcing, XModel_g);
 		}
 		else
