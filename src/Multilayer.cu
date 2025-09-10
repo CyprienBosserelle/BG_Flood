@@ -595,8 +595,8 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 		T dmdt = (fmvp - fmv) * cmdinv;
 		T fG = vvi * dmdl - uui * dmdt;
 
-		uui += dt * fG * vvi;
-		vvi -= dt * fG * uui;
+		//uui += dt * fG * vvi;
+		//vvi -= dt * fG * uui;
 
 		XEv.u[i] = uui;
 		XEv.v[i] = vvi;
