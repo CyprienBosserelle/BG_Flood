@@ -588,8 +588,11 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 		XFlux.hu[i] += dt * XFlux.hau[i];
 		XFlux.hv[i] += dt * XFlux.hav[i];
 		
-		uui += dt * (XFlux.hau[i] + XFlux.hau[iright]) / (XFlux.hfu[i] + XFlux.hfu[iright] + dry);
-		vvi += dt * (XFlux.hav[i] + XFlux.hav[itop]) / (XFlux.hfv[i] + XFlux.hfv[itop] + dry);
+		//uui += dt * (XFlux.hau[i] + XFlux.hau[iright]) / (XFlux.hfu[i] + XFlux.hfu[iright] + dry);
+		//vvi += dt * (XFlux.hav[i] + XFlux.hav[itop]) / (XFlux.hfv[i] + XFlux.hfv[itop] + dry);
+
+		uui += (XFlux.hau[i] + XFlux.hau[iright]);
+		vvi += (XFlux.hav[i] + XFlux.hav[itop]);
 
 		T dmdl = (fmup - fmu) * cmdinv;// absurd if not spherical!
 		T dmdt = (fmvp - fmv) * cmdinv;
