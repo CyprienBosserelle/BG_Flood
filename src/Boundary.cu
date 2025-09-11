@@ -169,6 +169,93 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 template void FlowbndFlux<float>(Param XParam,  double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
 template void FlowbndFlux<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
 
+template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxMLP<T> XFlux)
+{
+	dim3 blockDim(XParam.blkwidth, 1, 1);
+	dim3 gridDimBBNDLeft(bndseg.left.nblk, 1, 1);
+	dim3 gridDimBBNDRight(bndseg.right.nblk, 1, 1);
+	dim3 gridDimBBNDTop(bndseg.top.nblk, 1, 1);
+	dim3 gridDimBBNDBot(bndseg.bot.nblk, 1, 1);
+
+	double zsbnd = 0.0;
+	if (!std::isnan(XParam.zsinit)) // apply specified zsinit
+	{
+		zsbnd = XParam.zsinit;
+	}
+	// Warning this above is not ideal but sufficient for fail safe of testing if someone specifies initial conditions and no boundary for a type 3 they should be in trouble
+	T taper = T(1.0);
+	if (bndseg.on)
+	{
+		if (bndseg.uniform)
+		{
+			int SLstepinbnd = 1;
+
+			double difft = bndseg.data[SLstepinbnd].time - totaltime;
+			while (difft < 0.0)
+			{
+				SLstepinbnd++;
+				difft = bndseg.data[SLstepinbnd].time - totaltime;
+			}
+
+			//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+			zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
+
+
+			if (XParam.bndtaper > 0.0)
+			{
+				taper = min(totaltime / XParam.bndtaper, 1.0);
+			}
+		}
+		else
+		{
+			// Nothing. it is already done in update forcing
+		}
+
+	}
+
+	if (bndseg.type != 1)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//if (bndseg.left.nblk > 0)
+			{
+				//Left
+				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			//if (bndseg.right.nblk > 0)
+			{
+				//Right
+				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			//if (bndseg.top.nblk > 0)
+			{
+				//top
+				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hav);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			//if (bndseg.bot.nblk > 0)
+			{
+				//bot
+				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hfv);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+		}
+		else
+		{
+			//bndFluxGPUSideCPU(XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			//bndFluxGPUSideCPU(XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			//bndFluxGPUSideCPU(XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+			//bndFluxGPUSideCPU(XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+
+
+		}
+	}
+}
+template void FlowbndFluxML<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxMLP<float> XFlux);
+template void FlowbndFluxML<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxMLP<double> XFlux);
+
 template <class T> void FlowbndFluxold(Param XParam, double totaltime, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux)
 {
 	dim3 blockDim(XParam.blkwidth, 1, 1);

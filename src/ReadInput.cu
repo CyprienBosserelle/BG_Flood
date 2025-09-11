@@ -175,7 +175,7 @@ Param readparamstr(std::string line, Param param)
 		}
 		if (!foo)
 		{
-			param.engine = 2;
+			param.engine = 5;
 		}
 	}
 	///////////////////////////////////////////////////////
@@ -481,7 +481,9 @@ Param readparamstr(std::string line, Param param)
 			//Verify that the variable name makes sense?
 			//Need to add more here
 
-			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw" };
+
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+
 
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
@@ -1380,7 +1382,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
 	XParam.nrivers = int(XForcing.rivers.size());
 
-
+	// Engine checks
+	if (XParam.engine == 5)
+	{
+		XParam.CFL = utils::max(XParam.CFL, 0.25);
+		//XParam.eps = 0.0000000001;
+	}
 
 	// Check whether endtime was specified by the user
 	//No; i.e. endtimne =0.0

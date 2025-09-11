@@ -177,11 +177,11 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t### Homogeneous rain on grid Mass conservation test ###");
 			if (XParam.GPUDEVICE >= 0)
 			{
-				testrainGPU = Raintest(0.0, 0, 10);
+				testrainGPU = Raintest(0.0, 0, 10, XParam.engine);
 				result = testrainGPU ? "successful" : "failed";
 				log("\t\tHomogeneous rain on grid test GPU: " + result);
 			}
-			testrainCPU = Raintest(0.0, -1, 10);
+			testrainCPU = Raintest(0.0, -1, 10, XParam.engine);
 			result = testrainCPU ? "successful" : "failed";
 			log("\t\tHomogeneous rain on grid test CPU: " + result);
 			isfailed = (!testrainCPU || !testrainGPU || isfailed) ? true : false;
@@ -343,6 +343,11 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		TestPinMem(XParam, XModel, XModel_g);
 	}
 
+	if (mytest == 900)
+	{
+		GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+	}
+
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -407,6 +412,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	T x, y, delta;
 	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
 
+	//XParam.engine = 2;
 
 	T a = T(1.0); //Gaussian wave amplitude
 
@@ -574,7 +580,14 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+			if (XParam.engine == 5)
+			{
+				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+			}
+			else
+			{
+				FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+			}
 			XLoop.dt = XLoop_g.dt;
 		}
 		else
@@ -2714,14 +2727,14 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 
 }
 
-/*! \fn bool Raintest(T zsnit, int gpu, float alpha)
+/*! \fn bool Raintest(T zsnit, int gpu, float alpha,int engineid)
 *
 * This function tests the mass conservation of the spacial injection (used to model rain on grid)
 *	The function creates its own model setup and mesh independantly to what the user inputs.
 *	This starts with a initial water level (zsnit=0.0 is dry) and runs for 0.1s before comparing results
 *	with zsnit=0.1 that is approx 20 steps
 */
-template <class T> bool Raintest(T zsnit, int gpu, float alpha)
+template <class T> bool Raintest(T zsnit, int gpu, float alpha,int engine)
 {
 	log("#####");
 	Param XParam;
@@ -2733,6 +2746,8 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	XParam.yo = -0.5;
 	XParam.xmax = 0.5;
 	XParam.ymax = 0.5;
+
+	XParam.engine = engine;
 
 	//XParam.initlevel = 0;
 	//XParam.minlevel = 0;
@@ -2759,12 +2774,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	XParam.GPUDEVICE = gpu;
 	XParam.rainbnd = true;
 	//output vars
-	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
-	std::vector<std::string> outv;
-	for (int nv = 0; nv < 15; nv++)
-	{
-		outv.push_back(outvi[nv]);
-	}
+	std::vector<std::string> outv = { "zb","h","zs","u","v" };
 	XParam.outvars = outv;
 
 	// create Model setup

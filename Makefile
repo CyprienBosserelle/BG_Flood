@@ -214,7 +214,9 @@ ALL_LDFLAGS += $(shell nc-config --libs)
 ################################################################################
 
 # Gencode arguments
+
 SMS ?= 50 52 60 75
+
 #SMS ?= 20 30 35
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
@@ -236,7 +238,7 @@ ifeq ($(SAMPLE_ENABLED),0)
 EXEC ?= @echo "[@]"
 endif
 
-OBJ = BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o  Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o utctime.o Write_txtlog.o
+OBJ = BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o  Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o utctime.o Write_txtlog.o FlowMLGPU.o Multilayer.o
 
 
 ################################################################################
@@ -351,7 +353,15 @@ Spherical.o:./src/Spherical.cu
 utctime.o:./src/utctime.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-BG_Flood: BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o Spherical.o utctime.o
+
+FlowMLGPU.o:./src/FlowMLGPU.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+
+Multilayer.o:./src/Multilayer.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+BG_Flood: BG_Flood.o AdaptCriteria.o Adaptation.o Advection.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o Spherical.o utctime.o FlowMLGPU.o Multilayer.o
 
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
@@ -362,7 +372,7 @@ run: build
 
 clean:
 
-	rm -f BG_Flood AdaptCriteria.o Adaptation.o Advection.o BG_Flood.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o Spherical.o utctime.o
+	rm -f BG_Flood AdaptCriteria.o Adaptation.o Advection.o BG_Flood.o Boundary.o ConserveElevation.o FlowCPU.o FlowGPU.o Friction.o Gradients.o GridManip.o Halo.o InitEvolv.o InitialConditions.o Kurganov.o Mainloop.o Meanmax.o MemManagement.o Mesh.o ReadForcing.o ReadInput.o Read_netcdf.o Reimann.o Setup_GPU.o Testing.o Updateforcing.o Util_CPU.o Write_netcdf.o Write_txtlog.o Poly.o Spherical.o utctime.o FlowMLGPU.o Multilayer.o
 
 	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/template
 

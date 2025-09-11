@@ -30,12 +30,20 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Core engine
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+			if (XParam.engine == 5)
+			{
+				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+			}
+			else
+			{
+				FlowGPU(XParam, XLoop, XForcing, XModel_g);
+			}
 		}
 		else
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
+		
 				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;

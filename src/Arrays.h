@@ -23,11 +23,33 @@ struct GradientsP
 	T* dzbdy;
 };
 
+template <class T>
+struct GradientsMLP
+{
+	
+	T* dhdx;
+	T* dudx;
+	T* dvdx;
+
+	
+	T* dhdy;
+	T* dudy;
+	T* dvdy;
+};
+
 
 template <class T>
 struct EvolvingP
 {
 	T* zs;
+	T* h;
+	T* u;
+	T* v;
+};
+
+template <class T>
+struct EvolvingMLP
+{
 	T* h;
 	T* u;
 	T* v;
@@ -48,6 +70,18 @@ struct FluxP
 	T* Fqux, * Fquy;
 	T* Fqvx, * Fqvy;
 	T* Fhu, * Fhv;
+};
+
+template <class T>
+struct FluxMLP
+{
+	//
+	T* hu, * hv;
+	T* hfu, * hfv;
+	T* hau, * hav;
+	T* Fux, * Fvy;
+	T* Fuy, * Fvx;
+
 };
 
 template <class T>
@@ -190,6 +224,7 @@ struct Model
 
 	GradientsP<T> grad;
 	FluxP<T> flux;
+	FluxMLP<T> fluxml;
 	AdvanceP<T> adv;
 	
 	//external forcing
@@ -236,6 +271,7 @@ struct Model
 	
 
 };
+
 
 // structure of useful variable for runing the main loop
 template <class T>
