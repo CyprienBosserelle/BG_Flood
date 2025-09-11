@@ -4873,7 +4873,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, -1, -1, LB);
+				ii = memloc(halowidth, blkmemwidth, blockDim.x - 1, -1, LB);
 			}
 
 		}
@@ -4936,7 +4936,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, 0, blockDim.x, RB);
+				ii = memloc(halowidth, blkmemwidth, 0, -1, RB);
 			}
 
 		}
