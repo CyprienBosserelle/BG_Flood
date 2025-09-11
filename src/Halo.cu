@@ -4829,11 +4829,11 @@ template void fillCorners<double>(Param XParam, int ib, BlockP<double> XBlock, d
 
 template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock, T* z)
 {
-	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
 	int halowidth = XParam.halowidth;
  	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
-	int iy = threadIdx.y;
+	//int iy = threadIdx.y;
 	//unsigned int iy = blockDim.x-1;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
@@ -4854,7 +4854,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	int iout, ii;
 	
 
-	if (ix == 0 && iy == 0)
+	if (ix == 0)
 	{
 		// Bot left corner
 
@@ -4869,22 +4869,24 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 		{
 			if (BL != ib)
 			{
-				ii = memloc(halowidth, blkmemwidth, -1, blockDim.x - 1, BL);
+				ii = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, blockDim.x - 1, -1, LB);
+				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
 			}
 
 		}
 		z[iout] = z[ii];
-	
+	}
+	if (ix == 1)
+	{
 	
 		// Top left corner
-		iout = memloc(halowidth, blkmemwidth, -1, blockDim.x, ib);
+		iout = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth, ib);
 		if (TL == ib && LT == ib)//
 		{
-			ii = memloc(halowidth, blkmemwidth, 0, blockDim.x - 1, ib);
+			ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
 		}
 		else
 		{
@@ -4894,45 +4896,49 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, blockDim.x, blockDim.x - 1, LT);
+				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, LT);
 			}
 
 		}
 		z[iout] = z[ii];
 	
-		
+	}
+	if (ix == 2)
+	{
 		// Top right corner
-		iout = memloc(halowidth, blkmemwidth, blockDim.x, blockDim.x, ib);
+		iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth, ib);
 		if (TR == ib && RT == ib)//
 		{
-			ii = memloc(halowidth, blkmemwidth, blockDim.x - 1, blockDim.x - 1, ib);
+			ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
 		}
 		else
 		{
 			if (TR != ib)
 			{
-				ii = memloc(halowidth, blkmemwidth, blockDim.x, 0, TR);
+				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, 0, blockDim.x, RT);
+				ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
 			}
 
 		}
 		z[iout] = z[ii];
 
-	
+	}
+	if (ix == 3)
+	{
 		// Bot right corner
-		iout = memloc(halowidth, blkmemwidth, blockDim.x, -1, ib);
+		iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, -1, ib);
 		if (BR == ib && RB == ib)//
 		{
-			ii = memloc(halowidth, blkmemwidth, blockDim.x - 1, 0, ib);
+			ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, ib);
 		}
 		else
 		{
 			if (BR != ib)
 			{
-				ii = memloc(halowidth, blkmemwidth, blockDim.x, blockDim.x - 1, BR);
+				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, BR);
 			}
 			else
 			{
