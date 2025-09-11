@@ -12,11 +12,12 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
-	
-
+	// Check for map output (output initialisation if needed)
+	mapoutput(XParam, XLoop, XModel, XModel_g);
 	
 	log("\t\tCompleted");
 	log("Model Running...");
+
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
@@ -108,7 +109,7 @@ template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<
 		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
 		cudaStreamDestroy(XLoop.streams[0]);
 
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
@@ -178,7 +179,7 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	Loop<T> XLoop;
 	XLoop.atmpuni = T(XParam.Paref);
 	XLoop.totaltime = XParam.totaltime;
-	XLoop.nextoutputtime = XParam.totaltime + XParam.outputtimestep;
+	XLoop.nextoutputtime = XModel.OutputT[0];
 	
 	// Prepare output files
 	InitSave2Netcdf(XParam, XModel);
@@ -238,17 +239,13 @@ template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XF
 
 
 
-template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, Model<T> XModel_g)
+template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel, Model<T> XModel_g)
 {
 	XLoop.nstepout++;
-
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.5) && XParam.outputtimestep > 0.0)
+	double tiny = 0.0000001;
+	/*
+	if  (abs(XLoop.nextoutputtime - XParam.totaltime) < tiny)
 	{
-		char buffer[256];
-		sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
-		std::string str(buffer);
-
-		log("Output to map. Totaltime = "+ std::to_string(XLoop.totaltime) +" s; Mean dt = " + str + " s");
 		if (XParam.GPUDEVICE >= 0)
 		{
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -256,14 +253,43 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			}
 		}
-		
+
+		SaveInitialisation2Netcdf(XParam, XModel);
+
+		XLoop.indNextoutputtime++;
+		if (XLoop.indNextoutputtime < XModel.OutputT.size())
+		{
+			XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
+
+		}
+
+		XLoop.nstepout = 0;
+
+	}
+	*/
+	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * tiny)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+			{
+				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+			}
+		}
+
 		Save2Netcdf(XParam, XLoop, XModel);
 
+		XLoop.indNextoutputtime++;
+		if (XLoop.indNextoutputtime < XModel.OutputT.size())
+		{
+			XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
 
-		XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
+		}
 
 		XLoop.nstepout = 0;
 	}
+
+	
 }
 
 template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
@@ -288,7 +314,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 			XLoop.TSAllout[o].push_back(stepread);
 					
 			
-			storeTSout << <gridDim, blockDim, 0 >> > (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
+			storeTSout <<<gridDim, blockDim, 0 >>> (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		//CUDA_CHECK(cudaDeviceSynchronize());

@@ -30,7 +30,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		hotstartsucess = readhotstartfile(XParam, XBlock, XEv, zb);
 
 		//add offset if present
-		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
+		if (T(XParam.zsoffset) != T(0.0)) // apply specified zsoffset
 		{
 			printf("\t\tadd offset to zs and hh... ");
 			//
@@ -104,7 +104,7 @@ template <class T>
 int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 {
 	T zzini = std::isnan(XParam.zsinit)? T(0.0): T(XParam.zsinit);
-	T zzoffset = std::isnan(XParam.zsoffset) ? T(0.0) : T(XParam.zsoffset);
+	T zzoffset = T(XParam.zsoffset);
 	
 
 	
@@ -487,6 +487,39 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 
 
 template <class T>
+int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
+{
+	int status;
+	int ncid;
+	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
+	int ib;
+	//double scalefac = 1.0;
+	//double offset = 0.0;
+
+	std::string zbname, zsname, hname, uname, vname, xname, yname;
+	// Open the file for read access
+	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
+
+	bool isBG_Flood = false;
+
+	int BG_vers = -999;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+	//Open NC file
+	printf("Open file...");
+	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+	status = nc_get_att_int(ncid, NC_GLOBAL, "BG_Flood", &BG_vers);
+
+	//isBG_Flood = BG_vers >= 0)
+	
+	status = nc_close(ncid);
+	
+	
+	
+}
+
+template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
 	int status;
@@ -504,6 +537,14 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 	//Open NC file
 	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+
+	//bool isBG_Flood = false;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+
+	//if it exist read each level separatly otherwise look for the following variables 
+
 	if (status != NC_NOERR) handle_ncerror(status);
 	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z", "zb_P0");
 	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA", "zs_P0");

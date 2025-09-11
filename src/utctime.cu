@@ -196,13 +196,23 @@ long long date_string_to_time(std::string date)
 	{
 		ddd = split(datetime[0], '/');
 	}
+	// index for the year and mday
+	//by default we assume date is written as yyyy-mm-ddTHH:MM:SS
+	int indexyear = 0;
+	int indexmday = 2;
 
+	if (ddd[0].length() < 4 && ddd[2].length() == 4)//i.e. date is written as dd-mm-yyyy
+	{
+		int indexyear = 2;
+		int indexmday = 0;
+	}
+	// If you write date like an American (mm-dd-yyyy). it wont work and I can't help
 
-	tm.tm_year = std::stoi(ddd[0]);
+	tm.tm_year = std::stoi(ddd[indexyear]);
 
 	tm.tm_mon = std::stoi(ddd[1]);
 
-	tm.tm_mday = std::stoi(ddd[2]);
+	tm.tm_mday = std::stoi(ddd[indexmday]);
 
 	if (datetime.size() > 1)
 	{
@@ -256,16 +266,27 @@ double date_string_to_s(std::string datetime, std::string refdate)
 	//UTCTime ttime = date_string_to_time(datetime);
 	//UTCTime reftime = date_string_to_time(refdate);
 
-	long long ttime = date_string_to_time(datetime);
-	long long reftime = date_string_to_time(refdate);
+	double diff;
 
-	//double diff = difftime(ttime, reftime);
+	std::string::size_type n = datetime.find('T');
+	if (std::string::npos == n)
+	{
+		diff = std::stod(datetime);
+	}
+	else
+	{
 
-	//std::chrono::microseconds timeDiff = ttime - reftime;
+		long long ttime = date_string_to_time(datetime);
+		long long reftime = date_string_to_time(refdate);
 
-	//double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+		//double diff = difftime(ttime, reftime);
 
-	double diff = (double)(ttime - reftime);
+		//std::chrono::microseconds timeDiff = ttime - reftime;
+
+		//double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+
+		diff = (double)(ttime - reftime);
+	}
 
 	return diff;
 }

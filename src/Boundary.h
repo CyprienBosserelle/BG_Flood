@@ -42,6 +42,8 @@ template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S);
 template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd,T unbnd, T& un, T& ut, T& zs, T& h);
 template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T& qmean, T& q, T& G, T& S);
 template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h);
+template <class T> __device__ __host__ void Dirichlet1Q(T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T& q);
+
 
 // End of global definition
 #endif
