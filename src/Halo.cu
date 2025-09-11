@@ -4879,7 +4879,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 		}
 		z[iout] = z[ii];
 	}
-	if (ix == 0 && iy == blockDim.x)
+	if (ix == 0 && iy == (blockDim.x - 1))
 	{
 		// Top left corner
 		iout = memloc(halowidth, blkmemwidth, -1, blockDim.x, ib);
@@ -4902,7 +4902,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 		z[iout] = z[ii];
 	}
 
-	if (ix == blockDim.x && iy == blockDim.x)
+	if (ix == (blockDim.x - 1) && iy == (blockDim.x - 1))
 	{
 		
 		// Top right corner
@@ -4927,7 +4927,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 
 	}
 
-	if (ix == blockDim.x && iy == 0)
+	if (ix == (blockDim.x - 1) && iy == 0)
 	{
 		// Bot right corner
 		iout = memloc(halowidth, blkmemwidth, blockDim.x, -1, ib);
