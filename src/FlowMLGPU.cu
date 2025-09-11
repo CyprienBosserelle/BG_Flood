@@ -123,7 +123,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdx);
 	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdy);
 
-	/*
+	
 	fillCornersGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -141,7 +141,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	*/
+	
 	//hv hfv u hu hfu v
 
 
@@ -170,9 +170,9 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	
 
 
-	//bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.cf, XModel.evolv);
+	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.cf, XModel.evolv);
 	///XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
-	//CUDA_CHECK(cudaDeviceSynchronize());
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	
 
