@@ -10,6 +10,9 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
 	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
 
+	// For halo corners
+	dim3 blockDimHC(4, 1, 1);
+
 	// Fill halo for Fu and Fv
 	dim3 blockDimHaloLR(2, XParam.blkwidth, 1);
 	//dim3 blockDimHaloBT(16, 1, 1);
@@ -124,22 +127,22 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdy);
 
 	
-	fillCornersGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
+	fillCornersGPU <<< gridDim, blockDimHC, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfu);
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfu);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfv);
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv.u);
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.evolv.u);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillCornersGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv.v);
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.evolv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	//hv hfv u hu hfu v
