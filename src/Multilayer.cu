@@ -30,6 +30,8 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 
 	T CFL_H = T(0.5);
 
+	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 
@@ -42,8 +44,11 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 
 
 	T fmu = T(1.0);
-	T cm = T(1.0);//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
-	T gmetric = T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T cml = cm;
+	//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	//T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
+	T gmetric = XParam.spherical ? (fmu/(cm)) :T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
 
 	T ax = (g * gmetric * (zsn - zsi) / delta);
 
@@ -124,6 +129,9 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
+
+	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]):T(1.0);
+
 	T CFL = T(XParam.CFL);
 
 	T CFL_H = T(0.5);
@@ -139,9 +147,12 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	T zbn = zb[ibot];
 
 
-	T fmu = T(1.0);
-	T cm = T(1.0);//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
-	T gmetric = T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
+	T fmu = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T cml = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo-XParam.dx, iy) : T(1.0);
+	//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	//T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
+	T gmetric = XParam.spherical ? (2*fmu / (cml+cm)) : T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
 
 	T ax = (g * gmetric * (zsn - zsi) / delta);
 
