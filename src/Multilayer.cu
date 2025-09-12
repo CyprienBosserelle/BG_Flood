@@ -239,6 +239,8 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 
 	T CFL_H = T(0.5);
 
+	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 
@@ -248,8 +250,9 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 		T hi = XEv.h[i];
 		T hn = XEv.h[ileft];
 
-		T cmn = T(1.0);//cm[-1]
-		T cmi = T(1.0);//cm[]
+		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+
+		T cmi = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
 		if (hul * dt / (delta * cmn) > CFL * hn)
 		{
@@ -297,6 +300,8 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 
 	T CFL_H = T(0.5);
 
+	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy-1, ib);
 
@@ -306,8 +311,8 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 		T hi = XEv.h[i];
 		T hn = XEv.h[ibot];
 
-		T cmn = T(1.0);//cm[-1]
-		T cmi = T(1.0);//cm[]
+		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo - 0.5*XParam.dx, iy) : T(1.0);
+		T cmi = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
 		if (hvl * dt / (delta * cmn) > CFL * hn)
 		{
@@ -491,8 +496,12 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
-	T cmu = T(1.0);
+	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+
+	T cmu = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T cmv = T(1.0);
+
+	
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
@@ -574,6 +583,8 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
+
+	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
