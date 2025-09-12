@@ -630,4 +630,28 @@ template <class T> __global__ void CleanupML(Param XParam, BlockP<T> XBlock, Evo
 template __global__ void CleanupML<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template __global__ void CleanupML<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
+template <class T> __global__ void Updatewindandriver(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, AdvanceP<T> XAdv)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	T hi = XEv.h[i];
+
+	if (hi > XParam.eps) {
+
+		XEv.u[i] += (XAdv.dhu[i] / hi) * dt;
+		XEv.v[i] += (XAdv.dhv[i] / hi) * dt;
+	}
+
+	XEv.h[i] = hi + XAdv.dh[i] * dt;
+
+}
+template __global__ void Updatewindandriver<float>(Param XParam, BlockP<float> XBlock, float dt, EvolvingP<float> XEv, AdvanceP<float> XAdv);
+template __global__ void Updatewindandriver<double>(Param XParam, BlockP<double> XBlock, double dt, EvolvingP<double> XEv, AdvanceP<double> XAdv);

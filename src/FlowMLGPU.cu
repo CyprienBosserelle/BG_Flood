@@ -45,6 +45,16 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XLoop.hugeposval, XModel.time.dtmax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.adv.dh);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.adv.dhu);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.adv.dhv);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
 	// Compute face value
 	CalcfaceValX << < gridDim, blockDim, 0 >> > (T(XLoop.dtmax), XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -182,8 +192,20 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	if (XForcing.rivers.size() > 0)
 	{
 		//Add River ML
+		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
 
+	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
+	{
+		AddwindforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
+	if (XForcing.rivers.size() > 0 || !XForcing.UWind.inputfile.empty())
+	{
+		Updatewindandriver << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.adv);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 
 	if (!XForcing.Rain.inputfile.empty())
 	{
@@ -204,8 +226,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	}
 
 	// Recalculate zs based on h and zb
-	CleanupML <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.zb);
+	CleanupML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
 
 
 }

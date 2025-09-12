@@ -19,7 +19,7 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock, T dt,
 template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux);
 
 template <class T> __global__ void CleanupML(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb);
-
+template <class T> __global__ void Updatewindandriver(Param XParam, BlockP<T> XBlock, T dt, EvolvingP<T> XEv, AdvanceP<T> XAdv);
 
 // End of global definition
 #endif
