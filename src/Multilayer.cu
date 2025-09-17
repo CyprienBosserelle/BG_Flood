@@ -30,7 +30,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 
 	T CFL_H = T(0.5);
 
-	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
@@ -149,7 +149,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 
 	T fmu = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
-	T cml = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo-XParam.dx, iy) : T(1.0);
+	T cml = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy-1) : T(1.0);
 	//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	//T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 	T gmetric = XParam.spherical ? (2*fmu / (cml+cm)) : T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
@@ -239,7 +239,7 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 
 	T CFL_H = T(0.5);
 
-	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
@@ -300,7 +300,7 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 
 	T CFL_H = T(0.5);
 
-	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy-1, ib);
@@ -311,7 +311,7 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 		T hi = XEv.h[i];
 		T hn = XEv.h[ibot];
 
-		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo - 0.5*XParam.dx, iy) : T(1.0);
+		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo - T(0.5*XParam.dx), iy) : T(1.0);
 		T cmi = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
 		if (hvl * dt / (delta * cmn) > CFL * hn)
@@ -496,12 +496,17 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
-	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
-
-	T cmu = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T cmu = T(1.0);
 	T cmv = T(1.0);
 
-	
+	if (XParam.spherical)
+	{
+		T ybo = T(XParam.yo + XBlock.yo[ib]);
+
+		cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
+		cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
+
+	}
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
@@ -584,7 +589,7 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
-	T ybo = T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
+	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
@@ -592,11 +597,11 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 	int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 	int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
-	T cm = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
-	T fmv = T(1.0);// XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+	T fmv =  XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 	T fmup = T(1.0);
-	T fmvp = T(1.0);// XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
+	T fmvp =  XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy+1)) : T(1.0);
 
 	T cmdinv, ga;
 
