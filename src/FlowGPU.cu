@@ -2,7 +2,6 @@
 
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
-	printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
 
 	//============================================
 	// construct threads abnd block parameters
@@ -163,12 +162,9 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
 
-	printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
 
 	if (XForcing.culverts.size() > 0)
 	{
-		printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
-
 		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}

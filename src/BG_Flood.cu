@@ -121,7 +121,6 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 	//============================================
 	// Prepare initial conditions on CPU
 	InitialConditions(XParam, XForcing, XModel);
-	printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
 
 	//============================================
 	// Initial adaptation
@@ -130,8 +129,6 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 	//============================================
 	// Setup GPU (bypassed within the function if no suitable GPU is available)
 	SetupGPU(XParam, XModel,XForcing, XModel_g);
-	printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
-	printf("XCulvertsF h1=%f\n", XModel_g.culvertsF.h1[0]);
 
 
 
