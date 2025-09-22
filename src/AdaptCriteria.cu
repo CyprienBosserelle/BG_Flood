@@ -3,7 +3,7 @@
 
 #include "AdaptCriteria.h"
 
-
+// Adaptation Criteria
 template <class T> int AdaptCriteria(Param XParam, Forcing<float> XForcing, Model<T> XModel)
 {
 	int success = 0;

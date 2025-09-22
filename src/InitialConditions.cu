@@ -17,6 +17,7 @@
 
 
 #include "InitialConditions.h"
+#include "Input.h"
 
 template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {
@@ -32,7 +33,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	//=====================================
 	// Initialise Friction map
 
-	if (!XForcing.cf.inputfile.empty())
+	if (!XForcing.cf.empty())
 	{
 		interp2BUQ(XParam, XModel.blocks, XForcing.cf, XModel.cf);
 	}
@@ -63,8 +64,10 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 	//=====================================
 	// Initial bndinfo
-	Calcbndblks(XParam, XForcing, XModel.blocks);
-	Findbndblks(XParam, XModel, XForcing);
+	//Calcbndblks(XParam, XForcing, XModel.blocks);
+	//Findbndblks(XParam, XModel, XForcing);
+	Initbndblks(XParam, XForcing, XModel.blocks);
+
 
 	//=====================================
 	// Calculate Active cells
@@ -75,8 +78,22 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 	if (XParam.infiltration)
 	{
-		interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
-		interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+		if (!XForcing.il.inputfile.empty())
+		{
+			interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+		}
+		else
+		{
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.il, XModel.il);
+		}
+		if (!XForcing.cl.inputfile.empty())
+		{
+			interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+		}
+		else
+		{
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.cl, XModel.cl);
+		}
 		// Set edges of friction map
 		setedges(XParam, XModel.blocks, XModel.il);
 		setedges(XParam, XModel.blocks, XModel.cl);
@@ -84,14 +101,14 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 		// Initialise infiltration to IL where h is already wet
 		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.hgw);
-
 	}
-
 
 	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
 
+	// Initialise Output times' vector
+	initOutputTimes(XParam, XModel.OutputT, XModel.blocks);
 }
 template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
@@ -128,14 +145,14 @@ template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
 
 	cudaStreamDestroy(streams[0]);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
@@ -200,7 +217,7 @@ void InitTSOutput(Param XParam)
 	}
 }
 
-template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP & bnd)
+template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP<T> & bnd)
 {
 	int ib;
 	T levdx,x,y,blkxmin,blkxmax,blkymin,blkymax,dxblk;
@@ -222,13 +239,13 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 			ib = XBlock.active[blk];
 			levdx = T(calcres(XParam.dx,XBlock.level[ib]));
 
-			x = XParam.TSnodesout[o].x;
-			y = XParam.TSnodesout[o].y;
+			x = (T)XParam.TSnodesout[o].x;
+			y = (T)XParam.TSnodesout[o].y;
 
 			dxblk = (T)(XParam.blkwidth) * levdx;
 
-			blkxmin = (XParam.xo + XBlock.xo[ib] - 0.5 * levdx);
-			blkymin = (XParam.yo + XBlock.yo[ib] - 0.5 * levdx);
+			blkxmin = ((T)XParam.xo + XBlock.xo[ib] - T(0.5) * levdx);
+			blkymin = ((T)XParam.yo + XBlock.yo[ib] - T(0.5) * levdx);
 
 			blkxmax = (blkxmin + dxblk);
 			blkymax = (blkymin + dxblk);
@@ -247,8 +264,8 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 	
 
 }
-template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock, BndblockP& bnd);
-template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock, BndblockP& bnd);
+template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock, BndblockP<float>& bnd);
+template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock, BndblockP<double>& bnd);
 
 
 
@@ -260,9 +277,9 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 	if (XForcing.rivers.size() > 0)
 	{
 		//
-		double xl, yb, xr, yt ;
+		double xl, yb, xr, yt, xi,yi ;
 		int ib;
-		double levdx;
+		double levdx, levdelta;
 		double dischargeArea;
 		log("\tInitializing rivers");
 		//For each rivers
@@ -275,18 +292,22 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			{
 				ib = XModel.blocks.active[ibl];
 				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+				levdelta = calcres(XParam.delta, XModel.blocks.level[ib]);
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
 					for (int i = 0; i < XParam.blkwidth; i++)
 					{
 						//int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
-						
-						
-						xl = XParam.xo + XModel.blocks.xo[ib] + i * levdx - 0.5 * levdx;
-						yb = XParam.yo + XModel.blocks.yo[ib] + j * levdx - 0.5 * levdx;
+						xi = XParam.xo + XModel.blocks.xo[ib] + i * levdx;
+						yi = XParam.yo + XModel.blocks.yo[ib] + j * levdx;
 
-						xr = XParam.xo + XModel.blocks.xo[ib] + i * levdx + 0.5 * levdx;
-						yt = XParam.yo + XModel.blocks.yo[ib] + j * levdx + 0.5 * levdx;
+
+						
+						xl = xi - 0.5 * levdx;
+						yb = yi - 0.5 * levdx;
+
+						xr = xi + 0.5 * levdx;
+						yt = yi + 0.5 * levdx;
 						// the conditions are that the discharge area as defined by the user have to include at least a model grid node
 						// This could be really annoying and there should be a better way to deal wiith this like polygon intersection
 						//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
@@ -297,7 +318,14 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 							idis.push_back(i);
 							jdis.push_back(j);
 							blockdis.push_back(ib);
-							dischargeArea = dischargeArea + levdx * levdx;
+							if (XParam.spherical)
+							{
+								dischargeArea = dischargeArea + spharea(XParam.Radius, xi, yi, levdx);
+							}
+							else
+							{
+								dischargeArea = dischargeArea + levdelta * levdelta;
+							}
 						}
 					}
 				}
@@ -309,7 +337,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				XForcing.rivers[Rin].i = idis;
 				XForcing.rivers[Rin].j = jdis;
 				XForcing.rivers[Rin].block = blockdis;
-				XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+				XForcing.rivers[Rin].disarea = dischargeArea; // That is valid for spherical grids
 			
 
 			
@@ -325,8 +353,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			}
 		}
 
-
-
+		
 		//Now identify sort and unique blocks where rivers are being inserted
 		std::vector<int> activeRiverBlk;
 
@@ -349,6 +376,135 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		{
 			XModel.bndblk.river[b] = activeRiverBlk[b];
 		}
+
+		// Setup the river info
+
+		int nburmax = activeRiverBlk.size();
+		int nribmax = 0;
+		for (int b = 0; b < activeRiverBlk.size(); b++)
+		{
+			int bur = activeRiverBlk[b];
+			int nriverinblock = 0;
+			for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+			{
+				std::vector<int> uniqblockforriver = XForcing.rivers[Rin].block;
+
+				std::sort(uniqblockforriver.begin(), uniqblockforriver.end());
+				uniqblockforriver.erase(std::unique(uniqblockforriver.begin(), uniqblockforriver.end()), uniqblockforriver.end());
+
+				for (int bir = 0; bir < uniqblockforriver.size(); bir++)
+				{
+					if (uniqblockforriver[bir] == bur)
+					{
+						nriverinblock = nriverinblock + 1;
+					}
+				}
+
+			}
+			nribmax = max(nribmax, nriverinblock);
+		}
+
+		// Allocate Qnow as pinned memory
+		AllocateMappedMemCPU(XForcing.rivers.size(), 1, XParam.GPUDEVICE,XModel.bndblk.Riverinfo.qnow);
+		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel.bndblk.Riverinfo.xend, XModel.bndblk.Riverinfo.ystart, XModel.bndblk.Riverinfo.yend);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xstart);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xend);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.ystart);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.yend);
+
+
+
+		// Allocate XXbidir and Xridib
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib);
+
+		// Fill them with a flag value 
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xridib);
+
+		//Xbidir is an array that stores block id where n rivers apply
+		//along the row of Xbidir block id is unique. meaning that a block id ith two river injection will appear on two seperate row of Xbidir
+		//The number of column (size of row 1) in xbidir is nburmax = length(uniq(blockwith river injected))
+		//
+
+		//Xridib is an array that stores River id that a river is injected for the corresponding block id in Xbidir
+
+
+		XModel.bndblk.Riverinfo.nribmax = nribmax;
+		XModel.bndblk.Riverinfo.nburmax = nburmax;
+
+		std::vector<RiverBlk> blocksalreadyin;
+		RiverBlk emptyvec;
+		for (int iblk = 0; iblk < nribmax; iblk++)
+		{
+
+			blocksalreadyin.push_back(emptyvec);
+			
+		}
+		
+		//(n, 10)
+		// 
+		std::vector<int> iriv(nribmax,0);
+		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+		{
+			std::vector<int> uniqblockforriver = XForcing.rivers[Rin].block;
+
+			std::sort(uniqblockforriver.begin(), uniqblockforriver.end());
+			uniqblockforriver.erase(std::unique(uniqblockforriver.begin(), uniqblockforriver.end()), uniqblockforriver.end());
+
+			
+
+			for (int bir = 0; bir < uniqblockforriver.size(); bir++)
+			{
+
+				for (int iribm = 0; iribm < nribmax; iribm++)
+				{
+
+					if (std::find(blocksalreadyin[iribm].block.begin(), blocksalreadyin[iribm].block.end(), uniqblockforriver[bir]) != blocksalreadyin[iribm].block.end())
+					{
+						//block found already listed in that line;
+
+						continue;
+					}
+					else
+					{
+						//not found;
+						// write to the array
+						XModel.bndblk.Riverinfo.Xbidir[iriv[iribm] + iribm * nburmax] = uniqblockforriver[bir];
+						XModel.bndblk.Riverinfo.Xridib[iriv[iribm] + iribm * nburmax] = Rin;
+
+						iriv[iribm] = iriv[iribm] + 1;
+
+						// add it to the list 
+						blocksalreadyin[iribm].block.push_back(uniqblockforriver[bir]);
+
+						
+
+						break;
+					}
+				}
+					
+			}
+
+		}
+		for (int iribm = 0; iribm < nribmax; iribm++)
+		{
+			for (int ibur = 0; ibur < nburmax; ibur++)
+			{
+				int indx = ibur + iribm * nburmax;
+				int Rin = XModel.bndblk.Riverinfo.Xridib[indx];
+				if (Rin > -1)
+				{
+					XModel.bndblk.Riverinfo.xstart[indx] = XForcing.rivers[Rin].xstart;
+					XModel.bndblk.Riverinfo.xend[indx] = XForcing.rivers[Rin].xend;
+					XModel.bndblk.Riverinfo.ystart[indx] = XForcing.rivers[Rin].ystart;
+					XModel.bndblk.Riverinfo.yend[indx] = XForcing.rivers[Rin].yend;
+				}
+			}
+		}
+
+
+		
 		
 	}
 
@@ -363,111 +519,306 @@ template<class T> void Initmaparray(Model<T>& XModel)
 {
 	//Main Parameters
 	XModel.OutputVarMap["zb"] = XModel.zb;
+	XModel.Outvarlongname["zb"] = "Ground elevation above datum";
+	XModel.Outvarstdname["zb"] = "ground_elevation_above_datum";
+	XModel.Outvarunits["zb"] = "m";
+
 
 	XModel.OutputVarMap["u"] = XModel.evolv.u;
+	XModel.Outvarlongname["u"] = "Water velocity in x-direction";// zonal
+	XModel.Outvarstdname["u"] = "u_velocity";
+	XModel.Outvarunits["u"] = "m s-1";
 
 	XModel.OutputVarMap["v"] = XModel.evolv.v;
+	XModel.Outvarlongname["v"] = "Velocity in y-direction";// meridional
+	XModel.Outvarstdname["v"] = "v_velocity";
+	XModel.Outvarunits["v"] = "m s-1";
 
 	XModel.OutputVarMap["zs"] = XModel.evolv.zs;
+	XModel.Outvarlongname["zs"] = "Water surface elevation above datum";
+	XModel.Outvarstdname["zs"] = "water_surface_elevation";
+	XModel.Outvarunits["zs"] = "m";
 
 	XModel.OutputVarMap["h"] = XModel.evolv.h;
+	XModel.Outvarlongname["h"] = "Water depth";
+	XModel.Outvarstdname["h"] = "water_depth";
+	XModel.Outvarunits["h"] = "m";
 
 	//Mean Max parameters
 	XModel.OutputVarMap["hmean"] = XModel.evmean.h;
+	XModel.Outvarlongname["hmean"] = "Mean water depth since last output";
+	XModel.Outvarstdname["hmean"] = "mean_water_depth";
+	XModel.Outvarunits["hmean"] = "m";
 
 	XModel.OutputVarMap["hmax"] = XModel.evmax.h;
+	XModel.Outvarlongname["hmax"] = "Maximum water depth since simulation start";
+	XModel.Outvarstdname["hmax"] = "maximum_water_depth";
+	XModel.Outvarunits["hmax"] = "m";
 
 	XModel.OutputVarMap["zsmean"] = XModel.evmean.zs;
+	XModel.Outvarlongname["zsmean"] = "Mean water elevation above datum since last output";
+	XModel.Outvarstdname["zsmean"] = "mean_water_elevation";
+	XModel.Outvarunits["zsmean"] = "m";
 
 	XModel.OutputVarMap["zsmax"] = XModel.evmax.zs;
+	XModel.Outvarlongname["zsmax"] = "Maximum water elevation above datum since simulation start";
+	XModel.Outvarstdname["zsmax"] = "maximum_water_elevation";
+	XModel.Outvarunits["zsmax"] = "m";
 
 	XModel.OutputVarMap["umean"] = XModel.evmean.u;
+	XModel.Outvarlongname["umean"] = "Mean velocity in x-direction since last output";
+	XModel.Outvarstdname["umean"] = "mean_u_velocity";
+	XModel.Outvarunits["umean"] = "m s-1";
 
 	XModel.OutputVarMap["umax"] = XModel.evmax.u;
+	XModel.Outvarlongname["umax"] = "Maximum velocity in x-direction since simulation start";
+	XModel.Outvarstdname["umax"] = "maximum_u_velocity";
+	XModel.Outvarunits["umax"] = "m s-1";
 
 	XModel.OutputVarMap["vmean"] = XModel.evmean.v;
+	XModel.Outvarlongname["vmean"] = "Mean velocity in y-direction since last output";
+	XModel.Outvarstdname["vmean"] = "mean_v_velocity";
+	XModel.Outvarunits["vmean"] = "m s-1";
 
 	XModel.OutputVarMap["vmax"] = XModel.evmax.v;
+	XModel.Outvarlongname["vmax"] = "Maximum velocity in y-direction since simulation start";
+	XModel.Outvarstdname["vmax"] = "maximum_v_velocity";
+	XModel.Outvarunits["vmax"] = "m s-1";
 
 	XModel.OutputVarMap["Umean"] = XModel.evmean.U;
+	XModel.Outvarlongname["Umean"] = "Mean velocity magnitude since last output";
+	XModel.Outvarstdname["Umean"] = "mean_velocity";
+	XModel.Outvarunits["Umean"] = "m s-1";
 
 	XModel.OutputVarMap["Umax"] = XModel.evmax.U;
+	XModel.Outvarlongname["Umax"] = "Maximum velocity magnitude since simulation start";
+	XModel.Outvarstdname["Umax"] = "maximum_velocity";
+	XModel.Outvarunits["Umax"] = "m s-1";
 
 	XModel.OutputVarMap["hUmean"] = XModel.evmean.hU;
+	XModel.Outvarlongname["hUmean"] = "Mean depth times velocity since last output";
+	XModel.Outvarstdname["hUmean"] = "mean_depth_velocity";
+	XModel.Outvarunits["hUmean"] = "m2 s-1";
 
 	XModel.OutputVarMap["hUmax"] = XModel.evmax.hU;
+	XModel.Outvarlongname["hUmax"] = "Maximum depth times velocity since simulation start";
+	XModel.Outvarstdname["hUmax"] = "maximum_depth_velocity";
+	XModel.Outvarunits["hUmax"] = "m2 s-1";
 
 	//others
 
 	XModel.OutputVarMap["uo"] = XModel.evolv_o.u;
+	XModel.Outvarlongname["uo"] = "Velocity in x-direction from previous half-step";
+	XModel.Outvarstdname["uo"] = "previous_u_velocity";
+	XModel.Outvarunits["uo"] = "m s-1";
 
 	XModel.OutputVarMap["vo"] = XModel.evolv_o.v;
+	XModel.Outvarlongname["vo"] = "Velocity in y-direction from previous half-step";
+	XModel.Outvarstdname["vo"] = "previous_v_velocity";
+	XModel.Outvarunits["vo"] = "m s-1";
 
 	XModel.OutputVarMap["zso"] = XModel.evolv_o.zs;
+	XModel.Outvarlongname["zso"] = "Water elevation above datum from previous half-step";
+	XModel.Outvarstdname["zso"] = "previous_water_elevation";
+	XModel.Outvarunits["zso"] = "m";
 
 	XModel.OutputVarMap["ho"] = XModel.evolv_o.h;
-
+	XModel.Outvarlongname["ho"] = "Water depth from previous half-step";
+	XModel.Outvarstdname["ho"] = "previous_water_depth";
+	XModel.Outvarunits["ho"] = "m";
 
 	// Gradients
 
 	XModel.OutputVarMap["dhdx"] = XModel.grad.dhdx;
+	XModel.Outvarlongname["dhdx"] = "Water depth gradient in x-direction";
+	XModel.Outvarstdname["dhdx"] = "water_depth_gradient_x_direction";
+	XModel.Outvarunits["dhdx"] = "m/m";
 
 	XModel.OutputVarMap["dhdy"] = XModel.grad.dhdy;
+	XModel.Outvarlongname["dhdy"] = "Water depth gradient in y-direction";
+	XModel.Outvarstdname["dhdy"] = "water_depth_gradient_y_direction";
+	XModel.Outvarunits["dhdy"] = "m/m";
 
 	XModel.OutputVarMap["dudx"] = XModel.grad.dudx;
+	XModel.Outvarlongname["dudx"] = "u-velocity gradient in x-direction";
+	XModel.Outvarstdname["dudx"] = "u_velocity_gradient_x_direction";
+	XModel.Outvarunits["dudx"] = "m s-1/m";
 
 	XModel.OutputVarMap["dudy"] = XModel.grad.dudy;
+	XModel.Outvarlongname["dudy"] = "u-velocity gradient in y-direction";
+	XModel.Outvarstdname["dudy"] = "u_velocity_gradient_y_direction";
+	XModel.Outvarunits["dudy"] = "m s-1/m";
 
 	XModel.OutputVarMap["dvdx"] = XModel.grad.dvdx;
+	XModel.Outvarlongname["dvdx"] = "v-velocity gradient in x-direction";
+	XModel.Outvarstdname["dvdx"] = "v_velocity_gradient_x_direction";
+	XModel.Outvarunits["dvdx"] = "m s-1/m";
 
 	XModel.OutputVarMap["dvdy"] = XModel.grad.dvdy;
+	XModel.Outvarlongname["dvdy"] = "v-velocity gradient in y-direction";
+	XModel.Outvarstdname["dvdy"] = "v_velocity_gradient_y_direction";
+	XModel.Outvarunits["dvdy"] = "m s-1/m";
 
 	XModel.OutputVarMap["dzsdx"] = XModel.grad.dzsdx;
+	XModel.Outvarlongname["dzsdx"] = "Water surface gradient in x-direction";
+	XModel.Outvarstdname["dzsdx"] = "water_surface_gradient_x_direction";
+	XModel.Outvarunits["dzsdx"] = "m/m";
 
 	XModel.OutputVarMap["dzsdy"] = XModel.grad.dzsdy;
+	XModel.Outvarlongname["dzsdy"] = "Water surface gradient in y-direction";
+	XModel.Outvarstdname["dzsdy"] = "water_surface_gradient_y_direction";
+	XModel.Outvarunits["dzsdy"] = "m/m";
 
 	XModel.OutputVarMap["dzbdx"] = XModel.grad.dzbdx;
+	XModel.Outvarlongname["dzbdx"] = "ground elevation gradient in x-direction";
+	XModel.Outvarstdname["dzbdx"] = "ground_surface_gradient_x_direction";
+	XModel.Outvarunits["dzbdx"] = "m/m";
 
 	XModel.OutputVarMap["dzbdy"] = XModel.grad.dzbdy;
+	XModel.Outvarlongname["dzbdy"] = "ground slope in y-direction";
+	XModel.Outvarstdname["dzbdy"] = "ground_surface_gradient_y_direction";
+	XModel.Outvarunits["dzbdy"] = "m/m";
 
 	//Flux
 	XModel.OutputVarMap["Fhu"] = XModel.flux.Fhu;
+	XModel.Outvarlongname["Fhu"] = "Fhu flux term in x-direction";
+	XModel.Outvarstdname["Fhu"] = "Fh_x_direction";
+	XModel.Outvarunits["Fhu"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fhv"] = XModel.flux.Fhv;
+	XModel.Outvarlongname["Fhv"] = "Fhv flux term in y-direction";
+	XModel.Outvarstdname["Fhv"] = "Fh_y_direction";
+	XModel.Outvarunits["Fhv"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fqux"] = XModel.flux.Fqux;
+	XModel.Outvarlongname["Fqux"] = "Fqux flux term in x-direction";
+	XModel.Outvarstdname["Fqux"] = "Fqu_x_direction";
+	XModel.Outvarunits["Fqux"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fqvy"] = XModel.flux.Fqvy;
+	XModel.Outvarlongname["Fqvy"] = "Fqvy flux term in y-direction";
+	XModel.Outvarstdname["Fqvy"] = "Fqv_y_direction";
+	XModel.Outvarunits["Fqvy"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fquy"] = XModel.flux.Fquy;
+	XModel.Outvarlongname["Fquy"] = "Fquy flux term in y-direction";
+	XModel.Outvarstdname["Fquy"] = "Fqu_y_direction";
+	XModel.Outvarunits["Fquy"] = "m2 s-1";
 
 	XModel.OutputVarMap["Fqvx"] = XModel.flux.Fqvx;
+	XModel.Outvarlongname["Fqvx"] = "Fqvx flux term in x-direction";
+	XModel.Outvarstdname["Fqvx"] = "Fqv_x_direction";
+	XModel.Outvarunits["Fqvx"] = "m2 s-1";
 
 	XModel.OutputVarMap["Su"] = XModel.flux.Su;
+	XModel.Outvarlongname["Su"] = "Topography source term un x-direction";
+	XModel.Outvarstdname["Su"] = "Topo_source_x_direction";
+	XModel.Outvarunits["Su"] = "m2 s-1";
 
 	XModel.OutputVarMap["Sv"] = XModel.flux.Sv;
+	XModel.Outvarlongname["Sv"] = "Topography source term un y-direction";
+	XModel.Outvarstdname["Sv"] = "Topo_source_y_direction";
+	XModel.Outvarunits["Sv"] = "m2 s-1";
+
+	XModel.OutputVarMap["Fux"] = XModel.fluxml.Fux;
+	XModel.Outvarlongname["Fux"] = "Flux term Fu x-direction";
+	XModel.Outvarstdname["Fux"] = "Flux_term_Fu_x_direction";
+	XModel.Outvarunits["Fux"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fuy"] = XModel.fluxml.Fuy;
+	XModel.Outvarlongname["Fuy"] = "Flux term Fu y-direction";
+	XModel.Outvarstdname["Fuy"] = "Flux_term_Fu_y_direction";
+	XModel.Outvarunits["Fuy"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fvx"] = XModel.fluxml.Fvx;
+	XModel.Outvarlongname["Fvx"] = "Flux term Fv x-direction";
+	XModel.Outvarstdname["Fvx"] = "Flux_term_Fv_x_direction";
+	XModel.Outvarunits["Fvx"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fvy"] = XModel.fluxml.Fvy;
+	XModel.Outvarlongname["Fvy"] = "Flux term Fv y-direction";
+	XModel.Outvarstdname["Fvy"] = "Flux_term_Fv_y_direction";
+	XModel.Outvarunits["Fvy"] = "m3 s-1";
+
+	XModel.OutputVarMap["hau"] = XModel.fluxml.hau;
+	XModel.Outvarlongname["hau"] = "Acceleration term hau x-direction";
+	XModel.Outvarstdname["hau"] = "Acceleration_term_hau_x_direction";
+	XModel.Outvarunits["hau"] = "m2 s-2";
+
+	XModel.OutputVarMap["hav"] = XModel.fluxml.hav;
+	XModel.Outvarlongname["hav"] = "Acceleration term hav y-direction";
+	XModel.Outvarstdname["hav"] = "Acceleration_term_hav_y_direction";
+	XModel.Outvarunits["hav"] = "m2 s-2";
+
+	XModel.OutputVarMap["hfu"] = XModel.fluxml.hfu;
+	XModel.Outvarlongname["hfu"] = "Flux term hfu x-direction";
+	XModel.Outvarstdname["hfu"] = "Flux_term_hfu_x_direction";
+	XModel.Outvarunits["hfu"] = "m3 s-1";
+
+	XModel.OutputVarMap["hfv"] = XModel.fluxml.hfv;
+	XModel.Outvarlongname["hfv"] = "Flux term hfv y-direction";
+	XModel.Outvarstdname["hfv"] = "Flux_term_hfv_y_direction";
+	XModel.Outvarunits["hfv"] = "m3 s-1";
+
+	XModel.OutputVarMap["hu"] = XModel.fluxml.hu;
+	XModel.Outvarlongname["hu"] = "Flux term hu x-direction";
+	XModel.Outvarstdname["hu"] = "Flux_term_hu_x_direction";
+	XModel.Outvarunits["hu"] = "m3 s-1";
+
+	XModel.OutputVarMap["hv"] = XModel.fluxml.hv;
+	XModel.Outvarlongname["hv"] = "Flux term hv y-direction";
+	XModel.Outvarstdname["hv"] = "Flux_term_hv_y_direction";
+	XModel.Outvarunits["hv"] = "m3 s-1";
 
 	//Advance
 	XModel.OutputVarMap["dh"] = XModel.adv.dh;
+	XModel.Outvarlongname["dh"] = "rate of change in water depth";
+	XModel.Outvarstdname["dh"] = "rate_change_water_depth";
+	XModel.Outvarunits["dh"] = "m s-1";
 
 	XModel.OutputVarMap["dhu"] = XModel.adv.dhu;
+	XModel.Outvarlongname["dhu"] = "changes in flux n x-direction";
+	XModel.Outvarstdname["dhu"] = "rate_change_flux_x_direction";
+	XModel.Outvarunits["dhu"] = "m3 s-1/s";
 
 	XModel.OutputVarMap["dhv"] = XModel.adv.dhv;
+	XModel.Outvarlongname["dhv"] = "changes in flux n y-direction";
+	XModel.Outvarstdname["dhv"] = "rate_change_flux_y_direction";
+	XModel.Outvarunits["dhv"] = "m3 s-1/s";
 
 	XModel.OutputVarMap["cf"] = XModel.cf;
+	XModel.Outvarlongname["cf"] = "Roughness";
+	XModel.Outvarunits["cf"] = "m";
 
 	XModel.OutputVarMap["il"] = XModel.il;
+	XModel.Outvarlongname["il"] = "Initial loss water from inflitration";
+	XModel.Outvarunits["il"] = "mm";
+
 	XModel.OutputVarMap["cl"] = XModel.cl;
+	XModel.Outvarlongname["cl"] = "Continung loss water from inflitration";
+	XModel.Outvarunits["cl"] = "mm h-1";
+
 	XModel.OutputVarMap["hgw"] = XModel.hgw;
+	XModel.Outvarlongname["hgw"] = "Groundwater height";
+	XModel.Outvarunits["hgw"] = "m";
 
 	XModel.OutputVarMap["Patm"] = XModel.Patm;
+	XModel.Outvarlongname["Patm"] = "Atmospheric pressure";
+	XModel.Outvarunits["Patm"] = "m";
+
 	XModel.OutputVarMap["datmpdx"] = XModel.datmpdx;
+	XModel.Outvarlongname["datmpdx"] = "Atmospheric pressure gradient in x-direction";
+	XModel.Outvarunits["datmpdx"] = "m/m";
+
 	XModel.OutputVarMap["datmpdy"] = XModel.datmpdy;
+	XModel.Outvarlongname["datmpdy"] = "Atmospheric pressure gradient in y-direction";
+	XModel.Outvarunits["datmpdy"] = "m/m";
 
 	//XModel.OutputVarMap["U"] = XModel.U;
 
 	XModel.OutputVarMap["twet"] = XModel.wettime;
-
+	XModel.Outvarlongname["twet"] = "time since the cell has been wet";
+	XModel.Outvarunits["twet"] = "s";
 	//XModel.OutputVarMap["vort"] = XModel.vort;
 }
 
@@ -483,13 +834,24 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 	std::vector<int> cornerblk; //index of the blocks at the corner of the zone 
 	outzoneP Xzone; //info on outzone given by the user
 	outzoneB XzoneB; //info on outzone computed and used actually for writing nc files
-	double eps;
+	//double eps;
 
 	// Find the blocks to output and the corners of this area for each zone
 	for (int o = 0; o < XParam.outzone.size(); o++)
 	{
 
 		Xzone = XParam.outzone[o];
+
+		XzoneB.xo = Xzone.xstart;
+		XzoneB.yo = Xzone.ystart;
+		XzoneB.xmax = Xzone.xend;
+		XzoneB.ymax = Xzone.yend;
+
+		std::vector<int> blkzone;
+		double xl, xr, yb, yt;
+
+		int nblk = 0;
+		/*
 		cornerblk = { 0, 0, 0, 0 };
 		// Find the blocks to output for each zone (and the corner of this area) 
 		//
@@ -501,10 +863,6 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		// must be defined first to have a rectangular zone. Then, a new pass through all blocks
 		// identify the blocks inside this new defined zone.
 		
-		std::vector<int> blkzone;
-		double xl, xr, yb, yt;
-
-		int nblk = 0;
 
 		//Getting the new area's corners
 
@@ -564,7 +922,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 			levdx = calcres(XParam.dx, XBlock.level[it]);
 			XzoneB.ymax = XParam.yo + XBlock.yo[it] + (XParam.blkwidth - 1) * levdx + levdx/2;
 		}
-
+		*/
 		// Get the list of all blocks in the zone and the maximum and minimum level of refinement
 		int maxlevel = XParam.minlevel;
 		int minlevel = XParam.maxlevel;
@@ -582,11 +940,16 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 
 			// Checking if at least one part of the a cell of the block is 
 			// inside the area defined by the user.
-			if (OBBdetect(xl, xr, yb, yt, XzoneB.xo, XzoneB.xmax, XzoneB.yo, XzoneB.ymax))
+			if (OBBdetect(xl, xr, yb, yt, Xzone.xstart, Xzone.xend, Xzone.ystart, Xzone.yend))
 			{
 				// This block belongs to the output zone defined by the user
 				blkzone.push_back(ib);
 				nblk++;
+
+				XzoneB.xo = min(XzoneB.xo,XParam.xo + XBlock.xo[ib] - levdx / 2);
+				XzoneB.xmax = max(XzoneB.xmax, XParam.xo + XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx + levdx / 2);
+				XzoneB.yo = min(XzoneB.yo, XParam.yo + XBlock.yo[ib] - levdx / 2);
+				XzoneB.ymax = max(XzoneB.ymax, XParam.yo + XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx + levdx / 2);
 
 				//min/max levels
 				if (XBlock.level[ib] > maxlevel) { maxlevel = XBlock.level[ib]; }
@@ -651,6 +1014,7 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.nblk = XParam.nblk;
 		XzoneB.maxlevel = XParam.maxlevel;
 		XzoneB.minlevel = XParam.minlevel;
+		XzoneB.OutputT = { XParam.totaltime, XParam.endtime };
 		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
 		int I = 0;
 		for (int ib = 0; ib < XParam.nblk; ib++)
@@ -672,6 +1036,165 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 template void Initoutzone<float>(Param& XParam, BlockP<float>& XBlock);
 template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
 
+/*
+*  Initialise bnd blk assign block to their relevant segment allocate memory...
+* 1. Find all the boundary blocks(block with themselves as neighbours)
+*
+* 2. make an array to store which segemnt they belong to
+*
+* If any bnd segment was specified
+* 3. scan each block and find which (if any) segment they belong to
+*	 For each segment
+*		 Calculate bbox
+*		 if inbbox calc inpoly
+*		if inpoly overwrite assingned segment with new one
+*
+*
+* 4. Calculate nblk per segment & allocate (do for each segment)
+*
+* 5. fill segmnent and side arrays for each segments
+*/
+template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
+{
+	//if(XForcing.bndseg.size()>0)
+
+	std::vector<int> bndblks;
+	std::vector<int> bndsegment;
+	// 1. Find all the boundary blocks (block with themselves as neighbours)
+	
+	
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+
+		bool testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) || (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
+		if (testbot)
+		{
+			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
+
+			bndblks.push_back(ib);
+			bndsegment.push_back(XForcing.bndseg.size()-1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
+			//loop through all but the last bnd seg which is meant for block that are not in any segments
+			for (int s = 0; s < XForcing.bndseg.size()-1; s++)
+			{
+				bool inpoly=blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+
+				if (inpoly)
+				{
+					bndsegment.back() = s;
+				}
+
+			}
+
+
+
+		}
+		
+
+	}
+
+	
+	for (int s = 0; s < XForcing.bndseg.size(); s++)
+	{
+		int segcount = 0;
+		int leftcount = 0;
+		int rightcount = 0;
+		int topcount = 0;
+		int botcount = 0;
+		
+		for (int ibl = 0; ibl < bndblks.size(); ibl++)
+		{
+			int ib = bndblks[ibl];
+			if (bndsegment[ibl] == s)
+			{
+				segcount++;
+
+				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
+				{
+					botcount++;
+				}
+				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
+				{
+					topcount++;
+				}
+				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
+				{
+					leftcount++;
+				}
+				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
+				{
+					rightcount++;
+				}
+			}
+		}
+		XForcing.bndseg[s].nblk = segcount;
+
+		log("\nBoundary Segment " + std::to_string(s) + " : " + XForcing.bndseg[s].inputfile + " has " + std::to_string(segcount) + " blocks ");
+
+		XForcing.bndseg[s].left.nblk = leftcount;
+		XForcing.bndseg[s].right.nblk = rightcount;
+		XForcing.bndseg[s].top.nblk = topcount;
+		XForcing.bndseg[s].bot.nblk = botcount;
+
+		//allocate array
+		//ReallocArray(int nblk, int blksize, T * &zb)
+		ReallocArray(leftcount, 1, XForcing.bndseg[s].left.blk);
+		ReallocArray(rightcount, 1, XForcing.bndseg[s].right.blk);
+		ReallocArray(topcount, 1, XForcing.bndseg[s].top.blk);
+		ReallocArray(botcount, 1, XForcing.bndseg[s].bot.blk);
+
+		ReallocArray(leftcount, XParam.blkwidth, XForcing.bndseg[s].left.qmean);
+		ReallocArray(rightcount, XParam.blkwidth, XForcing.bndseg[s].right.qmean);
+		ReallocArray(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
+		ReallocArray(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
+
+		FillCPU(leftcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].left.qmean);
+		FillCPU(rightcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].right.qmean);
+		FillCPU(topcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].top.qmean);
+		FillCPU(botcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].bot.qmean);
+
+		leftcount = 0;
+		rightcount = 0;
+		topcount = 0;
+		botcount = 0;
+
+		for (int ibl = 0; ibl < bndblks.size(); ibl++)
+		{
+			int ib = bndblks[ibl];
+
+			if (bndsegment[ibl] == s)
+			{
+				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
+				{
+					XForcing.bndseg[s].bot.blk[botcount] = ib;
+					botcount++;
+				}
+				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
+				{
+					XForcing.bndseg[s].top.blk[topcount] = ib;
+					topcount++;
+				}
+				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
+				{
+					XForcing.bndseg[s].left.blk[leftcount] = ib;
+					leftcount++;
+				}
+				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
+				{
+					XForcing.bndseg[s].right.blk[rightcount] = ib;
+					rightcount++;
+				}
+
+			}
+
+		}
+
+
+
+	}
+
+
+}
 
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {
@@ -747,9 +1270,10 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 }
 
 
-
-
-
+/*! \fn Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
+* Find which block on the model edge belongs to a "side boundary"
+* 
+*/
 template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
 {
 	//=====================================
@@ -987,8 +1511,7 @@ template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBl
 	}
 }
 
-template <class T>
-void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
+template <class T> void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 {
 //Initialisation to 0 (cold or hot start)
 
@@ -1011,4 +1534,90 @@ void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 			}
 		}
 	}
+}
+
+// Create a vector of times steps from the input structure Toutput
+std::vector<double> GetTimeOutput(T_output time_info)
+{
+	//std::vector<double> time_vect;
+	//double time;
+	
+	//Add independant values
+	//if (!time_info.val.empty())
+	//{
+	//	time_vect = time_info.val;
+	//}
+	
+	//Add timesteps from the vector 
+	//time = time_info.init;
+	//while (time < time_info.end)
+	//{
+	//	time_vect.push_back(time);
+	//	time += time_info.tstep;
+	//}
+
+	//Add last timesteps from the vector definition
+	//time_vect.push_back(time_info.end);
+
+	return(time_info.val);
+}
+
+
+
+// Creation of a vector for times requiering a map output
+// Compilations of vectors and independent times from the general input
+// and the different zones outputs
+template <class T> void initOutputTimes(Param XParam, std::vector<double>& OutputT, BlockP<T>& XBlock)
+{
+	std::vector<double> times;
+	std::vector<double> times_partial;
+
+	times_partial = GetTimeOutput(XParam.Toutput);
+	//printf("Time partial:\n");
+	//for (int k = 0; k < times_partial.size(); k++)
+	//{
+	//	printf("%f, ", times_partial[k]);
+	//}
+	//printf("\n");
+
+	times.insert(times.end(), times_partial.begin(), times_partial.end());
+
+	// if zoneOutputs, add their contribution
+	if (XParam.outzone.size() > 0)
+	{
+		for (int ii = 0; ii < XParam.outzone.size(); ii++)
+		{
+			times_partial = GetTimeOutput(XParam.outzone[ii].Toutput);
+			
+			//Add to main vector
+			times.insert(times.end(), times_partial.begin(), times_partial.end());
+			//Sort and remove duplicate before saving in outZone struct
+			std::sort(times_partial.begin(), times_partial.end());
+			times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
+			
+			XBlock.outZone[ii].OutputT = times_partial;
+		}
+	}
+	else //If not zoneoutput, output zone saved in zoneoutput structure
+	{
+		std::sort(times_partial.begin(), times_partial.end());
+		times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
+		
+		XBlock.outZone[0].OutputT = times_partial;
+	}
+
+	// Sort the times for output
+	std::sort(times.begin(), times.end());
+	times.erase(unique(times.begin(), times.end()), times.end());
+	
+	printf("Output Times:\n");
+	for (int k = 0; k < times.size(); k++)
+	{
+		printf("%e, ", times[k]);
+	}
+	printf("\n");
+	
+	
+
+	OutputT = times;
 }

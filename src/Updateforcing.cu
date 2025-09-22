@@ -8,16 +8,23 @@ template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float
 	//if a file is declared that implies that the dynamic forcing is applicable
 	if (!XForcing.Rain.inputfile.empty())
 	{
-		Forcingthisstep(XParam, XLoop, XForcing.Rain);
+		Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.Rain);
 	}
 	if (!XForcing.Atmp.inputfile.empty())
 	{
-		Forcingthisstep(XParam, XLoop, XForcing.Atmp);
+		Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.Atmp);
 	}
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
-		Forcingthisstep(XParam, XLoop, XForcing.UWind);
-		Forcingthisstep(XParam, XLoop, XForcing.VWind);
+		Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.UWind);
+		Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.VWind);
+	}
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on && !XForcing.bndseg[iseg].uniform)
+		{
+			Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.bndseg[iseg].WLmap);
+		}
 	}
 
 	
@@ -28,7 +35,7 @@ template void updateforcing<double>(Param XParam, Loop<double> XLoop, Forcing<fl
 
 
 
-template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP<float> &XDynForcing)
+void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynForcing)
 {
 	dim3 blockDimDF(16, 16, 1);
 	dim3 gridDimDF((int)ceil((float)XDynForcing.nx / (float)blockDimDF.x), (int)ceil((float)XDynForcing.ny / (float)blockDimDF.y), 1);
@@ -42,22 +49,22 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 
 		// Do this for all the corners
 		//Needs limiter in case WLbnd is empty
-		double difft = XDynForcing.unidata[Rstepinbnd].time - XLoop.totaltime;
+		double difft = XDynForcing.unidata[Rstepinbnd].time - totaltime;
 
 		while (difft < 0.0)
 		{
 			Rstepinbnd++;
-			difft = XDynForcing.unidata[Rstepinbnd].time - XLoop.totaltime;
+			difft = XDynForcing.unidata[Rstepinbnd].time - totaltime;
 		}
 
-		XDynForcing.nowvalue = T(interptime(XDynForcing.unidata[Rstepinbnd].wspeed, XDynForcing.unidata[Rstepinbnd - 1].wspeed, XDynForcing.unidata[Rstepinbnd].time - XDynForcing.unidata[Rstepinbnd - 1].time, XLoop.totaltime - XDynForcing.unidata[Rstepinbnd - 1].time));
+		XDynForcing.nowvalue =interptime(XDynForcing.unidata[Rstepinbnd].wspeed, XDynForcing.unidata[Rstepinbnd - 1].wspeed, XDynForcing.unidata[Rstepinbnd].time - XDynForcing.unidata[Rstepinbnd - 1].time, totaltime - XDynForcing.unidata[Rstepinbnd - 1].time);
 
 
 
 	}
 	else
 	{
-		int readfirststep = min(max((int)floor((XLoop.totaltime - XDynForcing.to) / XDynForcing.dt), 0), XDynForcing.nt - 2);
+		int readfirststep = std::min(std::max((int)floor((totaltime - XDynForcing.to) / XDynForcing.dt), 0), XDynForcing.nt - 2);
 
 		if (readfirststep + 1 > XDynForcing.instep)
 		{
@@ -74,7 +81,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 			}
 			
 			
-			//NextHDstep << <gridDimRain, blockDimRain, 0 >> > (XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g, Rainaft_g);
+			//NextHDstep <<<gridDimRain, blockDimRain, 0 >>> (XParam.Rainongrid.nx, XParam.Rainongrid.ny, Rainbef_g, Rainaft_g);
 			//CUDA_CHECK(cudaDeviceSynchronize());
 
 			// Read the actual file data
@@ -91,14 +98,16 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 		// Interpolate the forcing array to this time 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			InterpstepGPU << <gridDimDF, blockDimDF, 0 >> > (XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, float(XLoop.totaltime), float(XDynForcing.dt), XDynForcing.now_g, XDynForcing.before_g, XDynForcing.after_g);
+			float bftime = float(XDynForcing.to+XDynForcing.dt*(XDynForcing.instep-1));
+			float aftime = float(XDynForcing.to + XDynForcing.dt * (XDynForcing.instep));
+			InterpstepGPU <<<gridDimDF, blockDimDF, 0 >>> (XDynForcing.nx, XDynForcing.ny, float(totaltime), bftime,aftime, XDynForcing.now_g, XDynForcing.before_g, XDynForcing.after_g);
 			CUDA_CHECK(cudaDeviceSynchronize());
 
 			CUDA_CHECK(cudaMemcpyToArray(XDynForcing.GPU.CudArr, 0, 0, XDynForcing.now_g, XDynForcing.nx * XDynForcing.ny * sizeof(float), cudaMemcpyDeviceToDevice));
 		}
 		else
 		{
-			InterpstepCPU(XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, XLoop.totaltime, XDynForcing.dt, XDynForcing.val, XDynForcing.before, XDynForcing.after);
+			InterpstepCPU(XDynForcing.nx, XDynForcing.ny, XDynForcing.instep - 1, totaltime, XDynForcing.dt, XDynForcing.val, XDynForcing.before, XDynForcing.after);
 		}
 		//InterpstepCPU(XParam.windU.nx, XParam.windU.ny, readfirststep, XParam.totaltime, XParam.windU.dt, Uwind, Uwbef, Uwaft);
 		//InterpstepCPU(XParam.windV.nx, XParam.windV.ny, readfirststep, XParam.totaltime, XParam.windV.dt, Vwind, Vwbef, Vwaft);
@@ -112,7 +121,7 @@ template <class T> void Forcingthisstep(Param XParam, Loop<T> XLoop, DynForcingP
 
 template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, std::vector<River> XRivers, Model<T> XModel)
 {
-	dim3 gridDimRiver(XModel.bndblk.nblkriver, 1, 1);
+	dim3 gridDimRiver(XModel.bndblk.Riverinfo.nburmax, 1, 1);
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	T qnow;
 	for (int Rin = 0; Rin < XRivers.size(); Rin++)
@@ -127,17 +136,30 @@ template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, st
 		}
 
 		qnow = T(interptime(XRivers[Rin].flowinput[bndstep].q, XRivers[Rin].flowinput[max(bndstep - 1, 0)].q, XRivers[Rin].flowinput[bndstep].time - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time, XLoop.totaltime - XRivers[Rin].flowinput[max(bndstep - 1, 0)].time));
+		
+		XModel.bndblk.Riverinfo.qnow[Rin] = qnow / XRivers[Rin].disarea;
+	
+	}
 
-		if (XParam.GPUDEVICE >= 0)
+	if (XParam.GPUDEVICE >= 0)
+	{
+		for (int irib = 0; irib < XModel.bndblk.Riverinfo.nribmax; irib++)
 		{
-			InjectRiverGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
+			//InjectRiverGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
+			//CUDA_CHECK(cudaDeviceSynchronize());
+			InjectManyRiversGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, irib, XModel.bndblk.Riverinfo, XModel.blocks, XModel.adv);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
-		else
+		
+	}
+	else
+	{
+		for (int Rin = 0; Rin < XRivers.size(); Rin++)
 		{
-			InjectRiverCPU(XParam, XRivers[Rin], qnow, XModel.bndblk.nblkriver, XModel.bndblk.river, XModel.blocks, XModel.adv);
+			InjectRiverCPU(XParam, XRivers[Rin], T(XModel.bndblk.Riverinfo.qnow[Rin]), XModel.bndblk.nblkriver, XModel.bndblk.river, XModel.blocks, XModel.adv);
 		}
 	}
+	
 }
 template __host__ void AddRiverForcing<float>(Param XParam, Loop<float> XLoop, std::vector<River> XRivers, Model<float> XModel);
 template __host__ void AddRiverForcing<double>(Param XParam, Loop<double> XLoop, std::vector<River> XRivers, Model<double> XModel);
@@ -183,6 +205,59 @@ template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T q
 template __global__ void InjectRiverGPU<float>(Param XParam, River XRiver, float qnow, int* Riverblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
 template __global__ void InjectRiverGPU<double>(Param XParam, River XRiver, double qnow, int* Riverblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
+template <class T> __global__ void InjectManyRiversGPU(Param XParam,int irib, RiverInfo<T> XRin, BlockP<T> XBlock, AdvanceP<T> XAdv)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
+
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	
+	int indx = ibl + irib * XRin.nburmax;
+	
+	int ib,rid,i;
+
+	T xllo, yllo, xl, yb, xr, yt, levdx;
+	T rxst, ryst, rxnd, rynd;
+
+	ib = XRin.Xbidir[indx];
+	if (ib > -1)
+	{
+		
+		i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+		rid = XRin.Xridib[indx];
+
+		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
+
+		xllo = T(XParam.xo + XBlock.xo[ib]);
+		yllo = T(XParam.yo + XBlock.yo[ib]);
+
+
+		xl = xllo + ix * levdx - T(0.5) * levdx;
+		yb = yllo + iy * levdx - T(0.5) * levdx;
+
+		xr = xllo + ix * levdx + T(0.5) * levdx;
+		yt = yllo + iy * levdx + T(0.5) * levdx;
+
+		rxst = XRin.xstart[indx];
+		ryst = XRin.ystart[indx];
+		rxnd = XRin.xend[indx];
+		rynd = XRin.yend[indx];
+
+
+		T qnow = XRin.qnow_g[rid]; // here we use qnow_g because qnow is a CPU pointer
+		if (OBBdetect(xl, xr, yb, yt, rxst, rxnd, ryst, rynd))
+		{
+			XAdv.dh[i] += qnow; //was / T(XRiver.disarea) but this is done upstream now to be consistent with GPU Many river ops 
+
+		}
+
+
+	}
+
+}
+
 template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qnow, int nblkriver, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	unsigned int ib;
@@ -209,7 +284,7 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+				//T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
 				//T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 				//T y = XParam.yo + XBlock.yo[ib] + iy * delta;
@@ -225,7 +300,7 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 				//if (xx >= XForcing.rivers[Rin].xstart && xx <= XForcing.rivers[Rin].xend && yy >= XForcing.rivers[Rin].ystart && yy <= XForcing.rivers[Rin].yend)
 				if (OBBdetect(xl, xr, yb, yt, T(XRiver.xstart),T(XRiver.xend), T(XRiver.ystart), T(XRiver.yend)))
 				{
-					XAdv.dh[i] += qnow / T(XRiver.disarea);
+					XAdv.dh[i] += qnow ; //was / T(XRiver.disarea) but this is done upstream now to be consistent with GPU Many river ops 
 
 				}
 			}
@@ -289,6 +364,8 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 
 	T Rainhh;
 
+	T hi = XEv.h[i];
+
 	T x = XParam.xo + XBlock.xo[ib] + ix * delta;
 	T y = XParam.yo + XBlock.yo[ib] + iy * delta;
 	if (Rain.uniform)
@@ -301,13 +378,17 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 	}
 
 	
+	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)) * XBlock.activeCell[i]; // convert from mm/hrs to m/s and 
+	//printf("%f\n", Rainhh);
+	T qvol = hi / (hi + Rainhh);
 
-	Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * XLoop.dt,T(0.0)); // convert from mm/hrs to m/s
-
-	
-	XEv.h[i] += Rainhh * XBlock.activeCell[i];
-	XEv.zs[i] += Rainhh * XBlock.activeCell[i];
-
+	XEv.h[i] = hi + Rainhh;
+	XEv.zs[i] += Rainhh;
+	if (hi > XParam.eps)
+	{
+		//XEv.u[i] = XEv.u[i] * qvol;
+		//XEv.v[i] = XEv.v[i] * qvol;
+	}
 }
 template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __global__ void AddrainforcingImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
@@ -380,6 +461,8 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 
 				T delta = calcres(T(XParam.dx), XBlock.level[ib]);
 
+				T hi = XEv.h[i];
+
 				T Rainhh;
 
 				T x = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
@@ -395,10 +478,18 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 				}
 
 
-				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)); // convert from mm/hrs to m/s
+				Rainhh = max(Rainhh / T(1000.0) / T(3600.0) * T(XLoop.dt), T(0.0)) * XBlock.activeCell[i]; // convert from mm/hrs to m/s and 
 
-				XEv.h[i] += Rainhh * XBlock.activeCell[i];
-				XEv.zs[i] += Rainhh * XBlock.activeCell[i];
+				T qvol = hi/(hi + Rainhh);
+
+				XEv.h[i] = hi + Rainhh;
+				XEv.zs[i] += Rainhh;
+
+				if (hi > XParam.eps)
+				{
+					XEv.u[i] = XEv.u[i] * qvol;
+					XEv.v[i] = XEv.v[i] * qvol;
+				}
 			}
 		}
 	}
@@ -693,7 +784,7 @@ template <class T> __device__ T interp2BUQ(T x, T y, TexSetP Forcing)
 	T read;
 	
 	float ivw = float((x - T(Forcing.xo)) / T(Forcing.dx) + T(0.5));
-	float jvw = float((y - T(Forcing.yo)) / T(Forcing.dx) + T(0.5));
+	float jvw = float((y - T(Forcing.yo)) / T(Forcing.dy) + T(0.5));
 	read = tex2D<float>(Forcing.tex, ivw, jvw);
 	
 	return read;
@@ -736,7 +827,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 			T dtdef = min(XLoop.dt, XLoop.totaltime - deform[nd].startime);
 			if (XLoop.totaltime > deform[nd].startime + deform[nd].duration)
 			{
-				dtdef = min(XLoop.dt, XLoop.totaltime - (deform[nd].startime + deform[nd].duration));
+				dtdef = (T)min(XLoop.dt, XLoop.totaltime - (deform[nd].startime + deform[nd].duration));
 			}
 				
 
@@ -746,11 +837,11 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 			if (XParam.GPUDEVICE < 0)
 			{
-				AddDeformCPU(XParam, XModel.blocks, deform[nd], scale, XModel.evolv.zs, XModel.zb);
+				AddDeformCPU(XParam, XModel.blocks, deform[nd], XModel.evolv, scale, XModel.zb);
 			}
 			else
 			{
-				AddDeformGPU <<<gridDim, blockDim, 0 >>> (XParam, XModel.blocks, deform[nd], scale, XModel.evolv.zs, XModel.zb);
+				AddDeformGPU <<<gridDim, blockDim, 0 >>> (XParam, XModel.blocks, deform[nd], XModel.evolv, scale, XModel.zb);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 
@@ -779,7 +870,7 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 }
 
 
-template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb)
+template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb)
 {
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
@@ -801,7 +892,7 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 	//	printf("x=%f, y=%f, def=%f\n ", x, y, def);
 	//}
 
-	zss = zs[i] + def * scale;
+	zss = XEv.zs[i] + def * scale;
 	if (defmap.iscavity == true)
 	{
 		zbb = min(zss, zb[i]);
@@ -811,7 +902,8 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 		zbb = zb[i] + def * scale;
 	}
 
-	zs[i] = zss;
+	XEv.h[i] = zss - zbb;
+	XEv.zs[i] = zss;
 	zb[i] = zbb;
 
 	//zs[i] = zs[i] + def * scale;
@@ -821,7 +913,7 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 
 }
 
-template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, T scale, T* zs, T* zb)
+template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb)
 {
 	int ib;
 	
@@ -846,7 +938,7 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 
 				def = interp2BUQ(x, y, defmap);
 
-				zss = zs[i] + def * scale;
+				zss = XEv.zs[i] + def * scale;
 				if (defmap.iscavity == true)
 				{
 					zbb = min(zss, zb[i]);
@@ -856,7 +948,8 @@ template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, de
 					zbb = zb[i] + def * scale;
 				}
 
-				zs[i] = zss;
+				XEv.zs[i] = zss;
+				XEv.h[i] = zss - zbb;
 				zb[i] = zbb;
 			}
 		}

@@ -141,15 +141,31 @@ template float BarycentricInterpolation(float q1, float x1, float y1, float q2, 
 template double BarycentricInterpolation(double q1, double x1, double y1, double q2, double x2, double y2, double q3, double x3, double y3, double x, double y);
 
 
+
 template <class T>
 __host__ __device__ T calcres(T dx, int level)
 {
-	return level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
+	return  level < 0 ? dx * (1 << abs(level)) : dx / (1 << level);
 	//should be 1<< -level
 }
-
 template __host__ __device__ double calcres<double>(double dx, int level);
 template __host__ __device__ float calcres<float>(float dx, int level);
+
+template <class T>
+__host__ __device__ T calcres(Param XParam, T dx, int level)
+{
+	T ddx = calcres(dx, level); // here use dx as the cue for the compiler to use the float or double version of this function
+	
+	if (XParam.spherical)
+	{
+		ddx = ddx * T(XParam.Radius * pi / 180.0);
+	}
+		
+	return ddx;
+	//should be 1<< -level
+}
+template __host__ __device__ double calcres<double>(Param XParam, double dx, int level);
+template __host__ __device__ float calcres<float>(Param XParam, float dx, int level);
 
 template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2)
 {
@@ -201,3 +217,12 @@ template <class T> int ftoi(T value) {
 }
 template int ftoi<float>(float value);
 template int ftoi<double>(double value);
+
+template <class T> __host__ __device__ T signof(T a)
+{
+	
+	return a > T(0.0) ? T(1.0) : T(-1.0);
+}
+template int signof(int a);
+template float signof(float a);
+template double signof(double a);

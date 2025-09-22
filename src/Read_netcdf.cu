@@ -77,8 +77,18 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 
 
 
-void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
+
+//void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
+//void readgridncsize(forcingmap &Fmap, Param XParam)
+void readgridncsize(const std::string ncfilestr, const std::string varstr, std::string reftime, int& nx, int& ny, int& nt, double& dx, double& dy, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy)
 {
+	//std::string ncfilestr = Fmap.inputfile;
+	//std::string varstr = Fmap.varname;
+
+	//int nx, ny, nt;
+	//double dx, dt, xo, xmax, yo, ymax, to, tmax;
+	//bool flipx, flipy;
+
 	//read the dimentions of grid, levels and time
 	int status;
 	int ncid, ndimshh, ndims;
@@ -172,7 +182,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		double * ytempvar;
 		ytempvar = (double *)malloc(ny*sizeof(double));
 		size_t start[] = { 0 };
-		size_t count[] = { ny };
+		size_t count[] = { (size_t)ny };
 		status = nc_get_vara_double(ncid, varid, start, count, ytempvar);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -190,7 +200,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	else
 	{
 		size_t start[] = { 0, 0 };
-		size_t count[] = { ny, nx };
+		size_t count[] = { (size_t)ny, (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, ycoord);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -210,7 +220,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		double * xtempvar;
 		xtempvar = (double *)malloc(nx*sizeof(double));
 		size_t start[] = { 0 };
-		size_t count[] = { nx };
+		size_t count[] = { (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, xtempvar);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -228,15 +238,16 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	else
 	{
 		size_t start[] = { 0, 0 };
-		size_t count[] = { ny, nx };
+		size_t count[] = { (size_t)ny, (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, xcoord);
 		if (status != NC_NOERR) handle_ncerror(status);
 
 	}
 
-	double dxx;
+	double dxx,ddy;
 	//check dx
-	dxx = (xcoord[nx - 1] - xcoord[0]) / (nx - 1.0);
+	dxx = abs(xcoord[nx - 1] - xcoord[0]) / (nx - 1.0);
+	ddy = abs(ycoord[(ny - 1) * nx]- ycoord[0]) / (ny - 1.0);
 	//log("xo=" + std::to_string(xcoord[0])+"; xmax="+ std::to_string(xcoord[nx - 1]) +"; nx="+ std::to_string(nx) +"; dxx=" +std::to_string(dxx));
 	//dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
 
@@ -248,9 +259,15 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		status = nc_inq_dimname(ncid, tcovar, coordname);
 		if (status != NC_NOERR) handle_ncerror(status);
 
+		
+
+
 		//inquire variable id
 		status = nc_inq_varid(ncid, coordname, &varid);
 		if (status != NC_NOERR) handle_ncerror(status);
+
+		
+
 
 		// read the dimension of time variable // yes it should be == 1
 		status = nc_inq_varndims(ncid, varid, &ndims);
@@ -259,12 +276,15 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		//allocate temporary array and read time vector
 		double * ttempvar;
 		ttempvar = (double *)malloc(nt * sizeof(double));
-		size_t start[] = { 0 };
-		size_t count[] = { nt };
-		status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
+		//size_t start[] = { 0 };
+		//size_t count[] = { (size_t)nt };
+		//status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
+
+		status = readnctime2(ncid, coordname, reftime, nt, ttempvar);
 
 		to = ttempvar[0];
 		tmax= ttempvar[nt-1];
+		dt = ttempvar[1] - ttempvar[0];
 
 		free(ttempvar);
 	}
@@ -276,6 +296,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	}
 
 	dx = dxx;
+	dy = ddy;
 
 	xo = utils::min(xcoord[0], xcoord[nx - 1]);
 	xmax = utils::max(xcoord[0], xcoord[nx - 1]);
@@ -286,11 +307,13 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	if (xcoord[0] > xcoord[nx - 1])
 		flipx = true;
 
-	if (ycoord[0] > ycoord[ny - 1])
+	if (ycoord[0] > ycoord[(ny - 1) * nx])
 		flipy = true;
 
 
 	status = nc_close(ncid);
+
+	
 
 	free(ddimhh);
 	free(xcoord);
@@ -299,9 +322,31 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 
 }
 
+
+void readgridncsize(forcingmap& Fmap, Param XParam)
+{
+
+	readgridncsize(Fmap.inputfile, Fmap.varname, XParam.reftime, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.dy, Fmap.dt, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+}
+
+
+template<class T> void readgridncsize(T& Imap)
+{
+	double a, b, c;
+	int duma;
+	readgridncsize(Imap.inputfile, Imap.varname, "2000-01-01T00:00:00", Imap.nx, Imap.ny, duma, Imap.dx, Imap.dy, a, Imap.xo, Imap.yo, b, Imap.xmax, Imap.ymax, c, Imap.flipxx, Imap.flipyy);
+}
+template void readgridncsize<inputmap>(inputmap &Imap);
+template void readgridncsize<forcingmap>(forcingmap &Imap);
+template void readgridncsize<StaticForcingP<int >>(StaticForcingP<int>& Imap);
+template void readgridncsize<StaticForcingP<float >>(StaticForcingP<float> &Imap);
+template void readgridncsize<deformmap<float >>(deformmap<float >& Imap);
+template void readgridncsize<DynForcingP<float >>(DynForcingP<float >& Imap);
+
+
 int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 {
-	// This function reads the dimentions for each variables
+	// This function reads the dimensions for each variables
 	int status, varid;
 	int ncid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];
@@ -380,6 +425,134 @@ int readnctime(std::string filename, double * &time)
 	status = nc_close(ncid);
 
 	return status;
+}
+
+int readnctime2(int ncid,char * timecoordname,std::string refdate,size_t nt, double*& time)
+{
+
+	int status, varid;
+
+	std::string ncfilestr;
+	std::string varstr;
+
+	double fac = 1.0;
+	double offset = 0.0;
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	///std::vector<std::string> nameelements;
+
+	///nameelements = split(filename, '?');
+	///if (nameelements.size() > 1)
+	///{
+	///	//variable name for bathy is not given so it is assumed to be zb
+	///	ncfilestr = nameelements[0];
+	///	//varstr = nameelements[1];
+	///}
+	///else
+	///{
+	///	ncfilestr = filename;
+	///	//varstr = "time";
+	///}
+
+	// Warning this could be more robust by taking the unlimited dimension if time does not exist!
+	//std::string Varname = "time";
+
+	///status = nc_open(ncfilestr.c_str(), 0, &ncid);
+	///if (status != NC_NOERR) handle_ncerror(status);
+
+	status = nc_inq_varid(ncid, timecoordname, &varid);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	// inquire unit of time
+	int ncAttid;
+	size_t t_len;
+
+	char* tunit;
+
+	std::string tunitstr;
+
+	/* Get the attribute ID */
+	status = nc_inq_attid(ncid, varid, "units", &ncAttid);
+	if (status == NC_NOERR)
+	{
+		/* Read units attribute length from the variable */
+		status = nc_inq_attlen(ncid, varid, "units", &t_len);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		tunit = (char*)malloc(t_len + 1); // +1 to automatically have a null character at the end. Is this cross platform portable?
+
+		/* Read units attribute from the variable */
+		status = nc_get_att_text(ncid, varid, "units", tunit);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		// convert to string
+		tunitstr = std::string(tunit);
+
+		std::string ncstepunit= tunitstr;
+
+		if (tunitstr.find("since") != std::string::npos)
+		{
+
+			// Try to make sense of the unit
+			// The word "since" should be in the center
+			// e.g. hour since 2000-01-01 00:00:00 
+			std::vector<std::string> nodeitems = split(tunitstr, "since");
+			ncstepunit = trim(nodeitems[0], " ");
+			std::string ncrefdatestr = trim(nodeitems[1], " ");
+
+			//time_t ncrefdate = date_string_to_time(ncrefdatestr);
+			offset = date_string_to_s(ncrefdatestr, refdate);
+		}
+	
+		std::vector<std::string> secondvec = { "seconds","second","sec","s" };
+		std::vector<std::string> minutevec = { "minutes","minute","min","m" };
+		std::vector<std::string> hourvec = { "hours","hour","hrs","hr","h" };
+		std::vector<std::string> dayvec = { "days","day","d" };
+		std::vector<std::string> monthvec = { "months","month","mths", "mth", "mon" };
+		std::vector<std::string> yearvec = { "years","year","yrs", "yr", "y" };
+
+
+		std::size_t found;
+		found = case_insensitive_compare(ncstepunit, secondvec);
+		if (found == 0)
+			fac = 1.0;
+
+		found = case_insensitive_compare(ncstepunit, minutevec);
+		if (found == 0)
+			fac = 60.0;
+
+		found = case_insensitive_compare(ncstepunit, hourvec);
+		if (found == 0)
+			fac = 3600.0;
+
+		found = case_insensitive_compare(ncstepunit, dayvec);
+		if (found == 0)
+			fac = 3600.0*24.0;
+	
+		found = case_insensitive_compare(ncstepunit, monthvec);
+		if (found == 0)
+			fac = 3600.0 * 24.0 * 30.4375;
+
+		found = case_insensitive_compare(ncstepunit, yearvec);
+		if (found == 0)
+			fac = 3600.0 * 24.0 * 365.25;
+		
+
+	}
+
+	status = nc_get_var_double(ncid, varid, time);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	for (int it = 0; it < nt; it++)
+	{
+		time[it] = time[it] * fac + offset;
+		//printf("%f\n", time[it]);
+	}
+
+	///status = nc_close(ncid);
+
+	return status;
+	
 }
 
 template <class T>
@@ -469,7 +642,7 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 	if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 	{
-		zsa[0] = zsa[0] * scalefac + offset;
+		zsa[0] = zsa[0] * (T)scalefac + (T)offset;
 	}
 
 	if (checkhh)
@@ -514,17 +687,17 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 			if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 			{
-				zsa[0] = zsa[0] * scalefac + offset;
+				zsa[0] = zsa[0] * (T)scalefac + (T)offset;
 			}
 
 			hha = zsa[0];
 			if (hha > eps)
 			{
-				zsa[0] = zza;
+				zsa[0] = T(zza);
 			}
 			else
 			{
-				zsa[0] = 0.0;
+				zsa[0] = T(0.0);
 				wet = 0;
 			}
 			
@@ -634,7 +807,10 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		{
 			merr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
 		}
-
+		if (merr != NC_NOERR)
+		{
+			merr = nc_get_att_double(ncid, varid, "missing_value", &missing);
+		}
 
 		// remove fill value
 		if (merr == NC_NOERR)
@@ -644,11 +820,11 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					bool test = missing != missing ? vardata[i + j * nx] != vardata[i + j * nx] : (vardata[i + j * nx] > T(0.9 * missing));
+					bool test = missing != missing ? vardata[i + j * nx] != vardata[i + j * nx] : (abs(vardata[i + j * nx]) > abs(T(0.9 * missing)));
 					if (test) // i.e. if vardata is anywhere near missing
 					{
 						
-						vardata[i + j * nx] = T(0.0);
+						vardata[i + j * nx] = T(NAN);
 					}
 					//maxval = utils::max(maxval, vardata[i + j * nx]);
 				}
@@ -793,9 +969,9 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
 	//size_t countlv[]={1,1,netav,nxiv};
-	size_t startl[] = { steptoread, 0, 0 };
-	size_t countlu[] = { 1, WNDUmap.ny, WNDUmap.nx };
-	size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
+	size_t startl[] = { (size_t)steptoread, 0, 0 };
+	size_t countlu[] = { 1, (size_t)WNDUmap.ny, (size_t)WNDUmap.nx };
+	size_t countlv[] = { 1, (size_t)WNDVmap.ny, (size_t)WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};
 	//static ptrdiff_t stridel[] = { 1, 1, 1 };
@@ -884,8 +1060,8 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
 	//size_t countlv[]={1,1,netav,nxiv};
-	size_t startl[] = { steptoread, 0, 0 };
-	size_t countlu[] = { 1, ATMPmap.ny, ATMPmap.nx };
+	size_t startl[] = { (size_t)steptoread, 0, 0 };
+	size_t countlu[] = { 1, (size_t)ATMPmap.ny, (size_t)ATMPmap.nx };
 	//size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};

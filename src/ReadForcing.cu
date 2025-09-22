@@ -36,6 +36,29 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	for (int ib = 0; ib < XForcing.Bathy.size(); ib++)
 	{
 		readbathydata(XParam.posdown, XForcing.Bathy[ib]);
+
+		if (ib == 0) // Fill Nan for only the first bathy listed, the others will use values from original bathy topo.
+		{
+			denan(XForcing.Bathy[ib].nx, XForcing.Bathy[ib].ny, T(0.0), XForcing.Bathy[ib].val);
+		}
+	}
+	
+	if (XForcing.Bathy[0].extension.compare("nc") == 0)
+	{
+		std::string nccrs;
+		//Get_CRS information from last bathymetry file
+		nccrs = readCRSfrombathy(XParam.crs_ref, XForcing.Bathy[XForcing.Bathy.size() - 1]);
+
+		if (!nccrs.empty())
+		{
+			XParam.crs_ref = nccrs;
+		}
+		//XParam.crs_ref = "test2";
+	}
+	
+	if (isnan(XParam.grdalpha))
+	{
+		XParam.grdalpha=0.0;
 	}
 	
 	bool gpgpu = XParam.GPUDEVICE >= 0;
@@ -44,6 +67,27 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	// Read bnd files
 	log("\nReading boundary data...");
 
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on)
+		{
+			//XForcing.bndseg[iseg].data = readbndfile(XForcing.bndseg[iseg].inputfile, XParam);
+
+			if (XForcing.bndseg[iseg].uniform == 1)
+			{
+				// grid uniform time varying rain input
+				XForcing.bndseg[iseg].data = readINfileUNI(XForcing.bndseg[iseg].inputfile, XParam.reftime);
+			}
+			else
+			{
+				XForcing.bndseg[iseg].WLmap.denanval = 0.0;
+				InitDynforcing(gpgpu, XParam, XForcing.bndseg[iseg].WLmap);
+				//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
+			}
+		}
+	}
+
+	/*
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 	
 
@@ -92,6 +136,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			AllocateBndTEX(XForcing.bot);
 		}
 	}
+	*/
+
+
 
 	//Check that endtime is no longer than boundaries (if specified to other than wall or neumann)
 	// Removed. This is better done in the sanity check!
@@ -102,14 +149,29 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	//==================
 	// Friction maps 
 		
-	if (!XForcing.cf.inputfile.empty())
+	if (!XForcing.cf.empty())
 	{
+		//denanval = 0.0000001;
 		log("\nRead Roughness map (cf) data...");
 		// roughness map was specified!
-		readstaticforcing(XForcing.cf);
-
+		//readstaticforcing(XForcing.cf);
 		//log("...done");
+		// Here we are not using the automated denaning because we want to preserve the Nan in all but the "main/first" listed roughness map. 
+		// This mean that subsequently listed roughness map can have large NAN holes in them.
+		for (int ib = 0; ib < XForcing.cf.size(); ib++)
+		{
+			
+			readstaticforcing(XForcing.cf[ib]);
+			if (ib == 0) // Fill Nan for only the first map listed, the others will use values from original bathy topo.
+			{
+				denan(XForcing.cf[ib].nx, XForcing.cf[ib].ny, T(0.0000001), XForcing.cf[ib].val);
+			}
+		}
 	}
+
+
+
+
 
 	//==================
 	// Rain losses maps
@@ -117,12 +179,15 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	if (!XForcing.il.inputfile.empty())
 	{
 		log("\nRead initial losses map (il) data...");
+		XForcing.il.denanval = 0.0;
+
 		readstaticforcing(XForcing.il);
 		XParam.infiltration = true;
 	}
 	if (!XForcing.cl.inputfile.empty())
 	{
 		log("\nRead initial losses map (cl) data...");
+		XForcing.cl.denanval = 0.0;
 		readstaticforcing(XForcing.cl);
 		XParam.infiltration = true;
 	}
@@ -136,6 +201,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 
 		for (int nd = 0; nd < XForcing.deform.size(); nd++)
 		{
+			XForcing.deform[nd].denanval = 0.0;
 			// read the roughness map header
 			readstaticforcing(XForcing.deform[nd]);
 			//XForcing.deform[nd].grid = readcfmaphead(XForcing.deform[nd].grid);
@@ -156,6 +222,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			XForcing.deform[nd].GPU.yo = float(XForcing.deform[nd].yo);
 			XForcing.deform[nd].GPU.uniform = false;
 			XForcing.deform[nd].GPU.dx = float(XForcing.deform[nd].dx);
+			XForcing.deform[nd].GPU.dy = float(XForcing.deform[nd].dy);
 		}
 		//log("...done");
 
@@ -184,10 +251,10 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
 		{
 			// Now read the discharge input and store to  
-			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile);
+			XForcing.rivers[Rin].flowinput = readFlowfile(XForcing.rivers[Rin].Riverflowfile, XParam.reftime);
 
 			//Check the time range of the river forcing
-			nt = XForcing.rivers[Rin].flowinput.size();
+			nt = (int)XForcing.rivers[Rin].flowinput.size();
 			XForcing.rivers[Rin].to = XForcing.rivers[Rin].flowinput[0].time;
 			XForcing.rivers[Rin].tmax = XForcing.rivers[Rin].flowinput[nt-1].time;
 			if ( XForcing.rivers[Rin].tmax < XParam.endtime)
@@ -217,8 +284,8 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 
 			// grid uniform time varying wind input: wlevs[0] is wind speed and wlev[1] is direction
 			XForcing.VWind.inputfile = XForcing.UWind.inputfile;
-			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.grdalpha);
-			XForcing.VWind.unidata = readWNDfileUNI(XForcing.VWind.inputfile, XParam.grdalpha);
+			XForcing.UWind.unidata = readWNDfileUNI(XForcing.UWind.inputfile, XParam.reftime, XParam.grdalpha);
+			XForcing.VWind.unidata = readWNDfileUNI(XForcing.VWind.inputfile, XParam.reftime, XParam.grdalpha);
 
 			// this below is a bit ugly but it simplifies the other functions
 			for (int n = 0; n < XForcing.VWind.unidata.size(); n++)
@@ -231,7 +298,7 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			}
 
 			//Sanity check on the time range of the forcing
-			nt = XForcing.UWind.unidata.size();
+			nt = (int)XForcing.UWind.unidata.size();
 			if (XForcing.UWind.unidata[nt - 1].time < XParam.endtime || XForcing.VWind.unidata[nt - 1].time < XParam.endtime)
 			{
 				XParam.endtime = min(XForcing.UWind.unidata[nt - 1].time, XForcing.VWind.unidata[nt - 1].time);
@@ -249,6 +316,9 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 			//
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.UWind);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.VWind);
+
+			XForcing.UWind.denanval = 0.0;
+			XForcing.VWind.denanval = 0.0;
 			InitDynforcing(gpgpu, XParam, XForcing.UWind);
 			InitDynforcing(gpgpu, XParam, XForcing.VWind);
 
@@ -269,11 +339,15 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		if (XForcing.Atmp.uniform == 1)
 		{
 			// grid uniform time varying atm pressure input is pretty useless...
-			XForcing.Atmp.unidata = readINfileUNI(XForcing.Atmp.inputfile);;
+			XForcing.Atmp.unidata = readINfileUNI(XForcing.Atmp.inputfile, XParam.reftime);
 		}
 		else
 		{
+			XForcing.Atmp.denanval = XParam.Paref;
 			InitDynforcing(gpgpu, XParam, XForcing.Atmp);
+			// Deflault is zero wich is terrible so change to Paref so limitwaves generated at the edge of forcing
+			// Users should insure there forcing extend well beyond the intended model extent.
+			XForcing.Atmp.clampedge = T(XParam.Paref);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Atmp);
 		}
 	}
@@ -288,10 +362,11 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		if (XForcing.Rain.uniform == 1)
 		{
 			// grid uniform time varying rain input
-			XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile);
+			XForcing.Rain.unidata = readINfileUNI(XForcing.Rain.inputfile, XParam.reftime);
 		}
 		else
 		{
+			XForcing.Rain.denanval = 0.0;
 			InitDynforcing(gpgpu, XParam, XForcing.Rain);
 			//readDynforcing(gpgpu, XParam.totaltime, XForcing.Rain);
 		}
@@ -351,6 +426,8 @@ template <class T> void readstaticforcing(int step,T& Sforcing)
 		readforcingdata(step,Sforcing);
 		//readvardata(forcing.inputfile, forcing.varname, step, forcing.val);
 
+		denan(Sforcing.nx, Sforcing.ny, float(Sforcing.denanval), Sforcing.val);
+
 	}
 	else
 	{
@@ -368,7 +445,7 @@ template void readstaticforcing<StaticForcingP<int>>(int step, StaticForcingP<in
 */
 void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 {
-	Dforcing = readforcinghead(Dforcing);
+	Dforcing = readforcinghead(Dforcing, XParam);
 
 	//Sanity check on the time range of the forcing
 	if (Dforcing.tmax < XParam.endtime)
@@ -387,6 +464,7 @@ void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 	{
 		AllocateCPU(Dforcing.nx, Dforcing.ny, Dforcing.now, Dforcing.before, Dforcing.after, Dforcing.val);
 		readforcingdata(XParam.totaltime, Dforcing);
+		
 		if (gpgpu)
 		{ 
 			AllocateGPU(Dforcing.nx, Dforcing.ny, Dforcing.now_g);
@@ -406,6 +484,7 @@ void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 			Dforcing.GPU.yo = float(Dforcing.yo);
 			Dforcing.GPU.uniform = Dforcing.uniform;
 			Dforcing.GPU.dx = float(Dforcing.dx);
+			Dforcing.GPU.dy = float(Dforcing.dy);
 		}
 		
 	}
@@ -416,6 +495,11 @@ void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 	}
 }
 
+
+/*! \fn void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
+* This is a deprecated function! See InitDynforcing() instead
+*
+*/
 void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing);
@@ -465,13 +549,277 @@ void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 	}
 }
 
+/*! \fn  void readCRSfrombathy(std::string crs_ref, StaticForcingP<float> &Sforcing)
+* Reading the CRS information from the bathymetry file (last one read);
+*/
+std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcing)
+{
+	int ncid, ncvarid, ncAttid, status;
+	size_t t_len;
+	char* crs;
+	char* crs_wkt;
+	std::string crs_ref2;
+	
+	crs_wkt = "";
 
+	if (!Sforcing.inputfile.empty())
+	{
+
+		log("Reading CRS information from forcing metadata (file: " + Sforcing.inputfile + ")");
+
+
+		/* Open the netCDF file */
+		status = nc_open(Sforcing.inputfile.c_str(), NC_NOWRITE, &ncid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		/* Get variable ID */
+		status = nc_inq_varid(ncid, Sforcing.varname.c_str(), &ncvarid);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		/* Get the attribute ID */
+		status = nc_inq_attid(ncid, ncvarid, "grid_mapping", &ncAttid);
+		if (status == NC_NOERR)
+		{
+
+
+
+
+			/* Read CRS attribute from the variable */
+			status = nc_inq_attlen(ncid, ncvarid, "grid_mapping", &t_len);
+			if (status != NC_NOERR) handle_ncerror(status);
+
+			crs = (char*)malloc(t_len + 1);
+
+			crs[t_len] = '\0';
+
+			/* Read CRS attribute from the variable */
+			status = nc_get_att_text(ncid, ncvarid, "grid_mapping", crs);
+			if (status != NC_NOERR) handle_ncerror(status);
+
+			printf("grid info detected: %s\n", crs);
+
+
+			/*Get associated CRS variable ID*/
+			status = nc_inq_varid(ncid, crs, &ncvarid);
+			if (status != NC_NOERR) handle_ncerror(status);
+
+			std::vector<std::string> attnamevec = { "crs_wkt","spatial_ref" };
+
+			int idatt = -1;
+
+			for (int id = 0; id < attnamevec.size(); id++)
+			{
+				/* Get the attribute ID */
+				status = nc_inq_attid(ncid, ncvarid, attnamevec[id].c_str(), &ncAttid);
+				if (status == NC_NOERR)
+				{
+					idatt = id;
+					break;
+				}
+			}
+
+			if (idatt > -1)
+			{
+
+				/* Get the attribute ID */
+				status = nc_inq_attid(ncid, ncvarid, attnamevec[idatt].c_str(), &ncAttid);
+				if (status != NC_NOERR) handle_ncerror(status);
+
+
+				/* Read CRS attribute from the variable */
+				status = nc_inq_attlen(ncid, ncvarid, attnamevec[idatt].c_str(), &t_len);
+				if (status != NC_NOERR) handle_ncerror(status);
+
+				crs_wkt = (char*)malloc(t_len + 1);
+				crs_wkt[t_len] = '\0';
+
+				/* Read CRS attribute from the variable */
+				status = nc_get_att_text(ncid, ncvarid, attnamevec[idatt].c_str(), crs_wkt);
+				if (status != NC_NOERR) handle_ncerror(status);
+
+				printf("CRS_info: %s\n", crs_wkt);
+
+				//crs_ref = crs_wkt;
+				//crs_ref2 = crs_wkt;
+
+				//printf("CRS_info: %s\n", crs_ref2.c_str());
+			}
+			else
+			{
+				printf("CRS_info detected but not understood reverting to default CRS\n Rename attribute in grid-mapping variable\n");
+
+				//crs_wkt = ""; //Move to the top of the file for initialisation
+			}
+
+		}
+		status = nc_close(ncid);
+		/* Close the netCDF file */
+		if ( status != NC_NOERR) {
+			fprintf(stderr, "Error: Failed to close file.\n");
+		}
+	}
+	return crs_wkt;
+}
+
+Polygon readbndpolysegment(bndsegment bnd, Param XParam)
+{
+	Polygon bndpoly;
+	Vertex va,vb,vc,vd;
+	double epsbnd = calcres(XParam.dx,XParam.initlevel);
+	double xo = XParam.xo;
+	double xmax = XParam.xmax;
+	double yo = XParam.yo;
+	double ymax = XParam.ymax;
+
+
+	if (case_insensitive_compare(bnd.polyfile, "all") == 0)
+	{
+		va.x = xo - epsbnd; va.y = yo - epsbnd;
+		vb.x = xmax + epsbnd; vb.y = yo - epsbnd;
+		vc.x = xmax + epsbnd; vc.y = ymax + epsbnd;
+		vd.x = xo - epsbnd; vd.y = ymax + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = va.x;
+		bndpoly.xmax = vb.x;
+		bndpoly.ymin = va.y;
+		bndpoly.ymax = vd.y;
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "file") == 0)
+	{
+		if (bnd.WLmap.uniform == 1)
+		{
+
+			log("Warning: 'file' keyword used for uniform boundary, using 'all' instead");
+
+			va.x = xo - epsbnd; va.y = yo - epsbnd;
+			vb.x = xmax + epsbnd; vb.y = yo - epsbnd;
+			vc.x = xmax + epsbnd; vc.y = ymax + epsbnd;
+			vd.x = xo - epsbnd; vd.y = ymax + epsbnd;
+
+			bndpoly.vertices.push_back(va);
+			bndpoly.vertices.push_back(vb);
+			bndpoly.vertices.push_back(vc);
+			bndpoly.vertices.push_back(vd);
+			bndpoly.vertices.push_back(va);
+			bndpoly.xmin = va.x;
+			bndpoly.xmax = vb.x;
+			bndpoly.ymin = va.y;
+			bndpoly.ymax = vd.y;
+		}
+		else
+		{
+			DynForcingP<float> Df = readforcinghead(bnd.WLmap, XParam);
+		
+
+		
+
+			va.x = Df.xo - epsbnd; va.y = Df.yo - epsbnd;
+			vb.x = Df.xmax + epsbnd; vb.y = Df.yo - epsbnd;
+			vc.x = Df.xmax + epsbnd; vc.y = Df.ymax + epsbnd;
+			vd.x = Df.xo - epsbnd; vd.y = Df.ymax + epsbnd;
+
+			bndpoly.vertices.push_back(va);
+			bndpoly.vertices.push_back(vb);
+			bndpoly.vertices.push_back(vc);
+			bndpoly.vertices.push_back(vd);
+			bndpoly.vertices.push_back(va);
+			bndpoly.xmin = va.x;
+			bndpoly.xmax = vb.x;
+			bndpoly.ymin = va.y;
+			bndpoly.ymax = vd.y;
+		
+		}
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile,"left")==0)
+	{
+		va.x = xo - epsbnd; va.y = yo;
+		vb.x = xo + epsbnd; vb.y = yo;
+		vc.x = xo + epsbnd; vc.y = ymax;
+		vd.x = xo - epsbnd; vd.y = ymax;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo - epsbnd;
+		bndpoly.xmax = xo + epsbnd;
+		bndpoly.ymin = yo;
+		bndpoly.ymax = ymax;
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "bot") == 0)
+	{
+		va.x = xo ; va.y = yo - epsbnd;
+		vb.x = xmax; vb.y = yo - epsbnd;
+		vc.x = xmax; vc.y = yo + epsbnd;
+		vd.x = xo; vd.y = yo + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo ;
+		bndpoly.xmax = xmax;
+		bndpoly.ymin = yo - epsbnd;
+		bndpoly.ymax = yo + epsbnd;
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "right") == 0)
+	{
+		va.x = xmax - epsbnd; va.y = yo;
+		vb.x = xmax + epsbnd; vb.y = yo;
+		vc.x = xmax + epsbnd; vc.y = ymax;
+		vd.x = xmax - epsbnd; vd.y = ymax;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xmax - epsbnd;
+		bndpoly.xmax = xmax + epsbnd;
+		bndpoly.ymin = yo;
+		bndpoly.ymax = ymax;
+
+	}
+	else if (case_insensitive_compare(bnd.polyfile, "top") == 0)
+	{
+
+		va.x = xo; va.y = ymax - epsbnd;
+		vb.x = xmax; vb.y = ymax - epsbnd;
+		vc.x = xmax; vc.y = ymax + epsbnd;
+		vd.x = xo; vd.y = ymax + epsbnd;
+
+		bndpoly.vertices.push_back(va);
+		bndpoly.vertices.push_back(vb);
+		bndpoly.vertices.push_back(vc);
+		bndpoly.vertices.push_back(vd);
+		bndpoly.vertices.push_back(va);
+		bndpoly.xmin = xo;
+		bndpoly.xmax = xmax;
+		bndpoly.ymin = ymax - epsbnd;
+		bndpoly.ymax = ymax + epsbnd;
+	}
+	else
+	{
+		bndpoly = readPolygon(bnd.polyfile);
+	}
+
+	return bndpoly;
+}
 
 /*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 * Read boundary forcing files
 * 
 */
-std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
+std::vector<SLTS> readbndfile(std::string filename,Param & XParam)
 {
 	// read bnd or nest file
 	// side is for deciding whether we are talking about a left(side=0) bot (side =1) right (side=2) or top (side=3)
@@ -545,7 +893,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 	}
 	else
 	{
-		Bndinfo = readWLfile(filename);
+		Bndinfo = readWLfile(filename,XParam.reftime);
 	}
 
 	// Add zsoffset
@@ -567,7 +915,7 @@ std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
 * Read boundary water level data
 *
 */
-std::vector<SLTS> readWLfile(std::string WLfilename)
+std::vector<SLTS> readWLfile(std::string WLfilename, std::string & refdate)
 {
 	std::vector<SLTS> slbnd;
 
@@ -619,7 +967,8 @@ std::vector<SLTS> readWLfile(std::string WLfilename)
 			}
 
 
-			slbndline.time = std::stod(lineelements[0]);
+			//slbndline.time = std::stod(lineelements[0]);
+			slbndline.time = readinputtimetxt(lineelements[0], refdate);
 
 			for (int n = 1; n < lineelements.size(); n++)
 			{
@@ -663,15 +1012,17 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	std::vector<double> WLS,Unest,Vnest;
 	//Define NC file variables
 	int nnx, nny, nt, nbndpts, indxx, indyy, indx, indy,nx, ny;
-	double dx, xxo, yyo, to, xmax, ymax, tmax,xo,yo;
+	double dx, dy, xxo, yyo, tmax,xo,yo;
 	double * ttt, *zsa;
 	bool checkhh = false;
 	int iswet;
 	bool flipx = false;
 	bool flipy = false;
 
-	// Read NC info
-	readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax, flipx, flipy);
+
+	// Read NC info // 
+	//readgridncsize(ncfile,varname, nnx, nny, nt, dx, xxo, yyo, to, xmax, ymax, tmax, flipx, flipy);
+
 	
 	if (hor == 0)
 	{
@@ -765,7 +1116,7 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 
 			WLS.push_back(zsa[0]);
 
-			//printf("zs=%f\\n", zsa[0]);
+			printf("zs=%f\\n", zsa[0]);
 
 			// If true nesting then uu and vv are expected to be present in the netcdf file 
 
@@ -840,7 +1191,7 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 * Read flow data for river forcing
 *
 */
-std::vector<Flowin> readFlowfile(std::string Flowfilename)
+std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string &refdate)
 {
 	std::vector<Flowin> slbnd;
 
@@ -891,8 +1242,8 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 				exit(1);
 			}
 
-
-			slbndline.time = std::stod(lineelements[0]);
+			slbndline.time = readinputtimetxt(lineelements[0], refdate);
+			//slbndline.time = std::stod(lineelements[0]);
 
 			
 
@@ -922,7 +1273,7 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename)
 * Read rain/atmpressure data for spatially uniform forcing
 *
 */
-std::vector<Windin> readINfileUNI(std::string filename)
+std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate)
 {
 	std::vector<Windin> wndinput;
 
@@ -930,7 +1281,7 @@ std::vector<Windin> readINfileUNI(std::string filename)
 
 	if (fs.fail()) {
 		//std::cerr << filename << "ERROR: Atm presssure / Rainfall file could not be opened" << std::endl;
-		log("ERROR: Atm presssure / Rainfall file could not be opened : " + filename);
+		log("ERROR: Bnd file / Atm presssure / Rainfall file could not be opened : " + filename);
 		exit(1);
 	}
 
@@ -971,8 +1322,8 @@ std::vector<Windin> readINfileUNI(std::string filename)
 				exit(1);
 			}
 
-
-			wndline.time = std::stod(lineelements[0]);
+			wndline.time = readinputtimetxt(lineelements[0], refdate);
+			//wndline.time = std::stod(lineelements[0]);
 			wndline.wspeed = std::stod(lineelements[1]);
 			
 			wndinput.push_back(wndline);
@@ -991,7 +1342,7 @@ std::vector<Windin> readINfileUNI(std::string filename)
 * Read wind data for spatially uniform forcing
 *
 */
-std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
+std::vector<Windin> readWNDfileUNI(std::string filename, std::string & refdate, double grdalpha)
 {
 	// Warning grdapha is expected in radian here
 	std::vector<Windin> wndinput;
@@ -1043,8 +1394,8 @@ std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
 				exit(1);
 			}
 
-
-			wndline.time = std::stod(lineelements[0]);
+			wndline.time = readinputtimetxt(lineelements[0], refdate);
+			//wndline.time = std::stod(lineelements[0]);
 			if (lineelements.size() == 5)
 			{
 				// U and v are explicitelly stated
@@ -1247,6 +1598,10 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
 	readvardata(forcing.inputfile, forcing.varname, step, forcing.before, forcing.flipxx, forcing.flipyy);
 	readvardata(forcing.inputfile, forcing.varname, step+1, forcing.after, forcing.flipxx, forcing.flipyy);
+
+	denan(forcing.nx, forcing.ny, float(forcing.denanval), forcing.before);
+	denan(forcing.nx, forcing.ny, float(forcing.denanval), forcing.after);
+	
 	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.before);
 	clampedges(forcing.nx, forcing.ny, forcing.clampedge, forcing.after);
 
@@ -1254,11 +1609,11 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	forcing.val = forcing.now;
 }
 
-/*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
+/*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam)
 * Read Dynamic forcing meta/header data
 *
 */
-DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
+DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam)
 {
 	// Read critical parameter for the forcing map
 	log("Forcing map was specified. Checking file... ");
@@ -1269,16 +1624,11 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap)
 	if (fileext.compare("nc") == 0)
 	{
 		log("Reading Forcing file as netcdf file");
-		readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+
+		//readgridncsize(Fmap.inputfile,Fmap.varname, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+		readgridncsize(Fmap, XParam);
+
 		
-		if (Fmap.nt > 1)
-		{
-			Fmap.dt = (Fmap.tmax - Fmap.to) / (Fmap.nt - 1);
-		}
-		else
-		{
-			Fmap.dt = Fmap.tmax; // Or a very large number!
-		}
 	}
 	else
 	{
@@ -1314,6 +1664,7 @@ template<class T> T readforcinghead(T ForcingParam)
 		{
 			//log("'md' file");
 			readbathyHeadMD(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.grdalpha);
+			ForcingParam.dy = ForcingParam.dx;
 			ForcingParam.xo = 0.0;
 			ForcingParam.yo = 0.0;
 			ForcingParam.xmax = ForcingParam.xo + (double(ForcingParam.nx) - 1.0) * ForcingParam.dx;
@@ -1322,10 +1673,13 @@ template<class T> T readforcinghead(T ForcingParam)
 		}
 		if (ForcingParam.extension.compare("nc") == 0)
 		{
-			int dummy;
-			double dummyb, dummyc;
+			//int dummy;
+			//double dummyb, dummyc;
 			//log("netcdf file");
-			readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);
+
+			//readgridncsize(ForcingParam.inputfile, ForcingParam.varname, ForcingParam.nx, ForcingParam.ny, dummy, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, dummyb, ForcingParam.xmax, ForcingParam.ymax, dummyc, ForcingParam.flipxx, ForcingParam.flipyy);
+			readgridncsize(ForcingParam);
+
 			//log("For nc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 
 			//Check that the x and y variable are in crescent order:
@@ -1354,6 +1708,7 @@ template<class T> T readforcinghead(T ForcingParam)
 			readbathyASCHead(ForcingParam.inputfile, ForcingParam.nx, ForcingParam.ny, ForcingParam.dx, ForcingParam.xo, ForcingParam.yo, ForcingParam.grdalpha);
 			ForcingParam.xmax = ForcingParam.xo + (ForcingParam.nx-1)* ForcingParam.dx;
 			ForcingParam.ymax = ForcingParam.yo + (ForcingParam.ny-1)* ForcingParam.dx;
+
 			log("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
 		}
 
@@ -1365,7 +1720,7 @@ template<class T> T readforcinghead(T ForcingParam)
 
 
 		//printf("Bathymetry grid info: nx=%d\tny=%d\tdx=%lf\talpha=%f\txo=%lf\tyo=%lf\txmax=%lf\tymax=%lf\n", BathyParam.nx, BathyParam.ny, BathyParam.dx, BathyParam.grdalpha * 180.0 / pi, BathyParam.xo, BathyParam.yo, BathyParam.xmax, BathyParam.ymax);
-		log("Forcing grid info: nx=" + std::to_string(ForcingParam.nx) + " ny=" + std::to_string(ForcingParam.ny) + " dx=" + std::to_string(ForcingParam.dx) + " grdalpha=" + std::to_string(ForcingParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(ForcingParam.xo) + " xmax=" + std::to_string(ForcingParam.xmax) + " yo=" + std::to_string(ForcingParam.yo) + " ymax=" + std::to_string(ForcingParam.ymax));
+		log("Forcing grid info: nx=" + std::to_string(ForcingParam.nx) + " ny=" + std::to_string(ForcingParam.ny) + " dx=" + std::to_string(ForcingParam.dx) + " dy=" + std::to_string(ForcingParam.dy) + " grdalpha=" + std::to_string(ForcingParam.grdalpha*180.0 / pi) + " xo=" + std::to_string(ForcingParam.xo) + " xmax=" + std::to_string(ForcingParam.xmax) + " yo=" + std::to_string(ForcingParam.yo) + " ymax=" + std::to_string(ForcingParam.ymax));
 
 
 
@@ -1381,7 +1736,6 @@ template<class T> T readforcinghead(T ForcingParam)
 	}
 	return ForcingParam;
 }
-
 template inputmap readforcinghead<inputmap>(inputmap BathyParam);
 template forcingmap readforcinghead<forcingmap>(forcingmap BathyParam);
 //template StaticForcingP<float> readBathyhead<StaticForcingP<float>>(StaticForcingP<float> BathyParam);
@@ -1741,6 +2095,29 @@ template <class T> void clampedges(int nx, int ny, T clamp, T* z)
 		z[ii] = clamp;
 	}
 }
+
+template <class T> void denan(int nx, int ny, float denanval, T* z)
+{
+	for (int j = 0; j < ny; j++)
+	{
+		for (int i = 0; i < nx; i++)
+		{
+			if (isnan(z[i + j * nx]))
+			{
+				z[i + j * nx] = denanval;
+			}
+		}
+	}
+}
+template void denan<float>(int nx, int ny, float denanval, float* z);
+template void denan<double>(int nx, int ny, float denanval, double* z);
+
+void denan(int nx, int ny, float denanval, int* z)
+{
+	//don't do nothing
+	// This function exist for cleaner compiling requirement that NaN do not exist in int form
+}
+
 /*! \fn void InterpstepCPU(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un)
 * linearly interpolate between 2 cartesian arrays (of the same size)
 * This is used to interpolate dynamic forcing to a current time step 
@@ -1769,3 +2146,6 @@ template <class T> void clampedges(int nx, int ny, T clamp, T* z)
 //}
 //template void InterpstepCPU<int>(int nx, int ny, int hdstep, float totaltime, float hddt, int*& Ux, int* Uo, int* Un);
 //template void InterpstepCPU<float>(int nx, int ny, int hdstep, float totaltime, float hddt, float*& Ux, float* Uo, float* Un);
+
+
+

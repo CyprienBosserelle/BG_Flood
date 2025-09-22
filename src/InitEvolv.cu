@@ -30,7 +30,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		hotstartsucess = readhotstartfile(XParam, XBlock, XEv, zb);
 
 		//add offset if present
-		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
+		if (T(XParam.zsoffset) != T(0.0)) // apply specified zsoffset
 		{
 			printf("\t\tadd offset to zs and hh... ");
 			//
@@ -61,8 +61,18 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		//!leftWLbnd.empty()
 
 		//case 0 (i.e. zsinint not specified by user and no boundaries were specified)
+		bool bndison = false;
+		for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+		{
+			if (XForcing.bndseg[iseg].on)
+			{
+				bndison = true;
+			}
+		}
+
+
 		
-		if (std::isnan(XParam.zsinit) && (!XForcing.left.on && !XForcing.right.on && !XForcing.top.on && !XForcing.bot.on)) //zsinit is default
+		if (std::isnan(XParam.zsinit) && (!bndison)) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value than nan
 		}
@@ -94,7 +104,7 @@ template <class T>
 int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 {
 	T zzini = std::isnan(XParam.zsinit)? T(0.0): T(XParam.zsinit);
-	T zzoffset = std::isnan(XParam.zsoffset) ? T(0.0) : T(XParam.zsoffset);
+	T zzoffset = T(XParam.zsoffset);
 	
 
 	
@@ -127,9 +137,108 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 	return coldstartsucess;
 }
 
+template <class T>
+void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
+{
+	int nuni=0;
+	int ndyn=0;
+
+	T zsbnduni=T(0.0);
+	T zsbnd;
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on)
+		{
+			if (XForcing.bndseg[iseg].uniform)
+			{
+				nuni++;
+
+				int SLstepinbnd = 1;
+
+				double difft = XForcing.bndseg[iseg].data[SLstepinbnd].time - XParam.totaltime;
+				while (difft < 0.0)
+				{
+					SLstepinbnd++;
+					difft = XForcing.bndseg[iseg].data[SLstepinbnd].time - XParam.totaltime;
+				}
+
+				//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+				zsbnduni = zsbnduni + interptime(XForcing.bndseg[iseg].data[SLstepinbnd].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd - 1].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd].time - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time);
+
+			}
+			else
+			{
+				ndyn++;
+				Forcingthisstep(XParam, XParam.totaltime, XForcing.bndseg[iseg].WLmap);
+			}
+		}
+	}
+	if (nuni > 0)
+	{
+		zsbnduni = zsbnduni / nuni;
+	}
+
+	int ib;
+	double xi, yi;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+
+				double levdx = calcres(XParam.dx, XBlock.level[ib]);
+				xi = XParam.xo + XBlock.xo[ib] + i * levdx;
+				yi = XParam.yo + XBlock.yo[ib] + j * levdx;
+
+				zsbnd = zsbnduni;
+
+				if (ndyn > 0)
+				{
+					zsbnd = zsbnduni * nuni;
+					
+					for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+					{
+						if (XForcing.bndseg[iseg].on && !XForcing.bndseg[iseg].uniform)
+						{
+							//
+							zsbnd = zsbnd + float(interp2BUQ(xi, yi, XForcing.bndseg[iseg].WLmap));
+						}
+					}
+
+					zsbnd = zsbnd / (nuni + ndyn);
+				}
+
+				if (XParam.atmpforcing)
+				{
+					float atmpi;
+
+					if (XForcing.Atmp.uniform)
+					{
+						atmpi = float(XForcing.Atmp.nowvalue);
+					}
+					else
+					{
+						atmpi = float(interp2BUQ(xi, yi, XForcing.Atmp));
+					}
+					zsbnd = zsbnd - (atmpi - (T)XParam.Paref) * (T)XParam.Pa2m;
+				}
+
+				XEv.zs[n] = utils::max(zsbnd, zb[n]);
+				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
+				XEv.u[n] = T(0.0);
+				XEv.v[n] = T(0.0);
+			}
+		}
+	}
+
+}
+
 
 template <class T>
-void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
+void warmstartold(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
 	// This function read water level boundary if they have been setup and calculate the distance to the boundary 
 	// toward the end the water level value is calculated as an inverse distance to the available boundaries.
@@ -319,7 +428,20 @@ void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, Ev
 
 				zsbnd = T(((zsleft / distleft) * lefthere + (zsright / distright) * righthere + (zstop / disttop) * tophere + (zsbot / distbot) * bothere) / ((1.0 / distleft) * lefthere + (1.0 / distright) * righthere + (1.0 / disttop) * tophere + (1.0 / distbot) * bothere));
 
+				if (XParam.atmpforcing)
+				{
+					float atmpi;
 
+					if (XForcing.Atmp.uniform)
+					{
+						atmpi = float(XForcing.Atmp.nowvalue);
+					}
+					else
+					{
+						atmpi = float(interp2BUQ(xi, yi, XForcing.Atmp));
+					}
+					zsbnd = zsbnd - (atmpi- (T)XParam.Paref) * (T)XParam.Pa2m;
+				}
 
 				XEv.zs[n] = utils::max(zsbnd, zb[n]);
 				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
@@ -365,6 +487,39 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 
 
 template <class T>
+int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
+{
+	int status;
+	int ncid;
+	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
+	int ib;
+	//double scalefac = 1.0;
+	//double offset = 0.0;
+
+	std::string zbname, zsname, hname, uname, vname, xname, yname;
+	// Open the file for read access
+	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
+
+	bool isBG_Flood = false;
+
+	int BG_vers = -999;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+	//Open NC file
+	printf("Open file...");
+	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+	status = nc_get_att_int(ncid, NC_GLOBAL, "BG_Flood", &BG_vers);
+
+	//isBG_Flood = BG_vers >= 0)
+	
+	status = nc_close(ncid);
+	
+	
+	
+}
+
+template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
 	int status;
@@ -382,6 +537,14 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 	//Open NC file
 	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+
+	//bool isBG_Flood = false;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+
+	//if it exist read each level separatly otherwise look for the following variables 
+
 	if (status != NC_NOERR) handle_ncerror(status);
 	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z", "zb_P0");
 	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA", "zs_P0");

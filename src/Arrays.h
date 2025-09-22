@@ -23,11 +23,33 @@ struct GradientsP
 	T* dzbdy;
 };
 
+template <class T>
+struct GradientsMLP
+{
+	
+	T* dhdx;
+	T* dudx;
+	T* dvdx;
+
+	
+	T* dhdy;
+	T* dudy;
+	T* dvdy;
+};
+
 
 template <class T>
 struct EvolvingP
 {
 	T* zs;
+	T* h;
+	T* u;
+	T* v;
+};
+
+template <class T>
+struct EvolvingMLP
+{
 	T* h;
 	T* u;
 	T* v;
@@ -51,11 +73,32 @@ struct FluxP
 };
 
 template <class T>
+struct FluxMLP
+{
+	//
+	T* hu, * hv;
+	T* hfu, * hfv;
+	T* hau, * hav;
+	T* Fux, * Fvy;
+	T* Fuy, * Fvx;
+
+};
+
+template <class T>
 struct AdvanceP
 {
 	T* dh;
 	T* dhu;
 	T* dhv;
+};
+
+
+struct outP
+{
+	float* z;
+	short* z_s;
+	int level;
+	double xmin, xmax, ymin, ymax;
 };
 
 
@@ -67,7 +110,29 @@ struct maskinfo
 	int* blks; // array of block where bnd applies 
 	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
 	int* side; // e.g. 11000000 for the entire left side being a mask
+
+	int type = 0;
+
+
 };
+
+template <class T>
+struct RiverInfo
+{
+	int nbir;
+	int nburmax; // size of (max number of) unique block with rivers  
+	int nribmax; // size of (max number of) rivers in one block
+	int* Xbidir; // array of block id for each river size(nburmax,nribmax)
+	int* Xridib; // array of river id in each block size(nburmax,nribmax)
+	T* xstart;
+	T* xend;
+	T* ystart;
+	T *yend;
+	T* qnow; // qnow is a pin mapped and so both pointers are needed here
+	T* qnow_g; // this simplify the code later
+
+};
+
 
 // outzone info used to actually write the nc files (one nc file by zone, the default zone is the full domain)
 struct outzoneB 
@@ -78,6 +143,8 @@ struct outzoneB
 	std::string outname; // name for the output file (one for each zone)
 	int maxlevel; // maximum level in the zone
 	int minlevel; //minimum level in the zone
+	std::vector<double> OutputT; //Next time for the output of this zone
+	int index_next_OutputT = 0; //Index of next time output
 };
 
 
@@ -111,7 +178,7 @@ struct AdaptP
 
 
 
-
+template <class T>
 struct BndblockP
 {
 	int nblkriver, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
@@ -126,12 +193,15 @@ struct BndblockP
 	int* top;
 	int* bot;
 
-
+	RiverInfo<T> Riverinfo;
 
 
 };
 
-
+struct RiverBlk
+{
+	std::vector<int> block;
+};
 
 
 
@@ -154,6 +224,7 @@ struct Model
 
 	GradientsP<T> grad;
 	FluxP<T> flux;
+	FluxMLP<T> fluxml;
 	AdvanceP<T> adv;
 	
 	//external forcing
@@ -175,6 +246,10 @@ struct Model
 
 	// 
 	std::map<std::string, T *> OutputVarMap;
+	std::map<std::string, std::string> Outvarlongname;
+	std::map<std::string, std::string> Outvarstdname;
+	std::map<std::string, std::string> Outvarunits;
+	std::vector<double> OutputT;
 
 	//other output
 	//std::vector< std::vector< Pointout > > TSallout;
@@ -190,12 +265,13 @@ struct Model
 
 	AdaptP adapt;
 
-	BndblockP bndblk;
+	BndblockP<T> bndblk;
 
 
 	
 
 };
+
 
 // structure of useful variable for runing the main loop
 template <class T>
@@ -211,6 +287,8 @@ struct Loop
 	int nstep = 0;
 	//useful for calculating avg timestep
 	int nstepout = 0;
+	// Needed to identify next output time
+	int indNextoutputtime = 0;
 
 	// usefull for Time series output
 	int nTSsteps = 0;

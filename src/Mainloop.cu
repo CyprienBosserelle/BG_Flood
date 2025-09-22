@@ -12,15 +12,16 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
-	
-
+	// Check for map output (output initialisation if needed)
+	mapoutput(XParam, XLoop, XModel, XModel_g);
 	
 	log("\t\tCompleted");
 	log("Model Running...");
+
 	while (XLoop.totaltime < XParam.endtime)
 	{
 		// Bnd stuff here
-		updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
+		//updateBnd(XParam, XLoop, XForcing, XModel, XModel_g);
 
 
 		// Calculate dynamic forcing at this step
@@ -29,12 +30,20 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Core engine
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop, XForcing, XModel_g);
+			if (XParam.engine == 5)
+			{
+				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+			}
+			else
+			{
+				FlowGPU(XParam, XLoop, XForcing, XModel_g);
+			}
 		}
 		else
 		{
 			FlowCPU(XParam, XLoop, XForcing, XModel);
 		}
+		
 				
 		// Time keeping
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
@@ -100,7 +109,7 @@ template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<
 		fillHaloGPU(XParam, XModel_g.blocks, XLoop.streams[0], XModel_g.zb);
 		cudaStreamDestroy(XLoop.streams[0]);
 
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.dx, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		gradientHaloGPU(XParam, XModel_g.blocks, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
@@ -170,7 +179,7 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 	Loop<T> XLoop;
 	XLoop.atmpuni = T(XParam.Paref);
 	XLoop.totaltime = XParam.totaltime;
-	XLoop.nextoutputtime = XParam.totaltime + XParam.outputtimestep;
+	XLoop.nextoutputtime = XModel.OutputT[0];
 	
 	// Prepare output files
 	InitSave2Netcdf(XParam, XModel);
@@ -205,36 +214,38 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 
 template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	if (XParam.GPUDEVICE >= 0)
+	for (int ibndseg = 0; ibndseg < XForcing.bndseg.size(); ibndseg++)
 	{
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XModel_g.evolv);
-		Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XModel_g.evolv);
-	}
-	else
-	{
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XModel.evolv);
-		Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XModel.evolv);
+		if (XParam.GPUDEVICE >= 0)
+		{
+
+
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.left, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.right, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.top, XForcing.Atmp, XModel_g.evolv);
+			Flowbnd(XParam, XLoop, XModel_g.blocks, XForcing.bot, XForcing.Atmp, XModel_g.evolv);
+
+		}
+		else
+		{
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.left, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.right, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.top, XForcing.Atmp, XModel.evolv);
+			Flowbnd(XParam, XLoop, XModel.blocks, XForcing.bot, XForcing.Atmp, XModel.evolv);
+		}
 	}
 }
 
 
 
 
-template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, Model<T> XModel_g)
+template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel, Model<T> XModel_g)
 {
 	XLoop.nstepout++;
-
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.5) && XParam.outputtimestep > 0.0)
+	double tiny = 0.0000001;
+	/*
+	if  (abs(XLoop.nextoutputtime - XParam.totaltime) < tiny)
 	{
-		char buffer[256];
-		sprintf(buffer, "%e", XParam.outputtimestep / XLoop.nstepout);
-		std::string str(buffer);
-
-		log("Output to map. Totaltime = "+ std::to_string(XLoop.totaltime) +" s; Mean dt = " + str + " s");
 		if (XParam.GPUDEVICE >= 0)
 		{
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -242,14 +253,43 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop,Model<T> XModel, 
 				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			}
 		}
-		
+
+		SaveInitialisation2Netcdf(XParam, XModel);
+
+		XLoop.indNextoutputtime++;
+		if (XLoop.indNextoutputtime < XModel.OutputT.size())
+		{
+			XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
+
+		}
+
+		XLoop.nstepout = 0;
+
+	}
+	*/
+	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * tiny)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+			{
+				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
+			}
+		}
+
 		Save2Netcdf(XParam, XLoop, XModel);
 
+		XLoop.indNextoutputtime++;
+		if (XLoop.indNextoutputtime < XModel.OutputT.size())
+		{
+			XLoop.nextoutputtime = min(XModel.OutputT[XLoop.indNextoutputtime], XParam.endtime);
 
-		XLoop.nextoutputtime = min(XLoop.nextoutputtime + XParam.outputtimestep, XParam.endtime);
+		}
 
 		XLoop.nstepout = 0;
 	}
+
+	
 }
 
 template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
@@ -274,7 +314,7 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 			XLoop.TSAllout[o].push_back(stepread);
 					
 			
-			storeTSout << <gridDim, blockDim, 0 >> > (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
+			storeTSout <<<gridDim, blockDim, 0 >>> (XParam,(int)XParam.TSnodesout.size(), o, XLoop.nTSsteps, XParam.TSnodesout[o].block, XParam.TSnodesout[o].i, XParam.TSnodesout[o].j, XModel_g.bndblk.Tsout, XModel_g.evolv, XModel_g.TSstore);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		//CUDA_CHECK(cudaDeviceSynchronize());
@@ -397,7 +437,7 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 	{
 		// WARNING here we specify at least an initial time step if there was 10.0m of water at the highest resolution cell.
 		// The modle will recalculate the optimal dt in subsequent step;
-		XLoop.dtmax = calcres(XParam.dx, XParam.maxlevel) / (sqrt(XParam.g * 10.0));
+		XLoop.dtmax = calcres(XParam.delta, XParam.maxlevel) / (sqrt(XParam.g * 10.0));
 	}
 
 	//BlockP<T> XBlock = XModel.blocks;
@@ -430,7 +470,7 @@ template <class T> __host__ void CalcInitdtCPU(Param XParam, BlockP<T> XBlock, E
 	{
 		ib = XBlock.active[ibl];
 
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		delta = calcres(T(XParam.delta), XBlock.level[ib]);
 
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
@@ -455,7 +495,7 @@ template <class T> __global__ void CalcInitdtGPU(Param XParam, BlockP<T> XBlock,
 	unsigned int ib = XBlock.active[ibl];
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	T delta = calcres(XParam.dx, XBlock.level[ib]);
+	T delta = calcres(XParam.delta, XBlock.level[ib]);
 
 	dtmax[i] = delta / sqrt(XParam.g * max(XEvolv.h[i],T(XParam.eps)));
 }
@@ -480,7 +520,7 @@ template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XM
 		log(" \n ");
 		log("\t\tModel CRASHED: time steps (" + std::to_string(XLoop.dt) + ") inferior to " + std::to_string(XParam.dtmin) + "\n");
 
-		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho", "vo", "uo", "zso" };
+		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho","vo","uo","zso" };
 		std::vector<std::string> outvold = XParam.outvars;
 		if (XParam.GPUDEVICE >= 0)
 		{

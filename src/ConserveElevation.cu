@@ -31,13 +31,13 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 
-	conserveElevationLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationLeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationRight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
@@ -329,13 +329,13 @@ template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, Ev
 
 	//WetDryProlongationGPUBot
 
-	WetDryProlongationGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPULeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPURight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPUTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPUBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
@@ -350,13 +350,13 @@ template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, Evo
 
 	//WetDryProlongationGPUBot
 
-	WetDryRestrictionGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPULeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPURight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPUTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPUBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
@@ -787,7 +787,7 @@ template <class T> void conserveElevationGHLeft(Param XParam, int ib, int ibLB, 
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	ihalo = -1;
 	ip = 0;
 
@@ -871,7 +871,7 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 	int ip, jp, iq, jq;
 
 	int ihalo, jhalo, ibn;
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 
 	ihalo = -1;
@@ -926,7 +926,7 @@ template <class T> void conserveElevationGHRight(Param XParam, int ib, int ibRB,
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	ihalo = XParam.blkwidth;
 	ip = XParam.blkwidth-1;
 
@@ -1004,7 +1004,7 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 
 	int ihalo, jhalo, iq, jq, ip, jp, ibn;
 
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 	ihalo = blockDim.y;
 	jhalo = iy;
@@ -1061,7 +1061,7 @@ template <class T> void conserveElevationGHTop(Param XParam, int ib, int ibTL, i
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	jhalo = XParam.blkwidth;
 	jp = XParam.blkwidth - 1;
 
@@ -1137,7 +1137,7 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 
 
 	int ihalo, jhalo, iq, jq, ip, jp, ibn;
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 	ihalo = ix;
 	jhalo = iy+1;
@@ -1192,7 +1192,7 @@ template <class T> void conserveElevationGHBot(Param XParam, int ib, int ibBL, i
 {
 	int ibn;
 	int ihalo, jhalo, ip, jp, iq, jq;
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	jhalo = -1;
 	jp = 0;
 
@@ -1269,7 +1269,7 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 	int ip, jp, iq, jq;
 
 	int ihalo, jhalo, ibn;
-	T delta = calcres(XParam.dx, lev);
+	T delta = calcres(XParam.delta, lev);
 
 	ihalo = ix;
 	jhalo = -1;

@@ -14,6 +14,7 @@
 #include "FlowCPU.h"
 #include "Meanmax.h"
 #include "Updateforcing.h"
+#include "FlowMLGPU.h"
 
 template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);
 

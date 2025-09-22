@@ -37,34 +37,70 @@ struct SharedMemory<double>
 
 template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv)
 {
-	
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
 
 	//T eps = T(XParam.eps);
-	T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
-	
 
-	T fc = (T)XParam.lat * pi / T(21600.0);
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
+
+
+	T fc = 0.0;// XParam.spherical ? sin((ybo + calcres(T(XParam.dx), lev) * iy) * pi / 180.0) * pi / T(21600.0) : sin(T(XParam.lat * pi / 180.0)) * pi / T(21600.0); // 2*(2*pi/24/3600)
+	// fc should be pi / T(21600.0) * sin(phi)
+
 
 	int iright, itop;
-	
+
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	
+
 	iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 	itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
-	
+	T yup = T(iy) + T(1.0);
+	T ydwn = T(iy);
 
-	T cm = T(1.0);// 0.1;
+	if (iy == XParam.blkwidth - 1)
+	{
+		if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+		{
+			yup = iy + 0.75;
+		}
+		//if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
+		//{
+		//	yup = iy + 1.000;
+		//}
+	}
+
+	if (iy == 0)
+	{
+		if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+			ydwn = iy - 0.25 ;
+		}
+		
+	}
+
+
+
+
+
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
-	T fmv = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+	T fmup = T(1.0);
+	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
+
+
 
 	T hi = XEv.h[i];
 	T uui = XEv.u[i];
@@ -73,24 +109,26 @@ template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, Ev
 
 	T cmdinv, ga;
 
-	cmdinv = T(1.0)/ (cm * delta);
+	cmdinv = T(1.0) / (cm * delta);
 	ga = T(0.5) * g;
-		
+
 
 	XAdv.dh[i] = T(-1.0) * (XFlux.Fhu[iright] - XFlux.Fhu[i] + XFlux.Fhv[itop] - XFlux.Fhv[i]) * cmdinv;
-		
+
 
 
 	//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 	//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-	T dmdl = (fmu - fmu) / (cm * delta);// absurd if not spherical!
-	T dmdt = (fmv - fmv) / (cm * delta);
+	T dmdl = (fmup - fmu) * cmdinv;// absurd if not spherical!
+	T dmdt = (fmvp - fmv) * cmdinv;;
 	T fG = vvi * dmdl - uui * dmdt;
 	XAdv.dhu[i] = (XFlux.Fqux[i] + XFlux.Fquy[i] - XFlux.Su[iright] - XFlux.Fquy[itop]) * cmdinv + fc * hi * vvi;
 	XAdv.dhv[i] = (XFlux.Fqvy[i] + XFlux.Fqvx[i] - XFlux.Sv[itop] - XFlux.Fqvx[iright]) * cmdinv - fc * hi * uui;
-		
+
 	XAdv.dhu[i] += hi * (ga * hi * dmdl + fG * vvi);// This term is == 0 so should be commented here
 	XAdv.dhv[i] += hi * (ga * hi * dmdt - fG * uui);// Need double checking before doing that
+
+	
 	
 }
 template __global__ void updateEVGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, FluxP<float> XFlux, AdvanceP<float> XAdv);
@@ -103,22 +141,28 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 	//T eps = T(XParam.eps);
 	T delta;
 	T g = T(XParam.g);
+
+	T ybo;
 	
 
-	int ib;
+	int ib,lev;
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
-		delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		lev = XBlock.level[ib];
+		delta = calcres(T(XParam.delta), lev);
+
+		ybo = (T)XParam.yo + XBlock.yo[ib];
+
 		for (int iy = 0; iy < XParam.blkwidth; iy++)
 		{
 			for (int ix = 0; ix < XParam.blkwidth; ix++)
 			{
 
-				T fc = T(XParam.lat * pi / 21600.0);
+				T fc = XParam.spherical ? sin((ybo + calcres(T(XParam.dx), lev) * iy) * pi / 180.0) * pi / T(21600.0) : sin(T(XParam.lat * pi / 180.0)) * pi / T(21600.0); // 2*(2*pi/24/3600)
 
 				int iright, itop;
 
@@ -128,10 +172,33 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 				itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
 
+				T yup = T(iy) + T(1.0);
+				T ydwn = T(iy);
 
-				T cm = T(1.0);// 0.1;
+				if (iy == XParam.blkwidth - 1)
+				{
+					if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+					{
+						yup = iy + T(0.75);
+					}
+					
+				}
+				if (iy == 0)
+				{
+					if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+					{
+						ydwn = iy - T(0.25);
+					}
+
+				}
+
+
+
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 				T fmu = T(1.0);
-				T fmv = T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+				T fmup = T(1.0);
+				T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
 
 				T hi = XEv.h[i];
 				T uui = XEv.u[i];
@@ -150,8 +217,8 @@ template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, Evol
 
 				//double dmdl = (fmu[xplus + iy*nx] - fmu[i]) / (cm * delta);
 				//double dmdt = (fmv[ix + yplus*nx] - fmv[i]) / (cm  * delta);
-				T dmdl = (fmu - fmu) / (cm * delta);// absurd if not spherical!
-				T dmdt = (fmv - fmv) / (cm * delta);
+				T dmdl = (fmup - fmu) / (cm * delta);// absurd if not spherical!
+				T dmdt = (fmvp - fmv) / (cm * delta);
 				T fG = vvi * dmdl - uui * dmdt;
 				XAdv.dhu[i] = (XFlux.Fqux[i] + XFlux.Fquy[i] - XFlux.Su[iright] - XFlux.Fquy[itop]) * cmdinv + fc * hi * vvi;
 				XAdv.dhv[i] = (XFlux.Fqvy[i] + XFlux.Fqvx[i] - XFlux.Sv[itop] - XFlux.Fqvx[iright]) * cmdinv - fc * hi * uui;
@@ -184,10 +251,10 @@ template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, 
 	T ho, uo, vo;
 	T dhi = XAdv.dh[i];
 
-	T edt = dt;// dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
-
+	T edt = XParam.ForceMassConserve ? dt : dhi >= T(0.0) ? dt : min(dt, max(hold, XParam.eps) / abs(dhi));
+	
+	//ho = max(hold + edt * dhi,T(0.0));
 	ho = hold + edt * dhi;
-
 
 	if (ho > eps) {
 		//
@@ -240,7 +307,7 @@ template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T 
 
 				dhi = XAdv.dh[i];
 
-				T edt = dt;// dhi > T(0.0) ? dt : min(dt, hold / (T(-1.0) * dhi));
+				T edt = XParam.ForceMassConserve ? dt : dhi >= T(0.0) ? dt : min(dt, max(hold, XParam.eps) / abs(dhi));
 
 				ho = hold + edt * dhi;
 
@@ -408,7 +475,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 
 	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
 	// This was successfully tested with a range of grid size
-	//reducemax3 << <gridDimLine, blockDimLine, 64*sizeof(float) >> >(dtmax_g, arrmax_g, nx*ny)
+	//reducemax3 <<<gridDimLine, blockDimLine, 64*sizeof(float) >>>(dtmax_g, arrmax_g, nx*ny)
 	
 	int maxThreads = 256;
 	int threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
@@ -418,7 +485,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 	dim3 gridDimLine(blocks, 1, 1);
 
 	
-	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
+	reducemin3 <<<gridDimLine, blockDimLine, smemSize >>> (XTime.dtmax, XTime.arrmin, s);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
@@ -436,7 +503,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 
 		CUDA_CHECK(cudaMemcpy(XTime.dtmax, XTime.arrmin, s * sizeof(T), cudaMemcpyDeviceToDevice));
 
-		reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
+		reducemin3 <<<gridDimLineS, blockDimLineS, smemSize >>> (XTime.dtmax, XTime.arrmin, s);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		s = (s + (threads * 2 - 1)) / (threads * 2);

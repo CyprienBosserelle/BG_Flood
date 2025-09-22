@@ -287,7 +287,25 @@ template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<S
 					{
 						if (x >= forcing[nf].xo && x <= forcing[nf].xmax && y >= forcing[nf].yo && y <= forcing[nf].ymax)
 						{
-							z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+							T interpval= interp2BUQ(x, y, T(blkdx), forcing[nf]);
+
+							//if (isnan(interpval))
+							//{
+							//	log("NAN detected");
+							//}
+
+							if (!isnan(interpval))
+							{
+								z[n] = interp2BUQ(x, y, T(blkdx), forcing[nf]);
+							}
+							//else
+							//{
+							//	z[n] = -999.0;
+							//}
+							//{
+							//	log("NAN detected: Z="+std::to_string(z[n]));
+							//}
+
 						}
 					}
 				}
@@ -331,8 +349,8 @@ template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 	imin = max(ftoi(floor((xmin - forcing.xo) / forcing.dx)), 0);
 	imax = min(ftoi(floor((xmax - forcing.xo) / forcing.dx)), forcing.nx - 1);
 
-	jmin = max(ftoi(floor((ymin - forcing.yo) / forcing.dx)), 0);
-	jmax = min(ftoi(floor((ymax - forcing.yo) / forcing.dx)), forcing.ny - 1);
+	jmin = max(ftoi(floor((ymin - forcing.yo) / forcing.dy)), 0);
+	jmax = min(ftoi(floor((ymax - forcing.yo) / forcing.dy)), forcing.ny - 1);
 
 	//printf("imin=%d; imax=%d, jmin=%d, jmax=%d\t",imin, imax, jmin, jmax);
 
@@ -381,11 +399,11 @@ template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 	x1 = forcing.xo + forcing.dx * cfi;
 	x2 = forcing.xo + forcing.dx * cfip;
 
-	cfj = utils::min(utils::max((int)floor((yi - forcing.yo) / forcing.dx), 0), forcing.ny - 2);
+	cfj = utils::min(utils::max((int)floor((yi - forcing.yo) / forcing.dy), 0), forcing.ny - 2);
 	cfjp = cfj + 1;
 
-	y1 = forcing.yo + forcing.dx * cfj;
-	y2 = forcing.yo + forcing.dx * cfjp;
+	y1 = forcing.yo + forcing.dy * cfj;
+	y2 = forcing.yo + forcing.dy * cfjp;
 
 	q11 = forcing.val[cfi + cfj * forcing.nx];
 	q12 = forcing.val[cfi + cfjp * forcing.nx];
@@ -435,7 +453,7 @@ template void InterpstepCPU<float, double>(int nx, int ny, int hdstep, double to
 template void InterpstepCPU<double, double>(int nx, int ny, int hdstep, double totaltime, double hddt, double*& Ux, double* Uo, double* Un);
 
 
-template <class T> __global__ void InterpstepGPU(int nx, int ny, int hdstp, T totaltime, T hddt, T*Ux, T* Uo, T* Un)
+template <class T> __global__ void InterpstepGPU(int nx, int ny, T totaltime, T beforetime, T aftertime, T*Ux, T* Uo, T* Un)
 {
 	unsigned int ix = blockIdx.x * blockDim.x + threadIdx.x;
 	unsigned int iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -446,19 +464,21 @@ template <class T> __global__ void InterpstepGPU(int nx, int ny, int hdstp, T to
 	__shared__ T Uxn[16][16];
 	//	__shared__ float Ums[16];
 
-
+	T hddt = aftertime - beforetime;
 
 	if (ix < nx && iy < ny)
 	{
 		Uxo[tx][ty] = Uo[ix + nx * iy]/**Ums[tx]*/;
 		Uxn[tx][ty] = Un[ix + nx * iy]/**Ums[tx]*/;
 
-		Ux[ix + nx * iy] = Uxo[tx][ty] + (totaltime - hddt * hdstp) * (Uxn[tx][ty] - Uxo[tx][ty]) / hddt;
+		Ux[ix + nx * iy] = Uxo[tx][ty] + (totaltime - beforetime) * (Uxn[tx][ty] - Uxo[tx][ty]) / (hddt);
 	}
 }
 //template __global__ void InterpstepGPU<int>(int nx, int ny, int hdstp, T totaltime, T hddt, T* Ux, T* Uo, T* Un);
-template __global__ void InterpstepGPU<float>(int nx, int ny, int hdstp, float totaltime, float hddt, float* Ux, float* Uo, float* Un);
-template __global__ void InterpstepGPU<double>(int nx, int ny, int hdstp, double totaltime, double hddt, double* Ux, double* Uo, double* Un);
+template __global__ void InterpstepGPU<float>(int nx, int ny, float totaltime, float beforetime, float aftertime, float* Ux, float* Uo, float* Un);
+template __global__ void InterpstepGPU<double>(int nx, int ny, double totaltime, double beforetime, double aftertime, double* Ux, double* Uo, double* Un);
+
+
 
 template <class T> void Copy2CartCPU(int nx, int ny, T* dest, T* src)
 {

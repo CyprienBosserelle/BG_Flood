@@ -1,6 +1,10 @@
 
 #include "MemManagement.h"
 
+
+#define MEMORY_ALIGNMENT  4096
+#define ALIGN_UP(x,size) ( ((size_t)x+(size-1))&(~(size-1)) )
+
 __host__ int memloc(Param XParam, int i, int j, int ib)
 {
 	return (i+XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
@@ -23,6 +27,19 @@ template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zb)
 	}
 }
 
+template <class T> __host__ void FillCPU(int nx, int ny,T fillval, T*& zb)
+{
+	for (int ix = 0; ix < nx; ix++)
+	{
+		for (int iy = 0; iy < ny; iy++)
+		{
+			zb[iy * nx + ix] = fillval;
+		}
+	}
+}
+template void FillCPU<double>(int nx, int ny, double fillval, double*& zb);
+template void FillCPU<float>(int nx, int ny, float fillval, float*& zb);
+template void FillCPU<int>(int nx, int ny, int fillval, int*& zb);
 
 template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zs, T *&h, T *&u, T *&v)
 {
@@ -88,11 +105,19 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	AllocateCPU(nblk, blksize, XModel.grad.dzbdx);
 	AllocateCPU(nblk, blksize, XModel.grad.dzbdy);
+	if (XParam.engine==5)
+	{
+		AllocateCPU(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.Fuy, XModel.fluxml.Fvx);
+		AllocateCPU(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+		AllocateCPU(nblk, blksize, XModel.fluxml.hau);
+		AllocateCPU(nblk, blksize, XModel.fluxml.hav);
+	}
+	else
+	{
+		AllocateCPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
-	AllocateCPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
-
-	AllocateCPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
-
+		AllocateCPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+	}
 	AllocateCPU(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
 
 	AllocateCPU(nblk, blksize, XModel.cf, XModel.time.arrmax, XModel.time.arrmin, XModel.time.dtmax);
@@ -190,6 +215,9 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		//this will be eventually reallocated later
 		AllocateCPU(1, 1, XModel.bndblk.river);
 		XModel.bndblk.nblkriver = 1;
+
+		AllocateCPU(1, 1, XModel.bndblk.Riverinfo.Xbidir);
+		AllocateCPU(1, 1, XModel.bndblk.Riverinfo.Xridib);
 	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later
@@ -279,10 +307,19 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	ReallocArray(nblk, blksize, XModel.grad.dzbdx);
 	ReallocArray(nblk, blksize, XModel.grad.dzbdy);
+	if (XParam.engine == 5)
+	{
+		ReallocArray(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.Fuy, XModel.fluxml.Fvx);
+		ReallocArray(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+		ReallocArray(nblk, blksize, XModel.fluxml.hau);
+		ReallocArray(nblk, blksize, XModel.fluxml.hav);
+	}
+	else
+	{
+		ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
-	ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
-
-	ReallocArray(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+		ReallocArray(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+	}
 
 	ReallocArray(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
 
@@ -344,6 +381,82 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 template void ReallocArray<float>(int nblk, int blksize, Param XParam, Model<float>& XModel);
 template void ReallocArray<double>(int nblk, int blksize, Param XParam, Model<double>& XModel);
+
+
+
+
+template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z)
+{
+
+	bool bPinGenericMemory;
+	cudaDeviceProp deviceProp;
+#if defined(__APPLE__) || defined(MACOSX)
+	bPinGenericMemory = false;  // Generic Pinning of System Paged memory is not currently supported on Mac OSX
+#else
+	bPinGenericMemory = true;
+#endif
+
+	// Here there should be a limit for cudar version less than 4.000
+
+
+	if (bPinGenericMemory)
+	{
+		//printf("> Using Generic System Paged Memory (malloc)\n");
+	}
+	else
+	{
+		//printf("> Using CUDA Host Allocated (cudaHostAlloc)\n");
+	}
+	if (gpudevice >= 0)
+	{
+		cudaGetDeviceProperties(&deviceProp, gpudevice);
+
+		if (!deviceProp.canMapHostMemory)
+		{
+			fprintf(stderr, "Device %d does not support mapping CPU host memory!\n", gpudevice);
+			bPinGenericMemory = false;
+		}
+	}
+	size_t bytes = nx * ny * sizeof(T);
+	if (bPinGenericMemory)
+	{
+
+		
+
+		T* a_UA = (T*)malloc(bytes + MEMORY_ALIGNMENT);
+		
+
+		// We need to ensure memory is aligned to 4K (so we will need to padd memory accordingly)
+		z = (T*)ALIGN_UP(a_UA, MEMORY_ALIGNMENT);
+		
+		if (gpudevice >= 0)
+		{
+			CUDA_CHECK(cudaHostRegister(z, bytes, cudaHostRegisterMapped));
+		}
+
+	}
+	else
+	{
+
+		//flags = cudaHostAllocMapped;
+		CUDA_CHECK(cudaHostAlloc((void**)&z, bytes, cudaHostAllocMapped));
+		
+
+	}
+
+
+}
+template void AllocateMappedMemCPU<int>(int nx, int ny, int gpudevice, int*& z);
+template void AllocateMappedMemCPU<float>(int nx, int ny, int gpudevice, float*& z);
+template void AllocateMappedMemCPU<double>(int nx, int ny, int gpudevice, double*& z);
+
+template <class T> void AllocateMappedMemGPU(int nx, int ny, int gpudevice, T*& z_g, T* z)
+{
+	CUDA_CHECK(cudaHostGetDevicePointer((void**)&z_g, (void*)z, 0));
+}
+template void AllocateMappedMemGPU<int>(int nx, int ny, int gpudevice, int*& z_g, int* z);
+template void AllocateMappedMemGPU<float>(int nx, int ny, int gpudevice,float*& z_g, float* z);
+template void AllocateMappedMemGPU<double>(int nx, int ny, int gpudevice, double*& z_g, double* z);
 
 
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g)
@@ -408,10 +521,19 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	AllocateGPU(nblk, blksize, XModel.evolv_o);
 
 	AllocateGPU(nblk, blksize, XModel.grad);
-	AllocateGPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
+	if (XParam.engine == 5)
+	{
+		AllocateGPU(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.hau, XModel.fluxml.hav);
+		AllocateGPU(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
+		AllocateGPU(nblk, blksize, XModel.fluxml.Fuy);
+		AllocateGPU(nblk, blksize, XModel.fluxml.Fvx);
+	}
+	else
+	{
+		AllocateGPU(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
 
-	AllocateGPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
-
+		AllocateGPU(nblk, blksize, XModel.flux.Fqvx, XModel.flux.Fqvy, XModel.flux.Su, XModel.flux.Sv);
+	}
 	AllocateGPU(nblk, blksize, XModel.zb, XModel.adv.dh, XModel.adv.dhu, XModel.adv.dhv);
 
 	AllocateGPU(nblk, blksize, XModel.cf, XModel.time.arrmax, XModel.time.arrmin, XModel.time.dtmax);

@@ -72,7 +72,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 		//=====================================
 		// Initialise Friction map
 
-		if (!XForcing.cf.inputfile.empty())
+		if (!XForcing.cf.empty())
 		{
 			interp2BUQ(XParam, XModel.blocks, XForcing.cf, XModel.cf);
 		}
@@ -87,8 +87,22 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 		// Initialise the continuous losses map
 		if (XParam.infiltration)
 		{
-			interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
-			interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+			if (!XForcing.il.inputfile.empty())
+			{
+				interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+			}
+			else
+			{
+				InitArrayBUQ(XParam, XModel.blocks, (T)XParam.il, XModel.il);
+			}
+			if (!XForcing.cl.inputfile.empty())
+			{
+				interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+			}
+			else
+			{
+				InitArrayBUQ(XParam, XModel.blocks, (T)XParam.cl, XModel.cl);
+			}
 			// Set edges of friction map
 			setedges(XParam, XModel.blocks, XModel.il);
 			setedges(XParam, XModel.blocks, XModel.cl);
@@ -140,6 +154,9 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 		{
 			coarsen[ib] = false;
 		}
+		// Warning, Here cancelling all coasening because of a bug
+		// This could become an option for optimising the refinment process ??
+		coarsen[ib] = false;
 	}
 
 

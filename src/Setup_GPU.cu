@@ -47,6 +47,35 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 		AllocateGPU(XForcing.bot.nblk, 1, XForcing.bot.blks_g);
 		CopytoGPU(XForcing.bot.nblk, 1, XForcing.bot.blks, XForcing.bot.blks_g);
 
+
+		for (int s = 0; s < XForcing.bndseg.size(); s++)
+		{
+			AllocateGPU(XForcing.bndseg[s].left.nblk, 1, XForcing.bndseg[s].left.blk_g);
+			CopytoGPU(XForcing.bndseg[s].left.nblk, 1, XForcing.bndseg[s].left.blk, XForcing.bndseg[s].left.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].right.nblk, 1, XForcing.bndseg[s].right.blk_g);
+			CopytoGPU(XForcing.bndseg[s].right.nblk, 1, XForcing.bndseg[s].right.blk, XForcing.bndseg[s].right.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].top.nblk, 1, XForcing.bndseg[s].top.blk_g);
+			CopytoGPU(XForcing.bndseg[s].top.nblk, 1, XForcing.bndseg[s].top.blk, XForcing.bndseg[s].top.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].bot.nblk, 1, XForcing.bndseg[s].bot.blk_g);
+			CopytoGPU(XForcing.bndseg[s].bot.nblk, 1, XForcing.bndseg[s].bot.blk, XForcing.bndseg[s].bot.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].left.nblk, XParam.blkwidth, XForcing.bndseg[s].left.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].left.nblk, XParam.blkwidth, XForcing.bndseg[s].left.qmean, XForcing.bndseg[s].left.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].right.nblk, XParam.blkwidth, XForcing.bndseg[s].right.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].right.nblk, XParam.blkwidth, XForcing.bndseg[s].right.qmean, XForcing.bndseg[s].right.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].top.nblk, XParam.blkwidth, XForcing.bndseg[s].top.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].top.nblk, XParam.blkwidth, XForcing.bndseg[s].top.qmean, XForcing.bndseg[s].top.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].bot.nblk, XParam.blkwidth, XForcing.bndseg[s].bot.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].bot.nblk, XParam.blkwidth, XForcing.bndseg[s].bot.qmean, XForcing.bndseg[s].bot.qmean_g);
+		}
+
+
 		// Also for mask
 		XModel_g.blocks.mask.nblk = XModel.blocks.mask.nblk;
 		AllocateGPU(XModel_g.blocks.mask.nblk, 1, XModel_g.blocks.mask.side);
@@ -71,6 +100,33 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			XModel_g.bndblk.nblkriver = XModel.bndblk.nblkriver;
 			AllocateGPU(XModel.bndblk.nblkriver, 1, XModel_g.bndblk.river);
 			CopytoGPU(XModel.bndblk.nblkriver, 1, XModel.bndblk.river, XModel_g.bndblk.river);
+
+			int nribmax = XModel.bndblk.Riverinfo.nribmax;
+			int nburmax = XModel.bndblk.Riverinfo.nburmax;
+
+			XModel_g.bndblk.Riverinfo.nribmax = nribmax;
+			XModel_g.bndblk.Riverinfo.nburmax = nburmax;
+
+
+			AllocateMappedMemGPU(XForcing.rivers.size(), 1,XParam.GPUDEVICE, XModel_g.bndblk.Riverinfo.qnow_g,XModel.bndblk.Riverinfo.qnow);
+			XModel_g.bndblk.Riverinfo.qnow = XModel.bndblk.Riverinfo.qnow;
+
+
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xbidir);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xridib);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir, XModel_g.bndblk.Riverinfo.Xbidir);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib, XModel_g.bndblk.Riverinfo.Xridib);
+
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.xstart);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.xend);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.ystart);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.yend);
+
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel_g.bndblk.Riverinfo.xstart);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xend, XModel_g.bndblk.Riverinfo.xend);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.ystart, XModel_g.bndblk.Riverinfo.ystart);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.yend, XModel_g.bndblk.Riverinfo.yend);
+
 		}
 
 		// Reset GPU mean and max arrays
@@ -236,8 +292,8 @@ void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 	memset(&Tex.texDesc, 0, sizeof(cudaTextureDesc));
 	Tex.texDesc.addressMode[0] = cudaAddressModeClamp;
 	Tex.texDesc.addressMode[1] = cudaAddressModeClamp;
-	//Tex.texDesc.filterMode = cudaFilterModeLinear;
-	Tex.texDesc.filterMode = cudaFilterModePoint;
+	Tex.texDesc.filterMode = cudaFilterModeLinear;
+	//Tex.texDesc.filterMode = cudaFilterModePoint;
 	Tex.texDesc.normalizedCoords = false;
 
 	memset(&Tex.resDesc, 0, sizeof(cudaResourceDesc));

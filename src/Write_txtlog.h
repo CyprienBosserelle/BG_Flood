@@ -9,6 +9,6 @@ void log(std::string text);
 void create_logfile();
 void write_text_to_log_file(std::string text);
 void SaveParamtolog(Param XParam);
-
+void saveparam2netCDF(int ncid, int bgfid, Param XParam);
 // End of global definition
 #endif

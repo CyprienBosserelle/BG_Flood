@@ -29,6 +29,7 @@ template <class T> __host__ __device__ T minmod2(T theta, T s0, T s1, T s2);
 
 template <class T> __host__  __device__  bool OBBdetect(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax);
 
+template <class T> __host__ __device__ T signof(T a);
 
 template <class T> int ftoi(T value);
 // End of global definition

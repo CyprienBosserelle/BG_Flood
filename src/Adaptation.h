@@ -13,6 +13,7 @@
 #include "InitialConditions.h"
 #include "Testing.h"
 
+
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel);
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel);
 template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock, bool*& refine, bool*& coarsen);
