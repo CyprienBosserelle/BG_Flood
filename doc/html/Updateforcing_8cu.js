@@ -1,7 +1,7 @@
 var Updateforcing_8cu =
 [
-    [ "AddDeformCPU", "Updateforcing_8cu.html#a097cc7899b0e1a9625fe181f28b04a4a", null ],
-    [ "AddDeformGPU", "Updateforcing_8cu.html#af459e9fbf88eca601d6305ba672ab07c", null ],
+    [ "AddDeformCPU", "Updateforcing_8cu.html#a440e1fe521d891fe63267290cd1739fb", null ],
+    [ "AddDeformGPU", "Updateforcing_8cu.html#ad60e7a01a4d6518f40023a51b1e5d96a", null ],
     [ "AddinfiltrationImplicitCPU", "Updateforcing_8cu.html#ad13e319a421a8ddb774a162050b0c1d1", null ],
     [ "AddinfiltrationImplicitCPU< double >", "Updateforcing_8cu.html#a68de01b6ced158bbbf77084b9241dbfd", null ],
     [ "AddinfiltrationImplicitCPU< float >", "Updateforcing_8cu.html#aacdd085344c119ee3b29278ae5dc6c87", null ],
@@ -39,7 +39,8 @@ var Updateforcing_8cu =
     [ "deformstep", "Updateforcing_8cu.html#af4611c0475dad4b01cfc5dba1ad82c82", null ],
     [ "deformstep< double >", "Updateforcing_8cu.html#a91774c40fbff21eb06f6cdad0523f7f3", null ],
     [ "deformstep< float >", "Updateforcing_8cu.html#ab31beccb5921ab182ac24d65128e5c04", null ],
-    [ "Forcingthisstep", "Updateforcing_8cu.html#acc3a8335e222afc5a35dfe3075cb79cb", null ],
+    [ "Forcingthisstep", "Updateforcing_8cu.html#a3e39c9d702154fb36bfd0e673598dc0c", null ],
+    [ "InjectManyRiversGPU", "Updateforcing_8cu.html#afc306f0d9a9b89d92d9957d0ab25601a", null ],
     [ "InjectRiverCPU", "Updateforcing_8cu.html#a9ea906ec1361134319212670574ba18c", null ],
     [ "InjectRiverCPU< double >", "Updateforcing_8cu.html#ad86e6061c902d45cec22f62942d2ea33", null ],
     [ "InjectRiverCPU< float >", "Updateforcing_8cu.html#a0756780865a0176e5a5f95c89d415c48", null ],

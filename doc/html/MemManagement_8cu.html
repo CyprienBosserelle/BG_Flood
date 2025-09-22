@@ -94,6 +94,7 @@ $(document).ready(function(){initNavTree('MemManagement_8cu.html',''); initResiz
 
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">MemManagement.cu File Reference</div>  </div>
@@ -106,6 +107,13 @@ Include dependency graph for MemManagement.cu:</div>
 <div class="center"><img src="MemManagement_8cu__incl.png" border="0" usemap="#asrc_2MemManagement_8cu" alt=""/></div>
 </div>
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a184e592fc29c13eab20979a5e4f785a3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a184e592fc29c13eab20979a5e4f785a3">MEMORY_ALIGNMENT</a>&#160;&#160;&#160;4096</td></tr>
+<tr class="separator:a184e592fc29c13eab20979a5e4f785a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70a5b82465a54d9130ba59c31dd105e6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a70a5b82465a54d9130ba59c31dd105e6">ALIGN_UP</a>(x,  size)&#160;&#160;&#160;( ((size_t)x+(size-1))&amp;(~(size-1)) )</td></tr>
+<tr class="separator:a70a5b82465a54d9130ba59c31dd105e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ad0ad7b983948a031a40f89c1369a91bf"><td class="memItemLeft" align="right" valign="top">__host__ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#ad0ad7b983948a031a40f89c1369a91bf">memloc</a> (<a class="el" href="classParam.html">Param</a> XParam, int i, int j, int ib)</td></tr>
@@ -115,6 +123,15 @@ Functions</h2></td></tr>
 <tr class="memitem:af5b2613b6a0140cdb9295b7dd5dabc4e"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:af5b2613b6a0140cdb9295b7dd5dabc4e"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#af5b2613b6a0140cdb9295b7dd5dabc4e">AllocateCPU</a> (int nx, int ny, T *&amp;zb)</td></tr>
 <tr class="separator:af5b2613b6a0140cdb9295b7dd5dabc4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70ae6bcde329ae664862262415cddd1c"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a70ae6bcde329ae664862262415cddd1c"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a70ae6bcde329ae664862262415cddd1c">FillCPU</a> (int nx, int ny, T fillval, T *&amp;zb)</td></tr>
+<tr class="separator:a70ae6bcde329ae664862262415cddd1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca49cc69255b1cab045d797e0bf0d2c4"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#aca49cc69255b1cab045d797e0bf0d2c4">FillCPU&lt; double &gt;</a> (int nx, int ny, double fillval, double *&amp;zb)</td></tr>
+<tr class="separator:aca49cc69255b1cab045d797e0bf0d2c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97df775c85d85a11bc6dabd406d99697"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a97df775c85d85a11bc6dabd406d99697">FillCPU&lt; float &gt;</a> (int nx, int ny, float fillval, float *&amp;zb)</td></tr>
+<tr class="separator:a97df775c85d85a11bc6dabd406d99697"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a737618a8c15e9a568b209685c8d07cd0"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a737618a8c15e9a568b209685c8d07cd0">FillCPU&lt; int &gt;</a> (int nx, int ny, int fillval, int *&amp;zb)</td></tr>
+<tr class="separator:a737618a8c15e9a568b209685c8d07cd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2e88d8dc0428143936352be4b6b4938"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:ac2e88d8dc0428143936352be4b6b4938"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#ac2e88d8dc0428143936352be4b6b4938">AllocateCPU</a> (int nx, int ny, T *&amp;zs, T *&amp;h, T *&amp;u, T *&amp;v)</td></tr>
 <tr class="separator:ac2e88d8dc0428143936352be4b6b4938"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,6 +212,24 @@ Functions</h2></td></tr>
 <tr class="separator:a632f700b36214e83801e7fa1b9d79f6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6788d01685d9924661db11af337221ac"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a6788d01685d9924661db11af337221ac">ReallocArray&lt; double &gt;</a> (int nblk, int blksize, <a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structModel.html">Model</a>&lt; double &gt; &amp;XModel)</td></tr>
 <tr class="separator:a6788d01685d9924661db11af337221ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2938410b899f5f7687c22997655d9588"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a2938410b899f5f7687c22997655d9588"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a2938410b899f5f7687c22997655d9588">AllocateMappedMemCPU</a> (int nx, int ny, int gpudevice, T *&amp;z)</td></tr>
+<tr class="separator:a2938410b899f5f7687c22997655d9588"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9274da31f5e21b5115857e51a4373525"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a9274da31f5e21b5115857e51a4373525">AllocateMappedMemCPU&lt; int &gt;</a> (int nx, int ny, int gpudevice, int *&amp;z)</td></tr>
+<tr class="separator:a9274da31f5e21b5115857e51a4373525"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad05f7c42136832b8817689fc2c78f71b"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#ad05f7c42136832b8817689fc2c78f71b">AllocateMappedMemCPU&lt; float &gt;</a> (int nx, int ny, int gpudevice, float *&amp;z)</td></tr>
+<tr class="separator:ad05f7c42136832b8817689fc2c78f71b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd8fa816afa44285df53c35287f558af"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#acd8fa816afa44285df53c35287f558af">AllocateMappedMemCPU&lt; double &gt;</a> (int nx, int ny, int gpudevice, double *&amp;z)</td></tr>
+<tr class="separator:acd8fa816afa44285df53c35287f558af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc411d9ef22e532d0831749971681f92"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:adc411d9ef22e532d0831749971681f92"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#adc411d9ef22e532d0831749971681f92">AllocateMappedMemGPU</a> (int nx, int ny, int gpudevice, T *&amp;z_g, T *z)</td></tr>
+<tr class="separator:adc411d9ef22e532d0831749971681f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6d234865808a4520aa0d700134d2c48"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#ad6d234865808a4520aa0d700134d2c48">AllocateMappedMemGPU&lt; int &gt;</a> (int nx, int ny, int gpudevice, int *&amp;z_g, int *z)</td></tr>
+<tr class="separator:ad6d234865808a4520aa0d700134d2c48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b2c48797d2969537b16ca0919f90b8f"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a2b2c48797d2969537b16ca0919f90b8f">AllocateMappedMemGPU&lt; float &gt;</a> (int nx, int ny, int gpudevice, float *&amp;z_g, float *z)</td></tr>
+<tr class="separator:a2b2c48797d2969537b16ca0919f90b8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb34483dc4606b93d5cfb953e3d8340a"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#acb34483dc4606b93d5cfb953e3d8340a">AllocateMappedMemGPU&lt; double &gt;</a> (int nx, int ny, int gpudevice, double *&amp;z_g, double *z)</td></tr>
+<tr class="separator:acb34483dc4606b93d5cfb953e3d8340a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e573ee5a85dfe633828db07d46440fb"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a1e573ee5a85dfe633828db07d46440fb"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#a1e573ee5a85dfe633828db07d46440fb">AllocateGPU</a> (int nx, int ny, T *&amp;z_g)</td></tr>
 <tr class="separator:a1e573ee5a85dfe633828db07d46440fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -237,6 +272,49 @@ Functions</h2></td></tr>
 <tr class="memitem:affc8bab4b4aae4e524cd18567e47a1b7"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MemManagement_8cu.html#affc8bab4b4aae4e524cd18567e47a1b7">AllocateGPU&lt; double &gt;</a> (int nblk, int blksize, <a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structModel.html">Model</a>&lt; double &gt; &amp;XModel)</td></tr>
 <tr class="separator:affc8bab4b4aae4e524cd18567e47a1b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a70a5b82465a54d9130ba59c31dd105e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70a5b82465a54d9130ba59c31dd105e6">&#9670;&nbsp;</a></span>ALIGN_UP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ALIGN_UP</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">size&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;( ((size_t)x+(size-1))&amp;(~(size-1)) )</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a184e592fc29c13eab20979a5e4f785a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a184e592fc29c13eab20979a5e4f785a3">&#9670;&nbsp;</a></span>MEMORY_ALIGNMENT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MEMORY_ALIGNMENT&#160;&#160;&#160;4096</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ac85c44d5aefda185f362a5f3ec194df6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac85c44d5aefda185f362a5f3ec194df6">&#9670;&nbsp;</a></span>AllocateCPU() <span class="overload">[1/7]</span></h2>
@@ -1842,6 +1920,516 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a2938410b899f5f7687c22997655d9588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2938410b899f5f7687c22997655d9588">&#9670;&nbsp;</a></span>AllocateMappedMemCPU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void AllocateMappedMemCPU </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&amp;&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acd8fa816afa44285df53c35287f558af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd8fa816afa44285df53c35287f558af">&#9670;&nbsp;</a></span>AllocateMappedMemCPU&lt; double &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#a2938410b899f5f7687c22997655d9588">AllocateMappedMemCPU</a>&lt; double &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&amp;&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad05f7c42136832b8817689fc2c78f71b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad05f7c42136832b8817689fc2c78f71b">&#9670;&nbsp;</a></span>AllocateMappedMemCPU&lt; float &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#a2938410b899f5f7687c22997655d9588">AllocateMappedMemCPU</a>&lt; float &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&amp;&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9274da31f5e21b5115857e51a4373525"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9274da31f5e21b5115857e51a4373525">&#9670;&nbsp;</a></span>AllocateMappedMemCPU&lt; int &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#a2938410b899f5f7687c22997655d9588">AllocateMappedMemCPU</a>&lt; int &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&amp;&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adc411d9ef22e532d0831749971681f92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc411d9ef22e532d0831749971681f92">&#9670;&nbsp;</a></span>AllocateMappedMemGPU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void AllocateMappedMemGPU </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&amp;&#160;</td>
+          <td class="paramname"><em>z_g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb34483dc4606b93d5cfb953e3d8340a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb34483dc4606b93d5cfb953e3d8340a">&#9670;&nbsp;</a></span>AllocateMappedMemGPU&lt; double &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#adc411d9ef22e532d0831749971681f92">AllocateMappedMemGPU</a>&lt; double &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&amp;&#160;</td>
+          <td class="paramname"><em>z_g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2b2c48797d2969537b16ca0919f90b8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b2c48797d2969537b16ca0919f90b8f">&#9670;&nbsp;</a></span>AllocateMappedMemGPU&lt; float &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#adc411d9ef22e532d0831749971681f92">AllocateMappedMemGPU</a>&lt; float &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&amp;&#160;</td>
+          <td class="paramname"><em>z_g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad6d234865808a4520aa0d700134d2c48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6d234865808a4520aa0d700134d2c48">&#9670;&nbsp;</a></span>AllocateMappedMemGPU&lt; int &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#adc411d9ef22e532d0831749971681f92">AllocateMappedMemGPU</a>&lt; int &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpudevice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&amp;&#160;</td>
+          <td class="paramname"><em>z_g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a70ae6bcde329ae664862262415cddd1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70ae6bcde329ae664862262415cddd1c">&#9670;&nbsp;</a></span>FillCPU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__host__ void FillCPU </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>fillval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&amp;&#160;</td>
+          <td class="paramname"><em>zb</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aca49cc69255b1cab045d797e0bf0d2c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca49cc69255b1cab045d797e0bf0d2c4">&#9670;&nbsp;</a></span>FillCPU&lt; double &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#a70ae6bcde329ae664862262415cddd1c">FillCPU</a>&lt; double &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>fillval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&amp;&#160;</td>
+          <td class="paramname"><em>zb</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a97df775c85d85a11bc6dabd406d99697"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97df775c85d85a11bc6dabd406d99697">&#9670;&nbsp;</a></span>FillCPU&lt; float &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#a70ae6bcde329ae664862262415cddd1c">FillCPU</a>&lt; float &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>fillval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&amp;&#160;</td>
+          <td class="paramname"><em>zb</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a737618a8c15e9a568b209685c8d07cd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a737618a8c15e9a568b209685c8d07cd0">&#9670;&nbsp;</a></span>FillCPU&lt; int &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">template void <a class="el" href="MemManagement_8h.html#a70ae6bcde329ae664862262415cddd1c">FillCPU</a>&lt; int &gt; </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fillval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&amp;&#160;</td>
+          <td class="paramname"><em>zb</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a07fddb78af39693b50b36905f15b18ef"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a07fddb78af39693b50b36905f15b18ef">&#9670;&nbsp;</a></span>memloc() <span class="overload">[1/2]</span></h2>
 
@@ -2768,7 +3356,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="MemManagement_8cu.html">MemManagement.cu</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

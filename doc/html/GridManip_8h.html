@@ -153,9 +153,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a242cf7787fb7c176e5a784ddfb3aea7e"><td class="memTemplParams" colspan="2">template&lt;class T , class F &gt; </td></tr>
 <tr class="memitem:a242cf7787fb7c176e5a784ddfb3aea7e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="GridManip_8h.html#a242cf7787fb7c176e5a784ddfb3aea7e">InterpstepCPU</a> (int nx, int ny, int hdstep, F totaltime, F hddt, T *&amp;Ux, T *Uo, T *Un)</td></tr>
 <tr class="separator:a242cf7787fb7c176e5a784ddfb3aea7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ab029799189d93997384b3de4edf592"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a0ab029799189d93997384b3de4edf592"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="GridManip_8h.html#a0ab029799189d93997384b3de4edf592">InterpstepGPU</a> (int nx, int ny, int hdstp, T totaltime, T hddt, T *Ux, T *Uo, T *Un)</td></tr>
-<tr class="separator:a0ab029799189d93997384b3de4edf592"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7ab41e494c64dd0a64e7e3305406d5c"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:aa7ab41e494c64dd0a64e7e3305406d5c"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="GridManip_8h.html#aa7ab41e494c64dd0a64e7e3305406d5c">InterpstepGPU</a> (int nx, int ny, T totaltime, T beforetime, T aftertime, T *Ux, T *Uo, T *Un)</td></tr>
+<tr class="separator:aa7ab41e494c64dd0a64e7e3305406d5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a152ff9652c67512fa8d890a539ffc4ec"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a152ff9652c67512fa8d890a539ffc4ec"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="GridManip_8h.html#a152ff9652c67512fa8d890a539ffc4ec">Copy2CartCPU</a> (int nx, int ny, T *dest, T *src)</td></tr>
 <tr class="separator:a152ff9652c67512fa8d890a539ffc4ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -641,8 +641,8 @@ template&lt;class T , class F &gt; </div>
 
 </div>
 </div>
-<a id="a0ab029799189d93997384b3de4edf592"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ab029799189d93997384b3de4edf592">&#9670;&nbsp;</a></span>InterpstepGPU()</h2>
+<a id="aa7ab41e494c64dd0a64e7e3305406d5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7ab41e494c64dd0a64e7e3305406d5c">&#9670;&nbsp;</a></span>InterpstepGPU()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -664,12 +664,6 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>hdstp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">T&#160;</td>
           <td class="paramname"><em>totaltime</em>, </td>
         </tr>
@@ -677,7 +671,13 @@ template&lt;class T &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">T&#160;</td>
-          <td class="paramname"><em>hddt</em>, </td>
+          <td class="paramname"><em>beforetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>aftertime</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -751,7 +751,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="GridManip_8h.html">GridManip.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

@@ -38,6 +38,8 @@ double \mbox{\hyperlink{Util__CPU_8h_a24ac58842c87974b54e6c84db08ecc79}{interpti
 \item 
 {\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ bool \mbox{\hyperlink{Util__CPU_8h_a59ad6246014964c62a5bab20fe88eb98}{OBBdetect}} (T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)
 \item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Util__CPU_8h_a6fc75ebfe4c6c57350e8e2ae37f2ea71}{signof}} (T a)
+\item 
 {\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Util__CPU_8h_a597092ff46641fcd737e90426f61bdfb}{ftoi}} (T value)
 \end{DoxyCompactItemize}
 
@@ -97,4 +99,10 @@ int ftoi (\begin{DoxyParamCaption}\item[{T}]{value }\end{DoxyParamCaption})}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ bool OBBdetect (\begin{DoxyParamCaption}\item[{T}]{Axmin,  }\item[{T}]{Axmax,  }\item[{T}]{Aymin,  }\item[{T}]{Aymax,  }\item[{T}]{Bxmin,  }\item[{T}]{Bxmax,  }\item[{T}]{Bymin,  }\item[{T}]{Bymax }\end{DoxyParamCaption})}
 
-Overlaping Bounding Box to detect which cell river falls into. It is the simplest version of the algorythm where the bounding box are paralle;l to the axis 
+Overlaping Bounding Box to detect which cell river falls into. It is the simplest version of the algorythm where the bounding box are paralle;l to the axis \mbox{\Hypertarget{Util__CPU_8h_a6fc75ebfe4c6c57350e8e2ae37f2ea71}\label{Util__CPU_8h_a6fc75ebfe4c6c57350e8e2ae37f2ea71}} 
+\index{Util\_CPU.h@{Util\_CPU.h}!signof@{signof}}
+\index{signof@{signof}!Util\_CPU.h@{Util\_CPU.h}}
+\doxysubsubsection{\texorpdfstring{signof()}{signof()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T signof (\begin{DoxyParamCaption}\item[{T}]{a }\end{DoxyParamCaption})}
+

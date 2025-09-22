@@ -5,6 +5,9 @@
 {\ttfamily \#include \char`\"{}Write\+\_\+txtlog.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utctime.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Input.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Read\+Forcing.\+h\char`\"{}}\newline
 Include dependency graph for Read\+Input.\+h\+:
 % FIG 0
 This graph shows which files directly or indirectly include this file\+:
@@ -32,13 +35,35 @@ void \mbox{\hyperlink{ReadInput_8h_a7fdeaad11fab6949d565928655753fe8}{split}} (c
 \item 
 std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{ReadInput_8h_ae924c9b43cd7b086945003c09c294d2b}{split}} (const std\+::string \&s, char delim)
 \item 
+void \mbox{\hyperlink{ReadInput_8h_a3bb2a577745ebc9687192e9ffe232805}{split\+\_\+full}} (const std\+::string \&s, char delim, std\+::vector$<$ std\+::string $>$ \&elems)
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{ReadInput_8h_a556ddb170d6a9354da5e26c052f23e42}{split\+\_\+full}} (const std\+::string \&s, char delim)
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{ReadInput_8h_adb275b1a4a7b5893f7ebf1a03aa55e97}{split}} (const std\+::string s, const std\+::string delim)
+\item 
 std\+::string \mbox{\hyperlink{ReadInput_8h_a61bb9a4530ff40c81495172a56719e36}{trim}} (const std\+::string \&str, const std\+::string \&whitespace)
 \item 
 std\+::size\+\_\+t \mbox{\hyperlink{ReadInput_8h_aa1d5d87b815650c5b765af942c77f93e}{case\+\_\+insensitive\+\_\+compare}} (std\+::string s1, std\+::string s2)
 \item 
 std\+::size\+\_\+t \mbox{\hyperlink{ReadInput_8h_a56048a1bd60d79cb6a8dca48c33ce51f}{case\+\_\+insensitive\+\_\+compare}} (std\+::string s1, std\+::vector$<$ std\+::string $>$ vecstr)
 \item 
-\mbox{\hyperlink{classbndparam}{bndparam}} \mbox{\hyperlink{ReadInput_8h_ad67149d5fe06b044690f5def4a865b37}{readbndline}} (std\+::string parametervalue)
+bool \mbox{\hyperlink{ReadInput_8h_a769a0adefc87a67894d130f070e87a2c}{readparambool}} (std\+::string paramstr, bool defaultval)
+\item 
+void \mbox{\hyperlink{ReadInput_8h_ad04a1b1a00d15ecabb4c70df90f33b18}{Initialise\+Toutput}} (\mbox{\hyperlink{classT__output}{T\+\_\+output}} \&Toutput, \mbox{\hyperlink{classParam}{Param}} XParam)
+\item 
+\mbox{\hyperlink{classbndsegment}{bndsegment}} \mbox{\hyperlink{ReadInput_8h_a85689aa928d7756ee19d30e163a334f1}{readbndline}} (std\+::string parametervalue)
+\item 
+\mbox{\hyperlink{classbndsegment}{bndsegment}} \mbox{\hyperlink{ReadInput_8h_a8251ca5f794b80f4fddf1159688f99e3}{readbndlineside}} (std\+::string parametervalue, std\+::string side)
+\item 
+std\+::vector$<$ double $>$ \mbox{\hyperlink{ReadInput_8h_a0d9a0edec5d7a459568fb7f42bf3c074}{Read\+Toutput}} (std\+::vector$<$ std\+::string $>$ paramstr, \mbox{\hyperlink{classParam}{Param}} XParam)
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{ReadInput_8h_a2021584a63514a3a55998b8b6df80687}{Read\+Tout\+STR}} (std\+::string paramstr)
+\item 
+double \mbox{\hyperlink{ReadInput_8h_a446b06623deadaba4e4569c0ca0df865}{Read\+Tvalstr}} (std\+::string timestr, double start, double end, std\+::string reftime)
+\item 
+std\+::vector$<$ double $>$ \mbox{\hyperlink{ReadInput_8h_a3110d762f42545a998ff33c99a39461d}{Read\+TRangestr}} (std\+::vector$<$ std\+::string $>$ timestr, double start, double end, std\+::string reftime)
+\item 
+double \mbox{\hyperlink{ReadInput_8h_a6815c049735d6d8a741ef3c2fa257f23}{read\+Approxtimestr}} (std\+::string input)
 \end{DoxyCompactItemize}
 
 
@@ -73,11 +98,29 @@ separate parameter from value \mbox{\Hypertarget{ReadInput_8h_a83b6362c0cf581af5
 \doxysubsubsection{\texorpdfstring{findparameter()}{findparameter()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
 {\footnotesize\ttfamily std\+::string findparameter (\begin{DoxyParamCaption}\item[{std\+::vector$<$ std\+::string $>$}]{parameterstr,  }\item[{std\+::string}]{line }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{ReadInput_8h_ad67149d5fe06b044690f5def4a865b37}\label{ReadInput_8h_ad67149d5fe06b044690f5def4a865b37}} 
+\mbox{\Hypertarget{ReadInput_8h_ad04a1b1a00d15ecabb4c70df90f33b18}\label{ReadInput_8h_ad04a1b1a00d15ecabb4c70df90f33b18}} 
+\index{ReadInput.h@{ReadInput.h}!InitialiseToutput@{InitialiseToutput}}
+\index{InitialiseToutput@{InitialiseToutput}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{InitialiseToutput()}{InitialiseToutput()}}
+{\footnotesize\ttfamily void Initialise\+Toutput (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classT__output}{T\+\_\+output}} \&}]{Toutput,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a6815c049735d6d8a741ef3c2fa257f23}\label{ReadInput_8h_a6815c049735d6d8a741ef3c2fa257f23}} 
+\index{ReadInput.h@{ReadInput.h}!readApproxtimestr@{readApproxtimestr}}
+\index{readApproxtimestr@{readApproxtimestr}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{readApproxtimestr()}{readApproxtimestr()}}
+{\footnotesize\ttfamily double read\+Approxtimestr (\begin{DoxyParamCaption}\item[{std\+::string}]{input }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a85689aa928d7756ee19d30e163a334f1}\label{ReadInput_8h_a85689aa928d7756ee19d30e163a334f1}} 
 \index{ReadInput.h@{ReadInput.h}!readbndline@{readbndline}}
 \index{readbndline@{readbndline}!ReadInput.h@{ReadInput.h}}
 \doxysubsubsection{\texorpdfstring{readbndline()}{readbndline()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{classbndparam}{bndparam}} readbndline (\begin{DoxyParamCaption}\item[{std\+::string}]{parametervalue }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbndsegment}{bndsegment}} readbndline (\begin{DoxyParamCaption}\item[{std\+::string}]{parametervalue }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a8251ca5f794b80f4fddf1159688f99e3}\label{ReadInput_8h_a8251ca5f794b80f4fddf1159688f99e3}} 
+\index{ReadInput.h@{ReadInput.h}!readbndlineside@{readbndlineside}}
+\index{readbndlineside@{readbndlineside}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{readbndlineside()}{readbndlineside()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbndsegment}{bndsegment}} readbndlineside (\begin{DoxyParamCaption}\item[{std\+::string}]{parametervalue,  }\item[{std\+::string}]{side }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{ReadInput_8h_a4fd3d44799253e60792d8adf2c54a601}\label{ReadInput_8h_a4fd3d44799253e60792d8adf2c54a601}} 
 \index{ReadInput.h@{ReadInput.h}!readfileinfo@{readfileinfo}}
@@ -88,7 +131,13 @@ T readfileinfo (\begin{DoxyParamCaption}\item[{std\+::string}]{input,  }\item[{T
 
 convert file name into name and extension This is used for various input classes
 
-template inputmap \mbox{\hyperlink{ReadInput_8cu_a153d4f5d0a4587b308bff17625446006}{readfileinfo$<$inputmap$>$(std\+::string input, inputmap outinfo)}}; template forcingmap \mbox{\hyperlink{ReadInput_8cu_a800949fe783932e10b64846cc960df44}{readfileinfo$<$forcingmap$>$(std\+::string input, forcingmap outinfo)}}; template Static\+Forcing\+P$<$float$>$ readfileinfo$<$Static\+Forcing\+P$<$float$>$$>$(std\+::string input, Static\+Forcing\+P$<$float$>$ outinfo); template Dyn\+Forcing\+P$<$float$>$ readfileinfo$<$Dyn\+Forcing\+P$<$float$>$$>$(std\+::string input, Dyn\+Forcing\+P$<$float$>$ outinfo); template deformmap$<$float$>$ readfileinfo$<$deformmap$<$float$>$$>$(std\+::string input, deformmap$<$float$>$ outinfo); \mbox{\Hypertarget{ReadInput_8h_af8275cea8c05e6da8e4b0e5d32881e3e}\label{ReadInput_8h_af8275cea8c05e6da8e4b0e5d32881e3e}} 
+template inputmap \mbox{\hyperlink{ReadInput_8cu_a153d4f5d0a4587b308bff17625446006}{readfileinfo$<$inputmap$>$(std\+::string input, inputmap outinfo)}}; template forcingmap \mbox{\hyperlink{ReadInput_8cu_a800949fe783932e10b64846cc960df44}{readfileinfo$<$forcingmap$>$(std\+::string input, forcingmap outinfo)}}; template Static\+Forcing\+P$<$float$>$ readfileinfo$<$Static\+Forcing\+P$<$float$>$$>$(std\+::string input, Static\+Forcing\+P$<$float$>$ outinfo); template \mbox{\hyperlink{structDynForcingP}{Dyn\+Forcing\+P$<$float$>$}} readfileinfo$<$\mbox{\hyperlink{structDynForcingP}{Dyn\+Forcing\+P$<$float$>$}}$>$(std\+::string input, \mbox{\hyperlink{structDynForcingP}{Dyn\+Forcing\+P$<$float$>$}} outinfo); template deformmap$<$float$>$ readfileinfo$<$deformmap$<$float$>$$>$(std\+::string input, deformmap$<$float$>$ outinfo); \mbox{\Hypertarget{ReadInput_8h_a769a0adefc87a67894d130f070e87a2c}\label{ReadInput_8h_a769a0adefc87a67894d130f070e87a2c}} 
+\index{ReadInput.h@{ReadInput.h}!readparambool@{readparambool}}
+\index{readparambool@{readparambool}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{readparambool()}{readparambool()}}
+{\footnotesize\ttfamily bool readparambool (\begin{DoxyParamCaption}\item[{std\+::string}]{paramstr,  }\item[{bool}]{defaultval }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_af8275cea8c05e6da8e4b0e5d32881e3e}\label{ReadInput_8h_af8275cea8c05e6da8e4b0e5d32881e3e}} 
 \index{ReadInput.h@{ReadInput.h}!Readparamfile@{Readparamfile}}
 \index{Readparamfile@{Readparamfile}!ReadInput.h@{ReadInput.h}}
 \doxysubsubsection{\texorpdfstring{Readparamfile()}{Readparamfile()}}
@@ -107,7 +156,31 @@ Read BG\+\_\+param.\+txt line and convert parameter to the righ parameter in the
 \doxysubsubsection{\texorpdfstring{readparamstr()}{readparamstr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
 {\footnotesize\ttfamily \mbox{\hyperlink{classParam}{Param}} readparamstr (\begin{DoxyParamCaption}\item[{std\+::string}]{line,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{param }\end{DoxyParamCaption})}
 
-Read BG\+\_\+param.\+txt line and convert parameter to the righ parameter in the class retrun an updated \mbox{\hyperlink{classParam}{Param}} class \mbox{\Hypertarget{ReadInput_8h_a16f53b241a2b708361e002670df091e6}\label{ReadInput_8h_a16f53b241a2b708361e002670df091e6}} 
+Read BG\+\_\+param.\+txt line and convert parameter to the righ parameter in the class retrun an updated \mbox{\hyperlink{classParam}{Param}} class \mbox{\Hypertarget{ReadInput_8h_a0d9a0edec5d7a459568fb7f42bf3c074}\label{ReadInput_8h_a0d9a0edec5d7a459568fb7f42bf3c074}} 
+\index{ReadInput.h@{ReadInput.h}!ReadToutput@{ReadToutput}}
+\index{ReadToutput@{ReadToutput}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{ReadToutput()}{ReadToutput()}}
+{\footnotesize\ttfamily std\+::vector$<$double$>$ Read\+Toutput (\begin{DoxyParamCaption}\item[{std\+::vector$<$ std\+::string $>$}]{paramstr,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a2021584a63514a3a55998b8b6df80687}\label{ReadInput_8h_a2021584a63514a3a55998b8b6df80687}} 
+\index{ReadInput.h@{ReadInput.h}!ReadToutSTR@{ReadToutSTR}}
+\index{ReadToutSTR@{ReadToutSTR}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{ReadToutSTR()}{ReadToutSTR()}}
+{\footnotesize\ttfamily std\+::vector$<$std\+::string$>$ Read\+Tout\+STR (\begin{DoxyParamCaption}\item[{std\+::string}]{paramstr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a3110d762f42545a998ff33c99a39461d}\label{ReadInput_8h_a3110d762f42545a998ff33c99a39461d}} 
+\index{ReadInput.h@{ReadInput.h}!ReadTRangestr@{ReadTRangestr}}
+\index{ReadTRangestr@{ReadTRangestr}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{ReadTRangestr()}{ReadTRangestr()}}
+{\footnotesize\ttfamily std\+::vector$<$double$>$ Read\+TRangestr (\begin{DoxyParamCaption}\item[{std\+::vector$<$ std\+::string $>$}]{timestr,  }\item[{double}]{start,  }\item[{double}]{end,  }\item[{std\+::string}]{reftime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a446b06623deadaba4e4569c0ca0df865}\label{ReadInput_8h_a446b06623deadaba4e4569c0ca0df865}} 
+\index{ReadInput.h@{ReadInput.h}!ReadTvalstr@{ReadTvalstr}}
+\index{ReadTvalstr@{ReadTvalstr}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{ReadTvalstr()}{ReadTvalstr()}}
+{\footnotesize\ttfamily double Read\+Tvalstr (\begin{DoxyParamCaption}\item[{std\+::string}]{timestr,  }\item[{double}]{start,  }\item[{double}]{end,  }\item[{std\+::string}]{reftime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a16f53b241a2b708361e002670df091e6}\label{ReadInput_8h_a16f53b241a2b708361e002670df091e6}} 
 \index{ReadInput.h@{ReadInput.h}!setendtime@{setendtime}}
 \index{setendtime@{setendtime}!ReadInput.h@{ReadInput.h}}
 \doxysubsubsection{\texorpdfstring{setendtime()}{setendtime()}}
@@ -116,16 +189,34 @@ Read BG\+\_\+param.\+txt line and convert parameter to the righ parameter in the
 Calculate/modify endtime based on maximum time in forcing \mbox{\Hypertarget{ReadInput_8h_ae924c9b43cd7b086945003c09c294d2b}\label{ReadInput_8h_ae924c9b43cd7b086945003c09c294d2b}} 
 \index{ReadInput.h@{ReadInput.h}!split@{split}}
 \index{split@{split}!ReadInput.h@{ReadInput.h}}
-\doxysubsubsection{\texorpdfstring{split()}{split()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+\doxysubsubsection{\texorpdfstring{split()}{split()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
 {\footnotesize\ttfamily std\+::vector$<$std\+::string$>$ split (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s,  }\item[{char}]{delim }\end{DoxyParamCaption})}
 
 split string based in character \mbox{\Hypertarget{ReadInput_8h_a7fdeaad11fab6949d565928655753fe8}\label{ReadInput_8h_a7fdeaad11fab6949d565928655753fe8}} 
 \index{ReadInput.h@{ReadInput.h}!split@{split}}
 \index{split@{split}!ReadInput.h@{ReadInput.h}}
-\doxysubsubsection{\texorpdfstring{split()}{split()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+\doxysubsubsection{\texorpdfstring{split()}{split()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
 {\footnotesize\ttfamily void split (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s,  }\item[{char}]{delim,  }\item[{std\+::vector$<$ std\+::string $>$ \&}]{elems }\end{DoxyParamCaption})}
 
-split string based in character \mbox{\Hypertarget{ReadInput_8h_a61bb9a4530ff40c81495172a56719e36}\label{ReadInput_8h_a61bb9a4530ff40c81495172a56719e36}} 
+split string based in character \mbox{\Hypertarget{ReadInput_8h_adb275b1a4a7b5893f7ebf1a03aa55e97}\label{ReadInput_8h_adb275b1a4a7b5893f7ebf1a03aa55e97}} 
+\index{ReadInput.h@{ReadInput.h}!split@{split}}
+\index{split@{split}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{split()}{split()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily std\+::vector$<$std\+::string$>$ split (\begin{DoxyParamCaption}\item[{const std\+::string}]{s,  }\item[{const std\+::string}]{delim }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadInput_8h_a556ddb170d6a9354da5e26c052f23e42}\label{ReadInput_8h_a556ddb170d6a9354da5e26c052f23e42}} 
+\index{ReadInput.h@{ReadInput.h}!split\_full@{split\_full}}
+\index{split\_full@{split\_full}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{split\_full()}{split\_full()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::vector$<$std\+::string$>$ split\+\_\+full (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s,  }\item[{char}]{delim }\end{DoxyParamCaption})}
+
+split string based in character, conserving empty items \mbox{\Hypertarget{ReadInput_8h_a3bb2a577745ebc9687192e9ffe232805}\label{ReadInput_8h_a3bb2a577745ebc9687192e9ffe232805}} 
+\index{ReadInput.h@{ReadInput.h}!split\_full@{split\_full}}
+\index{split\_full@{split\_full}!ReadInput.h@{ReadInput.h}}
+\doxysubsubsection{\texorpdfstring{split\_full()}{split\_full()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void split\+\_\+full (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{s,  }\item[{char}]{delim,  }\item[{std\+::vector$<$ std\+::string $>$ \&}]{elems }\end{DoxyParamCaption})}
+
+split string based in character, conserving empty item \mbox{\Hypertarget{ReadInput_8h_a61bb9a4530ff40c81495172a56719e36}\label{ReadInput_8h_a61bb9a4530ff40c81495172a56719e36}} 
 \index{ReadInput.h@{ReadInput.h}!trim@{trim}}
 \index{trim@{trim}!ReadInput.h@{ReadInput.h}}
 \doxysubsubsection{\texorpdfstring{trim()}{trim()}}

@@ -102,6 +102,7 @@ $(document).ready(function(){initNavTree('Boundary_8h.html',''); initResizable()
 <div class="textblock"><code>#include &quot;<a class="el" href="General_8h_source.html">General.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="MemManagement_8h_source.html">MemManagement.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Util__CPU_8h_source.html">Util_CPU.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Updateforcing_8h_source.html">Updateforcing.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Boundary.h:</div>
 <div class="dyncontent">
@@ -117,9 +118,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac17e657eb1ba981e7b5661c3997692ed"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:ac17e657eb1ba981e7b5661c3997692ed"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#ac17e657eb1ba981e7b5661c3997692ed">Flowbnd</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; T &gt; &amp;XLoop, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classbndparam.html">bndparam</a> side, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; XEv)</td></tr>
-<tr class="separator:ac17e657eb1ba981e7b5661c3997692ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1070c3a02b0f106ebfba5aebebe8425d"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a1070c3a02b0f106ebfba5aebebe8425d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a1070c3a02b0f106ebfba5aebebe8425d">Flowbnd</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; T &gt; &amp;XLoop, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classbndparam.html">bndparam</a> side, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Atmp, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; XEv)</td></tr>
+<tr class="separator:a1070c3a02b0f106ebfba5aebebe8425d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59cbed77b10dbaf2fa1c4261631b78c5"><td class="memItemLeft" align="right" valign="top">__host__ __device__ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a59cbed77b10dbaf2fa1c4261631b78c5">Inside</a> (int halowidth, int blkmemwidth, int isright, int istop, int ix, int iy, int ib)</td></tr>
 <tr class="separator:a59cbed77b10dbaf2fa1c4261631b78c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a099d9eb334ae46f6467552a50596a196"><td class="memItemLeft" align="right" valign="top">__host__ __device__ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a099d9eb334ae46f6467552a50596a196">isbnd</a> (int isright, int istop, int blkwidth, int ix, int iy)</td></tr>
@@ -139,9 +140,36 @@ Functions</h2></td></tr>
 <tr class="memitem:a91a99b6f920543db1cdd58ed166eab2c"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a91a99b6f920543db1cdd58ed166eab2c"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a91a99b6f920543db1cdd58ed166eab2c">maskbndGPUbot</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; Xev, T *zb)</td></tr>
 <tr class="separator:a91a99b6f920543db1cdd58ed166eab2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5da9c2cb6774461d8f6de7cafd105ed6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a5da9c2cb6774461d8f6de7cafd105ed6"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a5da9c2cb6774461d8f6de7cafd105ed6">bndGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="classbndparam.html">bndparam</a> side, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, float itime, T *zs, T *h, T *un, T *ut)</td></tr>
-<tr class="separator:a5da9c2cb6774461d8f6de7cafd105ed6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a974c3e91252e6886c1577201af2d9136"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a974c3e91252e6886c1577201af2d9136"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a974c3e91252e6886c1577201af2d9136">maskbndGPUFluxleft</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; Xev, <a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt; Flux)</td></tr>
+<tr class="separator:a974c3e91252e6886c1577201af2d9136"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace0711ff24a69d91c4b3475d956f80b7"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ace0711ff24a69d91c4b3475d956f80b7"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#ace0711ff24a69d91c4b3475d956f80b7">maskbndGPUFluxtop</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt; Flux)</td></tr>
+<tr class="separator:ace0711ff24a69d91c4b3475d956f80b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b98408b87883d4ddfbbbd8254ae8d7f"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a1b98408b87883d4ddfbbbd8254ae8d7f"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a1b98408b87883d4ddfbbbd8254ae8d7f">maskbndGPUFluxright</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt; Flux)</td></tr>
+<tr class="separator:a1b98408b87883d4ddfbbbd8254ae8d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad76dc3a9c37690c1c68e3ed0c8761d80"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ad76dc3a9c37690c1c68e3ed0c8761d80"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#ad76dc3a9c37690c1c68e3ed0c8761d80">maskbndGPUFluxbot</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt; Flux)</td></tr>
+<tr class="separator:ad76dc3a9c37690c1c68e3ed0c8761d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a493b3a9d491a55b39aeb7edfe53a5ef8"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a493b3a9d491a55b39aeb7edfe53a5ef8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a493b3a9d491a55b39aeb7edfe53a5ef8">FlowbndFlux</a> (<a class="el" href="classParam.html">Param</a> XParam, double totaltime, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classbndsegment.html">bndsegment</a> bndseg, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Atmp, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; XEv, <a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt; XFlux)</td></tr>
+<tr class="separator:a493b3a9d491a55b39aeb7edfe53a5ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3a143b7b4d7a10d06fd245daf0e6dd7"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ae3a143b7b4d7a10d06fd245daf0e6dd7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#ae3a143b7b4d7a10d06fd245daf0e6dd7">FlowbndFlux</a> (<a class="el" href="classParam.html">Param</a> XParam, double totaltime, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classbndparam.html">bndparam</a> side, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Atmp, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; XEv, <a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt; XFlux)</td></tr>
+<tr class="separator:ae3a143b7b4d7a10d06fd245daf0e6dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaec6c50a87ec1475242fd2636570993f"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:aaec6c50a87ec1475242fd2636570993f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#aaec6c50a87ec1475242fd2636570993f">FlowbndFluxML</a> (<a class="el" href="classParam.html">Param</a> XParam, double totaltime, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classbndsegment.html">bndsegment</a> bndseg, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Atmp, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; XEv, <a class="el" href="structFluxMLP.html">FluxMLP</a>&lt; T &gt; XFlux)</td></tr>
+<tr class="separator:aaec6c50a87ec1475242fd2636570993f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad24f377cb23e38ac40ffce632d0971d8"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ad24f377cb23e38ac40ffce632d0971d8"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#ad24f377cb23e38ac40ffce632d0971d8">bndFluxGPUSide</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="classbndsegmentside.html">bndsegmentside</a> side, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Atmp, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Zsmap, bool uniform, int type, float zsbnd, T taper, T *zs, T *h, T *un, T *ut, T *Fh, T *Fq, T *Ss)</td></tr>
+<tr class="separator:ad24f377cb23e38ac40ffce632d0971d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a994c0a68a28b55ac136fa3fd105c5db8"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a994c0a68a28b55ac136fa3fd105c5db8"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a994c0a68a28b55ac136fa3fd105c5db8">bndGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="classbndparam.html">bndparam</a> side, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Atmp, float itime, T *zs, T *h, T *un, T *ut)</td></tr>
+<tr class="separator:a994c0a68a28b55ac136fa3fd105c5db8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31da8c718f61d1febaf765248e0c73a5"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a31da8c718f61d1febaf765248e0c73a5"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a31da8c718f61d1febaf765248e0c73a5">bndCPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="classbndparam.html">bndparam</a> side, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, std::vector&lt; double &gt; zsbndvec, std::vector&lt; double &gt; uubndvec, std::vector&lt; double &gt; vvbndvec, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; Atmp, T *zs, T *h, T *un, T *ut)</td></tr>
+<tr class="separator:a31da8c718f61d1febaf765248e0c73a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad433f7b7fe383758a05a3788eeddf488"><td class="memItemLeft" align="right" valign="top">__device__ __host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#ad433f7b7fe383758a05a3788eeddf488">findmaskside</a> (int side, bool &amp;isleftbot, bool &amp;islefttop, bool &amp;istopleft, bool &amp;istopright, bool &amp;isrighttop, bool &amp;isrightbot, bool &amp;isbotright, bool &amp;isbotleft)</td></tr>
 <tr class="separator:ad433f7b7fe383758a05a3788eeddf488"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7033b2e3bb1ce6a37421d932dc2c9f6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
@@ -150,12 +178,21 @@ Functions</h2></td></tr>
 <tr class="memitem:ac038c08cc0c028bbd1495d23e5f9a1f2"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:ac038c08cc0c028bbd1495d23e5f9a1f2"><td class="memTemplItemLeft" align="right" valign="top">__device__ __host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#ac038c08cc0c028bbd1495d23e5f9a1f2">noslipbnd</a> (T zsinside, T hinside, T &amp;un, T &amp;ut, T &amp;zs, T &amp;h)</td></tr>
 <tr class="separator:ac038c08cc0c028bbd1495d23e5f9a1f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11c397504eb338755672f8c9f64862c0"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a11c397504eb338755672f8c9f64862c0"><td class="memTemplItemLeft" align="right" valign="top">__device__ __host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a11c397504eb338755672f8c9f64862c0">noslipbndQ</a> (T &amp;F, T &amp;G, T &amp;S)</td></tr>
+<tr class="separator:a11c397504eb338755672f8c9f64862c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a526a85506746cc9877baaea4ee1f84ae"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a526a85506746cc9877baaea4ee1f84ae"><td class="memTemplItemLeft" align="right" valign="top">__device__ __host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a526a85506746cc9877baaea4ee1f84ae">ABS1D</a> (T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd, T unbnd, T &amp;un, T &amp;ut, T &amp;zs, T &amp;h)</td></tr>
 <tr class="separator:a526a85506746cc9877baaea4ee1f84ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ea9bad9e1b37e1db9d6bec65d18259d"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a6ea9bad9e1b37e1db9d6bec65d18259d"><td class="memTemplItemLeft" align="right" valign="top">__device__ __host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a6ea9bad9e1b37e1db9d6bec65d18259d">ABS1DQ</a> (T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T &amp;qmean, T &amp;q, T &amp;G, T &amp;S)</td></tr>
+<tr class="separator:a6ea9bad9e1b37e1db9d6bec65d18259d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cb790e8b942d8f4f32cefb163df9ffd"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6cb790e8b942d8f4f32cefb163df9ffd"><td class="memTemplItemLeft" align="right" valign="top">__device__ __host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a6cb790e8b942d8f4f32cefb163df9ffd">Dirichlet1D</a> (T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T &amp;un, T &amp;ut, T &amp;zs, T &amp;h)</td></tr>
 <tr class="separator:a6cb790e8b942d8f4f32cefb163df9ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e7c96b473fa73b48210521f9b06958f"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a7e7c96b473fa73b48210521f9b06958f"><td class="memTemplItemLeft" align="right" valign="top">__device__ __host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Boundary_8h.html#a7e7c96b473fa73b48210521f9b06958f">Dirichlet1Q</a> (T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T &amp;q)</td></tr>
+<tr class="separator:a7e7c96b473fa73b48210521f9b06958f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a526a85506746cc9877baaea4ee1f84ae"></a>
@@ -242,8 +279,296 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a5da9c2cb6774461d8f6de7cafd105ed6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5da9c2cb6774461d8f6de7cafd105ed6">&#9670;&nbsp;</a></span>bndGPU()</h2>
+<a id="a6ea9bad9e1b37e1db9d6bec65d18259d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ea9bad9e1b37e1db9d6bec65d18259d">&#9670;&nbsp;</a></span>ABS1DQ()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__device__ __host__ void ABS1DQ </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>sign</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>factime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>facrel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>zs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>zsbnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>zsinside</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>qmean</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>q</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>G</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>S</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a31da8c718f61d1febaf765248e0c73a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31da8c718f61d1febaf765248e0c73a5">&#9670;&nbsp;</a></span>bndCPU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__host__ void bndCPU </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classbndparam.html">bndparam</a>&#160;</td>
+          <td class="paramname"><em>side</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>zsbndvec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>uubndvec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>vvbndvec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Atmp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>zs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>un</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>ut</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad24f377cb23e38ac40ffce632d0971d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad24f377cb23e38ac40ffce632d0971d8">&#9670;&nbsp;</a></span>bndFluxGPUSide()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void bndFluxGPUSide </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classbndsegmentside.html">bndsegmentside</a>&#160;</td>
+          <td class="paramname"><em>side</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Atmp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Zsmap</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>uniform</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>zsbnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>taper</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>zs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>un</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>ut</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>Fh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>Fq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>Ss</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a994c0a68a28b55ac136fa3fd105c5db8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a994c0a68a28b55ac136fa3fd105c5db8">&#9670;&nbsp;</a></span>bndGPU()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -267,6 +592,12 @@ template&lt;class T &gt; </div>
           <td></td>
           <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
           <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Atmp</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -386,6 +717,66 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a7e7c96b473fa73b48210521f9b06958f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e7c96b473fa73b48210521f9b06958f">&#9670;&nbsp;</a></span>Dirichlet1Q()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__device__ __host__ void Dirichlet1Q </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>sign</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>zsbnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>zsinside</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>hinside</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>uninside</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>q</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ad433f7b7fe383758a05a3788eeddf488"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad433f7b7fe383758a05a3788eeddf488">&#9670;&nbsp;</a></span>findmaskside()</h2>
 
@@ -456,8 +847,8 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="ac17e657eb1ba981e7b5661c3997692ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac17e657eb1ba981e7b5661c3997692ed">&#9670;&nbsp;</a></span>Flowbnd()</h2>
+<a id="a1070c3a02b0f106ebfba5aebebe8425d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1070c3a02b0f106ebfba5aebebe8425d">&#9670;&nbsp;</a></span>Flowbnd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -491,8 +882,194 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Atmp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
           <td class="paramname"><em>XEv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3a143b7b4d7a10d06fd245daf0e6dd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3a143b7b4d7a10d06fd245daf0e6dd7">&#9670;&nbsp;</a></span>FlowbndFlux() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FlowbndFlux </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>totaltime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classbndparam.html">bndparam</a>&#160;</td>
+          <td class="paramname"><em>side</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Atmp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XEv</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XFlux</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a493b3a9d491a55b39aeb7edfe53a5ef8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a493b3a9d491a55b39aeb7edfe53a5ef8">&#9670;&nbsp;</a></span>FlowbndFlux() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FlowbndFlux </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>totaltime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classbndsegment.html">bndsegment</a>&#160;</td>
+          <td class="paramname"><em>bndseg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Atmp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XEv</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XFlux</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaec6c50a87ec1475242fd2636570993f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaec6c50a87ec1475242fd2636570993f">&#9670;&nbsp;</a></span>FlowbndFluxML()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FlowbndFluxML </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>totaltime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classbndsegment.html">bndsegment</a>&#160;</td>
+          <td class="paramname"><em>bndseg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>Atmp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XEv</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxMLP.html">FluxMLP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XFlux</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -746,6 +1323,156 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="ad76dc3a9c37690c1c68e3ed0c8761d80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad76dc3a9c37690c1c68e3ed0c8761d80">&#9670;&nbsp;</a></span>maskbndGPUFluxbot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void maskbndGPUFluxbot </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Flux</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a974c3e91252e6886c1577201af2d9136"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a974c3e91252e6886c1577201af2d9136">&#9670;&nbsp;</a></span>maskbndGPUFluxleft()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void maskbndGPUFluxleft </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Xev</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Flux</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1b98408b87883d4ddfbbbd8254ae8d7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b98408b87883d4ddfbbbd8254ae8d7f">&#9670;&nbsp;</a></span>maskbndGPUFluxright()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void maskbndGPUFluxright </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Flux</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ace0711ff24a69d91c4b3475d956f80b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace0711ff24a69d91c4b3475d956f80b7">&#9670;&nbsp;</a></span>maskbndGPUFluxtop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void maskbndGPUFluxtop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Flux</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="acdef573f7f2d65d3fe3f215342377a8b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acdef573f7f2d65d3fe3f215342377a8b">&#9670;&nbsp;</a></span>maskbndGPUleft()</h2>
 
@@ -926,13 +1653,49 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a11c397504eb338755672f8c9f64862c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11c397504eb338755672f8c9f64862c0">&#9670;&nbsp;</a></span>noslipbndQ()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__device__ __host__ void noslipbndQ </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>F</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>G</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>S</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Boundary_8h.html">Boundary.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

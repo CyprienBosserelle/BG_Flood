@@ -112,20 +112,22 @@ $(document).ready(function(){initNavTree('FlowGPU_8h_source.html',''); initResiz
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Friction_8h.html">Friction.h</a>&quot;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Updateforcing_8h.html">Updateforcing.h</a>&quot;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Reimann_8h.html">Reimann.h</a>&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="FlowGPU_8h.html#a7651ec12d9de9eb8b3b5709582d19c76">FlowGPU</a>(<a class="code" href="classParam.html">Param</a> XParam, <a class="code" href="structLoop.html">Loop&lt;T&gt;</a>&amp; XLoop, <a class="code" href="structForcing.html">Forcing&lt;float&gt;</a> XForcing, <a class="code" href="structModel.html">Model&lt;T&gt;</a> XModel);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; __global__ <span class="keywordtype">void</span> <a class="code" href="FlowGPU_8h.html#ae0cc27dc9f8f783ab833ed41e885152f">reset_var</a>(<span class="keywordtype">int</span> halowidth, <span class="keywordtype">int</span>* active, T resetval, T* Var);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="FlowGPU_8h.html#a2ce0f188d21f6d0845597f2fea727cd8">HalfStepGPU</a>(<a class="code" href="classParam.html">Param</a> XParam, <a class="code" href="structLoop.html">Loop&lt;T&gt;</a>&amp; XLoop, <a class="code" href="structForcing.html">Forcing&lt;float&gt;</a> XForcing, <a class="code" href="structModel.html">Model&lt;T&gt;</a> XModel);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">// End of global definition</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Boundary_8h.html">Boundary.h</a>&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="FlowGPU_8h.html#a7651ec12d9de9eb8b3b5709582d19c76">FlowGPU</a>(<a class="code" href="classParam.html">Param</a> XParam, <a class="code" href="structLoop.html">Loop&lt;T&gt;</a>&amp; XLoop, <a class="code" href="structForcing.html">Forcing&lt;float&gt;</a> XForcing, <a class="code" href="structModel.html">Model&lt;T&gt;</a> XModel);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; __global__ <span class="keywordtype">void</span> <a class="code" href="FlowGPU_8h.html#ae0cc27dc9f8f783ab833ed41e885152f">reset_var</a>(<span class="keywordtype">int</span> halowidth, <span class="keywordtype">int</span>* active, T resetval, T* Var);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="FlowGPU_8h.html#a2ce0f188d21f6d0845597f2fea727cd8">HalfStepGPU</a>(<a class="code" href="classParam.html">Param</a> XParam, <a class="code" href="structLoop.html">Loop&lt;T&gt;</a>&amp; XLoop, <a class="code" href="structForcing.html">Forcing&lt;float&gt;</a> XForcing, <a class="code" href="structModel.html">Model&lt;T&gt;</a> XModel);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">// End of global definition</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aAdvection_8h_html"><div class="ttname"><a href="Advection_8h.html">Advection.h</a></div></div>
 <div class="ttc" id="aArrays_8h_html"><div class="ttname"><a href="Arrays_8h.html">Arrays.h</a></div></div>
-<div class="ttc" id="aFlowGPU_8h_html_a2ce0f188d21f6d0845597f2fea727cd8"><div class="ttname"><a href="FlowGPU_8h.html#a2ce0f188d21f6d0845597f2fea727cd8">HalfStepGPU</a></div><div class="ttdeci">void HalfStepGPU(Param XParam, Loop&lt; T &gt; &amp;XLoop, Forcing&lt; float &gt; XForcing, Model&lt; T &gt; XModel)</div><div class="ttdef"><b>Definition:</b> FlowGPU.cu:291</div></div>
+<div class="ttc" id="aBoundary_8h_html"><div class="ttname"><a href="Boundary_8h.html">Boundary.h</a></div></div>
+<div class="ttc" id="aFlowGPU_8h_html_a2ce0f188d21f6d0845597f2fea727cd8"><div class="ttname"><a href="FlowGPU_8h.html#a2ce0f188d21f6d0845597f2fea727cd8">HalfStepGPU</a></div><div class="ttdeci">void HalfStepGPU(Param XParam, Loop&lt; T &gt; &amp;XLoop, Forcing&lt; float &gt; XForcing, Model&lt; T &gt; XModel)</div><div class="ttdef"><b>Definition:</b> FlowGPU.cu:308</div></div>
 <div class="ttc" id="aFlowGPU_8h_html_a7651ec12d9de9eb8b3b5709582d19c76"><div class="ttname"><a href="FlowGPU_8h.html#a7651ec12d9de9eb8b3b5709582d19c76">FlowGPU</a></div><div class="ttdeci">void FlowGPU(Param XParam, Loop&lt; T &gt; &amp;XLoop, Forcing&lt; float &gt; XForcing, Model&lt; T &gt; XModel)</div><div class="ttdef"><b>Definition:</b> FlowGPU.cu:3</div></div>
-<div class="ttc" id="aFlowGPU_8h_html_ae0cc27dc9f8f783ab833ed41e885152f"><div class="ttname"><a href="FlowGPU_8h.html#ae0cc27dc9f8f783ab833ed41e885152f">reset_var</a></div><div class="ttdeci">__global__ void reset_var(int halowidth, int *active, T resetval, T *Var)</div><div class="ttdef"><b>Definition:</b> FlowGPU.cu:491</div></div>
+<div class="ttc" id="aFlowGPU_8h_html_ae0cc27dc9f8f783ab833ed41e885152f"><div class="ttname"><a href="FlowGPU_8h.html#ae0cc27dc9f8f783ab833ed41e885152f">reset_var</a></div><div class="ttdeci">__global__ void reset_var(int halowidth, int *active, T resetval, T *Var)</div><div class="ttdef"><b>Definition:</b> FlowGPU.cu:507</div></div>
 <div class="ttc" id="aForcing_8h_html"><div class="ttname"><a href="Forcing_8h.html">Forcing.h</a></div></div>
 <div class="ttc" id="aFriction_8h_html"><div class="ttname"><a href="Friction_8h.html">Friction.h</a></div></div>
 <div class="ttc" id="aGeneral_8h_html"><div class="ttname"><a href="General_8h.html">General.h</a></div></div>
@@ -137,16 +139,16 @@ $(document).ready(function(){initNavTree('FlowGPU_8h_source.html',''); initResiz
 <div class="ttc" id="aUpdateforcing_8h_html"><div class="ttname"><a href="Updateforcing_8h.html">Updateforcing.h</a></div></div>
 <div class="ttc" id="aUtil__CPU_8h_html"><div class="ttname"><a href="Util__CPU_8h.html">Util_CPU.h</a></div></div>
 <div class="ttc" id="aclassParam_html"><div class="ttname"><a href="classParam.html">Param</a></div><div class="ttdef"><b>Definition:</b> Param.h:10</div></div>
-<div class="ttc" id="astructForcing_html"><div class="ttname"><a href="structForcing.html">Forcing</a></div><div class="ttdef"><b>Definition:</b> Forcing.h:116</div></div>
-<div class="ttc" id="astructLoop_html"><div class="ttname"><a href="structLoop.html">Loop</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:203</div></div>
-<div class="ttc" id="astructModel_html"><div class="ttname"><a href="structModel.html">Model</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:151</div></div>
+<div class="ttc" id="astructForcing_html"><div class="ttname"><a href="structForcing.html">Forcing</a></div><div class="ttdef"><b>Definition:</b> Forcing.h:157</div></div>
+<div class="ttc" id="astructLoop_html"><div class="ttname"><a href="structLoop.html">Loop</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:279</div></div>
+<div class="ttc" id="astructModel_html"><div class="ttname"><a href="structModel.html">Model</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:221</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="FlowGPU_8h.html">FlowGPU.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

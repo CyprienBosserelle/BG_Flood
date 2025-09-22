@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('InitEvolv_8h_source.html',''); initRes
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="GridManip_8h.html">GridManip.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Read__netcdf_8h.html">Read_netcdf.h</a>&quot;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="ReadForcing_8h.html">ReadForcing.h</a>&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Updateforcing_8h.html">Updateforcing.h</a>&quot;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="InitEvolv_8h.html#a6cadd35d79d134af18f47a2fa86e500c">initevolv</a>(<a class="code" href="classParam.html">Param</a> XParam, <a class="code" href="structBlockP.html">BlockP&lt;T&gt;</a> XBlock, <a class="code" href="structForcing.html">Forcing&lt;float&gt;</a> XForcing, <a class="code" href="structEvolvingP.html">EvolvingP&lt;T&gt;</a>&amp; XEv, T*&amp; zb);</div>
@@ -127,28 +127,29 @@ $(document).ready(function(){initNavTree('InitEvolv_8h_source.html',''); initRes
 <div class="ttc" id="aForcing_8h_html"><div class="ttname"><a href="Forcing_8h.html">Forcing.h</a></div></div>
 <div class="ttc" id="aGeneral_8h_html"><div class="ttname"><a href="General_8h.html">General.h</a></div></div>
 <div class="ttc" id="aGridManip_8h_html"><div class="ttname"><a href="GridManip_8h.html">GridManip.h</a></div></div>
-<div class="ttc" id="aInitEvolv_8h_html_a0831d7ffc3b6f6689bbc0572e0ffabc3"><div class="ttname"><a href="InitEvolv_8h.html#a0831d7ffc3b6f6689bbc0572e0ffabc3">warmstart</a></div><div class="ttdeci">void warmstart(Param XParam, Forcing&lt; float &gt; XForcing, BlockP&lt; T &gt; XBlock, T *zb, EvolvingP&lt; T &gt; &amp;XEv)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:132</div></div>
+<div class="ttc" id="aInitEvolv_8h_html_a0831d7ffc3b6f6689bbc0572e0ffabc3"><div class="ttname"><a href="InitEvolv_8h.html#a0831d7ffc3b6f6689bbc0572e0ffabc3">warmstart</a></div><div class="ttdeci">void warmstart(Param XParam, Forcing&lt; float &gt; XForcing, BlockP&lt; T &gt; XBlock, T *zb, EvolvingP&lt; T &gt; &amp;XEv)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:141</div></div>
 <div class="ttc" id="aInitEvolv_8h_html_a6cadd35d79d134af18f47a2fa86e500c"><div class="ttname"><a href="InitEvolv_8h.html#a6cadd35d79d134af18f47a2fa86e500c">initevolv</a></div><div class="ttdeci">void initevolv(Param XParam, BlockP&lt; T &gt; XBlock, Forcing&lt; float &gt; XForcing, EvolvingP&lt; T &gt; &amp;XEv, T *&amp;zb)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:21</div></div>
-<div class="ttc" id="aInitEvolv_8h_html_ac25b19d857c6899099322406558826bf"><div class="ttname"><a href="InitEvolv_8h.html#ac25b19d857c6899099322406558826bf">AddZSoffset</a></div><div class="ttdeci">int AddZSoffset(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; &amp;XEv, T *zb)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:338</div></div>
-<div class="ttc" id="aInitEvolv_8h_html_acff23dccc956433e8500e1d8d6d831b6"><div class="ttname"><a href="InitEvolv_8h.html#acff23dccc956433e8500e1d8d6d831b6">readhotstartfile</a></div><div class="ttdeci">int readhotstartfile(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; &amp;XEv, T *&amp;zb)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:368</div></div>
-<div class="ttc" id="aInitEvolv_8h_html_addab31c7158e0a9a5cef70d38616be3a"><div class="ttname"><a href="InitEvolv_8h.html#addab31c7158e0a9a5cef70d38616be3a">coldstart</a></div><div class="ttdeci">int coldstart(Param XParam, BlockP&lt; T &gt; XBlock, T *zb, EvolvingP&lt; T &gt; &amp;XEv)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:94</div></div>
+<div class="ttc" id="aInitEvolv_8h_html_ac25b19d857c6899099322406558826bf"><div class="ttname"><a href="InitEvolv_8h.html#ac25b19d857c6899099322406558826bf">AddZSoffset</a></div><div class="ttdeci">int AddZSoffset(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; &amp;XEv, T *zb)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:460</div></div>
+<div class="ttc" id="aInitEvolv_8h_html_acff23dccc956433e8500e1d8d6d831b6"><div class="ttname"><a href="InitEvolv_8h.html#acff23dccc956433e8500e1d8d6d831b6">readhotstartfile</a></div><div class="ttdeci">int readhotstartfile(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; &amp;XEv, T *&amp;zb)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:523</div></div>
+<div class="ttc" id="aInitEvolv_8h_html_addab31c7158e0a9a5cef70d38616be3a"><div class="ttname"><a href="InitEvolv_8h.html#addab31c7158e0a9a5cef70d38616be3a">coldstart</a></div><div class="ttdeci">int coldstart(Param XParam, BlockP&lt; T &gt; XBlock, T *zb, EvolvingP&lt; T &gt; &amp;XEv)</div><div class="ttdef"><b>Definition:</b> InitEvolv.cu:104</div></div>
 <div class="ttc" id="aMemManagement_8h_html"><div class="ttname"><a href="MemManagement_8h.html">MemManagement.h</a></div></div>
 <div class="ttc" id="aParam_8h_html"><div class="ttname"><a href="Param_8h.html">Param.h</a></div></div>
 <div class="ttc" id="aReadForcing_8h_html"><div class="ttname"><a href="ReadForcing_8h.html">ReadForcing.h</a></div></div>
 <div class="ttc" id="aRead__netcdf_8h_html"><div class="ttname"><a href="Read__netcdf_8h.html">Read_netcdf.h</a></div></div>
+<div class="ttc" id="aUpdateforcing_8h_html"><div class="ttname"><a href="Updateforcing_8h.html">Updateforcing.h</a></div></div>
 <div class="ttc" id="aUtil__CPU_8h_html"><div class="ttname"><a href="Util__CPU_8h.html">Util_CPU.h</a></div></div>
 <div class="ttc" id="aWrite__txtlog_8h_html"><div class="ttname"><a href="Write__txtlog_8h.html">Write_txtlog.h</a></div></div>
 <div class="ttc" id="aclassParam_html"><div class="ttname"><a href="classParam.html">Param</a></div><div class="ttdef"><b>Definition:</b> Param.h:10</div></div>
-<div class="ttc" id="astructBlockP_html"><div class="ttname"><a href="structBlockP.html">BlockP</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:86</div></div>
-<div class="ttc" id="astructEvolvingP_html"><div class="ttname"><a href="structEvolvingP.html">EvolvingP</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:29</div></div>
-<div class="ttc" id="astructForcing_html"><div class="ttname"><a href="structForcing.html">Forcing</a></div><div class="ttdef"><b>Definition:</b> Forcing.h:116</div></div>
+<div class="ttc" id="astructBlockP_html"><div class="ttname"><a href="structBlockP.html">BlockP</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:153</div></div>
+<div class="ttc" id="astructEvolvingP_html"><div class="ttname"><a href="structEvolvingP.html">EvolvingP</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:43</div></div>
+<div class="ttc" id="astructForcing_html"><div class="ttname"><a href="structForcing.html">Forcing</a></div><div class="ttdef"><b>Definition:</b> Forcing.h:157</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="InitEvolv_8h.html">InitEvolv.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

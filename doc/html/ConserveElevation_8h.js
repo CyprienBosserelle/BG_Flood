@@ -23,7 +23,15 @@ var ConserveElevation_8h =
     [ "ProlongationElevation", "ConserveElevation_8h.html#a6e3d3de971e7e7911a3d5e6c4153eb99", null ],
     [ "WetDryProlongation", "ConserveElevation_8h.html#aba3f7b8cb37fdda55fe8938ea33d4512", null ],
     [ "WetDryProlongationGPU", "ConserveElevation_8h.html#ab7fa1d7163667bab1c7cd84553448b7f", null ],
+    [ "WetDryProlongationGPUBot", "ConserveElevation_8h.html#afd4a6261211e3a6fa8232d77c6891d52", null ],
+    [ "WetDryProlongationGPULeft", "ConserveElevation_8h.html#ae9e7438ddefaa3369f29996987a19d01", null ],
+    [ "WetDryProlongationGPURight", "ConserveElevation_8h.html#ac3ffb93a73b4daaa2ffb392c86855f63", null ],
+    [ "WetDryProlongationGPUTop", "ConserveElevation_8h.html#a4bd6eb5f83ea7c7448f03941178d58d8", null ],
     [ "wetdryrestriction", "ConserveElevation_8h.html#a61ffafd5fa2ebb6ec32c3797ffc6d38c", null ],
     [ "WetDryRestriction", "ConserveElevation_8h.html#afebcff1a2c87ddb0c67afdea7185cc23", null ],
-    [ "WetDryRestrictionGPU", "ConserveElevation_8h.html#acdafa94af71c15ee14b6b73ccae8628d", null ]
+    [ "WetDryRestrictionGPU", "ConserveElevation_8h.html#acdafa94af71c15ee14b6b73ccae8628d", null ],
+    [ "WetDryRestrictionGPUBot", "ConserveElevation_8h.html#a9a7c2909f97ad96f9a769e9ecfe2d3cd", null ],
+    [ "WetDryRestrictionGPULeft", "ConserveElevation_8h.html#a1e8aea1a6136e5460eb73ed906f8d5f8", null ],
+    [ "WetDryRestrictionGPURight", "ConserveElevation_8h.html#a45b87745d429894acd012f5d60aeeb3a", null ],
+    [ "WetDryRestrictionGPUTop", "ConserveElevation_8h.html#ad519fdc6d94a14f008a25eba1f9591c9", null ]
 ];

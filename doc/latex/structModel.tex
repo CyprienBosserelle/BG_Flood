@@ -19,6 +19,8 @@ Collaboration diagram for Model$<$ T $>$\+:
 \item 
 \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ \mbox{\hyperlink{structModel_ade6ba820a67343cacc36139cd590a471}{flux}}
 \item 
+\mbox{\hyperlink{structFluxMLP}{Flux\+MLP}}$<$ T $>$ \mbox{\hyperlink{structModel_adc2ba53a09da27d5c6eefc08c3884b41}{fluxml}}
+\item 
 \mbox{\hyperlink{structAdvanceP}{AdvanceP}}$<$ T $>$ \mbox{\hyperlink{structModel_a99d616f320b6e74c8db1c667eef32735}{adv}}
 \item 
 T $\ast$ \mbox{\hyperlink{structModel_af0ae9e7ea89d7602b9925c69806553f7}{zb}}
@@ -41,6 +43,14 @@ T $\ast$ \mbox{\hyperlink{structModel_a2dc0e7ba4a86c5abab8744693f9695ca}{datmpdy
 \item 
 std\+::map$<$ std\+::string, T $\ast$ $>$ \mbox{\hyperlink{structModel_aa7367f17b98c5f286b6f349b0d5ea05e}{Output\+Var\+Map}}
 \item 
+std\+::map$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{structModel_ab9312993e4ebae4ea704902ffd8e0533}{Outvarlongname}}
+\item 
+std\+::map$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{structModel_a7e5192bfb7bbb92d646282484b094f50}{Outvarstdname}}
+\item 
+std\+::map$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{structModel_a457b715759eac47e7f94155f7e51ac9a}{Outvarunits}}
+\item 
+std\+::vector$<$ double $>$ \mbox{\hyperlink{structModel_a45bf268f372be0bc06d560d213baf6b3}{OutputT}}
+\item 
 T $\ast$ \mbox{\hyperlink{structModel_ab58a6e884817dfe342c5a7bcfc5163ea}{TSstore}}
 \item 
 \mbox{\hyperlink{structEvolvingP__M}{Evolving\+P\+\_\+M}}$<$ T $>$ \mbox{\hyperlink{structModel_ab367939d5698461d89437e31abafe176}{evmean}}
@@ -53,7 +63,7 @@ T $\ast$ \mbox{\hyperlink{structModel_a7cd6ec368446856bbb77e48cc8200e52}{wettime
 \item 
 \mbox{\hyperlink{structAdaptP}{AdaptP}} \mbox{\hyperlink{structModel_a77f7280cd13121a9951ecebc1835250d}{adapt}}
 \item 
-\mbox{\hyperlink{structBndblockP}{BndblockP}} \mbox{\hyperlink{structModel_ada4497fe8527560c970eb37b759851c0}{bndblk}}
+\mbox{\hyperlink{structBndblockP}{BndblockP}}$<$ T $>$ \mbox{\hyperlink{structModel_a9fefabd7a84c233fa47cdeba219bcb30}{bndblk}}
 \end{DoxyCompactItemize}
 
 
@@ -79,12 +89,12 @@ T $\ast$ \mbox{\hyperlink{structModel_a7cd6ec368446856bbb77e48cc8200e52}{wettime
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \mbox{\hyperlink{structBlockP}{BlockP}}$<$T$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::blocks}
 
-\mbox{\Hypertarget{structModel_ada4497fe8527560c970eb37b759851c0}\label{structModel_ada4497fe8527560c970eb37b759851c0}} 
+\mbox{\Hypertarget{structModel_a9fefabd7a84c233fa47cdeba219bcb30}\label{structModel_a9fefabd7a84c233fa47cdeba219bcb30}} 
 \index{Model$<$ T $>$@{Model$<$ T $>$}!bndblk@{bndblk}}
 \index{bndblk@{bndblk}!Model$<$ T $>$@{Model$<$ T $>$}}
 \doxysubsubsection{\texorpdfstring{bndblk}{bndblk}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-\mbox{\hyperlink{structBndblockP}{BndblockP}} \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::bndblk}
+\mbox{\hyperlink{structBndblockP}{BndblockP}}$<$T$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::bndblk}
 
 \mbox{\Hypertarget{structModel_ad7862de7da8600dbbf95e58b709e770a}\label{structModel_ad7862de7da8600dbbf95e58b709e770a}} 
 \index{Model$<$ T $>$@{Model$<$ T $>$}!cf@{cf}}
@@ -149,6 +159,13 @@ T $\ast$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::datmpdy}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \mbox{\hyperlink{structFluxP}{FluxP}}$<$T$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::flux}
 
+\mbox{\Hypertarget{structModel_adc2ba53a09da27d5c6eefc08c3884b41}\label{structModel_adc2ba53a09da27d5c6eefc08c3884b41}} 
+\index{Model$<$ T $>$@{Model$<$ T $>$}!fluxml@{fluxml}}
+\index{fluxml@{fluxml}!Model$<$ T $>$@{Model$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{fluxml}{fluxml}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\mbox{\hyperlink{structFluxMLP}{Flux\+MLP}}$<$T$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::fluxml}
+
 \mbox{\Hypertarget{structModel_a6450961b6277669aad0e5835e559d6b9}\label{structModel_a6450961b6277669aad0e5835e559d6b9}} 
 \index{Model$<$ T $>$@{Model$<$ T $>$}!grad@{grad}}
 \index{grad@{grad}!Model$<$ T $>$@{Model$<$ T $>$}}
@@ -170,12 +187,40 @@ T$\ast$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::hgw}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 T$\ast$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::il}
 
+\mbox{\Hypertarget{structModel_a45bf268f372be0bc06d560d213baf6b3}\label{structModel_a45bf268f372be0bc06d560d213baf6b3}} 
+\index{Model$<$ T $>$@{Model$<$ T $>$}!OutputT@{OutputT}}
+\index{OutputT@{OutputT}!Model$<$ T $>$@{Model$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{OutputT}{OutputT}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+std\+::vector$<$double$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::OutputT}
+
 \mbox{\Hypertarget{structModel_aa7367f17b98c5f286b6f349b0d5ea05e}\label{structModel_aa7367f17b98c5f286b6f349b0d5ea05e}} 
 \index{Model$<$ T $>$@{Model$<$ T $>$}!OutputVarMap@{OutputVarMap}}
 \index{OutputVarMap@{OutputVarMap}!Model$<$ T $>$@{Model$<$ T $>$}}
 \doxysubsubsection{\texorpdfstring{OutputVarMap}{OutputVarMap}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 std\+::map$<$std\+::string, T $\ast$$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::Output\+Var\+Map}
+
+\mbox{\Hypertarget{structModel_ab9312993e4ebae4ea704902ffd8e0533}\label{structModel_ab9312993e4ebae4ea704902ffd8e0533}} 
+\index{Model$<$ T $>$@{Model$<$ T $>$}!Outvarlongname@{Outvarlongname}}
+\index{Outvarlongname@{Outvarlongname}!Model$<$ T $>$@{Model$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Outvarlongname}{Outvarlongname}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+std\+::map$<$std\+::string, std\+::string$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::Outvarlongname}
+
+\mbox{\Hypertarget{structModel_a7e5192bfb7bbb92d646282484b094f50}\label{structModel_a7e5192bfb7bbb92d646282484b094f50}} 
+\index{Model$<$ T $>$@{Model$<$ T $>$}!Outvarstdname@{Outvarstdname}}
+\index{Outvarstdname@{Outvarstdname}!Model$<$ T $>$@{Model$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Outvarstdname}{Outvarstdname}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+std\+::map$<$std\+::string, std\+::string$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::Outvarstdname}
+
+\mbox{\Hypertarget{structModel_a457b715759eac47e7f94155f7e51ac9a}\label{structModel_a457b715759eac47e7f94155f7e51ac9a}} 
+\index{Model$<$ T $>$@{Model$<$ T $>$}!Outvarunits@{Outvarunits}}
+\index{Outvarunits@{Outvarunits}!Model$<$ T $>$@{Model$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Outvarunits}{Outvarunits}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+std\+::map$<$std\+::string, std\+::string$>$ \mbox{\hyperlink{structModel}{Model}}$<$ T $>$\+::Outvarunits}
 
 \mbox{\Hypertarget{structModel_a5cd42d2d44fc6bf26b02ba08a9aa1bf1}\label{structModel_a5cd42d2d44fc6bf26b02ba08a9aa1bf1}} 
 \index{Model$<$ T $>$@{Model$<$ T $>$}!Patm@{Patm}}

@@ -3,6 +3,7 @@
 {\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Updateforcing.\+h\char`\"{}}\newline
 Include dependency graph for Boundary.\+h\+:
 % FIG 0
 This graph shows which files directly or indirectly include this file\+:
@@ -10,7 +11,7 @@ This graph shows which files directly or indirectly include this file\+:
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Boundary_8h_ac17e657eb1ba981e7b5661c3997692ed}{Flowbnd}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv)
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Boundary_8h_a1070c3a02b0f106ebfba5aebebe8425d}{Flowbnd}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Atmp, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv)
 \item 
 \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ int \mbox{\hyperlink{Boundary_8h_a59cbed77b10dbaf2fa1c4261631b78c5}{Inside}} (int halowidth, int blkmemwidth, int isright, int istop, int ix, int iy, int ib)
 \item 
@@ -26,7 +27,25 @@ This graph shows which files directly or indirectly include this file\+:
 \item 
 {\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a91a99b6f920543db1cdd58ed166eab2c}{maskbnd\+GPUbot}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, T $\ast$zb)
 \item 
-{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a5da9c2cb6774461d8f6de7cafd105ed6}{bnd\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, float itime, T $\ast$zs, T $\ast$h, T $\ast$un, T $\ast$ut)
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a974c3e91252e6886c1577201af2d9136}{maskbnd\+GPUFluxleft}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ Xev, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ Flux)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ace0711ff24a69d91c4b3475d956f80b7}{maskbnd\+GPUFluxtop}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ Flux)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a1b98408b87883d4ddfbbbd8254ae8d7f}{maskbnd\+GPUFluxright}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ Flux)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ad76dc3a9c37690c1c68e3ed0c8761d80}{maskbnd\+GPUFluxbot}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ Flux)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Boundary_8h_a493b3a9d491a55b39aeb7edfe53a5ef8}{Flowbnd\+Flux}} (\mbox{\hyperlink{classParam}{Param}} XParam, double totaltime, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classbndsegment}{bndsegment}} bndseg, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Atmp, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Boundary_8h_ae3a143b7b4d7a10d06fd245daf0e6dd7}{Flowbnd\+Flux}} (\mbox{\hyperlink{classParam}{Param}} XParam, double totaltime, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Atmp, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Boundary_8h_aaec6c50a87ec1475242fd2636570993f}{Flowbnd\+Flux\+ML}} (\mbox{\hyperlink{classParam}{Param}} XParam, double totaltime, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{classbndsegment}{bndsegment}} bndseg, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Atmp, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structFluxMLP}{Flux\+MLP}}$<$ T $>$ XFlux)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ad24f377cb23e38ac40ffce632d0971d8}{bnd\+Flux\+GPUSide}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classbndsegmentside}{bndsegmentside}} side, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Atmp, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Zsmap, bool uniform, int type, float zsbnd, T taper, T $\ast$zs, T $\ast$h, T $\ast$un, T $\ast$ut, T $\ast$Fh, T $\ast$Fq, T $\ast$Ss)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a994c0a68a28b55ac136fa3fd105c5db8}{bnd\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Atmp, float itime, T $\ast$zs, T $\ast$h, T $\ast$un, T $\ast$ut)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a31da8c718f61d1febaf765248e0c73a5}{bnd\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{classbndparam}{bndparam}} side, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, std\+::vector$<$ double $>$ zsbndvec, std\+::vector$<$ double $>$ uubndvec, std\+::vector$<$ double $>$ vvbndvec, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Atmp, T $\ast$zs, T $\ast$h, T $\ast$un, T $\ast$ut)
 \item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ad433f7b7fe383758a05a3788eeddf488}{findmaskside}} (int side, bool \&isleftbot, bool \&islefttop, bool \&istopleft, bool \&istopright, bool \&isrighttop, bool \&isrightbot, bool \&isbotright, bool \&isbotleft)
 \item 
@@ -34,9 +53,15 @@ This graph shows which files directly or indirectly include this file\+:
 \item 
 {\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_ac038c08cc0c028bbd1495d23e5f9a1f2}{noslipbnd}} (T zsinside, T hinside, T \&un, T \&ut, T \&zs, T \&h)
 \item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a11c397504eb338755672f8c9f64862c0}{noslipbndQ}} (T \&F, T \&G, T \&S)
+\item 
 {\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a526a85506746cc9877baaea4ee1f84ae}{ABS1D}} (T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd, T unbnd, T \&un, T \&ut, T \&zs, T \&h)
 \item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a6ea9bad9e1b37e1db9d6bec65d18259d}{ABS1\+DQ}} (T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T \&qmean, T \&q, T \&G, T \&S)
+\item 
 {\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a6cb790e8b942d8f4f32cefb163df9ffd}{Dirichlet1D}} (T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T \&un, T \&ut, T \&zs, T \&h)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Boundary_8h_a7e7c96b473fa73b48210521f9b06958f}{Dirichlet1Q}} (T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T \&q)
 \end{DoxyCompactItemize}
 
 
@@ -48,12 +73,33 @@ This graph shows which files directly or indirectly include this file\+:
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void ABS1D (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{sign,  }\item[{T}]{zsbnd,  }\item[{T}]{zsinside,  }\item[{T}]{hinside,  }\item[{T}]{utbnd,  }\item[{T}]{unbnd,  }\item[{T \&}]{un,  }\item[{T \&}]{ut,  }\item[{T \&}]{zs,  }\item[{T \&}]{h }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{Boundary_8h_a5da9c2cb6774461d8f6de7cafd105ed6}\label{Boundary_8h_a5da9c2cb6774461d8f6de7cafd105ed6}} 
+\mbox{\Hypertarget{Boundary_8h_a6ea9bad9e1b37e1db9d6bec65d18259d}\label{Boundary_8h_a6ea9bad9e1b37e1db9d6bec65d18259d}} 
+\index{Boundary.h@{Boundary.h}!ABS1DQ@{ABS1DQ}}
+\index{ABS1DQ@{ABS1DQ}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{ABS1DQ()}{ABS1DQ()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void ABS1\+DQ (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{sign,  }\item[{T}]{factime,  }\item[{T}]{facrel,  }\item[{T}]{zs,  }\item[{T}]{zsbnd,  }\item[{T}]{zsinside,  }\item[{T}]{h,  }\item[{T \&}]{qmean,  }\item[{T \&}]{q,  }\item[{T \&}]{G,  }\item[{T \&}]{S }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a31da8c718f61d1febaf765248e0c73a5}\label{Boundary_8h_a31da8c718f61d1febaf765248e0c73a5}} 
+\index{Boundary.h@{Boundary.h}!bndCPU@{bndCPU}}
+\index{bndCPU@{bndCPU}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{bndCPU()}{bndCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void bnd\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{std\+::vector$<$ double $>$}]{zsbndvec,  }\item[{std\+::vector$<$ double $>$}]{uubndvec,  }\item[{std\+::vector$<$ double $>$}]{vvbndvec,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Atmp,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{un,  }\item[{T $\ast$}]{ut }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ad24f377cb23e38ac40ffce632d0971d8}\label{Boundary_8h_ad24f377cb23e38ac40ffce632d0971d8}} 
+\index{Boundary.h@{Boundary.h}!bndFluxGPUSide@{bndFluxGPUSide}}
+\index{bndFluxGPUSide@{bndFluxGPUSide}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{bndFluxGPUSide()}{bndFluxGPUSide()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void bnd\+Flux\+GPUSide (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classbndsegmentside}{bndsegmentside}}}]{side,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Atmp,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Zsmap,  }\item[{bool}]{uniform,  }\item[{int}]{type,  }\item[{float}]{zsbnd,  }\item[{T}]{taper,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{un,  }\item[{T $\ast$}]{ut,  }\item[{T $\ast$}]{Fh,  }\item[{T $\ast$}]{Fq,  }\item[{T $\ast$}]{Ss }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a994c0a68a28b55ac136fa3fd105c5db8}\label{Boundary_8h_a994c0a68a28b55ac136fa3fd105c5db8}} 
 \index{Boundary.h@{Boundary.h}!bndGPU@{bndGPU}}
 \index{bndGPU@{bndGPU}!Boundary.h@{Boundary.h}}
 \doxysubsubsection{\texorpdfstring{bndGPU()}{bndGPU()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-\+\_\+\+\_\+global\+\_\+\+\_\+ void bnd\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{float}]{itime,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{un,  }\item[{T $\ast$}]{ut }\end{DoxyParamCaption})}
+\+\_\+\+\_\+global\+\_\+\+\_\+ void bnd\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Atmp,  }\item[{float}]{itime,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{un,  }\item[{T $\ast$}]{ut }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{Boundary_8h_a6cb790e8b942d8f4f32cefb163df9ffd}\label{Boundary_8h_a6cb790e8b942d8f4f32cefb163df9ffd}} 
 \index{Boundary.h@{Boundary.h}!Dirichlet1D@{Dirichlet1D}}
@@ -62,18 +108,46 @@ This graph shows which files directly or indirectly include this file\+:
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void Dirichlet1D (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{sign,  }\item[{T}]{zsbnd,  }\item[{T}]{zsinside,  }\item[{T}]{hinside,  }\item[{T}]{uninside,  }\item[{T \&}]{un,  }\item[{T \&}]{ut,  }\item[{T \&}]{zs,  }\item[{T \&}]{h }\end{DoxyParamCaption})}
 
+\mbox{\Hypertarget{Boundary_8h_a7e7c96b473fa73b48210521f9b06958f}\label{Boundary_8h_a7e7c96b473fa73b48210521f9b06958f}} 
+\index{Boundary.h@{Boundary.h}!Dirichlet1Q@{Dirichlet1Q}}
+\index{Dirichlet1Q@{Dirichlet1Q}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{Dirichlet1Q()}{Dirichlet1Q()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void Dirichlet1Q (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{sign,  }\item[{T}]{zsbnd,  }\item[{T}]{zsinside,  }\item[{T}]{hinside,  }\item[{T}]{uninside,  }\item[{T \&}]{q }\end{DoxyParamCaption})}
+
 \mbox{\Hypertarget{Boundary_8h_ad433f7b7fe383758a05a3788eeddf488}\label{Boundary_8h_ad433f7b7fe383758a05a3788eeddf488}} 
 \index{Boundary.h@{Boundary.h}!findmaskside@{findmaskside}}
 \index{findmaskside@{findmaskside}!Boundary.h@{Boundary.h}}
 \doxysubsubsection{\texorpdfstring{findmaskside()}{findmaskside()}}
 {\footnotesize\ttfamily \+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void findmaskside (\begin{DoxyParamCaption}\item[{int}]{side,  }\item[{bool \&}]{isleftbot,  }\item[{bool \&}]{islefttop,  }\item[{bool \&}]{istopleft,  }\item[{bool \&}]{istopright,  }\item[{bool \&}]{isrighttop,  }\item[{bool \&}]{isrightbot,  }\item[{bool \&}]{isbotright,  }\item[{bool \&}]{isbotleft }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{Boundary_8h_ac17e657eb1ba981e7b5661c3997692ed}\label{Boundary_8h_ac17e657eb1ba981e7b5661c3997692ed}} 
+\mbox{\Hypertarget{Boundary_8h_a1070c3a02b0f106ebfba5aebebe8425d}\label{Boundary_8h_a1070c3a02b0f106ebfba5aebebe8425d}} 
 \index{Boundary.h@{Boundary.h}!Flowbnd@{Flowbnd}}
 \index{Flowbnd@{Flowbnd}!Boundary.h@{Boundary.h}}
 \doxysubsubsection{\texorpdfstring{Flowbnd()}{Flowbnd()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-void Flowbnd (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv }\end{DoxyParamCaption})}
+void Flowbnd (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Atmp,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ae3a143b7b4d7a10d06fd245daf0e6dd7}\label{Boundary_8h_ae3a143b7b4d7a10d06fd245daf0e6dd7}} 
+\index{Boundary.h@{Boundary.h}!FlowbndFlux@{FlowbndFlux}}
+\index{FlowbndFlux@{FlowbndFlux}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{FlowbndFlux()}{FlowbndFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Flowbnd\+Flux (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{double}]{totaltime,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classbndparam}{bndparam}}}]{side,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Atmp,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a493b3a9d491a55b39aeb7edfe53a5ef8}\label{Boundary_8h_a493b3a9d491a55b39aeb7edfe53a5ef8}} 
+\index{Boundary.h@{Boundary.h}!FlowbndFlux@{FlowbndFlux}}
+\index{FlowbndFlux@{FlowbndFlux}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{FlowbndFlux()}{FlowbndFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Flowbnd\+Flux (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{double}]{totaltime,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classbndsegment}{bndsegment}}}]{bndseg,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Atmp,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_aaec6c50a87ec1475242fd2636570993f}\label{Boundary_8h_aaec6c50a87ec1475242fd2636570993f}} 
+\index{Boundary.h@{Boundary.h}!FlowbndFluxML@{FlowbndFluxML}}
+\index{FlowbndFluxML@{FlowbndFluxML}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{FlowbndFluxML()}{FlowbndFluxML()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Flowbnd\+Flux\+ML (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{double}]{totaltime,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{classbndsegment}{bndsegment}}}]{bndseg,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Atmp,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structFluxMLP}{Flux\+MLP}}$<$ T $>$}]{XFlux }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{Boundary_8h_ac7033b2e3bb1ce6a37421d932dc2c9f6}\label{Boundary_8h_ac7033b2e3bb1ce6a37421d932dc2c9f6}} 
 \index{Boundary.h@{Boundary.h}!halowall@{halowall}}
@@ -108,6 +182,34 @@ void Flowbnd (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUbot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
 
+\mbox{\Hypertarget{Boundary_8h_ad76dc3a9c37690c1c68e3ed0c8761d80}\label{Boundary_8h_ad76dc3a9c37690c1c68e3ed0c8761d80}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUFluxbot@{maskbndGPUFluxbot}}
+\index{maskbndGPUFluxbot@{maskbndGPUFluxbot}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUFluxbot()}{maskbndGPUFluxbot()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUFluxbot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a974c3e91252e6886c1577201af2d9136}\label{Boundary_8h_a974c3e91252e6886c1577201af2d9136}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUFluxleft@{maskbndGPUFluxleft}}
+\index{maskbndGPUFluxleft@{maskbndGPUFluxleft}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUFluxleft()}{maskbndGPUFluxleft()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUFluxleft (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{Xev,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a1b98408b87883d4ddfbbbd8254ae8d7f}\label{Boundary_8h_a1b98408b87883d4ddfbbbd8254ae8d7f}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUFluxright@{maskbndGPUFluxright}}
+\index{maskbndGPUFluxright@{maskbndGPUFluxright}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUFluxright()}{maskbndGPUFluxright()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUFluxright (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{Flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_ace0711ff24a69d91c4b3475d956f80b7}\label{Boundary_8h_ace0711ff24a69d91c4b3475d956f80b7}} 
+\index{Boundary.h@{Boundary.h}!maskbndGPUFluxtop@{maskbndGPUFluxtop}}
+\index{maskbndGPUFluxtop@{maskbndGPUFluxtop}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{maskbndGPUFluxtop()}{maskbndGPUFluxtop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void maskbnd\+GPUFluxtop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{Flux }\end{DoxyParamCaption})}
+
 \mbox{\Hypertarget{Boundary_8h_acdef573f7f2d65d3fe3f215342377a8b}\label{Boundary_8h_acdef573f7f2d65d3fe3f215342377a8b}} 
 \index{Boundary.h@{Boundary.h}!maskbndGPUleft@{maskbndGPUleft}}
 \index{maskbndGPUleft@{maskbndGPUleft}!Boundary.h@{Boundary.h}}
@@ -135,4 +237,11 @@ void Flowbnd (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}
 \doxysubsubsection{\texorpdfstring{noslipbnd()}{noslipbnd()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void noslipbnd (\begin{DoxyParamCaption}\item[{T}]{zsinside,  }\item[{T}]{hinside,  }\item[{T \&}]{un,  }\item[{T \&}]{ut,  }\item[{T \&}]{zs,  }\item[{T \&}]{h }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Boundary_8h_a11c397504eb338755672f8c9f64862c0}\label{Boundary_8h_a11c397504eb338755672f8c9f64862c0}} 
+\index{Boundary.h@{Boundary.h}!noslipbndQ@{noslipbndQ}}
+\index{noslipbndQ@{noslipbndQ}!Boundary.h@{Boundary.h}}
+\doxysubsubsection{\texorpdfstring{noslipbndQ()}{noslipbndQ()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+host\+\_\+\+\_\+ void noslipbndQ (\begin{DoxyParamCaption}\item[{T \&}]{F,  }\item[{T \&}]{G,  }\item[{T \&}]{S }\end{DoxyParamCaption})}
 

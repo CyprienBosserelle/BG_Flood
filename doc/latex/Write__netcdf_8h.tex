@@ -6,6 +6,7 @@
 {\ttfamily \#include \char`\"{}Read\+Input.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
 Include dependency graph for Write\+\_\+netcdf.\+h\+:
 % FIG 0
 This graph shows which files directly or indirectly include this file\+:
@@ -27,7 +28,7 @@ void \mbox{\hyperlink{Write__netcdf_8h_acd23cfd734db5604e86925f669812e28}{handle
 \item 
 void \mbox{\hyperlink{Write__netcdf_8h_a7baa2f1395758b42afb5ce020605abd0}{writenctimestep}} (std\+::string outfile, double totaltime)
 \item 
-{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8h_a8295cb2c92f35bdd2d1eeb9b2807cb57}{Save2\+Netcdf}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8h_af2d239f5cce35afc5cac0ad32bf8fe7d}{Save2\+Netcdf}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
 \item 
 void \mbox{\hyperlink{Write__netcdf_8h_aeed9da1a9c25e765c9c2588e44efcadd}{create2dnc}} (char $\ast$filename, int nx, int ny, double $\ast$xx, double $\ast$yy, double $\ast$var, char $\ast$varname)
 \item 
@@ -86,12 +87,12 @@ void defncvar\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{
 {\footnotesize\ttfamily template$<$class T $>$ \\
 void Init\+Save2\+Netcdf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{Write__netcdf_8h_a8295cb2c92f35bdd2d1eeb9b2807cb57}\label{Write__netcdf_8h_a8295cb2c92f35bdd2d1eeb9b2807cb57}} 
+\mbox{\Hypertarget{Write__netcdf_8h_af2d239f5cce35afc5cac0ad32bf8fe7d}\label{Write__netcdf_8h_af2d239f5cce35afc5cac0ad32bf8fe7d}} 
 \index{Write\_netcdf.h@{Write\_netcdf.h}!Save2Netcdf@{Save2Netcdf}}
 \index{Save2Netcdf@{Save2Netcdf}!Write\_netcdf.h@{Write\_netcdf.h}}
 \doxysubsubsection{\texorpdfstring{Save2Netcdf()}{Save2Netcdf()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-void Save2\+Netcdf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+void Save2\+Netcdf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{Write__netcdf_8h_ae6f75b11a4428da84c143c0d1cad9f07}\label{Write__netcdf_8h_ae6f75b11a4428da84c143c0d1cad9f07}} 
 \index{Write\_netcdf.h@{Write\_netcdf.h}!write2dvarnc@{write2dvarnc}}

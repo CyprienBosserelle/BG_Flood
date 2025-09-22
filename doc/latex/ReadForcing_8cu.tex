@@ -32,17 +32,21 @@ void \mbox{\hyperlink{ReadForcing_8cu_ac2c8aa02f8230319bda8c04d8d926f43}{read\+D
 \item 
 void \mbox{\hyperlink{ReadForcing_8cu_a1ab85ae186390e00b60eec3c1c2d300e}{readbathydata}} (int posdown, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ \&Sforcing)
 \item 
-std\+::vector$<$ \mbox{\hyperlink{classSLTS}{SLTS}} $>$ \mbox{\hyperlink{ReadForcing_8cu_a436c1e78e856a0ea84561d1e682a328e}{readbndfile}} (std\+::string filename, \mbox{\hyperlink{classParam}{Param}} XParam, int side)
+std\+::string \mbox{\hyperlink{ReadForcing_8cu_a5d818df54a96c84ba9041a7723529c37}{read\+CRSfrombathy}} (std\+::string crs\+\_\+ref, \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ \&Sforcing)
 \item 
-std\+::vector$<$ \mbox{\hyperlink{classSLTS}{SLTS}} $>$ \mbox{\hyperlink{ReadForcing_8cu_afeea4dd9d8ebd063082ea4c1567e5bc0}{read\+WLfile}} (std\+::string WLfilename)
+\mbox{\hyperlink{classPolygon}{Polygon}} \mbox{\hyperlink{ReadForcing_8cu_a2f5682e418a0ef4df2f01f32b63f9f18}{readbndpolysegment}} (\mbox{\hyperlink{classbndsegment}{bndsegment}} bnd, \mbox{\hyperlink{classParam}{Param}} XParam)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{classSLTS}{SLTS}} $>$ \mbox{\hyperlink{ReadForcing_8cu_a63aad7e21f8862ae2814592f373e801d}{readbndfile}} (std\+::string filename, \mbox{\hyperlink{classParam}{Param}} \&XParam)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{classSLTS}{SLTS}} $>$ \mbox{\hyperlink{ReadForcing_8cu_a770a60d1078d46548b2b400f0269f17e}{read\+WLfile}} (std\+::string WLfilename, std\+::string \&refdate)
 \item 
 std\+::vector$<$ \mbox{\hyperlink{classSLTS}{SLTS}} $>$ \mbox{\hyperlink{ReadForcing_8cu_a0d3f4deb9291534b13100dd67c2f07a0}{read\+Nestfile}} (std\+::string ncfile, std\+::string varname, int hor, double eps, double bndxo, double bndxmax, double bndy)
 \item 
-std\+::vector$<$ \mbox{\hyperlink{classFlowin}{Flowin}} $>$ \mbox{\hyperlink{ReadForcing_8cu_ad437a175cd35b9bb5fe83df8a89dc65f}{read\+Flowfile}} (std\+::string Flowfilename)
+std\+::vector$<$ \mbox{\hyperlink{classFlowin}{Flowin}} $>$ \mbox{\hyperlink{ReadForcing_8cu_ad3a4d90c2d9929279eaa88c9d8332149}{read\+Flowfile}} (std\+::string Flowfilename, std\+::string \&refdate)
 \item 
-std\+::vector$<$ \mbox{\hyperlink{classWindin}{Windin}} $>$ \mbox{\hyperlink{ReadForcing_8cu_ac29aa33a795f38b48d40f23e17e39e9e}{read\+INfile\+UNI}} (std\+::string filename)
+std\+::vector$<$ \mbox{\hyperlink{classWindin}{Windin}} $>$ \mbox{\hyperlink{ReadForcing_8cu_ab8a60f8a1837e4d290acac635863b8be}{read\+INfile\+UNI}} (std\+::string filename, std\+::string \&refdate)
 \item 
-std\+::vector$<$ \mbox{\hyperlink{classWindin}{Windin}} $>$ \mbox{\hyperlink{ReadForcing_8cu_aab1844d704897f7cd2334740a2d73695}{read\+WNDfile\+UNI}} (std\+::string filename, double grdalpha)
+std\+::vector$<$ \mbox{\hyperlink{classWindin}{Windin}} $>$ \mbox{\hyperlink{ReadForcing_8cu_ac8f6aef19bae6123d0f15e4ebd55e06e}{read\+WNDfile\+UNI}} (std\+::string filename, std\+::string \&refdate, double grdalpha)
 \item 
 \mbox{\hyperlink{classPolygon}{Polygon}} \mbox{\hyperlink{ReadForcing_8cu_a5ef6fe5b2362fd76cf2494070cdf09a8}{read\+Polygon}} (std\+::string filename)
 \item 
@@ -60,7 +64,7 @@ template void \mbox{\hyperlink{ReadForcing_8cu_afcb5d7dd91e63019d53a8aa0fd6078d5
 \item 
 void \mbox{\hyperlink{ReadForcing_8cu_a3fa1bbd9368f3a36be12b5e091995f48}{readforcingdata}} (double totaltime, \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \&forcing)
 \item 
-\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \mbox{\hyperlink{ReadForcing_8cu_a2adfebe940d02f827f44987bb49d9f84}{readforcinghead}} (\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Fmap)
+\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \mbox{\hyperlink{ReadForcing_8cu_a0a03a64eaf1d9f23bd90dde04ac88552}{readforcinghead}} (\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ Fmap, \mbox{\hyperlink{classParam}{Param}} XParam)
 \item 
 {\footnotesize template$<$class T $>$ }\\T \mbox{\hyperlink{ReadForcing_8cu_af925e26d0223510bd6989d56d682e01b}{readforcinghead}} (T Forcing\+Param)
 \item 
@@ -93,6 +97,14 @@ template void \mbox{\hyperlink{ReadForcing_8cu_aae56d6759d3c92328bb8312184685227
 template void \mbox{\hyperlink{ReadForcing_8cu_a323c95e4833b1c2c2bbbe524cc7e30d5}{readbathy\+ASCzb$<$ float $>$}} (std\+::string filename, int nx, int ny, float $\ast$\&zb)
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ReadForcing_8cu_a0339053c220ea024214ab1c9b72cf8ce}{clampedges}} (int nx, int ny, T clamp, T $\ast$z)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ReadForcing_8cu_ad8c2bd04b5b1a5107e1b652c94f35c3b}{denan}} (int nx, int ny, float denanval, T $\ast$z)
+\item 
+template void \mbox{\hyperlink{ReadForcing_8cu_a293e3805e56ae53e10fb1ed2ba542f86}{denan$<$ float $>$}} (int nx, int ny, float denanval, float $\ast$z)
+\item 
+template void \mbox{\hyperlink{ReadForcing_8cu_a1c38a8da1fc6a5f3378129f940997fa2}{denan$<$ double $>$}} (int nx, int ny, float denanval, double $\ast$z)
+\item 
+void \mbox{\hyperlink{ReadForcing_8cu_aa50a9f2e1aef7fe1cd0d4ae1a6aae926}{denan}} (int nx, int ny, float denanval, int $\ast$z)
 \end{DoxyCompactItemize}
 
 
@@ -115,6 +127,31 @@ void clampedges (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\
 \index{DelimLine@{DelimLine}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{DelimLine()}{DelimLine()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
 {\footnotesize\ttfamily std\+::vector$<$std\+::string$>$ Delim\+Line (\begin{DoxyParamCaption}\item[{std\+::string}]{line,  }\item[{int}]{n,  }\item[{char}]{delim }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadForcing_8cu_aa50a9f2e1aef7fe1cd0d4ae1a6aae926}\label{ReadForcing_8cu_aa50a9f2e1aef7fe1cd0d4ae1a6aae926}} 
+\index{ReadForcing.cu@{ReadForcing.cu}!denan@{denan}}
+\index{denan@{denan}!ReadForcing.cu@{ReadForcing.cu}}
+\doxysubsubsection{\texorpdfstring{denan()}{denan()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void denan (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float}]{denanval,  }\item[{int $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadForcing_8cu_ad8c2bd04b5b1a5107e1b652c94f35c3b}\label{ReadForcing_8cu_ad8c2bd04b5b1a5107e1b652c94f35c3b}} 
+\index{ReadForcing.cu@{ReadForcing.cu}!denan@{denan}}
+\index{denan@{denan}!ReadForcing.cu@{ReadForcing.cu}}
+\doxysubsubsection{\texorpdfstring{denan()}{denan()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void denan (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float}]{denanval,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadForcing_8cu_a1c38a8da1fc6a5f3378129f940997fa2}\label{ReadForcing_8cu_a1c38a8da1fc6a5f3378129f940997fa2}} 
+\index{ReadForcing.cu@{ReadForcing.cu}!denan$<$ double $>$@{denan$<$ double $>$}}
+\index{denan$<$ double $>$@{denan$<$ double $>$}!ReadForcing.cu@{ReadForcing.cu}}
+\doxysubsubsection{\texorpdfstring{denan$<$ double $>$()}{denan< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_ad8c2bd04b5b1a5107e1b652c94f35c3b}{denan}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float}]{denanval,  }\item[{double $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadForcing_8cu_a293e3805e56ae53e10fb1ed2ba542f86}\label{ReadForcing_8cu_a293e3805e56ae53e10fb1ed2ba542f86}} 
+\index{ReadForcing.cu@{ReadForcing.cu}!denan$<$ float $>$@{denan$<$ float $>$}}
+\index{denan$<$ float $>$@{denan$<$ float $>$}!ReadForcing.cu@{ReadForcing.cu}}
+\doxysubsubsection{\texorpdfstring{denan$<$ float $>$()}{denan< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_ad8c2bd04b5b1a5107e1b652c94f35c3b}{denan}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float}]{denanval,  }\item[{float $\ast$}]{z }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{ReadForcing_8cu_a2abd45f07ddf2a1a3d67f9c51fd859a3}\label{ReadForcing_8cu_a2abd45f07ddf2a1a3d67f9c51fd859a3}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!InitDynforcing@{InitDynforcing}}
@@ -178,25 +215,37 @@ void readbathy\+MD (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\
 \doxysubsubsection{\texorpdfstring{readbathyMD$<$ int $>$()}{readbathyMD< int >()}}
 {\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d12c65a96fe1d7f9f5a70956f96d54b}{readbathy\+MD}}$<$ int $>$ (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\item[{int $\ast$\&}]{zb }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{ReadForcing_8cu_a436c1e78e856a0ea84561d1e682a328e}\label{ReadForcing_8cu_a436c1e78e856a0ea84561d1e682a328e}} 
+\mbox{\Hypertarget{ReadForcing_8cu_a63aad7e21f8862ae2814592f373e801d}\label{ReadForcing_8cu_a63aad7e21f8862ae2814592f373e801d}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readbndfile@{readbndfile}}
 \index{readbndfile@{readbndfile}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readbndfile()}{readbndfile()}}
-{\footnotesize\ttfamily std\+::vector$<$ \mbox{\hyperlink{classSLTS}{SLTS}} $>$ readbndfile (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{side }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classSLTS}{SLTS}}$>$ readbndfile (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam }\end{DoxyParamCaption})}
 
-Read boundary forcing files \mbox{\Hypertarget{ReadForcing_8cu_ac2c8aa02f8230319bda8c04d8d926f43}\label{ReadForcing_8cu_ac2c8aa02f8230319bda8c04d8d926f43}} 
+\mbox{\Hypertarget{ReadForcing_8cu_a2f5682e418a0ef4df2f01f32b63f9f18}\label{ReadForcing_8cu_a2f5682e418a0ef4df2f01f32b63f9f18}} 
+\index{ReadForcing.cu@{ReadForcing.cu}!readbndpolysegment@{readbndpolysegment}}
+\index{readbndpolysegment@{readbndpolysegment}!ReadForcing.cu@{ReadForcing.cu}}
+\doxysubsubsection{\texorpdfstring{readbndpolysegment()}{readbndpolysegment()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classPolygon}{Polygon}} readbndpolysegment (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classbndsegment}{bndsegment}}}]{bnd,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ReadForcing_8cu_a5d818df54a96c84ba9041a7723529c37}\label{ReadForcing_8cu_a5d818df54a96c84ba9041a7723529c37}} 
+\index{ReadForcing.cu@{ReadForcing.cu}!readCRSfrombathy@{readCRSfrombathy}}
+\index{readCRSfrombathy@{readCRSfrombathy}!ReadForcing.cu@{ReadForcing.cu}}
+\doxysubsubsection{\texorpdfstring{readCRSfrombathy()}{readCRSfrombathy()}}
+{\footnotesize\ttfamily void read\+CRSfrombathy (\begin{DoxyParamCaption}\item[{std\+::string}]{crs\+\_\+ref,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ \&}]{Sforcing }\end{DoxyParamCaption})}
+
+Reading the CRS information from the bathymetry file (last one read); \mbox{\Hypertarget{ReadForcing_8cu_ac2c8aa02f8230319bda8c04d8d926f43}\label{ReadForcing_8cu_ac2c8aa02f8230319bda8c04d8d926f43}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readDynforcing@{readDynforcing}}
 \index{readDynforcing@{readDynforcing}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readDynforcing()}{readDynforcing()}}
 {\footnotesize\ttfamily void read\+Dynforcing (\begin{DoxyParamCaption}\item[{bool}]{gpgpu,  }\item[{double}]{totaltime,  }\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \&}]{Dforcing }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{ReadForcing_8cu_ad437a175cd35b9bb5fe83df8a89dc65f}\label{ReadForcing_8cu_ad437a175cd35b9bb5fe83df8a89dc65f}} 
+This is a deprecated function! See \mbox{\hyperlink{ReadForcing_8cu_a2abd45f07ddf2a1a3d67f9c51fd859a3}{Init\+Dynforcing()}} instead \mbox{\Hypertarget{ReadForcing_8cu_ad3a4d90c2d9929279eaa88c9d8332149}\label{ReadForcing_8cu_ad3a4d90c2d9929279eaa88c9d8332149}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readFlowfile@{readFlowfile}}
 \index{readFlowfile@{readFlowfile}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readFlowfile()}{readFlowfile()}}
-{\footnotesize\ttfamily std\+::vector$<$ \mbox{\hyperlink{classFlowin}{Flowin}} $>$ read\+Flowfile (\begin{DoxyParamCaption}\item[{std\+::string}]{Flowfilename }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classFlowin}{Flowin}}$>$ read\+Flowfile (\begin{DoxyParamCaption}\item[{std\+::string}]{Flowfilename,  }\item[{std\+::string \&}]{refdate }\end{DoxyParamCaption})}
 
-Read flow data for river forcing \mbox{\Hypertarget{ReadForcing_8cu_acecbceee95ca77d912e5d3b192e3e29b}\label{ReadForcing_8cu_acecbceee95ca77d912e5d3b192e3e29b}} 
+\mbox{\Hypertarget{ReadForcing_8cu_acecbceee95ca77d912e5d3b192e3e29b}\label{ReadForcing_8cu_acecbceee95ca77d912e5d3b192e3e29b}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readforcing@{readforcing}}
 \index{readforcing@{readforcing}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readforcing()}{readforcing()}}
@@ -240,11 +289,11 @@ Read static forcing data \mbox{\Hypertarget{ReadForcing_8cu_a6288f2cf23d366b4954
 \doxysubsubsection{\texorpdfstring{readforcingdata$<$ StaticForcingP$<$ int $>$ $>$()}{readforcingdata< StaticForcingP< int > >()}}
 {\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a3fa1bbd9368f3a36be12b5e091995f48}{readforcingdata}}$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ $>$ (\begin{DoxyParamCaption}\item[{int}]{step,  }\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$}]{forcing }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{ReadForcing_8cu_a2adfebe940d02f827f44987bb49d9f84}\label{ReadForcing_8cu_a2adfebe940d02f827f44987bb49d9f84}} 
+\mbox{\Hypertarget{ReadForcing_8cu_a0a03a64eaf1d9f23bd90dde04ac88552}\label{ReadForcing_8cu_a0a03a64eaf1d9f23bd90dde04ac88552}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readforcinghead@{readforcinghead}}
 \index{readforcinghead@{readforcinghead}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readforcinghead()}{readforcinghead()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
-{\footnotesize\ttfamily \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ readforcinghead (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Fmap }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ readforcinghead (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$}]{Fmap,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam }\end{DoxyParamCaption})}
 
 Read Dynamic forcing meta/header data \mbox{\Hypertarget{ReadForcing_8cu_af925e26d0223510bd6989d56d682e01b}\label{ReadForcing_8cu_af925e26d0223510bd6989d56d682e01b}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readforcinghead@{readforcinghead}}
@@ -271,13 +320,13 @@ Read Static forcing meta/header data \mbox{\Hypertarget{ReadForcing_8cu_acb115a7
 \doxysubsubsection{\texorpdfstring{readforcinghead$<$ StaticForcingP$<$ float $>$ $>$()}{readforcinghead< StaticForcingP< float > >()}}
 {\footnotesize\ttfamily template \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$float$>$ \mbox{\hyperlink{ReadForcing_8h_a03a01a0d223ec79d3892ececa91e4eff}{readforcinghead}}$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$}]{Forcing\+Param }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{ReadForcing_8cu_ac29aa33a795f38b48d40f23e17e39e9e}\label{ReadForcing_8cu_ac29aa33a795f38b48d40f23e17e39e9e}} 
+\mbox{\Hypertarget{ReadForcing_8cu_ab8a60f8a1837e4d290acac635863b8be}\label{ReadForcing_8cu_ab8a60f8a1837e4d290acac635863b8be}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readINfileUNI@{readINfileUNI}}
 \index{readINfileUNI@{readINfileUNI}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readINfileUNI()}{readINfileUNI()}}
-{\footnotesize\ttfamily std\+::vector$<$ \mbox{\hyperlink{classWindin}{Windin}} $>$ read\+INfile\+UNI (\begin{DoxyParamCaption}\item[{std\+::string}]{filename }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classWindin}{Windin}}$>$ read\+INfile\+UNI (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\item[{std\+::string \&}]{refdate }\end{DoxyParamCaption})}
 
-Read rain/atmpressure data for spatially uniform forcing \mbox{\Hypertarget{ReadForcing_8cu_a0d3f4deb9291534b13100dd67c2f07a0}\label{ReadForcing_8cu_a0d3f4deb9291534b13100dd67c2f07a0}} 
+\mbox{\Hypertarget{ReadForcing_8cu_a0d3f4deb9291534b13100dd67c2f07a0}\label{ReadForcing_8cu_a0d3f4deb9291534b13100dd67c2f07a0}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readNestfile@{readNestfile}}
 \index{readNestfile@{readNestfile}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readNestfile()}{readNestfile()}}
@@ -339,19 +388,19 @@ single parameter version of \mbox{\hyperlink{ReadForcing_8cu_a306a1320cbc833c305
 \doxysubsubsection{\texorpdfstring{readstaticforcing$<$ StaticForcingP$<$ int $>$ $>$()}{readstaticforcing< StaticForcingP< int > >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
 {\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a306a1320cbc833c3058456bd2c6df2c5}{readstaticforcing}}$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ \&}]{Sforcing }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{ReadForcing_8cu_afeea4dd9d8ebd063082ea4c1567e5bc0}\label{ReadForcing_8cu_afeea4dd9d8ebd063082ea4c1567e5bc0}} 
+\mbox{\Hypertarget{ReadForcing_8cu_a770a60d1078d46548b2b400f0269f17e}\label{ReadForcing_8cu_a770a60d1078d46548b2b400f0269f17e}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readWLfile@{readWLfile}}
 \index{readWLfile@{readWLfile}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readWLfile()}{readWLfile()}}
-{\footnotesize\ttfamily std\+::vector$<$ \mbox{\hyperlink{classSLTS}{SLTS}} $>$ read\+WLfile (\begin{DoxyParamCaption}\item[{std\+::string}]{WLfilename }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classSLTS}{SLTS}}$>$ read\+WLfile (\begin{DoxyParamCaption}\item[{std\+::string}]{WLfilename,  }\item[{std\+::string \&}]{refdate }\end{DoxyParamCaption})}
 
-Read boundary water level data \mbox{\Hypertarget{ReadForcing_8cu_aab1844d704897f7cd2334740a2d73695}\label{ReadForcing_8cu_aab1844d704897f7cd2334740a2d73695}} 
+\mbox{\Hypertarget{ReadForcing_8cu_ac8f6aef19bae6123d0f15e4ebd55e06e}\label{ReadForcing_8cu_ac8f6aef19bae6123d0f15e4ebd55e06e}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readWNDfileUNI@{readWNDfileUNI}}
 \index{readWNDfileUNI@{readWNDfileUNI}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readWNDfileUNI()}{readWNDfileUNI()}}
-{\footnotesize\ttfamily std\+::vector$<$ \mbox{\hyperlink{classWindin}{Windin}} $>$ read\+WNDfile\+UNI (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\item[{double}]{grdalpha }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classWindin}{Windin}}$>$ read\+WNDfile\+UNI (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\item[{std\+::string \&}]{refdate,  }\item[{double}]{grdalpha }\end{DoxyParamCaption})}
 
-Read wind data for spatially uniform forcing \mbox{\Hypertarget{ReadForcing_8cu_ae853fd83c25a1c55c6a495ef2dfc2cfb}\label{ReadForcing_8cu_ae853fd83c25a1c55c6a495ef2dfc2cfb}} 
+\mbox{\Hypertarget{ReadForcing_8cu_ae853fd83c25a1c55c6a495ef2dfc2cfb}\label{ReadForcing_8cu_ae853fd83c25a1c55c6a495ef2dfc2cfb}} 
 \index{ReadForcing.cu@{ReadForcing.cu}!readXBbathy@{readXBbathy}}
 \index{readXBbathy@{readXBbathy}!ReadForcing.cu@{ReadForcing.cu}}
 \doxysubsubsection{\texorpdfstring{readXBbathy()}{readXBbathy()}}

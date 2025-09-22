@@ -1,6 +1,8 @@
 var classinputmap =
 [
+    [ "denanval", "classinputmap.html#ad24365594041423812590029c48c3cd5", null ],
     [ "dx", "classinputmap.html#af8166beb80032716a2cb79f1f30e1629", null ],
+    [ "dy", "classinputmap.html#a2a7b526a69debaf802ee8b4365a4d949", null ],
     [ "extension", "classinputmap.html#a80721901bfe18f039255b521b29ed05f", null ],
     [ "flipxx", "classinputmap.html#a5fc2664ee0afe5e4644088c7e72be361", null ],
     [ "flipyy", "classinputmap.html#a9c22e10895c1559b69b36092abd7aca8", null ],

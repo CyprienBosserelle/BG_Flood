@@ -109,6 +109,7 @@ $(document).ready(function(){initNavTree('InitialConditions_8h.html',''); initRe
 <code>#include &quot;<a class="el" href="GridManip_8h_source.html">GridManip.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="InitEvolv_8h_source.html">InitEvolv.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Gradients_8h_source.html">Gradients.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Spherical_8h_source.html">Spherical.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for InitialConditions.h:</div>
 <div class="dyncontent">
@@ -138,9 +139,9 @@ Functions</h2></td></tr>
 <tr class="separator:a92d93b52d0855bccfd492225026be911"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a763216129a9441782bbf02da1440c568"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8h.html#a763216129a9441782bbf02da1440c568">InitTSOutput</a> (<a class="el" href="classParam.html">Param</a> XParam)</td></tr>
 <tr class="separator:a763216129a9441782bbf02da1440c568"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00df2cd6889ed35970ab143abd056800"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a00df2cd6889ed35970ab143abd056800"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8h.html#a00df2cd6889ed35970ab143abd056800">FindTSoutNodes</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a> &amp;bnd)</td></tr>
-<tr class="separator:a00df2cd6889ed35970ab143abd056800"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13f967444cee5c69fa9cb6440510e6e7"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a13f967444cee5c69fa9cb6440510e6e7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8h.html#a13f967444cee5c69fa9cb6440510e6e7">FindTSoutNodes</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a>&lt; T &gt; &amp;bnd)</td></tr>
+<tr class="separator:a13f967444cee5c69fa9cb6440510e6e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a263be1815f9718565688c7df2e501586"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a263be1815f9718565688c7df2e501586"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8h.html#a263be1815f9718565688c7df2e501586">Calcbndblks</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock)</td></tr>
 <tr class="separator:a263be1815f9718565688c7df2e501586"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,6 +160,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a1798976a481c2b62fc463897a1dc0f29"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a1798976a481c2b62fc463897a1dc0f29"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8h.html#a1798976a481c2b62fc463897a1dc0f29">calcactiveCellCPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing, T *zb)</td></tr>
 <tr class="separator:a1798976a481c2b62fc463897a1dc0f29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64efa40d094126115fa54a03bb146cd5"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a64efa40d094126115fa54a03bb146cd5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8h.html#a64efa40d094126115fa54a03bb146cd5">initOutputTimes</a> (<a class="el" href="classParam.html">Param</a> XParam, std::vector&lt; double &gt; &amp;OutputT, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; &amp;XBlock)</td></tr>
+<tr class="separator:a64efa40d094126115fa54a03bb146cd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a1798976a481c2b62fc463897a1dc0f29"></a>
@@ -272,11 +276,12 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Find which block on the model edge belongs to a "side boundary" </p>
 
 </div>
 </div>
-<a id="a00df2cd6889ed35970ab143abd056800"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00df2cd6889ed35970ab143abd056800">&#9670;&nbsp;</a></span>FindTSoutNodes()</h2>
+<a id="a13f967444cee5c69fa9cb6440510e6e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13f967444cee5c69fa9cb6440510e6e7">&#9670;&nbsp;</a></span>FindTSoutNodes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -298,7 +303,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a>&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>bnd</em>&#160;</td>
         </tr>
         <tr>
@@ -386,6 +391,42 @@ template&lt;class T &gt; </div>
           <td></td>
           <td class="paramtype"><a class="el" href="structModel.html">Model</a>&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>XModel</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a64efa40d094126115fa54a03bb146cd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64efa40d094126115fa54a03bb146cd5">&#9670;&nbsp;</a></span>initOutputTimes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void initOutputTimes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>OutputT</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>XBlock</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -547,7 +588,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="InitialConditions_8h.html">InitialConditions.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

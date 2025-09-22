@@ -113,6 +113,7 @@ $(document).ready(function(){initNavTree('Testing_8h.html',''); initResizable();
 <code>#include &quot;<a class="el" href="FlowCPU_8h_source.html">FlowCPU.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="FlowGPU_8h_source.html">FlowGPU.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Adaptation_8h_source.html">Adaptation.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="utctime_8h_source.html">utctime.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Testing.h:</div>
 <div class="dyncontent">
@@ -157,9 +158,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a7b6329079d1c7902af71dd17677dae15"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a7b6329079d1c7902af71dd17677dae15"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Testing_8h.html#a7b6329079d1c7902af71dd17677dae15">MassConserveSteepSlope</a> (T zsnit, int gpu)</td></tr>
 <tr class="separator:a7b6329079d1c7902af71dd17677dae15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b588f22d9b47f00af2a94804ac2b7f1"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a5b588f22d9b47f00af2a94804ac2b7f1"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Testing_8h.html#a5b588f22d9b47f00af2a94804ac2b7f1">Raintest</a> (T zsnit, int gpu, float alpha)</td></tr>
-<tr class="separator:a5b588f22d9b47f00af2a94804ac2b7f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31b092b81a7e3ff99df93441e5d0bb62"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a31b092b81a7e3ff99df93441e5d0bb62"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Testing_8h.html#a31b092b81a7e3ff99df93441e5d0bb62">Raintest</a> (T zsnit, int gpu, float alpha, int engine)</td></tr>
+<tr class="separator:a31b092b81a7e3ff99df93441e5d0bb62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f58fd96fa0d9473ed0c863d5b789485"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a1f58fd96fa0d9473ed0c863d5b789485"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Testing_8h.html#a1f58fd96fa0d9473ed0c863d5b789485">testboundaries</a> (<a class="el" href="classParam.html">Param</a> XParam, T maxslope)</td></tr>
 <tr class="separator:a1f58fd96fa0d9473ed0c863d5b789485"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,6 +170,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a6645fef2658aa8f5bb8f72823d17019c"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6645fef2658aa8f5bb8f72823d17019c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Testing_8h.html#a6645fef2658aa8f5bb8f72823d17019c">Rainlossestest</a> (T zsnit, int gpu, float alpha)</td></tr>
 <tr class="separator:a6645fef2658aa8f5bb8f72823d17019c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee83c778b6d86fde8c183b3a896cdc71"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:aee83c778b6d86fde8c183b3a896cdc71"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Testing_8h.html#aee83c778b6d86fde8c183b3a896cdc71">TestMultiBathyRough</a> (int gpu, T ref, int secnario)</td></tr>
+<tr class="separator:aee83c778b6d86fde8c183b3a896cdc71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad474adad94a69be09516b5f538fc460a"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ad474adad94a69be09516b5f538fc460a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Testing_8h.html#ad474adad94a69be09516b5f538fc460a">TestFlexibleOutputTimes</a> (int gpu, T ref, int scenario)</td></tr>
+<tr class="separator:ad474adad94a69be09516b5f538fc460a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a4974ca541eb0c671b0b437f594b63aba"></a>
@@ -405,8 +412,8 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a5b588f22d9b47f00af2a94804ac2b7f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b588f22d9b47f00af2a94804ac2b7f1">&#9670;&nbsp;</a></span>Raintest()</h2>
+<a id="a31b092b81a7e3ff99df93441e5d0bb62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31b092b81a7e3ff99df93441e5d0bb62">&#9670;&nbsp;</a></span>Raintest()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -429,7 +436,13 @@ template&lt;class T &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>alpha</em>&#160;</td>
+          <td class="paramname"><em>alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>engine</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -560,6 +573,42 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="ad474adad94a69be09516b5f538fc460a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad474adad94a69be09516b5f538fc460a">&#9670;&nbsp;</a></span>TestFlexibleOutputTimes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TestFlexibleOutputTimes </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>ref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>scenario</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a1803abe24ad2daba8d11e5e46c783762"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1803abe24ad2daba8d11e5e46c783762">&#9670;&nbsp;</a></span>Testing()</h2>
 
@@ -633,6 +682,42 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="aee83c778b6d86fde8c183b3a896cdc71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee83c778b6d86fde8c183b3a896cdc71">&#9670;&nbsp;</a></span>TestMultiBathyRough()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TestMultiBathyRough </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gpu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>ref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>secnario</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0755c7670bec1082029464abce5504ad"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0755c7670bec1082029464abce5504ad">&#9670;&nbsp;</a></span>ZoneOutputTest()</h2>
 
@@ -671,7 +756,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Testing_8h.html">Testing.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:18 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

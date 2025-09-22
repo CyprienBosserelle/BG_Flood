@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['gradientsp_1301',['GradientsP',['../structGradientsP.html',1,'']]]
+  ['gradientsmlp_1494',['GradientsMLP',['../structGradientsMLP.html',1,'']]],
+  ['gradientsp_1495',['GradientsP',['../structGradientsP.html',1,'']]]
 ];

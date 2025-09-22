@@ -121,9 +121,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a0831d7ffc3b6f6689bbc0572e0ffabc3"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a0831d7ffc3b6f6689bbc0572e0ffabc3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitEvolv_8cu.html#a0831d7ffc3b6f6689bbc0572e0ffabc3">warmstart</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; XForcing, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *zb, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; &amp;XEv)</td></tr>
 <tr class="separator:a0831d7ffc3b6f6689bbc0572e0ffabc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fbb7998c589a4ed6cc4f878eb401bf7"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a0fbb7998c589a4ed6cc4f878eb401bf7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitEvolv_8cu.html#a0fbb7998c589a4ed6cc4f878eb401bf7">warmstartold</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; XForcing, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *zb, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; &amp;XEv)</td></tr>
+<tr class="separator:a0fbb7998c589a4ed6cc4f878eb401bf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac25b19d857c6899099322406558826bf"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:ac25b19d857c6899099322406558826bf"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitEvolv_8cu.html#ac25b19d857c6899099322406558826bf">AddZSoffset</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; &amp;XEv, T *zb)</td></tr>
 <tr class="separator:ac25b19d857c6899099322406558826bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79af6bcf26f13848ee5fca74f082ab1c"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a79af6bcf26f13848ee5fca74f082ab1c"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitEvolv_8cu.html#a79af6bcf26f13848ee5fca74f082ab1c">readhotstartfileBG</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; &amp;XEv, T *&amp;zb)</td></tr>
+<tr class="separator:a79af6bcf26f13848ee5fca74f082ab1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acff23dccc956433e8500e1d8d6d831b6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:acff23dccc956433e8500e1d8d6d831b6"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitEvolv_8cu.html#acff23dccc956433e8500e1d8d6d831b6">readhotstartfile</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; &amp;XEv, T *&amp;zb)</td></tr>
 <tr class="separator:acff23dccc956433e8500e1d8d6d831b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -480,6 +486,48 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a79af6bcf26f13848ee5fca74f082ab1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79af6bcf26f13848ee5fca74f082ab1c">&#9670;&nbsp;</a></span>readhotstartfileBG()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">int readhotstartfileBG </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>XEv</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&amp;&#160;</td>
+          <td class="paramname"><em>zb</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0831d7ffc3b6f6689bbc0572e0ffabc3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0831d7ffc3b6f6689bbc0572e0ffabc3">&#9670;&nbsp;</a></span>warmstart()</h2>
 
@@ -528,13 +576,61 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a0fbb7998c589a4ed6cc4f878eb401bf7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fbb7998c589a4ed6cc4f878eb401bf7">&#9670;&nbsp;</a></span>warmstartold()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void warmstartold </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structForcing.html">Forcing</a>&lt; float &gt;&#160;</td>
+          <td class="paramname"><em>XForcing</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>zb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>XEv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="InitEvolv_8cu.html">InitEvolv.cu</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

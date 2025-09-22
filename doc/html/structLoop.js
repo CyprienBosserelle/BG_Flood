@@ -10,6 +10,7 @@ var structLoop =
     [ "gridDim", "structLoop.html#a93929edda1b29e1230cf44fb08f8791d", null ],
     [ "hugenegval", "structLoop.html#a4f456faf0de9b08f099e0dd44c790388", null ],
     [ "hugeposval", "structLoop.html#a324fbf87aacab45d22f4ad92cb2a2ffa", null ],
+    [ "indNextoutputtime", "structLoop.html#a2166bcfff33532161e920418ba731e53", null ],
     [ "nextoutputtime", "structLoop.html#ac91b2b218fc8bdf6c736627084f3adfc", null ],
     [ "nstep", "structLoop.html#a83d5311ba65215aa0d66aecc90bfd3b1", null ],
     [ "nstepout", "structLoop.html#a5f4b6a2a12188e1aefde0fe49979b5dc", null ],

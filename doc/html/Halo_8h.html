@@ -138,6 +138,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a29a79939f743cb813160e5cd771480b9"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a29a79939f743cb813160e5cd771480b9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#a29a79939f743cb813160e5cd771480b9">fillHaloGPUnew</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, cudaStream_t stream, T *z)</td></tr>
 <tr class="separator:a29a79939f743cb813160e5cd771480b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9685d8f9a22683d2a5a8ab96abb1f735"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a9685d8f9a22683d2a5a8ab96abb1f735"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#a9685d8f9a22683d2a5a8ab96abb1f735">fillHaloGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *z)</td></tr>
+<tr class="separator:a9685d8f9a22683d2a5a8ab96abb1f735"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a31e12451e1336defc379f47d6aab9e"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a4a31e12451e1336defc379f47d6aab9e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#a4a31e12451e1336defc379f47d6aab9e">fillHalo</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; Xev, T *zb)</td></tr>
 <tr class="separator:a4a31e12451e1336defc379f47d6aab9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,6 +172,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa2ee5621453ee3e33a49b920693879c6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:aa2ee5621453ee3e33a49b920693879c6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#aa2ee5621453ee3e33a49b920693879c6">fillHaloTopRightGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, bool doprolong, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, cudaStream_t stream, T *z)</td></tr>
 <tr class="separator:aa2ee5621453ee3e33a49b920693879c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8656ca08616abdeb043f622de7243fd"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ad8656ca08616abdeb043f622de7243fd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#ad8656ca08616abdeb043f622de7243fd">bndmaskGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; Xev, <a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt; Flux)</td></tr>
+<tr class="separator:ad8656ca08616abdeb043f622de7243fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7bdbf10e6e7309983c7143644f18268"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:ad7bdbf10e6e7309983c7143644f18268"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#ad7bdbf10e6e7309983c7143644f18268">fillLeft</a> (<a class="el" href="classParam.html">Param</a> XParam, int ib, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *&amp;z)</td></tr>
 <tr class="separator:ad7bdbf10e6e7309983c7143644f18268"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -260,8 +266,59 @@ Functions</h2></td></tr>
 <tr class="memitem:a0c0b81d1c956a11c4025491946f90010"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a0c0b81d1c956a11c4025491946f90010"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#a0c0b81d1c956a11c4025491946f90010">HaloFluxGPUBT</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *z)</td></tr>
 <tr class="separator:a0c0b81d1c956a11c4025491946f90010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9178199ff5e46ef9a5fee4241b8e235e"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a9178199ff5e46ef9a5fee4241b8e235e"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#a9178199ff5e46ef9a5fee4241b8e235e">HaloFluxGPULRnew</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *z)</td></tr>
+<tr class="separator:a9178199ff5e46ef9a5fee4241b8e235e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ddd71e988ae7200bfd409d5d9d81921"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a5ddd71e988ae7200bfd409d5d9d81921"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#a5ddd71e988ae7200bfd409d5d9d81921">HaloFluxGPUBTnew</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *z)</td></tr>
+<tr class="separator:a5ddd71e988ae7200bfd409d5d9d81921"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ba5024f1ba2013889f0dd2eee8e9f94"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a9ba5024f1ba2013889f0dd2eee8e9f94"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Halo_8h.html#a9ba5024f1ba2013889f0dd2eee8e9f94">fillCornersGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *z)</td></tr>
+<tr class="separator:a9ba5024f1ba2013889f0dd2eee8e9f94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ad8656ca08616abdeb043f622de7243fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8656ca08616abdeb043f622de7243fd">&#9670;&nbsp;</a></span>bndmaskGPU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void bndmaskGPU </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Xev</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structFluxP.html">FluxP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>Flux</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="af9678ea06bf2f69ed3152b64f8deffca"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af9678ea06bf2f69ed3152b64f8deffca">&#9670;&nbsp;</a></span>fillBot() <span class="overload">[1/2]</span></h2>
 
@@ -568,6 +625,42 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a9ba5024f1ba2013889f0dd2eee8e9f94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ba5024f1ba2013889f0dd2eee8e9f94">&#9670;&nbsp;</a></span>fillCornersGPU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void fillCornersGPU </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a571ac7ff2cf8b31f5d026b7e909e5271"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a571ac7ff2cf8b31f5d026b7e909e5271">&#9670;&nbsp;</a></span>fillHalo() <span class="overload">[1/4]</span></h2>
 
@@ -753,7 +846,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating halos for each block of a single variable on CPU. </p>
-<h2><a class="anchor" id="autotoc_md135"></a>
+<h2><a class="anchor" id="autotoc_md133"></a>
 Description</h2>
 <p>This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo CPU function. This is layer 2 of 3 wrap so the candy doesn't stick too much. </p>
 
@@ -800,16 +893,16 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating flux in the halos for a block and a single variable on CPU. </p>
-<h2><a class="anchor" id="autotoc_md140"></a>
+<h2><a class="anchor" id="autotoc_md138"></a>
 Depreciated</h2>
 <p>This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn't preserve the balance of fluxes on the restiction interface It should be deleted soon </p>
-<h2><a class="anchor" id="autotoc_md141"></a>
+<h2><a class="anchor" id="autotoc_md139"></a>
 Description</h2>
 
 </div>
 </div>
 <a id="a2ee84ac3de37b97bf6c4a3919f8a355b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ee84ac3de37b97bf6c4a3919f8a355b">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[1/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ee84ac3de37b97bf6c4a3919f8a355b">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[1/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -849,14 +942,14 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating halos for each block of a single variable on GPU. </p>
-<h2><a class="anchor" id="autotoc_md142"></a>
+<h2><a class="anchor" id="autotoc_md140"></a>
 Description</h2>
 <p>This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions </p>
 
 </div>
 </div>
 <a id="a2a355feb696605ad555fe018395bcac2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a355feb696605ad555fe018395bcac2">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[2/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a355feb696605ad555fe018395bcac2">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[2/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -892,7 +985,7 @@ template&lt;class T &gt; </div>
 </div>
 </div>
 <a id="a8bcac8c7fda9dd6edcfb34f40543ceef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8bcac8c7fda9dd6edcfb34f40543ceef">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[3/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bcac8c7fda9dd6edcfb34f40543ceef">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[3/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -934,7 +1027,7 @@ template&lt;class T &gt; </div>
 </div>
 </div>
 <a id="a3f01819995937c8bbce5ac05c18f71b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f01819995937c8bbce5ac05c18f71b4">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[4/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f01819995937c8bbce5ac05c18f71b4">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[4/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -970,7 +1063,7 @@ template&lt;class T &gt; </div>
 </div>
 </div>
 <a id="a8d8f335f2691b865597b01f0e6c2e210"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d8f335f2691b865597b01f0e6c2e210">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[5/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d8f335f2691b865597b01f0e6c2e210">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[5/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -994,6 +1087,42 @@ template&lt;class T &gt; </div>
           <td></td>
           <td class="paramtype"><a class="el" href="structGradientsP.html">GradientsP</a>&lt; T &gt;&#160;</td>
           <td class="paramname"><em>Grad</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9685d8f9a22683d2a5a8ab96abb1f735"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9685d8f9a22683d2a5a8ab96abb1f735">&#9670;&nbsp;</a></span>fillHaloGPU() <span class="overload">[6/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void fillHaloGPU </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1082,7 +1211,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Wrapping function for calculating flux for halos for each block of a single variable on GPU. </p>
-<h2><a class="anchor" id="autotoc_md143"></a>
+<h2><a class="anchor" id="autotoc_md141"></a>
 Description</h2>
 <p>This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function. The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions </p>
 
@@ -2000,6 +2129,42 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a5ddd71e988ae7200bfd409d5d9d81921"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ddd71e988ae7200bfd409d5d9d81921">&#9670;&nbsp;</a></span>HaloFluxGPUBTnew()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void HaloFluxGPUBTnew </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a82e672706036bc5b4e87cd2b739f9609"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a82e672706036bc5b4e87cd2b739f9609">&#9670;&nbsp;</a></span>HaloFluxGPULR()</h2>
 
@@ -2010,6 +2175,42 @@ template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">__global__ void HaloFluxGPULR </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9178199ff5e46ef9a5fee4241b8e235e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9178199ff5e46ef9a5fee4241b8e235e">&#9670;&nbsp;</a></span>HaloFluxGPULRnew()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void HaloFluxGPULRnew </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
           <td class="paramname"><em>XParam</em>, </td>
@@ -2120,17 +2321,17 @@ template&lt;class T &gt; </div>
 
 <p>Recalculate water surface after recalculating the values on the halo on the CPU. </p>
 <p>Recalculate water surface after recalculating the values on the halo on the GPU.</p>
-<h2><a class="anchor" id="autotoc_md136"></a>
+<h2><a class="anchor" id="autotoc_md134"></a>
 Description</h2>
 <p>Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps. <br  />
  zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)</p>
-<h2><a class="anchor" id="autotoc_md137"></a>
+<h2><a class="anchor" id="autotoc_md135"></a>
 Warning</h2>
 <p>This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction</p>
-<h2><a class="anchor" id="autotoc_md138"></a>
+<h2><a class="anchor" id="autotoc_md136"></a>
 Description</h2>
 <p>Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps. zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)</p>
-<h2><a class="anchor" id="autotoc_md139"></a>
+<h2><a class="anchor" id="autotoc_md137"></a>
 Warning</h2>
 <p>This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction </p>
 
@@ -2478,7 +2679,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Halo_8h.html">Halo.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

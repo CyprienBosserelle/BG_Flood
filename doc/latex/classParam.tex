@@ -4,6 +4,10 @@
 
 {\ttfamily \#include $<$Param.\+h$>$}
 
+
+
+Collaboration diagram for Param\+:
+% FIG 0
 \doxysubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -29,6 +33,10 @@ double \mbox{\hyperlink{classParam_a6294cc3b34858ec859b809535d62faa1}{cf}} = 0.\
 \item 
 double \mbox{\hyperlink{classParam_a31e15f3847a2e75b936ab0aea996900a}{Cd}} = 0.\+002
 \item 
+double \mbox{\hyperlink{classParam_a5e4968c3d1eb9dcbfbe4841313dd526e}{il}} = 0.\+0
+\item 
+double \mbox{\hyperlink{classParam_ac156ae8354a898c377f440732a4a5983}{cl}} = 0.\+0
+\item 
 bool \mbox{\hyperlink{classParam_a63560d0910c087fd7fc4e9a8e8345922}{windforcing}} = false
 \item 
 bool \mbox{\hyperlink{classParam_abaaf2f49bde9fed254f80a88ec32a30d}{atmpforcing}} = false
@@ -41,13 +49,7 @@ bool \mbox{\hyperlink{classParam_adf63cfa3d4df365208074857ff9aecd3}{conserve\+El
 \item 
 bool \mbox{\hyperlink{classParam_ac1b0f48735d022dbbaf72b33a90ca5d7}{wetdryfix}} = true
 \item 
-bool \mbox{\hyperlink{classParam_a716b643890ebd9d7fda0280d2b46f0cf}{leftbnd}} = false
-\item 
-bool \mbox{\hyperlink{classParam_af3d39fb85e682bb8624647de01410206}{rightbnd}} = false
-\item 
-bool \mbox{\hyperlink{classParam_afadd1eca80d4fb49c1541bb7b27d0263}{topbnd}} = false
-\item 
-bool \mbox{\hyperlink{classParam_af6b337ecf38a10803f3cd8e5e06cdd5c}{botbnd}} = false
+bool \mbox{\hyperlink{classParam_ad726f6cdd31ef755e528ddb0e6625cf2}{Force\+Mass\+Conserve}} = false
 \item 
 double \mbox{\hyperlink{classParam_adccee86eade735a53ed48f73c2086098}{Pa2m}} = 0.\+00009916
 \item 
@@ -91,7 +93,7 @@ double \mbox{\hyperlink{classParam_af85123c8e6ad62f834df061df5cafa25}{grdalpha}}
 \item 
 int \mbox{\hyperlink{classParam_a5e566a6b64bbb2d2aae7202695b0d371}{posdown}} = 0
 \item 
-int \mbox{\hyperlink{classParam_a0517015808f440ce5fcc06d18b2ef896}{spherical}} = 0
+bool \mbox{\hyperlink{classParam_a245439e7a28e89165ad3084af27c8da7}{spherical}} = 0
 \item 
 double \mbox{\hyperlink{classParam_a85094868d69eb0e50469af461bd925b3}{Radius}} = 6371220.
 \item 
@@ -99,9 +101,9 @@ double \mbox{\hyperlink{classParam_a59981aed45aa424e9f4856ae9107f21b}{mask}} = 9
 \item 
 int \mbox{\hyperlink{classParam_aac4696364843ddccbb8b47961023cd4c}{initlevel}} = 0
 \item 
-int \mbox{\hyperlink{classParam_a602c2223020d433369cf8c1dbd236517}{maxlevel}} = 0
+int \mbox{\hyperlink{classParam_a602c2223020d433369cf8c1dbd236517}{maxlevel}} = -\/99999
 \item 
-int \mbox{\hyperlink{classParam_a974d1451ddd209fb3550b554726e12ad}{minlevel}} = 0
+int \mbox{\hyperlink{classParam_a974d1451ddd209fb3550b554726e12ad}{minlevel}} = -\/99999
 \item 
 int \mbox{\hyperlink{classParam_acb234cabc3637721b8115f04363157d8}{nblkmem}} = 0
 \item 
@@ -111,13 +113,31 @@ double \mbox{\hyperlink{classParam_a82248332d20759fbb16209cba4fef780}{membuffer}
 \item 
 double \mbox{\hyperlink{classParam_a0bfe307e5614456c51685a69161ebdf6}{outputtimestep}} = 0.\+0
 \item 
-double \mbox{\hyperlink{classParam_a3a2075d8dade68288089733ca5969930}{endtime}} = 0.\+0
+double \mbox{\hyperlink{classParam_a3a2075d8dade68288089733ca5969930}{endtime}} = std\+::numeric\+\_\+limits$<$double$>$\+::max()
 \item 
 double \mbox{\hyperlink{classParam_a71491afdf2a212a74e76fddf574a08a7}{totaltime}} = 0.\+0
+\item 
+double \mbox{\hyperlink{classParam_a1b5ddadef2ac55650e66c35152ef1f85}{inittime}} = 0.\+0
 \item 
 double \mbox{\hyperlink{classParam_ade28be53ad4e21dbebf789b57fb03fce}{dtinit}} = -\/1
 \item 
 double \mbox{\hyperlink{classParam_a2f28cb8d294f1ca1f120a3abe201e352}{dtmin}} = 0.\+0005
+\item 
+\mbox{\hyperlink{classT__output}{T\+\_\+output}} \mbox{\hyperlink{classParam_a9d5ff5efd69fdda52b5606a9de43fa9c}{Toutput}}
+\item 
+bool \mbox{\hyperlink{classParam_a716b643890ebd9d7fda0280d2b46f0cf}{leftbnd}} = false
+\item 
+bool \mbox{\hyperlink{classParam_af3d39fb85e682bb8624647de01410206}{rightbnd}} = false
+\item 
+bool \mbox{\hyperlink{classParam_afadd1eca80d4fb49c1541bb7b27d0263}{topbnd}} = false
+\item 
+bool \mbox{\hyperlink{classParam_af6b337ecf38a10803f3cd8e5e06cdd5c}{botbnd}} = false
+\item 
+int \mbox{\hyperlink{classParam_a33a0f36d752bf9dedafceb1c06444966}{aoibnd}} = 0
+\item 
+double \mbox{\hyperlink{classParam_ae18c9950d026334710c66888898a9cf9}{bndrelaxtime}} = 3600.\+0
+\item 
+double \mbox{\hyperlink{classParam_a2ae1aa9ba67896297450f9e7aca0ad1a}{bndfiltertime}} = 60.\+0
 \item 
 double \mbox{\hyperlink{classParam_a63a70c37cfb0eec2968ece3d623318a4}{zsinit}} = nan(\char`\"{}\char`\"{})
 \item 
@@ -126,6 +146,8 @@ double \mbox{\hyperlink{classParam_a3c29fe5c8af313e37bbb5d9faad470f9}{zsoffset}}
 std\+::string \mbox{\hyperlink{classParam_af885609128acc8bb3ddb29c58c0a53ba}{hotstartfile}}
 \item 
 int \mbox{\hyperlink{classParam_a6800bcfe3bbe46d0fcfe61c868d8efb3}{hotstep}} = 0
+\item 
+double \mbox{\hyperlink{classParam_a56143e8c0b9724a460afb4eadd45d0e9}{bndtaper}} = 0.\+0
 \item 
 clock\+\_\+t \mbox{\hyperlink{classParam_acd500b97cb6da25e98425b35a79e1941}{startcputime}}
 \item 
@@ -200,6 +222,12 @@ std\+::string \mbox{\hyperlink{classParam_a49ea40358f9235a361c3350cd53e4af8}{Ada
 std\+::string \mbox{\hyperlink{classParam_afc41c7225a81bfb714a509525b9b19ca}{Adapt\+\_\+arg5}}
 \item 
 int \mbox{\hyperlink{classParam_a0e640148fd6c5ee78f06a14deeae92f6}{adaptmaxiteration}} = 20
+\item 
+std\+::string \mbox{\hyperlink{classParam_a152bd97e4b0ad04634500f42e09dc1d8}{reftime}} = \char`\"{}\char`\"{}
+\item 
+std\+::string \mbox{\hyperlink{classParam_a84d4da11b6ae2adecbefe10da3891323}{crs\+\_\+ref}} = \char`\"{}no\+\_\+crs\char`\"{}
+\item 
+bool \mbox{\hyperlink{classParam_ab19a5460fef554a9dd7da2983540ab43}{savebyblk}} = true
 \end{DoxyCompactItemize}
 
 
@@ -261,6 +289,12 @@ A class. A class for holding model parameters.
 \doxysubsubsection{\texorpdfstring{addoffset}{addoffset}}
 {\footnotesize\ttfamily float Param\+::addoffset = 0.\+0f}
 
+\mbox{\Hypertarget{classParam_a33a0f36d752bf9dedafceb1c06444966}\label{classParam_a33a0f36d752bf9dedafceb1c06444966}} 
+\index{Param@{Param}!aoibnd@{aoibnd}}
+\index{aoibnd@{aoibnd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{aoibnd}{aoibnd}}
+{\footnotesize\ttfamily int Param\+::aoibnd = 0}
+
 \mbox{\Hypertarget{classParam_abaaf2f49bde9fed254f80a88ec32a30d}\label{classParam_abaaf2f49bde9fed254f80a88ec32a30d}} 
 \index{Param@{Param}!atmpforcing@{atmpforcing}}
 \index{atmpforcing@{atmpforcing}!Param@{Param}}
@@ -284,6 +318,24 @@ A class. A class for holding model parameters.
 \index{blkwidth@{blkwidth}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{blkwidth}{blkwidth}}
 {\footnotesize\ttfamily int Param\+::blkwidth = 16}
+
+\mbox{\Hypertarget{classParam_a2ae1aa9ba67896297450f9e7aca0ad1a}\label{classParam_a2ae1aa9ba67896297450f9e7aca0ad1a}} 
+\index{Param@{Param}!bndfiltertime@{bndfiltertime}}
+\index{bndfiltertime@{bndfiltertime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{bndfiltertime}{bndfiltertime}}
+{\footnotesize\ttfamily double Param\+::bndfiltertime = 60.\+0}
+
+\mbox{\Hypertarget{classParam_ae18c9950d026334710c66888898a9cf9}\label{classParam_ae18c9950d026334710c66888898a9cf9}} 
+\index{Param@{Param}!bndrelaxtime@{bndrelaxtime}}
+\index{bndrelaxtime@{bndrelaxtime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{bndrelaxtime}{bndrelaxtime}}
+{\footnotesize\ttfamily double Param\+::bndrelaxtime = 3600.\+0}
+
+\mbox{\Hypertarget{classParam_a56143e8c0b9724a460afb4eadd45d0e9}\label{classParam_a56143e8c0b9724a460afb4eadd45d0e9}} 
+\index{Param@{Param}!bndtaper@{bndtaper}}
+\index{bndtaper@{bndtaper}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{bndtaper}{bndtaper}}
+{\footnotesize\ttfamily double Param\+::bndtaper = 0.\+0}
 
 \mbox{\Hypertarget{classParam_af6b337ecf38a10803f3cd8e5e06cdd5c}\label{classParam_af6b337ecf38a10803f3cd8e5e06cdd5c}} 
 \index{Param@{Param}!botbnd@{botbnd}}
@@ -309,11 +361,23 @@ A class. A class for holding model parameters.
 \doxysubsubsection{\texorpdfstring{CFL}{CFL}}
 {\footnotesize\ttfamily double Param\+::\+CFL = 0.\+5}
 
+\mbox{\Hypertarget{classParam_ac156ae8354a898c377f440732a4a5983}\label{classParam_ac156ae8354a898c377f440732a4a5983}} 
+\index{Param@{Param}!cl@{cl}}
+\index{cl@{cl}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{cl}{cl}}
+{\footnotesize\ttfamily double Param\+::cl = 0.\+0}
+
 \mbox{\Hypertarget{classParam_adf63cfa3d4df365208074857ff9aecd3}\label{classParam_adf63cfa3d4df365208074857ff9aecd3}} 
 \index{Param@{Param}!conserveElevation@{conserveElevation}}
 \index{conserveElevation@{conserveElevation}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{conserveElevation}{conserveElevation}}
 {\footnotesize\ttfamily bool Param\+::conserve\+Elevation = false}
+
+\mbox{\Hypertarget{classParam_a84d4da11b6ae2adecbefe10da3891323}\label{classParam_a84d4da11b6ae2adecbefe10da3891323}} 
+\index{Param@{Param}!crs\_ref@{crs\_ref}}
+\index{crs\_ref@{crs\_ref}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{crs\_ref}{crs\_ref}}
+{\footnotesize\ttfamily std\+::string Param\+::crs\+\_\+ref = \char`\"{}no\+\_\+crs\char`\"{}}
 
 \mbox{\Hypertarget{classParam_aa77daf8f531c8696764da0ed3a9d299e}\label{classParam_aa77daf8f531c8696764da0ed3a9d299e}} 
 \index{Param@{Param}!deformmaxtime@{deformmaxtime}}
@@ -367,7 +431,7 @@ A class. A class for holding model parameters.
 \index{Param@{Param}!endtime@{endtime}}
 \index{endtime@{endtime}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{endtime}{endtime}}
-{\footnotesize\ttfamily double Param\+::endtime = 0.\+0}
+{\footnotesize\ttfamily double Param\+::endtime = std\+::numeric\+\_\+limits$<$double$>$\+::max()}
 
 \mbox{\Hypertarget{classParam_a56642e1252852231103bd5cd633a0e07}\label{classParam_a56642e1252852231103bd5cd633a0e07}} 
 \index{Param@{Param}!engine@{engine}}
@@ -380,6 +444,12 @@ A class. A class for holding model parameters.
 \index{eps@{eps}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{eps}{eps}}
 {\footnotesize\ttfamily double Param\+::eps = 0.\+0001}
+
+\mbox{\Hypertarget{classParam_ad726f6cdd31ef755e528ddb0e6625cf2}\label{classParam_ad726f6cdd31ef755e528ddb0e6625cf2}} 
+\index{Param@{Param}!ForceMassConserve@{ForceMassConserve}}
+\index{ForceMassConserve@{ForceMassConserve}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{ForceMassConserve}{ForceMassConserve}}
+{\footnotesize\ttfamily bool Param\+::\+Force\+Mass\+Conserve = false}
 
 \mbox{\Hypertarget{classParam_a7b55ea8669b639a4c017bb6742155096}\label{classParam_a7b55ea8669b639a4c017bb6742155096}} 
 \index{Param@{Param}!frictionmodel@{frictionmodel}}
@@ -435,6 +505,12 @@ A class. A class for holding model parameters.
 \doxysubsubsection{\texorpdfstring{hotstep}{hotstep}}
 {\footnotesize\ttfamily int Param\+::hotstep = 0}
 
+\mbox{\Hypertarget{classParam_a5e4968c3d1eb9dcbfbe4841313dd526e}\label{classParam_a5e4968c3d1eb9dcbfbe4841313dd526e}} 
+\index{Param@{Param}!il@{il}}
+\index{il@{il}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{il}{il}}
+{\footnotesize\ttfamily double Param\+::il = 0.\+0}
+
 \mbox{\Hypertarget{classParam_afa652351c19bcec42888cb0767c8db27}\label{classParam_afa652351c19bcec42888cb0767c8db27}} 
 \index{Param@{Param}!infiltration@{infiltration}}
 \index{infiltration@{infiltration}!Param@{Param}}
@@ -446,6 +522,12 @@ A class. A class for holding model parameters.
 \index{initlevel@{initlevel}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{initlevel}{initlevel}}
 {\footnotesize\ttfamily int Param\+::initlevel = 0}
+
+\mbox{\Hypertarget{classParam_a1b5ddadef2ac55650e66c35152ef1f85}\label{classParam_a1b5ddadef2ac55650e66c35152ef1f85}} 
+\index{Param@{Param}!inittime@{inittime}}
+\index{inittime@{inittime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{inittime}{inittime}}
+{\footnotesize\ttfamily double Param\+::inittime = 0.\+0}
 
 \mbox{\Hypertarget{classParam_a450988e007ced6f1110f9b5374cf6b69}\label{classParam_a450988e007ced6f1110f9b5374cf6b69}} 
 \index{Param@{Param}!lat@{lat}}
@@ -469,7 +551,7 @@ A class. A class for holding model parameters.
 \index{Param@{Param}!maxlevel@{maxlevel}}
 \index{maxlevel@{maxlevel}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{maxlevel}{maxlevel}}
-{\footnotesize\ttfamily int Param\+::maxlevel = 0}
+{\footnotesize\ttfamily int Param\+::maxlevel = -\/99999}
 
 \mbox{\Hypertarget{classParam_a49c52ab200a51e9a7ecbf2496b8aa427}\label{classParam_a49c52ab200a51e9a7ecbf2496b8aa427}} 
 \index{Param@{Param}!maxTSstorage@{maxTSstorage}}
@@ -487,7 +569,7 @@ A class. A class for holding model parameters.
 \index{Param@{Param}!minlevel@{minlevel}}
 \index{minlevel@{minlevel}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{minlevel}{minlevel}}
-{\footnotesize\ttfamily int Param\+::minlevel = 0}
+{\footnotesize\ttfamily int Param\+::minlevel = -\/99999}
 
 \mbox{\Hypertarget{classParam_a84b9506f6d699bf3201c6b80783ce0a1}\label{classParam_a84b9506f6d699bf3201c6b80783ce0a1}} 
 \index{Param@{Param}!navailblk@{navailblk}}
@@ -651,6 +733,12 @@ A class. A class for holding model parameters.
 \doxysubsubsection{\texorpdfstring{rainforcing}{rainforcing}}
 {\footnotesize\ttfamily bool Param\+::rainforcing = false}
 
+\mbox{\Hypertarget{classParam_a152bd97e4b0ad04634500f42e09dc1d8}\label{classParam_a152bd97e4b0ad04634500f42e09dc1d8}} 
+\index{Param@{Param}!reftime@{reftime}}
+\index{reftime@{reftime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{reftime}{reftime}}
+{\footnotesize\ttfamily std\+::string Param\+::reftime = \char`\"{}\char`\"{}}
+
 \mbox{\Hypertarget{classParam_a1b2b73b8bb774d884fc7be02210cbdf4}\label{classParam_a1b2b73b8bb774d884fc7be02210cbdf4}} 
 \index{Param@{Param}!resetmax@{resetmax}}
 \index{resetmax@{resetmax}!Param@{Param}}
@@ -668,6 +756,12 @@ A class. A class for holding model parameters.
 \index{rightbnd@{rightbnd}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{rightbnd}{rightbnd}}
 {\footnotesize\ttfamily bool Param\+::rightbnd = false}
+
+\mbox{\Hypertarget{classParam_ab19a5460fef554a9dd7da2983540ab43}\label{classParam_ab19a5460fef554a9dd7da2983540ab43}} 
+\index{Param@{Param}!savebyblk@{savebyblk}}
+\index{savebyblk@{savebyblk}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{savebyblk}{savebyblk}}
+{\footnotesize\ttfamily bool Param\+::savebyblk = true}
 
 \mbox{\Hypertarget{classParam_af668a9cbd70f1a24d7cf6b9c99cacf9e}\label{classParam_af668a9cbd70f1a24d7cf6b9c99cacf9e}} 
 \index{Param@{Param}!scalefactor@{scalefactor}}
@@ -687,11 +781,11 @@ A class. A class for holding model parameters.
 \doxysubsubsection{\texorpdfstring{smallnc}{smallnc}}
 {\footnotesize\ttfamily int Param\+::smallnc = 1}
 
-\mbox{\Hypertarget{classParam_a0517015808f440ce5fcc06d18b2ef896}\label{classParam_a0517015808f440ce5fcc06d18b2ef896}} 
+\mbox{\Hypertarget{classParam_a245439e7a28e89165ad3084af27c8da7}\label{classParam_a245439e7a28e89165ad3084af27c8da7}} 
 \index{Param@{Param}!spherical@{spherical}}
 \index{spherical@{spherical}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{spherical}{spherical}}
-{\footnotesize\ttfamily int Param\+::spherical = 0}
+{\footnotesize\ttfamily bool Param\+::spherical = 0}
 
 \mbox{\Hypertarget{classParam_acd500b97cb6da25e98425b35a79e1941}\label{classParam_acd500b97cb6da25e98425b35a79e1941}} 
 \index{Param@{Param}!startcputime@{startcputime}}
@@ -722,6 +816,12 @@ A class. A class for holding model parameters.
 \index{totaltime@{totaltime}!Param@{Param}}
 \doxysubsubsection{\texorpdfstring{totaltime}{totaltime}}
 {\footnotesize\ttfamily double Param\+::totaltime = 0.\+0}
+
+\mbox{\Hypertarget{classParam_a9d5ff5efd69fdda52b5606a9de43fa9c}\label{classParam_a9d5ff5efd69fdda52b5606a9de43fa9c}} 
+\index{Param@{Param}!Toutput@{Toutput}}
+\index{Toutput@{Toutput}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Toutput}{Toutput}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classT__output}{T\+\_\+output}} Param\+::\+Toutput}
 
 \mbox{\Hypertarget{classParam_a2cf9401adaa530c2c933a9923d4c987e}\label{classParam_a2cf9401adaa530c2c933a9923d4c987e}} 
 \index{Param@{Param}!TSnodesout@{TSnodesout}}

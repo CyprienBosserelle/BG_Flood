@@ -22,11 +22,29 @@ int \mbox{\hyperlink{Read__netcdf_8cu_ace124d74a0f98083d0e9b3e8274d6fd6}{nc\+\_\
 \item 
 int \mbox{\hyperlink{Read__netcdf_8cu_af5f8c8bf691367eb8b8ac3d236d1c2bc}{nc\+\_\+get\+\_\+var1\+\_\+T}} (int ncid, int varid, const size\+\_\+t $\ast$startp, double $\ast$zsa)
 \item 
-void \mbox{\hyperlink{Read__netcdf_8cu_a67be9f7f289038fe5d7e29f32518f55b}{readgridncsize}} (const std\+::string ncfilestr, const std\+::string varstr, int \&nx, int \&ny, int \&nt, double \&dx, double \&xo, double \&yo, double \&to, double \&xmax, double \&ymax, double \&tmax, bool \&flipx, bool \&flipy)
+void \mbox{\hyperlink{Read__netcdf_8cu_a6e24e65db5d8609c76d187b1ea70eb08}{readgridncsize}} (const std\+::string ncfilestr, const std\+::string varstr, std\+::string reftime, int \&nx, int \&ny, int \&nt, double \&dx, double \&dy, double \&dt, double \&xo, double \&yo, double \&to, double \&xmax, double \&ymax, double \&tmax, bool \&flipx, bool \&flipy)
+\item 
+void \mbox{\hyperlink{Read__netcdf_8cu_af7eedec0cb2a07e005f541fed061c6ae}{readgridncsize}} (\mbox{\hyperlink{classforcingmap}{forcingmap}} \&Fmap, \mbox{\hyperlink{classParam}{Param}} XParam)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Read__netcdf_8cu_ae0c046efbc26b8dea142656b03cd8dc5}{readgridncsize}} (T \&Imap)
+\item 
+template void \mbox{\hyperlink{Read__netcdf_8cu_a337ab6c08c3ced016be21cab75e42752}{readgridncsize$<$ inputmap $>$}} (\mbox{\hyperlink{classinputmap}{inputmap}} \&Imap)
+\item 
+template void \mbox{\hyperlink{Read__netcdf_8cu_a7bb324458b12767711970e2c099c76cf}{readgridncsize$<$ forcingmap $>$}} (\mbox{\hyperlink{classforcingmap}{forcingmap}} \&Imap)
+\item 
+template void \mbox{\hyperlink{Read__netcdf_8cu_a1aa12a657a2854fb982c3e5a64e452c4}{readgridncsize$<$ Static\+Forcing\+P$<$ int $>$ $>$}} (\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ \&Imap)
+\item 
+template void \mbox{\hyperlink{Read__netcdf_8cu_aac540871925b4b6baaed5126c65c5961}{readgridncsize$<$ Static\+Forcing\+P$<$ float $>$ $>$}} (\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ \&Imap)
+\item 
+template void \mbox{\hyperlink{Read__netcdf_8cu_a86cc02e83d5f3b1d0633f33559f133a3}{readgridncsize$<$ deformmap$<$ float $>$ $>$}} (\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ \&Imap)
+\item 
+template void \mbox{\hyperlink{Read__netcdf_8cu_af5c988b670d630254c2dedd291134a65}{readgridncsize$<$ Dyn\+Forcing\+P$<$ float $>$ $>$}} (\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \&Imap)
 \item 
 int \mbox{\hyperlink{Read__netcdf_8cu_ac4849c1b38a6a4585828ce491d44ad62}{readvarinfo}} (std\+::string filename, std\+::string Varname, size\+\_\+t $\ast$\&ddimU)
 \item 
 int \mbox{\hyperlink{Read__netcdf_8cu_ab93cc9b6e522d0763c6e5a6d35b7047c}{readnctime}} (std\+::string filename, double $\ast$\&time)
+\item 
+int \mbox{\hyperlink{Read__netcdf_8cu_a089b3abbf61032bf6149c9163978a8db}{readnctime2}} (int ncid, char $\ast$timecoordname, std\+::string refdate, size\+\_\+t nt, double $\ast$\&time)
 \item 
 {\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Read__netcdf_8cu_a7008a78c8c1373c6b5cc6d9afdeb0fd6}{readncslev1}} (std\+::string filename, std\+::string varstr, size\+\_\+t indx, size\+\_\+t indy, size\+\_\+t indt, bool checkhh, double eps, T $\ast$\&zsa)
 \item 
@@ -129,11 +147,60 @@ void \mbox{\hyperlink{Read__netcdf_8cu_aa51602301123c9a4ee87e30b68c5695b}{readnc
 \doxysubsubsection{\texorpdfstring{readATMstep()}{readATMstep()}}
 {\footnotesize\ttfamily void read\+ATMstep (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classforcingmap}{forcingmap}}}]{ATMPmap,  }\item[{int}]{steptoread,  }\item[{float $\ast$\&}]{Po }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{Read__netcdf_8cu_a67be9f7f289038fe5d7e29f32518f55b}\label{Read__netcdf_8cu_a67be9f7f289038fe5d7e29f32518f55b}} 
+\mbox{\Hypertarget{Read__netcdf_8cu_a6e24e65db5d8609c76d187b1ea70eb08}\label{Read__netcdf_8cu_a6e24e65db5d8609c76d187b1ea70eb08}} 
 \index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize@{readgridncsize}}
 \index{readgridncsize@{readgridncsize}!Read\_netcdf.cu@{Read\_netcdf.cu}}
-\doxysubsubsection{\texorpdfstring{readgridncsize()}{readgridncsize()}}
-{\footnotesize\ttfamily void readgridncsize (\begin{DoxyParamCaption}\item[{const std\+::string}]{ncfilestr,  }\item[{const std\+::string}]{varstr,  }\item[{int \&}]{nx,  }\item[{int \&}]{ny,  }\item[{int \&}]{nt,  }\item[{double \&}]{dx,  }\item[{double \&}]{xo,  }\item[{double \&}]{yo,  }\item[{double \&}]{to,  }\item[{double \&}]{xmax,  }\item[{double \&}]{ymax,  }\item[{double \&}]{tmax,  }\item[{bool \&}]{flipx,  }\item[{bool \&}]{flipy }\end{DoxyParamCaption})}
+\doxysubsubsection{\texorpdfstring{readgridncsize()}{readgridncsize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily void readgridncsize (\begin{DoxyParamCaption}\item[{const std\+::string}]{ncfilestr,  }\item[{const std\+::string}]{varstr,  }\item[{std\+::string}]{reftime,  }\item[{int \&}]{nx,  }\item[{int \&}]{ny,  }\item[{int \&}]{nt,  }\item[{double \&}]{dx,  }\item[{double \&}]{dy,  }\item[{double \&}]{dt,  }\item[{double \&}]{xo,  }\item[{double \&}]{yo,  }\item[{double \&}]{to,  }\item[{double \&}]{xmax,  }\item[{double \&}]{ymax,  }\item[{double \&}]{tmax,  }\item[{bool \&}]{flipx,  }\item[{bool \&}]{flipy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_af7eedec0cb2a07e005f541fed061c6ae}\label{Read__netcdf_8cu_af7eedec0cb2a07e005f541fed061c6ae}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize@{readgridncsize}}
+\index{readgridncsize@{readgridncsize}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize()}{readgridncsize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily void readgridncsize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classforcingmap}{forcingmap}} \&}]{Fmap,  }\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_ae0c046efbc26b8dea142656b03cd8dc5}\label{Read__netcdf_8cu_ae0c046efbc26b8dea142656b03cd8dc5}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize@{readgridncsize}}
+\index{readgridncsize@{readgridncsize}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize()}{readgridncsize()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void readgridncsize (\begin{DoxyParamCaption}\item[{T \&}]{Imap }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_a86cc02e83d5f3b1d0633f33559f133a3}\label{Read__netcdf_8cu_a86cc02e83d5f3b1d0633f33559f133a3}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize$<$ deformmap$<$ float $>$ $>$@{readgridncsize$<$ deformmap$<$ float $>$ $>$}}
+\index{readgridncsize$<$ deformmap$<$ float $>$ $>$@{readgridncsize$<$ deformmap$<$ float $>$ $>$}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize$<$ deformmap$<$ float $>$ $>$()}{readgridncsize< deformmap< float > >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Read__netcdf_8h_ae0c046efbc26b8dea142656b03cd8dc5}{readgridncsize}}$<$ \mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classdeformmap}{deformmap}}$<$ float $>$ \&}]{Imap }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_af5c988b670d630254c2dedd291134a65}\label{Read__netcdf_8cu_af5c988b670d630254c2dedd291134a65}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize$<$ DynForcingP$<$ float $>$ $>$@{readgridncsize$<$ DynForcingP$<$ float $>$ $>$}}
+\index{readgridncsize$<$ DynForcingP$<$ float $>$ $>$@{readgridncsize$<$ DynForcingP$<$ float $>$ $>$}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize$<$ DynForcingP$<$ float $>$ $>$()}{readgridncsize< DynForcingP< float > >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Read__netcdf_8h_ae0c046efbc26b8dea142656b03cd8dc5}{readgridncsize}}$<$ \mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structDynForcingP}{Dyn\+ForcingP}}$<$ float $>$ \&}]{Imap }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_a7bb324458b12767711970e2c099c76cf}\label{Read__netcdf_8cu_a7bb324458b12767711970e2c099c76cf}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize$<$ forcingmap $>$@{readgridncsize$<$ forcingmap $>$}}
+\index{readgridncsize$<$ forcingmap $>$@{readgridncsize$<$ forcingmap $>$}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize$<$ forcingmap $>$()}{readgridncsize< forcingmap >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Read__netcdf_8h_ae0c046efbc26b8dea142656b03cd8dc5}{readgridncsize}}$<$ \mbox{\hyperlink{classforcingmap}{forcingmap}} $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classforcingmap}{forcingmap}} \&}]{Imap }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_a337ab6c08c3ced016be21cab75e42752}\label{Read__netcdf_8cu_a337ab6c08c3ced016be21cab75e42752}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize$<$ inputmap $>$@{readgridncsize$<$ inputmap $>$}}
+\index{readgridncsize$<$ inputmap $>$@{readgridncsize$<$ inputmap $>$}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize$<$ inputmap $>$()}{readgridncsize< inputmap >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Read__netcdf_8h_ae0c046efbc26b8dea142656b03cd8dc5}{readgridncsize}}$<$ \mbox{\hyperlink{classinputmap}{inputmap}} $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinputmap}{inputmap}} \&}]{Imap }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_aac540871925b4b6baaed5126c65c5961}\label{Read__netcdf_8cu_aac540871925b4b6baaed5126c65c5961}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize$<$ StaticForcingP$<$ float $>$ $>$@{readgridncsize$<$ StaticForcingP$<$ float $>$ $>$}}
+\index{readgridncsize$<$ StaticForcingP$<$ float $>$ $>$@{readgridncsize$<$ StaticForcingP$<$ float $>$ $>$}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize$<$ StaticForcingP$<$ float $>$ $>$()}{readgridncsize< StaticForcingP< float > >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Read__netcdf_8h_ae0c046efbc26b8dea142656b03cd8dc5}{readgridncsize}}$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ float $>$ \&}]{Imap }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Read__netcdf_8cu_a1aa12a657a2854fb982c3e5a64e452c4}\label{Read__netcdf_8cu_a1aa12a657a2854fb982c3e5a64e452c4}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readgridncsize$<$ StaticForcingP$<$ int $>$ $>$@{readgridncsize$<$ StaticForcingP$<$ int $>$ $>$}}
+\index{readgridncsize$<$ StaticForcingP$<$ int $>$ $>$@{readgridncsize$<$ StaticForcingP$<$ int $>$ $>$}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readgridncsize$<$ StaticForcingP$<$ int $>$ $>$()}{readgridncsize< StaticForcingP< int > >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Read__netcdf_8h_ae0c046efbc26b8dea142656b03cd8dc5}{readgridncsize}}$<$ \mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structStaticForcingP}{Static\+ForcingP}}$<$ int $>$ \&}]{Imap }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{Read__netcdf_8cu_a7008a78c8c1373c6b5cc6d9afdeb0fd6}\label{Read__netcdf_8cu_a7008a78c8c1373c6b5cc6d9afdeb0fd6}} 
 \index{Read\_netcdf.cu@{Read\_netcdf.cu}!readncslev1@{readncslev1}}
@@ -160,7 +227,19 @@ int readncslev1 (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\ite
 \doxysubsubsection{\texorpdfstring{readnctime()}{readnctime()}}
 {\footnotesize\ttfamily int readnctime (\begin{DoxyParamCaption}\item[{std\+::string}]{filename,  }\item[{double $\ast$\&}]{time }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{Read__netcdf_8cu_aa51602301123c9a4ee87e30b68c5695b}\label{Read__netcdf_8cu_aa51602301123c9a4ee87e30b68c5695b}} 
+\mbox{\Hypertarget{Read__netcdf_8cu_a089b3abbf61032bf6149c9163978a8db}\label{Read__netcdf_8cu_a089b3abbf61032bf6149c9163978a8db}} 
+\index{Read\_netcdf.cu@{Read\_netcdf.cu}!readnctime2@{readnctime2}}
+\index{readnctime2@{readnctime2}!Read\_netcdf.cu@{Read\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{readnctime2()}{readnctime2()}}
+{\footnotesize\ttfamily int readnctime2 (\begin{DoxyParamCaption}\item[{int}]{ncid,  }\item[{char $\ast$}]{timecoordname,  }\item[{std\+::string}]{refdate,  }\item[{size\+\_\+t}]{nt,  }\item[{double $\ast$\&}]{time }\end{DoxyParamCaption})}
+
+std\+::vector$<$std\+::string$>$ nameelements;
+
+nameelements = split(filename, \textquotesingle{}?\textquotesingle{}); if (nameelements.\+size() $>$ 1) \{ //variable name for bathy is not given so it is assumed to be zb ncfilestr = nameelements\mbox{[}0\mbox{]}; //varstr = nameelements\mbox{[}1\mbox{]}; \} else \{ ncfilestr = filename; //varstr = \char`\"{}time\char`\"{}; \}
+
+status = nc\+\_\+open(ncfilestr.\+c\+\_\+str(), 0, \&ncid); if (status != NC\+\_\+\+NOERR) handle\+\_\+ncerror(status);
+
+status = nc\+\_\+close(ncid);\mbox{\Hypertarget{Read__netcdf_8cu_aa51602301123c9a4ee87e30b68c5695b}\label{Read__netcdf_8cu_aa51602301123c9a4ee87e30b68c5695b}} 
 \index{Read\_netcdf.cu@{Read\_netcdf.cu}!readnczb@{readnczb}}
 \index{readnczb@{readnczb}!Read\_netcdf.cu@{Read\_netcdf.cu}}
 \doxysubsubsection{\texorpdfstring{readnczb()}{readnczb()}}

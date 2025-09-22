@@ -108,14 +108,15 @@ $(document).ready(function(){initNavTree('Write__txtlog_8h_source.html',''); ini
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keywordtype">void</span> <a class="code" href="Write__txtlog_8h.html#a2a943ddae08dfb41fce1f81ff1ecd357">create_logfile</a>();</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keywordtype">void</span> <a class="code" href="Write__txtlog_8h.html#a8dc4c812702060e9a2a9d3983daf9cbb">write_text_to_log_file</a>(std::string text);</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keywordtype">void</span> <a class="code" href="Write__txtlog_8h.html#a6f38f0571f7488a284105de78d6375c9">SaveParamtolog</a>(<a class="code" href="classParam.html">Param</a> XParam);</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keywordtype">void</span> <a class="code" href="Write__txtlog_8h.html#a67d938e5b26cbb85e146d04b94b977ae">saveparam2netCDF</a>(<span class="keywordtype">int</span> ncid, <span class="keywordtype">int</span> bgfid, <a class="code" href="classParam.html">Param</a> XParam);</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// End of global definition</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aGeneral_8h_html"><div class="ttname"><a href="General_8h.html">General.h</a></div></div>
 <div class="ttc" id="aParam_8h_html"><div class="ttname"><a href="Param_8h.html">Param.h</a></div></div>
 <div class="ttc" id="aWrite__txtlog_8h_html_a2a943ddae08dfb41fce1f81ff1ecd357"><div class="ttname"><a href="Write__txtlog_8h.html#a2a943ddae08dfb41fce1f81ff1ecd357">create_logfile</a></div><div class="ttdeci">void create_logfile()</div><div class="ttdef"><b>Definition:</b> Write_txtlog.cpp:30</div></div>
-<div class="ttc" id="aWrite__txtlog_8h_html_a6f38f0571f7488a284105de78d6375c9"><div class="ttname"><a href="Write__txtlog_8h.html#a6f38f0571f7488a284105de78d6375c9">SaveParamtolog</a></div><div class="ttdeci">void SaveParamtolog(Param XParam)</div><div class="ttdef"><b>Definition:</b> Write_txtlog.cpp:94</div></div>
-<div class="ttc" id="aWrite__txtlog_8h_html_a8dc4c812702060e9a2a9d3983daf9cbb"><div class="ttname"><a href="Write__txtlog_8h.html#a8dc4c812702060e9a2a9d3983daf9cbb">write_text_to_log_file</a></div><div class="ttdeci">void write_text_to_log_file(std::string text)</div><div class="ttdef"><b>Definition:</b> Write_txtlog.cpp:86</div></div>
+<div class="ttc" id="aWrite__txtlog_8h_html_a67d938e5b26cbb85e146d04b94b977ae"><div class="ttname"><a href="Write__txtlog_8h.html#a67d938e5b26cbb85e146d04b94b977ae">saveparam2netCDF</a></div><div class="ttdeci">void saveparam2netCDF(int ncid, int bgfid, Param XParam)</div><div class="ttdef"><b>Definition:</b> Write_txtlog.cpp:219</div></div>
+<div class="ttc" id="aWrite__txtlog_8h_html_a6f38f0571f7488a284105de78d6375c9"><div class="ttname"><a href="Write__txtlog_8h.html#a6f38f0571f7488a284105de78d6375c9">SaveParamtolog</a></div><div class="ttdeci">void SaveParamtolog(Param XParam)</div><div class="ttdef"><b>Definition:</b> Write_txtlog.cpp:96</div></div>
+<div class="ttc" id="aWrite__txtlog_8h_html_a8dc4c812702060e9a2a9d3983daf9cbb"><div class="ttname"><a href="Write__txtlog_8h.html#a8dc4c812702060e9a2a9d3983daf9cbb">write_text_to_log_file</a></div><div class="ttdeci">void write_text_to_log_file(std::string text)</div><div class="ttdef"><b>Definition:</b> Write_txtlog.cpp:88</div></div>
 <div class="ttc" id="aWrite__txtlog_8h_html_a952fb8894d8841da2c243c1523e32f71"><div class="ttname"><a href="Write__txtlog_8h.html#a952fb8894d8841da2c243c1523e32f71">log</a></div><div class="ttdeci">void log(std::string text)</div><div class="ttdef"><b>Definition:</b> Write_txtlog.cpp:22</div></div>
 <div class="ttc" id="aclassParam_html"><div class="ttname"><a href="classParam.html">Param</a></div><div class="ttdef"><b>Definition:</b> Param.h:10</div></div>
 </div><!-- fragment --></div><!-- contents -->
@@ -124,7 +125,7 @@ $(document).ready(function(){initNavTree('Write__txtlog_8h_source.html',''); ini
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Write__txtlog_8h.html">Write_txtlog.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

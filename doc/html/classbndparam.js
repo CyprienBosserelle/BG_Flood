@@ -10,6 +10,8 @@ var classbndparam =
     [ "nblk", "classbndparam.html#af3e5f11f59a0305bfe20d69f1ac5593a", null ],
     [ "nbnd", "classbndparam.html#af1e99084a48b3629c2bfc684d1f7e54e", null ],
     [ "on", "classbndparam.html#afa43a8bc8d9c11b3d57cff8118d3730b", null ],
+    [ "qmean", "classbndparam.html#a5bdb0b7e11e378cab416c757d534f69b", null ],
+    [ "qmean_g", "classbndparam.html#af39c0cc259bbdb685aeb9b58f90e80e2", null ],
     [ "side", "classbndparam.html#ac2dba2a5c09bbbc5d36a4164ee80dbc7", null ],
     [ "type", "classbndparam.html#af3ee0676754f9a23d2a5d9cecf9fb083", null ]
 ];

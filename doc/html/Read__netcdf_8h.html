@@ -107,6 +107,7 @@ $(document).ready(function(){initNavTree('Read__netcdf_8h.html',''); initResizab
 <code>#include &quot;<a class="el" href="Util__CPU_8h_source.html">Util_CPU.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="GridManip_8h_source.html">GridManip.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Forcing_8h_source.html">Forcing.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="utctime_8h_source.html">utctime.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Read_netcdf.h:</div>
 <div class="dyncontent">
@@ -136,12 +137,19 @@ Functions</h2></td></tr>
 <tr class="separator:af5f8c8bf691367eb8b8ac3d236d1c2bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a405416e388c378f3778101d1d2deb6b5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#a405416e388c378f3778101d1d2deb6b5">checkncvarname</a> (int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE)</td></tr>
 <tr class="separator:a405416e388c378f3778101d1d2deb6b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67be9f7f289038fe5d7e29f32518f55b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#a67be9f7f289038fe5d7e29f32518f55b">readgridncsize</a> (const std::string ncfilestr, const std::string varstr, int &amp;nx, int &amp;ny, int &amp;nt, double &amp;dx, double &amp;xo, double &amp;yo, double &amp;to, double &amp;xmax, double &amp;ymax, double &amp;tmax, bool &amp;flipx, bool &amp;flipy)</td></tr>
-<tr class="separator:a67be9f7f289038fe5d7e29f32518f55b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e24e65db5d8609c76d187b1ea70eb08"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#a6e24e65db5d8609c76d187b1ea70eb08">readgridncsize</a> (const std::string ncfilestr, const std::string varstr, std::string reftime, int &amp;nx, int &amp;ny, int &amp;nt, double &amp;dx, double &amp;dy, double &amp;dt, double &amp;xo, double &amp;yo, double &amp;to, double &amp;xmax, double &amp;ymax, double &amp;tmax, bool &amp;flipx, bool &amp;flipy)</td></tr>
+<tr class="separator:a6e24e65db5d8609c76d187b1ea70eb08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7eedec0cb2a07e005f541fed061c6ae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#af7eedec0cb2a07e005f541fed061c6ae">readgridncsize</a> (<a class="el" href="classforcingmap.html">forcingmap</a> &amp;Fmap, <a class="el" href="classParam.html">Param</a> XParam)</td></tr>
+<tr class="separator:af7eedec0cb2a07e005f541fed061c6ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0c046efbc26b8dea142656b03cd8dc5"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ae0c046efbc26b8dea142656b03cd8dc5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#ae0c046efbc26b8dea142656b03cd8dc5">readgridncsize</a> (T &amp;Imap)</td></tr>
+<tr class="separator:ae0c046efbc26b8dea142656b03cd8dc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4849c1b38a6a4585828ce491d44ad62"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#ac4849c1b38a6a4585828ce491d44ad62">readvarinfo</a> (std::string filename, std::string Varname, size_t *&amp;ddimU)</td></tr>
 <tr class="separator:ac4849c1b38a6a4585828ce491d44ad62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab93cc9b6e522d0763c6e5a6d35b7047c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#ab93cc9b6e522d0763c6e5a6d35b7047c">readnctime</a> (std::string filename, double *&amp;time)</td></tr>
 <tr class="separator:ab93cc9b6e522d0763c6e5a6d35b7047c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a089b3abbf61032bf6149c9163978a8db"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#a089b3abbf61032bf6149c9163978a8db">readnctime2</a> (int ncid, char *timecoordname, std::string refdate, size_t nt, double *&amp;time)</td></tr>
+<tr class="separator:a089b3abbf61032bf6149c9163978a8db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7008a78c8c1373c6b5cc6d9afdeb0fd6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a7008a78c8c1373c6b5cc6d9afdeb0fd6"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Read__netcdf_8h.html#a7008a78c8c1373c6b5cc6d9afdeb0fd6">readncslev1</a> (std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T *&amp;zsa)</td></tr>
 <tr class="separator:a7008a78c8c1373c6b5cc6d9afdeb0fd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -620,8 +628,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a67be9f7f289038fe5d7e29f32518f55b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a67be9f7f289038fe5d7e29f32518f55b">&#9670;&nbsp;</a></span>readgridncsize()</h2>
+<a id="a6e24e65db5d8609c76d187b1ea70eb08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e24e65db5d8609c76d187b1ea70eb08">&#9670;&nbsp;</a></span>readgridncsize() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -637,6 +645,12 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">const std::string&#160;</td>
           <td class="paramname"><em>varstr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>reftime</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -661,6 +675,18 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">double &amp;&#160;</td>
           <td class="paramname"><em>dx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;&#160;</td>
+          <td class="paramname"><em>dy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;&#160;</td>
+          <td class="paramname"><em>dt</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -714,6 +740,54 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af7eedec0cb2a07e005f541fed061c6ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7eedec0cb2a07e005f541fed061c6ae">&#9670;&nbsp;</a></span>readgridncsize() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void readgridncsize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classforcingmap.html">forcingmap</a> &amp;&#160;</td>
+          <td class="paramname"><em>Fmap</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae0c046efbc26b8dea142656b03cd8dc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0c046efbc26b8dea142656b03cd8dc5">&#9670;&nbsp;</a></span>readgridncsize() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void readgridncsize </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>Imap</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -811,6 +885,56 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a089b3abbf61032bf6149c9163978a8db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a089b3abbf61032bf6149c9163978a8db">&#9670;&nbsp;</a></span>readnctime2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int readnctime2 </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>timecoordname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>refdate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&amp;&#160;</td>
+          <td class="paramname"><em>time</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>std::vector&lt;std::string&gt; nameelements;</p>
+<p>nameelements = split(filename, '?'); if (nameelements.size() &gt; 1) { //variable name for bathy is not given so it is assumed to be zb ncfilestr = nameelements[0]; //varstr = nameelements[1]; } else { ncfilestr = filename; //varstr = "time"; }</p>
+<p>status = nc_open(ncfilestr.c_str(), 0, &amp;ncid); if (status != NC_NOERR) handle_ncerror(status);</p>
+<p>status = nc_close(ncid);</p>
 
 </div>
 </div>
@@ -994,7 +1118,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Read__netcdf_8h.html">Read_netcdf.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

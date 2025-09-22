@@ -105,6 +105,7 @@ $(document).ready(function(){initNavTree('Write__netcdf_8h.html',''); initResiza
 <code>#include &quot;<a class="el" href="ReadInput_8h_source.html">ReadInput.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="MemManagement_8h_source.html">MemManagement.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Util__CPU_8h_source.html">Util_CPU.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Arrays_8h_source.html">Arrays.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Write_netcdf.h:</div>
 <div class="dyncontent">
@@ -139,9 +140,9 @@ Functions</h2></td></tr>
 <tr class="separator:a30a4c8f75da0210b6762b38e005c2942"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7baa2f1395758b42afb5ce020605abd0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Write__netcdf_8h.html#a7baa2f1395758b42afb5ce020605abd0">writenctimestep</a> (std::string outfile, double totaltime)</td></tr>
 <tr class="separator:a7baa2f1395758b42afb5ce020605abd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8295cb2c92f35bdd2d1eeb9b2807cb57"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a8295cb2c92f35bdd2d1eeb9b2807cb57"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Write__netcdf_8h.html#a8295cb2c92f35bdd2d1eeb9b2807cb57">Save2Netcdf</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; T &gt; XLoop, <a class="el" href="structModel.html">Model</a>&lt; T &gt; XModel)</td></tr>
-<tr class="separator:a8295cb2c92f35bdd2d1eeb9b2807cb57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2d239f5cce35afc5cac0ad32bf8fe7d"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:af2d239f5cce35afc5cac0ad32bf8fe7d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Write__netcdf_8h.html#af2d239f5cce35afc5cac0ad32bf8fe7d">Save2Netcdf</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; T &gt; XLoop, <a class="el" href="structModel.html">Model</a>&lt; T &gt; &amp;XModel)</td></tr>
+<tr class="separator:af2d239f5cce35afc5cac0ad32bf8fe7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeed9da1a9c25e765c9c2588e44efcadd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Write__netcdf_8h.html#aeed9da1a9c25e765c9c2588e44efcadd">create2dnc</a> (char *filename, int nx, int ny, double *xx, double *yy, double *var, char *varname)</td></tr>
 <tr class="separator:aeed9da1a9c25e765c9c2588e44efcadd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7b7f1fe1864e3ad6d4bac1982e3a561"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Write__netcdf_8h.html#aa7b7f1fe1864e3ad6d4bac1982e3a561">create3dnc</a> (char *name, int nx, int ny, int nt, double *xx, double *yy, double *theta, double *var, char *varname)</td></tr>
@@ -484,8 +485,8 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a8295cb2c92f35bdd2d1eeb9b2807cb57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8295cb2c92f35bdd2d1eeb9b2807cb57">&#9670;&nbsp;</a></span>Save2Netcdf()</h2>
+<a id="af2d239f5cce35afc5cac0ad32bf8fe7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2d239f5cce35afc5cac0ad32bf8fe7d">&#9670;&nbsp;</a></span>Save2Netcdf()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -507,7 +508,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structModel.html">Model</a>&lt; T &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="structModel.html">Model</a>&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>XModel</em>&#160;</td>
         </tr>
         <tr>
@@ -712,7 +713,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Write__netcdf_8h.html">Write_netcdf.h</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:18 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

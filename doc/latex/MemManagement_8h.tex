@@ -37,6 +37,10 @@ This graph shows which files directly or indirectly include this file\+:
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8h_ad1f3c3382ef4419a772a92a0721b7d72}{Realloc\+Array}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
 \item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8h_a2938410b899f5f7687c22997655d9588}{Allocate\+Mapped\+Mem\+CPU}} (int nx, int ny, int gpudevice, T $\ast$\&z)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{MemManagement_8h_a70ae6bcde329ae664862262415cddd1c}{Fill\+CPU}} (int nx, int ny, T fillval, T $\ast$\&zb)
+\item 
 int \mbox{\hyperlink{MemManagement_8h_ab8149333b09331fc68caed3784f934a4}{memloc}} (\mbox{\hyperlink{classParam}{Param}} XParam, int i, int j, int ib)
 \item 
 \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ int \mbox{\hyperlink{MemManagement_8h_a07fddb78af39693b50b36905f15b18ef}{memloc}} (int halowidth, int blkmemwidth, int i, int j, int ib)
@@ -44,6 +48,8 @@ int \mbox{\hyperlink{MemManagement_8h_ab8149333b09331fc68caed3784f934a4}{memloc}
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8h_a7760a58fb55d0e75f1b56e99d68c024c}{Allocate\+GPU}} (int nblk, int blksize, \mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8h_a1e573ee5a85dfe633828db07d46440fb}{Allocate\+GPU}} (int nx, int ny, T $\ast$\&z\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{MemManagement_8h_adc411d9ef22e532d0831749971681f92}{Allocate\+Mapped\+Mem\+GPU}} (int nx, int ny, int gpudevice, T $\ast$\&z\+\_\+g, T $\ast$z)
 \end{DoxyCompactItemize}
 
 
@@ -110,6 +116,27 @@ void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nblk,  }\item[{int}]{bl
 \doxysubsubsection{\texorpdfstring{AllocateGPU()}{AllocateGPU()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 void Allocate\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T $\ast$\&}]{z\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8h_a2938410b899f5f7687c22997655d9588}\label{MemManagement_8h_a2938410b899f5f7687c22997655d9588}} 
+\index{MemManagement.h@{MemManagement.h}!AllocateMappedMemCPU@{AllocateMappedMemCPU}}
+\index{AllocateMappedMemCPU@{AllocateMappedMemCPU}!MemManagement.h@{MemManagement.h}}
+\doxysubsubsection{\texorpdfstring{AllocateMappedMemCPU()}{AllocateMappedMemCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+Mapped\+Mem\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{gpudevice,  }\item[{T $\ast$\&}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8h_adc411d9ef22e532d0831749971681f92}\label{MemManagement_8h_adc411d9ef22e532d0831749971681f92}} 
+\index{MemManagement.h@{MemManagement.h}!AllocateMappedMemGPU@{AllocateMappedMemGPU}}
+\index{AllocateMappedMemGPU@{AllocateMappedMemGPU}!MemManagement.h@{MemManagement.h}}
+\doxysubsubsection{\texorpdfstring{AllocateMappedMemGPU()}{AllocateMappedMemGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Allocate\+Mapped\+Mem\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{gpudevice,  }\item[{T $\ast$\&}]{z\+\_\+g,  }\item[{T $\ast$}]{z }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{MemManagement_8h_a70ae6bcde329ae664862262415cddd1c}\label{MemManagement_8h_a70ae6bcde329ae664862262415cddd1c}} 
+\index{MemManagement.h@{MemManagement.h}!FillCPU@{FillCPU}}
+\index{FillCPU@{FillCPU}!MemManagement.h@{MemManagement.h}}
+\doxysubsubsection{\texorpdfstring{FillCPU()}{FillCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Fill\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T}]{fillval,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{MemManagement_8h_a07fddb78af39693b50b36905f15b18ef}\label{MemManagement_8h_a07fddb78af39693b50b36905f15b18ef}} 
 \index{MemManagement.h@{MemManagement.h}!memloc@{memloc}}

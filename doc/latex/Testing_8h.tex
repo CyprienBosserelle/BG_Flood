@@ -14,6 +14,7 @@
 {\ttfamily \#include \char`\"{}Flow\+CPU.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Flow\+GPU.\+h\char`\"{}}\newline
 {\ttfamily \#include \char`\"{}Adaptation.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}utctime.\+h\char`\"{}}\newline
 Include dependency graph for Testing.\+h\+:
 % FIG 0
 This graph shows which files directly or indirectly include this file\+:
@@ -41,13 +42,17 @@ bool \mbox{\hyperlink{Testing_8h_a6a029027bd2060a3ecad9f8d09807962}{Raintestinpu
 \item 
 {\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a7b6329079d1c7902af71dd17677dae15}{Mass\+Conserve\+Steep\+Slope}} (T zsnit, int gpu)
 \item 
-{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a5b588f22d9b47f00af2a94804ac2b7f1}{Raintest}} (T zsnit, int gpu, float alpha)
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a31b092b81a7e3ff99df93441e5d0bb62}{Raintest}} (T zsnit, int gpu, float alpha, int engine)
 \item 
 {\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a1f58fd96fa0d9473ed0c863d5b789485}{testboundaries}} (\mbox{\hyperlink{classParam}{Param}} XParam, T maxslope)
 \item 
 {\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a0755c7670bec1082029464abce5504ad}{Zone\+Output\+Test}} (int nzones, T zsinit)
 \item 
 {\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_a6645fef2658aa8f5bb8f72823d17019c}{Rainlossestest}} (T zsnit, int gpu, float alpha)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_aee83c778b6d86fde8c183b3a896cdc71}{Test\+Multi\+Bathy\+Rough}} (int gpu, T ref, int secnario)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Testing_8h_ad474adad94a69be09516b5f538fc460a}{Test\+Flexible\+Output\+Times}} (int gpu, T ref, int scenario)
 \end{DoxyCompactItemize}
 
 
@@ -94,12 +99,12 @@ This function tests the mass conservation of the vertical injection (used for ri
 {\footnotesize\ttfamily template$<$class T $>$ \\
 bool Rainlossestest (\begin{DoxyParamCaption}\item[{T}]{zsinit,  }\item[{int}]{gpu,  }\item[{float}]{alpha }\end{DoxyParamCaption})}
 
-This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain. The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsinit=0.\+0 is dry) and runs for 1s comparing results every 0.\+1s (that is approx 20 steps) \mbox{\Hypertarget{Testing_8h_a5b588f22d9b47f00af2a94804ac2b7f1}\label{Testing_8h_a5b588f22d9b47f00af2a94804ac2b7f1}} 
+This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain. The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsinit=0.\+0 is dry) and runs for 1s comparing results every 0.\+1s (that is approx 20 steps) \mbox{\Hypertarget{Testing_8h_a31b092b81a7e3ff99df93441e5d0bb62}\label{Testing_8h_a31b092b81a7e3ff99df93441e5d0bb62}} 
 \index{Testing.h@{Testing.h}!Raintest@{Raintest}}
 \index{Raintest@{Raintest}!Testing.h@{Testing.h}}
 \doxysubsubsection{\texorpdfstring{Raintest()}{Raintest()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-bool Raintest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu,  }\item[{float}]{alpha }\end{DoxyParamCaption})}
+bool Raintest (\begin{DoxyParamCaption}\item[{T}]{zsnit,  }\item[{int}]{gpu,  }\item[{float}]{alpha,  }\item[{int}]{engine }\end{DoxyParamCaption})}
 
 This function tests the mass conservation of the spacial injection (used to model rain on grid) The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsnit=0.\+0 is dry) and runs for 0.\+1s before comparing results with zsnit=0.\+1 that is approx 20 steps \mbox{\Hypertarget{Testing_8h_a6a029027bd2060a3ecad9f8d09807962}\label{Testing_8h_a6a029027bd2060a3ecad9f8d09807962}} 
 \index{Testing.h@{Testing.h}!Raintestinput@{Raintestinput}}
@@ -130,6 +135,13 @@ This function tests the mass conservation of the vertical injection (used for ri
 {\footnotesize\ttfamily template$<$class T $>$ \\
 bool testboundaries (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{maxslope }\end{DoxyParamCaption})}
 
+\mbox{\Hypertarget{Testing_8h_ad474adad94a69be09516b5f538fc460a}\label{Testing_8h_ad474adad94a69be09516b5f538fc460a}} 
+\index{Testing.h@{Testing.h}!TestFlexibleOutputTimes@{TestFlexibleOutputTimes}}
+\index{TestFlexibleOutputTimes@{TestFlexibleOutputTimes}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{TestFlexibleOutputTimes()}{TestFlexibleOutputTimes()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Test\+Flexible\+Output\+Times (\begin{DoxyParamCaption}\item[{int}]{gpu,  }\item[{T}]{ref,  }\item[{int}]{scenario }\end{DoxyParamCaption})}
+
 \mbox{\Hypertarget{Testing_8h_a1803abe24ad2daba8d11e5e46c783762}\label{Testing_8h_a1803abe24ad2daba8d11e5e46c783762}} 
 \index{Testing.h@{Testing.h}!Testing@{Testing}}
 \index{Testing@{Testing}!Testing.h@{Testing.h}}
@@ -144,7 +156,14 @@ bool Testing (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 void Testing\+Output (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
 
-OUTDATED? \mbox{\Hypertarget{Testing_8h_a0755c7670bec1082029464abce5504ad}\label{Testing_8h_a0755c7670bec1082029464abce5504ad}} 
+OUTDATED? \mbox{\Hypertarget{Testing_8h_aee83c778b6d86fde8c183b3a896cdc71}\label{Testing_8h_aee83c778b6d86fde8c183b3a896cdc71}} 
+\index{Testing.h@{Testing.h}!TestMultiBathyRough@{TestMultiBathyRough}}
+\index{TestMultiBathyRough@{TestMultiBathyRough}!Testing.h@{Testing.h}}
+\doxysubsubsection{\texorpdfstring{TestMultiBathyRough()}{TestMultiBathyRough()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Test\+Multi\+Bathy\+Rough (\begin{DoxyParamCaption}\item[{int}]{gpu,  }\item[{T}]{ref,  }\item[{int}]{secnario }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Testing_8h_a0755c7670bec1082029464abce5504ad}\label{Testing_8h_a0755c7670bec1082029464abce5504ad}} 
 \index{Testing.h@{Testing.h}!ZoneOutputTest@{ZoneOutputTest}}
 \index{ZoneOutputTest@{ZoneOutputTest}!Testing.h@{Testing.h}}
 \doxysubsubsection{\texorpdfstring{ZoneOutputTest()}{ZoneOutputTest()}}

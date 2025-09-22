@@ -1,25 +1,25 @@
 var namespaces_dup =
 [
     [ "utils", "namespaceutils.html", [
-      [ "Rain-on-grid", "RainOnGrid.html#autotoc_md70", [
-        [ "Intro", "GaussianWave.html#autotoc_md53", null ],
-        [ "Goal", "GaussianWave.html#autotoc_md54", null ],
-        [ "Settings", "GaussianWave.html#autotoc_md55", [
-          [ "You will need:", "GaussianWave.html#autotoc_md56", null ],
-          [ "Bathy", "GaussianWave.html#autotoc_md57", null ],
-          [ "Initial conditon", "GaussianWave.html#autotoc_md58", null ],
-          [ "BG_param.txt", "GaussianWave.html#autotoc_md59", null ]
+      [ "Rain-on-grid", "RainOnGrid.html#autotoc_md128", [
+        [ "Intro", "GaussianWave.html#autotoc_md111", null ],
+        [ "Goal", "GaussianWave.html#autotoc_md112", null ],
+        [ "Settings", "GaussianWave.html#autotoc_md113", [
+          [ "You will need:", "GaussianWave.html#autotoc_md114", null ],
+          [ "Bathy", "GaussianWave.html#autotoc_md115", null ],
+          [ "Initial conditon", "GaussianWave.html#autotoc_md116", null ],
+          [ "BG_param.txt", "GaussianWave.html#autotoc_md117", null ]
         ] ],
-        [ "Result", "GaussianWave.html#autotoc_md63", null ],
-        [ "Run times", "GaussianWave.html#autotoc_md64", null ],
-        [ "Goals", "Monai.html#autotoc_md65", null ],
-        [ "Status", "Monai.html#autotoc_md66", null ],
-        [ "Settings", "Monai.html#autotoc_md67", null ],
-        [ "Results", "Monai.html#autotoc_md68", null ],
-        [ "Run times", "Monai.html#autotoc_md69", null ],
-        [ "Goals", "RainOnGrid.html#autotoc_md71", null ],
-        [ "Settings", "RainOnGrid.html#autotoc_md72", null ],
-        [ "Results", "RainOnGrid.html#autotoc_md73", null ]
+        [ "Result", "GaussianWave.html#autotoc_md121", null ],
+        [ "Run times", "GaussianWave.html#autotoc_md122", null ],
+        [ "Goals", "Monai.html#autotoc_md123", null ],
+        [ "Status", "Monai.html#autotoc_md124", null ],
+        [ "Settings", "Monai.html#autotoc_md125", null ],
+        [ "Results", "Monai.html#autotoc_md126", null ],
+        [ "Run times", "Monai.html#autotoc_md127", null ],
+        [ "Goals", "RainOnGrid.html#autotoc_md129", null ],
+        [ "Settings", "RainOnGrid.html#autotoc_md130", null ],
+        [ "Results", "RainOnGrid.html#autotoc_md131", null ]
       ] ],
       [ "max", "namespaceutils.html#aeba68c7a52d2689b740394f49c278ed8", null ],
       [ "max< double >", "namespaceutils.html#ad5c66f9e93c6d4728a2578871a4a5040", null ],

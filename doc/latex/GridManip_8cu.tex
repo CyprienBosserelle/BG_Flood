@@ -138,11 +138,11 @@ template void \mbox{\hyperlink{GridManip_8cu_a04d05e14653fded15c21215c9d70819f}{
 \item 
 template void \mbox{\hyperlink{GridManip_8cu_a023f8b0a1c8bfd5949d1383da480b437}{Interpstep\+CPU$<$ double, double $>$}} (int nx, int ny, int hdstep, double totaltime, double hddt, double $\ast$\&Ux, double $\ast$Uo, double $\ast$Un)
 \item 
-{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a0ab029799189d93997384b3de4edf592}{Interpstep\+GPU}} (int nx, int ny, int hdstp, T totaltime, T hddt, T $\ast$Ux, T $\ast$Uo, T $\ast$Un)
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_aa7ab41e494c64dd0a64e7e3305406d5c}{Interpstep\+GPU}} (int nx, int ny, T totaltime, T beforetime, T aftertime, T $\ast$Ux, T $\ast$Uo, T $\ast$Un)
 \item 
-template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a779e956073de6ebb5590cca5f3135e79}{Interpstep\+GPU$<$ float $>$}} (int nx, int ny, int hdstp, float totaltime, float hddt, float $\ast$Ux, float $\ast$Uo, float $\ast$Un)
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a303ce4ab14cd9767ceaad23960df5e4e}{Interpstep\+GPU$<$ float $>$}} (int nx, int ny, float totaltime, float beforetime, float aftertime, float $\ast$Ux, float $\ast$Uo, float $\ast$Un)
 \item 
-template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a0d7b84bd9ad6ca588aadf4b7ab4c86bb}{Interpstep\+GPU$<$ double $>$}} (int nx, int ny, int hdstp, double totaltime, double hddt, double $\ast$Ux, double $\ast$Uo, double $\ast$Un)
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8cu_a00f850ccca97b85a220bb85993bcb6f1}{Interpstep\+GPU$<$ double $>$}} (int nx, int ny, double totaltime, double beforetime, double aftertime, double $\ast$Ux, double $\ast$Uo, double $\ast$Un)
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8cu_a152ff9652c67512fa8d890a539ffc4ec}{Copy2\+Cart\+CPU}} (int nx, int ny, T $\ast$dest, T $\ast$src)
 \item 
@@ -565,26 +565,26 @@ void Interpstep\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny
 \doxysubsubsection{\texorpdfstring{InterpstepCPU$<$ int, float $>$()}{InterpstepCPU< int, float >()}}
 {\footnotesize\ttfamily template void \mbox{\hyperlink{ReadForcing_8h_a0d7b8d36675c4fb7f9e8ab773c10b3ec}{Interpstep\+CPU}}$<$ int, float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{float}]{totaltime,  }\item[{float}]{hddt,  }\item[{int $\ast$\&}]{Ux,  }\item[{int $\ast$}]{Uo,  }\item[{int $\ast$}]{Un }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{GridManip_8cu_a0ab029799189d93997384b3de4edf592}\label{GridManip_8cu_a0ab029799189d93997384b3de4edf592}} 
+\mbox{\Hypertarget{GridManip_8cu_aa7ab41e494c64dd0a64e7e3305406d5c}\label{GridManip_8cu_aa7ab41e494c64dd0a64e7e3305406d5c}} 
 \index{GridManip.cu@{GridManip.cu}!InterpstepGPU@{InterpstepGPU}}
 \index{InterpstepGPU@{InterpstepGPU}!GridManip.cu@{GridManip.cu}}
 \doxysubsubsection{\texorpdfstring{InterpstepGPU()}{InterpstepGPU()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-\+\_\+\+\_\+global\+\_\+\+\_\+ void Interpstep\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstp,  }\item[{T}]{totaltime,  }\item[{T}]{hddt,  }\item[{T $\ast$}]{Ux,  }\item[{T $\ast$}]{Uo,  }\item[{T $\ast$}]{Un }\end{DoxyParamCaption})}
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Interpstep\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T}]{totaltime,  }\item[{T}]{beforetime,  }\item[{T}]{aftertime,  }\item[{T $\ast$}]{Ux,  }\item[{T $\ast$}]{Uo,  }\item[{T $\ast$}]{Un }\end{DoxyParamCaption})}
 
 Ums\mbox{[}tx\mbox{]}
 
-Ums\mbox{[}tx\mbox{]}\mbox{\Hypertarget{GridManip_8cu_a0d7b84bd9ad6ca588aadf4b7ab4c86bb}\label{GridManip_8cu_a0d7b84bd9ad6ca588aadf4b7ab4c86bb}} 
+Ums\mbox{[}tx\mbox{]}\mbox{\Hypertarget{GridManip_8cu_a00f850ccca97b85a220bb85993bcb6f1}\label{GridManip_8cu_a00f850ccca97b85a220bb85993bcb6f1}} 
 \index{GridManip.cu@{GridManip.cu}!InterpstepGPU$<$ double $>$@{InterpstepGPU$<$ double $>$}}
 \index{InterpstepGPU$<$ double $>$@{InterpstepGPU$<$ double $>$}!GridManip.cu@{GridManip.cu}}
 \doxysubsubsection{\texorpdfstring{InterpstepGPU$<$ double $>$()}{InterpstepGPU< double >()}}
-{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_a0ab029799189d93997384b3de4edf592}{Interpstep\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstp,  }\item[{double}]{totaltime,  }\item[{double}]{hddt,  }\item[{double $\ast$}]{Ux,  }\item[{double $\ast$}]{Uo,  }\item[{double $\ast$}]{Un }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_aa7ab41e494c64dd0a64e7e3305406d5c}{Interpstep\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double}]{totaltime,  }\item[{double}]{beforetime,  }\item[{double}]{aftertime,  }\item[{double $\ast$}]{Ux,  }\item[{double $\ast$}]{Uo,  }\item[{double $\ast$}]{Un }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{GridManip_8cu_a779e956073de6ebb5590cca5f3135e79}\label{GridManip_8cu_a779e956073de6ebb5590cca5f3135e79}} 
+\mbox{\Hypertarget{GridManip_8cu_a303ce4ab14cd9767ceaad23960df5e4e}\label{GridManip_8cu_a303ce4ab14cd9767ceaad23960df5e4e}} 
 \index{GridManip.cu@{GridManip.cu}!InterpstepGPU$<$ float $>$@{InterpstepGPU$<$ float $>$}}
 \index{InterpstepGPU$<$ float $>$@{InterpstepGPU$<$ float $>$}!GridManip.cu@{GridManip.cu}}
 \doxysubsubsection{\texorpdfstring{InterpstepGPU$<$ float $>$()}{InterpstepGPU< float >()}}
-{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_a0ab029799189d93997384b3de4edf592}{Interpstep\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstp,  }\item[{float}]{totaltime,  }\item[{float}]{hddt,  }\item[{float $\ast$}]{Ux,  }\item[{float $\ast$}]{Uo,  }\item[{float $\ast$}]{Un }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_aa7ab41e494c64dd0a64e7e3305406d5c}{Interpstep\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{float}]{totaltime,  }\item[{float}]{beforetime,  }\item[{float}]{aftertime,  }\item[{float $\ast$}]{Ux,  }\item[{float $\ast$}]{Uo,  }\item[{float $\ast$}]{Un }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{GridManip_8cu_a2c53af2a95f3a86427f93b440f40ddd2}\label{GridManip_8cu_a2c53af2a95f3a86427f93b440f40ddd2}} 
 \index{GridManip.cu@{GridManip.cu}!setedges@{setedges}}

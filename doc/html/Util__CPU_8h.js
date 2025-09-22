@@ -12,5 +12,6 @@ var Util__CPU_8h =
     [ "nearest", "Util__CPU_8h.html#a456a3278339bdb99a60c931be5d52201", null ],
     [ "nextPow2", "Util__CPU_8h.html#ac691304e3b7dc491d76ed6ce8025dede", null ],
     [ "OBBdetect", "Util__CPU_8h.html#a59ad6246014964c62a5bab20fe88eb98", null ],
+    [ "signof", "Util__CPU_8h.html#a6fc75ebfe4c6c57350e8e2ae37f2ea71", null ],
     [ "sq", "Util__CPU_8h.html#a73741d59af8a4d9511715aca4540bd72", null ]
 ];

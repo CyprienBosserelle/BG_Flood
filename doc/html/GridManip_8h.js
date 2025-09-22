@@ -11,6 +11,6 @@ var GridManip_8h =
     [ "interp2BUQ", "GridManip_8h.html#a6ef807f08f9ab5df6f2fed0ca99649a5", null ],
     [ "interp2BUQ", "GridManip_8h.html#a21e34043eba5a823525041e78302851b", null ],
     [ "InterpstepCPU", "GridManip_8h.html#a242cf7787fb7c176e5a784ddfb3aea7e", null ],
-    [ "InterpstepGPU", "GridManip_8h.html#a0ab029799189d93997384b3de4edf592", null ],
+    [ "InterpstepGPU", "GridManip_8h.html#aa7ab41e494c64dd0a64e7e3305406d5c", null ],
     [ "setedges", "GridManip_8h.html#a2c53af2a95f3a86427f93b440f40ddd2", null ]
 ];

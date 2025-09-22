@@ -3,6 +3,7 @@ var structTexSetP =
     [ "channelDesc", "structTexSetP.html#a3e8ae3cd1135328ce30d7ef8f86ebcb8", null ],
     [ "CudArr", "structTexSetP.html#a0d8891215a5b1c226a5f03801fdfd4d1", null ],
     [ "dx", "structTexSetP.html#af3c70d509345d3b8efe28bf8cba90855", null ],
+    [ "dy", "structTexSetP.html#ab4b9a6f78fa625879a5b200bb3369246", null ],
     [ "nowvalue", "structTexSetP.html#a253b7dd5a67f14dcdbd4f470a41091a1", null ],
     [ "resDesc", "structTexSetP.html#a090e891c9e98f4adc41be4dc863f6255", null ],
     [ "tex", "structTexSetP.html#a92b310f0baffc139bda921ddb508241d", null ],

@@ -100,6 +100,7 @@ $(document).ready(function(){initNavTree('InitialConditions_8cu.html',''); initR
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="InitialConditions_8h_source.html">InitialConditions.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Input_8h_source.html">Input.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for InitialConditions.cu:</div>
 <div class="dyncontent">
@@ -134,13 +135,13 @@ Functions</h2></td></tr>
 <tr class="separator:a92d93b52d0855bccfd492225026be911"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a763216129a9441782bbf02da1440c568"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a763216129a9441782bbf02da1440c568">InitTSOutput</a> (<a class="el" href="classParam.html">Param</a> XParam)</td></tr>
 <tr class="separator:a763216129a9441782bbf02da1440c568"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00df2cd6889ed35970ab143abd056800"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a00df2cd6889ed35970ab143abd056800"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a00df2cd6889ed35970ab143abd056800">FindTSoutNodes</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a> &amp;bnd)</td></tr>
-<tr class="separator:a00df2cd6889ed35970ab143abd056800"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09c6b7f86e103ba0978f74420c7f9748"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a09c6b7f86e103ba0978f74420c7f9748">FindTSoutNodes&lt; float &gt;</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; float &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a> &amp;bnd)</td></tr>
-<tr class="separator:a09c6b7f86e103ba0978f74420c7f9748"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab302192b2740dbcda882a62ba441b3c0"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#ab302192b2740dbcda882a62ba441b3c0">FindTSoutNodes&lt; double &gt;</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; double &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a> &amp;bnd)</td></tr>
-<tr class="separator:ab302192b2740dbcda882a62ba441b3c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13f967444cee5c69fa9cb6440510e6e7"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a13f967444cee5c69fa9cb6440510e6e7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a13f967444cee5c69fa9cb6440510e6e7">FindTSoutNodes</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a>&lt; T &gt; &amp;bnd)</td></tr>
+<tr class="separator:a13f967444cee5c69fa9cb6440510e6e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a841f73e5637f2556d68e01d99f279516"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a841f73e5637f2556d68e01d99f279516">FindTSoutNodes&lt; float &gt;</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; float &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a>&lt; float &gt; &amp;bnd)</td></tr>
+<tr class="separator:a841f73e5637f2556d68e01d99f279516"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e4ecef51cc1a30d96176f46d9f92f40"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a6e4ecef51cc1a30d96176f46d9f92f40">FindTSoutNodes&lt; double &gt;</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; double &gt; XBlock, <a class="el" href="structBndblockP.html">BndblockP</a>&lt; double &gt; &amp;bnd)</td></tr>
+<tr class="separator:a6e4ecef51cc1a30d96176f46d9f92f40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac45dc08bf06560c0af1728ac0feb2142"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:ac45dc08bf06560c0af1728ac0feb2142"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#ac45dc08bf06560c0af1728ac0feb2142">InitRivers</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing, <a class="el" href="structModel.html">Model</a>&lt; T &gt; &amp;XModel)</td></tr>
 <tr class="separator:ac45dc08bf06560c0af1728ac0feb2142"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,12 +170,15 @@ Functions</h2></td></tr>
 <tr class="separator:aa74da46431774aaf0e7e6882c5f10a8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b85cd98a7659e1fcca7ddd8cc105d36"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a8b85cd98a7659e1fcca7ddd8cc105d36">Initoutzone&lt; double &gt;</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; double &gt; &amp;XBlock)</td></tr>
 <tr class="separator:a8b85cd98a7659e1fcca7ddd8cc105d36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85565d26e330010c4abe870524b5fce9"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a85565d26e330010c4abe870524b5fce9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a85565d26e330010c4abe870524b5fce9">Initbndblks</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock)</td></tr>
+<tr class="separator:a85565d26e330010c4abe870524b5fce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a263be1815f9718565688c7df2e501586"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a263be1815f9718565688c7df2e501586"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a263be1815f9718565688c7df2e501586">Calcbndblks</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock)</td></tr>
 <tr class="separator:a263be1815f9718565688c7df2e501586"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ea2be9bd2babd573611c8655e4301d6"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a8ea2be9bd2babd573611c8655e4301d6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a8ea2be9bd2babd573611c8655e4301d6">Findbndblks</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structModel.html">Model</a>&lt; T &gt; XModel, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing)</td></tr>
-<tr class="separator:a8ea2be9bd2babd573611c8655e4301d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fad3c22b90f7fe77ee7f9bec4dd8126"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a7fad3c22b90f7fe77ee7f9bec4dd8126"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a7fad3c22b90f7fe77ee7f9bec4dd8126">Findbndblks</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structModel.html">Model</a>&lt; T &gt; XModel, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing)</td></tr>
+<tr class="separator:a7fad3c22b90f7fe77ee7f9bec4dd8126"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1107bca3fddd95fe16350c332d7764bf"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a1107bca3fddd95fe16350c332d7764bf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a1107bca3fddd95fe16350c332d7764bf">RectCornerBlk</a> (<a class="el" href="classParam.html">Param</a> &amp;XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; &amp;XBlock, double xo, double yo, double xmax, double ymax, bool isEps, std::vector&lt; int &gt; &amp;cornerblk)</td></tr>
 <tr class="separator:a1107bca3fddd95fe16350c332d7764bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,6 +191,11 @@ Functions</h2></td></tr>
 <tr class="memitem:a266ea9817acbebeeaf166015432d0bfe"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a266ea9817acbebeeaf166015432d0bfe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a266ea9817acbebeeaf166015432d0bfe">initinfiltration</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, T *h, T *initLoss, T *hgw)</td></tr>
 <tr class="separator:a266ea9817acbebeeaf166015432d0bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a067cd35d5468417ae5d787e1011872a7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a067cd35d5468417ae5d787e1011872a7">GetTimeOutput</a> (<a class="el" href="classT__output.html">T_output</a> time_info)</td></tr>
+<tr class="separator:a067cd35d5468417ae5d787e1011872a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64efa40d094126115fa54a03bb146cd5"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a64efa40d094126115fa54a03bb146cd5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="InitialConditions_8cu.html#a64efa40d094126115fa54a03bb146cd5">initOutputTimes</a> (<a class="el" href="classParam.html">Param</a> XParam, std::vector&lt; double &gt; &amp;OutputT, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; &amp;XBlock)</td></tr>
+<tr class="separator:a64efa40d094126115fa54a03bb146cd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a1798976a481c2b62fc463897a1dc0f29"></a>
@@ -303,8 +312,8 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a8ea2be9bd2babd573611c8655e4301d6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ea2be9bd2babd573611c8655e4301d6">&#9670;&nbsp;</a></span>Findbndblks()</h2>
+<a id="a7fad3c22b90f7fe77ee7f9bec4dd8126"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fad3c22b90f7fe77ee7f9bec4dd8126">&#9670;&nbsp;</a></span>Findbndblks()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -312,7 +321,7 @@ template&lt;class T &gt; </div>
 template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void Findbndblks </td>
+          <td class="memname">Findbndblks </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
           <td class="paramname"><em>XParam</em>, </td>
@@ -336,6 +345,7 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Find which block on the model edge belongs to a "side boundary" </p>
 
 </div>
 </div>
@@ -425,8 +435,8 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a00df2cd6889ed35970ab143abd056800"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00df2cd6889ed35970ab143abd056800">&#9670;&nbsp;</a></span>FindTSoutNodes()</h2>
+<a id="a13f967444cee5c69fa9cb6440510e6e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13f967444cee5c69fa9cb6440510e6e7">&#9670;&nbsp;</a></span>FindTSoutNodes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -448,7 +458,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a>&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>bnd</em>&#160;</td>
         </tr>
         <tr>
@@ -461,14 +471,14 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="ab302192b2740dbcda882a62ba441b3c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab302192b2740dbcda882a62ba441b3c0">&#9670;&nbsp;</a></span>FindTSoutNodes&lt; double &gt;()</h2>
+<a id="a6e4ecef51cc1a30d96176f46d9f92f40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e4ecef51cc1a30d96176f46d9f92f40">&#9670;&nbsp;</a></span>FindTSoutNodes&lt; double &gt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">template void <a class="el" href="InitialConditions_8h.html#a00df2cd6889ed35970ab143abd056800">FindTSoutNodes</a>&lt; double &gt; </td>
+          <td class="memname">template void <a class="el" href="InitialConditions_8h.html#a13f967444cee5c69fa9cb6440510e6e7">FindTSoutNodes</a>&lt; double &gt; </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classParam.html">Param</a> &amp;&#160;</td>
           <td class="paramname"><em>XParam</em>, </td>
@@ -482,7 +492,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a>&lt; double &gt; &amp;&#160;</td>
           <td class="paramname"><em>bnd</em>&#160;</td>
         </tr>
         <tr>
@@ -495,14 +505,14 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a09c6b7f86e103ba0978f74420c7f9748"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09c6b7f86e103ba0978f74420c7f9748">&#9670;&nbsp;</a></span>FindTSoutNodes&lt; float &gt;()</h2>
+<a id="a841f73e5637f2556d68e01d99f279516"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a841f73e5637f2556d68e01d99f279516">&#9670;&nbsp;</a></span>FindTSoutNodes&lt; float &gt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">template void <a class="el" href="InitialConditions_8h.html#a00df2cd6889ed35970ab143abd056800">FindTSoutNodes</a>&lt; float &gt; </td>
+          <td class="memname">template void <a class="el" href="InitialConditions_8h.html#a13f967444cee5c69fa9cb6440510e6e7">FindTSoutNodes</a>&lt; float &gt; </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classParam.html">Param</a> &amp;&#160;</td>
           <td class="paramname"><em>XParam</em>, </td>
@@ -516,8 +526,62 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structBndblockP.html">BndblockP</a>&lt; float &gt; &amp;&#160;</td>
           <td class="paramname"><em>bnd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a067cd35d5468417ae5d787e1011872a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a067cd35d5468417ae5d787e1011872a7">&#9670;&nbsp;</a></span>GetTimeOutput()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; GetTimeOutput </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classT__output.html">T_output</a>&#160;</td>
+          <td class="paramname"><em>time_info</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a85565d26e330010c4abe870524b5fce9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85565d26e330010c4abe870524b5fce9">&#9670;&nbsp;</a></span>Initbndblks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void Initbndblks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a> &amp;&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;&#160;</td>
+          <td class="paramname"><em>XForcing</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -756,6 +820,42 @@ template&lt;class T &gt; </div>
           <td></td>
           <td class="paramtype"><a class="el" href="structModel.html">Model</a>&lt; T &gt; &amp;&#160;</td>
           <td class="paramname"><em>XModel</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a64efa40d094126115fa54a03bb146cd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64efa40d094126115fa54a03bb146cd5">&#9670;&nbsp;</a></span>initOutputTimes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void initOutputTimes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>OutputT</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>XBlock</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1220,7 +1320,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="InitialConditions_8cu.html">InitialConditions.cu</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

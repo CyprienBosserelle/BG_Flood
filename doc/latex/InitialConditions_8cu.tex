@@ -1,6 +1,7 @@
 \hypertarget{InitialConditions_8cu}{}\doxysection{src/\+Initial\+Conditions.cu File Reference}
 \label{InitialConditions_8cu}\index{src/InitialConditions.cu@{src/InitialConditions.cu}}
 {\ttfamily \#include \char`\"{}Initial\+Conditions.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Input.\+h\char`\"{}}\newline
 Include dependency graph for Initial\+Conditions.\+cu\+:
 % FIG 0
 \doxysubsection*{Functions}
@@ -28,11 +29,11 @@ template void \mbox{\hyperlink{InitialConditions_8cu_a17bbd0ce4e3a1210d556f2dcfa
 \item 
 void \mbox{\hyperlink{InitialConditions_8cu_a763216129a9441782bbf02da1440c568}{Init\+TSOutput}} (\mbox{\hyperlink{classParam}{Param}} XParam)
 \item 
-{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a00df2cd6889ed35970ab143abd056800}{Find\+TSout\+Nodes}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structBndblockP}{BndblockP}} \&bnd)
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a13f967444cee5c69fa9cb6440510e6e7}{Find\+TSout\+Nodes}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structBndblockP}{BndblockP}}$<$ T $>$ \&bnd)
 \item 
-template void \mbox{\hyperlink{InitialConditions_8cu_a09c6b7f86e103ba0978f74420c7f9748}{Find\+TSout\+Nodes$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structBndblockP}{BndblockP}} \&bnd)
+template void \mbox{\hyperlink{InitialConditions_8cu_a841f73e5637f2556d68e01d99f279516}{Find\+TSout\+Nodes$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structBndblockP}{BndblockP}}$<$ float $>$ \&bnd)
 \item 
-template void \mbox{\hyperlink{InitialConditions_8cu_ab302192b2740dbcda882a62ba441b3c0}{Find\+TSout\+Nodes$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structBndblockP}{BndblockP}} \&bnd)
+template void \mbox{\hyperlink{InitialConditions_8cu_a6e4ecef51cc1a30d96176f46d9f92f40}{Find\+TSout\+Nodes$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structBndblockP}{BndblockP}}$<$ double $>$ \&bnd)
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_ac45dc08bf06560c0af1728ac0feb2142}{Init\+Rivers}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
 \item 
@@ -58,9 +59,11 @@ template void \mbox{\hyperlink{InitialConditions_8cu_aa74da46431774aaf0e7e6882c5
 \item 
 template void \mbox{\hyperlink{InitialConditions_8cu_a8b85cd98a7659e1fcca7ddd8cc105d36}{Initoutzone$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&XBlock)
 \item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a85565d26e330010c4abe870524b5fce9}{Initbndblks}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock)
+\item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a263be1815f9718565688c7df2e501586}{Calcbndblks}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock)
 \item 
-{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a8ea2be9bd2babd573611c8655e4301d6}{Findbndblks}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing)
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a7fad3c22b90f7fe77ee7f9bec4dd8126}{Findbndblks}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing)
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a1107bca3fddd95fe16350c332d7764bf}{Rect\+Corner\+Blk}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock, double xo, double yo, double xmax, double ymax, bool is\+Eps, std\+::vector$<$ int $>$ \&cornerblk)
 \item 
@@ -69,6 +72,10 @@ template void \mbox{\hyperlink{InitialConditions_8cu_a8b85cd98a7659e1fcca7ddd8cc
 {\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{InitialConditions_8cu_a6737856696082f8fade0c1ebafb12333}{calcactive\+Cell\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$zb)
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a266ea9817acbebeeaf166015432d0bfe}{initinfiltration}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$init\+Loss, T $\ast$hgw)
+\item 
+std\+::vector$<$ double $>$ \mbox{\hyperlink{InitialConditions_8cu_a067cd35d5468417ae5d787e1011872a7}{Get\+Time\+Output}} (\mbox{\hyperlink{classT__output}{T\+\_\+output}} time\+\_\+info)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitialConditions_8cu_a64efa40d094126115fa54a03bb146cd5}{init\+Output\+Times}} (\mbox{\hyperlink{classParam}{Param}} XParam, std\+::vector$<$ double $>$ \&OutputT, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock)
 \end{DoxyCompactItemize}
 
 
@@ -94,14 +101,14 @@ void calcactive\+Cell\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{clas
 {\footnotesize\ttfamily template$<$class T $>$ \\
 void Calcbndblks (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{InitialConditions_8cu_a8ea2be9bd2babd573611c8655e4301d6}\label{InitialConditions_8cu_a8ea2be9bd2babd573611c8655e4301d6}} 
+\mbox{\Hypertarget{InitialConditions_8cu_a7fad3c22b90f7fe77ee7f9bec4dd8126}\label{InitialConditions_8cu_a7fad3c22b90f7fe77ee7f9bec4dd8126}} 
 \index{InitialConditions.cu@{InitialConditions.cu}!Findbndblks@{Findbndblks}}
 \index{Findbndblks@{Findbndblks}!InitialConditions.cu@{InitialConditions.cu}}
 \doxysubsubsection{\texorpdfstring{Findbndblks()}{Findbndblks()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-void Findbndblks (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing }\end{DoxyParamCaption})}
+Findbndblks (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{InitialConditions_8cu_a651e27aab2a3ecbf5d3a0425c32292c7}\label{InitialConditions_8cu_a651e27aab2a3ecbf5d3a0425c32292c7}} 
+Find which block on the model edge belongs to a \char`\"{}side boundary\char`\"{} \mbox{\Hypertarget{InitialConditions_8cu_a651e27aab2a3ecbf5d3a0425c32292c7}\label{InitialConditions_8cu_a651e27aab2a3ecbf5d3a0425c32292c7}} 
 \index{InitialConditions.cu@{InitialConditions.cu}!Findoutzoneblks@{Findoutzoneblks}}
 \index{Findoutzoneblks@{Findoutzoneblks}!InitialConditions.cu@{InitialConditions.cu}}
 \doxysubsubsection{\texorpdfstring{Findoutzoneblks()}{Findoutzoneblks()}}
@@ -120,24 +127,37 @@ void Findoutzoneblks (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam
 \doxysubsubsection{\texorpdfstring{Findoutzoneblks$<$ float $>$()}{Findoutzoneblks< float >()}}
 {\footnotesize\ttfamily template void \mbox{\hyperlink{InitialConditions_8cu_a651e27aab2a3ecbf5d3a0425c32292c7}{Findoutzoneblks}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&}]{XBlock }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{InitialConditions_8cu_a00df2cd6889ed35970ab143abd056800}\label{InitialConditions_8cu_a00df2cd6889ed35970ab143abd056800}} 
+\mbox{\Hypertarget{InitialConditions_8cu_a13f967444cee5c69fa9cb6440510e6e7}\label{InitialConditions_8cu_a13f967444cee5c69fa9cb6440510e6e7}} 
 \index{InitialConditions.cu@{InitialConditions.cu}!FindTSoutNodes@{FindTSoutNodes}}
 \index{FindTSoutNodes@{FindTSoutNodes}!InitialConditions.cu@{InitialConditions.cu}}
 \doxysubsubsection{\texorpdfstring{FindTSoutNodes()}{FindTSoutNodes()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-void Find\+TSout\+Nodes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structBndblockP}{BndblockP}} \&}]{bnd }\end{DoxyParamCaption})}
+void Find\+TSout\+Nodes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structBndblockP}{BndblockP}}$<$ T $>$ \&}]{bnd }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{InitialConditions_8cu_ab302192b2740dbcda882a62ba441b3c0}\label{InitialConditions_8cu_ab302192b2740dbcda882a62ba441b3c0}} 
+\mbox{\Hypertarget{InitialConditions_8cu_a6e4ecef51cc1a30d96176f46d9f92f40}\label{InitialConditions_8cu_a6e4ecef51cc1a30d96176f46d9f92f40}} 
 \index{InitialConditions.cu@{InitialConditions.cu}!FindTSoutNodes$<$ double $>$@{FindTSoutNodes$<$ double $>$}}
 \index{FindTSoutNodes$<$ double $>$@{FindTSoutNodes$<$ double $>$}!InitialConditions.cu@{InitialConditions.cu}}
 \doxysubsubsection{\texorpdfstring{FindTSoutNodes$<$ double $>$()}{FindTSoutNodes< double >()}}
-{\footnotesize\ttfamily template void \mbox{\hyperlink{InitialConditions_8h_a00df2cd6889ed35970ab143abd056800}{Find\+TSout\+Nodes}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structBndblockP}{BndblockP}} \&}]{bnd }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{InitialConditions_8h_a13f967444cee5c69fa9cb6440510e6e7}{Find\+TSout\+Nodes}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structBndblockP}{BndblockP}}$<$ double $>$ \&}]{bnd }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{InitialConditions_8cu_a09c6b7f86e103ba0978f74420c7f9748}\label{InitialConditions_8cu_a09c6b7f86e103ba0978f74420c7f9748}} 
+\mbox{\Hypertarget{InitialConditions_8cu_a841f73e5637f2556d68e01d99f279516}\label{InitialConditions_8cu_a841f73e5637f2556d68e01d99f279516}} 
 \index{InitialConditions.cu@{InitialConditions.cu}!FindTSoutNodes$<$ float $>$@{FindTSoutNodes$<$ float $>$}}
 \index{FindTSoutNodes$<$ float $>$@{FindTSoutNodes$<$ float $>$}!InitialConditions.cu@{InitialConditions.cu}}
 \doxysubsubsection{\texorpdfstring{FindTSoutNodes$<$ float $>$()}{FindTSoutNodes< float >()}}
-{\footnotesize\ttfamily template void \mbox{\hyperlink{InitialConditions_8h_a00df2cd6889ed35970ab143abd056800}{Find\+TSout\+Nodes}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structBndblockP}{BndblockP}} \&}]{bnd }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{InitialConditions_8h_a13f967444cee5c69fa9cb6440510e6e7}{Find\+TSout\+Nodes}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structBndblockP}{BndblockP}}$<$ float $>$ \&}]{bnd }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InitialConditions_8cu_a067cd35d5468417ae5d787e1011872a7}\label{InitialConditions_8cu_a067cd35d5468417ae5d787e1011872a7}} 
+\index{InitialConditions.cu@{InitialConditions.cu}!GetTimeOutput@{GetTimeOutput}}
+\index{GetTimeOutput@{GetTimeOutput}!InitialConditions.cu@{InitialConditions.cu}}
+\doxysubsubsection{\texorpdfstring{GetTimeOutput()}{GetTimeOutput()}}
+{\footnotesize\ttfamily std\+::vector$<$double$>$ Get\+Time\+Output (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classT__output}{T\+\_\+output}}}]{time\+\_\+info }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InitialConditions_8cu_a85565d26e330010c4abe870524b5fce9}\label{InitialConditions_8cu_a85565d26e330010c4abe870524b5fce9}} 
+\index{InitialConditions.cu@{InitialConditions.cu}!Initbndblks@{Initbndblks}}
+\index{Initbndblks@{Initbndblks}!InitialConditions.cu@{InitialConditions.cu}}
+\doxysubsubsection{\texorpdfstring{Initbndblks()}{Initbndblks()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Initbndblks (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{InitialConditions_8cu_a1f421419c275c129f3e231e21c3a80fe}\label{InitialConditions_8cu_a1f421419c275c129f3e231e21c3a80fe}} 
 \index{InitialConditions.cu@{InitialConditions.cu}!InitialConditions@{InitialConditions}}
@@ -190,6 +210,13 @@ void Initmaparray (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structModel}{
 \doxysubsubsection{\texorpdfstring{initoutput()}{initoutput()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 void initoutput (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InitialConditions_8cu_a64efa40d094126115fa54a03bb146cd5}\label{InitialConditions_8cu_a64efa40d094126115fa54a03bb146cd5}} 
+\index{InitialConditions.cu@{InitialConditions.cu}!initOutputTimes@{initOutputTimes}}
+\index{initOutputTimes@{initOutputTimes}!InitialConditions.cu@{InitialConditions.cu}}
+\doxysubsubsection{\texorpdfstring{initOutputTimes()}{initOutputTimes()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void init\+Output\+Times (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{std\+::vector$<$ double $>$ \&}]{OutputT,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{InitialConditions_8cu_a80248239ba4160d18f8651e310098dd8}\label{InitialConditions_8cu_a80248239ba4160d18f8651e310098dd8}} 
 \index{InitialConditions.cu@{InitialConditions.cu}!Initoutzone@{Initoutzone}}

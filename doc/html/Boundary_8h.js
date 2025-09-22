@@ -1,17 +1,29 @@
 var Boundary_8h =
 [
     [ "ABS1D", "Boundary_8h.html#a526a85506746cc9877baaea4ee1f84ae", null ],
-    [ "bndGPU", "Boundary_8h.html#a5da9c2cb6774461d8f6de7cafd105ed6", null ],
+    [ "ABS1DQ", "Boundary_8h.html#a6ea9bad9e1b37e1db9d6bec65d18259d", null ],
+    [ "bndCPU", "Boundary_8h.html#a31da8c718f61d1febaf765248e0c73a5", null ],
+    [ "bndFluxGPUSide", "Boundary_8h.html#ad24f377cb23e38ac40ffce632d0971d8", null ],
+    [ "bndGPU", "Boundary_8h.html#a994c0a68a28b55ac136fa3fd105c5db8", null ],
     [ "Dirichlet1D", "Boundary_8h.html#a6cb790e8b942d8f4f32cefb163df9ffd", null ],
+    [ "Dirichlet1Q", "Boundary_8h.html#a7e7c96b473fa73b48210521f9b06958f", null ],
     [ "findmaskside", "Boundary_8h.html#ad433f7b7fe383758a05a3788eeddf488", null ],
-    [ "Flowbnd", "Boundary_8h.html#ac17e657eb1ba981e7b5661c3997692ed", null ],
+    [ "Flowbnd", "Boundary_8h.html#a1070c3a02b0f106ebfba5aebebe8425d", null ],
+    [ "FlowbndFlux", "Boundary_8h.html#ae3a143b7b4d7a10d06fd245daf0e6dd7", null ],
+    [ "FlowbndFlux", "Boundary_8h.html#a493b3a9d491a55b39aeb7edfe53a5ef8", null ],
+    [ "FlowbndFluxML", "Boundary_8h.html#aaec6c50a87ec1475242fd2636570993f", null ],
     [ "halowall", "Boundary_8h.html#ac7033b2e3bb1ce6a37421d932dc2c9f6", null ],
     [ "Inside", "Boundary_8h.html#a59cbed77b10dbaf2fa1c4261631b78c5", null ],
     [ "isbnd", "Boundary_8h.html#a099d9eb334ae46f6467552a50596a196", null ],
     [ "maskbnd", "Boundary_8h.html#aa023b0e53092dd1d34728511f1f93005", null ],
     [ "maskbndGPUbot", "Boundary_8h.html#a91a99b6f920543db1cdd58ed166eab2c", null ],
+    [ "maskbndGPUFluxbot", "Boundary_8h.html#ad76dc3a9c37690c1c68e3ed0c8761d80", null ],
+    [ "maskbndGPUFluxleft", "Boundary_8h.html#a974c3e91252e6886c1577201af2d9136", null ],
+    [ "maskbndGPUFluxright", "Boundary_8h.html#a1b98408b87883d4ddfbbbd8254ae8d7f", null ],
+    [ "maskbndGPUFluxtop", "Boundary_8h.html#ace0711ff24a69d91c4b3475d956f80b7", null ],
     [ "maskbndGPUleft", "Boundary_8h.html#acdef573f7f2d65d3fe3f215342377a8b", null ],
     [ "maskbndGPUright", "Boundary_8h.html#ac1a6983a856cbc02072948f3d3fad1ea", null ],
     [ "maskbndGPUtop", "Boundary_8h.html#aec86c8b6389e6f9ca2e81ab733e58487", null ],
-    [ "noslipbnd", "Boundary_8h.html#ac038c08cc0c028bbd1495d23e5f9a1f2", null ]
+    [ "noslipbnd", "Boundary_8h.html#ac038c08cc0c028bbd1495d23e5f9a1f2", null ],
+    [ "noslipbndQ", "Boundary_8h.html#a11c397504eb338755672f8c9f64862c0", null ]
 ];

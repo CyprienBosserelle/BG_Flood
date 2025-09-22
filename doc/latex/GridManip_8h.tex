@@ -35,7 +35,7 @@ This graph shows which files directly or indirectly include this file\+:
 \item 
 {\footnotesize template$<$class T , class F $>$ }\\void \mbox{\hyperlink{GridManip_8h_a242cf7787fb7c176e5a784ddfb3aea7e}{Interpstep\+CPU}} (int nx, int ny, int hdstep, F totaltime, F hddt, T $\ast$\&Ux, T $\ast$Uo, T $\ast$Un)
 \item 
-{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_a0ab029799189d93997384b3de4edf592}{Interpstep\+GPU}} (int nx, int ny, int hdstp, T totaltime, T hddt, T $\ast$Ux, T $\ast$Uo, T $\ast$Un)
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{GridManip_8h_aa7ab41e494c64dd0a64e7e3305406d5c}{Interpstep\+GPU}} (int nx, int ny, T totaltime, T beforetime, T aftertime, T $\ast$Ux, T $\ast$Uo, T $\ast$Un)
 \item 
 {\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{GridManip_8h_a152ff9652c67512fa8d890a539ffc4ec}{Copy2\+Cart\+CPU}} (int nx, int ny, T $\ast$dest, T $\ast$src)
 \end{DoxyCompactItemize}
@@ -119,12 +119,12 @@ T interp2\+BUQ (\begin{DoxyParamCaption}\item[{T}]{x,  }\item[{T}]{y,  }\item[{T
 {\footnotesize\ttfamily template$<$class T , class F $>$ \\
 void Interpstep\+CPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstep,  }\item[{F}]{totaltime,  }\item[{F}]{hddt,  }\item[{T $\ast$\&}]{Ux,  }\item[{T $\ast$}]{Uo,  }\item[{T $\ast$}]{Un }\end{DoxyParamCaption})}
 
-\mbox{\Hypertarget{GridManip_8h_a0ab029799189d93997384b3de4edf592}\label{GridManip_8h_a0ab029799189d93997384b3de4edf592}} 
+\mbox{\Hypertarget{GridManip_8h_aa7ab41e494c64dd0a64e7e3305406d5c}\label{GridManip_8h_aa7ab41e494c64dd0a64e7e3305406d5c}} 
 \index{GridManip.h@{GridManip.h}!InterpstepGPU@{InterpstepGPU}}
 \index{InterpstepGPU@{InterpstepGPU}!GridManip.h@{GridManip.h}}
 \doxysubsubsection{\texorpdfstring{InterpstepGPU()}{InterpstepGPU()}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
-\+\_\+\+\_\+global\+\_\+\+\_\+ void Interpstep\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{hdstp,  }\item[{T}]{totaltime,  }\item[{T}]{hddt,  }\item[{T $\ast$}]{Ux,  }\item[{T $\ast$}]{Uo,  }\item[{T $\ast$}]{Un }\end{DoxyParamCaption})}
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Interpstep\+GPU (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{T}]{totaltime,  }\item[{T}]{beforetime,  }\item[{T}]{aftertime,  }\item[{T $\ast$}]{Ux,  }\item[{T $\ast$}]{Uo,  }\item[{T $\ast$}]{Un }\end{DoxyParamCaption})}
 
 Ums\mbox{[}tx\mbox{]}
 

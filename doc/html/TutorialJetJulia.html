@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('TutorialJetJulia.html',''); initResiza
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This is a very simple example that shows the model stability in transitional flows.</p>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<h2><a class="anchor" id="autotoc_md51"></a>
 Make a bathymetry</h2>
 <p>Below is a Julia script to make the bathymetry. </p><pre class="fragment">using GMT
 
@@ -129,20 +129,20 @@ grdimage(G, lw=:thinnest, color=cmap, fmt=:png, show=true)
 
 gmtwrite("bathy.asc", G; id="ef");
 </pre><p> The result is a grid domain looking like this: <img src="https://github.com/CyprienBosserelle/BG/blob/development/Examples/Jet/bathy_jet.png" alt="Bathy file" class="inline"/> You can also use the bathy.asc file in the example folder.</p>
-<h2><a class="anchor" id="autotoc_md11"></a>
+<h2><a class="anchor" id="autotoc_md52"></a>
 Make Bnd files</h2>
 <p>We are going to set the water level to 0.0m on the right and 1.0 on the left and keep it constant. To dio that we create 2 files <code>right.txt</code> and <code>left.bnd</code></p>
-<h3><a class="anchor" id="autotoc_md12"></a>
+<h3><a class="anchor" id="autotoc_md53"></a>
 &lt;tt&gt;right.bnd&lt;/tt&gt;</h3>
 <pre class="fragment"># This is the right boundary
 0.0 0.0
 3600.0 0.0
-</pre> <h3><a class="anchor" id="autotoc_md13"></a>
+</pre> <h3><a class="anchor" id="autotoc_md54"></a>
 &lt;tt&gt;left.bnd&lt;/tt&gt;</h3>
 <pre class="fragment"># This is the right boundary
 0.0 1.0
 3600.0 1.0
-</pre> <h2><a class="anchor" id="autotoc_md14"></a>
+</pre> <h2><a class="anchor" id="autotoc_md55"></a>
 Set up the &lt;tt&gt;BG_param.txt&lt;/tt&gt; file</h2>
 <p>First it is good practice to document your parameter file: </p><pre class="fragment">##############################
 ## Jet demo
@@ -159,12 +159,12 @@ rightbndfile = right.bnd
 
 left=3; # Absorbing bnd
 leftbndfile = left.txt
-</pre> <h2><a class="anchor" id="autotoc_md15"></a>
+</pre> <h2><a class="anchor" id="autotoc_md56"></a>
 Run the model</h2>
 <p>If you are on windows simply double-click on the executable and in linux launch the binary.</p>
 <p>Vorticity output should look like this:</p>
 <p>&lt;video src="https://github.com/CyprienBosserelle/BG/blob/development/Examples/Jet/anim_01.mp4" width="320" height="200" controls preload&gt;&lt;/video&gt; <a href="https://youtu.be/f1A7EeeMlls">Video</a></p>
-<h2><a class="anchor" id="autotoc_md16"></a>
+<h2><a class="anchor" id="autotoc_md57"></a>
 Things to try</h2>
 <ul>
 <li>What happens when using a different value for theta (1-2.0)</li>
@@ -172,16 +172,16 @@ Things to try</h2>
 <li>What happens when you bring the boundary close to the jet</li>
 <li>Why is the jet so unstable/asymmetrical? (what are the initial condition like?)</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h1><a class="anchor" id="autotoc_md58"></a>
 Gaussian Wave</h1>
 <p>This is a great example to test whether there are bugs in the model and how the boundary work.</p>
-<h2><a class="anchor" id="autotoc_md18"></a>
+<h2><a class="anchor" id="autotoc_md59"></a>
 Bathymetry</h2>
 <p>We start with a flat bathymetry with 0.0 everywhere. You still need a file for that!</p>
 <p>Here a couple of suggestion on making the file: Using GMT: <code>grdmath -R-5/5/-5/5 -I0.03921 0 MUL = bathy.nc</code></p>
 <p>Using Julia: See section below with the hotstart file.</p>
 <p>In any case you can pick up the file in the example folder.</p>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md60"></a>
 Hortstart</h2>
 <p>We want to setup a bump in the water level centered in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.</p>
 <pre class="fragment">using GMT
@@ -221,12 +221,12 @@ gmtwrite("gauss.asc", G; id="ef");
 gmtwrite("gauss.nc", G);
 # GMT netcdf variable is "z" by default but the hotstart file needs "zs" for water surface
 gmt("grdmath gauss.nc 1.0 MUL = gauss_zs.nc?zs");
-</pre> <h2><a class="anchor" id="autotoc_md20"></a>
+</pre> <h2><a class="anchor" id="autotoc_md61"></a>
 Make Bnd files</h2>
 <p>We are going to set the water level to 0.0m on all 4 sides and keep it constant. To do that we create 1 files <code>zero.txt</code>: </p><pre class="fragment"># This is the a boundary
 0.0 0.0
 3600.0 0.0
-</pre> <h2><a class="anchor" id="autotoc_md21"></a>
+</pre> <h2><a class="anchor" id="autotoc_md62"></a>
 Set up the &lt;tt&gt;BG_param.txt&lt;/tt&gt; file</h2>
 <p>First it is good practice to document your parameter file: </p><pre class="fragment">##############################
 ## Gaussian bump demo
@@ -255,19 +255,19 @@ outvars=zb,uu,vv,zs,vort;
 # This file will contain 5 column: time,zs,hh,uu,vv
 TSOfile=Southside.txt;
 TSnode=0.0,-4.0;
-</pre> <h2><a class="anchor" id="autotoc_md22"></a>
+</pre> <h2><a class="anchor" id="autotoc_md63"></a>
 Run the model</h2>
 <p>Plot Southside.txt in your favorite tool.</p>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md64"></a>
 Things to try:</h2>
 <ul>
 <li>What happens with different boundary types</li>
 <li>Try running with double precision. What is the difference?</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md24"></a>
+<h1><a class="anchor" id="autotoc_md65"></a>
 Transpacific tsunami</h1>
 <p>This tutorial is the next stat from the Gaussian wave. Here we produce a realistic tsunami and let it propagate across the Pacific.</p>
-<h2><a class="anchor" id="autotoc_md25"></a>
+<h2><a class="anchor" id="autotoc_md66"></a>
 Bathy and domain definition</h2>
 <p>The bathymetry file we are using was extracted from the GEBCO gobal bathymetry using GMT command grdcut / grdsample. This section needs a tutorial of its own. Here in the <code>BG_param.txt</code> we specify the file name and that it is a spherical model domain. </p><pre class="fragment"># Bathymetry file
 bathy = Tpac_big.asc;
@@ -277,18 +277,18 @@ ymax=14.32
 
 dx=0.08;
 </pre><p> Also we do not want to simulate Blocks that are entirely covered in land where the elevation is bigger than say 30.0m above the datum </p><pre class="fragment">mask = 30.0;
-</pre><h2><a class="anchor" id="autotoc_md26"></a>
+</pre><h2><a class="anchor" id="autotoc_md67"></a>
 Initial tsunami wave</h2>
 <p>See matlab file in the folder or simply use: </p><pre class="fragment">hotstartfile=Maule_zs_init_simpleflt.nc;
-</pre> <h2><a class="anchor" id="autotoc_md27"></a>
+</pre> <h2><a class="anchor" id="autotoc_md68"></a>
 Boundary</h2>
 <p>In the previous tutorial you have seen how different boundary type let's wave through with minimal reflection. You choose.</p>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<h2><a class="anchor" id="autotoc_md69"></a>
 Time Keeping</h2>
 <pre class="fragment">totaltime = 0.000000; # Start time
 endtime = 54000.000000;
 outputtimestep = 600.000000;
-</pre> <h2><a class="anchor" id="autotoc_md29"></a>
+</pre> <h2><a class="anchor" id="autotoc_md70"></a>
 Outputs</h2>
 <pre class="fragment">outvars = hh,zs,zsmax;
 # Files
@@ -297,13 +297,13 @@ smallnc = 0; #if smallnc==1 all Output are scaled and saved as a short int
 
 TSnode = -86.374,-17.984
 TSOfile = SW_Lima.txt
-</pre> <h2><a class="anchor" id="autotoc_md30"></a>
+</pre> <h2><a class="anchor" id="autotoc_md71"></a>
 Things to try</h2>
 <ul>
 <li>Try changing the model domain and resolution. What happens if part of the domain is outside of the area covered by the bathymetry?</li>
 <li>Try outputing a time series near Christchurch</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md72"></a>
 River + Rain = Waikanae example</h1>
 <p>Here we setup a model of the Waikanae Catchment (on the Kapiti Coast in New Zealand) force the tide on one of the open boundary </p>
 </div></div><!-- contents -->
@@ -313,7 +313,7 @@ River + Rain = Waikanae example</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="Tutorials.html">Tutorials</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:18 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

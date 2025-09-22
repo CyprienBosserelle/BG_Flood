@@ -34,60 +34,61 @@ var NAVTREE =
       [ "How to use the model", "index.html#User", null ],
       [ "How to use/change the code", "index.html#Developer", null ]
     ] ],
-    [ "Installation", "How_to_install.html", "How_to_install" ],
+    [ "Installation", "How_to_install.html", null ],
     [ "Paramters and Forcings list", "ParameterList.html", [
-      [ "List of the Parameters' input", "ParameterList.html#autotoc_md91", [
-        [ "General parameters", "ParameterList.html#autotoc_md92", null ],
-        [ "Grid parameters", "ParameterList.html#autotoc_md93", null ],
-        [ "Adaptation", "ParameterList.html#autotoc_md94", null ],
-        [ "Timekeeping", "ParameterList.html#autotoc_md95", null ],
-        [ "Initialisation", "ParameterList.html#autotoc_md96", null ],
-        [ "Outputs", "ParameterList.html#autotoc_md97", null ],
-        [ "Netcdf parameters", "ParameterList.html#autotoc_md98", null ],
-        [ "ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)", "ParameterList.html#autotoc_md99", null ]
+      [ "List of the Parameters' input", "ParameterList.html#autotoc_md10", [
+        [ "From precompiled binaries (Win10 only)", "How_to_install.html#autotoc_md9", null ],
+        [ "General parameters", "ParameterList.html#autotoc_md11", null ],
+        [ "Grid parameters", "ParameterList.html#autotoc_md12", null ],
+        [ "Adaptation", "ParameterList.html#autotoc_md13", null ],
+        [ "Timekeeping", "ParameterList.html#autotoc_md14", null ],
+        [ "Initialisation", "ParameterList.html#autotoc_md15", null ],
+        [ "Outputs", "ParameterList.html#autotoc_md16", null ],
+        [ "Netcdf parameters", "ParameterList.html#autotoc_md17", null ],
+        [ "ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)", "ParameterList.html#autotoc_md18", null ]
       ] ],
-      [ "List of the Forcings' inputs", "ParameterList.html#autotoc_md100", null ],
-      [ "List of the non-identified inputs", "ParameterList.html#autotoc_md101", null ]
+      [ "List of the Forcings' inputs", "ParameterList.html#autotoc_md19", null ],
+      [ "List of the non-identified inputs", "ParameterList.html#autotoc_md20", null ]
     ] ],
     [ "Manual", "Manual.html", [
-      [ "Model controls", "Manual.html#autotoc_md104", [
-        [ "BG_param.txt", "Manual.html#autotoc_md105", [
-          [ "How to use the BG_param.txt file", "Manual.html#autotoc_md106", null ],
-          [ "General comment about input files", "Manual.html#autotoc_md107", null ]
+      [ "Model controls", "Manual.html#autotoc_md21", [
+        [ "BG_param.txt", "Manual.html#autotoc_md22", [
+          [ "How to use the BG_param.txt file", "Manual.html#autotoc_md23", null ],
+          [ "General comment about input files", "Manual.html#autotoc_md24", null ]
         ] ],
-        [ "List of Parameters", "Manual.html#autotoc_md108", null ],
-        [ "Bathymetry/topography files", "Manual.html#autotoc_md109", null ],
-        [ "Conputational mesh", "Manual.html#autotoc_md110", [
-          [ "Masking", "Manual.html#autotoc_md111", null ]
+        [ "List of Parameters", "Manual.html#autotoc_md25", null ],
+        [ "Bathymetry/topography files", "Manual.html#autotoc_md26", null ],
+        [ "Conputational mesh", "Manual.html#autotoc_md27", [
+          [ "Masking", "Manual.html#autotoc_md28", null ]
         ] ],
-        [ "Boundaries", "Manual.html#autotoc_md112", [
-          [ "Boundary file (for type 2 or 3)", "Manual.html#autotoc_md113", [
-            [ "Uniform boundary file", "Manual.html#autotoc_md114", null ],
-            [ "Variable boundary file", "Manual.html#autotoc_md115", null ]
+        [ "Boundaries", "Manual.html#autotoc_md29", [
+          [ "Boundary file (for type 2 or 3)", "Manual.html#autotoc_md30", [
+            [ "Uniform boundary file", "Manual.html#autotoc_md31", null ],
+            [ "Variable boundary file", "Manual.html#autotoc_md32", null ]
           ] ]
         ] ],
-        [ "Bottom friction", "Manual.html#autotoc_md116", null ],
-        [ "Rivers and Area discharge", "Manual.html#autotoc_md117", null ],
-        [ "Wind atm pressure forcing", "Manual.html#autotoc_md118", [
-          [ "Wind forcing (may contain bugs)", "Manual.html#autotoc_md119", [
-            [ "spatially uniform txt file:", "Manual.html#autotoc_md120", null ],
-            [ "Spatially and time varying input", "Manual.html#autotoc_md121", null ]
+        [ "Bottom friction", "Manual.html#autotoc_md33", null ],
+        [ "Rivers and Area discharge", "Manual.html#autotoc_md34", null ],
+        [ "Wind atm pressure forcing", "Manual.html#autotoc_md35", [
+          [ "Wind forcing (may contain bugs)", "Manual.html#autotoc_md36", [
+            [ "spatially uniform txt file:", "Manual.html#autotoc_md37", null ],
+            [ "Spatially and time varying input", "Manual.html#autotoc_md38", null ]
           ] ],
-          [ "Atmospheric pressure forcing", "Manual.html#autotoc_md122", null ]
+          [ "Atmospheric pressure forcing", "Manual.html#autotoc_md39", null ]
         ] ],
-        [ "Outputs", "Manual.html#autotoc_md123", [
-          [ "Map outputs", "Manual.html#autotoc_md124", [
-            [ "Default snapshot outputs", "Manual.html#autotoc_md125", null ],
-            [ "Complementary variables", "Manual.html#autotoc_md126", null ],
-            [ "Mean/averaged output between output steps", "Manual.html#autotoc_md127", null ],
-            [ "Max output", "Manual.html#autotoc_md128", null ],
-            [ "Risk assesment related output", "Manual.html#autotoc_md129", null ],
-            [ "Model related outputs", "Manual.html#autotoc_md130", null ],
-            [ "Other gradients and intermediate terms of the equations", "Manual.html#autotoc_md131", null ]
+        [ "Outputs", "Manual.html#autotoc_md40", [
+          [ "Map outputs", "Manual.html#autotoc_md41", [
+            [ "Default snapshot outputs", "Manual.html#autotoc_md42", null ],
+            [ "Complementary variables", "Manual.html#autotoc_md43", null ],
+            [ "Mean/averaged output between output steps", "Manual.html#autotoc_md44", null ],
+            [ "Max output", "Manual.html#autotoc_md45", null ],
+            [ "Risk assesment related output", "Manual.html#autotoc_md46", null ],
+            [ "Model related outputs", "Manual.html#autotoc_md47", null ],
+            [ "Other gradients and intermediate terms of the equations", "Manual.html#autotoc_md48", null ]
           ] ],
-          [ "Point or Time-Serie output", "Manual.html#autotoc_md132", null ]
+          [ "Point or Time-Serie output", "Manual.html#autotoc_md49", null ]
         ] ],
-        [ "Adaptative grid", "Manual.html#autotoc_md133", null ]
+        [ "Adaptative grid", "Manual.html#autotoc_md50", null ]
       ] ]
     ] ],
     [ "Modules", "Modules.html", "Modules" ],
@@ -124,14 +125,16 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AdaptCriteria_8cu.html",
-"ConserveElevation_8h.html#afc1cff5d5122df41b6b03e393ac7d8fa",
-"GridManip_8h_source.html",
-"InitialConditions_8cu.html#a263be1815f9718565688c7df2e501586",
-"MemManagement_8cu.html#ae06a8f257b052110ee151c57a2a02159",
-"Read__netcdf_8h.html#aa51602301123c9a4ee87e30b68c5695b",
-"Updateforcing_8h.html#af459e9fbf88eca601d6305ba672ab07c",
-"classRiver.html#a9cdc0bb319caa1c9755599698371ed32",
-"structBndblockP.html#a7b880703815f83cde0910c10c523dbdf"
+"ConserveElevation_8cu.html#ad180aea103462200ba25dbc872435b43",
+"GridManip_8cu.html#a6f9e138c54b4130a9f587ccb47b86f52",
+"Halo_8h.html#a5ddd71e988ae7200bfd409d5d9d81921",
+"Meanmax_8cu.html#aa9312b0abbf78530f2fd462bc65997bd",
+"ReadForcing_8cu.html#a323c95e4833b1c2c2bbbe524cc7e30d5",
+"Spherical_8cu.html#acaec182e726b1bca8a3fcea4870f8920",
+"Util__CPU_8h.html#a24ac58842c87974b54e6c84db08ecc79",
+"classWindin.html#a7d8e6b814577c7af6e1ff7f4766484d5",
+"structBndblockP.html",
+"utctime_8h.html#afd41627872b2b532a3b6fd44eeffeffa"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

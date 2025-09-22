@@ -73,6 +73,12 @@ template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbo
 \item 
 template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Util__CPU_8cu_aa156fd0b66e09a53725bb000a968aaf1}{calcres$<$ float $>$}} (float dx, int level)
 \item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Util__CPU_8cu_ae44a8d0d631657df0d55b6293e0d0ebb}{calcres}} (\mbox{\hyperlink{classParam}{Param}} XParam, T dx, int level)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Util__CPU_8cu_ab1d2de2f13fb92b3b7735b5c577e68cc}{calcres$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, double dx, int level)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Util__CPU_8cu_ab7db9a17c579eb06df1bc03bace68faa}{calcres$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, float dx, int level)
+\item 
 {\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Util__CPU_8cu_ab50b883225fc186e39bc291fe75e8ce2}{minmod2}} (T theta, T s0, T s1, T s2)
 \item 
 template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Util__CPU_8cu_aa66ecc177456a698ba2a0530f308f025}{minmod2}} (float theta, float s0, float s1, float s2)
@@ -90,6 +96,14 @@ template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ bool \mbox{
 template int \mbox{\hyperlink{Util__CPU_8cu_ad1f6f8db5955ceb0eb7374226ce2109a}{ftoi$<$ float $>$}} (float value)
 \item 
 template int \mbox{\hyperlink{Util__CPU_8cu_ae4e2a50c8ec1e0cc6f4727ba2d57b624}{ftoi$<$ double $>$}} (double value)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Util__CPU_8cu_a6fc75ebfe4c6c57350e8e2ae37f2ea71}{signof}} (T a)
+\item 
+template int \mbox{\hyperlink{Util__CPU_8cu_a09b9f69c6f1df69002910ae478915476}{signof}} (int a)
+\item 
+template float \mbox{\hyperlink{Util__CPU_8cu_a784f96b735dd077502244ef4ac71d131}{signof}} (float a)
+\item 
+template double \mbox{\hyperlink{Util__CPU_8cu_acfee5392943949eaa9d47778dfecd02e}{signof}} (double a)
 \end{DoxyCompactItemize}
 
 
@@ -132,24 +146,43 @@ T Barycentric\+Interpolation (\begin{DoxyParamCaption}\item[{T}]{q1,  }\item[{T}
 \doxysubsubsection{\texorpdfstring{BilinearInterpolation$<$ float $>$()}{BilinearInterpolation< float >()}}
 {\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Util__CPU_8h_aee8df9b24b1f0dfa189aff7fa01c40d8}{Bilinear\+Interpolation}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{float}]{q11,  }\item[{float}]{q12,  }\item[{float}]{q21,  }\item[{float}]{q22,  }\item[{float}]{x1,  }\item[{float}]{x2,  }\item[{float}]{y1,  }\item[{float}]{y2,  }\item[{float}]{x,  }\item[{float}]{y }\end{DoxyParamCaption})}
 
+\mbox{\Hypertarget{Util__CPU_8cu_ae44a8d0d631657df0d55b6293e0d0ebb}\label{Util__CPU_8cu_ae44a8d0d631657df0d55b6293e0d0ebb}} 
+\index{Util\_CPU.cu@{Util\_CPU.cu}!calcres@{calcres}}
+\index{calcres@{calcres}!Util\_CPU.cu@{Util\_CPU.cu}}
+\doxysubsubsection{\texorpdfstring{calcres()}{calcres()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T calcres (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{T}]{dx,  }\item[{int}]{level }\end{DoxyParamCaption})}
+
 \mbox{\Hypertarget{Util__CPU_8cu_a362bab91663dd793a0dc1fed7bf7ac27}\label{Util__CPU_8cu_a362bab91663dd793a0dc1fed7bf7ac27}} 
 \index{Util\_CPU.cu@{Util\_CPU.cu}!calcres@{calcres}}
 \index{calcres@{calcres}!Util\_CPU.cu@{Util\_CPU.cu}}
-\doxysubsubsection{\texorpdfstring{calcres()}{calcres()}}
+\doxysubsubsection{\texorpdfstring{calcres()}{calcres()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T calcres (\begin{DoxyParamCaption}\item[{T}]{dx,  }\item[{int}]{level }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{Util__CPU_8cu_a611ed4da7433807301079a8878d560fc}\label{Util__CPU_8cu_a611ed4da7433807301079a8878d560fc}} 
 \index{Util\_CPU.cu@{Util\_CPU.cu}!calcres$<$ double $>$@{calcres$<$ double $>$}}
 \index{calcres$<$ double $>$@{calcres$<$ double $>$}!Util\_CPU.cu@{Util\_CPU.cu}}
-\doxysubsubsection{\texorpdfstring{calcres$<$ double $>$()}{calcres< double >()}}
+\doxysubsubsection{\texorpdfstring{calcres$<$ double $>$()}{calcres< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
 {\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Util__CPU_8h_a362bab91663dd793a0dc1fed7bf7ac27}{calcres}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{double}]{dx,  }\item[{int}]{level }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Util__CPU_8cu_ab1d2de2f13fb92b3b7735b5c577e68cc}\label{Util__CPU_8cu_ab1d2de2f13fb92b3b7735b5c577e68cc}} 
+\index{Util\_CPU.cu@{Util\_CPU.cu}!calcres$<$ double $>$@{calcres$<$ double $>$}}
+\index{calcres$<$ double $>$@{calcres$<$ double $>$}!Util\_CPU.cu@{Util\_CPU.cu}}
+\doxysubsubsection{\texorpdfstring{calcres$<$ double $>$()}{calcres< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Util__CPU_8h_a362bab91663dd793a0dc1fed7bf7ac27}{calcres}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{double}]{dx,  }\item[{int}]{level }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{Util__CPU_8cu_aa156fd0b66e09a53725bb000a968aaf1}\label{Util__CPU_8cu_aa156fd0b66e09a53725bb000a968aaf1}} 
 \index{Util\_CPU.cu@{Util\_CPU.cu}!calcres$<$ float $>$@{calcres$<$ float $>$}}
 \index{calcres$<$ float $>$@{calcres$<$ float $>$}!Util\_CPU.cu@{Util\_CPU.cu}}
-\doxysubsubsection{\texorpdfstring{calcres$<$ float $>$()}{calcres< float >()}}
+\doxysubsubsection{\texorpdfstring{calcres$<$ float $>$()}{calcres< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
 {\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Util__CPU_8h_a362bab91663dd793a0dc1fed7bf7ac27}{calcres}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{float}]{dx,  }\item[{int}]{level }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Util__CPU_8cu_ab7db9a17c579eb06df1bc03bace68faa}\label{Util__CPU_8cu_ab7db9a17c579eb06df1bc03bace68faa}} 
+\index{Util\_CPU.cu@{Util\_CPU.cu}!calcres$<$ float $>$@{calcres$<$ float $>$}}
+\index{calcres$<$ float $>$@{calcres$<$ float $>$}!Util\_CPU.cu@{Util\_CPU.cu}}
+\doxysubsubsection{\texorpdfstring{calcres$<$ float $>$()}{calcres< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Util__CPU_8h_a362bab91663dd793a0dc1fed7bf7ac27}{calcres}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{float}]{dx,  }\item[{int}]{level }\end{DoxyParamCaption})}
 
 \mbox{\Hypertarget{Util__CPU_8cu_a597092ff46641fcd737e90426f61bdfb}\label{Util__CPU_8cu_a597092ff46641fcd737e90426f61bdfb}} 
 \index{Util\_CPU.cu@{Util\_CPU.cu}!ftoi@{ftoi}}
@@ -220,4 +253,28 @@ int ftoi (\begin{DoxyParamCaption}\item[{T}]{value }\end{DoxyParamCaption})}
 {\footnotesize\ttfamily template$<$class T $>$ \\
 OBBdetect (\begin{DoxyParamCaption}\item[{T}]{Axmin,  }\item[{T}]{Axmax,  }\item[{T}]{Aymin,  }\item[{T}]{Aymax,  }\item[{T}]{Bxmin,  }\item[{T}]{Bxmax,  }\item[{T}]{Bymin,  }\item[{T}]{Bymax }\end{DoxyParamCaption})}
 
-Overlaping Bounding Box to detect which cell river falls into. It is the simplest version of the algorythm where the bounding box are paralle;l to the axis 
+Overlaping Bounding Box to detect which cell river falls into. It is the simplest version of the algorythm where the bounding box are paralle;l to the axis \mbox{\Hypertarget{Util__CPU_8cu_acfee5392943949eaa9d47778dfecd02e}\label{Util__CPU_8cu_acfee5392943949eaa9d47778dfecd02e}} 
+\index{Util\_CPU.cu@{Util\_CPU.cu}!signof@{signof}}
+\index{signof@{signof}!Util\_CPU.cu@{Util\_CPU.cu}}
+\doxysubsubsection{\texorpdfstring{signof()}{signof()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily template double signof (\begin{DoxyParamCaption}\item[{double}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Util__CPU_8cu_a784f96b735dd077502244ef4ac71d131}\label{Util__CPU_8cu_a784f96b735dd077502244ef4ac71d131}} 
+\index{Util\_CPU.cu@{Util\_CPU.cu}!signof@{signof}}
+\index{signof@{signof}!Util\_CPU.cu@{Util\_CPU.cu}}
+\doxysubsubsection{\texorpdfstring{signof()}{signof()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily template float signof (\begin{DoxyParamCaption}\item[{float}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Util__CPU_8cu_a09b9f69c6f1df69002910ae478915476}\label{Util__CPU_8cu_a09b9f69c6f1df69002910ae478915476}} 
+\index{Util\_CPU.cu@{Util\_CPU.cu}!signof@{signof}}
+\index{signof@{signof}!Util\_CPU.cu@{Util\_CPU.cu}}
+\doxysubsubsection{\texorpdfstring{signof()}{signof()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily template int signof (\begin{DoxyParamCaption}\item[{int}]{a }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Util__CPU_8cu_a6fc75ebfe4c6c57350e8e2ae37f2ea71}\label{Util__CPU_8cu_a6fc75ebfe4c6c57350e8e2ae37f2ea71}} 
+\index{Util\_CPU.cu@{Util\_CPU.cu}!signof@{signof}}
+\index{signof@{signof}!Util\_CPU.cu@{Util\_CPU.cu}}
+\doxysubsubsection{\texorpdfstring{signof()}{signof()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T signof (\begin{DoxyParamCaption}\item[{T}]{a }\end{DoxyParamCaption})}
+

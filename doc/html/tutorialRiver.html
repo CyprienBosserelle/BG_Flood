@@ -100,12 +100,12 @@ $(document).ready(function(){initNavTree('tutorialRiver.html',''); initResizable
 <div class="textblock"><p>The objectif of this tutorial is to explain how to use the code BG_Flood to model river flooding. As the code allows rain on grid, we will look at pluvial and fluvial flooding.</p>
 <p>This testcase aims to reproduce the flooding event that occured from the 16 to the 18 of July 2021 (a 1 in 50 years flood event). During this event, the Buller river, passing through the town of Westport, on the West Coast of the South Island of Aotearoa New Zealand, get out of its primary bed and flooded the Westport area.</p>
 <p>Before begining this tutoral, the user is expected to have downloaded the windows executable or compiled the sources (version &gt; 0.8).</p>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md73"></a>
 Param file</h1>
 <p>The interface with BG_flood software is done using only a text file: </p><div class="fragment"><div class="line">BG_param.txt</div>
 </div><!-- fragment --><p> (This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG_Flood.)</p>
 <p>This file consists in a list of key words and inputs, separated by a "=" sign. For a full list of the available key words and a further description of this file, please refere to the [manual]{#Manual}.</p>
-<h1><a class="anchor" id="autotoc_md33"></a>
+<h1><a class="anchor" id="autotoc_md74"></a>
 Preparation of the topography/bathymetry (DEM: Digital Elevation Model)</h1>
 <p>The DEM, topography or bathymetry file is the only necessary file to be added to BG_param file to run the model. </p><div class="fragment"><div class="line">DEM = Wesport_DEM_8m.nc?z;</div>
 </div><!-- fragment --><p><img src="Westport_topo.png" alt="" class="inline" title="bathy"/></p>
@@ -116,9 +116,9 @@ Preparation of the topography/bathymetry (DEM: Digital Elevation Model)</h1>
 <p><img src="outputs.png" alt="" class="inline" title="outputs"/></p>
 <p>It contains 2D fields saved regularly in time. It details the blocs information, the time 1D variable, the xx and yy axis and the basic outputs (h,u,v,zb,zs) for a shallow water model (see manual for further description of the variables).</p>
 <p>A log file: BG_log.txt (very similaire to the shell outputs) is also created: <img src="log_file.png" alt="" class="inline" title="logfile"/></p>
-<h1><a class="anchor" id="autotoc_md34"></a>
+<h1><a class="anchor" id="autotoc_md75"></a>
 Basic fluvial flooding set-up</h1>
-<h2><a class="anchor" id="autotoc_md35"></a>
+<h2><a class="anchor" id="autotoc_md76"></a>
 River discharge</h2>
 <p>The river are, at this stage, forced by a vertical discharge on a user defined rectagular area: </p><div class="fragment"><div class="line">river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;</div>
 </div><!-- fragment --><p> where the four final numbers are: \( x_1, x_2, y_1, y_2 \), to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time ( \(s\)) from reference time, second column: river discharge in \(m^3s^{-1}\)).</p>
@@ -126,20 +126,20 @@ River discharge</h2>
 <p>This file is from an observed hydrograph, with data saved every 5min:</p>
 <p><img src="TE_Kuha_hydrograph.png" alt="" class="inline" title="riverF"/></p>
 <p>For each new river, just add the a similar river input line in the parameter file.</p>
-<h2><a class="anchor" id="autotoc_md36"></a>
+<h2><a class="anchor" id="autotoc_md77"></a>
 Timekeeping parameters</h2>
 <p>In this code, the time is defined in second, relative to some reference or the start of the simulation by default.</p>
 <p>The end of the simulation is prescribed in second as : </p><div class="fragment"><div class="line">endtime = 21600;</div>
 </div><!-- fragment --><p>The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, \( CFL=0.5000 \) by default.</p>
 <p>The simulation begin, by default at \( t=0 (s)\), but this can modify using "totaltime": </p><div class="fragment"><div class="line">totaltime = 3600;</div>
 </div><!-- fragment --><p> to begin one hour after the reference time ( used in the forcings for example).</p>
-<h2><a class="anchor" id="autotoc_md37"></a>
+<h2><a class="anchor" id="autotoc_md78"></a>
 Outputs</h2>
 <p>There is two types of outputs:</p><ul>
 <li>map outputs of 2D variables regularly through time</li>
 <li>time-series output of basic values, at a chosen position, at each time step.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md38"></a>
+<h3><a class="anchor" id="autotoc_md79"></a>
 Map outputs</h3>
 <p>By default, there is only a map output at the begining and end of the simulation.</p>
 <p>The map output can be modify by:</p><ul>
@@ -152,22 +152,22 @@ Map outputs</h3>
 <li>saving the output as float (variables are saved as short integer by default.): <div class="fragment"><div class="line">smallnc = 0;</div>
 </div><!-- fragment --></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md39"></a>
+<h3><a class="anchor" id="autotoc_md80"></a>
 Time-Serie outputs</h3>
 <p>For each TS output needed, a line with the destination file and the postition is needed:</p>
 <div class="fragment"><div class="line">TSnodesout=Offshore.txt,1482120,53814890;</div>
 </div><!-- fragment --><p> The file contains 5 colums \((t, zs, h, u,v)\) with the value at the nearest grid point (to the position defined by the user).</p>
-<h2><a class="anchor" id="autotoc_md40"></a>
+<h2><a class="anchor" id="autotoc_md81"></a>
 Resolution</h2>
 <p>For a first test, we will modify the resolution and set it to 40m to decrease the computational time: </p><div class="fragment"><div class="line">dx=40;</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md41"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md82"></a>
 Basic fluvial innundation results</h2>
 <p>This the shell output: <img src="Shell_output2.png" alt="" class="inline" title="shell2"/> It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).</p>
 <p>In the outputs, we get the different fields requested, for 6 different times. <img src="outputs_v2.png" alt="" class="inline" title="output2"/></p>
 <p>The Time-Serie output is: <img src="offshore.png" alt="" class="inline" title="TS2"/></p>
-<h1><a class="anchor" id="autotoc_md42"></a>
+<h1><a class="anchor" id="autotoc_md83"></a>
 Completing the set-up</h1>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Adding boundary conditions</h2>
 <p>Boundaries condition Boundaries are refered by their position, using "top/bottom/right/left" keywords. They are associated to a boundary type ( 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d) and possibly a file containing a time serie. In this case, the file name is placed before the type, coma-separated.</p>
 <p>In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.e. for the top, left and right boundaries. At the bottom, we will conserve the default value: 1. </p><div class="fragment"><div class="line">left = tide_westport.txt,2; </div>
@@ -177,19 +177,19 @@ Adding boundary conditions</h2>
 <p>They correspond to a classic time Serie observed offshore of the river mouth.</p>
 <p><img src="tide_westport.png" alt="" class="inline" title="Tide"/></p>
 <p>(If more values, they will be regularly spread along the boundary and the forcing will be the linear interpolation of these values).</p>
-<h2><a class="anchor" id="autotoc_md44"></a>
+<h2><a class="anchor" id="autotoc_md85"></a>
 Bottom friction</h2>
 <p>Different models from bottom friction are available. By default, the model used is -1 corresponding to a Manning model. Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models). The associated field (ASC or netCDF) or value must be enter with the key word </p><div class="fragment"><div class="line">frictionmodel=1;</div>
 <div class="line">cf=z0_100423_rec3.asc; #cf=0.01;  #If <span class="keyword">using</span> a uniform value</div>
 </div><!-- fragment --><p><img src="Bottom_friction_zo.png" alt="" class="inline" title="Friction"/></p>
 <p><b>Warning</b>: The model allows a roughness heigh / manning number map smaller than the computational domain and will extrapolate outside of the map.</p>
-<h2><a class="anchor" id="autotoc_md45"></a>
+<h2><a class="anchor" id="autotoc_md86"></a>
 Initialisation</h2>
 <p>By default, the model is initialised by a plane water surface located at \(z=0.0\).</p>
 <p>This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using: </p><div class="fragment"><div class="line">zsinit=-1.39; #in metre</div>
 </div><!-- fragment --><p> The model can also be initialised using a restart/hot start. A file containing a least the files zb, h or zs, u and v must be provided, with the steps (and no the time value) to use for the restart. </p><div class="fragment"><div class="line">hotstartfile = output_4.nc;</div>
 <div class="line">hotstep=5;</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md46"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md87"></a>
 Model controls</h2>
 <p>Some variables can be used to adjust the model (see Manual for more details):</p><ul>
 <li>run on CPU (or choose a GPU to run on): <div class="fragment"><div class="line">gpudevice=0;</div>
@@ -201,12 +201,12 @@ Model controls</h2>
 <li>Minimum heigh to concidere a cell wet (m) <div class="fragment"><div class="line">eps = 0.00010000; #<span class="keywordflow">default</span>=0.0001</div>
 </div><!-- fragment --></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md47"></a>
+<h2><a class="anchor" id="autotoc_md88"></a>
 Outputs</h2>
-<h1><a class="anchor" id="autotoc_md48"></a>
+<h1><a class="anchor" id="autotoc_md89"></a>
 ... Adding the rain</h1>
 <p>The model allows rain on grid forcing to model pluvial inundations.</p>
-<h2><a class="anchor" id="autotoc_md49"></a>
+<h2><a class="anchor" id="autotoc_md90"></a>
 Rain forcing</h2>
 <p>A rain intensity in \( mm.h^{-1} \), time and space varying can be forced in the model.</p>
 <p>The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:</p><ul>
@@ -225,7 +225,7 @@ Rain forcing</h2>
 <li>using a shape file to define a "area of interest" (<b>Method advised</b>): <div class="fragment"><div class="line">AOI=Domain_buffered-sea2.gmt;</div>
 </div><!-- fragment --></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md50"></a>
+<h1><a class="anchor" id="autotoc_md91"></a>
 Refining the grid in area of interest</h1>
 <p>The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU. These blocks can have different resolutions (but resolution does not change during the computation at this stage).</p>
 <p>The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level \(n\) , the resolution \(dx_n\) will be: $$dx_n=\frac{dx_0}{2^n}$$</p>
@@ -259,7 +259,7 @@ Refining the grid in area of interest</h1>
 </div><!-- fragment --><p><b>Note_1</b>: In order to optimise the refinement, different bathymetry files can be provided. A higher resolution one with smaller extend can be provided as a second DEM and will be use by the code when refining the grid (the code will use the last entered, having the info available): </p><div class="fragment"><div class="line">DEM = Wesport_DEM_8m.nc?z;</div>
 <div class="line">DEM = Wesport_DEM_2m_zoomed.nc?z;</div>
 </div><!-- fragment --><p><b>Note_2</b>: The code also allows for zone outputs: the output of different zones defined by the user (outputname,x1,x2,y1,y2): </p><div class="fragment"><div class="line">outzone=zoomed.nc,5.3,5.4,0.5,0.8;</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md51"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md92"></a>
 Results:</h2>
 <p>This is the logfile: </p><div class="fragment"><div class="line"><span class="preprocessor">#################################</span></div>
 <div class="line">BG_Flood v0.8</div>
@@ -329,13 +329,13 @@ Results:</h2>
 <div class="line">        Completed</div>
 <div class="line"><a class="code" href="structModel.html">Model</a> Running...</div>
 <div class="line">Output to map. Totaltime = 7200.000000 s; Mean dt = 2.230207e-01 s</div>
-<div class="ttc" id="aAdaptation_8cu_html_a05519ab2f26cb6f0735c4a46949a12c8"><div class="ttname"><a href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a></div><div class="ttdeci">void coarsen(Param XParam, BlockP&lt; T &gt; &amp;XBlock, AdaptP &amp;XAdapt, EvolvingP&lt; T &gt; XEvo, EvolvingP&lt; T &gt; &amp;XEv)</div><div class="ttdef"><b>Definition:</b> Adaptation.cu:592</div></div>
+<div class="ttc" id="aAdaptation_8cu_html_a05519ab2f26cb6f0735c4a46949a12c8"><div class="ttname"><a href="Adaptation_8cu.html#a05519ab2f26cb6f0735c4a46949a12c8">coarsen</a></div><div class="ttdeci">void coarsen(Param XParam, BlockP&lt; T &gt; &amp;XBlock, AdaptP &amp;XAdapt, EvolvingP&lt; T &gt; XEvo, EvolvingP&lt; T &gt; &amp;XEv)</div><div class="ttdef"><b>Definition:</b> Adaptation.cu:609</div></div>
 <div class="ttc" id="aBG__Flood_8cu_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="BG__Flood_8cu.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> BG_Flood.cu:49</div></div>
-<div class="ttc" id="astructForcing_html"><div class="ttname"><a href="structForcing.html">Forcing</a></div><div class="ttdef"><b>Definition:</b> Forcing.h:116</div></div>
-<div class="ttc" id="astructModel_html"><div class="ttname"><a href="structModel.html">Model</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:151</div></div>
+<div class="ttc" id="astructForcing_html"><div class="ttname"><a href="structForcing.html">Forcing</a></div><div class="ttdef"><b>Definition:</b> Forcing.h:157</div></div>
+<div class="ttc" id="astructModel_html"><div class="ttname"><a href="structModel.html">Model</a></div><div class="ttdef"><b>Definition:</b> Arrays.h:221</div></div>
 </div><!-- fragment --><p> In the model output, each resolution is store independently. When open with pyncview, we can visualise each layer. QGIS can merge all these layer togather or a postratement steps will be needed.</p>
 <p><img src="outputs_v3.png" alt="" class="inline" title="output_v3"/></p>
-<h2><a class="anchor" id="autotoc_md52"></a>
+<h2><a class="anchor" id="autotoc_md93"></a>
 Ground infiltration losses (Basic ILCL model)</h2>
 <p>An Initial Loss, Continuous Loss model has been implemented in the code (see ILCL page). <img src="Ex_Merge.png" alt="" class="inline" title="ILCL_tuto"/></p>
 <p>To use it, provide maps for the two coefficient as follow: </p><div class="fragment"><div class="line">initialloss=InitialLoss.asc;</div>
@@ -348,7 +348,7 @@ Ground infiltration losses (Basic ILCL model)</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="Tutorials.html">Tutorials</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:17 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:18 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

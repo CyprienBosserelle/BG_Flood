@@ -115,9 +115,8 @@ Functions</h2></td></tr>
 <tr class="separator:aced8d302d8a53a4bd40dbd9131c204aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af72d2ea58938eb1250ab16651003d111"><td class="memItemLeft" align="right" valign="top">template void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#af72d2ea58938eb1250ab16651003d111">updateforcing&lt; double &gt;</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; double &gt; XLoop, <a class="el" href="structForcing.html">Forcing</a>&lt; float &gt; &amp;XForcing)</td></tr>
 <tr class="separator:af72d2ea58938eb1250ab16651003d111"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc3a8335e222afc5a35dfe3075cb79cb"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:acc3a8335e222afc5a35dfe3075cb79cb"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#acc3a8335e222afc5a35dfe3075cb79cb">Forcingthisstep</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; T &gt; XLoop, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; &amp;XDynForcing)</td></tr>
-<tr class="separator:acc3a8335e222afc5a35dfe3075cb79cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e39c9d702154fb36bfd0e673598dc0c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#a3e39c9d702154fb36bfd0e673598dc0c">Forcingthisstep</a> (<a class="el" href="classParam.html">Param</a> XParam, double totaltime, <a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; &amp;XDynForcing)</td></tr>
+<tr class="separator:a3e39c9d702154fb36bfd0e673598dc0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33601f4b4569c59bde52d4ca112ede89"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a33601f4b4569c59bde52d4ca112ede89"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#a33601f4b4569c59bde52d4ca112ede89">AddRiverForcing</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; T &gt; XLoop, std::vector&lt; <a class="el" href="classRiver.html">River</a> &gt; XRivers, <a class="el" href="structModel.html">Model</a>&lt; T &gt; XModel)</td></tr>
 <tr class="separator:a33601f4b4569c59bde52d4ca112ede89"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,6 +131,9 @@ Functions</h2></td></tr>
 <tr class="separator:a044e409c1b9d0d99611df800cc756389"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8f9deab6ba5f33426ce03657cad1eff"><td class="memItemLeft" align="right" valign="top">template __global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#aa8f9deab6ba5f33426ce03657cad1eff">InjectRiverGPU&lt; double &gt;</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="classRiver.html">River</a> XRiver, double qnow, int *Riverblks, <a class="el" href="structBlockP.html">BlockP</a>&lt; double &gt; XBlock, <a class="el" href="structAdvanceP.html">AdvanceP</a>&lt; double &gt; XAdv)</td></tr>
 <tr class="separator:aa8f9deab6ba5f33426ce03657cad1eff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc306f0d9a9b89d92d9957d0ab25601a"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:afc306f0d9a9b89d92d9957d0ab25601a"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#afc306f0d9a9b89d92d9957d0ab25601a">InjectManyRiversGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, int irib, <a class="el" href="structRiverInfo.html">RiverInfo</a>&lt; T &gt; XRin, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structAdvanceP.html">AdvanceP</a>&lt; T &gt; XAdv)</td></tr>
+<tr class="separator:afc306f0d9a9b89d92d9957d0ab25601a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ea906ec1361134319212670574ba18c"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a9ea906ec1361134319212670574ba18c"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#a9ea906ec1361134319212670574ba18c">InjectRiverCPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="classRiver.html">River</a> XRiver, T qnow, int nblkriver, int *Riverblks, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="structAdvanceP.html">AdvanceP</a>&lt; T &gt; XAdv)</td></tr>
 <tr class="separator:a9ea906ec1361134319212670574ba18c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,16 +235,16 @@ Functions</h2></td></tr>
 <tr class="memitem:a524c082c522ed561263e6138f36c69c3"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a524c082c522ed561263e6138f36c69c3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#a524c082c522ed561263e6138f36c69c3">deformstep</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structLoop.html">Loop</a>&lt; T &gt; XLoop, std::vector&lt; <a class="el" href="classdeformmap.html">deformmap</a>&lt; float &gt;&gt; deform, <a class="el" href="structModel.html">Model</a>&lt; T &gt; XModel)</td></tr>
 <tr class="separator:a524c082c522ed561263e6138f36c69c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af459e9fbf88eca601d6305ba672ab07c"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:af459e9fbf88eca601d6305ba672ab07c"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#af459e9fbf88eca601d6305ba672ab07c">AddDeformGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classdeformmap.html">deformmap</a>&lt; float &gt; defmap, T scale, T *zs, T *zb)</td></tr>
-<tr class="separator:af459e9fbf88eca601d6305ba672ab07c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a097cc7899b0e1a9625fe181f28b04a4a"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a097cc7899b0e1a9625fe181f28b04a4a"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#a097cc7899b0e1a9625fe181f28b04a4a">AddDeformCPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classdeformmap.html">deformmap</a>&lt; float &gt; defmap, T scale, T *zs, T *zb)</td></tr>
-<tr class="separator:a097cc7899b0e1a9625fe181f28b04a4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad60e7a01a4d6518f40023a51b1e5d96a"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ad60e7a01a4d6518f40023a51b1e5d96a"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#ad60e7a01a4d6518f40023a51b1e5d96a">AddDeformGPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classdeformmap.html">deformmap</a>&lt; float &gt; defmap, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; XEv, T scale, T *zb)</td></tr>
+<tr class="separator:ad60e7a01a4d6518f40023a51b1e5d96a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a440e1fe521d891fe63267290cd1739fb"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:a440e1fe521d891fe63267290cd1739fb"><td class="memTemplItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="Updateforcing_8cu.html#a440e1fe521d891fe63267290cd1739fb">AddDeformCPU</a> (<a class="el" href="classParam.html">Param</a> XParam, <a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt; XBlock, <a class="el" href="classdeformmap.html">deformmap</a>&lt; float &gt; defmap, <a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt; XEv, T scale, T *zb)</td></tr>
+<tr class="separator:a440e1fe521d891fe63267290cd1739fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a097cc7899b0e1a9625fe181f28b04a4a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a097cc7899b0e1a9625fe181f28b04a4a">&#9670;&nbsp;</a></span>AddDeformCPU()</h2>
+<a id="a440e1fe521d891fe63267290cd1739fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a440e1fe521d891fe63267290cd1739fb">&#9670;&nbsp;</a></span>AddDeformCPU()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -270,14 +272,14 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">T&#160;</td>
-          <td class="paramname"><em>scale</em>, </td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XEv</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">T *&#160;</td>
-          <td class="paramname"><em>zs</em>, </td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>scale</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -295,8 +297,8 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="af459e9fbf88eca601d6305ba672ab07c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af459e9fbf88eca601d6305ba672ab07c">&#9670;&nbsp;</a></span>AddDeformGPU()</h2>
+<a id="ad60e7a01a4d6518f40023a51b1e5d96a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad60e7a01a4d6518f40023a51b1e5d96a">&#9670;&nbsp;</a></span>AddDeformGPU()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -324,14 +326,14 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">T&#160;</td>
-          <td class="paramname"><em>scale</em>, </td>
+          <td class="paramtype"><a class="el" href="structEvolvingP.html">EvolvingP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XEv</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">T *&#160;</td>
-          <td class="paramname"><em>zs</em>, </td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>scale</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2053,13 +2055,11 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="acc3a8335e222afc5a35dfe3075cb79cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc3a8335e222afc5a35dfe3075cb79cb">&#9670;&nbsp;</a></span>Forcingthisstep()</h2>
+<a id="a3e39c9d702154fb36bfd0e673598dc0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e39c9d702154fb36bfd0e673598dc0c">&#9670;&nbsp;</a></span>Forcingthisstep()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class T &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void Forcingthisstep </td>
@@ -2070,14 +2070,62 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structLoop.html">Loop</a>&lt; T &gt;&#160;</td>
-          <td class="paramname"><em>XLoop</em>, </td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>totaltime</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="structDynForcingP.html">DynForcingP</a>&lt; float &gt; &amp;&#160;</td>
           <td class="paramname"><em>XDynForcing</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afc306f0d9a9b89d92d9957d0ab25601a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc306f0d9a9b89d92d9957d0ab25601a">&#9670;&nbsp;</a></span>InjectManyRiversGPU()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">__global__ void InjectManyRiversGPU </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classParam.html">Param</a>&#160;</td>
+          <td class="paramname"><em>XParam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>irib</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structRiverInfo.html">RiverInfo</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XRin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structBlockP.html">BlockP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XBlock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structAdvanceP.html">AdvanceP</a>&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>XAdv</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2741,7 +2789,7 @@ template&lt;class T &gt; </div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Updateforcing_8cu.html">Updateforcing.cu</a></li>
-    <li class="footer">Generated on Fri Mar 10 2023 08:58:16 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue Sep 23 2025 10:57:18 for BG_Flood by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

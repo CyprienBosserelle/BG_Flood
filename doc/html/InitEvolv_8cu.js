@@ -8,5 +8,7 @@ var InitEvolv_8cu =
     [ "readhotstartfile", "InitEvolv_8cu.html#acff23dccc956433e8500e1d8d6d831b6", null ],
     [ "readhotstartfile< double >", "InitEvolv_8cu.html#a8a22a7be42c3643cff484a4c550d34c3", null ],
     [ "readhotstartfile< float >", "InitEvolv_8cu.html#ad06e62af39a391d3f8b06f9758a55f6b", null ],
-    [ "warmstart", "InitEvolv_8cu.html#a0831d7ffc3b6f6689bbc0572e0ffabc3", null ]
+    [ "readhotstartfileBG", "InitEvolv_8cu.html#a79af6bcf26f13848ee5fca74f082ab1c", null ],
+    [ "warmstart", "InitEvolv_8cu.html#a0831d7ffc3b6f6689bbc0572e0ffabc3", null ],
+    [ "warmstartold", "InitEvolv_8cu.html#a0fbb7998c589a4ed6cc4f878eb401bf7", null ]
 ];
