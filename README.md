@@ -11,7 +11,7 @@ The adaptive version of the model is currently under heavy development. Makefile
 
 
 [![Documentation (Work in progress)](https://img.shields.io/badge/doc-Doxygen-blue)](https://aliceharang.github.io/)
-
+Auto: [![Documentation](https://img.shields.io/badge/doc-Doxygen-blue)](https://cyprienbosserelle.github.io/BG_Flood/)
 ## Reference
 
 Bosserelle C., Lane E., Harang A., (2021) BG-Flood: A GPU adaptive, open-source, general inundation hazard model. Proceedings of the Australasian Coasts & Ports 2021 Conference. 
