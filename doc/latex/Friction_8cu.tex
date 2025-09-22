@@ -1,0 +1,200 @@
+\hypertarget{Friction_8cu}{}\doxysection{src/\+Friction.cu File Reference}
+\label{Friction_8cu}\index{src/Friction.cu@{src/Friction.cu}}
+{\ttfamily \#include \char`\"{}Friction.\+h\char`\"{}}\newline
+Include dependency graph for Friction.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a36262f64e922c05e1e6436e482a4629a}{bottomfriction\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T dt, T $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a70610d60fa29a5c40b79c139ed5cb06a}{bottomfriction\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float dt, float $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_ae884297ec5ad9da300b189215f563d09}{bottomfriction\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double dt, double $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_af0b8d53f38f5bf256107707a315653f5}{bottomfriction\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T dt, T $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_aa291cd1c8de51443bdded37e0e23f17f}{bottomfriction\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float dt, float $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a9bae5fe596087c7d4b0eb20057362e47}{bottomfriction\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double dt, double $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a6e344a350de00e300fb7a8979cb3cbf4}{Xiafriction\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T dt, T $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv\+\_\+o)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a812b9c3a70b20b582642a760f9d171cb}{Xiafriction\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float dt, float $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv\+\_\+o)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_ac283e37b288fe24c4bf78bacdbb667aa}{Xiafriction\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double dt, double $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv\+\_\+o)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a237e9ffcd102e8c5b14f5799455c2f10}{Xiafriction\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T dt, T $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv\+\_\+o)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a18363d1c4b582fce5fb9aadc2dd1c943}{Xiafriction\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, float dt, float $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv\+\_\+o)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a072ad3e97b28e3f3b606c75eaf2b0ebe}{Xiafriction\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, double dt, double $\ast$cf, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv\+\_\+o)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Friction_8cu_a974cac10b20a26a81a1ae78ae3388e8f}{smartfriction}} (T hi, T zo)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Friction_8cu_aa32273d235da2701fb6f59340159d389}{manningfriction}} (T g, T hi, T n)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_ac5af6b2282e8df3b7b644398c816956d}{Thereshold\+Vel\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv)
+\begin{DoxyCompactList}\small\item\em Function Used to prevent crazy velocity on the GPU. \end{DoxyCompactList}\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a8aa613f8007758940a6f77143a9424c4}{Thereshold\+Vel\+GPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv)
+\item 
+template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a9f62f9a66948acd66729d40b776712e5}{Thereshold\+Vel\+GPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a6904b52b68ce3b428f568892c91b351c}{Thereshold\+Vel\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv)
+\begin{DoxyCompactList}\small\item\em Function Used to prevent crazy velocity on the CPU. \end{DoxyCompactList}\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a8d5942d50bde8fc29dc7f378dd42cdfa}{Thereshold\+Vel\+CPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvolv)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8cu_a909f811e62aa0edee7b3a2743bf98495}{Thereshold\+Vel\+CPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvolv)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ bool \mbox{\hyperlink{Friction_8cu_a11aeccfdeb5fc5bc0fec239a5ff01afa}{Threshold\+Velocity}} (T Threshold, T \&u, T \&v)
+\begin{DoxyCompactList}\small\item\em Function Used to prevent crazy velocity. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Friction_8cu_af0b8d53f38f5bf256107707a315653f5}\label{Friction_8cu_af0b8d53f38f5bf256107707a315653f5}} 
+\index{Friction.cu@{Friction.cu}!bottomfrictionCPU@{bottomfrictionCPU}}
+\index{bottomfrictionCPU@{bottomfrictionCPU}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{bottomfrictionCPU()}{bottomfrictionCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void bottomfriction\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{dt,  }\item[{T $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a9bae5fe596087c7d4b0eb20057362e47}\label{Friction_8cu_a9bae5fe596087c7d4b0eb20057362e47}} 
+\index{Friction.cu@{Friction.cu}!bottomfrictionCPU$<$ double $>$@{bottomfrictionCPU$<$ double $>$}}
+\index{bottomfrictionCPU$<$ double $>$@{bottomfrictionCPU$<$ double $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{bottomfrictionCPU$<$ double $>$()}{bottomfrictionCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_af0b8d53f38f5bf256107707a315653f5}{bottomfriction\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{dt,  }\item[{double $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_aa291cd1c8de51443bdded37e0e23f17f}\label{Friction_8cu_aa291cd1c8de51443bdded37e0e23f17f}} 
+\index{Friction.cu@{Friction.cu}!bottomfrictionCPU$<$ float $>$@{bottomfrictionCPU$<$ float $>$}}
+\index{bottomfrictionCPU$<$ float $>$@{bottomfrictionCPU$<$ float $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{bottomfrictionCPU$<$ float $>$()}{bottomfrictionCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_af0b8d53f38f5bf256107707a315653f5}{bottomfriction\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{dt,  }\item[{float $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a36262f64e922c05e1e6436e482a4629a}\label{Friction_8cu_a36262f64e922c05e1e6436e482a4629a}} 
+\index{Friction.cu@{Friction.cu}!bottomfrictionGPU@{bottomfrictionGPU}}
+\index{bottomfrictionGPU@{bottomfrictionGPU}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{bottomfrictionGPU()}{bottomfrictionGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void bottomfriction\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{dt,  }\item[{T $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_ae884297ec5ad9da300b189215f563d09}\label{Friction_8cu_ae884297ec5ad9da300b189215f563d09}} 
+\index{Friction.cu@{Friction.cu}!bottomfrictionGPU$<$ double $>$@{bottomfrictionGPU$<$ double $>$}}
+\index{bottomfrictionGPU$<$ double $>$@{bottomfrictionGPU$<$ double $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{bottomfrictionGPU$<$ double $>$()}{bottomfrictionGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a36262f64e922c05e1e6436e482a4629a}{bottomfriction\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{dt,  }\item[{double $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a70610d60fa29a5c40b79c139ed5cb06a}\label{Friction_8cu_a70610d60fa29a5c40b79c139ed5cb06a}} 
+\index{Friction.cu@{Friction.cu}!bottomfrictionGPU$<$ float $>$@{bottomfrictionGPU$<$ float $>$}}
+\index{bottomfrictionGPU$<$ float $>$@{bottomfrictionGPU$<$ float $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{bottomfrictionGPU$<$ float $>$()}{bottomfrictionGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a36262f64e922c05e1e6436e482a4629a}{bottomfriction\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{dt,  }\item[{float $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_aa32273d235da2701fb6f59340159d389}\label{Friction_8cu_aa32273d235da2701fb6f59340159d389}} 
+\index{Friction.cu@{Friction.cu}!manningfriction@{manningfriction}}
+\index{manningfriction@{manningfriction}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{manningfriction()}{manningfriction()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T manningfriction (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{hi,  }\item[{T}]{n }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a974cac10b20a26a81a1ae78ae3388e8f}\label{Friction_8cu_a974cac10b20a26a81a1ae78ae3388e8f}} 
+\index{Friction.cu@{Friction.cu}!smartfriction@{smartfriction}}
+\index{smartfriction@{smartfriction}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{smartfriction()}{smartfriction()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T smartfriction (\begin{DoxyParamCaption}\item[{T}]{hi,  }\item[{T}]{zo }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a6904b52b68ce3b428f568892c91b351c}\label{Friction_8cu_a6904b52b68ce3b428f568892c91b351c}} 
+\index{Friction.cu@{Friction.cu}!TheresholdVelCPU@{TheresholdVelCPU}}
+\index{TheresholdVelCPU@{TheresholdVelCPU}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{TheresholdVelCPU()}{TheresholdVelCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Thereshold\+Vel\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+
+
+Function Used to prevent crazy velocity on the CPU. 
+
+The function wraps teh main functio for the CPU. \mbox{\Hypertarget{Friction_8cu_a909f811e62aa0edee7b3a2743bf98495}\label{Friction_8cu_a909f811e62aa0edee7b3a2743bf98495}} 
+\index{Friction.cu@{Friction.cu}!TheresholdVelCPU$<$ double $>$@{TheresholdVelCPU$<$ double $>$}}
+\index{TheresholdVelCPU$<$ double $>$@{TheresholdVelCPU$<$ double $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{TheresholdVelCPU$<$ double $>$()}{TheresholdVelCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a07678d8890f3392fd6d67b83f5f827fa}{Thereshold\+Vel\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a8d5942d50bde8fc29dc7f378dd42cdfa}\label{Friction_8cu_a8d5942d50bde8fc29dc7f378dd42cdfa}} 
+\index{Friction.cu@{Friction.cu}!TheresholdVelCPU$<$ float $>$@{TheresholdVelCPU$<$ float $>$}}
+\index{TheresholdVelCPU$<$ float $>$@{TheresholdVelCPU$<$ float $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{TheresholdVelCPU$<$ float $>$()}{TheresholdVelCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a07678d8890f3392fd6d67b83f5f827fa}{Thereshold\+Vel\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_ac5af6b2282e8df3b7b644398c816956d}\label{Friction_8cu_ac5af6b2282e8df3b7b644398c816956d}} 
+\index{Friction.cu@{Friction.cu}!TheresholdVelGPU@{TheresholdVelGPU}}
+\index{TheresholdVelGPU@{TheresholdVelGPU}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{TheresholdVelGPU()}{TheresholdVelGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Thereshold\+Vel\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+
+
+Function Used to prevent crazy velocity on the GPU. 
+
+The function wraps the main function for the GPU. \mbox{\Hypertarget{Friction_8cu_a9f62f9a66948acd66729d40b776712e5}\label{Friction_8cu_a9f62f9a66948acd66729d40b776712e5}} 
+\index{Friction.cu@{Friction.cu}!TheresholdVelGPU$<$ double $>$@{TheresholdVelGPU$<$ double $>$}}
+\index{TheresholdVelGPU$<$ double $>$@{TheresholdVelGPU$<$ double $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{TheresholdVelGPU$<$ double $>$()}{TheresholdVelGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_ad63a9a1303af21fb64e87be6eb45b31f}{Thereshold\+Vel\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a8aa613f8007758940a6f77143a9424c4}\label{Friction_8cu_a8aa613f8007758940a6f77143a9424c4}} 
+\index{Friction.cu@{Friction.cu}!TheresholdVelGPU$<$ float $>$@{TheresholdVelGPU$<$ float $>$}}
+\index{TheresholdVelGPU$<$ float $>$@{TheresholdVelGPU$<$ float $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{TheresholdVelGPU$<$ float $>$()}{TheresholdVelGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_ad63a9a1303af21fb64e87be6eb45b31f}{Thereshold\+Vel\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a11aeccfdeb5fc5bc0fec239a5ff01afa}\label{Friction_8cu_a11aeccfdeb5fc5bc0fec239a5ff01afa}} 
+\index{Friction.cu@{Friction.cu}!ThresholdVelocity@{ThresholdVelocity}}
+\index{ThresholdVelocity@{ThresholdVelocity}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{ThresholdVelocity()}{ThresholdVelocity()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool Threshold\+Velocity (\begin{DoxyParamCaption}\item[{T}]{Threshold,  }\item[{T \&}]{u,  }\item[{T \&}]{v }\end{DoxyParamCaption})}
+
+
+
+Function Used to prevent crazy velocity. 
+
+The function scale velocities so it doesn\textquotesingle{}t exceeds a given threshold. Default threshold is/should be 16.\+0m/s \mbox{\Hypertarget{Friction_8cu_a6e344a350de00e300fb7a8979cb3cbf4}\label{Friction_8cu_a6e344a350de00e300fb7a8979cb3cbf4}} 
+\index{Friction.cu@{Friction.cu}!XiafrictionCPU@{XiafrictionCPU}}
+\index{XiafrictionCPU@{XiafrictionCPU}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{XiafrictionCPU()}{XiafrictionCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Xiafriction\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{dt,  }\item[{T $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_ac283e37b288fe24c4bf78bacdbb667aa}\label{Friction_8cu_ac283e37b288fe24c4bf78bacdbb667aa}} 
+\index{Friction.cu@{Friction.cu}!XiafrictionCPU$<$ double $>$@{XiafrictionCPU$<$ double $>$}}
+\index{XiafrictionCPU$<$ double $>$@{XiafrictionCPU$<$ double $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{XiafrictionCPU$<$ double $>$()}{XiafrictionCPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a6e344a350de00e300fb7a8979cb3cbf4}{Xiafriction\+CPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{dt,  }\item[{double $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a812b9c3a70b20b582642a760f9d171cb}\label{Friction_8cu_a812b9c3a70b20b582642a760f9d171cb}} 
+\index{Friction.cu@{Friction.cu}!XiafrictionCPU$<$ float $>$@{XiafrictionCPU$<$ float $>$}}
+\index{XiafrictionCPU$<$ float $>$@{XiafrictionCPU$<$ float $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{XiafrictionCPU$<$ float $>$()}{XiafrictionCPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a6e344a350de00e300fb7a8979cb3cbf4}{Xiafriction\+CPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{dt,  }\item[{float $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a237e9ffcd102e8c5b14f5799455c2f10}\label{Friction_8cu_a237e9ffcd102e8c5b14f5799455c2f10}} 
+\index{Friction.cu@{Friction.cu}!XiafrictionGPU@{XiafrictionGPU}}
+\index{XiafrictionGPU@{XiafrictionGPU}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{XiafrictionGPU()}{XiafrictionGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Xiafriction\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{dt,  }\item[{T $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a072ad3e97b28e3f3b606c75eaf2b0ebe}\label{Friction_8cu_a072ad3e97b28e3f3b606c75eaf2b0ebe}} 
+\index{Friction.cu@{Friction.cu}!XiafrictionGPU$<$ double $>$@{XiafrictionGPU$<$ double $>$}}
+\index{XiafrictionGPU$<$ double $>$@{XiafrictionGPU$<$ double $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{XiafrictionGPU$<$ double $>$()}{XiafrictionGPU< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a237e9ffcd102e8c5b14f5799455c2f10}{Xiafriction\+GPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{double}]{dt,  }\item[{double $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvolv\+\_\+o }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Friction_8cu_a18363d1c4b582fce5fb9aadc2dd1c943}\label{Friction_8cu_a18363d1c4b582fce5fb9aadc2dd1c943}} 
+\index{Friction.cu@{Friction.cu}!XiafrictionGPU$<$ float $>$@{XiafrictionGPU$<$ float $>$}}
+\index{XiafrictionGPU$<$ float $>$@{XiafrictionGPU$<$ float $>$}!Friction.cu@{Friction.cu}}
+\doxysubsubsection{\texorpdfstring{XiafrictionGPU$<$ float $>$()}{XiafrictionGPU< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Friction_8h_a237e9ffcd102e8c5b14f5799455c2f10}{Xiafriction\+GPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{float}]{dt,  }\item[{float $\ast$}]{cf,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvolv\+\_\+o }\end{DoxyParamCaption})}
+

@@ -1,0 +1,324 @@
+\hypertarget{ConserveElevation_8h}{}\doxysection{src/\+Conserve\+Elevation.h File Reference}
+\label{ConserveElevation_8h}\index{src/ConserveElevation.h@{src/ConserveElevation.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Write\+\_\+txtlog.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+Include dependency graph for Conserve\+Elevation.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a1f752ed5b01997f37e1f0986a612abe4}{conserve\+Elevation}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a9a251e892ac246c237767b097c4ca457}{conserve\+Elevation\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_ad180aea103462200ba25dbc872435b43}{conserve\+Elevation\+Grad\+Halo}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx, T $\ast$dhdy, T $\ast$dzsdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a05665562887f49a5bcd5ab5d3b4db5c5}{conserve\+Elevation\+Grad\+Halo\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx, T $\ast$dhdy, T $\ast$dzsdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_afc1cff5d5122df41b6b03e393ac7d8fa}{conserve\+Elevation\+Left}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+LB, int ib\+LT, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_ad9c8cfc185863fb0f56a95a2a18839b3}{conserve\+Elevation\+Left}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_abb579b1211c3e5b43dd55dff4fc9cbe6}{conserve\+Elevation\+Right}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+RB, int ib\+RT, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_ae1a90f767d2fcad2b1805894ab58bd9c}{conserve\+Elevation\+Right}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a950109b9337dddca66b220ef9b46e4de}{conserve\+Elevation\+Top}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+TL, int ib\+TR, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a5ccd8135fce98d59fd051ccb77b1aabb}{conserve\+Elevation\+Top}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a048c11c064fc6cb003b9bea36be0870c}{conserve\+Elevation\+Bot}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+BL, int ib\+BR, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a0939d280e64f70ef9bc0d354bb0ff6a6}{conserve\+Elevation\+Bot}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a70a8ec7acee3b7252a71e9fd9d7c06b9}{conserve\+Elevation\+GHLeft}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+LB, int ib\+LT, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_ac480e3b9358d672ce5564fa5e5e6916d}{conserve\+Elevation\+GHLeft}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a81f977cd054b124c4bf3c59041cc6a60}{conserve\+Elevation\+GHRight}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+RB, int ib\+RT, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_aa74d877a6a36748655d6396b6437bfe8}{conserve\+Elevation\+GHRight}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_af53ee3b0d8b0b8130b74a64474858c87}{conserve\+Elevation\+GHTop}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+TL, int ib\+TR, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_ab7e3dcbd9d6430b478332453abc2dcb0}{conserve\+Elevation\+GHTop}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_a60d5a2b2be409f6592ab1e4dbccafb09}{conserve\+Elevation\+GHBot}} (\mbox{\hyperlink{classParam}{Param}} XParam, int ib, int ib\+BL, int ib\+BR, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a4bad624baf2f3c344602de9295b9b436}{conserve\+Elevation\+GHBot}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$zs, T $\ast$zb, T $\ast$dhdx, T $\ast$dzsdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_ab7fa1d7163667bab1c7cd84553448b7f}{Wet\+Dry\+Prolongation\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_aba3f7b8cb37fdda55fe8938ea33d4512}{Wet\+Dry\+Prolongation}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_ac3ffb93a73b4daaa2ffb392c86855f63}{Wet\+Dry\+Prolongation\+GPURight}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a4bd6eb5f83ea7c7448f03941178d58d8}{Wet\+Dry\+Prolongation\+GPUTop}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_afd4a6261211e3a6fa8232d77c6891d52}{Wet\+Dry\+Prolongation\+GPUBot}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_ae9e7438ddefaa3369f29996987a19d01}{Wet\+Dry\+Prolongation\+GPULeft}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_acdafa94af71c15ee14b6b73ccae8628d}{Wet\+Dry\+Restriction\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{ConserveElevation_8h_afebcff1a2c87ddb0c67afdea7185cc23}{Wet\+Dry\+Restriction}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a1e8aea1a6136e5460eb73ed906f8d5f8}{Wet\+Dry\+Restriction\+GPULeft}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_ad519fdc6d94a14f008a25eba1f9591c9}{Wet\+Dry\+Restriction\+GPUTop}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a9a7c2909f97ad96f9a769e9ecfe2d3cd}{Wet\+Dry\+Restriction\+GPUBot}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a45b87745d429894acd012f5d60aeeb3a}{Wet\+Dry\+Restriction\+GPURight}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a61ffafd5fa2ebb6ec32c3797ffc6d38c}{wetdryrestriction}} (int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int i, int j, T $\ast$h, T $\ast$zs, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void \mbox{\hyperlink{ConserveElevation_8h_a6e3d3de971e7e7911a3d5e6c4153eb99}{Prolongation\+Elevation}} (int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, T $\ast$h, T $\ast$zs, T $\ast$zb)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{ConserveElevation_8h_a1f752ed5b01997f37e1f0986a612abe4}\label{ConserveElevation_8h_a1f752ed5b01997f37e1f0986a612abe4}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevation@{conserveElevation}}
+\index{conserveElevation@{conserveElevation}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevation()}{conserveElevation()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a0939d280e64f70ef9bc0d354bb0ff6a6}\label{ConserveElevation_8h_a0939d280e64f70ef9bc0d354bb0ff6a6}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationBot@{conserveElevationBot}}
+\index{conserveElevationBot@{conserveElevationBot}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationBot()}{conserveElevationBot()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+Bot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a048c11c064fc6cb003b9bea36be0870c}\label{ConserveElevation_8h_a048c11c064fc6cb003b9bea36be0870c}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationBot@{conserveElevationBot}}
+\index{conserveElevationBot@{conserveElevationBot}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationBot()}{conserveElevationBot()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+Bot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+BL,  }\item[{int}]{ib\+BR,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a4bad624baf2f3c344602de9295b9b436}\label{ConserveElevation_8h_a4bad624baf2f3c344602de9295b9b436}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHBot@{conserveElevationGHBot}}
+\index{conserveElevationGHBot@{conserveElevationGHBot}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHBot()}{conserveElevationGHBot()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+GHBot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a60d5a2b2be409f6592ab1e4dbccafb09}\label{ConserveElevation_8h_a60d5a2b2be409f6592ab1e4dbccafb09}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHBot@{conserveElevationGHBot}}
+\index{conserveElevationGHBot@{conserveElevationGHBot}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHBot()}{conserveElevationGHBot()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+GHBot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+BL,  }\item[{int}]{ib\+BR,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ac480e3b9358d672ce5564fa5e5e6916d}\label{ConserveElevation_8h_ac480e3b9358d672ce5564fa5e5e6916d}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHLeft@{conserveElevationGHLeft}}
+\index{conserveElevationGHLeft@{conserveElevationGHLeft}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHLeft()}{conserveElevationGHLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+GHLeft (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a70a8ec7acee3b7252a71e9fd9d7c06b9}\label{ConserveElevation_8h_a70a8ec7acee3b7252a71e9fd9d7c06b9}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHLeft@{conserveElevationGHLeft}}
+\index{conserveElevationGHLeft@{conserveElevationGHLeft}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHLeft()}{conserveElevationGHLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+GHLeft (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+LB,  }\item[{int}]{ib\+LT,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_aa74d877a6a36748655d6396b6437bfe8}\label{ConserveElevation_8h_aa74d877a6a36748655d6396b6437bfe8}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHRight@{conserveElevationGHRight}}
+\index{conserveElevationGHRight@{conserveElevationGHRight}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHRight()}{conserveElevationGHRight()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+GHRight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a81f977cd054b124c4bf3c59041cc6a60}\label{ConserveElevation_8h_a81f977cd054b124c4bf3c59041cc6a60}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHRight@{conserveElevationGHRight}}
+\index{conserveElevationGHRight@{conserveElevationGHRight}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHRight()}{conserveElevationGHRight()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+GHRight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+RB,  }\item[{int}]{ib\+RT,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ab7e3dcbd9d6430b478332453abc2dcb0}\label{ConserveElevation_8h_ab7e3dcbd9d6430b478332453abc2dcb0}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHTop@{conserveElevationGHTop}}
+\index{conserveElevationGHTop@{conserveElevationGHTop}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHTop()}{conserveElevationGHTop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+GHTop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_af53ee3b0d8b0b8130b74a64474858c87}\label{ConserveElevation_8h_af53ee3b0d8b0b8130b74a64474858c87}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGHTop@{conserveElevationGHTop}}
+\index{conserveElevationGHTop@{conserveElevationGHTop}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGHTop()}{conserveElevationGHTop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+GHTop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+TL,  }\item[{int}]{ib\+TR,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a9a251e892ac246c237767b097c4ca457}\label{ConserveElevation_8h_a9a251e892ac246c237767b097c4ca457}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGPU@{conserveElevationGPU}}
+\index{conserveElevationGPU@{conserveElevationGPU}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGPU()}{conserveElevationGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ad180aea103462200ba25dbc872435b43}\label{ConserveElevation_8h_ad180aea103462200ba25dbc872435b43}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGradHalo@{conserveElevationGradHalo}}
+\index{conserveElevationGradHalo@{conserveElevationGradHalo}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGradHalo()}{conserveElevationGradHalo()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+Grad\+Halo (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx,  }\item[{T $\ast$}]{dhdy,  }\item[{T $\ast$}]{dzsdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a05665562887f49a5bcd5ab5d3b4db5c5}\label{ConserveElevation_8h_a05665562887f49a5bcd5ab5d3b4db5c5}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationGradHaloGPU@{conserveElevationGradHaloGPU}}
+\index{conserveElevationGradHaloGPU@{conserveElevationGradHaloGPU}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationGradHaloGPU()}{conserveElevationGradHaloGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+Grad\+Halo\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{dhdx,  }\item[{T $\ast$}]{dzsdx,  }\item[{T $\ast$}]{dhdy,  }\item[{T $\ast$}]{dzsdy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ad9c8cfc185863fb0f56a95a2a18839b3}\label{ConserveElevation_8h_ad9c8cfc185863fb0f56a95a2a18839b3}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationLeft@{conserveElevationLeft}}
+\index{conserveElevationLeft@{conserveElevationLeft}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationLeft()}{conserveElevationLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+Left (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_afc1cff5d5122df41b6b03e393ac7d8fa}\label{ConserveElevation_8h_afc1cff5d5122df41b6b03e393ac7d8fa}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationLeft@{conserveElevationLeft}}
+\index{conserveElevationLeft@{conserveElevationLeft}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationLeft()}{conserveElevationLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+Left (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+LB,  }\item[{int}]{ib\+LT,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ae1a90f767d2fcad2b1805894ab58bd9c}\label{ConserveElevation_8h_ae1a90f767d2fcad2b1805894ab58bd9c}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationRight@{conserveElevationRight}}
+\index{conserveElevationRight@{conserveElevationRight}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationRight()}{conserveElevationRight()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+Right (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_abb579b1211c3e5b43dd55dff4fc9cbe6}\label{ConserveElevation_8h_abb579b1211c3e5b43dd55dff4fc9cbe6}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationRight@{conserveElevationRight}}
+\index{conserveElevationRight@{conserveElevationRight}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationRight()}{conserveElevationRight()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+Right (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+RB,  }\item[{int}]{ib\+RT,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a5ccd8135fce98d59fd051ccb77b1aabb}\label{ConserveElevation_8h_a5ccd8135fce98d59fd051ccb77b1aabb}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationTop@{conserveElevationTop}}
+\index{conserveElevationTop@{conserveElevationTop}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationTop()}{conserveElevationTop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void conserve\+Elevation\+Top (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a950109b9337dddca66b220ef9b46e4de}\label{ConserveElevation_8h_a950109b9337dddca66b220ef9b46e4de}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!conserveElevationTop@{conserveElevationTop}}
+\index{conserveElevationTop@{conserveElevationTop}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{conserveElevationTop()}{conserveElevationTop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void conserve\+Elevation\+Top (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{ib,  }\item[{int}]{ib\+TL,  }\item[{int}]{ib\+TR,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a6e3d3de971e7e7911a3d5e6c4153eb99}\label{ConserveElevation_8h_a6e3d3de971e7e7911a3d5e6c4153eb99}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!ProlongationElevation@{ProlongationElevation}}
+\index{ProlongationElevation@{ProlongationElevation}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{ProlongationElevation()}{ProlongationElevation()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void Prolongation\+Elevation (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{blkmemwidth,  }\item[{T}]{eps,  }\item[{int}]{ib,  }\item[{int}]{ibn,  }\item[{int}]{ihalo,  }\item[{int}]{jhalo,  }\item[{int}]{ip,  }\item[{int}]{jp,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_aba3f7b8cb37fdda55fe8938ea33d4512}\label{ConserveElevation_8h_aba3f7b8cb37fdda55fe8938ea33d4512}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryProlongation@{WetDryProlongation}}
+\index{WetDryProlongation@{WetDryProlongation}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryProlongation()}{WetDryProlongation()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Wet\+Dry\+Prolongation (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ab7fa1d7163667bab1c7cd84553448b7f}\label{ConserveElevation_8h_ab7fa1d7163667bab1c7cd84553448b7f}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryProlongationGPU@{WetDryProlongationGPU}}
+\index{WetDryProlongationGPU@{WetDryProlongationGPU}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryProlongationGPU()}{WetDryProlongationGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Wet\+Dry\+Prolongation\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_afd4a6261211e3a6fa8232d77c6891d52}\label{ConserveElevation_8h_afd4a6261211e3a6fa8232d77c6891d52}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryProlongationGPUBot@{WetDryProlongationGPUBot}}
+\index{WetDryProlongationGPUBot@{WetDryProlongationGPUBot}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryProlongationGPUBot()}{WetDryProlongationGPUBot()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Prolongation\+GPUBot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ae9e7438ddefaa3369f29996987a19d01}\label{ConserveElevation_8h_ae9e7438ddefaa3369f29996987a19d01}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryProlongationGPULeft@{WetDryProlongationGPULeft}}
+\index{WetDryProlongationGPULeft@{WetDryProlongationGPULeft}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryProlongationGPULeft()}{WetDryProlongationGPULeft()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Prolongation\+GPULeft (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ac3ffb93a73b4daaa2ffb392c86855f63}\label{ConserveElevation_8h_ac3ffb93a73b4daaa2ffb392c86855f63}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryProlongationGPURight@{WetDryProlongationGPURight}}
+\index{WetDryProlongationGPURight@{WetDryProlongationGPURight}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryProlongationGPURight()}{WetDryProlongationGPURight()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Prolongation\+GPURight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a4bd6eb5f83ea7c7448f03941178d58d8}\label{ConserveElevation_8h_a4bd6eb5f83ea7c7448f03941178d58d8}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryProlongationGPUTop@{WetDryProlongationGPUTop}}
+\index{WetDryProlongationGPUTop@{WetDryProlongationGPUTop}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryProlongationGPUTop()}{WetDryProlongationGPUTop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Prolongation\+GPUTop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a61ffafd5fa2ebb6ec32c3797ffc6d38c}\label{ConserveElevation_8h_a61ffafd5fa2ebb6ec32c3797ffc6d38c}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!wetdryrestriction@{wetdryrestriction}}
+\index{wetdryrestriction@{wetdryrestriction}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{wetdryrestriction()}{wetdryrestriction()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void wetdryrestriction (\begin{DoxyParamCaption}\item[{int}]{halowidth,  }\item[{int}]{blkmemwidth,  }\item[{T}]{eps,  }\item[{int}]{ib,  }\item[{int}]{ibn,  }\item[{int}]{ihalo,  }\item[{int}]{jhalo,  }\item[{int}]{i,  }\item[{int}]{j,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{zs,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_afebcff1a2c87ddb0c67afdea7185cc23}\label{ConserveElevation_8h_afebcff1a2c87ddb0c67afdea7185cc23}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryRestriction@{WetDryRestriction}}
+\index{WetDryRestriction@{WetDryRestriction}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryRestriction()}{WetDryRestriction()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Wet\+Dry\+Restriction (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_acdafa94af71c15ee14b6b73ccae8628d}\label{ConserveElevation_8h_acdafa94af71c15ee14b6b73ccae8628d}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryRestrictionGPU@{WetDryRestrictionGPU}}
+\index{WetDryRestrictionGPU@{WetDryRestrictionGPU}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryRestrictionGPU()}{WetDryRestrictionGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Wet\+Dry\+Restriction\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a9a7c2909f97ad96f9a769e9ecfe2d3cd}\label{ConserveElevation_8h_a9a7c2909f97ad96f9a769e9ecfe2d3cd}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryRestrictionGPUBot@{WetDryRestrictionGPUBot}}
+\index{WetDryRestrictionGPUBot@{WetDryRestrictionGPUBot}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryRestrictionGPUBot()}{WetDryRestrictionGPUBot()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Restriction\+GPUBot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a1e8aea1a6136e5460eb73ed906f8d5f8}\label{ConserveElevation_8h_a1e8aea1a6136e5460eb73ed906f8d5f8}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryRestrictionGPULeft@{WetDryRestrictionGPULeft}}
+\index{WetDryRestrictionGPULeft@{WetDryRestrictionGPULeft}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryRestrictionGPULeft()}{WetDryRestrictionGPULeft()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Restriction\+GPULeft (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_a45b87745d429894acd012f5d60aeeb3a}\label{ConserveElevation_8h_a45b87745d429894acd012f5d60aeeb3a}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryRestrictionGPURight@{WetDryRestrictionGPURight}}
+\index{WetDryRestrictionGPURight@{WetDryRestrictionGPURight}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryRestrictionGPURight()}{WetDryRestrictionGPURight()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Restriction\+GPURight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{ConserveElevation_8h_ad519fdc6d94a14f008a25eba1f9591c9}\label{ConserveElevation_8h_ad519fdc6d94a14f008a25eba1f9591c9}} 
+\index{ConserveElevation.h@{ConserveElevation.h}!WetDryRestrictionGPUTop@{WetDryRestrictionGPUTop}}
+\index{WetDryRestrictionGPUTop@{WetDryRestrictionGPUTop}!ConserveElevation.h@{ConserveElevation.h}}
+\doxysubsubsection{\texorpdfstring{WetDryRestrictionGPUTop()}{WetDryRestrictionGPUTop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Wet\+Dry\+Restriction\+GPUTop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+

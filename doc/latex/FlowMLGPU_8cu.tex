@@ -1,0 +1,36 @@
+\hypertarget{FlowMLGPU_8cu}{}\doxysection{src/\+Flow\+MLGPU.cu File Reference}
+\label{FlowMLGPU_8cu}\index{src/FlowMLGPU.cu@{src/FlowMLGPU.cu}}
+{\ttfamily \#include \char`\"{}Flow\+MLGPU.\+h\char`\"{}}\newline
+Include dependency graph for Flow\+MLGPU.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{FlowMLGPU_8cu_ad4c25bc7dfd0a11430b556aa0af3ebbe}{Flow\+MLGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template void \mbox{\hyperlink{FlowMLGPU_8cu_abb549f9159bae396a04b2ed21d935a3e}{Flow\+MLGPU$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template void \mbox{\hyperlink{FlowMLGPU_8cu_a1c3f2bfcd33816e348c5a6be65a69816}{Flow\+MLGPU$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{FlowMLGPU_8cu_ad4c25bc7dfd0a11430b556aa0af3ebbe}\label{FlowMLGPU_8cu_ad4c25bc7dfd0a11430b556aa0af3ebbe}} 
+\index{FlowMLGPU.cu@{FlowMLGPU.cu}!FlowMLGPU@{FlowMLGPU}}
+\index{FlowMLGPU@{FlowMLGPU}!FlowMLGPU.cu@{FlowMLGPU.cu}}
+\doxysubsubsection{\texorpdfstring{FlowMLGPU()}{FlowMLGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Flow\+MLGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+Xiafriction\+GPU $<$$<$$<$ grid\+Dim, block\+Dim, 0 $>$$>$$>$ (XParam, XModel.\+blocks, XModel.\+time.\+dt, XModel.\+cf, XModel.\+evolv, XModel.\+evolv\+\_\+o);\mbox{\Hypertarget{FlowMLGPU_8cu_a1c3f2bfcd33816e348c5a6be65a69816}\label{FlowMLGPU_8cu_a1c3f2bfcd33816e348c5a6be65a69816}} 
+\index{FlowMLGPU.cu@{FlowMLGPU.cu}!FlowMLGPU$<$ double $>$@{FlowMLGPU$<$ double $>$}}
+\index{FlowMLGPU$<$ double $>$@{FlowMLGPU$<$ double $>$}!FlowMLGPU.cu@{FlowMLGPU.cu}}
+\doxysubsubsection{\texorpdfstring{FlowMLGPU$<$ double $>$()}{FlowMLGPU< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{FlowMLGPU_8h_ad4c25bc7dfd0a11430b556aa0af3ebbe}{Flow\+MLGPU}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{FlowMLGPU_8cu_abb549f9159bae396a04b2ed21d935a3e}\label{FlowMLGPU_8cu_abb549f9159bae396a04b2ed21d935a3e}} 
+\index{FlowMLGPU.cu@{FlowMLGPU.cu}!FlowMLGPU$<$ float $>$@{FlowMLGPU$<$ float $>$}}
+\index{FlowMLGPU$<$ float $>$@{FlowMLGPU$<$ float $>$}!FlowMLGPU.cu@{FlowMLGPU.cu}}
+\doxysubsubsection{\texorpdfstring{FlowMLGPU$<$ float $>$()}{FlowMLGPU< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{FlowMLGPU_8h_ad4c25bc7dfd0a11430b556aa0af3ebbe}{Flow\+MLGPU}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
