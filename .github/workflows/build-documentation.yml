@@ -32,20 +32,16 @@ jobs:
     - name: Install Doxygen
       run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-    # Install Python, MkDocs and its dependencies
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install Python dependencies
+    # Install uv and set up Python environment
+    - name: Install uv
       run: |
-        python -m pip install --upgrade pip
-        pip install sphinx breathe
-        # If you have a requirements.txt, use:
-        # pip install -r docs/requirements.txt
+        curl -Ls https://github.com/astral-sh/uv/releases/latest/download/uv-installer.sh | bash
 
-  
+    - name: Set up Python and install dependencies with uv
+      run: |
+        uv venv
+        uv pip install
+
       # Build the HTML documentation
    # - name: Build Doxygen Documentation
    #   run: doxygen ./Doxygenfile
@@ -56,15 +52,14 @@ jobs:
 
     # Build MkDocs Documentation
     - name: Build MkDocs Documentation
-      run: |
-        mkdocs build
+      run: uv pip run mkdocs build
 
     # Deploy the MkDocs documentation to GitHub Pages
     - name: GH Pages Deployment
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_build/html/
+        publish_dir: ./site
         enable_jekyll: false
         allow_empty_commit: false
         force_orphan: true
