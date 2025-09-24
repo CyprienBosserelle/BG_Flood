@@ -7,7 +7,7 @@ name: Documentation
 # events but only for the master branch
 on:
   push:
-    branches: [ development, documentation2, main ]
+    branches: [ development, documentation2, main, Doc_mkdoc ]
 
 jobs:
   build-documentation:
@@ -24,7 +24,7 @@ jobs:
     - name: Update Input table
       uses: test-room-7/action-update-file@v1
       with:
-        file-path: doc/ParametersList-py.md
+        file-path: docs/ParametersList-py.md
         commit-msg: Automatic update of Input parameter list
         github-token: ${{ secrets.GITHUB_TOKEN }}  
 
@@ -32,7 +32,7 @@ jobs:
     - name: Install Doxygen
       run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-    # Install Python and Sphinx dependencies
+    # Install Python, MkDocs and its dependencies
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -54,17 +54,17 @@ jobs:
     - name: Build Doxygen XML Documentation
       run: doxygen Doxygenfile
 
-    # Build Sphinx HTML Documentation
-    - name: Build Sphinx HTML Documentation
+    # Build MkDocs Documentation
+    - name: Build MkDocs Documentation
       run: |
-        sphinx-build -b html -d doc/build/doctrees doc/ doc/source doc/html
-    
-    # Deploy the Sphinx HTML documentation to GitHub Pages
+        mkdocs build
+
+    # Deploy the MkDocs documentation to GitHub Pages
     - name: GH Pages Deployment
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./doc/_build/html/
+        publish_dir: ./docs/_build/html/
         enable_jekyll: false
         allow_empty_commit: false
         force_orphan: true
