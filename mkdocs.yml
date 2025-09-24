@@ -28,7 +28,7 @@ plugins:
             EXTENSION_MAPPING: "cu=c++" # map file extensions to languages
             RECURSIVE: True # recursive search in source directories
   - bibtex:
-      bib_file: docs/references.bib
+      bib_file: docs/References.bib
       cite_style: plain
       # more options can be found in the mkdocs-bibtex documentation
 
