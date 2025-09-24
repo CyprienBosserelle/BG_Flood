@@ -17,7 +17,7 @@ plugins:
   - search
   #- awesome-nav
   - mkdoxy:
-      doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
+      #doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
       projects:
         BGFlood: # name of project must be alphanumeric + numbers (without spaces)
           src-dirs: src/ # path to source code (support multiple paths separated by space) => INPUT
