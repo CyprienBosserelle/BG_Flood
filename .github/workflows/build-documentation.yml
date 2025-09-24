@@ -40,7 +40,7 @@ jobs:
     - name: Set up Python and install dependencies with uv
       run: |
         uv venv
-        uv pip install --all
+        uv pip install .
 
       # Build the HTML documentation
    # - name: Build Doxygen Documentation
