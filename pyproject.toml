@@ -10,9 +10,6 @@ requires-python = ">= 3.13.7"
 
 dynamic = ["version"]
 
-[project.urls]
-Homepage = "https://github.com/CyprienBosserelle/BG_Flood"
-
 dependencies= [
     "mkdocs-material>=9.6",
     "mkdoxy>=1.2.8",
@@ -21,6 +18,9 @@ dependencies= [
     "mkdocs-glightbox>=0.4",
     "pypandoc-binary>=1.15",
 ]
+
+[project.urls]
+Homepage = "https://github.com/CyprienBosserelle/BG_Flood"
 
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
