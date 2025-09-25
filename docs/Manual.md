@@ -332,7 +332,7 @@ By default, the initial resolution of the grid is the resolution of the bathymet
 The reference level, correponding to the bathymetry resolution or $dx$ if defined by the user, will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$
   will be:
 $$
-dx_n=\frac{dx_0}{2^n}
+dx_n=$rac{dx_0}{2^n}
 $$
  
 with  $dx_0$ the resolution at level 0. 

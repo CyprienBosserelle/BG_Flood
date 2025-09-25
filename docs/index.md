@@ -33,7 +33,7 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 ### Latex:
 Latex is working : $d_n$ or 
 $$
-d_n={\frac{10}{5}}
+d_n={$rac{10}{5}}
 $$
 
 ### Pictures:
@@ -45,9 +45,13 @@ $$
   <figcaption>Image caption</figcaption>
 </figure>
 
-based on [@10.1016/j.envsoft.2016.11.012]
+based on @10.1016/j.envsoft.2016.11.012
 
 ### References
 
-\full_bibliography
+$full_bibliography
+
+
+### Adding nice videos
+see Home!
 

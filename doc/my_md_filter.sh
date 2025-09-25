@@ -1,3 +1,3 @@
 #!/bin/bash
-##sed 's/$/\f$/g'
-sed -e '/*/ s/$/\f$/g'
+##sed 's/$/$/g'
+sed -e '/*/ s/$/$/g'

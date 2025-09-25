@@ -1,2 +1,2 @@
 #!/bin/bash
-sed 's/$/\f$/g'
+sed 's/$/$/g'

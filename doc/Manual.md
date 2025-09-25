@@ -147,14 +147,14 @@ Bottom friction is applied implicitly in the model (applied to velocities after 
 There are 3 friction equations implemented defined in `BG_param.txt` as `frictionmodel = `:
 
 * 0: Basic Quadratic friction law (expecting the non-dimensional friction coefficient 'cf' )
-* 1: Roughtness length model from Smart (expecting a \f$z_0\f$ parameter in 'cf')
+* 1: Roughtness length model from Smart (expecting a $z_0$ parameter in 'cf')
 * -1 Manning's friction model (expecting a Manning n parameter 'cf')
 Quadratic friction is the default, with a uniform friction coefficient:
 ```{txt}
   frictionmodel = 0
   cf = 0.001
 ``` 
-If a uniform friction is required add `cf=` to your `BG_param.txt` with the desired value. `cf` keyword is also used for the \f$z0\f$ of Smart formulation and \f$n\f$ of the Manning formulation. 
+If a uniform friction is required add `cf=` to your `BG_param.txt` with the desired value. `cf` keyword is also used for the $z0$ of Smart formulation and $n$ of the Manning formulation. 
 
 For non-uniform friction parameter use the keyword  `cfmap` or `roughnessmap` and assign an `.asc` or `.nc` file. For nc files you may need to supply the netcdf variable name: e.g. `cfmap=final_rough.nc?zo`. The roughness grid does not need to match the model grid dimension and coarser friction grid will be interpolated to the model grid cells and model cells outside of the forcing domain will be extrapolated (nearest value).
 
@@ -309,7 +309,7 @@ For each Time-Serie output needed, a line with the destination file and the post
 ```{txt} 
 TSnodesout=Offshore.txt,xloc,yloc;
 ```
-The file contains 5 colums \f$(t, zs, h, u,v)\f$ with the value at the nearest grid point (to the position defined by the user).
+The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).
 
 ## Adaptative grid
 At the stage of development, the code will adapt the grid only before the computation but not along the calcul.
@@ -318,11 +318,11 @@ The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by
 These blocks can have different resolutions (but the resolution does not change during the computation at this stage).
 
 By default, the initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use different levels of resolution. 
-The reference level, correponding to the bathymetry resolution or "dx" if defined by the user, will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  \f$n\f$ , the resolution  \f$dx_n\f$
+The reference level, correponding to the bathymetry resolution or "dx" if defined by the user, will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$
   will be:
 $$dx_n=\frac{dx_0}{2^n}$$
  
-with  \f$dx_0\f$ the resolution at level 0. 
+with  $dx_0$ the resolution at level 0. 
 
 When refinning using the level implementation, different key words are expected:
 
@@ -348,5 +348,5 @@ Adaptation = Targetlevel,MyLevelMap.nc?levels ;
 Where max and min represent the range of level expected, and init is a number in this range (it is advice to use the min level). MyLevelMap is a netcdf 2D map of levels, that can have a different resolution and dimension from the computational grid. The amplitude of the levels on the map can also be larger than than min/max. All these levels are positive or negative integer.
 
 
-For a bathymetry map of 10m resolution ( or \f$ dx=10m\f$), we can use \f$min=-3\f$, \f$max=2\f$ and \f$init=-3\f$ to create a grid where coarser cell will be \f$10/2^-3=80m\f$ and the thinner \f$10/2=2.5m\f$. The level file would contains a 2D map with integer values from -3 to 2.
+For a bathymetry map of 10m resolution ( or $ dx=10m$), we can use $min=-3$, $max=2$ and $init=-3$ to create a grid where coarser cell will be $10/2^-3=80m$ and the thinner $10/2=2.5m$. The level file would contains a 2D map with integer values from -3 to 2.
 

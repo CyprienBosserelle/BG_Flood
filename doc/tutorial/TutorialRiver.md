@@ -52,7 +52,7 @@ The river are, at this stage, forced by a vertical discharge on a user defined r
 ```{txt} 
 river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
 ```
-where the four final numbers are: \f$ x_1, x_2, y_1, y_2 \f$, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time (\f$s\f$) from reference time, second column: river discharge in \f$m^3s^{-1}\f$).
+where the four final numbers are: $ x_1, x_2, y_1, y_2 $, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time ($s$) from reference time, second column: river discharge in $m^3s^{-1}$).
 
 ![riverfile](./figure/river_discharge.png)
 
@@ -70,9 +70,9 @@ The end of the simulation is prescribed in second as :
 endtime = 21600;
 ```
 
-The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, \f$ CFL=0.5000 \f$ by default.
+The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, $ CFL=0.5000 $ by default.
 
-The simulation begin, by default at \f$ t=0 (s)\f$, but this can modify using "totaltime": 
+The simulation begin, by default at $ t=0 (s)$, but this can modify using "totaltime": 
 ```{txt} 
 totaltime = 3600;
 ```
@@ -112,7 +112,7 @@ For each TS output needed, a line with the destination file and the postition is
 ```{txt} 
 TSnodesout=Offshore.txt,1482120,53814890;
 ```
-The file contains 5 colums \f$(t, zs, h, u,v)\f$ with the value at the nearest grid point (to the position defined by the user).
+The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).
 
 ## Resolution
 For a first test, we will modify the resolution and set it to 40m to decrease the computational time:
@@ -170,7 +170,7 @@ cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
 **Warning**: The model allows a roughness heigh / manning number map smaller than the computational domain and will extrapolate outside of the map.
 
 ## Initialisation
-By default, the model is initialised by a plane water surface located at \f$z=0.0\f$.
+By default, the model is initialised by a plane water surface located at $z=0.0$.
 
 This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using:
 ```{txt} 
@@ -194,7 +194,7 @@ By default, the code will detect if there is a suitable GPU on the machine.
 ```{txt} 
 doubleprecision = 1;
 ```
-- Minmod limiter parameter (to tune momentum dissipation \f$\in [1,2]\f$)
+- Minmod limiter parameter (to tune momentum dissipation $\in [1,2]$)
 ```{txt} 
 theta=1.3; #default value=1.3
 ```
@@ -212,7 +212,7 @@ eps = 0.00010000; #default=0.0001
 The model allows rain on grid forcing to model pluvial inundations.
 
 ## Rain forcing
-A rain intensity in \f$ mm.h^{-1} \f$, time and space varying can be forced in the model.
+A rain intensity in $ mm.h^{-1} $, time and space varying can be forced in the model.
 
 The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:
 - Time serie forcing:
@@ -249,11 +249,11 @@ AOI=Domain_buffered-sea2.gmt;
 The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
 These blocks can have different resolutions (but resolution does not change during the computation at this stage).
 
-The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  \f$n\f$ , the resolution  \f$dx_n\f$
+The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$
   will be:
 $$dx_n=\frac{dx_0}{2^n}$$
  
-with  \f$dx_0\f$ the resolution at level 0. 
+with  $dx_0$ the resolution at level 0. 
 
 When refinning using the level implementation, different key words are expected:
 
@@ -271,10 +271,10 @@ The different methods of refinement available in the code are called using the k
 
 To refine the grid for this case, we will use the *former coarse simulation* and create a map for values where hmax is strictly positive (and/or umax,vmax different from zero), after removing the sea area. 
 
-Here, the bathymetry map resolution is a 10m resolution (\f$ dx_8=10m\f$). We will impose:
-- a level -3 resolution ( \f$dx_{-3}=80m\f$) in the background domain, 
-- a level 1 resolution ( \f$dx_1=5m\f$) in the flooded area
-- a level 2 resolution ( \f$dx_2=2.5m\f$)  in the main river bed area. 
+Here, the bathymetry map resolution is a 10m resolution ($ dx_8=10m$). We will impose:
+- a level -3 resolution ( $dx_{-3}=80m$) in the background domain, 
+- a level 1 resolution ( $dx_1=5m$) in the flooded area
+- a level 2 resolution ( $dx_2=2.5m$)  in the main river bed area. 
 
 ![coarseRun](./figure/coarse.png)
 ![refine](./figure/refine.png)

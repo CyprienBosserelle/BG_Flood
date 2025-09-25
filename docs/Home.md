@@ -12,6 +12,17 @@ The model is designed to simulate [flood/inundation](https://english.stackexchan
     If you have any issue/question post it on the issue board. While the model is fairly user friendly, it was designed for users with a basic understanding of hydrodynamics and some experience in modelling. The wiki (and the model) expect that users have some experience in basic file manipulations and are comfortable with handling NetCDF files for input and output.
 
 
+This code is an open-source shallow water solver. Designed to be fast, it run on GPUs and generate its own adaptative mesh. It is mainly used in a context of flooding:
+
+- fresh water flooding (fluvial and pluvial)
+- tsunami propagation and run-off
+
+![type:video](./videos/Westport_flooding.mp4)
+![type:video](./videos/Tsunami_AtmosphericP.mp4)
+![Tsunami](./videos/Tsunami_multi-levels.gif)
+![Nadi](./videos/Nadi_Flooding.gif)
+
+
 
 
 # Model development stage
@@ -37,6 +48,7 @@ The master branch is at stage 4 of development with 5 stage planned as below:
 
 **Testing**
 CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flood/actions/workflows//main.yml/badge.svg?branch=development) 
+
 
 
 
