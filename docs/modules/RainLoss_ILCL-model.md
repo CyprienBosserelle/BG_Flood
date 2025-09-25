@@ -1,4 +1,4 @@
-@page ILCL Ground infiltration: Initial Loss - Continuous Loss
+Ground infiltration: Initial Loss - Continuous Loss
 
 
 Rainfall is often absorbed in soil and leaf litter before joining surface flow.The default behaviour of BG_Flood is to assume the rainfall given as input is actually [runoff](https://en.wikipedia.org/wiki/Surface_runoff) (i.e. rainfall exess that will make the surface flows). Instead a basic initial - continuous loss model can be apply to approximate runoff. 
@@ -14,7 +14,9 @@ The water absorbed in the ground will be tracked using the ground water elevatio
 
 On each cell, at each simulation step, we can express the quantity of water absorbed in the ground $ha_{t}$ using:
 
-![equ](https://latex.codecogs.com/gif.latex? ha_{t} = \begin{cases}   h_{t} & \text{if} \;\; hgw_{t-1} + h_{t} < il\\      cl & \text{if}\;\; hgw_{t-1} > il\\      \min(il - hgw_{t-1} + cl\,,\, h_{t}) & \text{otherwise} \end{cases})
+$$
+ha_{t} = \begin{cases}   h_{t} & \text{if} \;\; hgw_{t-1} + h_{t} < il\\      cl & \text{if}\;\; hgw_{t-1} > il\\      \min(il - hgw_{t-1} + cl\,,\, h_{t}) & \text{otherwise} \end{cases}
+$$
 
 <!---
 \f{eqnarray*}{
@@ -29,9 +31,16 @@ On each cell, at each simulation step, we can express the quantity of water abso
 where $il$ and $cl$ are respectively the initial loss and continuous loss coefficient at a given cell location, and $hgw_{t}$ is the accumulated ground water at this cell location since the begining of the simulation.
 
 The water absorbed is then added to the ground water tracking variable:
-$$hgw_{t}=hgw_{t-1} + ha_{t}$$
- and removed from the surface water height and the surface water elevation (not shown here):
- $$h_{t \;final} = h_{t} - ha_{t}$$
+
+$$
+hgw_{t}=hgw_{t-1} + ha_{t}
+$$
+
+and removed from the surface water height and the surface water elevation (not shown here):
+
+$$
+h_{t \;final} = h_{t} - ha_{t}
+$$
 
 The following figure shows a representation of the initial loss - continuing loss model with $il = 10 mm$ and $cl = 1 mm/s$ :
 
@@ -39,12 +48,12 @@ The following figure shows a representation of the initial loss - continuing los
 
 *Initial loss and continuing loss reprensentation during a cell-wetting event*
 
-### __Important notes__:
--> All cells that are initially wet at the begining of the simulation ($h > XParam.eps$) will have their initial loss ($il$) set to 0.0, in order to be consistent with the physic of the model.
+!!! note
+    All cells that are initially wet at the begining of the simulation ($h > XParam.eps$) will have their initial loss ($il$) set to 0.0, in order to be consistent with the physic of the model.
 
-```diff
--> This model is meant to be used with the rain on grid feature. The model is applied indistinctively to water from any source and can cause unexpected results if misused.
-```
+!!! warning
+    This model is meant to be used with the rain on grid feature. The model is applied indistinctively to water from any source and can cause unexpected results if misused.
+
 ## Testcase for the ILCL model
 The ILCL model is tested in the Westport (ANZ) area, on the Orowaiti river (with a uniform 5m grid). A 20mm/hr rain is uniformly applied on the domain during 30 minutes. An initial loss of 5mm and an continuous loss of 5mm/h are used to define infiltration uniformly on the domain. The results, compared to a reference case without infiltration, are presented in the following figure.
 ![Model_test](../figure/Ex_Merge.png)

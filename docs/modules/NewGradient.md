@@ -1,4 +1,4 @@
-@page HaloGradient Halo and gradient
+Halo and gradient
 
 Using multi-resolution in BG_Flood, we need to keep track of how blocks with different resolutions talk to each other. This page tries to explain how this is done.
 
@@ -26,11 +26,16 @@ otherwise:
 Prolongation is the action of extending a value from a coarse cell to a finer cell. Often this is done by using the gradient value. 
 e.g.:
 
-$$HaloB = A + Gradient(A) * dx * 0.5$$
+$$
+HaloB = A + Gradient(A) * dx * 0.5
+$$
 
 ### Restriction
 Restriction is where we calculate the value of a coarse cell from values of fine cells. This is usually done with cell average.
-$$HaloA = 0.25*(B1+B2+B3+B4)$$
+
+$$
+HaloA = 0.25*(B1+B2+B3+B4)
+$$
 
 
 ## Filling the Halo: The chicken and the egg.
@@ -43,6 +48,6 @@ Instead we first fill the halo for straight copy cells and restriction cells. Th
 
 
 ## Conserving elevation
-Using prolongation at the wet/dry interface can lead to inconsistencies between h and zs. To limit the inconsistency zs is calculated from h after a prolongation calculation (see refine_linear). While this conserves mass, it, however, leads to a violation of the lake-at-rest resulting in (small) spurious velocity at that interface. To remove the instability and preserve the elevation of the water (rather than its mass) we use a conserve elevation option (conserveelevation = true). This gets rid of the instability and preserves the elevation of the water level but then violates the mass conservation.
+Using prolongation at the wet/dry interface can lead to inconsistencies between $h$ and $zs$. To limit the inconsistency $zs$ is calculated from $h$ after a prolongation calculation (see refine_linear). While this conserves mass, it, however, leads to a violation of the lake-at-rest resulting in (small) spurious velocity at that interface. To remove the instability and preserve the elevation of the water (rather than its mass) we use a conserve elevation option (conserveelevation = true). This gets rid of the instability and preserves the elevation of the water level but then violates the mass conservation.
 
 ## Fluxes halo are a bit different
