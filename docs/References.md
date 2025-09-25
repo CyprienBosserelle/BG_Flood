@@ -12,7 +12,7 @@
 ## List of references
 Full reference list from work used in the development of BG_Flood and produced using the code.
 
-$ull_bibliography
+\full_bibliography
 
 
 

@@ -21,7 +21,7 @@ plugins:
   - mkdocs-video
   #- awesome-nav
   - mkdoxy:
-      #doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
+      doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
       projects:
         BGFlood: # name of project must be alphanumeric + numbers (without spaces)
           src-dirs: src/ # path to source code (support multiple paths separated by space) => INPUT
@@ -47,7 +47,10 @@ nav:
       - 'Coastal fluvial flooding': 'tutorial/TutorialRiver.md'
       - 'Monai and Julia': 'tutorial/TutorialMonaiJulia.md'
       - 'Jet and Julia': 'tutorial/TutorialJetJulia.md'
-  - Modules: 'modules/*.md'
+  - Modules:
+      - 'Ground infiltration': 'modules/RainLoss_ILCL-model.md'
+      - 'New Gradient Method': 'modules/NewGradient.md'
+      - 'Wet-dry fix': 'modules/Wetdryfix-Conservation.md'
   - References: 'References.md'
   #- Examples : 
   - Code sources:
