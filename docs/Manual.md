@@ -60,7 +60,7 @@ Where the file input is a timeserie (e.g. boundary forcing), then the file exten
 ## List of Parameters
 Remember that the only required parameter to run the model is the bathymetry file. But if you want to run something fun you will need to specify boundary conditions, initial conditions and/or some forcings.
 
-[Full list of the parameters](@ref ParameterList)
+[Full list of the parameters](ParametersList-py.md)
 
 
 ## Bathymetry/topography files

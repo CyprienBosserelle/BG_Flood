@@ -44,9 +44,13 @@ nav:
   - Parameters list : 'ParametersList-py.md'
   - Manual: 'Manual.md'
   - Tutorials:
+      - Introduction: 'Tutorial_intro.md'
       - 'Coastal fluvial flooding': 'tutorial/TutorialRiver.md'
-      - 'Monai and Julia': 'tutorial/TutorialMonaiJulia.md'
       - 'Jet and Julia': 'tutorial/TutorialJetJulia.md'
+      - 'Gaussian wave' : 'tutorial/Gaussian_Wave_Julia.md'
+      - 'Transpacific tsunami': 'tutorial/Transpacific_tsunami.md'
+      - 'Monai and Julia': 'tutorial/TutorialMonaiJulia.md'
+
   - Modules:
       - 'Ground infiltration': 'modules/RainLoss_ILCL-model.md'
       - 'New Gradient Method': 'modules/NewGradient.md'
@@ -108,8 +112,8 @@ markdown_extensions:
   - footnotes
   # Icons and emojis
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 
 

@@ -62,20 +62,24 @@ CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flo
 4. When updating/upgrading BG_Flood simply repeat 1 and 2
 
 ## On Linux machines
+Use instead if needed:
+* [Manual](Manual.md)
+* [Modules](modules/Modules.md)
+* [Tutorials](tutorial/Tutorial_intro.md)
 
-* @ref Compile-under-linux
-* @ref Use-On-SuperComputer
+*  Compile-under-linux
+*  Use-On-SuperComputer
 
 
 
 ## How to use the model {#User}
 
-* @ref Manual
-* @ref Modules
-* @ref Tutorials 
-* @ref Test-and-Examples 
+*  Manual
+*  Modules
+*  Tutorials 
+*  Test-and-Examples 
 
 
 # How to use/change the code {#Developer}
-* @ref Code-map
+*  Code-map
 -->

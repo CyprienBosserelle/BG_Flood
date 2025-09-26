@@ -1,10 +1,7 @@
 
 
----
-title: Mkdoc-material set-up!
----
 
-# Page title
+# Mkdoc-material set-up!
 
 # Welcome to MkDocs by Alice
 For full documentation visit [mkdocs.org](https://www.mkdocs.org).

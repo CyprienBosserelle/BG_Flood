@@ -13,18 +13,15 @@ During this tutorial, we will build, step by step, a test case
 
 
 # Param file
-The interface with BG_flood software is done using only a text file:
-```{bash} 
-BG_param.txt
-```
+The interface with BG_flood software is done using only a text file: `BG_param.txt`
 (This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG_Flood.)
 
 This file consists in a list of key words and inputs, separated by a "=" sign. 
-For a full list of the available key words and a further description of this file, please refere to the [manual]{#Manual}.
+For a full list of the available key words and a further description of this file, please refer to the [parameter list]{../ParametersList-py.md} and the [manual]{../Manual.md}.
 
 # Preparation of the topography/bathymetry (DEM: Digital Elevation Model)
 The DEM, topography or bathymetry file is the only necessary file to be added to BG_param file to run the model.
-```{txt}
+``` txt
 DEM = Wesport_DEM_8m.nc?z;
 ``` 
 
@@ -46,29 +43,29 @@ A result files: `output.nc` is created (here opened with the [PyNcView]{https://
 It contains 2D spatial fields saved regularly in time.
 It details the blocs information:
 
-- blockid: block index
-- blocklevel: level of refinement for each block
-- blockstatus: Is the block active ?
-- blockwidth: number of cells in x or y direction in the block (not considering halo cells for computational purpose only)
-- blockxo/blockyo: coordinate of the bottom left corner of he block
+- `blockid`: block index
+- `blocklevel`: level of refinement for each block
+- `blockstatus`: Is the block active ?
+- `blockwidth`: number of cells in x or y direction in the block (not considering halo cells for computational purpose only)
+- `blockxo`/`blockyo`: coordinate of the bottom left corner of he block
 
 the time 1D variables or coordinates:
 
-- time: time vector in second or real time
-- xx/yy axis: spacial coordinate in m (by default)
+- `time`: time vector in second or real time
+- `xx`/`yy` axis: spacial coordinate in m (by default)
 
 and the by default outputs:
 
-- h : the water depth in m
-- u : the veloctity vector component in the x direction
-- v: the velocity vector component in the y direction
-- zb: the bottom/ground elevation (m from vertical projection reference)
-- zs: the surface water elevation (m from vertical projection reference)
+- `h` : the water depth in m
+- `u` : the veloctity vector component in the x direction
+- `v`: the velocity vector component in the y direction
+- `zb`: the bottom/ground elevation (m from vertical projection reference)
+- `zs`: the surface water elevation (m from vertical projection reference)
 
 (see manual for further description of the variables).
 
 !!! note
-    In BG_Flood, the memory is organised in blocked  
+    In BG_Flood, the memory is organised in blocked for an optimal parallelisation on GPU. All the cells on a block will share some status and parameter such as the level of refinement (or cell size) and the active status.
 
 
 
@@ -82,7 +79,7 @@ A log file: `BG_log.txt` (very similaire to the shell outputs) is also created t
 
 ## River discharge
 The river are (at this stage) forced by a vertical discharge on a user defined rectagular area:
-```{txt} 
+``` txt 
 river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
 ```
 where the four final numbers are: $x_1$, $x_2$, $y_1$, $y_2$, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time ($s$) from reference time, second column: river discharge in $m^3s^{-1}$).
@@ -99,14 +96,14 @@ For each new river, just add the a similar river input line in the parameter fil
 In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
 
 The end of the simulation is prescribed in second as :
-```{txt} 
+``` txt  
 endtime = 21600;
 ```
 
 The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, $CFL=0.5000$ by default.
 
 The simulation begin, by default at $t=0(s)$, but this can modify using "totaltime": 
-```{txt} 
+``` txt 
 totaltime = 3600;
 ```
 to begin one hour after the reference time (used in the forcings for example).
@@ -126,28 +123,28 @@ By default, there is only a map output at the begining and end of the simulation
 The map output can be modify by:
 
 - defining a timestep (in s) for these outputs:
-```{txt} 
+``` txt 
 outputtimestep = 3600.0;
 ```
 - changing the set of variables in the output file (from the list given in the manual)
-```{txt} 
+``` txt 
 outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
 ```
 The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.
 There is also special variables for risk assesment after inundation (Umax, hmax, hUmax, twet)
 - changing the name of the output file:
-```{txt} 
+``` txt 
 outfile = Results_tuto_basicRun.nc;
 ```
 - saving the output as float (variables are saved as short integer by default.):
-```{txt} 
+``` txt 
 smallnc = 0;
 ```
 
 ### Time-Serie outputs
 For each TS output needed, a line with the destination file and the postition is needed:
 
-```{txt} 
+``` txt 
 TSnodesout=Offshore.txt,1482120,53814890;
 ```
 corresponding to `TSnodesout=filename.txt,x_p,y_p;`
@@ -155,7 +152,7 @@ The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid 
 
 ## Resolution
 For a first test, we will modify the resolution and set it to 40m to decrease the computational time:
-```{txt} 
+``` txt 
 dx=40;
 ```
 
@@ -177,7 +174,7 @@ Boundaries' conditions are refered by their position, using 'top/bottom/right/le
 
 In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.e. for the top, left and right boundaries.
 At the bottom, we will conserve the default value: 1.
-```{txt} 
+``` txt
 left = tide_westport.txt,2; 
 right = tide_westport.txt,2; 
 top = tide_westport.txt,2; 
@@ -185,7 +182,7 @@ top = tide_westport.txt,2;
 
 In this case, as the boundaries are relatively small compared to the time wave length, we will used the same value along all the boundaries. We will then have only two columns in the file: Time and one elevation.
 tide_file
-``` {txt "tide_westport.txt"}
+``` txt "tide_westport.txt"
 0.000000 	0.714714 
 600.000000 	0.794714 
 1200.000000 	0.864714 
@@ -216,7 +213,8 @@ They correspond to a classic time Serie observed offshore of the river mouth.
 
 ![Tide](../figure/tide_westport.png)
 
-(If more values, they will be regularly spread along the boundary and the forcing will be the linear interpolation of these values). 
+!!! note 
+    If more values are added to the file (more columns), they will be regularly spread along the boundary and the forcing will be linearly interpolated between these values. 
 
 
 ## Bottom friction
@@ -224,7 +222,7 @@ Different models from bottom friction are available.
 By default, the model used is -1 corresponding to a Manning model.
 Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models).
 The associated field (ASC or netCDF) or value must be enter with the key word
-```{txt} 
+``` txt
 frictionmodel=1;
 cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
 ```
@@ -238,34 +236,36 @@ cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
 By default, the model is initialised by a plane water surface located at $z=0.0$.
 
 This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using:
-```{txt} 
+``` txt 
 zsinit=-1.39; #in metre
 ```
 The model can also be initialised using a restart/hot start.
 A file containing a least the files zb, h or zs, u and v must be provided, with the steps (and no the time value) to use for the restart.
-```{txt} 
+``` txt 
 hotstartfile = output_4.nc;
 hotstep=5;
 ```
+!!! warning
+    the code can be restarted only from an uniform grid (and not from results with multi-level of resolutions).
 
 ## Model controls
 Some variables can be used to adjust the model (see Manual for more details):
 
 - run on CPU (or choose a GPU to run on):
-```{txt} 
+``` txt 
 gpudevice=0;
 ```
 By default, the code will detect if there is a suitable GPU on the machine.
 - Double precision instead of a float precision during the computation:
-```{txt} 
+``` txt 
 doubleprecision = 1;
 ```
 - Minmod limiter parameter (to tune momentum dissipation $\in [1,2]$)
-```{txt} 
+``` txt 
 theta=1.3; #default value=1.3
 ```
 - Minimum heigh to concidere a cell wet (m)
-```{txt} 
+``` txt 
 eps = 0.00010000; #default=0.0001
 ```
 
@@ -282,11 +282,11 @@ A rain intensity in $mm.h^{-1}$, time and space varying can be forced in the mod
 The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:
 
 - Time serie forcing:
-```{txt} 
+``` txt 
 rainfall=rain_westport.txt
 ```
 - Spacial file forcing:
-```{txt} 
+``` txt 
 rainfile=VCSN_buller_202107_dailynzcsmcov_disaggdaily_500m_nztm_clipped.nc?depth;
 ```
 Here, we will use a time serie:
@@ -298,16 +298,16 @@ Using the rain on grid forcing will activate all the cells of the domain and wil
 Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:
 
 - using the `x0` / `xmax` / `y0` / `ymax` keywords to restrain the extend of the computational domain (but still rectangular)
-```{txt} 
+``` txt 
 x0=1475000; #m
 ```
 - a manual mask with values 999 in the bathymetry will be read by the code as "non-active" area
 - masking all the bloc with all cells having an elevation superior to some value:
-```{txt} 
+``` txt 
 mask=250; #m
 ```
 - using a shape file to define a "area of interest":
-```{txt} 
+``` txt  
 AOI=Domain_buffered-sea2.gmt;
 ```
 !!! note "Method advised"
@@ -365,7 +365,7 @@ Here, the bathymetry map resolution is a 10m resolution ($dx=10m$). We will impo
 
 
 To use it, the following options need to be added to the param file:
-```{txt} 
+``` txt  
 initlevel = -3 ;
 maxlevel = 2 ;
 minlevel = -3 ;
@@ -384,7 +384,7 @@ Adaptation = Targetlevel,refin_mask.nc?z ;
 
 !!! note "Note again ..."
      The code also allows for zone outputs: the output of different zones defined by the user (`output-file-name,x1,x2,y1,y2`):
-     ```{txt}
+     ``` txt
      outzone=zoomed.nc,5.3,5.4,0.5,0.8;
      ``` 
 
@@ -476,7 +476,7 @@ An Initial Loss, Continuous Loss model has been implemented in the code (see ILC
 
 
 To use it, provide maps for the two coefficient as follow:
- ```{txt}
+ ``` txt
 initialloss=InitialLoss.asc;
 continuousloss=ContinuousLoss.asc;
  ``` 
