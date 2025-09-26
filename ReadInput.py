@@ -24,7 +24,7 @@ import re;
 BG_ReadInput="src/ReadInput.cu"
 BG_Params_h="src/Param.h"
 BG_Forcing_h="src/Forcing.h"
-ParamListFile="ParametersList-py.md"
+ParamListFile="docs/ParametersList-py.md"
 
 #%% Getting the list of the available entry keys
 # Get the parameter keys, as well as the list of variables associated to the
