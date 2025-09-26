@@ -23,7 +23,9 @@ BG_flood user interface consists in a text file, associating key words to user c
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
 |doubleprecision|doubleprecision| 0|0: float precision, 1: double precision|
 |engine|engine| 1|1: Buttinger, 2: Kurganov, 3: KurganovATMP|
+
 ### Grid parameters
+
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |dx|dx| nan("")|Grid resolution in the coordinate system unit in m.|
@@ -38,28 +40,36 @@ BG_flood user interface consists in a text file, associating key words to user c
 |spherical|spherical| 0|Flag for sperical coordinate (still in development)|
 |Radius|Radius| 6371220.|Earth radius [m]|
 |mask|mask| 9999.0|Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory|
+
 ### Adaptation
+
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |initlevel|initlevel| 0|Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)|
 |maxlevel|maxlevel| 0|Maximum level for grid adaptation (overwrite the adaptation map if use) |
 |minlevel|minlevel| 0|Minumim level for grid adaptation (overwrite the adaptation map if use) |
 |membuffer|membuffer| 1.05|Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
+
 ### Timekeeping
+
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |outputtimestep| outputtimestep , outtimestep , outputstep | 0.0|Number of seconds between netCDF outputs, 0.0 for none|
 |endtime|endtime| 0.0|Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing|
 |totaltime| totaltime , inittime | 0.0|Total simulation time in s|
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
+
 ###  Initialisation
+
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |zsinit| zsinit , initzs | nan("")|Init zs for cold start in m. If not specified by user and no bnd file = 1 then sanity check will set it to 0.0|
 |zsoffset|zsoffset| nan("")|Add a water level offset in m to initial conditions and boundaries (0.0 by default)|
 |hotstartfile|hotstartfile|None<br>|Allow to hotstart (or restart) the computation providing a netcdf file containing at least zb, h or zs, u and v<br>|
 |hotstep|hotstep| 0|Step to read if hotstart file has multiple steps (step and not (computation) time)|
+
 ### Outputs
+
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |outfile|outfile| "Output.nc"|netcdf output file name|
@@ -68,13 +78,17 @@ BG_flood user interface consists in a text file, associating key words to user c
 |resetmax|resetmax| false|Switch to reset the "max" outputs after each output|
 |outishift|outishift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in x direction to visualise the halo around blocks in the output |
 |outjshift|outjshift| 0|DEBUGGING ONLY: allow cell shift (1 or -1) in y direction to visualise the halo around blocks in the output |
+
 ### Netcdf parameters
+
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |smallnc|smallnc| 1|Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float|
 |scalefactor|scalefactor| 0.01f|Scale factor used for the short integer conversion for netcdf outputs|
 |addoffset|addoffset| 0.0f|Offset add during the short integer conversion for netcdf outputs|
+
 ###  ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)
+
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |use_catalyst|use_catalyst| 0|Switch to use ParaView Catalyst|
@@ -83,7 +97,6 @@ BG_flood user interface consists in a text file, associating key words to user c
 |vtk_output_time_interval|vtk_output_time_interval| 1.0|Output time step for ParaView Catalyst|
 |vtk_outputfile_root|vtk_outputfile_root| "bg_out"|output file name for ParaView Catalyst|
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
----
 
 ## List of the Forcings' inputs
 
@@ -100,13 +113,12 @@ BG_flood user interface consists in a text file, associating key words to user c
 |Wind| Wind , windfiles |None|Wind = mywind.nc?uw,mywind.nc?vw<br>Wind = MyWind.txt|Spacially varying: 2 files are given, 1st file is U wind and second is V wind ( no rotation of the data is performed)<br>Spacially uniform: 1 file is given then a 3 column file is expected, showing time, windspeed and direction.<br>Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)|
 |Atmp| Atmp , atmpfile |None|Atmp=AtmosphericPressure.nc?p| The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using Pa2.|
 |Rain| Rain , rainfile |None|rain=rain_forcing.txt <br>rain=rain_forcing.nc?RainIntensity| This allow to force a time varying, space varying rain intensity on the model, in mm/h.<br>Spacially varrying (rain map), a netcdf file is expected (with the variable associated to the rain after "?").<br>Spacially uniform: the rain is forced using a time serie using a 2 column values table containing time (not necessary unformly distributed) and rain.|
----
+
 
 ## List of the non-identified inputs
 
 |_Reference_|_Keys_|
 |---|---|
 |Adaptation|Adaptation|
----
 
 *Note* : The keys are not case sensitive.
