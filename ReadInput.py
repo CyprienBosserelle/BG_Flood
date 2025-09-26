@@ -212,6 +212,7 @@ for ii in range(len(P_lines)):
             #Out.write('---\n\n')
         #else:
         #    First=1
+        Out.write('\n')
         Out.write("### " + str(SubTitle[ii]) + "\n")
         Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
         Out.write('|---|---|---|---|\n')
@@ -220,7 +221,6 @@ for ii in range(len(P_lines)):
             if ParamTable.Line[ind] == ii:
                 mystr= "|" + str(ParamTable.Reference[ind]) + "|" + str(ParamTable.Keys[ind]) + "|" + str(ParamTable.Default[ind][4:]) + "|" + str(ParamTable.Comment[ind][4:]) + "|\n"
                 Out.write(mystr)
-    Out.write('\n\n')
 Out.write('\n\n')
 
 #Creation of the Forcing table in MD
