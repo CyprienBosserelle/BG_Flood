@@ -16,6 +16,7 @@ examples.
 Finally, these keys are listed in tables: one for the parameter, one for the forcings
 (and a last one for the non-identified keys).
 
+# Updated to fit in mkdocs setup - Sept 2025
 """
 #%% Configuration
 import re;
@@ -197,11 +198,11 @@ for i in range(len(P_lines)):
 #Creating the mark-down file/table for the list of the user input parameters
 Out=open(ParamListFile,'w')
 Out.write('# Paramter and Forcing list for BG_Flood\n\n')
-Out.write('BG_flood user interface consists in a text file, associating key words to user chosen parameters and forcings.\n')
+Out.write('BG_flood user interface consists in a text file (`BG_param.txt` by default), associating key words to user chosen input parameters and forcing information.\n')
 
 #Creation of the Parameter table in MD
 #####Paramters
-Out.write('## List of the Parameters\' input\n\n')
+Out.write('## List of the input Parameters\n\n')
 #Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
 #Out.write('|---|---|---|---|\n')
 First=0
@@ -219,7 +220,8 @@ for ii in range(len(P_lines)):
             if ParamTable.Line[ind] == ii:
                 mystr= "|" + str(ParamTable.Reference[ind]) + "|" + str(ParamTable.Keys[ind]) + "|" + str(ParamTable.Default[ind][4:]) + "|" + str(ParamTable.Comment[ind][4:]) + "|\n"
                 Out.write(mystr)
-Out.write('---\n\n')
+    Out.write('\n\n')
+Out.write('\n\n')
 
 #Creation of the Forcing table in MD
 #####Forcings
@@ -230,7 +232,7 @@ Out.write('|---|---|---|---|---|\n')
 for ind in range(len(ForcingTable.Reference)):
     mystr= "|" + str(ForcingTable.Reference[ind]) + "|" + str(ForcingTable.Keys[ind]) + "|" + str(ForcingTable.Default[ind][4:]) + "|" + str(ForcingTable.Example[ind][4:]) + "|"+ str(ForcingTable.Comment[ind][4:]) + "|\n"
     Out.write(mystr)
-Out.write('---\n\n')
+Out.write('\n\n')
 
 
 #Creation of the non-identified entries table in MD
@@ -242,9 +244,9 @@ Out.write('|---|---|\n')
 for ind in range(len(NonIdTable.Reference)):
         mystr= "|" + str(NonIdTable.Reference[ind]) + "|" + str(NonIdTable.Keys[ind]) + "|\n"
         Out.write(mystr)
-Out.write('---\n\n')
+Out.write('\n\n')
 
-Out.write('*Note* : The keys are not case sensitive.\n')
+Out.write('!!! note \n    The keys are not case sensitive.\n')
 
 
 Out.close()

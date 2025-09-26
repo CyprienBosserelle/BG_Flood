@@ -21,7 +21,7 @@ plugins:
   - mkdocs-video
   #- awesome-nav
   - mkdoxy:
-      doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
+      #doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
       projects:
         BGFlood: # name of project must be alphanumeric + numbers (without spaces)
           src-dirs: src/ # path to source code (support multiple paths separated by space) => INPUT
@@ -39,7 +39,7 @@ plugins:
 
 nav:
   - Home: 'Home.md'
-  - Examples of Mkdocs material: 'index.md'
+  - TMP Examples of Mkdocs material: 'index.md'
   - Installation: 'Install.md'
   - Parameters list : 'ParametersList-py.md'
   - Manual: 'Manual.md'
@@ -106,8 +106,10 @@ markdown_extensions:
   - pymdownx.blocks.caption
   # Footnotes
   - footnotes
-
-
+  # Icons and emojis
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
 
 
 

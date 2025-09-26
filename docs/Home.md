@@ -51,6 +51,7 @@ CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flo
 
 
 
+<!--
 
 # How to install
 
@@ -77,4 +78,4 @@ CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flo
 
 # How to use/change the code {#Developer}
 * @ref Code-map
-
+-->
