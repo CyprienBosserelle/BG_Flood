@@ -1,5 +1,4 @@
-# TEST !!!! 
-Paramter and Forcing list for BG_Flood
+# Paramter and Forcing list for BG_Flood
 
 BG_flood user interface consists in a text file (`BG_param.txt` by default), associating key words to user chosen input parameters and forcing information.
 ## List of the input Parameters
