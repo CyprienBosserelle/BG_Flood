@@ -197,7 +197,7 @@ for i in range(len(P_lines)):
 
 #Creating the mark-down file/table for the list of the user input parameters
 Out=open(ParamListFile,'w')
-Out.write('# Paramter and Forcing list for BG_Flood\n\n')
+Out.write('# TEST !!!! \nParamter and Forcing list for BG_Flood\n\n')
 Out.write('BG_flood user interface consists in a text file (`BG_param.txt` by default), associating key words to user chosen input parameters and forcing information.\n')
 
 #Creation of the Parameter table in MD
