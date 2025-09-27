@@ -1,0 +1,92 @@
+\hypertarget{Mesh_8h}{}\doxysection{src/\+Mesh.h File Reference}
+\label{Mesh_8h}\index{src/Mesh.h@{src/Mesh.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Write\+\_\+txtlog.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Grid\+Manip.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Poly.\+h\char`\"{}}\newline
+Include dependency graph for Mesh.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{Mesh_8h_a21e957acbea121649d45ed65b3ee022a}{Calc\+Initnblk}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mesh_8h_a25954300a3b06925383080a171b87684}{Init\+Mesh}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mesh_8h_abef3377058dffce5f3e9b470fa6359c3}{Init\+Block\+Info}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mesh_8h_a3635239aa757f4ee0990122bb9a2cbd9}{Init\+Blockadapt}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdap)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mesh_8h_a78f8a9d54f38493884b0c2cee3f5528d}{Init\+Blockxoyo}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mesh_8h_ae53a5b6fa3a68e28925e972bcebb8d58}{Init\+Blockneighbours}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Mesh_8h_a35668f946c554f3b6882d2e681038edd}{Calc\+Maskblk}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mesh_8h_a9ad50da5140076bdaf821685200015f1}{Find\+Maskblk}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Mesh_8h_a21e957acbea121649d45ed65b3ee022a}\label{Mesh_8h_a21e957acbea121649d45ed65b3ee022a}} 
+\index{Mesh.h@{Mesh.h}!CalcInitnblk@{CalcInitnblk}}
+\index{CalcInitnblk@{CalcInitnblk}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{CalcInitnblk()}{CalcInitnblk()}}
+{\footnotesize\ttfamily int Calc\+Initnblk (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing }\end{DoxyParamCaption})}
+
+nmask++;\mbox{\Hypertarget{Mesh_8h_a35668f946c554f3b6882d2e681038edd}\label{Mesh_8h_a35668f946c554f3b6882d2e681038edd}} 
+\index{Mesh.h@{Mesh.h}!CalcMaskblk@{CalcMaskblk}}
+\index{CalcMaskblk@{CalcMaskblk}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{CalcMaskblk()}{CalcMaskblk()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int Calc\+Maskblk (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mesh_8h_a9ad50da5140076bdaf821685200015f1}\label{Mesh_8h_a9ad50da5140076bdaf821685200015f1}} 
+\index{Mesh.h@{Mesh.h}!FindMaskblk@{FindMaskblk}}
+\index{FindMaskblk@{FindMaskblk}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{FindMaskblk()}{FindMaskblk()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Find\+Maskblk (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mesh_8h_a3635239aa757f4ee0990122bb9a2cbd9}\label{Mesh_8h_a3635239aa757f4ee0990122bb9a2cbd9}} 
+\index{Mesh.h@{Mesh.h}!InitBlockadapt@{InitBlockadapt}}
+\index{InitBlockadapt@{InitBlockadapt}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{InitBlockadapt()}{InitBlockadapt()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Init\+Blockadapt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdap }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mesh_8h_abef3377058dffce5f3e9b470fa6359c3}\label{Mesh_8h_abef3377058dffce5f3e9b470fa6359c3}} 
+\index{Mesh.h@{Mesh.h}!InitBlockInfo@{InitBlockInfo}}
+\index{InitBlockInfo@{InitBlockInfo}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{InitBlockInfo()}{InitBlockInfo()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Init\+Block\+Info (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mesh_8h_ae53a5b6fa3a68e28925e972bcebb8d58}\label{Mesh_8h_ae53a5b6fa3a68e28925e972bcebb8d58}} 
+\index{Mesh.h@{Mesh.h}!InitBlockneighbours@{InitBlockneighbours}}
+\index{InitBlockneighbours@{InitBlockneighbours}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{InitBlockneighbours()}{InitBlockneighbours()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Init\+Blockneighbours (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mesh_8h_a78f8a9d54f38493884b0c2cee3f5528d}\label{Mesh_8h_a78f8a9d54f38493884b0c2cee3f5528d}} 
+\index{Mesh.h@{Mesh.h}!InitBlockxoyo@{InitBlockxoyo}}
+\index{InitBlockxoyo@{InitBlockxoyo}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{InitBlockxoyo()}{InitBlockxoyo()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Init\+Blockxoyo (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mesh_8h_a25954300a3b06925383080a171b87684}\label{Mesh_8h_a25954300a3b06925383080a171b87684}} 
+\index{Mesh.h@{Mesh.h}!InitMesh@{InitMesh}}
+\index{InitMesh@{InitMesh}!Mesh.h@{Mesh.h}}
+\doxysubsubsection{\texorpdfstring{InitMesh()}{InitMesh()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Init\+Mesh (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+

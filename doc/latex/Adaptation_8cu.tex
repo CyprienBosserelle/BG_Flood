@@ -1,0 +1,262 @@
+\hypertarget{Adaptation_8cu}{}\doxysection{src/\+Adaptation.cu File Reference}
+\label{Adaptation_8cu}\index{src/Adaptation.cu@{src/Adaptation.cu}}
+{\ttfamily \#include \char`\"{}Adaptation.\+h\char`\"{}}\newline
+Include dependency graph for Adaptation.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Adaptation_8cu_a185d47978609c5d1cfbd6ce1c9cdbbce}{Adaptation}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_a8d9935e0bd636ad81c9947aa06d66703}{Adaptation$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_af4db1427ef180609648ea129f9fca7db}{Adaptation$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Adaptation_8cu_a8c47cd4458d2ac7dbb130f5e9fae28fd}{Initial\+Adaptation}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_ab9acd95f9dacf5e9596aab12d00d5f95}{Initial\+Adaptation$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_a1fa02c7cba007704bc12fc10dc10a775}{Initial\+Adaptation$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Adaptation_8cu_a9e945ca4ef1a370bac958cf8c3cce311}{refinesanitycheck}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, bool $\ast$\&\mbox{\hyperlink{Adaptation_8h_a5a0fadfabf08842dd007da2684ccc63b}{refine}}, bool $\ast$\&\mbox{\hyperlink{Adaptation_8h_a05519ab2f26cb6f0735c4a46949a12c8}{coarsen}})
+\item 
+int \mbox{\hyperlink{Adaptation_8cu_afc64c434be889b2f7ac88ecc31c36d71}{checkneighbourrefine}} (int neighbourib, int levelib, int levelneighbour, bool $\ast$\&\mbox{\hyperlink{Adaptation_8h_a5a0fadfabf08842dd007da2684ccc63b}{refine}}, bool $\ast$\&\mbox{\hyperlink{Adaptation_8h_a05519ab2f26cb6f0735c4a46949a12c8}{coarsen}})
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Adaptation_8cu_a9d0e0b083fad78cda118c0b558b37964}{check\+BUQsanity}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock)
+\item 
+template bool \mbox{\hyperlink{Adaptation_8cu_adc47067fd3ca2e493bce74d07e1d18cb}{check\+BUQsanity$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock)
+\item 
+template bool \mbox{\hyperlink{Adaptation_8cu_a9ca15b549a30a9534aac68c497c80b2c}{check\+BUQsanity$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock)
+\item 
+bool \mbox{\hyperlink{Adaptation_8cu_a0007c0c0d1bb030245da864af4e0efba}{checklevel}} (int ib, int levelib, int neighbourib, int levelneighbour)
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Adaptation_8cu_a3869608912f8608152e9642498988f36}{checkneighbourdistance}} (double dx, int ib, int levelib, T blocko, int neighbourib, int levelneighbour, T neighbourblocko, bool rightortop)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Adaptation_8cu_aa3714ebc78a153ec692e9094b5a0fd38}{Adapt}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Adaptation_8cu_a23c04b8fb9cc46eae83feb814600d467}{Calc\+Availblk}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt)
+\item 
+template int \mbox{\hyperlink{Adaptation_8cu_ae4d5ac22912c73864d7f931f58c399ae}{Calc\+Availblk$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt)
+\item 
+template int \mbox{\hyperlink{Adaptation_8cu_aac33b074d744b599f1d7acfaef070334}{Calc\+Availblk$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Adaptation_8cu_aaa50c45c77eba62be4db0a0760a6e7b0}{Add\+Blocks}} (int nnewblk, \mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template int \mbox{\hyperlink{Adaptation_8cu_a435f8b0493cbf51cd0a0ef1ecbdbea21}{Add\+Blocks$<$ float $>$}} (int nnewblk, \mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template int \mbox{\hyperlink{Adaptation_8cu_a45634df349ece7cb3985bcbaf8d069fc}{Add\+Blocks$<$ double $>$}} (int nnewblk, \mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Adaptation_8cu_a05519ab2f26cb6f0735c4a46949a12c8}{coarsen}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvo, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&XEv)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_a93f57f713e135bcbed06165cc8676613}{coarsen$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvo, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&XEv)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_a92a49fed2c2e895253ec74ccd40605e6}{coarsen$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvo, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&XEv)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Adaptation_8cu_a5a0fadfabf08842dd007da2684ccc63b}{refine}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvo, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&XEv)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_ae997e097daffd8612ecbf20ab3771bdf}{refine$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ XEvo, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&XEv)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_a8949873ccbfb5d3966f97e3bf91f6fb0}{refine$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ XEvo, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&XEv)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Adaptation_8cu_a8e034c0941813f09d0437e8c600628d2}{Adaptationcleanup}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_a33bd45bb87744a71ff584f1c91b42d4d}{Adaptationcleanup$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt)
+\item 
+template void \mbox{\hyperlink{Adaptation_8cu_a627fa126461a97fded283294fee4b86c}{Adaptationcleanup$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&XBlock, \mbox{\hyperlink{structAdaptP}{AdaptP}} \&XAdapt)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Adaptation_8cu_aa3714ebc78a153ec692e9094b5a0fd38}\label{Adaptation_8cu_aa3714ebc78a153ec692e9094b5a0fd38}} 
+\index{Adaptation.cu@{Adaptation.cu}!Adapt@{Adapt}}
+\index{Adapt@{Adapt}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{Adapt()}{Adapt()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Adapt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a185d47978609c5d1cfbd6ce1c9cdbbce}\label{Adaptation_8cu_a185d47978609c5d1cfbd6ce1c9cdbbce}} 
+\index{Adaptation.cu@{Adaptation.cu}!Adaptation@{Adaptation}}
+\index{Adaptation@{Adaptation}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{Adaptation()}{Adaptation()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Adaptation (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_af4db1427ef180609648ea129f9fca7db}\label{Adaptation_8cu_af4db1427ef180609648ea129f9fca7db}} 
+\index{Adaptation.cu@{Adaptation.cu}!Adaptation$<$ double $>$@{Adaptation$<$ double $>$}}
+\index{Adaptation$<$ double $>$@{Adaptation$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{Adaptation$<$ double $>$()}{Adaptation< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a185d47978609c5d1cfbd6ce1c9cdbbce}{Adaptation}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a8d9935e0bd636ad81c9947aa06d66703}\label{Adaptation_8cu_a8d9935e0bd636ad81c9947aa06d66703}} 
+\index{Adaptation.cu@{Adaptation.cu}!Adaptation$<$ float $>$@{Adaptation$<$ float $>$}}
+\index{Adaptation$<$ float $>$@{Adaptation$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{Adaptation$<$ float $>$()}{Adaptation< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a185d47978609c5d1cfbd6ce1c9cdbbce}{Adaptation}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a8e034c0941813f09d0437e8c600628d2}\label{Adaptation_8cu_a8e034c0941813f09d0437e8c600628d2}} 
+\index{Adaptation.cu@{Adaptation.cu}!Adaptationcleanup@{Adaptationcleanup}}
+\index{Adaptationcleanup@{Adaptationcleanup}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{Adaptationcleanup()}{Adaptationcleanup()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Adaptationcleanup (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a627fa126461a97fded283294fee4b86c}\label{Adaptation_8cu_a627fa126461a97fded283294fee4b86c}} 
+\index{Adaptation.cu@{Adaptation.cu}!Adaptationcleanup$<$ double $>$@{Adaptationcleanup$<$ double $>$}}
+\index{Adaptationcleanup$<$ double $>$@{Adaptationcleanup$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{Adaptationcleanup$<$ double $>$()}{Adaptationcleanup< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a8e034c0941813f09d0437e8c600628d2}{Adaptationcleanup}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a33bd45bb87744a71ff584f1c91b42d4d}\label{Adaptation_8cu_a33bd45bb87744a71ff584f1c91b42d4d}} 
+\index{Adaptation.cu@{Adaptation.cu}!Adaptationcleanup$<$ float $>$@{Adaptationcleanup$<$ float $>$}}
+\index{Adaptationcleanup$<$ float $>$@{Adaptationcleanup$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{Adaptationcleanup$<$ float $>$()}{Adaptationcleanup< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a8e034c0941813f09d0437e8c600628d2}{Adaptationcleanup}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_aaa50c45c77eba62be4db0a0760a6e7b0}\label{Adaptation_8cu_aaa50c45c77eba62be4db0a0760a6e7b0}} 
+\index{Adaptation.cu@{Adaptation.cu}!AddBlocks@{AddBlocks}}
+\index{AddBlocks@{AddBlocks}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{AddBlocks()}{AddBlocks()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int Add\+Blocks (\begin{DoxyParamCaption}\item[{int}]{nnewblk,  }\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
+{
+    int ib = XModel.blocks.active[ibl];
+\end{DoxyVerb}
+ if (ib == -\/1) \{ XModel.\+adapt.\+coarsen\mbox{[}ib\mbox{]} = false; XModel.\+adapt.\+refine\mbox{[}ib\mbox{]} = false; \}
+
+printf(\char`\"{}ibl=\%d; availblk\mbox{[}ibl\mbox{]}=\%d;\textbackslash{}n\char`\"{},ibl, availblk\mbox{[}ibl\mbox{]}); \begin{DoxyVerb}}
+\end{DoxyVerb}
+\mbox{\Hypertarget{Adaptation_8cu_a45634df349ece7cb3985bcbaf8d069fc}\label{Adaptation_8cu_a45634df349ece7cb3985bcbaf8d069fc}} 
+\index{Adaptation.cu@{Adaptation.cu}!AddBlocks$<$ double $>$@{AddBlocks$<$ double $>$}}
+\index{AddBlocks$<$ double $>$@{AddBlocks$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{AddBlocks$<$ double $>$()}{AddBlocks< double >()}}
+{\footnotesize\ttfamily template int \mbox{\hyperlink{Adaptation_8h_aaa50c45c77eba62be4db0a0760a6e7b0}{Add\+Blocks}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{int}]{nnewblk,  }\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a435f8b0493cbf51cd0a0ef1ecbdbea21}\label{Adaptation_8cu_a435f8b0493cbf51cd0a0ef1ecbdbea21}} 
+\index{Adaptation.cu@{Adaptation.cu}!AddBlocks$<$ float $>$@{AddBlocks$<$ float $>$}}
+\index{AddBlocks$<$ float $>$@{AddBlocks$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{AddBlocks$<$ float $>$()}{AddBlocks< float >()}}
+{\footnotesize\ttfamily template int \mbox{\hyperlink{Adaptation_8h_aaa50c45c77eba62be4db0a0760a6e7b0}{Add\+Blocks}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{int}]{nnewblk,  }\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a23c04b8fb9cc46eae83feb814600d467}\label{Adaptation_8cu_a23c04b8fb9cc46eae83feb814600d467}} 
+\index{Adaptation.cu@{Adaptation.cu}!CalcAvailblk@{CalcAvailblk}}
+\index{CalcAvailblk@{CalcAvailblk}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{CalcAvailblk()}{CalcAvailblk()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int Calc\+Availblk (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_aac33b074d744b599f1d7acfaef070334}\label{Adaptation_8cu_aac33b074d744b599f1d7acfaef070334}} 
+\index{Adaptation.cu@{Adaptation.cu}!CalcAvailblk$<$ double $>$@{CalcAvailblk$<$ double $>$}}
+\index{CalcAvailblk$<$ double $>$@{CalcAvailblk$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{CalcAvailblk$<$ double $>$()}{CalcAvailblk< double >()}}
+{\footnotesize\ttfamily template int \mbox{\hyperlink{Adaptation_8h_a23c04b8fb9cc46eae83feb814600d467}{Calc\+Availblk}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_ae4d5ac22912c73864d7f931f58c399ae}\label{Adaptation_8cu_ae4d5ac22912c73864d7f931f58c399ae}} 
+\index{Adaptation.cu@{Adaptation.cu}!CalcAvailblk$<$ float $>$@{CalcAvailblk$<$ float $>$}}
+\index{CalcAvailblk$<$ float $>$@{CalcAvailblk$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{CalcAvailblk$<$ float $>$()}{CalcAvailblk< float >()}}
+{\footnotesize\ttfamily template int \mbox{\hyperlink{Adaptation_8h_a23c04b8fb9cc46eae83feb814600d467}{Calc\+Availblk}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a9d0e0b083fad78cda118c0b558b37964}\label{Adaptation_8cu_a9d0e0b083fad78cda118c0b558b37964}} 
+\index{Adaptation.cu@{Adaptation.cu}!checkBUQsanity@{checkBUQsanity}}
+\index{checkBUQsanity@{checkBUQsanity}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{checkBUQsanity()}{checkBUQsanity()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool check\+BUQsanity (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a9ca15b549a30a9534aac68c497c80b2c}\label{Adaptation_8cu_a9ca15b549a30a9534aac68c497c80b2c}} 
+\index{Adaptation.cu@{Adaptation.cu}!checkBUQsanity$<$ double $>$@{checkBUQsanity$<$ double $>$}}
+\index{checkBUQsanity$<$ double $>$@{checkBUQsanity$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{checkBUQsanity$<$ double $>$()}{checkBUQsanity< double >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Adaptation_8h_a9d0e0b083fad78cda118c0b558b37964}{check\+BUQsanity}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_adc47067fd3ca2e493bce74d07e1d18cb}\label{Adaptation_8cu_adc47067fd3ca2e493bce74d07e1d18cb}} 
+\index{Adaptation.cu@{Adaptation.cu}!checkBUQsanity$<$ float $>$@{checkBUQsanity$<$ float $>$}}
+\index{checkBUQsanity$<$ float $>$@{checkBUQsanity$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{checkBUQsanity$<$ float $>$()}{checkBUQsanity< float >()}}
+{\footnotesize\ttfamily template bool \mbox{\hyperlink{Adaptation_8h_a9d0e0b083fad78cda118c0b558b37964}{check\+BUQsanity}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a0007c0c0d1bb030245da864af4e0efba}\label{Adaptation_8cu_a0007c0c0d1bb030245da864af4e0efba}} 
+\index{Adaptation.cu@{Adaptation.cu}!checklevel@{checklevel}}
+\index{checklevel@{checklevel}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{checklevel()}{checklevel()}}
+{\footnotesize\ttfamily bool checklevel (\begin{DoxyParamCaption}\item[{int}]{ib,  }\item[{int}]{levelib,  }\item[{int}]{neighbourib,  }\item[{int}]{levelneighbour }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a3869608912f8608152e9642498988f36}\label{Adaptation_8cu_a3869608912f8608152e9642498988f36}} 
+\index{Adaptation.cu@{Adaptation.cu}!checkneighbourdistance@{checkneighbourdistance}}
+\index{checkneighbourdistance@{checkneighbourdistance}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{checkneighbourdistance()}{checkneighbourdistance()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool checkneighbourdistance (\begin{DoxyParamCaption}\item[{double}]{dx,  }\item[{int}]{ib,  }\item[{int}]{levelib,  }\item[{T}]{blocko,  }\item[{int}]{neighbourib,  }\item[{int}]{levelneighbour,  }\item[{T}]{neighbourblocko,  }\item[{bool}]{rightortop }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_afc64c434be889b2f7ac88ecc31c36d71}\label{Adaptation_8cu_afc64c434be889b2f7ac88ecc31c36d71}} 
+\index{Adaptation.cu@{Adaptation.cu}!checkneighbourrefine@{checkneighbourrefine}}
+\index{checkneighbourrefine@{checkneighbourrefine}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{checkneighbourrefine()}{checkneighbourrefine()}}
+{\footnotesize\ttfamily int checkneighbourrefine (\begin{DoxyParamCaption}\item[{int}]{neighbourib,  }\item[{int}]{levelib,  }\item[{int}]{levelneighbour,  }\item[{bool $\ast$\&}]{refine,  }\item[{bool $\ast$\&}]{coarsen }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a05519ab2f26cb6f0735c4a46949a12c8}\label{Adaptation_8cu_a05519ab2f26cb6f0735c4a46949a12c8}} 
+\index{Adaptation.cu@{Adaptation.cu}!coarsen@{coarsen}}
+\index{coarsen@{coarsen}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{coarsen()}{coarsen()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void coarsen (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvo,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a92a49fed2c2e895253ec74ccd40605e6}\label{Adaptation_8cu_a92a49fed2c2e895253ec74ccd40605e6}} 
+\index{Adaptation.cu@{Adaptation.cu}!coarsen$<$ double $>$@{coarsen$<$ double $>$}}
+\index{coarsen$<$ double $>$@{coarsen$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{coarsen$<$ double $>$()}{coarsen< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a05519ab2f26cb6f0735c4a46949a12c8}{coarsen}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvo,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a93f57f713e135bcbed06165cc8676613}\label{Adaptation_8cu_a93f57f713e135bcbed06165cc8676613}} 
+\index{Adaptation.cu@{Adaptation.cu}!coarsen$<$ float $>$@{coarsen$<$ float $>$}}
+\index{coarsen$<$ float $>$@{coarsen$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{coarsen$<$ float $>$()}{coarsen< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a05519ab2f26cb6f0735c4a46949a12c8}{coarsen}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvo,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a8c47cd4458d2ac7dbb130f5e9fae28fd}\label{Adaptation_8cu_a8c47cd4458d2ac7dbb130f5e9fae28fd}} 
+\index{Adaptation.cu@{Adaptation.cu}!InitialAdaptation@{InitialAdaptation}}
+\index{InitialAdaptation@{InitialAdaptation}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{InitialAdaptation()}{InitialAdaptation()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Initial\+Adaptation (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a1fa02c7cba007704bc12fc10dc10a775}\label{Adaptation_8cu_a1fa02c7cba007704bc12fc10dc10a775}} 
+\index{Adaptation.cu@{Adaptation.cu}!InitialAdaptation$<$ double $>$@{InitialAdaptation$<$ double $>$}}
+\index{InitialAdaptation$<$ double $>$@{InitialAdaptation$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{InitialAdaptation$<$ double $>$()}{InitialAdaptation< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a8c47cd4458d2ac7dbb130f5e9fae28fd}{Initial\+Adaptation}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_ab9acd95f9dacf5e9596aab12d00d5f95}\label{Adaptation_8cu_ab9acd95f9dacf5e9596aab12d00d5f95}} 
+\index{Adaptation.cu@{Adaptation.cu}!InitialAdaptation$<$ float $>$@{InitialAdaptation$<$ float $>$}}
+\index{InitialAdaptation$<$ float $>$@{InitialAdaptation$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{InitialAdaptation$<$ float $>$()}{InitialAdaptation< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a8c47cd4458d2ac7dbb130f5e9fae28fd}{Initial\+Adaptation}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ \&}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a5a0fadfabf08842dd007da2684ccc63b}\label{Adaptation_8cu_a5a0fadfabf08842dd007da2684ccc63b}} 
+\index{Adaptation.cu@{Adaptation.cu}!refine@{refine}}
+\index{refine@{refine}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{refine()}{refine()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void refine (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvo,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{XEv }\end{DoxyParamCaption})}
+
+How did we miss that before\mbox{\Hypertarget{Adaptation_8cu_a8949873ccbfb5d3966f97e3bf91f6fb0}\label{Adaptation_8cu_a8949873ccbfb5d3966f97e3bf91f6fb0}} 
+\index{Adaptation.cu@{Adaptation.cu}!refine$<$ double $>$@{refine$<$ double $>$}}
+\index{refine$<$ double $>$@{refine$<$ double $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{refine$<$ double $>$()}{refine< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a5a0fadfabf08842dd007da2684ccc63b}{refine}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$}]{XEvo,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ double $>$ \&}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_ae997e097daffd8612ecbf20ab3771bdf}\label{Adaptation_8cu_ae997e097daffd8612ecbf20ab3771bdf}} 
+\index{Adaptation.cu@{Adaptation.cu}!refine$<$ float $>$@{refine$<$ float $>$}}
+\index{refine$<$ float $>$@{refine$<$ float $>$}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{refine$<$ float $>$()}{refine< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Adaptation_8h_a5a0fadfabf08842dd007da2684ccc63b}{refine}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&}]{XBlock,  }\item[{\mbox{\hyperlink{structAdaptP}{AdaptP}} \&}]{XAdapt,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$}]{XEvo,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ float $>$ \&}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Adaptation_8cu_a9e945ca4ef1a370bac958cf8c3cce311}\label{Adaptation_8cu_a9e945ca4ef1a370bac958cf8c3cce311}} 
+\index{Adaptation.cu@{Adaptation.cu}!refinesanitycheck@{refinesanitycheck}}
+\index{refinesanitycheck@{refinesanitycheck}!Adaptation.cu@{Adaptation.cu}}
+\doxysubsubsection{\texorpdfstring{refinesanitycheck()}{refinesanitycheck()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool refinesanitycheck (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{bool $\ast$\&}]{refine,  }\item[{bool $\ast$\&}]{coarsen }\end{DoxyParamCaption})}
+
