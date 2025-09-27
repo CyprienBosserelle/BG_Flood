@@ -19,14 +19,15 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |Toutput|Toutput| 0|Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for the model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
-|il| il , Rain_il , initialloss | 0.0|Initial Loss (if constant)|
-|cl| cl , Rain_cl , continuousloss | 0.0|Continuous Loss (if constant)|
+|il| il , Rain_il , initialloss | 0.0|Initial Loss value (if constant)|
+|cl| cl , Rain_cl , continuousloss | 0.0|Continuous Loss value (if constant)|
 |conserveElevation|conserveElevation| false|Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks|
 |wetdryfix| wetdryfix , reminstab , fixinstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
 |Pa2m|Pa2m| 0.00009916|Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)|
 |Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
 |doubleprecision|doubleprecision| 0|0: float precision, 1: double precision (for the solver and math)|
+|savebyblk| savebyblk , writebyblk , saveperblk , writeperblk , savebyblock , writebyblock , saveperblock , writeperblock | true||
 |engine|engine| 1|1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms |
 
 ### Grid parameters
@@ -61,6 +62,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |totaltime| totaltime , inittime , starttime , start_time , init_time , start , init | 0.0|Total simulation time in s|
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
 |dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
+|reftime| reftime , referencetime , timeref | ""|Reference time string as yyyy-mm-ddTHH:MM:SS|
 
 ### Boundaries
 |_Reference_|_Keys_|_default_|_Explanation_|
@@ -96,7 +98,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |scalefactor|scalefactor| 0.01f|Scale factor used for the short integer conversion for netcdf outputs. This follow the COARDS convention.|
 |addoffset|addoffset| 0.0f|Offset add during the short integer conversion for netcdf outputs (follow the COARDS convention)|
 
-###  ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)
+###  ParaView Catalyst parameters (special use with ParaView)
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |use_catalyst|use_catalyst| 0|Switch to use ParaView Catalyst|
@@ -105,10 +107,8 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |vtk_output_time_interval|vtk_output_time_interval| 1.0|Output time step for ParaView Catalyst|
 |vtk_outputfile_root|vtk_outputfile_root| "bg_out"|output file name for ParaView Catalyst|
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
-|rainbnd| rainbnd , rainonbnd | false|when false it force the rain foring on the bnd cells to be null.|
+|rainbnd| rainbnd , rainonbnd | false|when false it force the rain forcing on the bnd cells to be null.|
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
-|reftime| reftime , referencetime , timeref | ""|Reference time string as yyyy-mm-ddTHH:MM:SS|
-|savebyblk| savebyblk , writebyblk , saveperblk , writeperblk , savebyblock , writebyblock , saveperblock , writeperblock | true||
 
 
 ## List of the Forcings' inputs
