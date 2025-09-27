@@ -1,0 +1,1730 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="ReadForcing_8h" kind="file" language="C++">
+    <compoundname>ReadForcing.h</compoundname>
+    <includes refid="General_8h" local="yes">General.h</includes>
+    <includes refid="Input_8h" local="yes">Input.h</includes>
+    <includes refid="Param_8h" local="yes">Param.h</includes>
+    <includes refid="Write__txtlog_8h" local="yes">Write_txtlog.h</includes>
+    <includes refid="Read__netcdf_8h" local="yes">Read_netcdf.h</includes>
+    <includes refid="Forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="Util__CPU_8h" local="yes">Util_CPU.h</includes>
+    <includes refid="Setup__GPU_8h" local="yes">Setup_GPU.h</includes>
+    <includes refid="Poly_8h" local="yes">Poly.h</includes>
+    <includedby refid="BG__Flood_8h" local="yes">src/BG_Flood.h</includedby>
+    <includedby refid="InitEvolv_8h" local="yes">src/InitEvolv.h</includedby>
+    <includedby refid="ReadForcing_8cu" local="yes">src/ReadForcing.cu</includedby>
+    <includedby refid="ReadInput_8h" local="yes">src/ReadInput.h</includedby>
+    <includedby refid="Testing_8h" local="yes">src/Testing.h</includedby>
+    <includedby refid="Updateforcing_8h" local="yes">src/Updateforcing.h</includedby>
+    <incdepgraph>
+      <node id="32">
+        <label>Arrays.h</label>
+        <link refid="Arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>Forcing.h</label>
+        <link refid="Forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="General_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Input.h</label>
+        <link refid="Input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Param.h</label>
+        <link refid="Param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/ReadForcing.h</label>
+        <link refid="ReadForcing_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>Util_CPU.h</label>
+        <link refid="Util__CPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Write_txtlog.h</label>
+        <link refid="Write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="18">
+        <label>src/AdaptCriteria.h</label>
+        <link refid="AdaptCriteria_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/Adaptation.h</label>
+        <link refid="Adaptation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>src/Advection.h</label>
+        <link refid="Advection_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/BG_Flood.h</label>
+        <link refid="BG__Flood_8h_source"/>
+      </node>
+      <node id="16">
+        <label>src/Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>src/ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>src/FlowCPU.h</label>
+        <link refid="FlowCPU_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>src/FlowGPU.h</label>
+        <link refid="FlowGPU_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="FlowMLGPU_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>src/Friction.h</label>
+        <link refid="Friction_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>src/GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>src/Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>src/Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/Mainloop.h</label>
+        <link refid="Mainloop_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>src/Meanmax.h</label>
+        <link refid="Meanmax_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>src/MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>src/Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>src/Multilayer.h</label>
+        <link refid="Multilayer_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>src/Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/ReadForcing.h</label>
+        <link refid="ReadForcing_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>src/ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>src/Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>src/Reimann.h</label>
+        <link refid="Reimann_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>src/Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>src/Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/Testing.h</label>
+        <link refid="Testing_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>src/Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>src/Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>src/utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="ReadForcing_8h_1acecbceee95ca77d912e5d3b192e3e29b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readforcing</definition>
+        <argsstring>(Param &amp;XParam, Forcing&lt; T &gt; &amp;XForcing)</argsstring>
+        <name>readforcing</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; T &gt; &amp;</type>
+          <declname>XForcing</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>wrapping function for reading all the forcing data </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="15" column="17" bodyfile="src/ReadForcing.cu" bodystart="29" bodyend="392" declfile="src/ReadForcing.h" declline="15" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a9c6eda2624f150ed25afc87b26bf3161" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; <ref refid="classSLTS" kindref="compound">SLTS</ref> &gt;</type>
+        <definition>std::vector&lt; SLTS &gt; readbndfile</definition>
+        <argsstring>(std::string filename, Param &amp;XParam)</argsstring>
+        <name>readbndfile</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="17" column="13" bodyfile="src/ReadForcing.cu" bodystart="822" bodyend="911" declfile="src/ReadForcing.h" declline="17" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a11547b5ba6aaded88a9afd24fdb2d142" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; <ref refid="classSLTS" kindref="compound">SLTS</ref> &gt;</type>
+        <definition>std::vector&lt; SLTS &gt; readWLfile</definition>
+        <argsstring>(std::string WLfilename, std::string &amp;refdate)</argsstring>
+        <name>readWLfile</name>
+        <param>
+          <type>std::string</type>
+          <declname>WLfilename</declname>
+        </param>
+        <param>
+          <type>std::string &amp;</type>
+          <declname>refdate</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="18" column="13" bodyfile="src/ReadForcing.cu" bodystart="918" bodyend="997" declfile="src/ReadForcing.h" declline="18" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a0d3f4deb9291534b13100dd67c2f07a0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; <ref refid="classSLTS" kindref="compound">SLTS</ref> &gt;</type>
+        <definition>std::vector&lt; SLTS &gt; readNestfile</definition>
+        <argsstring>(std::string ncfile, std::string varname, int hor, double eps, double bndxo, double bndxmax, double bndy)</argsstring>
+        <name>readNestfile</name>
+        <param>
+          <type>std::string</type>
+          <declname>ncfile</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>varname</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>hor</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>eps</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>bndxo</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>bndxmax</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>bndy</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Read boundary Nesting data </para>
+        </detaileddescription>
+        <inbodydescription>
+<para>To Be continued</para>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="20" column="13" bodyfile="src/ReadForcing.cu" bodystart="1004" bodyend="1188" declfile="src/ReadForcing.h" declline="20" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a1a79ff76e56739730c37d33d6a53645f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; <ref refid="classFlowin" kindref="compound">Flowin</ref> &gt;</type>
+        <definition>std::vector&lt; Flowin &gt; readFlowfile</definition>
+        <argsstring>(std::string Flowfilename, std::string &amp;refdate)</argsstring>
+        <name>readFlowfile</name>
+        <param>
+          <type>std::string</type>
+          <declname>Flowfilename</declname>
+        </param>
+        <param>
+          <type>std::string &amp;</type>
+          <declname>refdate</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="22" column="13" bodyfile="src/ReadForcing.cu" bodystart="1194" bodyend="1269" declfile="src/ReadForcing.h" declline="22" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a85f7d6e9669096de5f863029321e7fce" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; <ref refid="classWindin" kindref="compound">Windin</ref> &gt;</type>
+        <definition>std::vector&lt; Windin &gt; readINfileUNI</definition>
+        <argsstring>(std::string filename, std::string &amp;refdate)</argsstring>
+        <name>readINfileUNI</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>std::string &amp;</type>
+          <declname>refdate</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="23" column="13" bodyfile="src/ReadForcing.cu" bodystart="1276" bodyend="1338" declfile="src/ReadForcing.h" declline="23" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1afd9d40a1f566bb45d7dee7cc6d6dd3cf" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; <ref refid="classWindin" kindref="compound">Windin</ref> &gt;</type>
+        <definition>std::vector&lt; Windin &gt; readWNDfileUNI</definition>
+        <argsstring>(std::string filename, std::string &amp;refdate, double grdalpha)</argsstring>
+        <name>readWNDfileUNI</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>std::string &amp;</type>
+          <declname>refdate</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>grdalpha</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="24" column="13" bodyfile="src/ReadForcing.cu" bodystart="1345" bodyend="1434" declfile="src/ReadForcing.h" declline="24" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1aa50a9f2e1aef7fe1cd0d4ae1a6aae926" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void denan</definition>
+        <argsstring>(int nx, int ny, float denanval, int *z)</argsstring>
+        <name>denan</name>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>denanval</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>z</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="26" column="6" bodyfile="src/ReadForcing.cu" bodystart="2115" bodyend="2119" declfile="src/ReadForcing.h" declline="26" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1ad8c2bd04b5b1a5107e1b652c94f35c3b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void denan</definition>
+        <argsstring>(int nx, int ny, float denanval, T *z)</argsstring>
+        <name>denan</name>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>denanval</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>z</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="27" column="18" bodyfile="src/ReadForcing.cu" bodystart="2099" bodyend="2111" declfile="src/ReadForcing.h" declline="27" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1ac2c8aa02f8230319bda8c04d8d926f43" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readDynforcing</definition>
+        <argsstring>(bool gpgpu, double totaltime, DynForcingP&lt; float &gt; &amp;Dforcing)</argsstring>
+        <name>readDynforcing</name>
+        <param>
+          <type>bool</type>
+          <declname>gpgpu</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>totaltime</declname>
+        </param>
+        <param>
+          <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; float &gt; &amp;</type>
+          <declname>Dforcing</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>This is a deprecated function! See InitDynforcing() instead </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="30" column="6" bodyfile="src/ReadForcing.cu" bodystart="503" bodyend="525" declfile="src/ReadForcing.h" declline="30" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a0a03a64eaf1d9f23bd90dde04ac88552" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+        <definition>DynForcingP&lt; float &gt; readforcinghead</definition>
+        <argsstring>(DynForcingP&lt; float &gt; Fmap, Param XParam)</argsstring>
+        <name>readforcinghead</name>
+        <param>
+          <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Fmap</declname>
+        </param>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Read Dynamic forcing meta/header data </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="33" column="13" bodyfile="src/ReadForcing.cu" bodystart="1616" bodyend="1640" declfile="src/ReadForcing.h" declline="33" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a03a01a0d223ec79d3892ececa91e4eff" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>T</type>
+        <definition>T readforcinghead</definition>
+        <argsstring>(T Fmap)</argsstring>
+        <name>readforcinghead</name>
+        <param>
+          <type>T</type>
+          <declname>Fmap</declname>
+          <defname>ForcingParam</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Read Static forcing meta/header data </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="36" column="14" bodyfile="src/ReadForcing.cu" bodystart="1648" bodyend="1738" declfile="src/ReadForcing.h" declline="36" declcolumn="14"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a847bdde03bb70f1fda59f20d55e9d207" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readstaticforcing</definition>
+        <argsstring>(T &amp;Sforcing)</argsstring>
+        <name>readstaticforcing</name>
+        <param>
+          <type>T &amp;</type>
+          <declname>Sforcing</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>single parameter version of readstaticforcing(int step,T&amp; Sforcing) readstaticforcing(0, Sforcing); </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="38" column="17" bodyfile="src/ReadForcing.cu" bodystart="401" bodyend="404" declfile="src/ReadForcing.h" declline="38" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a306a1320cbc833c3058456bd2c6df2c5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readstaticforcing</definition>
+        <argsstring>(int step, T &amp;Sforcing)</argsstring>
+        <name>readstaticforcing</name>
+        <param>
+          <type>int</type>
+          <declname>step</declname>
+        </param>
+        <param>
+          <type>T &amp;</type>
+          <declname>Sforcing</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Allocate and read static (i.e. not varying in time) forcing Used for Bathy, roughness, deformation </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="39" column="18" bodyfile="src/ReadForcing.cu" bodystart="414" bodyend="437" declfile="src/ReadForcing.h" declline="39" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a2d93dc80f4f9d2da60249113611c5e46" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readforcingdata</definition>
+        <argsstring>(int step, T forcing)</argsstring>
+        <name>readforcingdata</name>
+        <param>
+          <type>int</type>
+          <declname>step</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>forcing</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Read static forcing data </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="41" column="18" bodyfile="src/ReadForcing.cu" bodystart="1559" bodyend="1586" declfile="src/ReadForcing.h" declline="41" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a3fa1bbd9368f3a36be12b5e091995f48" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readforcingdata</definition>
+        <argsstring>(double totaltime, DynForcingP&lt; float &gt; &amp;forcing)</argsstring>
+        <name>readforcingdata</name>
+        <param>
+          <type>double</type>
+          <declname>totaltime</declname>
+        </param>
+        <param>
+          <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; float &gt; &amp;</type>
+          <declname>forcing</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Read Dynamic forcing data </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="42" column="6" bodyfile="src/ReadForcing.cu" bodystart="1596" bodyend="1610" declfile="src/ReadForcing.h" declline="42" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1ae8215efcb9518437cb6bfd2bad1297d5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readbathyHeadMD</definition>
+        <argsstring>(std::string filename, int &amp;nx, int &amp;ny, double &amp;dx, double &amp;grdalpha)</argsstring>
+        <name>readbathyHeadMD</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>int &amp;</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int &amp;</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>grdalpha</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Read MD file header data </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="43" column="6" bodyfile="src/ReadForcing.cu" bodystart="1749" bodyend="1801" declfile="src/ReadForcing.h" declline="43" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a0d12c65a96fe1d7f9f5a70956f96d54b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readbathyMD</definition>
+        <argsstring>(std::string filename, T *&amp;zb)</argsstring>
+        <name>readbathyMD</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="44" column="18" bodyfile="src/ReadForcing.cu" bodystart="1808" bodyend="1879" declfile="src/ReadForcing.h" declline="44" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1ae853fd83c25a1c55c6a495ef2dfc2cfb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readXBbathy</definition>
+        <argsstring>(std::string filename, int nx, int ny, T *&amp;zb)</argsstring>
+        <name>readXBbathy</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="45" column="18" bodyfile="src/ReadForcing.cu" bodystart="1887" bodyend="1917" declfile="src/ReadForcing.h" declline="45" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a2abd45f07ddf2a1a3d67f9c51fd859a3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void InitDynforcing</definition>
+        <argsstring>(bool gpgpu, Param &amp;XParam, DynForcingP&lt; float &gt; &amp;Dforcing)</argsstring>
+        <name>InitDynforcing</name>
+        <param>
+          <type>bool</type>
+          <declname>gpgpu</declname>
+        </param>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; float &gt; &amp;</type>
+          <declname>Dforcing</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="47" column="6" bodyfile="src/ReadForcing.cu" bodystart="446" bodyend="496" declfile="src/ReadForcing.h" declline="47" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1aa4fa6864f4f241e906cc1ecab4826011" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readbathyASCHead</definition>
+        <argsstring>(std::string filename, int &amp;nx, int &amp;ny, double &amp;dx, double &amp;xo, double &amp;yo, double &amp;grdalpha)</argsstring>
+        <name>readbathyASCHead</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>int &amp;</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int &amp;</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>xo</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>yo</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>grdalpha</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Read ASC file meta/header data </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="49" column="6" bodyfile="src/ReadForcing.cu" bodystart="1926" bodyend="2033" declfile="src/ReadForcing.h" declline="49" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a733346c52f01d60518590c3f56a08a8a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readbathyASCzb</definition>
+        <argsstring>(std::string filename, int nx, int ny, T *&amp;zb)</argsstring>
+        <name>readbathyASCzb</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="50" column="18" bodyfile="src/ReadForcing.cu" bodystart="2040" bodyend="2074" declfile="src/ReadForcing.h" declline="50" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a0d7b8d36675c4fb7f9e8ab773c10b3ec" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void InterpstepCPU</definition>
+        <argsstring>(int nx, int ny, int hdstep, float totaltime, float hddt, T *&amp;Ux, T *Uo, T *Un)</argsstring>
+        <name>InterpstepCPU</name>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>hdstep</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>totaltime</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>hddt</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>Ux</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>Uo</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>Un</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="52" column="18" declfile="src/ReadForcing.h" declline="52" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a0339053c220ea024214ab1c9b72cf8ce" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void clampedges</definition>
+        <argsstring>(int nx, int ny, T clamp, T *z)</argsstring>
+        <name>clampedges</name>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>clamp</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>z</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="54" column="18" bodyfile="src/ReadForcing.cu" bodystart="2078" bodyend="2097" declfile="src/ReadForcing.h" declline="54" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1aa6689fb75885a2d6d64ce5248b4dada5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; std::string &gt;</type>
+        <definition>std::vector&lt; std::string &gt; DelimLine</definition>
+        <argsstring>(std::string line, int n, char delim)</argsstring>
+        <name>DelimLine</name>
+        <param>
+          <type>std::string</type>
+          <declname>line</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>delim</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="56" column="13" bodyfile="src/ReadForcing.cu" bodystart="1510" bodyend="1521" declfile="src/ReadForcing.h" declline="56" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a967cd42d051264482791760e6ef6df49" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; std::string &gt;</type>
+        <definition>std::vector&lt; std::string &gt; DelimLine</definition>
+        <argsstring>(std::string line, int n)</argsstring>
+        <name>DelimLine</name>
+        <param>
+          <type>std::string</type>
+          <declname>line</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="57" column="13" bodyfile="src/ReadForcing.cu" bodystart="1523" bodyend="1552" declfile="src/ReadForcing.h" declline="57" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a5ef6fe5b2362fd76cf2494070cdf09a8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classPolygon" kindref="compound">Polygon</ref></type>
+        <definition>Polygon readPolygon</definition>
+        <argsstring>(std::string filename)</argsstring>
+        <name>readPolygon</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="58" column="9" bodyfile="src/ReadForcing.cu" bodystart="1442" bodyend="1507" declfile="src/ReadForcing.h" declline="58" declcolumn="9"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadForcing_8h_1a2f5682e418a0ef4df2f01f32b63f9f18" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classPolygon" kindref="compound">Polygon</ref></type>
+        <definition>Polygon readbndpolysegment</definition>
+        <argsstring>(bndsegment bnd, Param XParam)</argsstring>
+        <name>readbndpolysegment</name>
+        <param>
+          <type><ref refid="classbndsegment" kindref="compound">bndsegment</ref></type>
+          <declname>bnd</declname>
+        </param>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadForcing.h" line="59" column="9" bodyfile="src/ReadForcing.cu" bodystart="664" bodyend="816" declfile="src/ReadForcing.h" declline="59" declcolumn="9"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>READFORCING_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>READFORCING_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Input.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Write_txtlog.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Read_netcdf.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Setup_GPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Poly.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readforcing(<ref refid="classParam" kindref="compound">Param</ref>&amp;<sp/>XParam,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;T&gt;</ref><sp/>&amp;<sp/>XForcing);</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal">std::vector&lt;SLTS&gt;<sp/>readbndfile(std::string<sp/>filename,<sp/><ref refid="classParam" kindref="compound">Param</ref><sp/>&amp;<sp/>XParam);</highlight></codeline>
+<codeline lineno="18"><highlight class="normal">std::vector&lt;SLTS&gt;<sp/>readWLfile(std::string<sp/>WLfilename,<sp/><sp/>std::string&amp;<sp/>refdate);</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal">std::vector&lt;SLTS&gt;<sp/>readNestfile(std::string<sp/>ncfile,<sp/>std::string<sp/>varname,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>hor,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>eps,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>bndxo,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>bndxmax,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>bndy);</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal">std::vector&lt;Flowin&gt;<sp/>readFlowfile(std::string<sp/>Flowfilename,<sp/>std::string<sp/>&amp;refdate);</highlight></codeline>
+<codeline lineno="23"><highlight class="normal">std::vector&lt;Windin&gt;<sp/>readINfileUNI(std::string<sp/>filename,<sp/>std::string<sp/>&amp;refdate);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal">std::vector&lt;Windin&gt;<sp/>readWNDfileUNI(std::string<sp/>filename,<sp/>std::string<sp/>&amp;<sp/>refdate,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>grdalpha);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>denan(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>denanval,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>z);</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>denan(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>denanval,<sp/>T*<sp/>z);</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readDynforcing(</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>gpgpu,</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>totaltime,<sp/><ref refid="structDynForcingP" kindref="compound">DynForcingP&lt;float&gt;</ref>&amp;<sp/>Dforcing);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="comment">//DynForcingP&lt;float&gt;<sp/>readforcinghead(DynForcingP&lt;float&gt;<sp/>Fmap);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><ref refid="structDynForcingP" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>readforcinghead(<ref refid="structDynForcingP" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Fmap,<sp/><ref refid="classParam" kindref="compound">Param</ref><sp/>XParam);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>T<sp/>readforcinghead(T<sp/>Fmap);</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="comment">//template&lt;class<sp/>T&gt;<sp/>T<sp/>readBathyhead(T<sp/>BathyParam);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readstaticforcing(T&amp;<sp/>Sforcing);</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readstaticforcing(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>step,<sp/>T&amp;<sp/>Sforcing);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readforcingdata(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>step,<sp/>T<sp/>forcing);</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readforcingdata(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>totaltime,<sp/><ref refid="structDynForcingP" kindref="compound">DynForcingP&lt;float&gt;</ref>&amp;<sp/>forcing);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readbathyHeadMD(std::string<sp/>filename,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>&amp;nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>&amp;ny,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;dx,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;grdalpha);</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readbathyMD(std::string<sp/>filename,<sp/>T*&amp;<sp/>zb);</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readXBbathy(std::string<sp/>filename,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/>T*&amp;<sp/>zb);</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>InitDynforcing(</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>gpgpu,<sp/><ref refid="classParam" kindref="compound">Param</ref>&amp;<sp/>XParam,<sp/><ref refid="structDynForcingP" kindref="compound">DynForcingP&lt;float&gt;</ref>&amp;<sp/>Dforcing);</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readbathyASCHead(std::string<sp/>filename,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>&amp;nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>&amp;ny,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;dx,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;xo,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;yo,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>&amp;grdalpha);</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readbathyASCzb(std::string<sp/>filename,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/>T*&amp;<sp/>zb);</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>InterpstepCPU(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>hdstep,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>totaltime,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>hddt,<sp/>T*&amp;<sp/>Ux,<sp/>T*<sp/>Uo,<sp/>T*<sp/>Un);</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>clampedges(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/>T<sp/>clamp,<sp/>T*<sp/>z);</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="normal">std::vector&lt;std::string&gt;<sp/>DelimLine(std::string<sp/>line,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>n,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>delim);</highlight></codeline>
+<codeline lineno="57"><highlight class="normal">std::vector&lt;std::string&gt;<sp/>DelimLine(std::string<sp/>line,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>n);</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><ref refid="classPolygon" kindref="compound">Polygon</ref><sp/>readPolygon(std::string<sp/>filename);</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><ref refid="classPolygon" kindref="compound">Polygon</ref><sp/>readbndpolysegment(<ref refid="classbndsegment" kindref="compound">bndsegment</ref><sp/>bnd,<sp/><ref refid="classParam" kindref="compound">Param</ref><sp/>XParam);</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/ReadForcing.h"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,278 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classbndsegment" kind="class" language="C++" prot="public">
+    <compoundname>bndsegment</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classbndsegment_1a36e0deffcbc88d640f2cb4f103ab111c" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="classWindin" kindref="compound">Windin</ref> &gt;</type>
+        <definition>std::vector&lt;Windin&gt; bndsegment::data</definition>
+        <argsstring></argsstring>
+        <name>data</name>
+        <qualifiedname>bndsegment::data</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="122" column="13" bodyfile="src/Forcing.h" bodystart="122" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a9c12051e5744578328d63492e8ac0f77" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string bndsegment::inputfile</definition>
+        <argsstring></argsstring>
+        <name>inputfile</name>
+        <qualifiedname>bndsegment::inputfile</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="123" column="13" bodyfile="src/Forcing.h" bodystart="123" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a453c384cc7e8ab704b1cc596f30cbc01" prot="public" static="no" mutable="no">
+        <type><ref refid="classPolygon" kindref="compound">Polygon</ref></type>
+        <definition>Polygon bndsegment::poly</definition>
+        <argsstring></argsstring>
+        <name>poly</name>
+        <qualifiedname>bndsegment::poly</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="124" column="9" bodyfile="src/Forcing.h" bodystart="124" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a9c394cf7c6238ece0c2c7d2def8f8a65" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string bndsegment::polyfile</definition>
+        <argsstring></argsstring>
+        <name>polyfile</name>
+        <qualifiedname>bndsegment::polyfile</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="125" column="13" bodyfile="src/Forcing.h" bodystart="125" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1ae9362860f7be33c243b0da7fa4948624" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool bndsegment::on</definition>
+        <argsstring></argsstring>
+        <name>on</name>
+        <qualifiedname>bndsegment::on</qualifiedname>
+        <initializer>= false</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="126" column="6" bodyfile="src/Forcing.h" bodystart="126" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a3fd13c7ec286dbd5d3865765a1aa5b54" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool bndsegment::uniform</definition>
+        <argsstring></argsstring>
+        <name>uniform</name>
+        <qualifiedname>bndsegment::uniform</qualifiedname>
+        <initializer>= true</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="127" column="6" bodyfile="src/Forcing.h" bodystart="127" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a65bca8ab1b6c0fcb0bd6c40b7feb134c" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int bndsegment::type</definition>
+        <argsstring></argsstring>
+        <name>type</name>
+        <qualifiedname>bndsegment::type</qualifiedname>
+        <initializer>= 1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="129" column="5" bodyfile="src/Forcing.h" bodystart="129" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1af9703f8ffe1908fa13fa857c236152e1" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int bndsegment::nbnd</definition>
+        <argsstring></argsstring>
+        <name>nbnd</name>
+        <qualifiedname>bndsegment::nbnd</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="131" column="5" bodyfile="src/Forcing.h" bodystart="131" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1af765d97f525316f32604474c853ac785" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int bndsegment::nblk</definition>
+        <argsstring></argsstring>
+        <name>nblk</name>
+        <qualifiedname>bndsegment::nblk</qualifiedname>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="132" column="5" bodyfile="src/Forcing.h" bodystart="132" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a794c912ba1d29ba50028590cff05e135" prot="public" static="no" mutable="no">
+        <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+        <definition>DynForcingP&lt;float&gt; bndsegment::WLmap</definition>
+        <argsstring></argsstring>
+        <name>WLmap</name>
+        <qualifiedname>bndsegment::WLmap</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="137" column="13" bodyfile="src/Forcing.h" bodystart="137" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1af0224af4d549114f145c6e036a4ed610" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndsegmentside" kindref="compound">bndsegmentside</ref></type>
+        <definition>bndsegmentside bndsegment::left</definition>
+        <argsstring></argsstring>
+        <name>left</name>
+        <qualifiedname>bndsegment::left</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="139" column="16" bodyfile="src/Forcing.h" bodystart="139" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a0673957fe1007ffd50be077d800b5f2a" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndsegmentside" kindref="compound">bndsegmentside</ref></type>
+        <definition>bndsegmentside bndsegment::right</definition>
+        <argsstring></argsstring>
+        <name>right</name>
+        <qualifiedname>bndsegment::right</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="140" column="16" bodyfile="src/Forcing.h" bodystart="140" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a2e6be02cfaa4595192505261fec28df3" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndsegmentside" kindref="compound">bndsegmentside</ref></type>
+        <definition>bndsegmentside bndsegment::top</definition>
+        <argsstring></argsstring>
+        <name>top</name>
+        <qualifiedname>bndsegment::top</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="141" column="16" bodyfile="src/Forcing.h" bodystart="141" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegment_1a79ed325aca7b6ffb3a61b97c4dc3cf57" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndsegmentside" kindref="compound">bndsegmentside</ref></type>
+        <definition>bndsegmentside bndsegment::bot</definition>
+        <argsstring></argsstring>
+        <name>bot</name>
+        <qualifiedname>bndsegment::bot</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="142" column="16" bodyfile="src/Forcing.h" bodystart="142" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="3">
+        <label>DynForcingP&lt; float &gt;</label>
+        <link refid="structDynForcingP"/>
+        <childnode refid="4" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>Polygon</label>
+        <link refid="classPolygon"/>
+      </node>
+      <node id="6">
+        <label>TexSetP</label>
+        <link refid="structTexSetP"/>
+      </node>
+      <node id="1">
+        <label>bndsegment</label>
+        <link refid="classbndsegment"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>poly</edgelabel>
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>WLmap</edgelabel>
+        </childnode>
+        <childnode refid="7" relation="usage">
+          <edgelabel>bot</edgelabel>
+          <edgelabel>left</edgelabel>
+          <edgelabel>right</edgelabel>
+          <edgelabel>top</edgelabel>
+        </childnode>
+      </node>
+      <node id="7">
+        <label>bndsegmentside</label>
+        <link refid="classbndsegmentside"/>
+      </node>
+      <node id="4">
+        <label>forcingmap</label>
+        <link refid="classforcingmap"/>
+        <childnode refid="5" relation="public-inheritance">
+        </childnode>
+        <childnode refid="6" relation="usage">
+          <edgelabel>GPU</edgelabel>
+        </childnode>
+      </node>
+      <node id="5">
+        <label>inputmap</label>
+        <link refid="classinputmap"/>
+      </node>
+    </collaborationgraph>
+    <location file="src/Forcing.h" line="120" column="1" bodyfile="src/Forcing.h" bodystart="120" bodyend="144"/>
+    <listofallmembers>
+      <member refid="classbndsegment_1a79ed325aca7b6ffb3a61b97c4dc3cf57" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>bot</name></member>
+      <member refid="classbndsegment_1a36e0deffcbc88d640f2cb4f103ab111c" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>data</name></member>
+      <member refid="classbndsegment_1a9c12051e5744578328d63492e8ac0f77" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>inputfile</name></member>
+      <member refid="classbndsegment_1af0224af4d549114f145c6e036a4ed610" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>left</name></member>
+      <member refid="classbndsegment_1af765d97f525316f32604474c853ac785" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>nblk</name></member>
+      <member refid="classbndsegment_1af9703f8ffe1908fa13fa857c236152e1" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>nbnd</name></member>
+      <member refid="classbndsegment_1ae9362860f7be33c243b0da7fa4948624" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>on</name></member>
+      <member refid="classbndsegment_1a453c384cc7e8ab704b1cc596f30cbc01" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>poly</name></member>
+      <member refid="classbndsegment_1a9c394cf7c6238ece0c2c7d2def8f8a65" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>polyfile</name></member>
+      <member refid="classbndsegment_1a0673957fe1007ffd50be077d800b5f2a" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>right</name></member>
+      <member refid="classbndsegment_1a2e6be02cfaa4595192505261fec28df3" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>top</name></member>
+      <member refid="classbndsegment_1a65bca8ab1b6c0fcb0bd6c40b7feb134c" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>type</name></member>
+      <member refid="classbndsegment_1a3fd13c7ec286dbd5d3865765a1aa5b54" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>uniform</name></member>
+      <member refid="classbndsegment_1a794c912ba1d29ba50028590cff05e135" prot="public" virt="non-virtual"><scope>bndsegment</scope><name>WLmap</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structFluxMLP" kind="struct" language="C++" prot="public">
+    <compoundname>FluxMLP</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structFluxMLP_1a530a89934d80b1618555be1672154607" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hu</definition>
+        <argsstring></argsstring>
+        <name>hu</name>
+        <qualifiedname>FluxMLP::hu</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="79" column="3" bodyfile="src/Arrays.h" bodystart="79" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1a10a3c1968b33583e644b764b3b98548e" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T * FluxMLP&lt; T &gt;::hv</definition>
+        <argsstring></argsstring>
+        <name>hv</name>
+        <qualifiedname>FluxMLP::hv</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="79" column="7" bodyfile="src/Arrays.h" bodystart="79" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1ad1ef419c40e8269d0983d305f484fb11" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hfu</definition>
+        <argsstring></argsstring>
+        <name>hfu</name>
+        <qualifiedname>FluxMLP::hfu</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="80" column="3" bodyfile="src/Arrays.h" bodystart="80" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1a849d33368c50c881d6ac5f6adabc90e6" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T * FluxMLP&lt; T &gt;::hfv</definition>
+        <argsstring></argsstring>
+        <name>hfv</name>
+        <qualifiedname>FluxMLP::hfv</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="80" column="8" bodyfile="src/Arrays.h" bodystart="80" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1a1ba388f579392b35430bc05b84e90a22" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hau</definition>
+        <argsstring></argsstring>
+        <name>hau</name>
+        <qualifiedname>FluxMLP::hau</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="81" column="3" bodyfile="src/Arrays.h" bodystart="81" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1a2c2ec821e20356d311caa454316f9667" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T * FluxMLP&lt; T &gt;::hav</definition>
+        <argsstring></argsstring>
+        <name>hav</name>
+        <qualifiedname>FluxMLP::hav</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="81" column="8" bodyfile="src/Arrays.h" bodystart="81" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1aca5373a94cc9cd28142645a1120167b7" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::Fux</definition>
+        <argsstring></argsstring>
+        <name>Fux</name>
+        <qualifiedname>FluxMLP::Fux</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="82" column="3" bodyfile="src/Arrays.h" bodystart="82" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1ac8a5293542b5c2916e7eacdae72edea8" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T * FluxMLP&lt; T &gt;::Fvy</definition>
+        <argsstring></argsstring>
+        <name>Fvy</name>
+        <qualifiedname>FluxMLP::Fvy</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="82" column="8" bodyfile="src/Arrays.h" bodystart="82" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1a04e4113d7cc416e22d7f9608fcdbe380" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::Fuy</definition>
+        <argsstring></argsstring>
+        <name>Fuy</name>
+        <qualifiedname>FluxMLP::Fuy</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="83" column="3" bodyfile="src/Arrays.h" bodystart="83" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structFluxMLP_1a2295c90eeb5c628fdae5fdc70ee2f8b8" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T * FluxMLP&lt; T &gt;::Fvx</definition>
+        <argsstring></argsstring>
+        <name>Fvx</name>
+        <qualifiedname>FluxMLP::Fvx</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="83" column="8" bodyfile="src/Arrays.h" bodystart="83" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="76" column="1" bodyfile="src/Arrays.h" bodystart="77" bodyend="85"/>
+    <listofallmembers>
+      <member refid="structFluxMLP_1aca5373a94cc9cd28142645a1120167b7" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fux</name></member>
+      <member refid="structFluxMLP_1a04e4113d7cc416e22d7f9608fcdbe380" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fuy</name></member>
+      <member refid="structFluxMLP_1a2295c90eeb5c628fdae5fdc70ee2f8b8" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fvx</name></member>
+      <member refid="structFluxMLP_1ac8a5293542b5c2916e7eacdae72edea8" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fvy</name></member>
+      <member refid="structFluxMLP_1a1ba388f579392b35430bc05b84e90a22" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hau</name></member>
+      <member refid="structFluxMLP_1a2c2ec821e20356d311caa454316f9667" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hav</name></member>
+      <member refid="structFluxMLP_1ad1ef419c40e8269d0983d305f484fb11" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hfu</name></member>
+      <member refid="structFluxMLP_1a849d33368c50c881d6ac5f6adabc90e6" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hfv</name></member>
+      <member refid="structFluxMLP_1a530a89934d80b1618555be1672154607" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hu</name></member>
+      <member refid="structFluxMLP_1a10a3c1968b33583e644b764b3b98548e" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hv</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
