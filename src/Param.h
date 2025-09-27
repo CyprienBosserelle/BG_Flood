@@ -22,8 +22,8 @@ public:
 	int frictionmodel = 0; // Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)
 	double cf = 0.0001; // Bottom friction coefficient for the model (if constant)
 	double Cd = 0.002; // Wind drag coefficient
-	double il = 0.0; //Initial Loss (if constant)
-	double cl = 0.0; //Continuous Loss (if constant)
+	double il = 0.0; //Initial Loss value (if constant)
+	double cl = 0.0; //Continuous Loss value (if constant)
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
@@ -39,6 +39,7 @@ public:
 	int GPUDEVICE = 0; // 0: first available GPU, -1: CPU single core, 2+: other GPU
 
 	int doubleprecision = 0; // 0: float precision, 1: double precision (for the solver and math)
+	bool savebyblk = true;
 
 	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
 
@@ -82,10 +83,9 @@ public:
 	double inittime = 0.0; // Initital model time. At start of simulation inittime==totaltime
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
+	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
+	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
 
-	T_output Toutput; /* Flexible time definition for outputs (nc files)
-	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"
-	Default = First and last timne steps*/
 
 	//*Boundaries
 	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
@@ -121,6 +121,10 @@ public:
 	//std::string Bathymetryfile;// bathymetry file name
 	//inputmap Bathymetry;
 
+	T_output Toutput;
+	/* Flexible time definition for outputs (nc files)
+	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"
+	Default = First and last timne steps*/
 
 	//Timeseries output (save as a vector containing information for each Time Serie output)
 	std::vector<TSoutnode> TSnodesout;
@@ -192,7 +196,7 @@ public:
 	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs (follow the COARDS convention)
 
 #ifdef USE_CATALYST
-		//* ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)
+		//* ParaView Catalyst parameters (special use with ParaView)
 	int use_catalyst = 0; // Switch to use ParaView Catalyst
 	int catalyst_python_pipeline = 0; //Pipeline to use ParaView Catalyst
 	int vtk_output_frequency = 0; // Output frequency for ParaView Catalyst
@@ -215,7 +219,7 @@ public:
 	// deformation forcing for tsunami generation
 	//std::vector<deformmap> deform;
 	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be null.
+	bool rainbnd = false; // when false it force the rain forcing on the bnd cells to be null.
 
 	// This here should be stored in a structure at a later stage
 
@@ -225,11 +229,8 @@ public:
 	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
 	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
 
-	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
-	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
 
 
-	bool savebyblk = true;
 
 };
 
