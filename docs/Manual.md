@@ -107,6 +107,16 @@ ymax = 5.0;
 
 In the case above BG_Flood will create a grid that has a bottom left corner at the ```(xo,yo)``` coordinate and extend at least all the way to coordinate ```(xmax,ymax)```.
 
+### Resolution
+
+The base (or reference) resolution is specified by `dx. By default it is the same as the DEM but can be overule. This is useful when testing the model with a coarser mesh for a quick run.
+
+BG_Flood can build a refine mesh. In this case `dx` is the resolution of the reference level of refinement (level 0). Level 1 of refinement has a resolution of `0.5*dx`, level 2 is `0.25*dx`, level -1 is `2*dx` etc...
+
+BG_Flood will automatically calculate the topography values at each mesh nodes from the DEM. This step can require interpolation (when DEM is coarser or out of phase with the DEM) or averaging (when the mesh is coarser than the DEM). 
+!!! danger "Beware of aliasing"
+  interpolating and averaging can lead to aliasing so 
+ 
 #### top and right domain extend will not necessarily be what you specify
 The ```(xmax,ymax)``` is at least reached because the final extent of the domain depends on what resolution (`dx`) is specified and the mesh block size so that the domain covers a round number of blocks. The mesh requires strictly compatible extent, resolution and round number of block in both `x` and `y` directions.
 While this is sometimes confusing to acheive exactly, BG_Flood automatically adjust `xmax` and `ymax` to produce the mesh domain compatible with `dx` and the block size. Thus `xo`, `yo` and `dx` are always enforced.
