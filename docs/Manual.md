@@ -81,20 +81,62 @@ This input file is critical as it defines the extent of the model grid and the b
 !!! Note
     Different files can be provided to the code (using the instruction line multiple times). The code will use the last one having information at a given location when interpolating the data to create the bottom elevation (`zb`) variable.
 
-## Conputational mesh
+## Computational mesh
 
 
 !!! info "BG_Flood generates its own mesh"
 
-By default, it is a quad regular mesh based on the DEM (Digital Elevation Model) extend and resolution. 
-The extend of the mesh and resolution of the mesh can be modify by the user. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.
+BG_Flood generates its own  mesh based on the a referrence point, size and resolution ( by default extracted from the DEM (Digital Elevation Model) extent and resolution). 
+The extent of the mesh and resolution of the mesh can be overridden by the user via several options. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.
+
+The mesh is a Block Uniform Quadtree. Meaning that it is a domain similar to a quadtree except that each element of the quadtree is a regular cartesian grid of 16x16 elements.
 
 
-### Masking
+### Mesh domain/extent
+
+By default, the mesh origin, extent, and resolution are read from the DEM. when several DEMs are used (see #Bathymetry/topography files) the model domain is extracted from the first(closer to the top of the file) dem specified.
+
+THe domain can be adjusted by specifying (one or more) coordinates of the bounding box of the domain such as:
+
+```
+xo = 1.0;
+yo = 0.0;
+xmax = 6.0;
+ymax = 5.0;
+```
+
+In the case above BG_Flood will create a grid that has a bottom left corner at the ```(xo,yo)``` coordinate and extend at least all the way to coordinate ```(xmax,ymax)```.
+
+#### top and right domain extend will not necessarily be what you specify
+The ```(xmax,ymax)``` is at least reached because the final extent of the domain depends on what resolution (`dx`) is specified and the mesh block size so that the domain covers a round number of blocks. The mesh requires strictly compatible extent, resolution and round number of block in both `x` and `y` directions.
+While this is sometimes confusing to acheive exactly, BG_Flood automatically adjust `xmax` and `ymax` to produce the mesh domain compatible with `dx` and the block size. Thus `xo`, `yo` and `dx` are always enforced.
+
+!!! danger "Beware"
+    When specifying `xo`, `yo`, `xmax`, `ymax` outside of the DEM extent, BG_Flood will extrapolate the values of forcing and DEM by repeating the values on the edge of the DEM domain. 
+
+#### Example
+
+
+
+### Area of Interest: polygonal extent
+
+Instsead of a rectangular extent BG_Flood can build a mesh based on a polygon domain.
+
+By specifying ```aoi = mydomain.xy``` BG_Flood will first build a virtual mesh but only keep the block that are inside or intersect the specified polygon.
+
+!!! note
+    `xo` and `yo` are still used as reference origin of the mesh using either the default DEM values or the ones specified by the user.  Since they are not trivially know at the start of the mesh generation `xmax` and `ymax` are also used to define the maximum extent but this is only noticeable by the user in the extent of the output layers.
+
+
+
+### Topography masking
 Parts of the input bathymetry can be masked and excluded from the computation. The model extent (and locations of side boundaries) will remain the same but entire blocks can be removed from the computational memory. These area will appear as NaN in the output file. The input grid is first devided in blocks of 16x16. If all the value within a block exceed the mask value (9999 as default) then that block is excluded from memory and no computation will occur there. An "area of interest" (AOI) can also be used to select a part of the domain. If none of the cells of a block is located in this area, that block will be excluded from memory.
 The AOI is prefered other the mask method as the later can create waterfalls on the borders of the domain, specially if the rain-on-grid method is used.
 
 There are no fancy treatment of the boundaries of masked blocks so it is safer to select a mask threshold (`mask`) to keep most of the masked are dry. If water tries to cross to a masked block, The boundary of blocks are treated as Neumann (no gradient) boundaries so the bathymetry of the 2 cells adjacent to a masked block are set to the same value (the value of the second cell removed from the masked block). 
+
+#### Example
+Below is an example of di
 
 ## Boundaries
 Four type of boundaries can be applied at the edge of the model. By default neumann (no perpendicular gradient) is applied. 
