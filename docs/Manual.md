@@ -23,7 +23,12 @@ BG_Flood is a hydrodynamics model for simulating 2D depth-averaged flow. The fol
 ## Model controls
 BG_Flood model reads an instruction file (or *param* file) that tells the model what to do and what forcing files to read. when instructions are not explicitely given the model will use the default value. How to use the param file is important for making BG_Flood do what you want it to do.
 
-By default this instruction file is called ```BG_param.txt```.
+By default this instruction file is called ```BG_param.txt```and is the file BG_Flood will be looking for if it is launched without aregument. You can specify any filename you like if you launch BG_Flood this way:
+
+```
+./BG_Flood my_param_file.txt
+```
+
 
 ### BG_param.txt
 All the model inputs are controlled by the ```BG_param.txt``` file. It is a simple text file that contains the parameters of the model that the user wishes to change. While it is easy to build such file manually but also it is easy to use script and/or programming language to generate and modify text file to automatically to build and run many simulations.
@@ -42,7 +47,7 @@ bathy = mybathyfile.nc
 
 #Any number of leading space or space between the parameter name and the equal sign will be accepted. Tabs are not acceptable
     theta       =      1.0
-#Obviously you have to put the right name down (spelling and not case sensitive) otherwise the line will be ignored
+#Obviously you have to put the right name down (spelling and not case sensitive) otherwise the line will be ignored without warning
 tteettaa = 1.22
 
 #If you want to add a comment at the end of a line with a parameter you can do it after putting a semi column e.g.:
@@ -107,6 +112,7 @@ For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary le
     right = mybndfile.txt,3;
     top = mybndfile.txt,3;
 ```
+You can also specify boundary segments.
 
 ### Boundary file (for type 2 or 3)
 Water level boundary file are needed to type 2 and 3 boundaries. The files are 2 (or more) columns, one with time in the first column and water level is the other(s). Note that the time step in the file doesn't need to be constant. The model will linearly interpolated between steps in the file. The file can be either comma separated or tab separated. This is automatically detected.
