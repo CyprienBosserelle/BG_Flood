@@ -37,3 +37,108 @@ TITLE = {Coastal Flooding and Port Infrastructure: A Case Study of Apia, Samoa},
 JOURNAL = {Coasts and Ports}, 
 YEAR = {2022},
 }
+
+@article{Kurganov2002,
+     author = {Kurganov, Alexander and Levy, Doron},
+     title = {Central-upwind schemes for the {Saint-Venant} system},
+     journal = {ESAIM: Mod\'elisation math\'ematique et analyse num\'erique},
+     pages = {397--425},
+     publisher = {EDP Sciences},
+     volume = {36},
+     number = {3},
+     year = {2002},
+     doi = {10.1051/m2an:2002019},
+     mrnumber = {1918938},
+     zbl = {1137.65398},
+     language = {en},
+     url = {https://www.numdam.org/articles/10.1051/m2an:2002019/}
+}
+
+@Article{Kirstetter2021,
+AUTHOR = {Kirstetter, G. and Delestre, O. and Lagr\'ee, P.-Y. and Popinet, S. and Josserand, C.},
+TITLE = {B-flood 1.0: an open-source Saint-Venant model for flash-flood simulation using adaptive refinement},
+JOURNAL = {Geoscientific Model Development},
+VOLUME = {14},
+YEAR = {2021},
+NUMBER = {11},
+PAGES = {7117--7132},
+URL = {https://gmd.copernicus.org/articles/14/7117/2021/},
+DOI = {10.5194/gmd-14-7117-2021}
+}
+
+@article{BUTTINGERKREUZHUBER201989,
+title = {A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography},
+journal = {Advances in Water Resources},
+volume = {127},
+pages = {89-108},
+year = {2019},
+issn = {0309-1708},
+doi = {https://doi.org/10.1016/j.advwatres.2019.03.010},
+url = {https://www.sciencedirect.com/science/article/pii/S0309170818305335},
+author = {Andreas Buttinger-Kreuzhuber and Zsolt Horváth and Sebastian Noelle and Günter Blöschl and Jürgen Waser},
+keywords = {Shallow water, Saint-Venant, Slope source term, Well-balanced scheme, Second-order reconstruction},
+abstract = {This paper presents a finite volume scheme on structured grids to simulate shallow flows over complex terrain. The situation of shallow downhill flow over a step is particularly challenging for most shallow water schemes. We study this situation in detail and devise a novel second-order reconstruction strategy, which gives superior results over former hydrostatic reconstruction (HR) schemes. The reconstruction step is based on a recent first-order hydrostatic reconstruction HR method, which improves shallow flows over steps. The proposed second-order scheme is well-balanced, positivity-preserving, and handles dry cells. When compared with the original HR, we lower the computational burden by using a simplified quadrature for the bed slope source term. We test the scheme on various benchmark setups to assess accuracy and robustness, where the method produces comparable results to other HR-based schemes in most cases and superior results in the case of shallow downhill flow over steps. The novel second-order scheme is capable of simulating large-scale real-world flood scenarios fast and accurately.}
+}
+
+@Article{Kurganov-Petrova2007,
+AUTHOR = {Alexander Kurganov and Guergana Petrova},
+TITLE = {A Second-Order Well-Balanced Positivity Preserving Central-Upwind Scheme for the Saint-Venant System},
+JOURNAL = {Communications in Mathematical Sciences},
+VOLUME = {5},
+YEAR = {2007},
+NUMBER = {1},
+PAGES = {133-160},
+URL = {https://www.aimsciences.org/article/doi/10.4310/CMS.2007.v5.n1.a7},
+DOI = {10.4310/CMS.2007.v5.n1.a7}
+}
+
+@article{XIA201887,
+title = {A new efficient implicit scheme for discretising the stiff friction terms in the shallow water equations},
+journal = {Advances in Water Resources},
+volume = {117},
+pages = {87-97},
+year = {2018},
+issn = {0309-1708},
+doi = {https://doi.org/10.1016/j.advwatres.2018.05.004},
+url = {https://www.sciencedirect.com/science/article/pii/S0309170818302124},
+author = {Xilin Xia and Qiuhua Liang},
+keywords = {Shallow water equations, Friction source terms, Implicit scheme, Stiff relaxation, Overland flow, Finite volume method},
+abstract = {Discretisation of the friction terms to ensure numerical stability and accuracy remains to be challenging for the development of robust numerical schemes to solve the shallow water equations (SWEs), particularly for applications involving very shallow flows (e.g. overland flows and wet/dry fronts) over complex domain topography. The key challenge is to ensure relaxation of the flow towards an equilibrium state characterised by the balance between friction and gravity in a computationally efficient way. To overcome this numerical challenge, this paper proposes a novel approach for discretising the friction source terms in the SWEs in the context of an explicit finite volume method. The overall numerical scheme adopts the HLLC Riemann solver and surface reconstruction method (SRM) to explicitly discretise the flux and bed slope source terms. Whilst a fully implicit scheme is used to handle the friction source terms, solution to the implicit formulation is analytically derived to explicitly update the flow variables. Compared with the existing approaches, the proposed scheme effectively resolves the issue associated with stiff relaxation without necessity to use an iteration method and it supports efficient simulation using time steps controlled only by the Courant–Friedrichs–Levy (CFL) condition. The current friction term discretisation scheme is not coupled with flux and bed slope calculation and therefore may be readily implemented in any other explicit finite volume SWE models. After being successfully validated against two benchmark tests with analytical solutions, the resulting new SWE model is applied to reproduce a rainfall-flooding event in the Upper Lee catchment in the UK.}
+}
+
+@article{Iwagaki1955,
+title = {Fundamental Studies on the Runoff Analysis by Characteristics},
+author = {Yuichi Iwagaki},
+year = {1955},
+publisher = {Disaster Prevention Research Institute, Kyoto University},
+address = {Kyoto, Japan},
+volume = {10},
+number = {FG-22},
+url = {https://public.ucrlib.aspace.cdlib.org/repositories/5/archival_objects/581960},
+abstract = {This is a fundamental study on runoff analysis by characteristics. The equation of motion and
+the equation of continuity are transformed into characteristic form, and the equations are solved by the method of characteristics. The results are compared with those obtained by the method of finite differences. The study includes the effects of friction and slope of the channel bed.},
+note = {Box: 9, Item: FG-22. Hans A. Einstein Flow collection, MS-89/4. Water Resources Collections & Archives. Accessed September 30, 2025.}
+}
+
+
+@article{Popinet2011,
+author = {Popinet, Stéphane},
+year = {2011},
+month = {09},
+pages = {1261-1285},
+title = {Quadtree-adaptive tsunami modelling},
+volume = {61},
+journal = {Ocean Dynamics},
+doi = {10.1007/s10236-011-0438-z}
+}
+
+@article{Aureli2020,
+author = {Aureli, Andrea and Popinet, Stéphane},
+year = {2020},
+month = {06},
+pages = {1-20},
+title = {A new approach to tsunami wave modeling using adaptive mesh refinement},
+volume = {70},
+journal = {Ocean Dynamics},
+doi = {10.1007/s10236-020-01373-5}
+}
