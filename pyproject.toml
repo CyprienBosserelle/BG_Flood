@@ -18,6 +18,8 @@ dependencies= [
     "mkdocs-glightbox>=0.4",
     "pypandoc-binary>=1.15",
     "mkdocs-video>=1.5.0",
+    "mkdocs-jupyter>=0.25.1",
+    "jupyter>=1.1.1",
 ]
 
 [project.urls]

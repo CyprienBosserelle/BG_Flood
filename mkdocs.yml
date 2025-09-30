@@ -22,9 +22,10 @@ plugins:
   - search
   - mkdocs-video
   - glightbox
+  - mkdocs-jupyter
   #- awesome-nav
   - mkdoxy:
-      #doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
+      doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
       projects:
         BGFlood: # name of project must be alphanumeric + numbers (without spaces)
           src-dirs: src/ # path to source code (support multiple paths separated by space) => INPUT
@@ -53,6 +54,8 @@ nav:
       - 'Gaussian wave' : 'tutorial/Gaussian_Wave_Julia.md'
       - 'Transpacific tsunami': 'tutorial/Transpacific_tsunami.md'
       - 'Monai and Julia': 'tutorial/TutorialMonaiJulia.md'
+      - 'Rain on grid, experimental valley': 'tutorial/Rain_CEA2008.ipynb'
+      - 'Rain on grid, variable slope and intensity': 'tutorial/RainMap_Aureli2020.ipynb'
 
   - Modules:
       - 'Ground infiltration': 'modules/RainLoss_ILCL-model.md'
@@ -98,6 +101,8 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  # Jupyter notebooks
+  - codehilite
   # Latex
   - pymdownx.arithmatex:
       generic: true
