@@ -5,7 +5,7 @@
      Even if the code can run on CPU (for testing purposes for example), it will be performant on NVIDIA GPUs. The best performances
      are observed on large NVIDIA GPUs on supercomputers.
 
-The code has only two main dependencies:
+The code has only two dependencies:
 
 - CUDA
 - netcdf
@@ -14,7 +14,7 @@ The code has only two main dependencies:
 ## :fontawesome-brands-windows: Windows 10 - 11
 
 On windows OS you should be able to use the binaries/executable we make available in each [release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest).
-Simply download and unzip the file in a suitable directory and either add the folder to your PATH or move the dll and .exe around where you want to run. 
+Simply download and unzip the file in a suitable directory and either add the folder to your PATH or move the dlls and .exe around where you want to run. 
 
 ### Build from source
 To build BG_Flood from source on Windows you will need to have pre-install:
@@ -70,7 +70,7 @@ make
 
 ## :material-server: Supercomputers
 
-The code can be run on local machines with NVIDIA GPU but it will get better performance by running on large GPU.
+The code can be run on local machines with NVIDIA GPU but it will get better performance by running on large GPU.Below are example of installation and running procedures on HPC the develloper used.
 
 ### ESNZ supercomputer: Cascade
 This machine is set-up using stack and all tools need to be install through it before compiling/running the code.
