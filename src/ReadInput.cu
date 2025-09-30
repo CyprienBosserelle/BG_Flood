@@ -30,6 +30,21 @@
 * template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input, DynForcingP<float> outinfo);
 * template deformmap<float> readfileinfo<deformmap<float>>(std::string input, deformmap<float> outinfo);
 */
+/**
+ * @brief Parse a parameter string and update the parameter structure.
+ * Parses a line from the parameter file and updates the given parameter structure.
+ * Convert file name into name and extension. 
+ * This is used for various input classes
+ * template inputmap readfileinfo<inputmap>(std::string input, inputmap outinfo);
+ * template forcingmap readfileinfo<forcingmap>(std::string input, forcingmap outinfo);
+ * template StaticForcingP<float> readfileinfo<StaticForcingP<float>>(std::string input, StaticForcingP<float> outinfo);
+ * template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input, DynForcingP<float> outinfo);
+ * template deformmap<float> readfileinfo<deformmap<float>>(std::string input, deformmap<float> outinfo);
+ *
+ * @param line Input line from parameter file
+ * @param param Parameter structure to update
+ * @return Updated parameter structure
+ */
 template <class T> T readfileinfo(std::string input, T outinfo)
 {
 	// Outinfo is based on an inputmap (or it's sub classes)
@@ -78,6 +93,14 @@ template deformmap<float> readfileinfo<deformmap<float>>(std::string input, defo
 * Open the BG_param.txt file and read the parameters
 * save the parameter in the Param class and or Forcing class.
 */
+/**
+ * @brief Read and parse the parameter file.
+ * Opens the specified parameter file (default: BG_param.txt file), reads its contents, and updates the provided
+ * parameter structures: Param class (XParam) and Forcing class (XForcing).
+ * @param XParam Reference to the parameter structure to be updated
+ * @param XForcing Reference to the forcing structure to be updated
+ * @param Paramfile Name of the parameter file to read
+ */
 void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfile)
 {
 	//
@@ -123,8 +146,19 @@ void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfil
 
 /*! \fn Param readparamstr(std::string line, Param param)
 * Read BG_param.txt line and convert parameter to the righ parameter in the class
-* retrun an updated Param class
+* return an updated Param class
 */
+/**
+ * @brief Parse a parameter string and update the parameter structure.
+ *
+ * Parses a line from the parameter file and updates the given parameter structure.
+ * Read BG_param.txt line and convert parameter to the right parameter in the class
+ * Return an updated Param class
+ *
+ * @param line Input line from parameter file
+ * @param param Parameter structure to update
+ * @return Updated parameter structure
+ */
 Param readparamstr(std::string line, Param param)
 {
 
@@ -844,6 +878,16 @@ Param readparamstr(std::string line, Param param)
 * Read BG_param.txt line and convert parameter to the righ parameter in the class
 * return an updated Param class
 */
+/**
+ * @brief Parse a parameter string and update the forcing structure.
+ * Parses a line from the parameter file and updates the given forcing structure.
+ * Read BG_param.txt line and convert parameter to the right parameter in the class	
+ * Return an updated Forcing class
+ * 
+ * @param line Input line from parameter file
+ * @param forcing Forcing structure to update
+ * @return Updated forcing structure
+ */
 template <class T>
 Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 {
@@ -1161,10 +1205,15 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 }
 
 
-/*! \fn void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
-* Check the Sanity of both Param and Forcing class
-* If required some parameter are infered
-*/
+
+/**
+ * @brief Check and adjust the sanity of model parameters and forcing data.
+ * This function checks the sanity of the model parameters and forcing data.
+ * It adjusts parameters as needed, ensuring they are within acceptable ranges
+ * and consistent with each other.
+ * @param XParam Reference to the model parameters structure to be checked and adjusted.
+ * @param XForcing Reference to the forcing data structure to be checked and adjusted.
+ */
 void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 {
 	Param DefaultParams;
@@ -1578,6 +1627,14 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 }
 
 //Initialise default values for Toutput (output times for map outputs)
+/**
+ * @brief Initialise the Toutput structure with output times.
+ * This function reads the output times from a specified input string
+ * and ensures that the times are within the simulation time range.
+ * If no valid times are provided, it defaults to using the total time and end time.
+ * @param Toutput_loc Reference to the T_output structure to be initialised.
+ * @param XParam The Param structure containing simulation parameters.
+ */
 void InitialiseToutput(T_output& Toutput_loc, Param XParam)
 {
 	
@@ -1597,10 +1654,15 @@ void InitialiseToutput(T_output& Toutput_loc, Param XParam)
 	
 }
 
-/*! \fn double setendtime(Param XParam,Forcing<float> XForcing)
-* Calculate/modify endtime based on maximum time in forcing
-*
-*/
+
+/**
+ * @brief Adjust the simulation "endtime" based on maximum time in forcings.
+ * This function checks the end times of boundary forcing data and adjusts
+ * the simulation end time if any boundary forcing ends before the specified end time.
+ * A warning is logged if the end time is reduced.
+ * @param XParam The Param structure containing simulation parameters, including the initial end time.
+ * @param XForcing The Forcing structure containing boundary forcing data.
+ */
 double setendtime(Param XParam, Forcing<float> XForcing)
 {
 	//endtime cannot be bigger than the smallest time set in a boundary
@@ -1636,10 +1698,15 @@ double setendtime(Param XParam, Forcing<float> XForcing)
 	return endtime;
 }
 
-/*! \fn std::string findparameter(std::string parameterstr, std::string line)
-* separate parameter from value
-*
-*/
+
+/**
+ * @brief Find and extract the value of a specified parameter from a configuration line.
+ * This function searches for a specified parameter in a given line of text,
+ * and extracts its associated value if found. It handles comments and whitespace appropriately.
+ * @param parameterstr The parameter name to search for.
+ * @param line The line of text to search within.
+ * @return The extracted parameter value as a string, or an empty string if the parameter is not found.
+ */
 std::string findparameter(std::vector<std::string> parameterstr, std::string line)
 {
 	std::size_t found;
@@ -1687,7 +1754,14 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 	//return parameternumber;
 }
 
-
+/**
+ * @brief Find and extract the value of a specified parameter from a configuration line.
+ * This function searches for a specified parameter in a given line of text,
+ * and extracts its associated value if found. It handles comments and whitespace appropriately.
+ * @param parameterstr The parameter name to search for.
+ * @param line The line of text to search within.
+ * @return The extracted parameter value as a string, or an empty string if the parameter is not found.
+ */
 std::string findparameter(std::string parameterstr, std::string line)
 {
 	std::vector<std::string> parametervec;
@@ -1697,10 +1771,15 @@ std::string findparameter(std::string parameterstr, std::string line)
 }
 
 
-/*! \fn void split(const std::string &s, char delim, std::vector<std::string> &elems)
-* split string based in character
-*
-*/
+
+/**
+ * @brief Split a string into tokens based on a specified delimiter, skipping empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Empty tokens resulting from consecutive delimiters are skipped.
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ * @param elems A reference to a vector where the resulting substrings will be stored.
+ */
 void split(const std::string& s, char delim, std::vector<std::string>& elems) {
 	std::stringstream ss;
 	ss.str(s);
@@ -1714,10 +1793,15 @@ void split(const std::string& s, char delim, std::vector<std::string>& elems) {
 	}
 }
 
-/*! \fn std::vector<std::string> split(const std::string &s, char delim)
-* split string based in character
-*
-*/
+
+/**
+ * @brief Split a string into tokens based on a specified character delimiter, skipping empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Empty tokens resulting from consecutive delimiters are skipped.	
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ * @return A vector containing the resulting substrings.
+ */
 std::vector<std::string> split(const std::string& s, char delim) {
 	std::vector<std::string> elems;
 	split(s, delim, elems);
@@ -1730,6 +1814,14 @@ std::vector<std::string> split(const std::string& s, char delim) {
 * split string based in character, conserving empty item
 *
 */
+/**
+ * @brief Split a string into tokens based on a specified delimiter, preserving empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.	
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ * @param elems A reference to a vector where the resulting substrings will be stored.
+ */
 void split_full(const std::string& s, char delim, std::vector<std::string>& elems) {
 	std::stringstream ss;
 	ss.str(s);
@@ -1750,13 +1842,26 @@ void split_full(const std::string& s, char delim, std::vector<std::string>& elem
 * split string based in character, conserving empty items
 *
 */
+/**
+ * @brief Split a string into tokens based on a specified character delimiter, preserving empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.	
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ */
 std::vector<std::string> split_full(const std::string& s, char delim) {
 	std::vector<std::string> elems;
 	split_full(s, delim, elems);
 	return elems;
 }
 
-
+/**
+ * @brief Split a string into tokens based on a specified substring delimiter.
+ * This function takes a string and splits it into a vector of substrings using the specified substring delimiter.
+ * @param s The input string to be split.
+ * @param delim The substring used as the delimiter for splitting the string.
+ * @return A vector containing the resulting substrings.
+ */
 std::vector<std::string> split(const std::string s, const std::string delim)
 {
 	size_t ide = 0;
@@ -1797,6 +1902,13 @@ std::vector<std::string> split(const std::string s, const std::string delim)
 * remove leading and trailing space in a string
 *
 */
+/**
+ * @brief Trim leading and trailing whitespace from a string.
+ * This function removes all leading and trailing characters from the input string
+ * that are present in the specified whitespace string.
+ * @param str The input string to be trimmed.
+ * @param whitespace A string containing all characters considered as whitespace.
+ */
 std::string trim(const std::string& str, const std::string& whitespace)
 {
 	const auto strBegin = str.find_first_not_of(whitespace);
@@ -1813,6 +1925,13 @@ std::string trim(const std::string& str, const std::string& whitespace)
 * case non-sensitive string comparison (return 0 if the same, as for the "compare" function)
 *
 */
+/**
+ * @brief Perform a non case-insensitive comparison between two strings or a string and a vector of strings.
+ * This function converts both strings to lowercase and compares them.
+ * If a vector of strings is provided, it compares the first string against each string in the vector.
+ * @param s1 The first string to compare.
+ * @param s2 The second string to compare, or a vector of strings to compare against
+ */
 std::size_t case_insensitive_compare(std::string s1, std::string s2)
 {
 	//Convert s1 and s2 to lower case strings
@@ -1822,6 +1941,12 @@ std::size_t case_insensitive_compare(std::string s1, std::string s2)
 	return s1.compare(s2);
 }
 
+/**
+ * @brief Perform a non case-insensitive comparison between a string and a vector of strings.
+ * This function converts the first string to lowercase and compares it against each string in the vector.	
+ * @param s1 The first string to compare.
+ * @param vecstr The vector of strings to compare against.
+ */
 std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> vecstr)
 {
 	std::size_t found;
@@ -1837,7 +1962,14 @@ std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> ve
 	return found;
 }
 
-
+/**
+ * @brief Read boundary segment information from a parameter value string for a specific side.
+ * This function parses a parameter value string to extract boundary segment information,
+ * including type, input file, and polygon file for a specified side.
+ * It also reads file information and sets the expected type of input based on the file extension.
+ * @param parametervalue The parameter value string containing boundary segment information.
+ * @param side The side (e.g., "left", "right", "top", "bot") for which the boundary segment is defined.
+ */
 bndsegment readbndlineside(std::string parametervalue, std::string side)
 {
 	bndsegment bnd;
@@ -1893,7 +2025,13 @@ bndsegment readbndlineside(std::string parametervalue, std::string side)
 	return bnd;
 }
 
-
+/**
+ * @brief Read boundary segment information from a parameter value string.
+ * This function parses a parameter value string to extract boundary segment information,
+ * including type, input file, and polygon file.
+ * It also reads file information and sets the expected type of input based on the file extension.
+ * @param parametervalue The parameter value string containing boundary segment information.
+ */
 bndsegment readbndline(std::string parametervalue)
 {
 	//bndseg = area.txt, waterlevelforcing, 1;
@@ -1947,7 +2085,14 @@ bndsegment readbndline(std::string parametervalue)
 }
 
 
-
+/**
+ * @brief Convert a parameter string to a boolean value, with a default fallback.
+ * This function interprets a parameter string as a boolean value, returning true for
+ * recognized true values and false for recognized false values. If the string does not match any known values,
+ * it returns a specified default value.	
+ * @param paramstr The parameter string to be interpreted.
+ * @param defaultval The default boolean value to return if the string does not match known values
+ */
 bool readparambool(std::string paramstr, bool defaultval)
 {
 	bool out = defaultval;
@@ -1974,7 +2119,14 @@ bool readparambool(std::string paramstr, bool defaultval)
 //	return (stat(name.c_str(), &buffer) == 0);
 //}
 
-
+/**
+ * @brief Split a comma-separated parameter string into a vector of strings.
+ * 
+ * This function takes a parameter string containing values separated by commas
+ * and splits it into a vector of individual strings.
+ * @param paramstr The parameter string to be split.
+ * @return A vector of strings obtained by splitting the input string at commas.
+ */
 std::vector<std::string> ReadToutSTR(std::string paramstr)
 {
 	std::vector<std::string> Toutputpar = split(paramstr, ',');
@@ -1982,7 +2134,17 @@ std::vector<std::string> ReadToutSTR(std::string paramstr)
 
 }
 
-
+/**
+ * @brief Read and interpret a time value string, converting it to a double within specified bounds.
+ * This function interprets a time value string, which can represent specific keywords
+ * ("start", "end"), relative times, or absolute date-time strings. It converts the	
+ * string to a double value representing time, ensuring it falls within the provided start and end bounds.
+ * @param timestr The time value string to be interpreted.
+ * @param start The start time bound.
+ * @param end The end time bound.
+ * @param reftime The reference time for interpreting absolute date-time strings.
+ * @return A double value representing the interpreted time, constrained within the start and end bounds.
+ */
 double ReadTvalstr(std::string timestr,double start, double end,std::string reftime)
 {
 	double time = 0.0;
@@ -2012,6 +2174,18 @@ double ReadTvalstr(std::string timestr,double start, double end,std::string reft
 
 }
 
+/**
+ * @brief Read and interpret a time range string, converting it to a vector of doubles within specified bounds.
+ * This function interprets a time range string formatted as "t_init:t_step:t_end", where each component can be
+ * a specific time value or a keyword representing the start or end of the overall time range.
+ * It converts the range into a vector of double values representing discrete time steps,
+ * ensuring all values fall within the provided start and end bounds.
+ * @param timestr A vector of strings representing the time range components: [t_init, t_step, t_end].
+ * @param start The start time bound.
+ * @param end The end time bound.
+ * @param reftime The reference time for interpreting absolute date-time strings.
+ * @return A vector of double values representing the interpreted time steps within the specified range.	
+ */
 std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start, double end, std::string reftime)
 {
 	double init = 0.0;
@@ -2079,7 +2253,14 @@ std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start
 
 }
 
-
+/**
+ * @brief Convert an approximate time string to a double value in seconds.
+ * This function interprets a time string that may include a numeric value followed by a time unit
+ * (e.g., "seconds", "minutes", "hours", "days", "months", "years") and converts it to a double value
+ * representing the equivalent time in seconds. If the unit is not recognized, it defaults to seconds.
+ * @param input The approximate time string to be converted (e.g., "10 minutes", "2.5 hours").
+ * @return A double value representing the time in seconds.
+ */
 double readApproxtimestr(std::string input)
 {
 	double time = 0.0;
@@ -2139,7 +2320,16 @@ double readApproxtimestr(std::string input)
 	return time;
 }
 
-
+/**
+ * @brief Read and interpret output time specifications from a vector of parameter strings.
+ * This function processes a vector of parameter strings that specify output times,	
+ * which can include individual time values or ranges defined by a start, step, and end.
+ * It converts these specifications into a vector of double values representing the output times,
+ * ensuring all times fall within the simulation's total time and end time.
+ * @param paramstr A vector of strings specifying output times or ranges.
+ * @param XParam The Param structure containing simulation parameters, including total time and end time.
+ * @return A vector of double values representing the interpreted output times.
+ */
 std::vector<double> ReadToutput(std::vector<std::string> paramstr,Param XParam)
 {
 	//

@@ -1,3 +1,10 @@
+/**
+ * @file Mesh.cu
+ * @brief Mesh initialization and management routines for BG_Flood GPU model.
+ *
+ * Contains functions for block-based mesh setup, memory allocation, block adaptation,
+ * and block neighbor initialization.
+ */
 //////////////////////////////////////////////////////////////////////////////////
 //                                                                              //
 //Copyright (C) 2018 Bosserelle                                                 //
@@ -18,6 +25,15 @@
 
 #include "Mesh.h"
 
+/**
+ * @brief Calculates the initial number of blocks for the mesh.
+ * @param XParam Model parameters (resolution, block size, etc.)
+ * @param XForcing Forcing data (bathymetry, AOI polygon, etc.)
+ * @return Number of blocks to allocate for the mesh.
+ *
+ * This function divides the domain into uniform blocks, checks masking and AOI,
+ * and counts blocks that are active for computation.
+ */
 int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 {
 
@@ -104,6 +120,15 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	return nblk;
 }
 
+/**
+ * @brief Initializes the mesh and allocates memory for blocks.
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure to hold mesh and block data
+ *
+ * Allocates memory, initializes block info, adaptation info, and boundary masks.
+ */
 template <class T>
 void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 {
@@ -151,6 +176,13 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 template void InitMesh<float>(Param &XParam, Forcing<float>& XForcing, Model<float> &XModel);
 template void InitMesh<double>(Param &XParam, Forcing<float>& XForcing, Model<double> &XModel);
 
+/**
+ * @brief Initializes block information (active status, level, coordinates, neighbors).
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XBlock Block data structure
+ */
 template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, BlockP<T>& XBlock)
 {
 	//============================
@@ -178,6 +210,13 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, B
 
 }
 
+/**
+ * @brief Initializes block adaptation arrays for mesh refinement/coarsening.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdap Adaptation data structure
+ */
 template <class T> void InitBlockadapt(Param &XParam, BlockP<T> XBlock, AdaptP& XAdap)
 {
 		InitBlkBUQ(XParam, XBlock, XParam.initlevel, XAdap.newlevel);
@@ -204,6 +243,17 @@ template void InitBlockadapt<double>(Param &XParam, BlockP<double> XBlock, Adapt
 
 
 
+/**
+ * @brief Initializes block coordinates and active status for the mesh.
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XBlock Block data structure
+ *
+ * Sets block coordinates and marks active blocks based on mask and AOI polygon.
+ * Loops over all blocks, checks if each block is inside the area of interest (AOI),
+ * and if the mask threshold is met, sets the block as active and stores its coordinates.
+ */
 template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, BlockP<T> &XBlock)
 {
 
@@ -299,6 +349,15 @@ template void InitBlockxoyo<float>(Param XParam, Forcing<float> XForcing, BlockP
 template void InitBlockxoyo<double>(Param XParam, Forcing<float> XForcing, BlockP<double> & XBlockP);
 
 template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForcing,  BlockP<T>& XBlock)
+/**
+ * @brief Initializes neighbor relationships for each block in a uniform mesh.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XBlock Block data structure
+ *
+ * Sets up neighbor indices for each block (left, right, top, bottom, corners).
+ */
 {
 	// This function will only work if the blocks are uniform
 	// A separate function is used for adaptivity
@@ -377,6 +436,13 @@ template void InitBlockneighbours<double>(Param &XParam, Forcing<float>& XForcin
 
 
 
+/**
+ * @brief Calculates the number of blocks with masked neighbors (for boundary handling).
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @return Number of blocks with masked neighbors.
+ */
 template <class T> int CalcMaskblk(Param XParam, BlockP<T> XBlock)
 {
 	int nmask = 0;
@@ -431,6 +497,14 @@ template int CalcMaskblk<double>(Param XParam, BlockP<double> XBlock);
 
 
 
+/**
+ * @brief Identifies and stores blocks with masked sides for boundary processing.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ *
+ * Populates mask arrays for blocks with masked sides for later boundary condition handling.
+ */
 template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 {
 

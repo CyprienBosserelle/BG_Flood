@@ -1,6 +1,17 @@
 #include "FlowCPU.h"
 
 
+/**
+ * @brief Main CPU flow solver for the flood model.
+ *
+ * Executes predictor and corrector steps, applies atmospheric, wind, and river forcing, updates advection and friction terms, and manages halo and gradient reconstruction for all blocks.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XLoop Loop control and time stepping
+ * @param XForcing Forcing data (atmospheric, wind, river, rain)
+ * @param XModel Model data structure
+ */
 template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XForcing, Model<T> XModel)
 {
 	//============================================
@@ -248,8 +259,19 @@ template void FlowCPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> 
 
 /*! \fn  void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 * Debugging flow step
-* This function was crated to debug the main engine of the model
+* This function was created to debug the main engine of the model
 */
+/**
+ * @brief Debugging flow step for the flood model.
+ *
+ * Runs a simplified flow step for debugging the main engine, including forcing, advection, friction, and halo/gradient reconstruction.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XLoop Loop control and time stepping
+ * @param XForcing Forcing data (atmospheric, wind, river, rain)
+ * @param XModel Model data structure
+ */
 template <class T> void HalfStepCPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
 	if (XParam.atmpforcing)

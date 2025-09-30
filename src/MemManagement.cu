@@ -5,17 +5,50 @@
 #define MEMORY_ALIGNMENT  4096
 #define ALIGN_UP(x,size) ( ((size_t)x+(size-1))&(~(size-1)) )
 
+/**
+ * @brief Compute memory index for a cell in a block (using Param).
+ *
+ * Calculates the linear memory index for a cell in a block using model parameters.
+ *
+ * @param XParam Model parameters
+ * @param i Cell x-index
+ * @param j Cell y-index
+ * @param ib Block index
+ * @return Linear memory index
+ */
 __host__ int memloc(Param XParam, int i, int j, int ib)
 {
 	return (i+XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 }
 
 
+/**
+ * @brief Compute memory index for a cell in a block (using explicit sizes).
+ *
+ * Calculates the linear memory index for a cell in a block using explicit halo and block sizes.
+ *
+ * @param halowidth Halo width
+ * @param blkmemwidth Block memory width
+ * @param i Cell x-index
+ * @param j Cell y-index
+ * @param ib Block index
+ * @return Linear memory index
+ */
 __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int ib)
 {
 	return (i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth* blkmemwidth);
 }
 
+/**
+ * @brief Allocate memory for a single array on the CPU.
+ *
+ * Allocates memory for the given array and checks for allocation failure.
+ *
+ * @tparam T Data type (float or int)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param zb Array to allocate
+ */
 template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zb)
 {
 	zb = (T *)malloc(nx*ny * sizeof(T));
@@ -27,6 +60,17 @@ template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zb)
 	}
 }
 
+/**
+ * @brief Fill a CPU array with a specified value.
+ *
+ * Sets all elements of the array to the given fill value.
+ *
+ * @tparam T Data type (float, double, int)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param fillval Value to fill
+ * @param zb Array to fill
+ */
 template <class T> __host__ void FillCPU(int nx, int ny,T fillval, T*& zb)
 {
 	for (int ix = 0; ix < nx; ix++)
@@ -41,6 +85,19 @@ template void FillCPU<double>(int nx, int ny, double fillval, double*& zb);
 template void FillCPU<float>(int nx, int ny, float fillval, float*& zb);
 template void FillCPU<int>(int nx, int ny, int fillval, int*& zb);
 
+/**
+ * @brief Allocate memory for multiple arrays (zs, h, u, v) on the CPU.
+ *
+ * Allocates memory for the given arrays.
+ *
+ * @tparam T Data type (float, double, int)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param zs Array to allocate
+ * @param h Array to allocate
+ * @param u Array to allocate
+ * @param v Array to allocate
+ */
 template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zs, T *&h, T *&u, T *&v)
 {
 
@@ -55,6 +112,21 @@ template void AllocateCPU<double>(int nx, int ny, double *&zs, double *&h, doubl
 template void AllocateCPU<float>(int nx, int ny, float *&zs, float *&h, float *&u, float *&v);
 template void AllocateCPU<int>(int nx, int ny, int *&zs, int *&h, int *&u, int *&v);
 
+/**
+ * @brief Allocate memory for extended arrays (zs, h, u, v, U, hU) on the CPU.
+ *
+ * Allocates memory for the given arrays.
+ *
+ * @tparam T Data type (float, double, int)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param zs Array to allocate
+ * @param h Array to allocate
+ * @param u Array to allocate
+ * @param v Array to allocate
+ * @param U Array to allocate
+ * @param hU Array to allocate
+ */
 template <class T> __host__ void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
 {
 
@@ -70,6 +142,16 @@ template void AllocateCPU<double>(int nx, int ny, double*& zs, double*& h, doubl
 template void AllocateCPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
 template void AllocateCPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
 
+/**
+ * @brief Allocate memory for gradient arrays on the CPU.
+ *
+ * Allocates memory for all gradient arrays in GradientsP structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param Grad GradientsP structure to allocate
+ */
 template <class T> __host__
 void AllocateCPU(int nx, int ny, GradientsP<T>& Grad)
 {
@@ -82,17 +164,48 @@ void AllocateCPU(int nx, int ny, GradientsP<T>& Grad)
 template void AllocateCPU<float>(int nx, int ny, GradientsP<float>& Grad);
 template void AllocateCPU<double>(int nx, int ny, GradientsP<double>& Grad);
 
+/**
+ * @brief Allocate memory for evolving variables on the CPU.
+ *
+ * Allocates memory for h, zs, u, v arrays in EvolvingP structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param Ev EvolvingP structure to allocate
+ */
 template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP<T> & Ev)
 {
 	AllocateCPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v);
 }
 
+/**
+ * @brief Allocate memory for extended evolving variables on the CPU.
+ *
+ * Allocates memory for h, zs, u, v, U, hU arrays in EvolvingP_M structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param Ev EvolvingP_M structure to allocate
+ */
 template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP_M<T>& Ev)
 {
 	AllocateCPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU);
 
 }
 
+/**
+ * @brief Allocate all model arrays on the CPU.
+ *
+ * Allocates memory for all arrays in the Model structure, including blocks, gradients, fluxes, and output buffers.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param XParam Model parameters
+ * @param XModel Model structure to allocate
+ */
 template <class T>
 void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 {
@@ -234,6 +347,16 @@ template void AllocateCPU<double>(int nblk, int blksize, Param XParam, Model<dou
 
 
 
+/**
+ * @brief Reallocate memory for a single array.
+ *
+ * Reallocates memory for the given array to match the new block and size.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param zb Array to reallocate
+ */
 template <class T> void ReallocArray(int nblk, int blksize, T* & zb)
 {
 	//
@@ -250,6 +373,19 @@ template <class T> void ReallocArray(int nblk, int blksize, T* & zb)
 	//return nblkmem
 }
 
+/**
+ * @brief Reallocate memory for multiple arrays (zs, h, u, v).
+ *
+ * Reallocates memory for the given arrays to match the new block and size.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param zs Array to reallocate
+ * @param h Array to reallocate
+ * @param u Array to reallocate
+ * @param v Array to reallocate
+ */
 template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v)
 {
 	//
@@ -264,6 +400,21 @@ template void ReallocArray<int>(int nblk, int blksize, int*& zs, int*& h, int*& 
 template void ReallocArray<float>(int nblk, int blksize, float*& zs, float*& h, float*& u, float*& v);
 template void ReallocArray<double>(int nblk, int blksize, double*& zs, double*& h, double*& u, double*& v);
 
+/**
+ * @brief Reallocate memory for extended arrays (zs, h, u, v, U, hU).
+ *
+ * Reallocates memory for the given arrays to match the new block and size.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param zs Array to reallocate
+ * @param h Array to reallocate
+ * @param u Array to reallocate
+ * @param v Array to reallocate
+ * @param U Array to reallocate
+ * @param hU Array to reallocate
+ */
 template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
 {
 	//
@@ -281,6 +432,16 @@ template void ReallocArray<int>(int nblk, int blksize, int* & zs, int*& h, int*&
 template void ReallocArray<float>(int nblk, int blksize, float* & zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
 template void ReallocArray<double>(int nblk, int blksize, double* & zs, double*& h, double*& u, double*& v, double*& U, double*& hU);
 
+/**
+ * @brief Reallocate memory for evolving variables structure.
+ *
+ * Reallocates memory for all arrays in EvolvingP structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param Ev EvolvingP structure to reallocate
+ */
 template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev)
 {
 	ReallocArray(nblk, blksize, Ev.zs, Ev.h, Ev.u, Ev.v);
@@ -288,6 +449,16 @@ template <class T> void ReallocArray(int nblk, int blksize, EvolvingP<T>& Ev)
 template void ReallocArray<float>(int nblk, int blksize, EvolvingP<float>& Ev);
 template void ReallocArray<double>(int nblk, int blksize, EvolvingP<double>& Ev);
 
+/**
+ * @brief Reallocate memory for extended evolving variables structure.
+ *
+ * Reallocates memory for all arrays in EvolvingP_M structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param Ev EvolvingP_M structure to reallocate
+ */
 template <class T> void ReallocArray(int nblk, int blksize, EvolvingP_M<T>& Ev)
 {
 	ReallocArray(nblk, blksize, Ev.zs, Ev.h, Ev.u, Ev.v, Ev.U, Ev.hU);
@@ -295,6 +466,17 @@ template <class T> void ReallocArray(int nblk, int blksize, EvolvingP_M<T>& Ev)
 template void ReallocArray<float>(int nblk, int blksize, EvolvingP_M<float>& Ev);
 template void ReallocArray<double>(int nblk, int blksize, EvolvingP_M<double>& Ev);
 
+/**
+ * @brief Reallocate all model arrays.
+ *
+ * Reallocates memory for all arrays in the Model structure, including blocks, gradients, fluxes, and output buffers.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param XParam Model parameters
+ * @param XModel Model structure to reallocate
+ */
 template <class T>
 void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 {
@@ -385,6 +567,17 @@ template void ReallocArray<double>(int nblk, int blksize, Param XParam, Model<do
 
 
 
+/**
+ * @brief Allocate mapped memory on the CPU for CUDA interop.
+ *
+ * Allocates pinned or mapped memory for CUDA host-device interoperation.
+ *
+ * @tparam T Data type (float or double)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param gpudevice GPU device index
+ * @param z Pointer to allocated memory
+ */
 template <class T> void AllocateMappedMemCPU(int nx, int ny,int gpudevice, T*& z)
 {
 
@@ -450,6 +643,18 @@ template void AllocateMappedMemCPU<int>(int nx, int ny, int gpudevice, int*& z);
 template void AllocateMappedMemCPU<float>(int nx, int ny, int gpudevice, float*& z);
 template void AllocateMappedMemCPU<double>(int nx, int ny, int gpudevice, double*& z);
 
+/**
+ * @brief Get device pointer for mapped host memory.
+ *
+ * Retrieves the device pointer for host memory mapped for CUDA interop.
+ *
+ * @tparam T Data type (float or double)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param gpudevice GPU device index
+ * @param z_g Device pointer output
+ * @param z Host pointer input
+ */
 template <class T> void AllocateMappedMemGPU(int nx, int ny, int gpudevice, T*& z_g, T* z)
 {
 	CUDA_CHECK(cudaHostGetDevicePointer((void**)&z_g, (void*)z, 0));
@@ -459,11 +664,34 @@ template void AllocateMappedMemGPU<float>(int nx, int ny, int gpudevice,float*& 
 template void AllocateMappedMemGPU<double>(int nx, int ny, int gpudevice, double*& z_g, double* z);
 
 
+/**
+ * @brief Allocate memory on the GPU for a single array.
+ *
+ * Allocates device memory for the given array.
+ *
+ * @tparam T Data type (float or double)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param z_g Device pointer output
+ */
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g)
 {
 	CUDA_CHECK(cudaMalloc((void**)& z_g, nx * ny * sizeof(T)));
 }
 
+/**
+ * @brief Allocate memory on the GPU for multiple arrays (zs, h, u, v).
+ *
+ * Allocates device memory for the given arrays.
+ *
+ * @tparam T Data type (float or double)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param zs Device pointer output
+ * @param h Device pointer output
+ * @param u Device pointer output
+ * @param v Device pointer output
+ */
 template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v)
 {
 
@@ -477,6 +705,21 @@ template void AllocateGPU<double>(int nx, int ny, double*& zs, double*& h, doubl
 template void AllocateGPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v);
 template void AllocateGPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v);
 
+/**
+ * @brief Allocate memory on the GPU for extended arrays (zs, h, u, v, U, hU).
+ *
+ * Allocates device memory for the given arrays.
+ *
+ * @tparam T Data type (float or double)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param zs Device pointer output
+ * @param h Device pointer output
+ * @param u Device pointer output
+ * @param v Device pointer output
+ * @param U Device pointer output
+ * @param hU Device pointer output
+ */
 template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
 {
 
@@ -492,6 +735,16 @@ template void AllocateGPU<double>(int nx, int ny, double*& zs, double*& h, doubl
 template void AllocateGPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
 template void AllocateGPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
 
+/**
+ * @brief Allocate memory on the GPU for gradient arrays.
+ *
+ * Allocates device memory for all gradient arrays in GradientsP structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nx Number of x elements
+ * @param ny Number of y elements
+ * @param Grad GradientsP structure to allocate
+ */
 template <class T> 
 void AllocateGPU(int nx, int ny, GradientsP<T>& Grad)
 {
@@ -503,16 +756,47 @@ void AllocateGPU(int nx, int ny, GradientsP<T>& Grad)
 template void AllocateGPU<float>(int nx, int ny, GradientsP<float>& Grad);
 template void AllocateGPU<double>(int nx, int ny, GradientsP<double>& Grad);
 
+/**
+ * @brief Allocate memory on the GPU for evolving variables structure.
+ *
+ * Allocates device memory for all arrays in EvolvingP structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param Ev EvolvingP structure to allocate
+ */
 template <class T> void AllocateGPU(int nblk, int blksize, EvolvingP<T>& Ev)
 {
 	AllocateGPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v);
 }
 
+/**
+ * @brief Allocate memory on the GPU for extended evolving variables structure.
+ *
+ * Allocates device memory for all arrays in EvolvingP_M structure.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param Ev EvolvingP_M structure to allocate
+ */
 template <class T> void AllocateGPU(int nblk, int blksize, EvolvingP_M<T>& Ev)
 {
 	AllocateGPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU);
 }
 
+/**
+ * @brief Allocate all model arrays on the GPU.
+ *
+ * Allocates device memory for all arrays in the Model structure, including blocks, gradients, fluxes, and output buffers.
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param XParam Model parameters
+ * @param XModel Model structure to allocate
+ */
 template <class T>
 void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 {

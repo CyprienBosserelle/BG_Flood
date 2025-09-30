@@ -1,5 +1,16 @@
 #include "FlowGPU.h"
 
+/**
+ * @brief Main GPU flow solver for the flood model.
+ *
+ * Executes predictor and corrector steps, applies atmospheric, wind, and river forcing, updates advection and friction terms, and manages halo and gradient reconstruction for all blocks using CUDA kernels and streams.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XLoop Loop control and time stepping
+ * @param XForcing Forcing data (atmospheric, wind, river, rain)
+ * @param XModel Model data structure
+ */
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
 	//============================================
@@ -305,6 +316,17 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 template void FlowGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void FlowGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
+/**
+ * @brief Debugging GPU flow step for the flood model.
+ *
+ * Runs a simplified flow step for debugging the main engine, including forcing, advection, friction, and halo/gradient reconstruction using CUDA kernels and streams.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XLoop Loop control and time stepping
+ * @param XForcing Forcing data (atmospheric, wind, river, rain)
+ * @param XModel Model data structure
+ */
 template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
 	//============================================
@@ -504,6 +526,17 @@ template void HalfStepGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float
 template void HalfStepGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
 
+/**
+ * @brief CUDA kernel to reset a variable array for all active blocks.
+ *
+ * Sets all values in the variable array to the specified reset value for each block and cell.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Halo width
+ * @param active Array of active block indices
+ * @param resetval Value to set
+ * @param Var Variable array to reset
+ */
 template <class T> __global__ void reset_var(int halowidth, int* active, T resetval, T* Var)
 {
 

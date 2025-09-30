@@ -1,7 +1,17 @@
 
 #include "Meanmax.h"
 
-// Calculate the mean and or max of requested variable on the GPU/CPU
+/**
+ * @brief Calculate mean and/or max of requested variables on GPU/CPU.
+ *
+ * Computes mean, max, and wet duration statistics for evolving variables, handling both CPU and GPU execution paths.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
@@ -101,6 +111,17 @@ template void Calcmeanmax<float>(Param XParam, Loop<float>& XLoop, Model<float> 
 template void Calcmeanmax<double>(Param XParam, Loop<double>& XLoop, Model<double> XModel, Model<double> XModel_g);
 
 
+/**
+ * @brief Reset mean and/or max statistics at output steps.
+ *
+ * Resets mean, max, and wet duration arrays after output is produced, handling both CPU and GPU paths.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void resetmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	// Reset mean and or max only at output steps
@@ -152,6 +173,17 @@ template <class T> void resetmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMod
 template void resetmeanmax<float>(Param XParam, Loop<float>& XLoop, Model<float> XModel, Model<float> XModel_g);
 template void resetmeanmax<double>(Param XParam, Loop<double>& XLoop, Model<double> XModel, Model<double> XModel_g);
 
+/**
+ * @brief Initialize mean and max statistics at the start of the simulation.
+ *
+ * Sets up/reset statistics arrays for the initial simulation step.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void Initmeanmax(Param XParam, Loop<T> XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	//at the initial step overide the reset max to initialise the max variable (if needed)
@@ -164,6 +196,17 @@ template <class T> void Initmeanmax(Param XParam, Loop<T> XLoop, Model<T> XModel
 template void Initmeanmax<float>(Param XParam, Loop<float> XLoop, Model<float> XModel, Model<float> XModel_g);
 template void Initmeanmax<double>(Param XParam, Loop<double> XLoop, Model<double> XModel, Model<double> XModel_g);
 
+/**
+ * @brief Reset max statistics arrays on the GPU.
+ *
+ * Sets all max arrays to a large negative value using a CUDA kernel.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data
+ * @param XEv Max evolving variables
+ */
 template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP_M<T>& XEv)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
@@ -185,6 +228,17 @@ template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 }
 
 
+/**
+ * @brief Reset max statistics arrays on the CPU.
+ *
+ * Sets all max arrays to a large negative value using CPU routines.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data
+ * @param XEv Max evolving variables
+ */
 template <class T> void resetmaxCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP_M<T>& XEv)
 {
 
@@ -198,6 +252,17 @@ template <class T> void resetmaxCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 }
 
 
+/**
+ * @brief Reset mean statistics arrays on the CPU.
+ *
+ * Sets all mean arrays to zero using CPU routines.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data
+ * @param XEv Mean evolving variables
+ */
 template <class T> void resetmeanCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP_M<T>& XEv)
 {
 
@@ -212,6 +277,17 @@ template <class T> void resetmeanCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlo
 template void resetmeanCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, EvolvingP_M<float>& XEv);
 template void resetmeanCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, EvolvingP_M<double>& XEv);
 
+/**
+ * @brief Reset mean statistics arrays on the GPU.
+ *
+ * Sets all mean arrays to zero using a CUDA kernel.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data
+ * @param XEv Mean evolving variables
+ */
 template <class T> void resetmeanGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, EvolvingP_M<T>& XEv)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
@@ -231,6 +307,17 @@ template void resetmeanGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float>
 template void resetmeanGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, EvolvingP_M<double>& XEv);
 
 
+/**
+ * @brief Reset a variable array to a specified value on the CPU.
+ *
+ * Sets all elements of the array to the given value using CPU routines.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param var Variable array to reset
+ * @param val Value to set
+ */
 template <class T> void resetvalCPU(Param XParam, BlockP<T> XBlock, T*& var, T val)
 {
 
@@ -240,6 +327,17 @@ template <class T> void resetvalCPU(Param XParam, BlockP<T> XBlock, T*& var, T v
 template void resetvalCPU<float>(Param XParam, BlockP<float> XBlock, float*& var, float val);
 template void resetvalCPU<double>(Param XParam, BlockP<double> XBlock, double*& var, double val);
 
+/**
+ * @brief Reset a variable array to a specified value on the GPU.
+ *
+ * Sets all elements of the array to the given value using a CUDA kernel.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param var Variable array to reset
+ * @param val Value to set
+ */
 template <class T> void resetvalGPU(Param XParam, BlockP<T> XBlock, T*& var, T val)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
@@ -253,6 +351,17 @@ template void resetvalGPU<double>(Param XParam, BlockP<double> XBlock, double*& 
 
 
 
+/**
+ * @brief CUDA kernel to accumulate mean values for a variable.
+ *
+ * Adds the current value to the running mean for each cell on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmean Mean variable array
+ * @param Var Source variable array
+ */
 template <class T> __global__ void addavg_varGPU(Param XParam, BlockP<T> XBlock, T* Varmean, T* Var)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -271,6 +380,17 @@ template <class T> __global__ void addavg_varGPU(Param XParam, BlockP<T> XBlock,
 }
 
 
+/**
+ * @brief Accumulate mean values for a variable on the CPU.
+ *
+ * Adds the current value to the running mean for each cell on the CPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmean Mean variable array
+ * @param Var Source variable array
+ */
 template <class T> __host__ void addavg_varCPU(Param XParam, BlockP<T> XBlock, T* Varmean, T* Var)
 {
 	int ib;
@@ -291,6 +411,17 @@ template <class T> __host__ void addavg_varCPU(Param XParam, BlockP<T> XBlock, T
 
 }
 
+/**
+ * @brief CUDA kernel to divide mean values by the number of steps.
+ *
+ * Finalizes the mean calculation by dividing accumulated values by the number of time steps on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param ntdiv Number of time steps
+ * @param Varmean Mean variable array
+ */
 template <class T> __global__ void divavg_varGPU(Param XParam, BlockP<T> XBlock, T ntdiv, T* Varmean)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -307,6 +438,17 @@ template <class T> __global__ void divavg_varGPU(Param XParam, BlockP<T> XBlock,
 
 }
 
+/**
+ * @brief Divide mean values by the number of steps on the CPU.
+ *
+ * Finalizes the mean calculation by dividing accumulated values by the number of time steps on the CPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param ntdiv Number of time steps
+ * @param Varmean Mean variable array
+ */
 template <class T> __host__ void divavg_varCPU(Param XParam, BlockP<T> XBlock, T ntdiv, T* Varmean)
 {
 	int ib;
@@ -327,6 +469,20 @@ template <class T> __host__ void divavg_varCPU(Param XParam, BlockP<T> XBlock, T
 
 }
 
+/**
+ * @brief CUDA kernel to compute velocity magnitude and hU product.
+ *
+ * Calculates the velocity magnitude and its product with water depth for each cell on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param h Water depth array
+ * @param u U-velocity array
+ * @param v V-velocity array
+ * @param U Output velocity magnitude array
+ * @param hU Output hU product array
+ */
 template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock, T * h, T * u, T * v, T* U, T* hU)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -344,6 +500,20 @@ template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock,
 
 }
 
+/**
+ * @brief Compute velocity magnitude and hU product on the CPU.
+ *
+ * Calculates the velocity magnitude and its product with water depth for each cell on the CPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param h Water depth array
+ * @param u U-velocity array
+ * @param v V-velocity array
+ * @param U Output velocity magnitude array
+ * @param hU Output hU product array
+ */
 template <class T> __host__ void addUandhU_CPU(Param XParam, BlockP<T> XBlock, T* h, T* u, T* v, T* U, T* hU)
 {
 	int ib, n;
@@ -365,6 +535,17 @@ template <class T> __host__ void addUandhU_CPU(Param XParam, BlockP<T> XBlock, T
 
 }
 
+/**
+ * @brief CUDA kernel to compute max value for a variable.
+ *
+ * Updates the max value for each cell by comparing with the current value on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmax Max variable array
+ * @param Var Source variable array
+ */
 template <class T> __global__ void max_varGPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -381,6 +562,18 @@ template <class T> __global__ void max_varGPU(Param XParam, BlockP<T> XBlock, T*
 
 }
 
+/**
+ * @brief CUDA kernel to compute max velocity magnitude.
+ *
+ * Updates the max velocity magnitude for each cell by comparing with the current value on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmax Max variable array
+ * @param Var1 U-velocity array
+ * @param Var2 V-velocity array
+ */
 template <class T> __global__ void max_Norm_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2)
 {
 	T Var_norm;
@@ -399,6 +592,19 @@ template <class T> __global__ void max_Norm_GPU(Param XParam, BlockP<T> XBlock, 
 
 }
 
+/**
+ * @brief CUDA kernel to compute max hU value.
+ *
+ * Updates the max hU value for each cell by comparing with the current value on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmax Max variable array
+ * @param h Water depth array
+ * @param u U-velocity array
+ * @param v V-velocity array
+ */
 template <class T> __global__ void max_hU_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* h, T* u, T* v)
 {
 	T Var_hU;
@@ -417,6 +623,17 @@ template <class T> __global__ void max_hU_GPU(Param XParam, BlockP<T> XBlock, T*
 
 }
 
+/**
+ * @brief Compute max value for a variable on the CPU.
+ *
+ * Updates the max value for each cell by comparing with the current value using CPU routines.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmax Max variable array
+ * @param Var Source variable array
+ */
 template <class T> __host__ void max_varCPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var)
 {
 	int ib;
@@ -437,6 +654,18 @@ template <class T> __host__ void max_varCPU(Param XParam, BlockP<T> XBlock, T* V
 
 }
 
+/**
+ * @brief Compute max velocity magnitude on the CPU.
+ *
+ * Updates the max velocity magnitude for each cell by comparing with the current value using CPU routines.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmax Max variable array
+ * @param Var1 U-velocity array
+ * @param Var2 V-velocity array
+ */
 template <class T> __host__ void max_Norm_CPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2)
 {
 	int ib, n;
@@ -458,6 +687,19 @@ template <class T> __host__ void max_Norm_CPU(Param XParam, BlockP<T> XBlock, T*
 
 }
 
+/**
+ * @brief Compute max hU value on the CPU.
+ *
+ * Updates the max hU value for each cell by comparing with the current value using CPU routines.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Varmax Max variable array
+ * @param h Water depth array
+ * @param u U-velocity array
+ * @param v V-velocity array
+ */
 template <class T> __host__ void max_hU_CPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* h, T* u, T* v)
 {
 	int ib, n;
@@ -479,6 +721,19 @@ template <class T> __host__ void max_hU_CPU(Param XParam, BlockP<T> XBlock, T* V
 
 }
 
+/**
+ * @brief CUDA kernel to accumulate wet duration for each cell.
+ *
+ * Adds time to the wet duration for cells where water depth exceeds a threshold on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param wett Wet duration array
+ * @param h Water depth array
+ * @param thresold Wet threshold value
+ * @param time Time increment
+ */
 template <class T> __global__ void addwettime_GPU(Param XParam, BlockP<T> XBlock, T* wett, T* h, T thresold, T time)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -499,6 +754,19 @@ template <class T> __global__ void addwettime_GPU(Param XParam, BlockP<T> XBlock
 }
 
 
+/**
+ * @brief Accumulate wet duration for each cell on the CPU.
+ *
+ * Adds time to the wet duration for cells where water depth exceeds a threshold on the CPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param wett Wet duration array
+ * @param h Water depth array
+ * @param thresold Wet threshold value
+ * @param time Time increment
+ */
 template <class T> __host__ void addwettime_CPU(Param XParam, BlockP<T> XBlock, T* wett, T* h, T thresold, T time)
 {
 	int ib, n;

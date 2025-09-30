@@ -5,6 +5,19 @@
 * Wrapping function to calculate gradien of evolving variables on GPU
 * This function is the entry point to the gradient functions on the GPU
 */
+/**
+ * @brief Entry point for gradient of evolving variables calculation on the GPU.
+ *
+ * Calculates gradients of evolving variables using CUDA kernels and synchronizes device operations.
+ * Handles halo filling and elevation conservation if required.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradient variables
+ * @param zb Bed elevation array
+ */
 template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad,T* zb)
 {
 	//const int num_streams = 4;
@@ -184,6 +197,18 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 template void gradientGPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb);
 template void gradientGPU<double>(Param XParam,  BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb);
 
+/**
+ * @brief Alternative GPU gradient calculation using shared memory kernels and CUDA streams.
+ *
+ * Uses gradientSMC kernels and handles halo filling, elevation conservation, and wet/dry prolongation.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradient variables
+ * @param zb Bed elevation array
+ */
 template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	
@@ -382,10 +407,21 @@ template void gradientGPUnew<float>(Param XParam, BlockP<float>XBlock, EvolvingP
 template void gradientGPUnew<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double* zb);
 
 
-/*! \fn void gradient(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
-* Device kernel for calculating grdients for an evolving poarameter using the minmod limiter
-* 
-*/
+/**
+ * @brief Device kernel for calculating gradients for an evolving parameter using the minmod limiter.
+ *
+ * Computes spatial derivatives in x and y directions for a given variable.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Width of halo region
+ * @param active Active block indices
+ * @param level Block refinement levels
+ * @param theta Limiter parameter
+ * @param dx Grid spacing
+ * @param a Input variable array
+ * @param dadx Output gradient in x
+ * @param dady Output gradient in y
+ */
 template <class T> __global__ void gradient(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 {
 	//int *leftblk,int *rightblk,int* topblk, int * botblk,
@@ -439,10 +475,21 @@ template __global__ void gradient<double>(int halowidth, int* active, int* level
 
 
 
-/*! \fn void gradientSM(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
-* Depreciated shared memory version of Device kernel for calculating gradients
-* Much slower than above
-*/
+/**
+ * @brief Deprecated shared memory device kernel for gradient calculation.
+ *
+ * Uses shared memory for stencil operations; slower than the standard kernel.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Width of halo region
+ * @param active Active block indices
+ * @param level Block refinement levels
+ * @param theta Limiter parameter
+ * @param dx Grid spacing
+ * @param a Input variable array
+ * @param dadx Output gradient in x
+ * @param dady Output gradient in y
+ */
 template <class T> __global__ void gradientSM(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 {
 	//int *leftblk,int *rightblk,int* topblk, int * botblk,
@@ -522,6 +569,23 @@ template <class T> __global__ void gradientSM(int halowidth, int* active, int* l
 template __global__ void gradientSM<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
 template __global__ void gradientSM<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
+
+
+/**
+ * @brief Shared memory device kernel for gradient calculation (variant B).
+ *
+ * Uses a fixed shared memory tile for stencil operations; only computes gradients for interior points.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Width of halo region
+ * @param active Active block indices
+ * @param level Block refinement levels
+ * @param theta Limiter parameter
+ * @param dx Grid spacing
+ * @param a Input variable array
+ * @param dadx Output gradient in x
+ * @param dady Output gradient in y
+ */
 template <class T> __global__ void gradientSMB(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 {
 	//int *leftblk,int *rightblk,int* topblk, int * botblk,
@@ -577,6 +641,21 @@ template <class T> __global__ void gradientSMB(int halowidth, int* active, int* 
 template __global__ void gradientSMB<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
 template __global__ void gradientSMB<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
+/**
+ * @brief Shared memory device kernel for gradient calculation (variant C).
+ *
+ * Uses a flat shared memory array for stencil operations; computes gradients for all points.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Width of halo region
+ * @param active Active block indices
+ * @param level Block refinement levels
+ * @param theta Limiter parameter
+ * @param dx Grid spacing
+ * @param a Input variable array
+ * @param dadx Output gradient in x
+ * @param dady Output gradient in y
+ */
 template <class T> __global__ void gradientSMC(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
 {
 	//int *leftblk,int *rightblk,int* topblk, int * botblk,
@@ -675,10 +754,20 @@ template __global__ void gradientSMC<double>(int halowidth, int* active, int* le
 
 
 
-/*! \fn void gradientedgeX(int halowidth, int ix, int* active, int* level, T theta, T dx, T* a, T* dadx)
-* Device kernel for calculating gradients for an evolving parameter using the minmod limiter only at specific column (i.e. fixed ix)
-*
-*/
+/**
+ * @brief Device kernel for calculating gradients for an evolving parameter using the minmod limiter only at a fixed column (i.e. fixed ix).
+ *
+ * Computes x-derivative for a specific column using the minmod limiter.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Width of halo region
+ * @param active Active block indices
+ * @param level Block refinement levels
+ * @param theta Limiter parameter
+ * @param dx Grid spacing
+ * @param a Input variable array
+ * @param dadx Output gradient in x
+ */
 template <class T> __global__ void gradientedgeX(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx)
 {
 	//int *leftblk,int *rightblk,int* topblk, int * botblk,
@@ -743,10 +832,20 @@ template __global__ void gradientedgeX<double>(int halowidth, int* active, int* 
 
 
 
-/*! \fn void gradientedgeY(int halowidth, int iy, int* active, int* level, T theta, T dx, T* a, T* dady)
-* Device kernel for calculating gradients for an evolving parameter using the minmod limiter only at specific row (i.e. fixed iy)
-*
-*/
+/**
+ * @brief Device kernel for calculating gradients for an evolving parameter using the minmod limiter only at a fixed row (i.e. fixed iy).
+ *
+ * Computes y-derivative for a specific row using the minmod limiter.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Width of halo region
+ * @param active Active block indices
+ * @param level Block refinement levels
+ * @param theta Limiter parameter
+ * @param dx Grid spacing
+ * @param a Input variable array
+ * @param dady Output gradient in y
+ */
 template <class T> __global__ void gradientedgeY(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dady)
 {
 	//int *leftblk,int *rightblk,int* topblk, int * botblk,
@@ -810,7 +909,15 @@ template __global__ void gradientedgeY<double>(int halowidth, int* active, int* 
 
 
 
-
+/**
+ * @brief CPU function for calculating gradients using the minmod limiter.
+ * Computes spatial derivatives in x and y directions for a given variable.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Input variable array
+ * @param dadx Output gradient in x
+ * @param dady Output gradient in y
+ */
 template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx, T* dady)
 {
 
@@ -851,6 +958,16 @@ template <class T> void gradientC(Param XParam, BlockP<T> XBlock, T* a, T* dadx,
 template void gradientC<float>(Param XParam, BlockP<float> XBlock, float* a, float* dadx, float* dady);
 template void gradientC<double>(Param XParam, BlockP<double> XBlock, double* a, double* dadx, double* dady);
 
+/**
+ * @brief CPU function to compute gradients for all evolving parameters, handle halo regions, and apply wet-dry fixes.
+ * Calculates spatial derivatives for height, surface elevation, and velocity components.
+ * Also manages halo regions and applies wet-dry fixes if necessary.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ */
 template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 
@@ -938,6 +1055,15 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 template void gradientCPU<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float * zb);
 template void gradientCPU<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double * zb);
 
+/**
+ * @brief CPU function to apply wet slope limiters to gradients of surface elevation.
+ * Adjusts gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ */
 template <class T> void WetsloperesetCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	int i, ib;
@@ -1001,6 +1127,17 @@ template <class T> void WetsloperesetCPU(Param XParam, BlockP<T>XBlock, Evolving
 	}
 }
 
+/**
+ * @brief Device kernel to apply wet slope limiters to gradients of surface elevation in the x-direction.
+ * Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition
+ * zones.
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void WetsloperesetXGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
@@ -1040,6 +1177,16 @@ template <class T> __global__ void WetsloperesetXGPU(Param XParam, BlockP<T>XBlo
 
 }
 
+/**	
+ * @brief Device kernel to apply wet slope limiters to gradients of surface elevation in the y-direction.
+ * Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void WetsloperesetYGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
@@ -1079,7 +1226,18 @@ template <class T> __global__ void WetsloperesetYGPU(Param XParam, BlockP<T>XBlo
 
 }
 
-
+/**
+ * @brief Device kernel to apply wet slope limiters to gradients of surface elevation at the left halo boundary.
+ * Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This kernel specifically handles the left halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the left surface elevation needed for the wet slope limiter.
+ */
 template <class T> __global__ void WetsloperesetHaloLeftGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -1227,6 +1385,17 @@ template <class T> __global__ void WetsloperesetHaloLeftGPU(Param XParam, BlockP
 
 }
 
+/**
+ * @brief CPU function to apply wet slope limiters to gradients of surface elevation at the left halo boundary.
+ * Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This function specifically handles the left halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the left surface elevation needed for
+ */
 template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 
@@ -1382,7 +1551,19 @@ template <class T> void WetsloperesetHaloLeftCPU(Param XParam, BlockP<T>XBlock, 
 	}
 }
 
-
+/**
+ * @brief Device kernel to apply wet slope limiters to gradients of surface elevation at the right halo boundary.
+ * Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This kernel specifically handles the right halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the right surface elevation needed for
+ * the wet slope limiter.
+ */
 template <class T> __global__ void WetsloperesetHaloRightGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -1537,6 +1718,18 @@ template <class T> __global__ void WetsloperesetHaloRightGPU(Param XParam, Block
 
 }
 
+/**
+ * @brief CPU function to apply wet slope limiters to gradients of surface elevation at the right halo boundary.
+ * Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This function specifically handles the right halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the right surface elevation needed for
+ * the wet slope limiter.
+ */
 template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -1700,7 +1893,18 @@ template <class T> void WetsloperesetHaloRightCPU(Param XParam, BlockP<T>XBlock,
 	}
 }
 
-
+/**
+ * @brief GPU kernel to reset the wet slope limiter at the bottom halo boundary.
+ * Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This kernel specifically handles the bottom halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the bottom surface elevation needed for the wet slope limiter.
+ */
 template <class T> __global__ void WetsloperesetHaloBotGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -1852,6 +2056,17 @@ template <class T> __global__ void WetsloperesetHaloBotGPU(Param XParam, BlockP<
 
 }
 
+/**
+ * @brief CPU function to reset the wet slope limiter at the bottom halo boundary.
+ * Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition zones.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This function specifically handles the bottom halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the bottom surface elevation needed for the wet slope limiter.
+ */
 template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -2014,6 +2229,19 @@ template <class T> void WetsloperesetHaloBotCPU(Param XParam, BlockP<T>XBlock, E
 
 }
 
+/**
+ * @brief GPU kernel to reset the wet slope limiter at the top halo boundary.
+ * Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition
+ * zones.
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters	
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This kernel specifically handles the top halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the top surface elevation needed for the wet slope limiter.
+ */
 template <class T> __global__ void WetsloperesetHaloTopGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -2167,7 +2395,18 @@ template <class T> __global__ void WetsloperesetHaloTopGPU(Param XParam, BlockP<
 }
 
 
-
+/**
+ * @brief CPU function to reset the wet slope limiter at the top halo boundary.
+ * Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition
+ * zones.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param XEv Evolving parameters (height, surface elevation, velocities)
+ * @param XGrad Gradient storage for the evolving parameters
+ * @param zb Bathymetry array
+ * @note This function specifically handles the top halo boundary, where special care is needed due to the absence of neighboring blocks on that side.
+ * The logic accounts for various configurations of neighboring blocks to correctly compute the top surface elevation needed for the wet slope limiter.
+ */
 template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -2326,7 +2565,22 @@ template <class T>  void WetsloperesetHaloTopCPU(Param XParam, BlockP<T>XBlock, 
 
 }
 
-
+/**
+ * @brief CPU function to compute gradients at the halo boundaries of all active blocks.
+ * This function iterates over all active blocks and computes the gradients at their halo boundaries
+ * using finite difference approximations.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This function calls specific functions to handle each of the four halo boundaries (left, right, bottom, top) for each block.
+ * It ensures that gradients are accurately computed at the edges of the computational domain, which is crucial for maintaining solution accuracy and stability.
+ * The function assumes that the input arrays are properly allocated and sized according to the simulation parameters.
+ * The gradient computations are performed using central differences where possible, and one-sided differences at the boundaries.
+ * The function is templated to support different data types (e.g., float, double).
+ * @see gradientHaloLeft, gradientHaloRight, gradientHaloBot, gradientHaloTop
+ */
 template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	int ib;
@@ -2350,7 +2604,23 @@ template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dad
 	}
 }
 
-
+/**
+ * @brief GPU function to compute gradients at the halo boundaries of all active blocks.
+ * This function launches CUDA kernels to compute the gradients at the halo boundaries
+ * of all active blocks using parallel processing.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This function sets up the CUDA grid and block dimensions and launches specific kernels to handle each of the four halo boundaries (left, right, bottom, top) for all active blocks.
+ * It ensures that gradients are accurately computed at the edges of the computational domain, which is crucial for maintaining solution accuracy and stability.
+ * The function assumes that the input arrays are properly allocated and sized according to the simulation parameters.
+ * The gradient computations are performed using central differences where possible, and one-sided differences at the boundaries.
+ * The function is templated to support different data types (e.g., float, double).
+ * @see gradientHaloLeftGPU, gradientHaloRightGPU, gradientHaloBotGPU, gradientHaloTopGPU
+ * @see gradientHaloLeft, gradientHaloRight, gradientHaloBot, gradientHaloTop
+ */
 template <class T> void gradientHaloGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	dim3 blockDimL(1, XParam.blkwidth, 1);
@@ -2373,6 +2643,23 @@ template <class T> void gradientHaloGPU(Param XParam, BlockP<T>XBlock, T* a, T* 
 	
 }
 
+/**
+ * @brief GPU function to compute gradients at the halo boundaries of all active blocks using multiple CUDA streams.
+ * This function launches CUDA kernels in separate streams to compute the gradients at the halo boundaries
+ * of all active blocks, allowing for concurrent execution and improved performance.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This function sets up multiple CUDA streams and launches specific kernels to handle each of the four halo boundaries (left, right, bottom, top) for all active blocks in separate streams.
+ * It ensures that gradients are accurately computed at the edges of the computational domain, which is crucial for maintaining solution accuracy and stability.
+ * The function assumes that the input arrays are properly allocated and sized according to the simulation parameters.
+ * The gradient computations are performed using central differences where possible, and one-sided differences at the boundaries.
+ * The function is templated to support different data types (e.g., float, double).
+ * @see gradientHaloLeftGPUnew, gradientHaloRightGPUnew, gradientHaloBotGPUnew, gradientHaloTopGPUnew
+ * @see gradientHaloLeft, gradientHaloRight, gradientHaloBot, gradientHaloTop
+ */
 template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	const int num_streams = 4;
@@ -2410,7 +2697,19 @@ template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, 
 
 }
 
-
+/**
+ * @brief CPU function to compute the gradient at the left halo boundary of a specific block.
+ * This function calculates the x and y derivatives at the left edge of the block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param ib Index of the block for which the left halo gradient is to be computed
+ * @param iy y-index within the block
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
 {
 	int i, ix, jj, ii, ir, it, itr;
@@ -2543,7 +2842,19 @@ template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, 
 
 }
 
-
+/**
+ * @brief CPU function to compute the gradient at the left halo boundary of a specific block.
+ * This function calculates the x and y derivatives at the left edge of the block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param ib Index of the block for which the left halo gradient is to be computed
+ * @param iy y-index within the block
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
 {
 	int i, ix, jj, ii, ir, it, itr;
@@ -2675,7 +2986,19 @@ template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib,
 
 }
 
-
+/**
+ * @brief CPU function to compute the gradient at the bottom halo boundary of a specific block.
+ * This function calculates the x and y derivatives at the bottom edge of the block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param ib Index of the block for which the bottom halo gradient is to be computed
+ * @param ix x-index within the block
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
 	int i, iy, jj, ii, ir, it, itr;
@@ -2810,6 +3133,19 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
 
 }
 
+/**
+ * @brief CPU function to compute the gradient at the top halo boundary of a specific block.
+ * This function calculates the x and y derivatives at the top edge of the block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param ib Index of the block for which the top halo gradient is to be computed
+ * @param ix x-index within the block
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
 	int i, iy, jj, ii, ir, it, itr;
@@ -2945,7 +3281,17 @@ template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, i
 }
 
 
-
+/**
+ * @brief GPU kernel to compute the gradient at the left halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the left edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3083,6 +3429,17 @@ template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XB
 
 }
 
+/**
+ * @brief GPU kernel to compute the gradient at the left halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the left edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloLeftGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3224,6 +3581,17 @@ template <class T> __global__ void gradientHaloLeftGPUnew(Param XParam, BlockP<T
 	}
 }
 
+/**
+ * @brief GPU kernel to compute the gradient at the right halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the right edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3361,7 +3729,17 @@ template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>X
 
 }
 
-
+/**
+ * @brief GPU kernel to compute the gradient at the right halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the right edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloRightGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3501,6 +3879,17 @@ template <class T> __global__ void gradientHaloRightGPUnew(Param XParam, BlockP<
 	}
 }
 
+/**
+ * @brief GPU kernel to compute the gradient at the bottom halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the bottom edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3644,6 +4033,17 @@ template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBl
 
 }
 
+/**
+ * @brief GPU kernel to compute the gradient at the bottom halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the bottom edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloBotGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3789,7 +4189,17 @@ template <class T> __global__ void gradientHaloBotGPUnew(Param XParam, BlockP<T>
 	}
 }
 
-
+/**
+ * @brief GPU kernel to compute the gradient at the top halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the top edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;
@@ -3933,6 +4343,17 @@ template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBl
 
 }
 
+/**
+ * @brief GPU kernel to compute the gradient at the top halo boundary of blocks.
+ * This kernel calculates the x and y derivatives at the top edge of each block using finite difference
+ * approximations, taking into account the presence of neighboring blocks and their levels.
+ * @param XParam Simulation parameters
+ * @param XBlock Block information
+ * @param a Array containing the variable for which gradients are to be computed
+ * @param dadx Array to store the computed x-derivative gradients
+ * @param dady Array to store the computed y-derivative gradients
+ * @note This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
+ */
 template <class T> __global__ void gradientHaloTopGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady)
 {
 	unsigned int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;

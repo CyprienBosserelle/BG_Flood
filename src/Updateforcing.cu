@@ -2,6 +2,13 @@
 
 #include "Updateforcing.h"
 
+/**
+ * @brief Update dynamic forcings for the current simulation step.
+ * Updates the dynamic forcing data for the current simulation time step.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param XForcing Forcing data structure to update
+ */
 template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float> &XForcing)
 {
 	// Update forcing for all possible dynamic forcing. 
@@ -35,6 +42,15 @@ template void updateforcing<double>(Param XParam, Loop<double> XLoop, Forcing<fl
 
 
 
+/**
+ * @brief Update dynamic forcing for the current simulation step.
+ *
+ * Updates the dynamic forcing data for the current simulation time step, handling uniform and non-uniform cases.
+ *
+ * @param XParam Model parameters
+ * @param totaltime Current simulation time
+ * @param XDynForcing Dynamic forcing structure to update
+ */
 void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynForcing)
 {
 	dim3 blockDimDF(16, 16, 1);
@@ -119,6 +135,14 @@ void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynFor
 	//return rainuni;
 }
 
+/**
+ * @brief Add river forcing to the model.
+ * Adds river discharge forcing to the model based on river data and current simulation time.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param XRivers Vector of river data structures
+ * @param XModel Model data structure
+ */
 template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, std::vector<River> XRivers, Model<T> XModel)
 {
 	dim3 gridDimRiver(XModel.bndblk.Riverinfo.nburmax, 1, 1);
@@ -164,7 +188,16 @@ template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, st
 template __host__ void AddRiverForcing<float>(Param XParam, Loop<float> XLoop, std::vector<River> XRivers, Model<float> XModel);
 template __host__ void AddRiverForcing<double>(Param XParam, Loop<double> XLoop, std::vector<River> XRivers, Model<double> XModel);
 
-
+/**
+ * @brief Inject river discharge into the model grid on the GPU.
+ * Injects river discharge into the model grid based on river geometry and discharge rate.
+ * @param XParam Model parameters
+ * @param XRiver River data structure
+ * @param qnow Current river discharge rate
+ * @param Riverblks Array of blocks affected by the river
+ * @param XBlock Block data structure
+ * @param XAdv Advance data structure
+ */
 template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T qnow, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -205,6 +238,16 @@ template <class T> __global__ void InjectRiverGPU(Param XParam,River XRiver, T q
 template __global__ void InjectRiverGPU<float>(Param XParam, River XRiver, float qnow, int* Riverblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
 template __global__ void InjectRiverGPU<double>(Param XParam, River XRiver, double qnow, int* Riverblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
+/**
+ * @brief Inject multiple river discharges into the model grid on the GPU.
+ * Injects river discharges into the model grid based on river geometry and discharge rates.
+ * Optimisation by processing multiple rivers in a single kernel launch.
+ * @param XParam Model parameters
+ * @param irib Index of the river being processed
+ * @param XRin River information structure
+ * @param XBlock Block data structure
+ * @param XAdv Advance data structure
+ */
 template <class T> __global__ void InjectManyRiversGPU(Param XParam,int irib, RiverInfo<T> XRin, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	int halowidth = XParam.halowidth;
@@ -258,6 +301,16 @@ template <class T> __global__ void InjectManyRiversGPU(Param XParam,int irib, Ri
 
 }
 
+/**
+ * @brief Inject river discharge into the model grid on the CPU.
+ * Injects river discharge into the model grid based on river geometry and discharge rate.
+ * @param XParam Model parameters
+ * @param XRiver River data structure
+ * @param qnow Current river discharge rate
+ * @param Riverblks Array of blocks affected by the river
+ * @param XBlock Block data structure
+ * @param XAdv Advance data structure
+ */
 template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qnow, int nblkriver, int* Riverblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
 	unsigned int ib;
@@ -312,6 +365,14 @@ template <class T> __host__ void InjectRiverCPU(Param XParam, River XRiver, T qn
 template __host__ void InjectRiverCPU<float>(Param XParam, River XRiver, float qnow, int nblkriver, int* Riverblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
 template __host__ void InjectRiverCPU<double>(Param XParam, River XRiver, double qnow, int nblkriver, int* Riverblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
+/**
+ * @brief Add rainfall forcing to the model on the GPU.
+ * Adds rainfall forcing to the model based on rainfall data and current simulation time.
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Rain Rainfall dynamic forcing structure
+ * @param XAdv Advance data structure
+ */
 template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -347,7 +408,15 @@ template <class T> __global__ void AddrainforcingGPU(Param XParam, BlockP<T> XBl
 template __global__ void AddrainforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
 template __global__ void AddrainforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
 
-
+/**
+ * @brief Add rainfall forcing to the model implicitly on the GPU.
+ * Adds rainfall forcing to the model based on rainfall data and current simulation time, updating water depth and surface elevation.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param XBlock Block data structure
+ * @param Rain Rainfall dynamic forcing structure
+ * @param XEv Evolving data structure
+ */
 template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -393,7 +462,14 @@ template <class T> __global__ void AddrainforcingImplicitGPU(Param XParam, Loop<
 template __global__ void AddrainforcingImplicitGPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __global__ void AddrainforcingImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
-
+/**
+ * @brief Add rainfall forcing to the model on the CPU.
+ * Adds rainfall forcing to the model based on rainfall data and current simulation time.
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Rain Rainfall dynamic forcing structure
+ * @param XAdv Advance data structure
+ */
 template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Rain, AdvanceP<T> XAdv)
 {
 	int ib;
@@ -442,6 +518,15 @@ template <class T> __host__ void AddrainforcingCPU(Param XParam, BlockP<T> XBloc
 template __host__ void AddrainforcingCPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Rain, AdvanceP<float> XAdv);
 template __host__ void AddrainforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Rain, AdvanceP<double> XAdv);
 
+/**
+ * @brief Add rainfall forcing to the model implicitly on the CPU.
+ * Adds rainfall forcing to the model based on rainfall data and current simulation time, updating water depth and surface elevation.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param XBlock Block data structure
+ * @param Rain Rainfall dynamic forcing structure
+ * @param XEv Evolving data structure
+ */
 template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, DynForcingP<float> Rain, EvolvingP<T> XEv)
 {
 	int ib;
@@ -497,6 +582,17 @@ template <class T> __host__ void AddrainforcingImplicitCPU(Param XParam, Loop<T>
 template __host__ void AddrainforcingImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, DynForcingP<float> Rain, EvolvingP<float> XEv);
 template __host__ void AddrainforcingImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, DynForcingP<float> Rain, EvolvingP<double> XEv);
 
+/**
+ * @brief Add infiltration forcing to the model implicitly on the CPU.
+ * Adds infiltration forcing to the model based on infiltration data and current water depth, updating water depth and surface elevation.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param XBlock Block data structure
+ * @param il Initial infiltration rates array
+ * @param cl Continuous infiltration rates array
+ * @param XEv Evolving data structure
+ * @param hgw Groundwater height array
+ */
 template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* hgw)
 {
 	int ib;
@@ -542,6 +638,17 @@ template <class T> __host__ void AddinfiltrationImplicitCPU(Param XParam, Loop<T
 template __host__ void AddinfiltrationImplicitCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, float* il, float* cl, EvolvingP<float> XEv, float* hgw);
 template __host__ void AddinfiltrationImplicitCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* hgw);
 
+/**
+ * @brief Add infiltration forcing to the model implicitly on the GPU.
+ * Adds infiltration forcing to the model based on infiltration data and current water depth, updating water depth and surface elevation.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param XBlock Block data structure
+ * @param il Initial infiltration rates array
+ * @param cl Continuous infiltration rates array
+ * @param XEv Evolving data structure
+ * @param hgw Groundwater height array
+ */
 template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* hgw)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -580,7 +687,15 @@ template __global__ void AddinfiltrationImplicitGPU<float>(Param XParam, Loop<fl
 template __global__ void AddinfiltrationImplicitGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, double* il, double* cl, EvolvingP<double> XEv, double* hgw);
 
 
-
+/**
+ * @brief Add wind forcing to the model on the GPU.
+ * Adds wind forcing to the model based on wind data and current simulation time.
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Uwind U-component of wind dynamic forcing structure
+ * @param Vwind V-component of wind dynamic forcing structure
+ * @param XAdv Advance data structure
+ */
 template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -629,6 +744,14 @@ template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBl
 template __global__ void AddwindforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<float> XAdv);
 template __global__ void AddwindforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<double> XAdv);
 
+/**
+ * @brief Add atmospheric pressure forcing to the model on the GPU.
+ * Adds atmospheric pressure forcing to the model based on pressure data and current simulation time.
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param PAtm Atmospheric pressure dynamic forcing structure
+ * @param XModel Model data structure
+ */
 template <class T> __global__ void AddPatmforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> PAtm, Model<T> XModel)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -659,7 +782,16 @@ template <class T> __global__ void AddPatmforcingGPU(Param XParam, BlockP<T> XBl
 template __global__ void AddPatmforcingGPU<float>(Param XParam, BlockP<float> XBlock, DynForcingP<float> PAtm, Model<float> XModel);
 template __global__ void AddPatmforcingGPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> PAtm, Model<double> XModel);
 
-
+/**
+ * @brief Add wind forcing to the model on the CPU.
+ * Adds wind forcing to the model based on wind data and current simulation time.
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Uwind U-component of wind dynamic forcing structure
+ * @param Vwind V-component of wind dynamic forcing structure
+ * @param XAdv Advance data structure
+ * 
+ */
 template <class T> __host__ void AddwindforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
 {
 	//
@@ -713,7 +845,15 @@ template __host__ void AddwindforcingCPU<float>(Param XParam, BlockP<float> XBlo
 template __host__ void AddwindforcingCPU<double>(Param XParam, BlockP<double> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<double> XAdv);
 
 
-
+/**
+ * @brief Add atmospheric pressure forcing to the model on the CPU.
+ * Adds atmospheric pressure forcing to the model based on pressure data and current simulation time.
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param PAtm Atmospheric pressure dynamic forcing structure
+ * @param XModel Model data structure
+ * 
+ */
 template <class T> __host__ void AddPatmforcingCPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> PAtm, Model<T> XModel)
 {
 	//
@@ -761,7 +901,13 @@ template __host__ void AddPatmforcingCPU<double>(Param XParam, BlockP<double> XB
 
 
 
-
+/**
+ * @brief Interpolate dynamic forcing data at given coordinates on the GPU.
+ * Interpolates dynamic forcing data at specified coordinates using bilinear interpolation.
+ * @param x X-coordinate
+ * @param y Y-coordinate
+ * @param Forcing Dynamic forcing data structure
+ */
 template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing)
 {
 	T read;
@@ -778,7 +924,13 @@ template <class T> __device__ T interpDyn2BUQ(T x, T y, TexSetP Forcing)
 template __device__ float interpDyn2BUQ<float>(float x, float y, TexSetP Forcing);
 template __device__ double interpDyn2BUQ<double>(double x, double y, TexSetP Forcing);
 
-
+/**
+ * @brief Interpolate data at given coordinates on the GPU.
+ * Interpolates data at specified coordinates using bilinear interpolation.
+ * @param x X-coordinate
+ * @param y Y-coordinate
+ * @param Forcing Dynamic forcing data structure
+ */
 template <class T> __device__ T interp2BUQ(T x, T y, TexSetP Forcing)
 {
 	T read;
@@ -792,7 +944,16 @@ template <class T> __device__ T interp2BUQ(T x, T y, TexSetP Forcing)
 template __device__ float interp2BUQ<float>(float x, float y, TexSetP Forcing);
 template __device__ double interp2BUQ<double>(double x, double y, TexSetP Forcing);
 
-
+/**
+ * @brief Perform a deformation step on the model.
+ * Applies deformation maps to the model based on the current simulation time and deformation parameters.
+ * Overloaded function to handle both CPU and GPU models.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param deform Vector of deformation maps
+ * @param XModel Model data structure
+ * @param XModel_g Model data structure for GPU
+ */
 template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel, Model<T> XModel_g)
 {
 	if (XParam.GPUDEVICE < 0)
@@ -809,6 +970,14 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 template void deformstep<float>(Param XParam, Loop<float> XLoop, std::vector<deformmap<float>> deform, Model<float> XModel, Model<float> XModel_g);
 template void deformstep<double>(Param XParam, Loop<double> XLoop, std::vector<deformmap<float>> deform, Model<double> XModel, Model<double> XModel_g);
 
+/**
+ * @brief Perform a deformation step on the model.
+ * Applies deformation maps to the model based on the current simulation time and deformation parameters.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param deform Vector of deformation maps
+ * @param XModel Model data structure
+ */
 template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<deformmap<float>> deform, Model<T> XModel)
 {
 	dim3 gridDim(XParam.nblk, 1, 1);
@@ -869,7 +1038,14 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 }
 
-
+/**
+ * @brief Perform a deformation step on the model on the GPU.
+ * Applies deformation maps to the model based on the current simulation time and deformation parameters.
+ * @param XParam Model parameters
+ * @param XLoop Loop structure containing time information
+ * @param deform Vector of deformation maps
+ * @param XModel Model data structure for GPU
+ */
 template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb)
 {
 	unsigned int ix = threadIdx.x;
@@ -913,6 +1089,17 @@ template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, 
 
 }
 
+/**
+ * @brief Perform a deformation step on the model on the CPU.
+ * Applies deformation maps to the model based on the current simulation time and deformation parameters.	
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param defmap Deformation map
+ * @param XEv Evolving data structure
+ * @param scale Scaling factor for deformation
+ * @param zb Bed elevation array
+ * 
+ */
 template <class T> __host__ void AddDeformCPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb)
 {
 	int ib;
