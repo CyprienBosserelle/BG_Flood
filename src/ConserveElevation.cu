@@ -909,7 +909,7 @@ template <class T> __host__ __device__ void conserveElevationGradHaloB(int halow
 	if (hwet > T(0.0))
 	{
 		zswet = zswet / hwet;
-0..		hq = utils::max(T(0.0), zswet - zbq);
+		hq = utils::max(T(0.0), zswet - zbq);
 		
 	}
 	else
