@@ -14,14 +14,17 @@ theme:
   - toc.integrate
   - content.code.copy
   - content.code.select
+extra_css:
+  - assets/css/extra.css
 
 
 plugins:
   - search
   - mkdocs-video
+  - glightbox
   #- awesome-nav
   - mkdoxy:
-      #doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
+      doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
       projects:
         BGFlood: # name of project must be alphanumeric + numbers (without spaces)
           src-dirs: src/ # path to source code (support multiple paths separated by space) => INPUT

@@ -17,10 +17,41 @@ This code is an open-source shallow water solver. Designed to be fast, it run on
 - fresh water flooding (fluvial and pluvial)
 - tsunami propagation and run-off
 
+<!-- glightbox-gallery 
+<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+  <a href="./videos/Westport_flooding.mp4" class="glightbox" data-type="video">
+    <img src="./videos/Westport_flooding_thumb.jpg" alt="Westport Flooding" style="height:120px;">
+  </a>
+  <a href="./videos/Tsunami_AtmosphericP.mp4" class="glightbox" data-type="video">
+    <img src="./videos/Tsunami_AtmosphericP_thumb.jpg" alt="Tsunami AtmosphericP" style="height:120px;">
+  </a>
+  <a href="./videos/Tsunami_multi-levels.gif" class="glightbox">
+    <img src="./videos/Tsunami_multi-levels.gif" alt="Tsunami" style="height:120px;">
+  </a>
+  <a href="./videos/Nadi_Flooding.gif" class="glightbox">
+    <img src="./videos/Nadi_Flooding.gif" alt="Nadi" style="height:120px;">
+  </a>
+</div>
+<!-- glightbox-gallery-end -->
+
+<!--
+<div class="glightbox-gallery">
+<!-- glightbox-gallery 
+![type:video](videos/Westport_flooding.mp4)
+![type:video](videos/Tsunami_AtmosphericP.mp4)
+![Tsunami](videos/Tsunami_multi-levels.gif)
+![Nadi](videos/Nadi_Flooding.gif)
+<!-- glightbox-gallery-end 
+</div>
+--> 
+
+
+ 
 ![type:video](./videos/Westport_flooding.mp4)
 ![type:video](./videos/Tsunami_AtmosphericP.mp4)
 ![Tsunami](./videos/Tsunami_multi-levels.gif)
 ![Nadi](./videos/Nadi_Flooding.gif)
+
 
 
 
