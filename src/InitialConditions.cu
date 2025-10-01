@@ -498,8 +498,10 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			XModel.culvertsF.h2[cc] = 0.0;
 			XModel.culvertsF.zs1[cc] = 0.0;
 			XModel.culvertsF.zs2[cc] = 0.0;
+
+			printf("Culvert_init =%f \n", XModel.culvertsF.h1[0]);
 		}
-		printf("Culvert_init =%f \n", XModel.culvertsF.h1[1]);
+		
 	}
 
 }

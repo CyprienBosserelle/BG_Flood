@@ -9,7 +9,7 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 	T Qmax, Vol1, Q;
 	int cc;
 
-
+	printf("nblkculvert = %d, XCulverts.size() = %zu\n", XModel.bndblk.nblkculvert, XCulverts.size());
 	// Get the elevation/water column for each culvert edge and put it in the culvert structure (loop on concerned blocks)
 	
 	if (XParam.GPUDEVICE >= 0)
@@ -220,8 +220,8 @@ template <class T> __global__ void GetCulvertElevGPU(Param XParam, int cc, Culve
 	//printf("culvert read ix1=%i, iy1=%i\n", XCulvert.ix1, XCulvert.iy1);
 	//for (int cc = 0; cc < XCulverts.size(); cc++)
 	//{
-		//if (ibl == XCulvert.block1 || ibl == XCulvert.block2)
-		//{
+		if (ibl == XCulvert.block1 || ibl == XCulvert.block2)
+		{
 			if (ix == XCulvert.ix1 && iy == XCulvert.iy1)
 			{
 				XCulvertF.h1[cc] = XEv.h[i];
@@ -232,7 +232,7 @@ template <class T> __global__ void GetCulvertElevGPU(Param XParam, int cc, Culve
 				XCulvertF.h2[cc] = XEv.h[i];
 				XCulvertF.zs2[cc] = XEv.zs[i];
 			}
-		//}
+		}
 	//}
 
 }
