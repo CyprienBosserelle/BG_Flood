@@ -16,8 +16,8 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 	{
 		for (cc = 0; cc < XCulverts.size(); cc++)
 		{
-		    GetCulvertElevGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.evolv);
-			//CUDA_CHECK(cudaDeviceSynchronize());
+		    GetCulvertElevGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc].block1, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block2, XCulverts[cc].ix2, XCulverts[cc].iy2, XModel.culvertsF, XModel.bndblk.culvert, XModel.evolv);
+			CUDA_CHECK(cudaDeviceSynchronize());
 			//CopyGPUtoCPU   (XParam,BlockP, )
 			//CopyGPUtoCPU(int , int blksize, T * z_cpu, T * z_gpu)
 		}
@@ -36,8 +36,9 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 		for (cc = 0; cc < XCulverts.size(); cc++)
 		{
 			DischargeCulvertGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert);
+			CUDA_CHECK(cudaDeviceSynchronize());
 		}
-		CUDA_CHECK(cudaDeviceSynchronize());
+		
 	}
 	else
 	{
@@ -204,7 +205,7 @@ template __host__ void InjectCulvertCPU<float>(Param XParam, std::vector<Culvert
 template __host__ void InjectCulvertCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
 
 
-template <class T> __global__ void GetCulvertElevGPU(Param XParam, int cc, Culvert XCulvert, CulvertF<T>& XCulvertF, int* Culvertblks, EvolvingP<T> XEv)
+template <class T> __global__ void GetCulvertElevGPU(Param XParam, int cc, int b1, int ix1, int iy1, int b2, int ix2,int iy2, CulvertF<T>& XCulvertF, int* Culvertblks, EvolvingP<T> XEv)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
@@ -220,14 +221,14 @@ template <class T> __global__ void GetCulvertElevGPU(Param XParam, int cc, Culve
 	//printf("culvert read ix1=%i, iy1=%i\n", XCulvert.ix1, XCulvert.iy1);
 	//for (int cc = 0; cc < XCulverts.size(); cc++)
 	//{
-		if (ibl == XCulvert.block1 || ibl == XCulvert.block2)
+		if (ibl == b1 || ibl == b2)
 		{
-			if (ix == XCulvert.ix1 && iy == XCulvert.iy1)
+			if (ix == ix1 && iy == iy1)
 			{
 				XCulvertF.h1[cc] = XEv.h[i];
 				XCulvertF.zs1[cc] = XEv.zs[i];
 			}
-			if (ix == XCulvert.ix2 && iy == XCulvert.iy2)
+			if (ix == ix2 && iy == iy2)
 			{
 				XCulvertF.h2[cc] = XEv.h[i];
 				XCulvertF.zs2[cc] = XEv.zs[i];
@@ -236,8 +237,8 @@ template <class T> __global__ void GetCulvertElevGPU(Param XParam, int cc, Culve
 	//}
 
 }
-template __global__ void GetCulvertElevGPU<float>(Param XParam, int cc, Culvert XCulvert, CulvertF<float>& XCulvertF, int* Culvertblks, EvolvingP<float> XEv);
-template __global__ void GetCulvertElevGPU<double>(Param XParam, int cc, Culvert XCulvert, CulvertF<double>& XCulvertF, int* Culvertlks, EvolvingP<double> XEv);
+template __global__ void GetCulvertElevGPU<float>(Param XParam, int cc, int b1, int ix1, int iy1, int b2, int ix2, int iy2, CulvertF<float>& XCulvertF, int* Culvertblks, EvolvingP<float> XEv);
+template __global__ void GetCulvertElevGPU<double>(Param XParam, int cc, int b1, int ix1, int iy1, int b2, int ix2, int iy2, CulvertF<double>& XCulvertF, int* Culvertlks, EvolvingP<double> XEv);
 
 
 template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)

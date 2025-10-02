@@ -166,7 +166,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (XForcing.culverts.size() > 0)
 	{
 		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		//CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
 	//============================================
