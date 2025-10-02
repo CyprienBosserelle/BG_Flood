@@ -53,22 +53,30 @@ This code is an open-source shallow water solver. Designed to be fast, it run on
 ![Nadi](./videos/Nadi_Flooding.gif)
 
 
-
-
-
 # Model development stage
-BG-Flood is still in early development stage but is already useful for real inundation simulation.       
+BG-Flood has now reach the first release stage but some further development are already ongoing or planned.       
 
 The master branch is at stage 4 of development with 5 stage planned as below:
 
-- [x] Cartesian naive formulation
-- [x] Same but with some ease of use for modelling studie
 - [x] Block Uniform formulation at constant level with masked blocks (with a full swing of _user friendly_ capabilities)
-- [x] Static Block uniform Quad-tree formulation (i.e. adapted mesh at the first step only )
-- [ ] Set of core solvers:
+- [x] Static Block uniform Quad-tree formulation (i.e. adapted mesh at the first step only), grid self-generated
+- [x] Set of core solvers:
     * [x] Reimann
     * [x] Kurganov
-    * [ ] new one...
+- [x] Multi-forcings
+    * [x] River input
+    * [x] Tidal forcing (complex polygon and forcing maps to allow nesting)
+    * [x] Rain-on-grid
+    * [x] Atmospheric pressure and wind forcing
+    * [x] Bottom friction
+    * [x] Ground infiltration (basic ILCL model)
+    * [x] Ground deformation (along the simulation but not flow induced)
+
+Future developments:
+
+- [ ] Multi-layer solver (on-going)
+- [ ] Flood structures modelling (on-going)
+- [ ] Wave forcing / storm surge
 - [ ] fully adaptive Block uniform Quad-tree formulation  (i.e. basilisk style wavelet refine)
 
 
