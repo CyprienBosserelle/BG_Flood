@@ -75,7 +75,7 @@ Input bathymetry data as a regular grid using `.asc`, `.nc`, `.md`. This is a re
 
 The correct way of reading the file will be dedicated by the file extension. For `.nc` (netcdf) files you can specify the name of the variable in the file as: `mybathyfile.nc?myvar` (will look for `zb` if none are specified). 
 
-This input file is critical as it defines the extent of the model grid and the base resolution in the model.
+This input file is critical as it defines the extent of the model grid and the base resolution in the model, see below for details.
 
 *Note*: 
 !!! Note
@@ -86,10 +86,12 @@ This input file is critical as it defines the extent of the model grid and the b
 
 !!! info "BG_Flood generates its own mesh"
 
-BG_Flood generates its own  mesh based on the a referrence point, size and resolution ( by default extracted from the DEM (Digital Elevation Model) extent and resolution). 
+BG_Flood generates its own mesh based on the a referrence point, size and resolution ( by default extracted from the DEM (Digital Elevation Model) extent and resolution). 
 The extent of the mesh and resolution of the mesh can be overridden by the user via several options. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.
 
 The mesh is a Block Uniform Quadtree. Meaning that it is a domain similar to a quadtree except that each element of the quadtree is a regular cartesian grid of 16x16 elements.
+
+![This is a block](./img/block_description.png)
 
 
 ### Mesh domain/extent
@@ -106,6 +108,8 @@ ymax = 5.0;
 ```
 
 In the case above BG_Flood will create a grid that has a bottom left corner at the ```(xo,yo)``` coordinate and extend at least all the way to coordinate ```(xmax,ymax)```.
+
+
 
 ### Resolution
 
