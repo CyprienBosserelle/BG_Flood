@@ -18,10 +18,7 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 		{
 		    GetCulvertElevGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc].block1, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block2, XCulverts[cc].ix2, XCulverts[cc].iy2, XModel.culvertsF, XModel.bndblk.culvert, XModel.evolv);
 			CUDA_CHECK(cudaDeviceSynchronize());
-			//CopyGPUtoCPU   (XParam,BlockP, )
-			//CopyGPUtoCPU(int , int blksize, T * z_cpu, T * z_gpu)
 		}
-		//CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
@@ -35,7 +32,7 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 	{
 		for (cc = 0; cc < XCulverts.size(); cc++)
 		{
-			DischargeCulvertGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert);
+			DischargeCulvertGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc].Qmax, XCulverts[cc].dx1, XCulverts[cc].type, XModel.culvertsF, XModel.bndblk.culvert);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		
@@ -264,7 +261,7 @@ template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culver
 template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
 
 
-template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, Culvert XCulvert, CulvertF<T>& XCulvertF, int* Culvertblks)
+template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, double Qmax, double dx1, int type, CulvertF<T>& XCulvertF, int* Culvertblks)
 {
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
@@ -273,15 +270,15 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, Cul
 
 	//for (int cc = 0; cc < XCulverts.size(); cc++)
 	//{
-		if (XCulvert.type == 0)
+		if (type == 0)
 		{
-			CulvertPump(XCulvert, XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], XParam.dt);
+			CulvertPump(Qmax, dx1, XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], XParam.dt);
 		}
 	//}
 }
 
-template __global__ void DischargeCulvertGPU<float>(Param XParam, int cc, Culvert XCulvert, CulvertF<float>& XCulvertF, int* Culvertblks);
-template __global__ void DischargeCulvertGPU<double>(Param XParam, int cc, Culvert XCulvert, CulvertF<double>& XCulvertF, int* Culvertlks);
+template __global__ void DischargeCulvertGPU<float>(Param XParam, int cc, double Qmax, double dx1, int type, CulvertF<float>& XCulvertF, int* Culvertblks);
+template __global__ void DischargeCulvertGPU<double>(Param XParam, int cc, double Qmax, double dx1, int type, CulvertF<double>& XCulvertF, int* Culvertlks);
 
 template <class T> __host__ void DischargeCulvertCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks)
 {
@@ -293,7 +290,7 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, std::vector<C
 	//Pump system	
 		if (XCulverts[cc].type == 0)
 		{
-			CulvertPump(XCulverts[cc], XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], XParam.dt);
+			CulvertPump(XCulverts[cc].Qmax, XCulverts[cc].dx1, XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], XParam.dt);
 		}
 		/*
 		//printf("H1=%f , H2=%f, DQ=%f \n", XModel.culvertsF.h1[cc], XModel.culvertsF.h2[cc], XModel.culvertsF.dq[cc]);
@@ -327,12 +324,11 @@ template __host__ void DischargeCulvertCPU<float>(Param XParam, std::vector<Culv
 template __host__ void DischargeCulvertCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF, int nblkculvert, int* Culvertblks);
 
 
-template <class T> __host__ __device__ void CulvertPump(Culvert XCulvert, T h1, T h2, T zs1, T zs2, T & dq, double dt)
+template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T & dq, double dt)
 {
-	T Qmax, Vol1, Q;
+	T Vol1, Q;
 
-	Qmax = XCulvert.Qmax;
-	Vol1 = h1 * XCulvert.dx1 * XCulvert.dx1;
+	Vol1 = h1 * dx1 * dx1;
 	Q = T(Vol1 * dt);
 	if (Q > Qmax)
 	{
@@ -343,5 +339,5 @@ template <class T> __host__ __device__ void CulvertPump(Culvert XCulvert, T h1, 
 		dq = Q;
 	}
 }
-template __host__ __device__ void CulvertPump<float>(Culvert XCulvert, float h1, float h2, float zs1, float zs2, float& q, double dt);
-template __host__ __device__ void CulvertPump<double>(Culvert XCulvert, double h1, double h2, double zs1, double zs2, double& q, double dt);
+template __host__ __device__ void CulvertPump<float>(double Qmax, double dx1, float h1, float h2, float zs1, float zs2, float& dq, double dt);
+template __host__ __device__ void CulvertPump<double>(double Qmax, double dx1, double h1, double h2, double zs1, double zs2, double& dq, double dt);
