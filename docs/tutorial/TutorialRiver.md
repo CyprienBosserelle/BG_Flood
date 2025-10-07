@@ -9,17 +9,17 @@ During this event, the Buller river, passing through the town of Westport, on th
 !!! info "Prerequisite"
      Before begining this tutoral, the user is expected to have downloaded the windows executable ([last release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest) on github) or compiled the sources (version > 0.8) of the BG_flood code on linux.
 
-During this tutorial, we will build, step by step, a test case
+During this tutorial, we will build, step by step, a test case. A relatively simple testcase will be build first. Then an example with more complex rain, tidal boundaries inputs will also be shared and explained.
 
 
-# Param file
+## Param file
 The interface with BG_flood software is done using only a text file: `BG_param.txt`
 (This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG_Flood.)
 
 This file consists in a list of key words and inputs, separated by a "=" sign. 
 For a full list of the available key words and a further description of this file, please refer to the [parameter list]{../ParametersList-py.md} and the [manual]{../Manual.md}.
 
-# Preparation of the topography/bathymetry (DEM: Digital Elevation Model)
+### Preparation of the topography/bathymetry (DEM: Digital Elevation Model)
 The DEM, topography or bathymetry file is the only necessary file to be added to BG_param file to run the model.
 ``` txt
 DEM = Wesport_DEM_8m.nc?z;
@@ -74,10 +74,10 @@ A log file: `BG_log.txt` (very similaire to the shell outputs) is also created t
 ![logfile](../figure/log_file.png)
 
 
-# Basic fluvial flooding set-up
+## Basic fluvial flooding set-up
 
 
-## River discharge
+### River discharge
 The river are (at this stage) forced by a vertical discharge on a user defined rectagular area:
 ``` txt 
 river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
@@ -92,7 +92,7 @@ This file has been generated from an observed hydrograph, with data saved every 
 
 For each new river, just add the a similar river input line in the parameter file.
 
-## Timekeeping parameters
+### Timekeeping parameters
 In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
 
 The end of the simulation is prescribed in second as :
@@ -111,13 +111,13 @@ to begin one hour after the reference time (used in the forcings for example).
 !!! note
     The code was initially designed to consider time only through duration in second. We can now use dates to defined time in the forcings and the param file, including a time reference. 
 
-## Outputs
+### Outputs
 There is two types of outputs:
 
  - map outputs of 2D variables regularly through time
  - time-serie (TS) output of basic values, at a chosen point position, at each time step.
 
-### Map outputs
+#### Map outputs
 By default, there is only a map output at the begining and end of the simulation.
 
 The map output can be modify by:
@@ -141,7 +141,7 @@ outfile = Results_tuto_basicRun.nc;
 smallnc = 0;
 ```
 
-### Time-Serie outputs
+#### Time-Serie outputs
 For each TS output needed, a line with the destination file and the postition is needed:
 
 ``` txt 
@@ -150,13 +150,13 @@ TSnodesout=Offshore.txt,1482120,53814890;
 corresponding to `TSnodesout=filename.txt,x_p,y_p;`
 The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).
 
-## Resolution
+### Resolution
 For a first test, we will modify the resolution and set it to 40m to decrease the computational time:
 ``` txt 
 dx=40;
 ```
 
-## Basic fluvial innundation results
+### Basic fluvial innundation results
 This the shell output:
 ![shell2](../figure/Shell_output2.png)
 It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).
@@ -168,8 +168,8 @@ The Time-Serie output is:
 ![TS2](../figure/offshore.png)
 
 
-# Completing the set-up
-## Adding boundary conditions
+## Completing the set-up
+### Adding boundary conditions
 Boundaries' conditions are refered by their position, using 'top/bottom/right/left' keywords. They are associated to a boundary type ( 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d) and possibly a file containing a time serie. In this case, the file name is placed before the type, coma-separated. 
 
 In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.e. for the top, left and right boundaries.
@@ -182,7 +182,7 @@ top = tide_westport.txt,2;
 
 In this case, as the boundaries are relatively small compared to the time wave length, we will used the same value along all the boundaries. We will then have only two columns in the file: Time and one elevation.
 tide_file
-``` txt "tide_westport.txt"
+``` txt title="tide_westport.txt"
 0.000000 	0.714714 
 600.000000 	0.794714 
 1200.000000 	0.864714 
@@ -206,7 +206,6 @@ tide_file
 339000.000000 	-0.875286 
 339600.000000 	-0.915286 
 340200.000000 	-0.955286 
-
 ```
 
 They correspond to a classic time Serie observed offshore of the river mouth.
@@ -217,7 +216,7 @@ They correspond to a classic time Serie observed offshore of the river mouth.
     If more values are added to the file (more columns), they will be regularly spread along the boundary and the forcing will be linearly interpolated between these values. 
 
 
-## Bottom friction
+### Bottom friction
 Different models from bottom friction are available.
 By default, the model used is -1 corresponding to a Manning model.
 Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models).
@@ -232,7 +231,7 @@ cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
 !!! warning
     The model allows a roughness heigh or manning number map smaller than the computational domain and will extrapolate outside of the map.
 
-## Initialisation
+### Initialisation
 By default, the model is initialised by a plane water surface located at $z=0.0$.
 
 This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using:
@@ -248,7 +247,7 @@ hotstep=5;
 !!! warning
     the code can be restarted only from an uniform grid (and not from results with multi-level of resolutions).
 
-## Model controls
+### Model controls
 Some variables can be used to adjust the model (see Manual for more details):
 
 - run on CPU (or choose a GPU to run on):
@@ -272,11 +271,11 @@ eps = 0.00010000; #default=0.0001
 
 
 
-# ... Adding the rain
+## ... Adding the rain
 
 The model allows rain on grid forcing to model pluvial inundations.
 
-## Rain forcing
+### Rain forcing
 A rain intensity in $mm.h^{-1}$, time and space varying can be forced in the model.
 
 The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:
@@ -315,7 +314,7 @@ AOI=Domain_buffered-sea2.gmt;
 
 
 
-# Refining the grid in area of interest
+## Refining the grid in area of interest
 The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
 These blocks can have different resolutions (but resolution does not change during the computation at this stage).
 
@@ -388,7 +387,7 @@ Adaptation = Targetlevel,refin_mask.nc?z ;
      outzone=zoomed.nc,5.3,5.4,0.5,0.8;
      ``` 
 
-## Results:
+### Results:
 This is the logfile:
 ``` txt title="BG_log.txt"
 #################################
@@ -467,6 +466,167 @@ When open with pyncview, we can visualise each layer. QGIS can merge all these l
 ![output_v3](../figure/outputs_v3.png)
 
 
+## How to incorporate more complex inputs
+Some more complex inputs can be used in this type of realistic model:
+
+### Date as time reference
+Up to here, the time was define as a duration in second from an arbitrary reference (begining of the simulation for example). All the inputs and the BG_param.txt file used this definition. Due to this convention, most of the inputs had to be modified to change date to duration in seconds, and the resluts are also in second (which can be confusing).
+The solver can use dates in the inputs (same time zone for all dates) and in the BG_param.txt, as:
+
+``` txt
+reftime = 2018-02-16T01:00:00
+
+starttime = 2018-02-16T02:00:00
+
+outputtimestep = 3600.000000
+
+endtime = 2018-02-18T17:00:00
+```
+
+where:
+
+- `reftime` is the reference time for the simulation
+- time convention is : $yyyy-mm-dd\textbf{T}hh:mm:ss$
+
+### Map boundary conditions
+To improve the boundary forcing, there is possibility to use a netcdf file associated to contours to define the boundary based on a time evolving 2D surface. It can be use to impose water elevation to impose tide or any open-water forcing for example, specially in a nested configuration.
+
+``` txt
+bndseg = tidebndpoly.bnd,tidebnd.nc,3;
+
+bndtaper = 7200.000000
+```
+where:
+-  `tidebnb.nc` is a 2D time varying map of water surface elevation.
+- `3` is the type of boundary (absorbing boundary).
+- `tidebndpoly.bnd` is a polygon where the boundary is applied
+- `bndtaper` is the duration of the relaxation of the boundary ($s$)
+
+As mention earlier, the computationnal domain can be define (or more specifically reduce from default DEM based domain) using an "aoi" (area of interest) which consist in a looped list of points.
+The boundary by default along it is a wall but can be modified by the following parameter `aoibnd`:
+
+``` txt
+aoi = aoi_BGFLOOD.txt
+
+aoibnd = 3;
+```
+
+
+### Multi DEM/roughness inputs
+The code support different inputs of DEMs or roughness maps. It will use the first DEM to define the computational extend by default. Then, for each grid point, it will use the last DEM provided where a valide value is defined at this location.
+One can for example provide a low resolution DEM of all the domain then add a high resolution of a given urban area if higher resolution will be sought after there. Similar set-up is also allowed for roughness maps.
+``` txt
+# DEM for the full domain, 8m resolution
+topofile = geofabric_8m_rupp_and_smart.nc?z;
+
+# DEM for the urban center, 2m resolution
+topofile = geofabric_2m_town.nc?z;
+```
+
+### Multi river injection
+Any number of river injection can be added (tested up to a thousand).
+Just repeat the river injection line as many times as needed.
+
+
+### Full BG_param.txt file
+
+``` txt
+##########
+# DEM    #
+##########
+
+# DEM for the full domain, 8m resolution
+topofile = geofabric_8m_rupp_and_smart.nc?z;
+
+# DEM for the urban center, 2m resolution
+topofile = geofabric_2m_town.nc?z;
+
+
+xmin = 1465335.000000
+xmax = 1497847.000000
+ymin = 5351567.000000
+ymax = 5388175.000000
+aoi = aoi_BGFLOOD.txt
+dx = 64.000000
+
+##############
+# Forcing    #
+##############
+
+zsoffset = 0.000000
+zsinit = -1.000000
+frictionmodel = 1
+cfmap = Roughness.nc?zo
+
+rainfile =outputrain_test.nc?depth
+
+##########
+# Rivers #
+##########
+
+
+
+
+###############
+# Adaptation  #
+###############
+
+initlevel = 0
+Adaptation = Targetlevel,refine_mask_town.nc
+minlevel = 0
+maxlevel = 4
+
+################
+# Boundaries   #
+################
+
+aoibnd = 3;
+bndseg = tidebndpoly.bnd,tidebnd.nc,3;
+
+#############
+# Timing    #
+#############
+
+bndtaper = 7200.000000
+
+reftime = 2018-02-16T01:00:00
+
+starttime = 2018-02-16T02:00:00
+
+outputtimestep = 3600.000000
+
+endtime = 2018-02-18T17:00:00
+
+#############
+# Others    #
+#############
+
+gpudevice = 0
+
+vmax = 10.000000
+
+#############
+# Output    #
+#############
+
+smallnc = 0
+
+savebyblk= false
+
+outvars = zs, u, v, h, hmax, zsmax, U, hUmax, Umax;
+
+outfile = Westport_Inundation.nc
+
+```
+
+!!! note
+    This is a real configuration run that would take about 15h on a A100 GPU. Not to be run on laptop GPU, but can be tested locally with decreased resolution (`dx`)
+
+
+
+
+
+
 
 
 
@@ -476,11 +636,12 @@ An Initial Loss, Continuous Loss model has been implemented in the code (see ILC
 
 
 To use it, provide maps for the two coefficient as follow:
- ``` txt
+
+``` txt
 initialloss=InitialLoss.asc;
 continuousloss=ContinuousLoss.asc;
- ``` 
-
+``` 
+NetCDF files can also be used for these inputs.
 
 
 

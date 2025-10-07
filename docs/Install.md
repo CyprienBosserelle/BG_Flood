@@ -14,7 +14,7 @@ The code has only two dependencies:
 ## :fontawesome-brands-windows: Windows 10 - 11
 
 On windows OS you should be able to use the binaries/executable we make available in each [release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest).
-Simply download and unzip the file in a suitable directory and either add the folder to your PATH or move the dlls and .exe around where you want to run. 
+Simply download and unzip the file in a suitable directory and either add the folder to your PATH or move the dlls and .exe around where you want to run (you might need to unblock it before first use). 
 
 ### Build from source
 To build BG_Flood from source on Windows you will need to have pre-install:
@@ -74,7 +74,7 @@ The code can be run on local machines with NVIDIA GPU but it will get better per
 
 ### ESNZ supercomputer: Cascade
 This machine is set-up using stack and all tools need to be install through it before compiling/running the code.
-The PBS job manager is used.
+The PBS job manager is used (see `man pbs` for more information).
 
 #### Compiling the code
 ```{bash}
@@ -82,12 +82,17 @@ The PBS job manager is used.
 spack load netcdf-c@4.9.2%gcc@11.5.0 cuda@12.8.0
 nclib=`nc-config --libdir`
 export LD_LIBRARY_PATH="${nclib}:$LD_LIBRARY_PATH"
-
-cd BG_Flood_Folder
+```
+Go in the folder where BG_Flood sources have been cloned and compile:
+```{bash}
+cd BG_Flood
 
 make -j 10
 
 ```
+!!! note
+    The executable is copied to a bin two folders up: `cp BG_Flood ../../bin/x86_64/linux/release`. Check that you have writing right there! 
+
 !!! note
     Spack load doesn't set LD_LIBRARY_PATH so running
     executable won't find libnetcdf.  Also it doesn't set
@@ -101,22 +106,94 @@ make -j 10
 #!/bin/bash
 
 #PBS -N *my_pbs_job_name*
-#PBS -l select=1:ncpus=4:ngpus=1:mem=32gb
-#PBS -l walltime=72:00:00
-#PBS -q a100q=""
-#PBS -A *myaccount*
+#PBS -l select=1:ncpus=1:ngpus=1:mem=32gb:nodepool=a100p
+#PBS -l walltime=01:00:00
+#PBS -q a100q
 #PBS -W umask=027
 
 # Change to running directory if required
 cd *my_case_dir*
 
+# Loading needed packages
+. $(ls /opt/niwa/profile/spack_* | tail -1)
+spack load netcdf-c@4.9.2%gcc@11.5.0 cuda@12.8.0
+nclib=`nc-config --libdir`
+export LD_LIBRARY_PATH="${nclib}:$LD_LIBRARY_PATH"
+
 # Launch of the solver
-BG_Flood BG_param.txt
+./BG_Flood BG_param.txt
 
 ```
 
 
-### NESI
+
+#### Basic PBS commands 
+??? tip "Based on NASA, hecc website"
+    [Link to initial documentation](https://www.nas.nasa.gov/hecc/support/kb/commonly-used-pbs-commands_174.html)
+
+The four most commonly used PBS commands, `qsub`, `qstat`, `qdel`, and `qhold`, are briefly described below. See man pbs for a list of all PBS commands.
+
+##### qsub
+To submit a batch job to the specified queue using a script:
+```
+%qsub -q queue_name job_script 
+```
+Only one queue for GPUs for the moment. When queue_name is omitted, the job is routed to the default queue, which is the normal queue.
+
+The resource_list typically specifies the number of nodes, CPUs, amount of memory and wall time needed for this job. 
+
+See `man pbs_resources` for more information on what resources can be specified.
+
+!!! note
+    If `-l resource_list` is omitted, the default resources for the specified queue is used. When `queue_name` is omitted, the job is routed to the default queue, which is the normal queue.
+
+##### qstat
+
+To display queue information:
+```
+%qstat -Q queue_name
+%qstat -q queue_name
+%qstat -fQ queue_name 
+```
+Each option uses a different format to display all of the queues available, and their constraints and status. The `queue_name` is optional.
+
+To display job status:
+
+| Flag | Description        |
+|------|-------------------|
+| a    | Display all jobs in any status (running, queued, held) |
+| r    | Display all running or suspended jobs                  |
+| n    | Display the execution hosts of the running jobs        |
+| i    | Display all queued, held or waiting jobs               |
+| u username | Display jobs that belong to the specified user   |
+| s    | Display any comment added by the administrator or scheduler. This option is typically used to find clues of why a job has not started running. |
+| f job_id | Display detailed information about a specific job  |
+| xf job_id / xu user_id | Display status information for finished jobs (within the past 7 days). |
+
+
+!!! tip
+    Some of these flags can be combined when you are checking the job status.
+
+##### qdel
+
+To delete (cancel) a job:
+```
+%qdel job_id 
+```
+
+##### qhold
+
+To hold a job:
+```
+%qhold job_id 
+```
+Only the job owner or a system administrator with "su" or "root" privilege can place a hold on a job. The hold can be released using the `qrls` command.
+
+For more detailed information on each command, see their corresponding man pages.
+
+
+
+### NESI (Maui-Mahuika)
 !!! danger "Depreciated"
     NESI supercomputer has now been closed and replaced by REANZ new generation of machines.
 

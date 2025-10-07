@@ -49,7 +49,7 @@ nav:
   - Manual: 'Manual.md'
   - Tutorials:
       - Introduction: 'Tutorial_intro.md'
-      - 'Coastal fluvial flooding': 'tutorial/TutorialRiver.md'
+      - 'Pluvial and fluvial flooding': 'tutorial/TutorialRiver.md'
       - 'Jet and Julia': 'tutorial/TutorialJetJulia.md'
       - 'Gaussian wave' : 'tutorial/Gaussian_Wave_Julia.md'
       - 'Transpacific tsunami': 'tutorial/Transpacific_tsunami.md'

@@ -1,4 +1,8 @@
-# Tutorials
+## Tutorials
+
+Two differents types of tutorial are proposed, some are benchmark configurations, with basics inputs generated during the tutorials, the other ones are more realistic cases with inputs provided (to download).
+
+### Benchmark tutorials
 
 Here is a list of all the available tutorials:
 
@@ -8,7 +12,11 @@ Here is a list of all the available tutorials:
 
 - [Transpacific tsunami](tutorial/Transpacific_tsunami.md): Simple tutorial presenting a transpacific tsunami propagation
 
+- Monia tutorial (Julia) (still in construction)
+
+### Real configuration tutorials
+
 - [River flooding tutorial](tutorial/TutorialRiver.md): Simple tutorial that go through the construction of a simple `BG_param.txt` file for fluvial and pluvial flooding. Some realistic input files are provided.
 
-- Monia tutorial (Julia): still in construction
+- Tsunami propagation  (still in construction)
 
