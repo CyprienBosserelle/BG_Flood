@@ -214,6 +214,9 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.h2);
 		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zs1);
 		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zs2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.type);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.Qmax);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.dx1);
 	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later
@@ -502,6 +505,9 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h1);
 		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h2);
 		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dq);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.type);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.Qmax);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dx1);
 	}
 	
 	/*if (XParam.outvort)

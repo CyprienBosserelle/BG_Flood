@@ -468,8 +468,10 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			activeCulvertBlk.push_back(XForcing.culverts[cc].block1);
 			activeCulvertBlk.push_back(XForcing.culverts[cc].block2);
 		}
+
 		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
 		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
+		
 		/*if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
 		{
 			ReallocArray(activeCulvertBlk.size(), 1, XModel.bndblk.culvert);
@@ -490,7 +492,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		//Calculate the friction coefficient (L=0.3164*Re^(-0.25) if Re<100000 eq de Blasius)
 		// and the Head Loss coeff (coeff * V^2)
 
-		//Initialisation of the culvert states variables
+		//Initialisation of the culvert states variables (and other needed on the GPUs)
 		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
 		{
 			XModel.culvertsF.dq[cc] = 0.0;
@@ -498,6 +500,9 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			XModel.culvertsF.h2[cc] = 0.0;
 			XModel.culvertsF.zs1[cc] = 0.0;
 			XModel.culvertsF.zs2[cc] = 0.0;
+			XModel.culvertsF.type[cc] = XForcing.culverts[cc].type;
+			XModel.culvertsF.Qmax[cc] = XForcing.culverts[cc].Qmax;
+			XModel.culvertsF.dx1[cc] = XForcing.culverts[cc].dx1;
 
 			printf("Culvert_init =%f \n", XModel.culvertsF.h1[0]);
 		}

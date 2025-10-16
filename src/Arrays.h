@@ -166,6 +166,9 @@ struct CulvertF
 	T* h1;
 	T* h2;
 	T* dq; //positive if frow from P1 toward P2
+	int* type;
+	double* Qmax;
+	double* dx1;
 };
 
 

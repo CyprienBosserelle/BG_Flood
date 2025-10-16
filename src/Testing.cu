@@ -4562,8 +4562,8 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 
 	xz = (double*)malloc(sizeof(double) * NX);
 	yz = (double*)malloc(sizeof(double) * NY);
-	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
-	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+	for (int i = 0; i < NX; i++) { xz[i] = -10.0 + 1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -10.0 + 1 * j; }
 
 	map = (double*)malloc(sizeof(double) * NY * NX);
 
@@ -4579,7 +4579,7 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 			{
 				map[j * NX + i] = 0.2; // Z1;
 			}
-			if (abs(yz[j]) < 0.21)
+			if (abs(yz[j]) < 2.1)
 			{
 				map[j * NX + i] = 1.0;
 			}
@@ -4591,8 +4591,8 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 
 	//xz = (double*)malloc(sizeof(double) * NX);
 	//yz = (double*)malloc(sizeof(double) * NY);
-	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.05 * i; }
-	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.05 * j; }
+	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.5 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -10.0 + 0.5 * j; }
 
 	//map = (double*)malloc(sizeof(double) * NY * NX);
 
@@ -4646,8 +4646,8 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 
 
 	//Creation of a refinement file
-	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
-	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+	for (int i = 0; i < NX; i++) { xz[i] = -10.0 + 1.0 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -10.0 + 1.0 * j; }
 
 	//map = (double*)malloc(sizeof(double) * NY * NX);
 
@@ -4656,7 +4656,7 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 		for (int i = 0; i < NX; i++)
 		{
 			map[j * NX + i] = 0;
-			if ((abs(xz[i]) < 0.5) && (abs(yz[j]) < 0.5))
+			if ((abs(xz[i]) < 5.0) && (abs(yz[j]) < 5.0))
 			{
 				map[j * NX + i] = 1;
 			}
@@ -4701,7 +4701,7 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 	//Add endtime and outputvar
 	param_file << "endtime = 10.0 ;" << std::endl;
 	param_file << "outvars = zs,h,u,v,zb,cf;" << std::endl;
-	param_file << "dx = 0.01;" << std::endl;
+	param_file << "dx = 0.1;" << std::endl;
 	param_file << "zsinit = 0.0;" << std::endl;
 	param_file << "smallnc = 0;" << std::endl;
 	param_file << "doubleprecision = 1;" << std::endl;
