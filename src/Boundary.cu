@@ -421,6 +421,36 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	T facrel =  T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
 
 
+	T ybo = (T)XParam.yo + XBlock.yo[ib];
+
+	T yup = T(iy);
+	T ydwn = T(iy)-T(1.0);
+
+	if (iy == XParam.blkwidth - 1)
+	{
+		if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+		{
+			yup = iy + T(0.75);
+		}
+
+	}
+	if (iy == 0)
+	{
+		if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+			ydwn = iy - T(0.25);
+		}
+
+	}
+
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy-1) : T(1.0);
+	T fmu = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+	T fmup = T(1.0);
+	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
+	T dmdt = (fmvp - fmv) / (cm * delta);
+	T sphcorr = hinside * hinside * XParam.g * 0.5 * dmdt;
+
 
 
 	if (type == 0) // No Flux
@@ -430,7 +460,10 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		
 		
 		noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
-	
+		if (XParam.spherical)
+		{
+			S = S - sphcorr;
+		}
 	}
 	else if (type == 2)
 	{
