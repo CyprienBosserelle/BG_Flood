@@ -39,6 +39,8 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z);
 
+
+
 template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z);
 template <class T> void fillRightFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z);
 
@@ -65,6 +67,8 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int* lev
 template <class T> __global__ void fillRight(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a);
 template <class T> __global__ void fillBot(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, T* a);
 template <class T> __global__ void fillTop(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a);
+
+template <class T> __global__ void fillLeftright(Param XParam, BlockP<T> XBlock, T* a);
 
 template <class T> __global__ void fillLeftnew(int halowidth, int nblk, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, T* a);
 template <class T> __global__ void fillRightnew(int halowidth, int nblk, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a);

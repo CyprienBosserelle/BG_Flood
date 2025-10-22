@@ -211,6 +211,8 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t
 {
 
 	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+
+	dim3 blockDimHaloLR2(1, XParam.blkwidth*2, 1);
 	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
@@ -220,6 +222,10 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t
 	fillRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
 	//fillRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
 	CUDA_CHECK(cudaDeviceSynchronize());
+	
+	//fillLeftright << <gridDim, blockDimHaloLR2, 0 >> > (XParam, XBlock, z);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	
 	fillBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, z);
 	//fillBot <<<gridDim, blockDimHaloBT, 0>>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, z);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -2083,6 +2089,350 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 }
 template __global__ void fillLeft<float>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, float* a);
 template __global__ void fillLeft<double>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, double* a);
+
+
+template <class T> __global__ void fillLeftright(Param XParam, BlockP<T> XBlock, T* a)
+{
+	
+	int blkwidth = XParam.blkwidth;
+	
+	int halowidth = XParam.halowidth;
+		
+	int blkmemwidth = blkwidth + XParam.halowidth * 2;
+
+	int iy, ibl, ib, lev;
+	int jj, ii, ir, it, itr;
+	int write,read;
+	T a_read;
+	T w1, w2, w3;
+	ibl = blockIdx.x;
+	ib = XBlock.active[ibl];
+	lev = XBlock.level[ib];
+
+
+	if (threadIdx.y < blkwidth)//left side
+	{
+
+		iy = threadIdx.y;
+		write = memloc(halowidth, blkmemwidth, -1, iy, ib);
+
+		
+
+		int LB = XBlock.LeftBot[ib];
+		int LT = XBlock.LeftTop[ib];
+		int RBLB = XBlock.RightBot[LB];
+		int BRLB = XBlock.BotRight[LB];
+		int TRLT = XBlock.TopRight[LT];
+
+		int levBRLB = XBlock.level[BRLB];
+		int levTRLT = XBlock.level[TRLT];
+		int levLB = XBlock.level[LB];
+		int levLT = XBlock.level[LT];
+		if (LB == ib)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				read = memloc(halowidth, blkmemwidth, 0, iy, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				if (LT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, 0, iy, ib);
+					a_read = a[read];
+
+				}
+				else
+				{
+
+					jj = (iy - (blkwidth / 2)) * 2;
+					ii = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj, LT);
+					ir = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj, LT);
+					it = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj + 1, LT);
+					itr = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj + 1, LT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+
+		}
+		else if (levLB == lev)
+		{
+			read = memloc(halowidth, blkmemwidth, (blkwidth - 1), iy, LB);
+			a_read = a[read];
+		}
+		else if (levLB > lev)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				jj = iy * 2;
+				ii = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj, LB);
+				ir = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj, LB);
+				it = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj + 1, LB);
+				itr = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj + 1, LB);
+				a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			else
+			{
+				if (LT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, 0, iy, ib);
+					a_read = a[read];
+				}
+				else
+				{
+					jj = (iy - (blkwidth / 2)) * 2;
+
+					ii = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj, LT);
+					ir = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj, LT);
+					it = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj + 1, LT);
+					itr = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj + 1, LT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+		}
+		else if (levLB < lev)
+		{
+			jj = RBLB == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + blkwidth / 2;
+			w1 = (T)1.0 / (T)3.0;
+			w2 = ceil(iy * (T)0.5) * 2 > iy ? T(1.0 / 6.0) : T(0.5);
+			w3 = ceil(iy * (T)0.5) * 2 > iy ? T(0.5) : T(1.0 / 6.0);
+
+			ii = memloc(halowidth, blkmemwidth, 0, iy, ib);
+			ir = memloc(halowidth, blkmemwidth, blkwidth - 1, jj, LB);
+			it = memloc(halowidth, blkmemwidth, blkwidth - 1, jj - 1, LB);
+			if (RBLB == ib)
+			{
+				if (iy == 0)
+				{
+					if (BRLB == LB)
+					{
+						w3 = (T)0.5 * (1.0 - w1);
+						w2 = w3;
+						it = ir;
+					}
+					else if (levBRLB < levLB)
+					{
+						w1 = T(4.0 / 10.0);
+						w2 = T(5.0 / 10.0);
+						w3 = T(1.0 / 10.0);
+						it = memloc(halowidth, blkmemwidth, blkwidth - 1, blkwidth - 1, BRLB);
+
+					}
+					else if (levBRLB == levLB)
+					{
+						it = memloc(halowidth, blkmemwidth, blkwidth - 1, blkwidth - 1, BRLB);
+					}
+					else if (levBRLB > levLB)
+					{
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
+						it = memloc(halowidth, blkmemwidth, blkwidth - 1, blkwidth - 1, BRLB);
+					}
+				}
+			}
+			else
+			{
+				if (iy == (blkwidth - 1))
+				{
+					if (TRLT == LT)
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						ir = it;
+					}
+					else if (levTRLT < levLT)
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 1.0 / 10.0;
+						w3 = 5.0 / 10.0;
+						ir = memloc(halowidth, blkmemwidth, blkwidth - 1, 0, TRLT);
+					}
+					else if (levTRLT == levLT)
+					{
+						ir = memloc(halowidth, blkmemwidth, blkwidth - 1, 0, TRLT);
+					}
+					else if (levTRLT > levLT)
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						ir = memloc(halowidth, blkmemwidth, blkwidth - 1, 0, TRLT);
+
+					}
+				}
+			}
+			a_read = w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		}
+
+		a[write] = a_read;
+	}
+	else//right side
+	{
+		iy = threadIdx.y - blkwidth;
+
+		int RB = XBlock.RightBot[ib];
+		int RT = XBlock.RightTop[ib];
+		//int LB = leftbot[ib];
+		//int BL = botleft[ib];
+		int LBRB = XBlock.LeftBot[RB];
+		int TLRT = XBlock.TopLeft[RT];
+		int BLRB = XBlock.BotLeft[RB];
+
+		int levRB = XBlock.level[RB];
+		int levRT = XBlock.level[RT];
+		int levBLRB = XBlock.level[BLRB];
+		int levTLRT = XBlock.level[TLRT];
+
+
+		if (RB == ib)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				read = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				if (RT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+					a_read = a[read];
+				}
+				else
+				{
+					jj = (iy - (blkwidth / 2)) * 2;
+					ii = memloc(halowidth, blkmemwidth, 0, jj, RT);
+					ir = memloc(halowidth, blkmemwidth, 1, jj, RT);
+					it = memloc(halowidth, blkmemwidth, 0, jj + 1, RT);
+					itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+		}
+		else if (levRB == lev)
+		{
+			read = memloc(halowidth, blkmemwidth, 0, iy, RB);
+			a_read = a[read];
+		}
+		else if (levRB > lev)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				jj = iy * 2;
+
+
+				ii = memloc(halowidth, blkmemwidth, 0, jj, RB);
+				ir = memloc(halowidth, blkmemwidth, 1, jj, RB);
+				it = memloc(halowidth, blkmemwidth, 0, jj + 1, RB);
+				itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RB);
+
+				a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			else
+			{
+				if (RT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+					a_read = a[read];
+				}
+				else
+				{
+					jj = (iy - (blkwidth / 2)) * 2;
+
+					ii = memloc(halowidth, blkmemwidth, 0, jj, RT);
+					ir = memloc(halowidth, blkmemwidth, 1, jj, RT);
+					it = memloc(halowidth, blkmemwidth, 0, jj + 1, RT);
+					itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+		}
+		else if (levRB < lev)
+		{
+			//
+			jj = LBRB == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + blkwidth / 2;
+			w1 = 1.0 / 3.0;
+			w2 = ceil(iy * (T)0.5) * 2 > iy ? T(1.0 / 6.0) : T(0.5);
+			w3 = ceil(iy * (T)0.5) * 2 > iy ? T(0.5) : T(1.0 / 6.0);
+			ii = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+			ir = memloc(halowidth, blkmemwidth, 0, jj, RB);
+			it = memloc(halowidth, blkmemwidth, 0, jj - 1, RB);
+			if (LBRB == ib)
+			{
+				if (iy == 0)
+				{
+					if (BLRB == RB)
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						it = ir;
+					}
+					else if (levBLRB < levRB)
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 5.0 / 10.0;
+						w3 = 1.0 / 10.0;
+						it = memloc(halowidth, blkmemwidth, 0, blkwidth - 1, BLRB);
+					}
+					else if (levBLRB == levRB)
+					{
+						it = memloc(halowidth, blkmemwidth, 0, blkwidth - 1, BLRB);
+					}
+					else if (levBLRB > levRB)
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						it = memloc(halowidth, blkmemwidth, 0, blkwidth - 1, BLRB);
+					}
+				}
+			}
+			else
+			{
+				if (iy == (blkwidth - 1))
+				{
+					if (TLRT == RT)
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						ir = it;
+					}
+					else if (levTLRT < levRT)
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 1.0 / 10.0;
+						w3 = 5.0 / 10.0;
+						ir = memloc(halowidth, blkmemwidth, 0, 0, TLRT);
+					}
+					else if (levTLRT == levRT)
+					{
+						ir = memloc(halowidth, blkmemwidth, 0, 0, TLRT);
+					}
+					else if (levTLRT > levRT)
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						ir = memloc(halowidth, blkmemwidth, 0, 0, TLRT);
+					}
+				}
+			}
+
+			a_read = w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		}
+		a[write] = a_read;
+		
+	}
+}
+template __global__ void fillLeftright<float>(Param XParam, BlockP<float> XBlock, float* a);
+template __global__ void fillLeftright<double>(Param XParam, BlockP<double> XBlock, double* a);
+
 
 /*! \fn void void fillLeftnew(...)
 * \brief New way of filling the left halo 2 blocks at a time to maximize GPU occupancy
