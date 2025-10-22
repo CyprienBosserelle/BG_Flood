@@ -44,11 +44,11 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 
 
 	T fmu = T(1.0);
-	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T cm = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T cml = cm;
 	//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	//T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
-	T gmetric = XParam.spherical ? (fmu/(cm)) :T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
+	T gmetric = T(1.0);// XParam.spherical ? (fmu / (cm)) : T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
 
 	T ax = (g * gmetric * (zsn - zsi) / delta);
 
