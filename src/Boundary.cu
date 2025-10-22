@@ -442,15 +442,15 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		}
 
 	}
-
+	/*
 	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy-1) : T(1.0);
 	T fmu = T(1.0);
 	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
 	T fmup = T(1.0);
 	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
 	T dmdt = (fmvp - fmv) / (cm * delta);
-	T sphcorr = hinside * hinside * XParam.g * 0.5 * dmdt;
-
+	T sphcorr = side.istop == 1 ? hinside * hinside * XParam.g * 0.5 * dmdt : T(0.0);
+	*/
 
 
 	if (type == 0) // No Flux
@@ -460,10 +460,8 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		
 		
 		noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
-		if (XParam.spherical)
-		{
-			S = S - sphcorr;
-		}
+
+		
 	}
 	else if (type == 2)
 	{
@@ -1657,7 +1655,7 @@ template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S)
 	// Basic no slip bnd hs no normal velocity and leaves tanegtial velocity alone (maybe needs a wall friction added to it?)
 	// 
 	F = T(0.0);
-	S = G;
+	//S = G;
 
 }
 
