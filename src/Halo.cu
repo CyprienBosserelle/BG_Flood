@@ -5202,17 +5202,21 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	//int LBTL = XBlock.leftbot[TL];
 	//int BLTL = XBlock.botleft[TL];
 	//int RBTR = XBlock.rightbot[TR];
-
+	int iia, iib, iic, iid,iit;
 
 
 	int iout, ii;
-	int iit, iib;
+	
 	T zout;
 	
 
 	if (ix == 0)
 	{
 		// Bot left corner
+		iout = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth, ib);
+		Cornerblk = XBlock.BotRight[XBlock.LeftBot[ib]];
+		//or
+		//Cornerblk = XBlock.LeftTop[XBlock.BotLeft[ib]];
 
 		iout = memloc(halowidth, blkmemwidth, -1, -1, ib);
 
@@ -5240,36 +5244,144 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 			}
 			else
 			{
-				if (BL != ib)
+				//if (BL != ib)
+				//{
+				//	if (XBlock.level[BL] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
+				//		//iib = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 2, BL);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
+				//		zout = z[ii];
+
+				//	}
+
+				//}
+				//else // with LB instead of BL
+				//{
+				//	if (XBlock.level[LB] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
+				//		//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, -1, LB);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
+				//		zout = z[ii];
+
+				//	}
+				//}
+				if (XBlock.level[Cornerblk] == XBlock.level[ib])
 				{
-					if (XBlock.level[BL] > XBlock.level[ib])
-					{
-						iit = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
-						//iib = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 2, BL);
-						zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
-					}
-					else
-					{
-						ii = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
-						zout = z[ii];
 
-					}
-
+					ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					zout = z[ii];
 				}
-				else // with LB instead of BL
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 1))
 				{
-					if (XBlock.level[LB] > XBlock.level[ib])
-					{
-						iit = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
-						//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, -1, LB);
-						zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
-					}
-					else
-					{
-						ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
-						zout = z[ii];
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, Cornerblk);
 
-					}
+					zout = 0.25 * (z[iia] + z[iib] + z[iic] + z[iid]);
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 2))
+				{
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, Cornerblk);
+
+					zout = (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 3, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 3, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 4, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 4, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 2, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 3, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 3, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 4, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 4, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					zout = zout / 16;
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+				{
+
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, 1, ib);
+
+					T ziid = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					zout = BilinearInterpolation(z[iia], z[iib], z[iic], ziid, T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), T(0.25));
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+				{
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
+
+					T ziid = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 4, ib);
+
+					ziid += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 4, ib);
+
+					ziid += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 2, ib);
+
+					ziid += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					ziid = ziid / 16;
+
+
+
+					zout = BilinearInterpolation(z[iia], z[iib], z[iic], ziid, T(0.0), T(1.0), T(0.0), T(1.0), T(0.375), T(0.375));
 				}
 			}
 
@@ -5281,6 +5393,9 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	
 		// Top left corner
 		iout = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth, ib);
+		Cornerblk = XBlock.TopRight[XBlock.LeftTop[ib]];
+		//or
+		//Cornerblk = XBlock.LeftBot[XBlock.TopLeft[ib]];
 
 		bool prefTL, prefLT;
 		prefTL = TL == ib ? false : XBlock.level[ib] == XBlock.level[TL];
@@ -5306,35 +5421,143 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 			}
 			else
 			{
-				if (TL != ib)
-				{
-					if (XBlock.level[TL] > XBlock.level[ib])
-					{
-						iit = memloc(halowidth, blkmemwidth, -1, 0, TL);
-						//iib = memloc(halowidth, blkmemwidth, -1, 1, TL);
-						zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
-					}
-					else
-					{
-						ii = memloc(halowidth, blkmemwidth, -1, 0, TL);
-						zout = z[ii];
+				//if (TL != ib)
+				//{
+				//	if (XBlock.level[TL] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, -1, 0, TL);
+				//		//iib = memloc(halowidth, blkmemwidth, -1, 1, TL);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, -1, 0, TL);
+				//		zout = z[ii];
 
-					}
+				//	}
+				//}
+				//else //with LT instead of TL
+				//{
+				//	if (XBlock.level[LT] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, XParam.blkwidth -1, XParam.blkwidth, LT);
+				//		//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth -2, XParam.blkwidth, LT);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth -1, XParam.blkwidth , LT);
+				//		zout = z[ii];
+
+				//	}
+				//}
+				if (XBlock.level[Cornerblk] == XBlock.level[ib])
+				{
+
+					ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					zout = z[ii];
 				}
-				else //with LT instead of TL
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 1))
 				{
-					if (XBlock.level[LT] > XBlock.level[ib])
-					{
-						iit = memloc(halowidth, blkmemwidth, XParam.blkwidth -1, XParam.blkwidth, LT);
-						//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth -2, XParam.blkwidth, LT);
-						zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
-					}
-					else
-					{
-						ii = memloc(halowidth, blkmemwidth, XParam.blkwidth -1, XParam.blkwidth , LT);
-						zout = z[ii];
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, Cornerblk);
 
-					}
+					zout = 0.25 * (z[iia] + z[iib] + z[iic] + z[iid]);
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 2))
+				{
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, Cornerblk);
+
+					zout = (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 2, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 2, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 3, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 3, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 0, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 0, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 1, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 1, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 2, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 2, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 3, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 3, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					zout = zout / 16;
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+				{
+
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, -1, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, 0, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
+
+					T ziib = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), T(0.75));
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+				{
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, -1, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, 0, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
+
+					T ziib = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 4, ib);
+
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 4, ib);
+
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 2, ib);
+
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					ziib = ziib / 16;
+
+
+
+					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.375), T(0.625));
 				}
 			}
 			
@@ -5347,6 +5570,10 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	{
 		// Top right corner
 		iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth, ib);
+
+		Cornerblk = XBlock.RightBot[XBlock.TopRight[ib]];
+		//or
+		//Cornerblk = XBlock.TopRight[XBlock.RightTop[ib]];
 
 		bool prefTR, prefRT;
 		prefTR = TR == ib ? false : XBlock.level[ib] == XBlock.level[TR];
@@ -5371,36 +5598,144 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 			}
 			else
 			{
-				if (TR != ib)
-				{
-					if (XBlock.level[TR] > XBlock.level[ib])
-					{
-						iit = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
-						//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, TR);
-						zout = z[iit];// T(0.5)* (z[iit] + z[iib]);
-					}
-					else
-					{
-						ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
-						zout = z[ii];
+				//if (TR != ib)
+				//{
+				//	if (XBlock.level[TR] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
+				//		//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, TR);
+				//		zout = z[iit];// T(0.5)* (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
+				//		zout = z[ii];
 
-					}
-				}
-				else //with RLT instead of TR
-				{
-					if (XBlock.level[TR] > XBlock.level[ib])
-					{
-						iit = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
-						//iib = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, RT);
-						zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
-					}
-					else
-					{
-						ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
-						zout = z[ii];
+				//	}
+				//}
+				//else //with RLT instead of TR
+				//{
+					//if (XBlock.level[TR] > XBlock.level[ib])
+					//{
+					//	iit = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
+					//	//iib = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, RT);
+					//	zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+					//}
+					//else
+					//{
+					//	ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
+					//	zout = z[ii];
 
+					//}
+					if (XBlock.level[Cornerblk] == XBlock.level[ib])
+					{
+
+						ii = memloc(halowidth, blkmemwidth, 0, 0, Cornerblk);
+						zout = z[ii];
 					}
-				}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 1))
+					{
+						iia = memloc(halowidth, blkmemwidth, 0, 0, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 1, 0, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 0, 1, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 1, 1, Cornerblk);
+
+						zout = 0.25 * (z[iia] + z[iib] + z[iic] + z[iid]);
+					}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 2))
+					{
+						iia = memloc(halowidth, blkmemwidth, 0, 0, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 1, 0, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 0, 1, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 1, 1, Cornerblk);
+
+						zout = (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						iia = memloc(halowidth, blkmemwidth, 2, 2, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 3, 2, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 2, 3, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 3, 3, Cornerblk);
+
+						zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						iia = memloc(halowidth, blkmemwidth, 2, 0, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 3, 0, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 2, 1, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 3, 1, Cornerblk);
+
+						zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						iia = memloc(halowidth, blkmemwidth, 0, 2, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 1, 2, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 0, 3, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 1, 3, Cornerblk);
+
+						zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						zout = zout / 16;
+					}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+					{
+
+						iib = memloc(XParam.halowidth, blkmemwidth, 0, - 1, Cornerblk);
+						iic = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iid = memloc(XParam.halowidth, blkmemwidth, 0, 0, Cornerblk);
+
+						int iila, iilb, iilc, iild;
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, ib);
+
+						T ziia = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						zout = BilinearInterpolation(ziia, z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), T(0.75));
+					}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+					{
+						iib = memloc(XParam.halowidth, blkmemwidth, 0, -1, Cornerblk);
+						iic = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iid = memloc(XParam.halowidth, blkmemwidth, 0, 0, Cornerblk);
+
+						int iila, iilb, iilc, iild;
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, ib);
+
+						T ziia = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 3, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 3, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 4, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 4, ib);
+
+						ziia += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 1, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 1, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 2, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 2, ib);
+
+						ziia += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 3, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 3, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 4, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 4, ib);
+
+						ziia += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						ziia = ziia / 16;
+
+
+
+						zout = BilinearInterpolation(ziia, z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.625), T(0.625));
+					}
+				//}
 			}
 
 		}
@@ -5420,7 +5755,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 		prefBR = BR == ib ? false : XBlock.level[ib] == XBlock.level[BR];
 		prefRB = RB == ib ? false : XBlock.level[ib] == XBlock.level[RB];
 
-		int iia, iib, iic, iid;
+		
 
 		if (BR == ib && RB == ib)//
 		{
@@ -5441,7 +5776,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 			}
 			else
 			{
-				if (XBlock.level[Cornerblk] <= XBlock.level[ib])
+				if (XBlock.level[Cornerblk] == XBlock.level[ib])
 				{
 
 					ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
@@ -5470,11 +5805,86 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					iic = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 4, Cornerblk);
 					iid = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 4, Cornerblk);
 
-					zout = (z[iia] + z[iib] + z[iic] + z[iid]);
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
 
-					zout = zout / 8;
+					iia = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 2, Cornerblk);
+					
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 3, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 3, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 4, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 4, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					zout = zout / 16;
 
 
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+				{
+					
+					iia = memloc(XParam.halowidth, blkmemwidth, -1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, ib);
+
+					T ziic = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), T(0.25));
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+				{
+					iia = memloc(XParam.halowidth, blkmemwidth, -1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, ib);
+
+					T ziic = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 2, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 2, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 3, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 3, ib);
+
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 1, ib);
+
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 2, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 2, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 3, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 3, ib);
+
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					ziic = ziic / 16;
+
+
+
+					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.625), T(0.375));
 				}
 			}
 
