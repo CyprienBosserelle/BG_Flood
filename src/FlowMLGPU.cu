@@ -74,17 +74,17 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hau);
 	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hav);
 
-	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfu);
+	/*HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfu);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfv);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	CUDA_CHECK(cudaDeviceSynchronize());*/
 
-	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hau);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hau);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Acceleration
 	// Pressure
@@ -131,11 +131,14 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudx);
+	/*fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudx);
 	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudy);
 	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdx);
-	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdy);
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdy);*/
 
+
+	gradientHaloGPUnew(XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	gradientHaloGPUnew(XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
 	
 	fillCornersGPU <<< gridDim, blockDimHC, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -168,11 +171,17 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fuy);
 	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fvy);
 
-	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fu);
-	//CUDA_CHECK(cudaDeviceSynchronize());
+	/*HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fux);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
-	//HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fv);
-	//CUDA_CHECK(cudaDeviceSynchronize());
+	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvx);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fuy);
+	CUDA_CHECK(cudaDeviceSynchronize());*/
 
 	
 
