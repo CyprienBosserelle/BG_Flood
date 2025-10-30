@@ -2409,6 +2409,8 @@ template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, 
 
 
 }
+template void gradientHaloGPUnew<float>(Param XParam, BlockP<float>XBlock, float* a, float* dadx, float* dady);
+template void gradientHaloGPUnew<double>(Param XParam, BlockP<double>XBlock, double* a, double* dadx, double* dady);
 
 
 template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)

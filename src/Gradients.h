@@ -40,6 +40,8 @@ template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>X
 template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 
+template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
+
 template <class T> __global__ void gradientHaloLeftGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientHaloRightGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientHaloTopGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
