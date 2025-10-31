@@ -530,7 +530,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarunits["u"] = "m s-1";
 
 	XModel.OutputVarMap["v"] = XModel.evolv.v;
-	XModel.Outvarlongname["v"] = "Velocity in y-direction";// meridional
+	XModel.Outvarlongname["v"] = "Water velocity in y-direction";// meridional
 	XModel.Outvarstdname["v"] = "v_velocity";
 	XModel.Outvarunits["v"] = "m s-1";
 
