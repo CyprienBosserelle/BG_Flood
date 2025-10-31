@@ -32,6 +32,8 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> void fillHaloTopRightGPU(Param XParam, bool doprolong, BlockP<T> XBlock, cudaStream_t stream, T* z);
 
+
+
 template <class T> void bndmaskGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux);
 
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T*& z);
@@ -56,6 +58,7 @@ template <class T> void Recalculatehh(Param XParam, BlockP<T> XBlock, EvolvingP<
 
 template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
 template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
+template <class T> void refine_bilinearGPU(Param XParam, BlockP<T> XBlock, T* z);
 
 template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy);
 template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdy);
@@ -84,6 +87,10 @@ template <class T> __global__ void HaloFluxGPUBT(Param XParam, BlockP<T> XBlock,
 
 template <class T> __global__  void HaloFluxGPULRnew(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> __global__ void HaloFluxGPUBTnew(Param XParam, BlockP<T> XBlock, T* z);
+
+template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XBlock, T* z);
+template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XBlock, T* z);
+
 
 template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock, T* z);
 

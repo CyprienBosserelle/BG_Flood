@@ -264,6 +264,8 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock,double* z)
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
 
 
+
+
 /*! \fn void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 */
 template <class T> void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
@@ -900,6 +902,51 @@ template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T>
 template __global__ void refine_linear_LeftGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_LeftGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+template <class T> __global__ void refine_bilinear_LeftGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int LB = XBlock.LeftBot[ib];
+	
+
+
+
+
+
+	if (XBlock.level[LB] < XBlock.level[ib])
+	{
+		if (iy > 0 && iy < XParam.blkwidth - 1)
+		{
+			int j = iy;
+
+			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+
+			T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
+
+			
+			int write = memloc(XParam.halowidth, blkmemwidth, -1, j, ib);
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+			iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj + 1, LB);
+			iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj, LB);
+			iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj + 1, LB);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), jr);
+
+		}
+
+	}
+}
+template __global__ void refine_bilinear_LeftGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_LeftGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 
 template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
@@ -962,6 +1009,50 @@ template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T
 template __global__ void refine_linear_RightGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_RightGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+template <class T> __global__ void refine_bilinear_RightGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int RB = XBlock.RightBot[ib];
+
+
+	if (XBlock.level[RB] < XBlock.level[ib])
+	{
+		if (iy > 0 && iy < XParam.blkwidth - 1)
+		{
+
+
+			int j = iy;
+			int jj = XBlock.LeftBot[RB] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+
+			T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
+
+
+			int write = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth,- 1, jj, RB);
+			iib = memloc(XParam.halowidth, blkmemwidth,- 1, jj + 1, RB);
+			iic = memloc(XParam.halowidth, blkmemwidth, 0, jj, RB);
+			iid = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, RB);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+
+
+		}
+
+
+	}
+}
+template __global__ void refine_bilinear_RightGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_RightGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
@@ -1023,6 +1114,49 @@ template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> 
 template __global__ void refine_linear_BotGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_BotGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+template <class T> __global__ void refine_bilinear_BotGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int BL = XBlock.BotLeft[ib];
+
+	if (XBlock.level[BL] < XBlock.level[ib])
+	{
+		if (ix > 0 && ix < XParam.blkwidth - 1)
+		{
+
+
+			int i = ix;
+			int ii = XBlock.TopLeft[BL] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
+
+			int write = memloc(XParam.halowidth, blkmemwidth, i, -1, ib);
+
+			T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
+
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth, ii, XParam.blkwidth - 1, BL);
+			iib = memloc(XParam.halowidth, blkmemwidth, ii, XParam.blkwidth, BL);
+			iic = memloc(XParam.halowidth, blkmemwidth, ii + 1, XParam.blkwidth - 1, BL);
+			iid = memloc(XParam.halowidth, blkmemwidth, ii + 1, XParam.blkwidth, BL);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.25));
+
+		}
+
+
+
+	}
+}
+template __global__ void refine_bilinear_BotGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_BotGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
@@ -1082,6 +1216,44 @@ template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> 
 template __global__ void refine_linear_TopGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_TopGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+template <class T> __global__ void refine_bilinear_TopGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int TL = XBlock.TopLeft[ib];
+
+	if (XBlock.level[TL] < XBlock.level[ib])
+	{
+		if (ix > 0 && ix < XParam.blkwidth - 1)
+		{
+
+			int i = ix;
+			int ii = XBlock.BotLeft[TL] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
+
+			T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
+			int write = memloc(XParam.halowidth, blkmemwidth, i, XParam.blkwidth, ib);
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth, ii, -1, TL);
+			iib = memloc(XParam.halowidth, blkmemwidth, ii, 0, TL);
+			iic = memloc(XParam.halowidth, blkmemwidth, ii + 1, -1, TL);
+			iid = memloc(XParam.halowidth, blkmemwidth, ii + 1, 0, TL);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.75));
+		}
+
+
+	}
+}
+template __global__ void refine_bilinear_TopGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_TopGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1111,6 +1283,21 @@ template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T
 }
 template void refine_linearGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linearGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
+
+template <class T> void refine_bilinearGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	refine_bilinear_LeftGPU << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, z);
+	refine_bilinear_RightGPU << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, z);
+	refine_bilinear_TopGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z);
+	refine_bilinear_BotGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z);
+	CUDA_CHECK(cudaDeviceSynchronize());
+}
+template void refine_bilinearGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template void refine_bilinearGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 
 template <class T> void HaloFluxCPULR(Param XParam, int ib, BlockP<T> XBlock, T *z)
@@ -1414,6 +1601,115 @@ template <class T> __global__  void HaloFluxGPULRnew(Param XParam, BlockP<T> XBl
 		}
 	}
 }
+
+template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	if (ibl < XParam.nblk)
+	{
+
+		int ib = XBlock.active[ibl];
+
+
+		int j = iy;
+
+		i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.RightBot[ib]] > XBlock.level[ib])
+		{
+
+			
+			
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockRight = j < (XParam.blkwidth / 2) ? XBlock.RightBot[ib] : XBlock.RightTop[ib];
+				
+			iia = memloc(XParam.halowidth, blkmemwidth, 0, jj, BlockRight);
+			iib = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, BlockRight);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.RightBot[ib]] <= XBlock.level[ib] )
+		{
+			jj = XBlock.level[XBlock.RightBot[ib]] == XBlock.level[ib] ? j : XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * T(0.5)) : floor(j *T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
+			zout = z[iia];
+		
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPURMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPURMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	//unsigned int iy = threadIdx.x;
+	int ibl = blockIdx.x;
+	
+
+	int j = ix;
+
+
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+
+		i = memloc(XParam.halowidth, blkmemwidth, j, XParam.blkwidth, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+		{
+
+
+
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockTop = j < (XParam.blkwidth / 2) ? XBlock.TopLeft[ib] : XBlock.TopRight[ib];
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, 0, BlockTop);
+			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, 0, BlockTop);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.TopLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		{
+			jj = XBlock.level[XBlock.TopLeft[ib]] == XBlock.level[ib] ? j : XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopLeft[ib]);
+			zout = z[iia];
+
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPUTMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPUTMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 template <class T> void HaloFluxCPUBT(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
@@ -5502,7 +5798,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 				{
 
 					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, -1, Cornerblk);
-					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
 					iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, 0, Cornerblk);
 
 					int iila, iilb, iilc, iild;
@@ -5512,14 +5808,14 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
 					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
 
-					T ziib = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					T ziic = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
-					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), T(0.75));
+					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), T(0.75));
 				}
 				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
 				{
 					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, -1, Cornerblk);
-					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
 					iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, 0, Cornerblk);
 
 					int iila, iilb, iilc, iild;
@@ -5529,21 +5825,21 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
 					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
 
-					T ziib = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					T ziic = (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
 					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 3, ib);
 					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 3, ib);
 					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 4, ib);
 					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 4, ib);
 
-					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
 					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 3, ib);
 					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 3, ib);
 					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 4, ib);
 					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 4, ib);
 
-					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
 
 					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 1, ib);
@@ -5551,13 +5847,13 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 2, ib);
 					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 2, ib);
 
-					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
-					ziib = ziib / 16;
+					ziic = ziic / 16;
 
 
 
-					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.375), T(0.625));
+					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.375), T(0.625));
 				}
 			}
 			
@@ -5677,8 +5973,8 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
 					{
 
-						iib = memloc(XParam.halowidth, blkmemwidth, 0, - 1, Cornerblk);
-						iic = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iib = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iic = memloc(XParam.halowidth, blkmemwidth, 0, -1, Cornerblk);
 						iid = memloc(XParam.halowidth, blkmemwidth, 0, 0, Cornerblk);
 
 						int iila, iilb, iilc, iild;
@@ -5694,8 +5990,8 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					}
 					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
 					{
-						iib = memloc(XParam.halowidth, blkmemwidth, 0, -1, Cornerblk);
-						iic = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iib = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iic = memloc(XParam.halowidth, blkmemwidth, 0, -1, Cornerblk);
 						iid = memloc(XParam.halowidth, blkmemwidth, 0, 0, Cornerblk);
 
 						int iila, iilb, iilc, iild;
@@ -5829,7 +6125,7 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 				{
 					
 					iia = memloc(XParam.halowidth, blkmemwidth, -1, XParam.blkwidth - 1, Cornerblk);
-					iib = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
 					iid = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth, Cornerblk);
 
 					int iila, iilb, iilc, iild;
@@ -5839,14 +6135,14 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, ib);
 					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, ib);
 
-					T ziic = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					T ziib = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
-					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), T(0.25));
+					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), T(0.25));
 				}
 				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
 				{
 					iia = memloc(XParam.halowidth, blkmemwidth, -1, XParam.blkwidth - 1, Cornerblk);
-					iib = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
 					iid = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth, Cornerblk);
 
 					int iila, iilb, iilc, iild;
@@ -5856,21 +6152,21 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, ib);
 					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, ib);
 
-					T ziic = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					T ziib = (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
 					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 2, ib);
 					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 2, ib);
 					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 3, ib);
 					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 3, ib);
 
-					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
 					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 0, ib);
 					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 0, ib);
 					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 1, ib);
 					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 1, ib);
 
-					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
 
 					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 2, ib);
@@ -5878,13 +6174,13 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 3, ib);
 					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 3, ib);
 
-					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
 
-					ziic = ziic / 16;
+					ziib = ziib / 16;
 
 
 
-					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.625), T(0.375));
+					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.625), T(0.375));
 				}
 			}
 
