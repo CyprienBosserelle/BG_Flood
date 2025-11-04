@@ -28,11 +28,11 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	//  Fill the halo for gradient reconstruction & Recalculate zs
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv, XModel.zb);
 	
-	// calculate grad for dhdx dhdy only
 	
+	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.h, XModel.evolv.h, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
 	//============================================
 	// Calculate gradient for evolving parameters for predictor step
-	gradientGPUnew(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
+	gradientGPUML(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.zb);
 	//gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.h, XModel.grad.dhdx, XModel.grad.dhdy);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -56,10 +56,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.zs, XModel.evolv.zs, XParam.nblk * XParam.blksize * sizeof(T) , cudaMemcpyDeviceToDevice));
-	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.h, XModel.evolv.h, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
-	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.u, XModel.evolv.u, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
-	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.v, XModel.evolv.v, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
+	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.zs, XModel.evolv.zs, XParam.nblk * XParam.blksize * sizeof(T) , cudaMemcpyDeviceToDevice));
+	
+	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.u, XModel.evolv.u, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
+	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.v, XModel.evolv.v, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
 
 	// Compute face value
 	CalcfaceValX << < gridDim, blockDim, 0 >> > (T(XLoop.dtmax), XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb);
