@@ -510,7 +510,7 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 	{
 		T ybo = T(XParam.yo + XBlock.yo[ib]);
 
-		cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
+		//cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
 		cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
 
 	}
