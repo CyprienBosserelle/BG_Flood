@@ -544,13 +544,13 @@ template __host__ void AddinfiltrationImplicitCPU<double>(Param XParam, Loop<dou
 
 template <class T> __global__ void AddinfiltrationImplicitGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, T* il, T* cl, EvolvingP<T> XEv, T* hgw)
 {
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
@@ -583,13 +583,13 @@ template __global__ void AddinfiltrationImplicitGPU<double>(Param XParam, Loop<d
 
 template <class T> __global__ void AddwindforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> Uwind, DynForcingP<float> Vwind, AdvanceP<T> XAdv)
 {
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
@@ -631,13 +631,13 @@ template __global__ void AddwindforcingGPU<double>(Param XParam, BlockP<double> 
 
 template <class T> __global__ void AddPatmforcingGPU(Param XParam, BlockP<T> XBlock, DynForcingP<float> PAtm, Model<T> XModel)
 {
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
@@ -872,10 +872,10 @@ template <class T> void deformstep(Param XParam, Loop<T> XLoop, std::vector<defo
 
 template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb)
 {
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 	int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
 
 	T zss, zbb;

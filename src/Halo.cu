@@ -149,12 +149,12 @@ template void Recalculatehh<double>(Param XParam, BlockP<double> XBlock, Evolvin
 */
 template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
-	unsigned int blkmemwidth = XParam.blkmemwidth;
+	int blkmemwidth = XParam.blkmemwidth;
 	
 	int ix = threadIdx.x -1;
 	int iy = threadIdx.y -1;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 	
 	int  n;
 	
@@ -976,7 +976,7 @@ template void refine_linear_Right<double>(Param XParam, int ib, BlockP<double> X
 
 template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	
 	int iy = threadIdx.y;
@@ -1011,7 +1011,7 @@ template __global__ void refine_linear_RightGPU<double>(Param XParam, BlockP<dou
 
 template <class T> __global__ void refine_bilinear_RightGPU(Param XParam, BlockP<T> XBlock, T* z)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 
 	int iy = threadIdx.y;
@@ -2216,12 +2216,12 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 
 template <class T> __global__ void fillLeft(int halowidth, int* active, int * level, int* leftbot, int * lefttop, int * rightbot, int* botright,int * topright, T * a)
 {
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = 0;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int lev = level[ib];
 	int LB = leftbot[ib];
@@ -3259,12 +3259,12 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 template <class T> __global__ void fillRight(int halowidth, int* active, int* level, int * rightbot,int* righttop,int * leftbot,int*botleft,int* topleft, T* a)
 {
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = blockDim.y - 1;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
@@ -3746,12 +3746,12 @@ template void fillRightFlux<double>(Param XParam, bool doProlongation, int ib, B
 
 template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
 {
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = blockDim.y - 1;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
@@ -5196,12 +5196,12 @@ template void fillTopFlux<double>(Param XParam, bool doProlongation, int ib, Blo
 
 template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
 {
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
+	int ix = threadIdx.x;
 	//unsigned int iy = blockDim.x - 1;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int TL = topleft[ib];
 	int TR = topright[ib];
