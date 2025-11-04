@@ -56,7 +56,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.zs, XModel.evolv.zs, XParam.nblk * XParam.blksize * sizeof(T) , cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.zs, XModel.evolv.zs, XParam.nblk * XParam.blksize * sizeof(T) , cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.h, XModel.evolv.h, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.u, XModel.evolv.u, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.evolv_o.v, XModel.evolv.v, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
 
 	// Compute face value
 	CalcfaceValX << < gridDim, blockDim, 0 >> > (T(XLoop.dtmax), XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb);

@@ -257,9 +257,9 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 		T hi = XEv.h[i];
 		T hn = XEv.h[ileft];
 
-		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+		T cmn = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
-		T cmi = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+		T cmi = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
 		if (hul * dt / (delta * cmn) > CFL * hn)
 		{
