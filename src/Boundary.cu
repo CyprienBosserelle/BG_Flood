@@ -476,6 +476,19 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 			qmean = T(0.0);
 		}
 	}
+	else if (type == 2)
+	{
+		if (h[i] > XParam.eps || zsX > zsi)
+		{
+			//
+			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+		}
+		else
+		{
+			noslipbndQ(F, G, S);
+			qmean = T(0.0);
+		}
+	}
 	else if (type == 3)
 	{
 		if (h[i] > XParam.eps || zsX > zsi )
