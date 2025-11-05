@@ -21,6 +21,20 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
 	dim3 gridDimHaloBT(XParam.nblk , 1, 1);
 
+	if (XParam.atmpforcing)
+	{
+		//Update atm press forcing
+		AddPatmforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.Atmp, XModel);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//Fill atmp halo
+		cudaStream_t atmpstreams[1];
+		CUDA_CHECK(cudaStreamCreate(&atmpstreams[0]));
+		fillHaloGPU(XParam, XModel.blocks, atmpstreams[0], XModel.Patm);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		cudaStreamDestroy(atmpstreams[0]);
+	}
+
 
 	// fill halo for zs,h,u and v 
 
@@ -62,10 +76,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.v, XModel.evolv.v, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
 
 	// Compute face value
-	CalcfaceValX << < gridDim, blockDim, 0 >> > (T(XLoop.dtmax), XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb);
+	CalcfaceValX << < gridDim, blockDim, 0 >> > (T(XLoop.dtmax), XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb, XModel.Patm);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	CalcfaceValY << < gridDim, blockDim, 0 >> > (T(XLoop.dtmax), XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb);
+	CalcfaceValY << < gridDim, blockDim, 0 >> > (T(XLoop.dtmax), XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.fluxml, XModel.time.dtmax, XModel.zb, XModel.Patm);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Timestep reduction

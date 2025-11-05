@@ -6,9 +6,10 @@
 //	T gmetric = (2. * fm.x[i] / (cm[i] + cm[i - 1]))
 //
 //	a_baro[i] (G*gmetric*(eta[i-1] - eta[i])/Delta)
+//	a_baro(eta, i) (gmetric(i)*(G*(eta[i-1] - eta[i])+sq(60.)*(100./1030.)*(panom[i-1]-panom[i]))/Delta)
 //}
 
-template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax,T* zb)
+template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax,T* zb,T* Patm)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -57,8 +58,18 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 
 	T gmetric =  (2. * fmu / (cm + cml));
 
-	T ax = (g* gmetric* (zsn - zsi) / delta);
-
+	T ax = 0.0;
+	
+	if (XParam.atmpforcing)
+	{
+		ax = g * gmetric * ((zsn - zsi) + XParam.Pa2m * (Patm[ileft] - Patm[i])) / delta;
+	}
+	else
+	{
+		ax = (g * gmetric * (zsn - zsi) / delta);
+	}
+	//T ax = (g * gmetric* ((zsn + XParam.Pa2m * Patm[i-1]) - (zsi + XParam.Pa2m * Patm[i])) / delta);
+	//T ax = (g * gmetric* ((eta[i-1] - eta[i])+sq(60.)*(100./1030.)*(panom[i-1]-panom[i]))/Delta)
 	T H = T(0.0);
 	T um = T(0.0);
 	T Hr = T(0.0);
@@ -115,10 +126,10 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	}
 	//pdt = dt = dtnext(dtmax);
 }
-template __global__ void CalcfaceValX<float>(float pdt, Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux, float* dtmax, float* zb);
-template __global__ void CalcfaceValX<double>(double pdt, Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux, double* dtmax, double* zb);
+template __global__ void CalcfaceValX<float>(float pdt, Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux, float* dtmax, float* zb, float* Patm);
+template __global__ void CalcfaceValX<double>(double pdt, Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux, double* dtmax, double* zb, double* Patm);
 
-template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb)
+template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb,T* Patm)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -161,7 +172,16 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	//T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 	T gmetric = XParam.spherical ? (2*fmu / (cml+cm)) : T(1.0);// (2. * fm.x[i] / (cm[i] + cm[i - 1]));
 
-	T ax = (g * gmetric * (zsn - zsi) / delta);
+	T ax = 0.0;//(g * gmetric * (zsn - zsi) / delta);
+
+	if (XParam.atmpforcing)
+	{
+		ax = g * gmetric * ((zsn - zsi) + XParam.Pa2m * (Patm[ibot] - Patm[i])) / delta;
+	}
+	else
+	{
+		ax = (g * gmetric * (zsn - zsi) / delta);
+	}
 
 	T H = T(0.0);
 	T um = T(0.0);
@@ -219,8 +239,8 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	}
 	//pdt = dt = dtnext(dtmax);
 }
-template __global__ void CalcfaceValY<float>(float pdt, Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux, float* dtmax, float* zb);
-template __global__ void CalcfaceValY<double>(double pdt, Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux, double* dtmax, double* zb);
+template __global__ void CalcfaceValY<float>(float pdt, Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxMLP<float> XFlux, float* dtmax, float* zb, float* Patm);
+template __global__ void CalcfaceValY<double>(double pdt, Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxMLP<double> XFlux, double* dtmax, double* zb, double* Patm);
 
 
 
