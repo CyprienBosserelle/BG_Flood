@@ -1377,7 +1377,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	if (!XForcing.Atmp.inputfile.empty())
 	{
 		XParam.atmpforcing = true;
-		XParam.engine = 3;
+
+		if (XParam.engine < 3)
+		{
+			XParam.engine = 3;
+		}
+		
 	}
 
 
