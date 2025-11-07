@@ -271,7 +271,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 
 	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.cf, XModel.evolv);
-	///XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
+	//XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	
