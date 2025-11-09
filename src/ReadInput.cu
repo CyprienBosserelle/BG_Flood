@@ -1392,7 +1392,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Engine checks
 	if (XParam.engine == 5)
 	{
-		XParam.CFL = utils::max(XParam.CFL, 0.5);
+		XParam.CFL = utils::min(XParam.CFL, 0.5);
 		//XParam.eps = 0.0000000001;
 	}
 
