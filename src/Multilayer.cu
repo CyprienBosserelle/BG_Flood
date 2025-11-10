@@ -45,7 +45,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 
 
 	T fmu = T(1.0);
-	T cm = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T cml = cm;
 	//T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	//T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
@@ -119,7 +119,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	if (H > dry) {
 		T c = um / CFL + sqrt(g*H) / CFL_H;//um / CFL + sqrt(g * (hydrostatic ? H : delta * tanh(H / delta))) / CFL_H;
 		if (c > T(0.)) {
-			dtmax[i] = min(delta / (c * fmu),dtmax[i]);
+			dtmax[i] = min(cm*delta / (c * fmu),dtmax[i]);
 			//if (dt < dtmax)
 			//	dtmax = dt;
 		}
@@ -232,7 +232,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 	if (H > dry) {
 		T c = um / CFL + sqrt(g * H) / CFL_H;//um / CFL + sqrt(g * (hydrostatic ? H : delta * tanh(H / delta))) / CFL_H;
 		if (c > T(0.0)) {
-			dtmax[i] = min(delta / (c * fmu), dtmax[i]);
+			dtmax[i] = min(min(cm,cml)*delta / (c * fmu), dtmax[i]);
 			//if (dt < dtmax)
 			//	dtmax = dt;
 		}
@@ -277,9 +277,9 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 		T hi = XEv.h[i];
 		T hn = XEv.h[ileft];
 
-		T cmn = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
-		T cmi = T(1.0);// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+		T cmi = cmn;// XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
 		if (hul * dt / (delta * cmn) > CFL * hn)
 		{
@@ -338,7 +338,7 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 		T hi = XEv.h[i];
 		T hn = XEv.h[ibot];
 
-		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo - T(0.5*XParam.dx), iy) : T(1.0);
+		T cmn = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy-1) : T(1.0);
 		T cmi = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
 		if (hvl * dt / (delta * cmn) > CFL * hn)
@@ -530,7 +530,7 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 	{
 		T ybo = T(XParam.yo + XBlock.yo[ib]);
 
-		//cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
+		cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
 		cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
 
 	}
@@ -645,8 +645,8 @@ template <class T> __global__ void pressureML(Param XParam, BlockP<T> XBlock,T d
 		uui += dt * (XFlux.hau[i] + XFlux.hau[iright]) / (XFlux.hfu[i] + XFlux.hfu[iright] + dry);
 		vvi += dt * (XFlux.hav[i] + XFlux.hav[itop]) / (XFlux.hfv[i] + XFlux.hfv[itop] + dry);
 
-		T dmdl = (fmup - fmu) * cmdinv;// absurd if not spherical!
-		T dmdt = (fmvp - fmv) * cmdinv;
+		T dmdl = (fmup - fmu) * cmdinv;// absurd if not spherical!dmdl = (fm.x[1,0] - fm.x[])/(cm[]*Delta);
+		T dmdt = (fmvp - fmv) * cmdinv;// (fm.y[0,1] - fm.y[])/(cm[]*Delta);
 		T fG = vvi * dmdl - uui * dmdt;
 
 		uui += dt * fG * vvi;
