@@ -14,8 +14,10 @@ The model is designed to simulate [flood/inundation](https://english.stackexchan
 
 This code is an open-source shallow water solver. Designed to be fast, it run on GPUs and generate its own adaptative mesh. It is mainly used in a context of flooding:
 
-- fresh water flooding (fluvial and pluvial)
-- tsunami propagation and run-off
+- Fresh water flooding (fluvial and pluvial)
+- Tides and storm-surges
+- Dam break
+- Tsunami propagation and inundation
 
 <!-- glightbox-gallery 
 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
