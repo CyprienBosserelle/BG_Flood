@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_flux_p" kind="struct" language="C++" prot="public">
+    <compoundname>FluxP</compoundname>
+    <includes refid="_arrays_8h" local="no">Arrays.h</includes>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_flux_p_1a84d46ac49567a37b6003659653e7c61c" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Su</definition>
+        <argsstring></argsstring>
+        <name>Su</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Source term for u </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="116" column="3" bodyfile="src/Arrays.h" bodystart="116" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_p_1ac8a06855719d653e239263c10b602772" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Sv</definition>
+        <argsstring></argsstring>
+        <name>Sv</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Source term for v </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="118" column="3" bodyfile="src/Arrays.h" bodystart="118" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_p_1ac3a599f0ed00e32352dd20edf2dd568a" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Fqux</definition>
+        <argsstring></argsstring>
+        <name>Fqux</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of u in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="120" column="3" bodyfile="src/Arrays.h" bodystart="120" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_p_1ad532ddfa554b8e9985152e482fe2d44b" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Fquy</definition>
+        <argsstring></argsstring>
+        <name>Fquy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of u in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="122" column="3" bodyfile="src/Arrays.h" bodystart="122" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_p_1ad61f95624bb8f5f41944124e94977242" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Fqvx</definition>
+        <argsstring></argsstring>
+        <name>Fqvx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of v in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="124" column="3" bodyfile="src/Arrays.h" bodystart="124" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_p_1ad441ac258b404df19af2189862bd4a6b" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Fqvy</definition>
+        <argsstring></argsstring>
+        <name>Fqvy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of v in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="126" column="3" bodyfile="src/Arrays.h" bodystart="126" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_p_1a17e14a93800ccca171a596871947c9aa" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Fhu</definition>
+        <argsstring></argsstring>
+        <name>Fhu</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of h in u-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="128" column="3" bodyfile="src/Arrays.h" bodystart="128" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_p_1aeb4d674a60d5436fa152886412c4107c" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxP&lt; T &gt;::Fhv</definition>
+        <argsstring></argsstring>
+        <name>Fhv</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of h in v-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="130" column="3" bodyfile="src/Arrays.h" bodystart="130" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Structure holding flux variables for advection. </para>
+    </briefdescription>
+    <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="113" column="1" bodyfile="src/Arrays.h" bodystart="114" bodyend="131"/>
+    <listofallmembers>
+      <member refid="struct_flux_p_1a17e14a93800ccca171a596871947c9aa" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Fhu</name></member>
+      <member refid="struct_flux_p_1aeb4d674a60d5436fa152886412c4107c" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Fhv</name></member>
+      <member refid="struct_flux_p_1ac3a599f0ed00e32352dd20edf2dd568a" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Fqux</name></member>
+      <member refid="struct_flux_p_1ad532ddfa554b8e9985152e482fe2d44b" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Fquy</name></member>
+      <member refid="struct_flux_p_1ad61f95624bb8f5f41944124e94977242" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Fqvx</name></member>
+      <member refid="struct_flux_p_1ad441ac258b404df19af2189862bd4a6b" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Fqvy</name></member>
+      <member refid="struct_flux_p_1a84d46ac49567a37b6003659653e7c61c" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Su</name></member>
+      <member refid="struct_flux_p_1ac8a06855719d653e239263c10b602772" prot="public" virt="non-virtual"><scope>FluxP</scope><name>Sv</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

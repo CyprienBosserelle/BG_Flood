@@ -1,0 +1,1595 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="_util___c_p_u_8cu" kind="file" language="C++">
+    <compoundname>Util_CPU.cu</compoundname>
+    <includes refid="_util___c_p_u_8h" local="yes">Util_CPU.h</includes>
+    <incdepgraph>
+      <node id="18">
+        <label>iomanip</label>
+      </node>
+      <node id="21">
+        <label>limits</label>
+      </node>
+      <node id="5">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="7">
+        <label>stdlib.h</label>
+      </node>
+      <node id="4">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="9">
+        <label>cmath</label>
+      </node>
+      <node id="15">
+        <label>netcdf.h</label>
+      </node>
+      <node id="12">
+        <label>string</label>
+      </node>
+      <node id="14">
+        <label>map</label>
+      </node>
+      <node id="2">
+        <label>Util_CPU.h</label>
+        <link refid="_util___c_p_u_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>fstream</label>
+      </node>
+      <node id="24">
+        <label>Input.h</label>
+        <link refid="_input_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Param.h</label>
+        <link refid="_param_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>ctime</label>
+      </node>
+      <node id="13">
+        <label>vector</label>
+      </node>
+      <node id="20">
+        <label>sstream</label>
+      </node>
+      <node id="8">
+        <label>math.h</label>
+      </node>
+      <node id="17">
+        <label>iostream</label>
+      </node>
+      <node id="3">
+        <label>General.h</label>
+        <link refid="_general_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>chrono</label>
+      </node>
+      <node id="22">
+        <label>thread</label>
+      </node>
+      <node id="1">
+        <label>src/Util_CPU.cu</label>
+        <link refid="_util___c_p_u_8cu"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>algorithm</label>
+      </node>
+      <node id="6">
+        <label>stdio.h</label>
+      </node>
+    </incdepgraph>
+    <innernamespace refid="namespaceutils">utils</innernamespace>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ac691304e3b7dc491d76ed6ce8025dede" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>unsigned int</type>
+        <definition>unsigned int nextPow2</definition>
+        <argsstring>(unsigned int x)</argsstring>
+        <name>nextPow2</name>
+        <param>
+          <type>unsigned int</type>
+          <declname>x</declname>
+        </param>
+        <briefdescription>
+<para>Computes the next power of two greater than or equal to x. Computes the next power of two greater than or equal to x. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="93" column="14" bodyfile="src/Util_CPU.cu" bodystart="93" bodyend="102"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a24ac58842c87974b54e6c84db08ecc79" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double interptime</definition>
+        <argsstring>(double next, double prev, double timenext, double time)</argsstring>
+        <name>interptime</name>
+        <param>
+          <type>double</type>
+          <declname>next</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>prev</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>timenext</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>time</declname>
+        </param>
+        <briefdescription>
+<para>Linear interpolation between two values. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="107" column="8" bodyfile="src/Util_CPU.cu" bodystart="107" bodyend="110"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1aee8df9b24b1f0dfa189aff7fa01c40d8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T BilinearInterpolation</definition>
+        <argsstring>(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y)</argsstring>
+        <name>BilinearInterpolation</name>
+        <param>
+          <type>T</type>
+          <declname>q11</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>q12</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>q21</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>q22</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>x1</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>x2</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y1</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y2</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y</declname>
+        </param>
+        <briefdescription>
+<para>Bilinear interpolation within a rectangle. Bilinear interpolation within a rectangle defined by (x1, y1) and (x2, y2). The values at the corners of the rectangle are q11, q12, q21, and q22. The function returns the interpolated value at the point (x, y). <linebreak/>
+ </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>q11</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value at (x1, y1) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>q12</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value at (x1, y2) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>q21</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value at (x2, y1) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>q22</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value at (x2, y2) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>x1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>x-coordinate of the bottom-left corner </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>x2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>x-coordinate of the top-right corner </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>y-coordinate of the bottom-left corner </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>y-coordinate of the top-right corner </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>x-coordinate of the point to interpolate </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>y-coordinate of the point to interpolate </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="129" column="35" bodyfile="src/Util_CPU.cu" bodystart="129" bodyend="144"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ab7b415cd8258f95d547db14856841c40" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ float</type>
+        <definition>template __host__ __device__ float BilinearInterpolation&lt; float &gt;</definition>
+        <argsstring>(float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2, float x, float y)</argsstring>
+        <name>BilinearInterpolation&lt; float &gt;</name>
+        <param>
+          <type>float</type>
+          <declname>q11</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>q12</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>q21</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>q22</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x1</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x2</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>y1</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>y2</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>y</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="146" column="30" declfile="src/Util_CPU.cu" declline="146" declcolumn="30"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ab884703c66a6d6d4cf08f72d630089c9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ double</type>
+        <definition>template __host__ __device__ double BilinearInterpolation&lt; double &gt;</definition>
+        <argsstring>(double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2, double x, double y)</argsstring>
+        <name>BilinearInterpolation&lt; double &gt;</name>
+        <param>
+          <type>double</type>
+          <declname>q11</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>q12</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>q21</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>q22</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>x1</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>x2</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>y1</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>y2</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>y</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="147" column="30" declfile="src/Util_CPU.cu" declline="147" declcolumn="30"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a5c8ec250aa6d79d7850c0ab1604b613d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>T</type>
+        <definition>T BarycentricInterpolation</definition>
+        <argsstring>(T q1, T x1, T y1, T q2, T x2, T y2, T q3, T x3, T y3, T x, T y)</argsstring>
+        <name>BarycentricInterpolation</name>
+        <param>
+          <type>T</type>
+          <declname>q1</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>x1</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y1</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>q2</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>x2</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y2</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>q3</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>x3</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y3</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y</declname>
+        </param>
+        <briefdescription>
+<para>Barycentric interpolation within a triangle. Barycentric interpolation within a triangle defined by the vertices (x1, y1), (x2, y2), and (x3, y3). The values at the vertices are q1, q2, and q3. The function returns the interpolated value at the point (x, y). </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>q1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value at (x1, y1) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>x1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>x-coordinate of the first vertex </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>y-coordinate of the first vertex </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>q2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value at (x2, y2) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>x2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>x-coordinate of the second vertex </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>y-coordinate of the second vertex </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>q3</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value at (x3, y3) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>x3</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>x-coordinate of the third vertex </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y3</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>y-coordinate of the third vertex </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>x-coordinate of the point to interpolate </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>y-coordinate of the point to interpolate </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Interpolated value at (x, y) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="167" column="15" bodyfile="src/Util_CPU.cu" bodystart="167" bodyend="178"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a458648ba3cd1bb56b26f0cee4211edab" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template float</type>
+        <definition>template float BarycentricInterpolation</definition>
+        <argsstring>(float q1, float x1, float y1, float q2, float x2, float y2, float q3, float x3, float y3, float x, float y)</argsstring>
+        <name>BarycentricInterpolation</name>
+        <param>
+          <type>float</type>
+          <declname>q1</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x1</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>y1</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>q2</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x2</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>y2</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>q3</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x3</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>y3</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>y</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="180" column="16" declfile="src/Util_CPU.cu" declline="180" declcolumn="16"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a96b735be65364b406ae9574fd3ea4820" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template double</type>
+        <definition>template double BarycentricInterpolation</definition>
+        <argsstring>(double q1, double x1, double y1, double q2, double x2, double y2, double q3, double x3, double y3, double x, double y)</argsstring>
+        <name>BarycentricInterpolation</name>
+        <param>
+          <type>double</type>
+          <declname>q1</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>x1</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>y1</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>q2</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>x2</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>y2</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>q3</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>x3</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>y3</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>y</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="181" column="17" declfile="src/Util_CPU.cu" declline="181" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a362bab91663dd793a0dc1fed7bf7ac27" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T calcres</definition>
+        <argsstring>(T dx, int level)</argsstring>
+        <name>calcres</name>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>level</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the grid resolution at a given refinement level. Calculate the grid resolution at a given refinement level. If level is negative, the resolution is coarsened (doubled for each level). If level is positive, the resolution is refined (halved for each level). </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The base grid resolution. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The refinement level (negative for coarsening, positive for refining). </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The calculated grid resolution at the specified level. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="194" column="23" bodyfile="src/Util_CPU.cu" bodystart="194" bodyend="198"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a611ed4da7433807301079a8878d560fc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ double</type>
+        <definition>template __host__ __device__ double calcres&lt; double &gt;</definition>
+        <argsstring>(double dx, int level)</argsstring>
+        <name>calcres&lt; double &gt;</name>
+        <param>
+          <type>double</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>level</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="199" column="30" declfile="src/Util_CPU.cu" declline="199" declcolumn="30"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1aa156fd0b66e09a53725bb000a968aaf1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ float</type>
+        <definition>template __host__ __device__ float calcres&lt; float &gt;</definition>
+        <argsstring>(float dx, int level)</argsstring>
+        <name>calcres&lt; float &gt;</name>
+        <param>
+          <type>float</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>level</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="200" column="30" declfile="src/Util_CPU.cu" declline="200" declcolumn="30"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ae44a8d0d631657df0d55b6293e0d0ebb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T calcres</definition>
+        <argsstring>(Param XParam, T dx, int level)</argsstring>
+        <name>calcres</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>level</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the grid resolution at a given refinement level, considering spherical coordinates. Calculate the grid resolution at a given refinement level, considering spherical coordinates. If level is negative, the resolution is coarsened (doubled for each level). If level is positive, the resolution is refined (halved for each level). If the grid is spherical, the resolution is adjusted by the Earth&apos;s radius and converted from degrees to meters. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The parameter object containing grid settings. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The base grid resolution. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The refinement level (negative for coarsening, positive for refining). </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The calculated grid resolution at the specified level, adjusted for spherical coordinates if applicable. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="214" column="23" bodyfile="src/Util_CPU.cu" bodystart="214" bodyend="225"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ab1d2de2f13fb92b3b7735b5c577e68cc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ double</type>
+        <definition>template __host__ __device__ double calcres&lt; double &gt;</definition>
+        <argsstring>(Param XParam, double dx, int level)</argsstring>
+        <name>calcres&lt; double &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>level</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="226" column="30" declfile="src/Util_CPU.cu" declline="226" declcolumn="30"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ab7db9a17c579eb06df1bc03bace68faa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ float</type>
+        <definition>template __host__ __device__ float calcres&lt; float &gt;</definition>
+        <argsstring>(Param XParam, float dx, int level)</argsstring>
+        <name>calcres&lt; float &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>level</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="227" column="30" declfile="src/Util_CPU.cu" declline="227" declcolumn="30"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ab50b883225fc186e39bc291fe75e8ce2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T minmod2</definition>
+        <argsstring>(T theta, T s0, T s1, T s2)</argsstring>
+        <name>minmod2</name>
+        <param>
+          <type>T</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>s0</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>s1</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>s2</declname>
+        </param>
+        <briefdescription>
+<para>Minmod limiter function for slope limiting in numerical schemes. Minmod limiter function for slope limiting in numerical schemes. The function takes a parameter theta and three slope values (s0, s1, s2). Theta is used to tune the limiting (theta=1 gives minmod, the most dissipative limiter, and theta=2 gives superbee, the least dissipative). The function returns the limited slope value based on the input slopes and theta. Usual value : float theta = 1.3f;. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>theta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The tuning parameter for the limiter (between 1 and 2). </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>s0</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The slope value at the left cell. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>s1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The slope value at the center cell. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>s2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The slope value at the right cell. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The limited slope value. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="243" column="35" bodyfile="src/Util_CPU.cu" bodystart="243" bodyend="263"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1aa66ecc177456a698ba2a0530f308f025" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ float</type>
+        <definition>template __host__ __device__ float minmod2</definition>
+        <argsstring>(float theta, float s0, float s1, float s2)</argsstring>
+        <name>minmod2</name>
+        <param>
+          <type>float</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>s0</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>s1</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>s2</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="265" column="36" declfile="src/Util_CPU.cu" declline="265" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a19340490959753ec127541c481d5544a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ double</type>
+        <definition>template __host__ __device__ double minmod2</definition>
+        <argsstring>(double theta, double s0, double s1, double s2)</argsstring>
+        <name>minmod2</name>
+        <param>
+          <type>double</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>s0</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>s1</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>s2</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="266" column="37" declfile="src/Util_CPU.cu" declline="266" declcolumn="37"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ac90cac2cad828f17eecf7b0af8b0f307" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ bool</type>
+        <definition>OBBdetect</definition>
+        <argsstring>(T Axmin, T Axmax, T Aymin, T Aymax, T Bxmin, T Bxmax, T Bymin, T Bymax)</argsstring>
+        <name>OBBdetect</name>
+        <param>
+          <type>T</type>
+          <declname>Axmin</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>Axmax</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>Aymin</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>Aymax</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>Bxmin</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>Bxmax</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>Bymin</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>Bymax</declname>
+        </param>
+        <briefdescription>
+<para>Overlapping Bounding Box detection. Overlapping Bounding Box detection to determine if two axis-aligned bounding boxes overlap. The function takes the minimum and maximum coordinates of two bounding boxes (A and B). It returns true if the bounding boxes overlap, and false otherwise. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>Axmin</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Minimum x-coordinate of bounding box A. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Axmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum x-coordinate of bounding box A. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Aymin</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Minimum y-coordinate of bounding box A. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Aymax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum y-coordinate of bounding box A. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Bxmin</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Minimum x-coordinate of bounding box B. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Bxmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum x-coordinate of bounding box B. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Bymin</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Minimum y-coordinate of bounding box B. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Bymax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum y-coordinate of bounding box B. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if the bounding boxes overlap, false otherwise.</para>
+</simplesect>
+Overlaping Bounding Box to detect which cell river falls into. It is the simplest version of the algorythm where the bounding box are paralle;l to the axis </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="286" column="40" bodyfile="src/Util_CPU.cu" bodystart="286" bodyend="296"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a64be66fcb28a2c15ddf3fc3030f0f480" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ bool</type>
+        <definition>template __host__ __device__ bool OBBdetect</definition>
+        <argsstring>(float Axmin, float Axmax, float Aymin, float Aymax, float Bxmin, float Bxmax, float Bymin, float Bymax)</argsstring>
+        <name>OBBdetect</name>
+        <param>
+          <type>float</type>
+          <declname>Axmin</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>Axmax</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>Aymin</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>Aymax</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>Bxmin</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>Bxmax</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>Bymin</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>Bymax</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="298" column="37" declfile="src/Util_CPU.cu" declline="298" declcolumn="37"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a4556dadc90f1c43b0723e7539c80c4f6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ bool</type>
+        <definition>template __host__ __device__ bool OBBdetect</definition>
+        <argsstring>(double Axmin, double Axmax, double Aymin, double Aymax, double Bxmin, double Bxmax, double Bymin, double Bymax)</argsstring>
+        <name>OBBdetect</name>
+        <param>
+          <type>double</type>
+          <declname>Axmin</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>Axmax</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>Aymin</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>Aymax</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>Bxmin</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>Bxmax</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>Bymin</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>Bymax</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="299" column="37" declfile="src/Util_CPU.cu" declline="299" declcolumn="37"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a597092ff46641fcd737e90426f61bdfb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int ftoi</definition>
+        <argsstring>(T value)</argsstring>
+        <name>ftoi</name>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+<para>Converts a floating-point number to the nearest integer. Converts a floating-point number to the nearest integer. The function rounds the value to the nearest integer, rounding halfway cases away from zero. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The floating-point number to convert. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The nearest integer. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="308" column="17" bodyfile="src/Util_CPU.cu" bodystart="308" bodyend="311"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ad1f6f8db5955ceb0eb7374226ce2109a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template int</type>
+        <definition>template int ftoi&lt; float &gt;</definition>
+        <argsstring>(float value)</argsstring>
+        <name>ftoi&lt; float &gt;</name>
+        <param>
+          <type>float</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="312" column="10" declfile="src/Util_CPU.cu" declline="312" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1ae4e2a50c8ec1e0cc6f4727ba2d57b624" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template int</type>
+        <definition>template int ftoi&lt; double &gt;</definition>
+        <argsstring>(double value)</argsstring>
+        <name>ftoi&lt; double &gt;</name>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="313" column="10" declfile="src/Util_CPU.cu" declline="313" declcolumn="10"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a6fc75ebfe4c6c57350e8e2ae37f2ea71" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T signof</definition>
+        <argsstring>(T a)</argsstring>
+        <name>signof</name>
+        <param>
+          <type>T</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+<para>Returns the sign of a number. Returns the sign of a number. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="319" column="35" bodyfile="src/Util_CPU.cu" bodystart="319" bodyend="323"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a09b9f69c6f1df69002910ae478915476" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template int</type>
+        <definition>template int signof</definition>
+        <argsstring>(int a)</argsstring>
+        <name>signof</name>
+        <param>
+          <type>int</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="324" column="14" declfile="src/Util_CPU.cu" declline="324" declcolumn="14"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1a784f96b735dd077502244ef4ac71d131" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template float</type>
+        <definition>template float signof</definition>
+        <argsstring>(float a)</argsstring>
+        <name>signof</name>
+        <param>
+          <type>float</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="325" column="16" declfile="src/Util_CPU.cu" declline="325" declcolumn="16"/>
+      </memberdef>
+      <memberdef kind="function" id="_util___c_p_u_8cu_1acfee5392943949eaa9d47778dfecd02e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template double</type>
+        <definition>template double signof</definition>
+        <argsstring>(double a)</argsstring>
+        <name>signof</name>
+        <param>
+          <type>double</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="326" column="17" declfile="src/Util_CPU.cu" declline="326" declcolumn="17"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="comment">//Copyright<sp/>(C)<sp/>2018<sp/>Bosserelle<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="comment">//<sp/>This<sp/>code<sp/>contains<sp/>an<sp/>adaptation<sp/>of<sp/>the<sp/>St<sp/>Venant<sp/>equation<sp/>from<sp/>Basilisk<sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="comment">//<sp/>See<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="comment">//<sp/>http://basilisk.fr/src/saint-venant.h<sp/>and<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="comment">//<sp/>S.<sp/>Popinet.<sp/>Quadtree-adaptive<sp/>tsunami<sp/>modelling.<sp/>Ocean<sp/>Dynamics,<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="comment">//<sp/>doi:<sp/>61(9)<sp/>:<sp/>1261<sp/>-<sp/>1285,<sp/>2011<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="comment">//<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="comment">//This<sp/>program<sp/>is<sp/>free<sp/>software:<sp/>you<sp/>can<sp/>redistribute<sp/>it<sp/>and/or<sp/>modify<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="comment">//it<sp/>under<sp/>the<sp/>terms<sp/>of<sp/>the<sp/>GNU<sp/>General<sp/>Public<sp/>License<sp/>as<sp/>published<sp/>by<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="comment">//the<sp/>Free<sp/>Software<sp/>Foundation.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="comment">//<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="comment">//This<sp/>program<sp/>is<sp/>distributed<sp/>in<sp/>the<sp/>hope<sp/>that<sp/>it<sp/>will<sp/>be<sp/>useful,<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="comment">//but<sp/>WITHOUT<sp/>ANY<sp/>WARRANTY;<sp/>without<sp/>even<sp/>the<sp/>implied<sp/>warranty<sp/>of<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="comment">//MERCHANTABILITY<sp/>or<sp/>FITNESS<sp/>FOR<sp/>A<sp/>PARTICULAR<sp/>PURPOSE.<sp/><sp/>See<sp/>the<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="comment">//GNU<sp/>General<sp/>Public<sp/>License<sp/>for<sp/>more<sp/>details.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="comment">//<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="comment">//You<sp/>should<sp/>have<sp/>received<sp/>a<sp/>copy<sp/>of<sp/>the<sp/>GNU<sp/>General<sp/>Public<sp/>License<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="comment">//along<sp/>with<sp/>this<sp/>program.<sp/><sp/>If<sp/>not,<sp/>see<sp/>&lt;http://www.gnu.org/licenses/&gt;.<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>//</highlight></codeline>
+<codeline lineno="22"><highlight class="comment"></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">utils<sp/>{</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>T<sp/>sq(T<sp/>a)<sp/>{</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(a*a);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>max(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>b)<sp/>{</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(a&lt;b)<sp/>?<sp/>b<sp/>:<sp/>a;<sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>or:<sp/>return<sp/>comp(a,b)?b:a;<sp/>for<sp/>version<sp/>(2)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>min(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>b)<sp/>{</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>!(b&lt;a)<sp/>?<sp/>a<sp/>:<sp/>b;<sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>or:<sp/>return<sp/>comp(a,b)?b:a;<sp/>for<sp/>version<sp/>(2)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>nearest(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>b,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>c)<sp/>{</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>abs(b<sp/>-<sp/>c)<sp/>&gt;<sp/>abs(a<sp/>-<sp/>c)<sp/>?<sp/>a<sp/>:<sp/>b;<sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Nearest<sp/>element<sp/>to<sp/>c</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>nearest(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T&amp;<sp/>b)<sp/>{</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>abs(b)<sp/>&gt;<sp/>abs(a)<sp/>?<sp/>a<sp/>:<sp/>b;<sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Nearest<sp/>element<sp/>to<sp/>0.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="62"><highlight class="comment"><sp/><sp/><sp/><sp/>template<sp/>&lt;class<sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>const<sp/>T&amp;<sp/>floor(const<sp/>T&amp;<sp/>a)<sp/>{</highlight></codeline>
+<codeline lineno="63"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>return<sp/>abs(b)<sp/>&gt;<sp/>abs(a)<sp/>?<sp/>a<sp/>:<sp/>b;</highlight></codeline>
+<codeline lineno="64"><highlight class="comment"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="65"><highlight class="comment">*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>min&lt;int&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>min&lt;float&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>min&lt;double&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>max&lt;int&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>max&lt;float&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>max&lt;double&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/>sq&lt;int&gt;(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>a);</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/>sq&lt;float&gt;(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>a);</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/>sq&lt;double&gt;(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>a);</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>nearest&lt;int&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>b,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>c);</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>nearest&lt;float&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>b,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>c);</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>nearest&lt;double&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>b,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>c);</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>nearest&lt;int&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>nearest&lt;float&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>nearest&lt;double&gt;(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>a,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>b);</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight></codeline>
+<codeline lineno="93"><highlight class="normal"></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nextPow2(</highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>x)</highlight></codeline>
+<codeline lineno="94"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><sp/><sp/>--x;</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/>x<sp/>|=<sp/>x<sp/>&gt;&gt;<sp/>1;</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/>x<sp/>|=<sp/>x<sp/>&gt;&gt;<sp/>2;</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/>x<sp/>|=<sp/>x<sp/>&gt;&gt;<sp/>4;</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/><sp/><sp/>x<sp/>|=<sp/>x<sp/>&gt;&gt;<sp/>8;</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/>x<sp/>|=<sp/>x<sp/>&gt;&gt;<sp/>16;</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>++x;</highlight></codeline>
+<codeline lineno="102"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"></highlight></codeline>
+<codeline lineno="107"><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>interptime(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>next,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>prev,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>timenext,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>time)</highlight></codeline>
+<codeline lineno="108"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>prev<sp/>+<sp/>(time)<sp/>/<sp/>(timenext)*(next<sp/>-<sp/>prev);</highlight></codeline>
+<codeline lineno="110"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="111"><highlight class="normal"></highlight></codeline>
+<codeline lineno="112"><highlight class="normal"></highlight></codeline>
+<codeline lineno="129"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>T<sp/>BilinearInterpolation(T<sp/>q11,<sp/>T<sp/>q12,<sp/>T<sp/>q21,<sp/>T<sp/>q22,<sp/>T<sp/>x1,<sp/>T<sp/>x2,<sp/>T<sp/>y1,<sp/>T<sp/>y2,<sp/>T<sp/>x,<sp/>T<sp/>y)</highlight></codeline>
+<codeline lineno="130"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>x2x1,<sp/>y2y1,<sp/>x2x,<sp/>y2y,<sp/>yy1,<sp/>xx1;</highlight></codeline>
+<codeline lineno="132"><highlight class="normal"><sp/><sp/><sp/><sp/>x2x1<sp/>=<sp/>x2<sp/>-<sp/>x1;</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"><sp/><sp/><sp/><sp/>y2y1<sp/>=<sp/>y2<sp/>-<sp/>y1;</highlight></codeline>
+<codeline lineno="134"><highlight class="normal"><sp/><sp/><sp/><sp/>x2x<sp/>=<sp/>x2<sp/>-<sp/>x;</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"><sp/><sp/><sp/><sp/>y2y<sp/>=<sp/>y2<sp/>-<sp/>y;</highlight></codeline>
+<codeline lineno="136"><highlight class="normal"><sp/><sp/><sp/><sp/>yy1<sp/>=<sp/>y<sp/>-<sp/>y1;</highlight></codeline>
+<codeline lineno="137"><highlight class="normal"><sp/><sp/><sp/><sp/>xx1<sp/>=<sp/>x<sp/>-<sp/>x1;</highlight></codeline>
+<codeline lineno="138"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(T)1.0<sp/>/<sp/>(x2x1<sp/>*<sp/>y2y1)<sp/>*<sp/>(</highlight></codeline>
+<codeline lineno="139"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>q11<sp/>*<sp/>x2x<sp/>*<sp/>y2y<sp/>+</highlight></codeline>
+<codeline lineno="140"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>q21<sp/>*<sp/>xx1<sp/>*<sp/>y2y<sp/>+</highlight></codeline>
+<codeline lineno="141"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>q12<sp/>*<sp/>x2x<sp/>*<sp/>yy1<sp/>+</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>q22<sp/>*<sp/>xx1<sp/>*<sp/>yy1</highlight></codeline>
+<codeline lineno="143"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="144"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"></highlight></codeline>
+<codeline lineno="146"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>BilinearInterpolation&lt;float&gt;(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>q11,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>q12,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>q21,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>q22,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x1,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x2,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y1,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y2,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y);</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>BilinearInterpolation&lt;double&gt;(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>q11,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>q12,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>q21,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>q22,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>x1,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>x2,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>y1,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>y2,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>x,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>y);</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"></highlight></codeline>
+<codeline lineno="167"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>T<sp/>BarycentricInterpolation(T<sp/>q1,<sp/>T<sp/>x1,<sp/>T<sp/>y1,<sp/>T<sp/>q2,<sp/>T<sp/>x2,<sp/>T<sp/>y2,<sp/>T<sp/>q3,<sp/>T<sp/>x3,<sp/>T<sp/>y3,<sp/>T<sp/>x,<sp/>T<sp/>y)</highlight></codeline>
+<codeline lineno="168"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>w1,<sp/>w2,<sp/>w3,<sp/>D;</highlight></codeline>
+<codeline lineno="170"><highlight class="normal"></highlight></codeline>
+<codeline lineno="171"><highlight class="normal"><sp/><sp/><sp/><sp/>D<sp/>=<sp/>(y2<sp/>-<sp/>y3)<sp/>*<sp/>(x1<sp/>+<sp/>x3)<sp/>+<sp/>(x3<sp/>-<sp/>x2)<sp/>*<sp/>(y1<sp/>-<sp/>y3);</highlight></codeline>
+<codeline lineno="172"><highlight class="normal"></highlight></codeline>
+<codeline lineno="173"><highlight class="normal"><sp/><sp/><sp/><sp/>w1<sp/>=<sp/>((y2<sp/>-<sp/>y3)<sp/>*<sp/>(x<sp/>-<sp/>x3)<sp/>+<sp/>(x3<sp/>-<sp/>x2)<sp/>*<sp/>(y<sp/>-<sp/>y3))<sp/>/<sp/>D;</highlight></codeline>
+<codeline lineno="174"><highlight class="normal"><sp/><sp/><sp/><sp/>w2<sp/>=<sp/>((y3<sp/>-<sp/>y1)<sp/>*<sp/>(x<sp/>-<sp/>x3)<sp/>+<sp/>(x1<sp/>-<sp/>x3)<sp/>*<sp/>(y<sp/>-<sp/>y3))<sp/>/<sp/>D;</highlight></codeline>
+<codeline lineno="175"><highlight class="normal"><sp/><sp/><sp/><sp/>w3<sp/>=<sp/>1<sp/>-<sp/>w1<sp/>-<sp/>w2;</highlight></codeline>
+<codeline lineno="176"><highlight class="normal"></highlight></codeline>
+<codeline lineno="177"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>q1<sp/>*<sp/>w1<sp/>+<sp/>q2<sp/>*<sp/>w2<sp/>+<sp/>q3<sp/>*<sp/>w3;</highlight></codeline>
+<codeline lineno="178"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="179"><highlight class="normal"></highlight></codeline>
+<codeline lineno="180"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>BarycentricInterpolation(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>q1,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x1,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y1,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>q2,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x2,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y2,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>q3,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x3,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y3,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>y);</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>BarycentricInterpolation(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>q1,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>x1,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>y1,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>q2,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>x2,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>y2,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>q3,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>x3,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>y3,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>x,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>y);</highlight></codeline>
+<codeline lineno="182"><highlight class="normal"></highlight></codeline>
+<codeline lineno="183"><highlight class="normal"></highlight></codeline>
+<codeline lineno="193"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="194"><highlight class="normal">__host__<sp/>__device__<sp/>T<sp/>calcres(T<sp/>dx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>level)</highlight></codeline>
+<codeline lineno="195"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="196"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><sp/>level<sp/>&lt;<sp/>0<sp/>?<sp/>dx<sp/>*<sp/>(1<sp/>&lt;&lt;<sp/>abs(level))<sp/>:<sp/>dx<sp/>/<sp/>(1<sp/>&lt;&lt;<sp/>level);</highlight></codeline>
+<codeline lineno="197"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//should<sp/>be<sp/>1&lt;&lt;<sp/>-level</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="198"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="199"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>calcres&lt;double&gt;(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>level);</highlight></codeline>
+<codeline lineno="200"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>calcres&lt;float&gt;(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>dx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>level);</highlight></codeline>
+<codeline lineno="201"><highlight class="normal"></highlight></codeline>
+<codeline lineno="213"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="214"><highlight class="normal">__host__<sp/>__device__<sp/>T<sp/>calcres(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/>T<sp/>dx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>level)</highlight></codeline>
+<codeline lineno="215"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="216"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>ddx<sp/>=<sp/>calcres(dx,<sp/>level);<sp/></highlight><highlight class="comment">//<sp/>here<sp/>use<sp/>dx<sp/>as<sp/>the<sp/>cue<sp/>for<sp/>the<sp/>compiler<sp/>to<sp/>use<sp/>the<sp/>float<sp/>or<sp/>double<sp/>version<sp/>of<sp/>this<sp/>function</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="217"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="218"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.spherical)</highlight></codeline>
+<codeline lineno="219"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="220"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ddx<sp/>=<sp/>ddx<sp/>*<sp/>T(XParam.Radius<sp/>*<sp/>pi<sp/>/<sp/>180.0);</highlight></codeline>
+<codeline lineno="221"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="222"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="223"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>ddx;</highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//should<sp/>be<sp/>1&lt;&lt;<sp/>-level</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="225"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="226"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>calcres&lt;double&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>level);</highlight></codeline>
+<codeline lineno="227"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>calcres&lt;float&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>dx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>level);</highlight></codeline>
+<codeline lineno="228"><highlight class="normal"></highlight></codeline>
+<codeline lineno="243"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>T<sp/>minmod2(T<sp/>theta,<sp/>T<sp/>s0,<sp/>T<sp/>s1,<sp/>T<sp/>s2)</highlight></codeline>
+<codeline lineno="244"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="245"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//theta<sp/>should<sp/>be<sp/>used<sp/>as<sp/>a<sp/>global<sp/>var</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="246"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>can<sp/>be<sp/>used<sp/>to<sp/>tune<sp/>the<sp/>limiting<sp/>(theta=1</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="247"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//gives<sp/>minmod,<sp/>the<sp/>most<sp/>dissipative<sp/>limiter<sp/>and<sp/>theta<sp/>=<sp/>2<sp/>gives</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="248"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/><sp/>superbee,<sp/>the<sp/>least<sp/>dissipative).</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="249"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//float<sp/>theta<sp/>=<sp/>1.3f;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="250"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(s0<sp/>&lt;<sp/>s1<sp/>&amp;&amp;<sp/>s1<sp/>&lt;<sp/>s2)<sp/>{</highlight></codeline>
+<codeline lineno="251"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>d1<sp/>=<sp/>theta<sp/>*<sp/>(s1<sp/>-<sp/>s0);</highlight></codeline>
+<codeline lineno="252"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>d2<sp/>=<sp/>(s2<sp/>-<sp/>s0)<sp/>/<sp/>T(2.0);</highlight></codeline>
+<codeline lineno="253"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>d3<sp/>=<sp/>theta<sp/>*<sp/>(s2<sp/>-<sp/>s1);</highlight></codeline>
+<codeline lineno="254"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(d2<sp/>&lt;<sp/>d1)<sp/>d1<sp/>=<sp/>d2;</highlight></codeline>
+<codeline lineno="255"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>min(d1,<sp/>d3);</highlight></codeline>
+<codeline lineno="256"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="257"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(s0<sp/>&gt;<sp/>s1<sp/>&amp;&amp;<sp/>s1<sp/>&gt;<sp/>s2)<sp/>{</highlight></codeline>
+<codeline lineno="258"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>d1<sp/>=<sp/>theta<sp/>*<sp/>(s1<sp/>-<sp/>s0),<sp/>d2<sp/>=<sp/>(s2<sp/>-<sp/>s0)<sp/>/<sp/>T(2.0),<sp/>d3<sp/>=<sp/>theta<sp/>*<sp/>(s2<sp/>-<sp/>s1);</highlight></codeline>
+<codeline lineno="259"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(d2<sp/>&gt;<sp/>d1)<sp/>d1<sp/>=<sp/>d2;</highlight></codeline>
+<codeline lineno="260"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>max(d1,<sp/>d3);</highlight></codeline>
+<codeline lineno="261"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="262"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>T(0.0);</highlight></codeline>
+<codeline lineno="263"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="264"><highlight class="normal"></highlight></codeline>
+<codeline lineno="265"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>minmod2(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>theta,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>s0,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>s1,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>s2);</highlight></codeline>
+<codeline lineno="266"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>minmod2(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>theta,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>s0,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>s1,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>s2);</highlight></codeline>
+<codeline lineno="267"><highlight class="normal"></highlight></codeline>
+<codeline lineno="286"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/><sp/>__device__<sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>OBBdetect(T<sp/>Axmin,<sp/>T<sp/>Axmax,<sp/>T<sp/>Aymin,<sp/>T<sp/>Aymax,<sp/>T<sp/>Bxmin,<sp/>T<sp/>Bxmax,<sp/>T<sp/>Bymin,<sp/>T<sp/>Bymax)</highlight></codeline>
+<codeline lineno="287"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="288"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>overlap<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="289"><highlight class="normal"></highlight></codeline>
+<codeline lineno="290"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>testX<sp/>=<sp/>Bxmin<sp/>&lt;=<sp/>Axmax<sp/>&amp;&amp;<sp/>Bxmax<sp/>&gt;=<sp/>Axmin;</highlight></codeline>
+<codeline lineno="291"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>testY<sp/>=<sp/>Bymin<sp/>&lt;=<sp/>Aymax<sp/>&amp;&amp;<sp/>Bymax<sp/>&gt;=<sp/>Aymin;</highlight></codeline>
+<codeline lineno="292"><highlight class="normal"></highlight></codeline>
+<codeline lineno="293"><highlight class="normal"><sp/><sp/><sp/><sp/>overlap<sp/>=<sp/>testX<sp/>&amp;&amp;<sp/>testY;</highlight></codeline>
+<codeline lineno="294"><highlight class="normal"></highlight></codeline>
+<codeline lineno="295"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>overlap;</highlight></codeline>
+<codeline lineno="296"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="297"><highlight class="normal"></highlight></codeline>
+<codeline lineno="298"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/><sp/>__device__<sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>OBBdetect(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Axmin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Axmax,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Aymin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Aymax,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Bxmin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Bxmax,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Bymin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Bymax);</highlight></codeline>
+<codeline lineno="299"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/><sp/>__device__<sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>OBBdetect(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Axmin,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Axmax,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Aymin,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Aymax,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Bxmin,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Bxmax,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Bymin,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Bymax);</highlight></codeline>
+<codeline lineno="300"><highlight class="normal"></highlight></codeline>
+<codeline lineno="308"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ftoi(T<sp/>value)<sp/>{</highlight></codeline>
+<codeline lineno="309"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(value<sp/>&gt;=<sp/>0<sp/>?<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(value<sp/>+<sp/>0.5)</highlight></codeline>
+<codeline lineno="310"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">int</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(value<sp/>-<sp/>0.5));</highlight></codeline>
+<codeline lineno="311"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="312"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ftoi&lt;float&gt;(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>value);</highlight></codeline>
+<codeline lineno="313"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ftoi&lt;double&gt;(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>value);</highlight></codeline>
+<codeline lineno="314"><highlight class="normal"></highlight></codeline>
+<codeline lineno="319"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>T<sp/>signof(T<sp/>a)</highlight></codeline>
+<codeline lineno="320"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="321"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="322"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>a<sp/>&gt;<sp/>T(0.0)<sp/>?<sp/>T(1.0)<sp/>:<sp/>T(-1.0);</highlight></codeline>
+<codeline lineno="323"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="324"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>signof(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>a);</highlight></codeline>
+<codeline lineno="325"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>signof(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>a);</highlight></codeline>
+<codeline lineno="326"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>signof(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>a);</highlight></codeline>
+    </programlisting>
+    <location file="src/Util_CPU.cu"/>
+  </compounddef>
+</doxygen>

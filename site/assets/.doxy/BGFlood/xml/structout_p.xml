@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="structout_p" kind="struct" language="C++" prot="public">
+    <compoundname>outP</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structout_p_1a8868e9e609a2931ce851491f5d008d1e" prot="public" static="no" mutable="no">
+        <type>float *</type>
+        <definition>float* outP::z</definition>
+        <argsstring></argsstring>
+        <name>z</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="180" column="7" bodyfile="src/Arrays.h" bodystart="180" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structout_p_1afd2f9318e080c37e3474951faa99a01f" prot="public" static="no" mutable="no">
+        <type>short *</type>
+        <definition>short* outP::z_s</definition>
+        <argsstring></argsstring>
+        <name>z_s</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="181" column="7" bodyfile="src/Arrays.h" bodystart="181" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structout_p_1afe23ee2f954ea20df43095c006b44176" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int outP::level</definition>
+        <argsstring></argsstring>
+        <name>level</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="182" column="5" bodyfile="src/Arrays.h" bodystart="182" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structout_p_1a5e88ba787d6dd40b4a1d22e62d7e32e3" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outP::xmin</definition>
+        <argsstring></argsstring>
+        <name>xmin</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="183" column="8" bodyfile="src/Arrays.h" bodystart="183" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structout_p_1a31c227676ab5818973284d0efc4ae209" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outP::xmax</definition>
+        <argsstring></argsstring>
+        <name>xmax</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="183" column="13" bodyfile="src/Arrays.h" bodystart="183" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structout_p_1ae2479f99a69a0aa2e4a5d22cfae78433" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outP::ymin</definition>
+        <argsstring></argsstring>
+        <name>ymin</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="183" column="18" bodyfile="src/Arrays.h" bodystart="183" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structout_p_1ab3ba41e801cf81e282aae178dc93630f" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outP::ymax</definition>
+        <argsstring></argsstring>
+        <name>ymax</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="183" column="23" bodyfile="src/Arrays.h" bodystart="183" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="178" column="1" bodyfile="src/Arrays.h" bodystart="179" bodyend="184"/>
+    <listofallmembers>
+      <member refid="structout_p_1afe23ee2f954ea20df43095c006b44176" prot="public" virt="non-virtual"><scope>outP</scope><name>level</name></member>
+      <member refid="structout_p_1a31c227676ab5818973284d0efc4ae209" prot="public" virt="non-virtual"><scope>outP</scope><name>xmax</name></member>
+      <member refid="structout_p_1a5e88ba787d6dd40b4a1d22e62d7e32e3" prot="public" virt="non-virtual"><scope>outP</scope><name>xmin</name></member>
+      <member refid="structout_p_1ab3ba41e801cf81e282aae178dc93630f" prot="public" virt="non-virtual"><scope>outP</scope><name>ymax</name></member>
+      <member refid="structout_p_1ae2479f99a69a0aa2e4a5d22cfae78433" prot="public" virt="non-virtual"><scope>outP</scope><name>ymin</name></member>
+      <member refid="structout_p_1a8868e9e609a2931ce851491f5d008d1e" prot="public" virt="non-virtual"><scope>outP</scope><name>z</name></member>
+      <member refid="structout_p_1afd2f9318e080c37e3474951faa99a01f" prot="public" virt="non-virtual"><scope>outP</scope><name>z_s</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

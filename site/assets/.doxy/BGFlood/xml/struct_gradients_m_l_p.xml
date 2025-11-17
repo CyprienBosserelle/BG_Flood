@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_gradients_m_l_p" kind="struct" language="C++" prot="public">
+    <compoundname>GradientsMLP</compoundname>
+    <includes refid="_arrays_8h" local="no">Arrays.h</includes>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_gradients_m_l_p_1aec7a9e1057b3153be43bef732766043e" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsMLP&lt; T &gt;::dhdx</definition>
+        <argsstring></argsstring>
+        <name>dhdx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Water depth gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="48" column="3" bodyfile="src/Arrays.h" bodystart="48" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_m_l_p_1adb474bead08a59dc1230277239c6c52f" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsMLP&lt; T &gt;::dudx</definition>
+        <argsstring></argsstring>
+        <name>dudx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity u gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="50" column="3" bodyfile="src/Arrays.h" bodystart="50" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_m_l_p_1af15bcad5d6e77a623e906a6c93d6f7b8" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsMLP&lt; T &gt;::dvdx</definition>
+        <argsstring></argsstring>
+        <name>dvdx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity v gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="52" column="3" bodyfile="src/Arrays.h" bodystart="52" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_m_l_p_1a53dea7fb022a1cc7c1eec6ceda037c26" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsMLP&lt; T &gt;::dhdy</definition>
+        <argsstring></argsstring>
+        <name>dhdy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Water depth gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="54" column="3" bodyfile="src/Arrays.h" bodystart="54" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_m_l_p_1af85d69d66b9e46fe880d7eb05ee5c1a8" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsMLP&lt; T &gt;::dudy</definition>
+        <argsstring></argsstring>
+        <name>dudy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity u gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="56" column="3" bodyfile="src/Arrays.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_m_l_p_1a3d2fae8fd92824aa90101da1d5281743" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsMLP&lt; T &gt;::dvdy</definition>
+        <argsstring></argsstring>
+        <name>dvdy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity v gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="58" column="3" bodyfile="src/Arrays.h" bodystart="58" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Structure holding gradient arrays (no z relative variables). </para>
+    </briefdescription>
+    <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="45" column="1" bodyfile="src/Arrays.h" bodystart="46" bodyend="59"/>
+    <listofallmembers>
+      <member refid="struct_gradients_m_l_p_1aec7a9e1057b3153be43bef732766043e" prot="public" virt="non-virtual"><scope>GradientsMLP</scope><name>dhdx</name></member>
+      <member refid="struct_gradients_m_l_p_1a53dea7fb022a1cc7c1eec6ceda037c26" prot="public" virt="non-virtual"><scope>GradientsMLP</scope><name>dhdy</name></member>
+      <member refid="struct_gradients_m_l_p_1adb474bead08a59dc1230277239c6c52f" prot="public" virt="non-virtual"><scope>GradientsMLP</scope><name>dudx</name></member>
+      <member refid="struct_gradients_m_l_p_1af85d69d66b9e46fe880d7eb05ee5c1a8" prot="public" virt="non-virtual"><scope>GradientsMLP</scope><name>dudy</name></member>
+      <member refid="struct_gradients_m_l_p_1af15bcad5d6e77a623e906a6c93d6f7b8" prot="public" virt="non-virtual"><scope>GradientsMLP</scope><name>dvdx</name></member>
+      <member refid="struct_gradients_m_l_p_1a3d2fae8fd92824aa90101da1d5281743" prot="public" virt="non-virtual"><scope>GradientsMLP</scope><name>dvdy</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

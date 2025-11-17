@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_gradients_p" kind="struct" language="C++" prot="public">
+    <compoundname>GradientsP</compoundname>
+    <includes refid="_arrays_8h" local="no">Arrays.h</includes>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_gradients_p_1ad43d1bb081c2d44b832b8cdcfd544347" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dzsdx</definition>
+        <argsstring></argsstring>
+        <name>dzsdx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Surface elevation gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="17" column="3" bodyfile="src/Arrays.h" bodystart="17" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1a3a9cb7fe4a455a7f5aeb9a82d4ff0703" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dhdx</definition>
+        <argsstring></argsstring>
+        <name>dhdx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Water depth gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="19" column="3" bodyfile="src/Arrays.h" bodystart="19" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1a031883fc1cf8682f6eb513f6dd46f47e" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dudx</definition>
+        <argsstring></argsstring>
+        <name>dudx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity u gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="21" column="3" bodyfile="src/Arrays.h" bodystart="21" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1aa5192b823cd1b71e7622d3e3c90ff163" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dvdx</definition>
+        <argsstring></argsstring>
+        <name>dvdx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity v gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="23" column="3" bodyfile="src/Arrays.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1aa29b0cab0dc36dbf955633abfdb4de1c" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dzsdy</definition>
+        <argsstring></argsstring>
+        <name>dzsdy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Surface elevation gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="26" column="3" bodyfile="src/Arrays.h" bodystart="26" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1abe2a881d2d1caeb44146412f5b765b64" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dhdy</definition>
+        <argsstring></argsstring>
+        <name>dhdy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Water depth gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="28" column="3" bodyfile="src/Arrays.h" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1ac700564ea6800deeed698502ab8a15eb" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dudy</definition>
+        <argsstring></argsstring>
+        <name>dudy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity u gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="30" column="3" bodyfile="src/Arrays.h" bodystart="30" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1aebefd731d1813ab1af3f7c282a5ba2e5" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dvdy</definition>
+        <argsstring></argsstring>
+        <name>dvdy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity v gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="32" column="3" bodyfile="src/Arrays.h" bodystart="32" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1a83a24485386c83f86ad6530c936e194e" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dzbdx</definition>
+        <argsstring></argsstring>
+        <name>dzbdx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Bed elevation gradient in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="35" column="3" bodyfile="src/Arrays.h" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_gradients_p_1af9686c22fbc669c58c288b74549edb98" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* GradientsP&lt; T &gt;::dzbdy</definition>
+        <argsstring></argsstring>
+        <name>dzbdy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Bed elevation gradient in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="37" column="3" bodyfile="src/Arrays.h" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Structure holding gradient arrays for physical variables. </para>
+    </briefdescription>
+    <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="14" column="1" bodyfile="src/Arrays.h" bodystart="15" bodyend="38"/>
+    <listofallmembers>
+      <member refid="struct_gradients_p_1a3a9cb7fe4a455a7f5aeb9a82d4ff0703" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dhdx</name></member>
+      <member refid="struct_gradients_p_1abe2a881d2d1caeb44146412f5b765b64" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dhdy</name></member>
+      <member refid="struct_gradients_p_1a031883fc1cf8682f6eb513f6dd46f47e" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dudx</name></member>
+      <member refid="struct_gradients_p_1ac700564ea6800deeed698502ab8a15eb" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dudy</name></member>
+      <member refid="struct_gradients_p_1aa5192b823cd1b71e7622d3e3c90ff163" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dvdx</name></member>
+      <member refid="struct_gradients_p_1aebefd731d1813ab1af3f7c282a5ba2e5" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dvdy</name></member>
+      <member refid="struct_gradients_p_1a83a24485386c83f86ad6530c936e194e" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dzbdx</name></member>
+      <member refid="struct_gradients_p_1af9686c22fbc669c58c288b74549edb98" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dzbdy</name></member>
+      <member refid="struct_gradients_p_1ad43d1bb081c2d44b832b8cdcfd544347" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dzsdx</name></member>
+      <member refid="struct_gradients_p_1aa29b0cab0dc36dbf955633abfdb4de1c" prot="public" virt="non-virtual"><scope>GradientsP</scope><name>dzsdy</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

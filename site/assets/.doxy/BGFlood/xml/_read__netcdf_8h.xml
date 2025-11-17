@@ -1,0 +1,2156 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="_read__netcdf_8h" kind="file" language="C++">
+    <compoundname>Read_netcdf.h</compoundname>
+    <includes refid="_general_8h" local="yes">General.h</includes>
+    <includes refid="_input_8h" local="yes">Input.h</includes>
+    <includes refid="_read_input_8h" local="yes">ReadInput.h</includes>
+    <includes refid="_write__txtlog_8h" local="yes">Write_txtlog.h</includes>
+    <includes refid="_write__netcdf_8h" local="yes">Write_netcdf.h</includes>
+    <includes refid="_util___c_p_u_8h" local="yes">Util_CPU.h</includes>
+    <includes refid="_grid_manip_8h" local="yes">GridManip.h</includes>
+    <includes refid="_forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="utctime_8h" local="yes">utctime.h</includes>
+    <includedby refid="_init_evolv_8h" local="yes">src/InitEvolv.h</includedby>
+    <includedby refid="_read__netcdf_8cu" local="yes">src/Read_netcdf.cu</includedby>
+    <includedby refid="_read_forcing_8h" local="yes">src/ReadForcing.h</includedby>
+    <incdepgraph>
+      <node id="29">
+        <label>ReadForcing.h</label>
+        <link refid="_read_forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>Write_netcdf.h</label>
+        <link refid="_write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="44">
+        <label>ConserveElevation.h</label>
+        <link refid="_conserve_elevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="33">
+        <label>Halo.h</label>
+        <link refid="_halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>Boundary.h</label>
+        <link refid="_boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>Forcing.h</label>
+        <link refid="_forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>InitEvolv.h</label>
+        <link refid="_init_evolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="38">
+        <label>Updateforcing.h</label>
+        <link refid="_updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="27">
+        <label>Util_CPU.h</label>
+        <link refid="_util___c_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Write_txtlog.h</label>
+        <link refid="_write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>Gradients.h</label>
+        <link refid="_gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="22">
+        <label>Input.h</label>
+        <link refid="_input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>ReadInput.h</label>
+        <link refid="_read_input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Param.h</label>
+        <link refid="_param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>Poly.h</label>
+        <link refid="_poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="30">
+        <label>Setup_GPU.h</label>
+        <link refid="_setup___g_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Kurganov.h</label>
+        <link refid="_kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+      <node id="39">
+        <label>InitialConditions.h</label>
+        <link refid="_initial_conditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="35">
+        <label>GridManip.h</label>
+        <link refid="_grid_manip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Mesh.h</label>
+        <link refid="_mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="_general_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>Arrays.h</label>
+        <link refid="_arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="32">
+        <label>MemManagement.h</label>
+        <link refid="_mem_management_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Read_netcdf.h</label>
+        <link refid="_read__netcdf_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>Spherical.h</label>
+        <link refid="_spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="29">
+        <label>src/ReadForcing.h</label>
+        <link refid="_read_forcing_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>src/Multilayer.h</label>
+        <link refid="_multilayer_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>src/Write_netcdf.h</label>
+        <link refid="_write__netcdf_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/Testing.h</label>
+        <link refid="_testing_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>src/FlowGPU.h</label>
+        <link refid="_flow_g_p_u_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>src/ConserveElevation.h</label>
+        <link refid="_conserve_elevation_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>src/Halo.h</label>
+        <link refid="_halo_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>src/utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>src/Reimann.h</label>
+        <link refid="_reimann_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>src/Boundary.h</label>
+        <link refid="_boundary_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/InitEvolv.h</label>
+        <link refid="_init_evolv_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>src/Updateforcing.h</label>
+        <link refid="_updateforcing_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>src/FlowCPU.h</label>
+        <link refid="_flow_c_p_u_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/Gradients.h</label>
+        <link refid="_gradients_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>src/Advection.h</label>
+        <link refid="_advection_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>src/ReadInput.h</label>
+        <link refid="_read_input_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>src/Poly.h</label>
+        <link refid="_poly_8h_source"/>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/BG_Flood.h</label>
+        <link refid="_b_g___flood_8h_source"/>
+      </node>
+      <node id="4">
+        <label>src/Adaptation.h</label>
+        <link refid="_adaptation_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>src/Setup_GPU.h</label>
+        <link refid="_setup___g_p_u_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>src/Kurganov.h</label>
+        <link refid="_kurganov_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/InitialConditions.h</label>
+        <link refid="_initial_conditions_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>src/Mesh.cu</label>
+        <link refid="_mesh_8cu"/>
+      </node>
+      <node id="20">
+        <label>src/Friction.h</label>
+        <link refid="_friction_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>src/GridManip.h</label>
+        <link refid="_grid_manip_8h_source"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>src/Mesh.h</label>
+        <link refid="_mesh_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>src/AdaptCriteria.h</label>
+        <link refid="_adapt_criteria_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/Mainloop.h</label>
+        <link refid="_mainloop_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="_flow_m_l_g_p_u_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>src/Meanmax.h</label>
+        <link refid="_meanmax_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>src/MemManagement.h</label>
+        <link refid="_mem_management_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Read_netcdf.h</label>
+        <link refid="_read__netcdf_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>src/Spherical.h</label>
+        <link refid="_spherical_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="_read__netcdf_8h_1aa7fad9e9c1f54ecbfed731514c11a13e" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int nc_get_var_T</definition>
+        <argsstring>(int ncid, int varid, float *&amp;zb)</argsstring>
+        <name>nc_get_var_T</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>varid</declname>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="17" column="12" bodyfile="src/Read_netcdf.cu" bodystart="24" bodyend="29" declfile="src/Read_netcdf.h" declline="17" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a601d3058dd90221e412a4c6dab5e0947" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int nc_get_var_T</definition>
+        <argsstring>(int ncid, int varid, double *&amp;zb)</argsstring>
+        <name>nc_get_var_T</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>varid</declname>
+        </param>
+        <param>
+          <type>double *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="18" column="12" bodyfile="src/Read_netcdf.cu" bodystart="30" bodyend="35" declfile="src/Read_netcdf.h" declline="18" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a3165cdf973892299732f36ae6b5aa5bd" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int nc_get_vara_T</definition>
+        <argsstring>(int ncid, int varid, const size_t *startp, const size_t *countp, float *&amp;zb)</argsstring>
+        <name>nc_get_vara_T</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>varid</declname>
+        </param>
+        <param>
+          <type>const size_t *</type>
+          <declname>startp</declname>
+        </param>
+        <param>
+          <type>const size_t *</type>
+          <declname>countp</declname>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="20" column="12" bodyfile="src/Read_netcdf.cu" bodystart="50" bodyend="56" declfile="src/Read_netcdf.h" declline="20" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a7b63115d8ad7293e06307282b73b74ab" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int nc_get_vara_T</definition>
+        <argsstring>(int ncid, int varid, const size_t *startp, const size_t *countp, double *&amp;zb)</argsstring>
+        <name>nc_get_vara_T</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>varid</declname>
+        </param>
+        <param>
+          <type>const size_t *</type>
+          <declname>startp</declname>
+        </param>
+        <param>
+          <type>const size_t *</type>
+          <declname>countp</declname>
+        </param>
+        <param>
+          <type>double *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="21" column="12" bodyfile="src/Read_netcdf.cu" bodystart="57" bodyend="63" declfile="src/Read_netcdf.h" declline="21" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1ace124d74a0f98083d0e9b3e8274d6fd6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int nc_get_var1_T</definition>
+        <argsstring>(int ncid, int varid, const size_t *startp, float *zsa)</argsstring>
+        <name>nc_get_var1_T</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>varid</declname>
+        </param>
+        <param>
+          <type>const size_t *</type>
+          <declname>startp</declname>
+        </param>
+        <param>
+          <type>float *</type>
+          <declname>zsa</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="23" column="12" bodyfile="src/Read_netcdf.cu" bodystart="65" bodyend="70" declfile="src/Read_netcdf.h" declline="23" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1af5f8c8bf691367eb8b8ac3d236d1c2bc" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int nc_get_var1_T</definition>
+        <argsstring>(int ncid, int varid, const size_t *startp, double *zsa)</argsstring>
+        <name>nc_get_var1_T</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>varid</declname>
+        </param>
+        <param>
+          <type>const size_t *</type>
+          <declname>startp</declname>
+        </param>
+        <param>
+          <type>double *</type>
+          <declname>zsa</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="24" column="12" bodyfile="src/Read_netcdf.cu" bodystart="71" bodyend="76" declfile="src/Read_netcdf.h" declline="24" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a405416e388c378f3778101d1d2deb6b5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string checkncvarname</definition>
+        <argsstring>(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE)</argsstring>
+        <name>checkncvarname</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>stringA</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>stringB</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>stringC</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>stringD</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>stringE</declname>
+        </param>
+        <briefdescription>
+<para>Check for the existence of NetCDF variable names and return the first found. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Checks up to five possible variable names in a NetCDF file and returns the first one that exists.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>ncid</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>NetCDF file ID </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>stringA</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>First variable name to check </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>stringB</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Second variable name to check </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>stringC</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Third variable name to check </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>stringD</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Fourth variable name to check </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>stringE</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Fifth variable name to check </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The first variable name found in the NetCDF file, or an empty string if none are found. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="29" column="13" bodyfile="src/Read_netcdf.cu" bodystart="1024" bodyend="1066" declfile="src/Read_netcdf.h" declline="29" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a6e24e65db5d8609c76d187b1ea70eb08" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readgridncsize</definition>
+        <argsstring>(const std::string ncfilestr, const std::string varstr, std::string reftime, int &amp;nx, int &amp;ny, int &amp;nt, double &amp;dx, double &amp;dy, double &amp;dt, double &amp;xo, double &amp;yo, double &amp;to, double &amp;xmax, double &amp;ymax, double &amp;tmax, bool &amp;flipx, bool &amp;flipy)</argsstring>
+        <name>readgridncsize</name>
+        <param>
+          <type>const std::string</type>
+          <declname>ncfilestr</declname>
+        </param>
+        <param>
+          <type>const std::string</type>
+          <declname>varstr</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>reftime</declname>
+        </param>
+        <param>
+          <type>int &amp;</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int &amp;</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>int &amp;</type>
+          <declname>nt</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>dy</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>xo</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>yo</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>to</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>xmax</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>ymax</declname>
+        </param>
+        <param>
+          <type>double &amp;</type>
+          <declname>tmax</declname>
+        </param>
+        <param>
+          <type>bool &amp;</type>
+          <declname>flipx</declname>
+        </param>
+        <param>
+          <type>bool &amp;</type>
+          <declname>flipy</declname>
+        </param>
+        <briefdescription>
+<para>Read grid size and metadata from a NetCDF file. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads dimensions, coordinates, and time information for a variable in a NetCDF file.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>ncfilestr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>NetCDF filename </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>varstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Variable name </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>reftime</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference time string </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of x grid points </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>ny</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of y grid points </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of time steps </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing in x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dy</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing in y </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step size </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>xo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Origin x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>yo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Origin y </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>to</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Origin time </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>xmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>ymax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum y </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>tmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum time </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>flipx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Flip x axis </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>flipy</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Flip y axis </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="32" column="6" bodyfile="src/Read_netcdf.cu" bodystart="106" bodyend="346" declfile="src/Read_netcdf.h" declline="32" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1af7eedec0cb2a07e005f541fed061c6ae" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readgridncsize</definition>
+        <argsstring>(forcingmap &amp;Fmap, Param XParam)</argsstring>
+        <name>readgridncsize</name>
+        <param>
+          <type><ref refid="classforcingmap" kindref="compound">forcingmap</ref> &amp;</type>
+          <declname>Fmap</declname>
+        </param>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <briefdescription>
+<para>Read grid size and metadata for a forcing map. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads grid size and metadata for a forcing map using model parameters.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>Fmap</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_forcing" kindref="compound">Forcing</ref> map structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="33" column="6" bodyfile="src/Read_netcdf.cu" bodystart="357" bodyend="361" declfile="src/Read_netcdf.h" declline="33" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1ae0c046efbc26b8dea142656b03cd8dc5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void readgridncsize</definition>
+        <argsstring>(T &amp;Imap)</argsstring>
+        <name>readgridncsize</name>
+        <param>
+          <type>T &amp;</type>
+          <declname>Imap</declname>
+        </param>
+        <briefdescription>
+<para>Read grid size and metadata for a generic map type. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads grid size and metadata for a generic map type (inputmap, forcingmap, etc.).</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Map type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>Imap</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Map structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="35" column="17" bodyfile="src/Read_netcdf.cu" bodystart="372" bodyend="377" declfile="src/Read_netcdf.h" declline="35" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1ac4849c1b38a6a4585828ce491d44ad62" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int readvarinfo</definition>
+        <argsstring>(std::string filename, std::string Varname, size_t *&amp;ddimU)</argsstring>
+        <name>readvarinfo</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>Varname</declname>
+        </param>
+        <param>
+          <type>size_t *&amp;</type>
+          <declname>ddimU</declname>
+        </param>
+        <briefdescription>
+<para>Read variable dimension info from a NetCDF file. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads the dimensions for a variable in a NetCDF file.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>filename</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>NetCDF filename </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Varname</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Variable name </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>ddimU</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for dimension sizes </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Number of dimensions </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="38" column="5" bodyfile="src/Read_netcdf.cu" bodystart="396" bodyend="435" declfile="src/Read_netcdf.h" declline="38" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1ab93cc9b6e522d0763c6e5a6d35b7047c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int readnctime</definition>
+        <argsstring>(std::string filename, double *&amp;time)</argsstring>
+        <name>readnctime</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>double *&amp;</type>
+          <declname>time</declname>
+        </param>
+        <briefdescription>
+<para>Read time variable from a NetCDF file. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads the time variable from a NetCDF file into a double array.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>filename</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>NetCDF filename </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>time</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for time values </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Status code </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="39" column="5" bodyfile="src/Read_netcdf.cu" bodystart="447" bodyend="486" declfile="src/Read_netcdf.h" declline="39" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a089b3abbf61032bf6149c9163978a8db" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int readnctime2</definition>
+        <argsstring>(int ncid, char *timecoordname, std::string refdate, size_t nt, double *&amp;time)</argsstring>
+        <name>readnctime2</name>
+        <param>
+          <type>int</type>
+          <declname>ncid</declname>
+        </param>
+        <param>
+          <type>char *</type>
+          <declname>timecoordname</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>refdate</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>nt</declname>
+        </param>
+        <param>
+          <type>double *&amp;</type>
+          <declname>time</declname>
+        </param>
+        <briefdescription>
+<para>Read time variable from a NetCDF file with reference date. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads the time variable from a NetCDF file using a reference date and time coordinate name.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>ncid</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>NetCDF file ID </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>timecoordname</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time coordinate variable name </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>refdate</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference date string </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of time steps </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>time</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for time values </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Status code </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+<para>std::vector&lt;std::string&gt; nameelements;</para>
+<para>nameelements = split(filename, &apos;?&apos;); if (nameelements.size() &gt; 1) { //variable name for bathy is not given so it is assumed to be zb ncfilestr = nameelements[0]; //varstr = nameelements[1]; } else { ncfilestr = filename; //varstr = &quot;time&quot;; }</para>
+<para>status = nc_open(ncfilestr.c_str(), 0, &amp;ncid); if (status != NC_NOERR) handle_ncerror(status);</para>
+<para>status = nc_close(ncid);</para>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="40" column="5" bodyfile="src/Read_netcdf.cu" bodystart="500" bodyend="626" declfile="src/Read_netcdf.h" declline="40" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a7008a78c8c1373c6b5cc6d9afdeb0fd6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int readncslev1</definition>
+        <argsstring>(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T *&amp;zsa)</argsstring>
+        <name>readncslev1</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>varstr</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>indx</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>indy</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>indt</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>checkhh</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>eps</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>zsa</declname>
+        </param>
+        <briefdescription>
+<para>Read a single level of data from a NetCDF file. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads a single level of data for a variable from a NetCDF file.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>filename</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>NetCDF filename </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>varstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Variable name </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>indx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>X index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>indy</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Y index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>indt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>checkhh</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Check for missing values </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>eps</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Epsilon for missing value detection </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zsa</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for data </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Status code </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="41" column="17" bodyfile="src/Read_netcdf.cu" bodystart="644" bodyend="803" declfile="src/Read_netcdf.h" declline="41" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a7474d68ee506f844b51565ff4b41f26c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int readvardata</definition>
+        <argsstring>(std::string filename, std::string Varname, int step, T *&amp;vardata, bool flipx, bool flipy)</argsstring>
+        <name>readvardata</name>
+        <param>
+          <type>std::string</type>
+          <declname>filename</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>Varname</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>step</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>vardata</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>flipx</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>flipy</declname>
+        </param>
+        <briefdescription>
+<para>Read variable data from a NetCDF file for a specific time step. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads data for a variable from a NetCDF file for a given time step, with optional axis flipping.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>filename</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>NetCDF filename </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Varname</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Variable name </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>step</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step to read </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>vardata</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for data </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>flipx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Flip x axis </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>flipy</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Flip y axis </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Status code </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="42" column="17" bodyfile="src/Read_netcdf.cu" bodystart="823" bodyend="1004" declfile="src/Read_netcdf.h" declline="42" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a36da5a9d68ce650ffc88eb3e9aefbc7e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readWNDstep</definition>
+        <argsstring>(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&amp;Uo, float *&amp;Vo)</argsstring>
+        <name>readWNDstep</name>
+        <param>
+          <type><ref refid="classforcingmap" kindref="compound">forcingmap</ref></type>
+          <declname>WNDUmap</declname>
+        </param>
+        <param>
+          <type><ref refid="classforcingmap" kindref="compound">forcingmap</ref></type>
+          <declname>WNDVmap</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>steptoread</declname>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>Uo</declname>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>Vo</declname>
+        </param>
+        <briefdescription>
+<para>Read wind data from NetCDF files for a specific time step. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads U and V wind components from NetCDF files for a given time step. By default we want to read wind info as float because it will reside in a texture. the value is converted to the apropriate type only when it is used. so there is no need to template this function</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>WNDUmap</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_forcing" kindref="compound">Forcing</ref> map for U wind </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>WNDVmap</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_forcing" kindref="compound">Forcing</ref> map for V wind </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>steptoread</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step to read </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Uo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for U wind </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Vo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for V wind </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="45" column="6" bodyfile="src/Read_netcdf.cu" bodystart="1081" bodyend="1169" declfile="src/Read_netcdf.h" declline="45" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a295d92253283ab3a6c74c1160bdaab5b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readATMstep</definition>
+        <argsstring>(forcingmap ATMPmap, int steptoread, float *&amp;Po)</argsstring>
+        <name>readATMstep</name>
+        <param>
+          <type><ref refid="classforcingmap" kindref="compound">forcingmap</ref></type>
+          <declname>ATMPmap</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>steptoread</declname>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>Po</declname>
+        </param>
+        <briefdescription>
+<para>Read atmospheric pressure data from NetCDF file for a specific time step. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads atmospheric pressure data from a NetCDF file for a given time step. Atm pressure is same as wind we only read floats and that is plenty for real world application.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>ATMPmap</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_forcing" kindref="compound">Forcing</ref> map for atmospheric pressure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>steptoread</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step to read </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Po</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output array for pressure data </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="46" column="6" bodyfile="src/Read_netcdf.cu" bodystart="1182" bodyend="1242" declfile="src/Read_netcdf.h" declline="46" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1a709e031ea8e9e656b958e7c984e7704a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void read3Dnc</definition>
+        <argsstring>(int nx, int ny, int ntheta, char ncfile[], float *&amp;ee)</argsstring>
+        <name>read3Dnc</name>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ntheta</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>ncfile</declname>
+          <array>[]</array>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>ee</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="48" column="17" bodyfile="src/Read_netcdf.cu" bodystart="1246" bodyend="1256" declfile="src/Read_netcdf.h" declline="48" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1ad4bc796c86f46ebb52272b9b2ade4309" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void read2Dnc</definition>
+        <argsstring>(int nx, int ny, char ncfile[], float *&amp;hh)</argsstring>
+        <name>read2Dnc</name>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>ncfile</declname>
+          <array>[]</array>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>hh</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="49" column="17" bodyfile="src/Read_netcdf.cu" bodystart="1258" bodyend="1268" declfile="src/Read_netcdf.h" declline="49" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="_read__netcdf_8h_1aa51602301123c9a4ee87e30b68c5695b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void readnczb</definition>
+        <argsstring>(int nx, int ny, std::string ncfile, float *&amp;zb)</argsstring>
+        <name>readnczb</name>
+        <param>
+          <type>int</type>
+          <declname>nx</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>ny</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>ncfile</declname>
+        </param>
+        <param>
+          <type>float *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Read_netcdf.h" line="50" column="17" bodyfile="src/Read_netcdf.cu" bodystart="1270" bodyend="1281" declfile="src/Read_netcdf.h" declline="50" declcolumn="17"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>READNETCDF_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>READNETCDF_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Input.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;ReadInput.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Write_txtlog.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Write_netcdf.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;GridManip.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;utctime.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nc_get_var_T(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>varid,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>*<sp/>&amp;zb);</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nc_get_var_T(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>varid,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*<sp/>&amp;zb);</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nc_get_vara_T(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>varid,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">*<sp/>startp,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">*<sp/>countp,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>*<sp/>&amp;zb);</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nc_get_vara_T(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>varid,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">*<sp/>startp,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">*<sp/>countp,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*<sp/>&amp;zb);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nc_get_var1_T(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>varid,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">*<sp/>startp,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>*<sp/>zsa);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nc_get_var1_T(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>varid,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">*<sp/>startp,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*<sp/>zsa);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight><highlight class="comment">//template<sp/>&lt;class<sp/>T&gt;<sp/>int<sp/>readnczb(int<sp/>nx,<sp/>int<sp/>ny,<sp/>const<sp/>std::string<sp/>ncfile,<sp/>T<sp/>*<sp/>&amp;zb);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="comment">//int<sp/>readnczb(int<sp/>nx,<sp/>int<sp/>ny,<sp/>const<sp/>std::string<sp/>ncfile,<sp/>float*&amp;<sp/>zb);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight><highlight class="comment">//int<sp/>readnczb(int<sp/>nx,<sp/>int<sp/>ny,<sp/>const<sp/>std::string<sp/>ncfile,<sp/>double*&amp;<sp/>zb);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal">std::string<sp/>checkncvarname(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,<sp/>std::string<sp/>stringA,<sp/>std::string<sp/>stringB,<sp/>std::string<sp/>stringC,<sp/>std::string<sp/>stringD,<sp/>std::string<sp/>stringE);</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readgridncsize(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>ncfilestr,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>varstr,<sp/>std::string<sp/>reftime,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>ny,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">&amp;<sp/>nt,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>dx,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>dy,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>dt,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>xo,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>yo,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>to,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>xmax,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>ymax,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">&amp;<sp/>tmax,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">&amp;<sp/>flipx,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">&amp;<sp/>flipy);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readgridncsize(<ref refid="classforcingmap" kindref="compound">forcingmap</ref>&amp;<sp/>Fmap,<sp/><ref refid="class_param" kindref="compound">Param</ref><sp/>XParam);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readgridncsize(T&amp;<sp/>Imap);</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>readvarinfo(std::string<sp/>filename,<sp/>std::string<sp/>Varname,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>*&amp;ddimU);</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>readnctime(std::string<sp/>filename,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>*<sp/>&amp;time);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>readnctime2(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncid,</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>timecoordname,<sp/>std::string<sp/>refdate,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>nt,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">*&amp;<sp/>time);</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>readncslev1(std::string<sp/>filename,<sp/>std::string<sp/>varstr,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>indx,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>indy,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>indt,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>checkhh,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>eps,<sp/>T<sp/>*<sp/>&amp;zsa);</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>readvardata(std::string<sp/>filename,<sp/>std::string<sp/>Varname,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>step,<sp/>T*&amp;<sp/>vardata,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>flipx,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>flipy);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight><highlight class="comment">//template<sp/>&lt;class<sp/>T&gt;<sp/>int<sp/>readhotstartfile(Param<sp/>XParam,<sp/>int<sp/>*<sp/>leftblk,<sp/>int<sp/>*rightblk,<sp/>int<sp/>*<sp/>topblk,<sp/>int*<sp/>botblk,<sp/>double<sp/>*<sp/>blockxo,<sp/>double<sp/>*<sp/>blockyo,<sp/>T<sp/>*<sp/>&amp;zs,<sp/>T<sp/>*<sp/>&amp;zb,<sp/>T<sp/>*<sp/>&amp;hh,<sp/>T<sp/>*&amp;uu,<sp/>T<sp/>*<sp/>&amp;vv);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readWNDstep(<ref refid="classforcingmap" kindref="compound">forcingmap</ref><sp/>WNDUmap,<sp/><ref refid="classforcingmap" kindref="compound">forcingmap</ref><sp/>WNDVmap,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>steptoread,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>*&amp;Uo,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>*&amp;Vo);</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readATMstep(<ref refid="classforcingmap" kindref="compound">forcingmap</ref><sp/>ATMPmap,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>steptoread,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>*&amp;Po);</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>read3Dnc(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ntheta,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>ncfile[],<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">*&amp;<sp/>ee);</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>read2Dnc(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>ncfile[],<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">*&amp;<sp/>hh);</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>readnczb(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny,<sp/>std::string<sp/>ncfile,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">*&amp;<sp/>zb);</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/Read_netcdf.h"/>
+  </compounddef>
+</doxygen>

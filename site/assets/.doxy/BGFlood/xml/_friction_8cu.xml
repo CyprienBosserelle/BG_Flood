@@ -1,0 +1,1986 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="_friction_8cu" kind="file" language="C++">
+    <compoundname>Friction.cu</compoundname>
+    <includes refid="_friction_8h" local="yes">Friction.h</includes>
+    <incdepgraph>
+      <node id="42">
+        <label>ReadForcing.h</label>
+        <link refid="_read_forcing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Write_netcdf.h</label>
+        <link refid="_write__netcdf_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>iomanip</label>
+      </node>
+      <node id="21">
+        <label>limits</label>
+      </node>
+      <node id="47">
+        <label>ConserveElevation.h</label>
+        <link refid="_conserve_elevation_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="7">
+        <label>stdlib.h</label>
+      </node>
+      <node id="4">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="9">
+        <label>cmath</label>
+      </node>
+      <node id="29">
+        <label>Halo.h</label>
+        <link refid="_halo_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="47" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Boundary.h</label>
+        <link refid="_boundary_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>Forcing.h</label>
+        <link refid="_forcing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>InitEvolv.h</label>
+        <link refid="_init_evolv_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>netcdf.h</label>
+      </node>
+      <node id="12">
+        <label>string</label>
+      </node>
+      <node id="36">
+        <label>Updateforcing.h</label>
+        <link refid="_updateforcing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>map</label>
+      </node>
+      <node id="31">
+        <label>Util_CPU.h</label>
+        <link refid="_util___c_p_u_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Write_txtlog.h</label>
+        <link refid="_write__txtlog_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Gradients.h</label>
+        <link refid="_gradients_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>fstream</label>
+      </node>
+      <node id="24">
+        <label>Input.h</label>
+        <link refid="_input_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>ReadInput.h</label>
+        <link refid="_read_input_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Param.h</label>
+        <link refid="_param_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Poly.h</label>
+        <link refid="_poly_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>ctime</label>
+      </node>
+      <node id="28">
+        <label>Setup_GPU.h</label>
+        <link refid="_setup___g_p_u_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+      </node>
+      <node id="46">
+        <label>Kurganov.h</label>
+        <link refid="_kurganov_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>vector</label>
+      </node>
+      <node id="1">
+        <label>src/Friction.cu</label>
+        <link refid="_friction_8cu"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>InitialConditions.h</label>
+        <link refid="_initial_conditions_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>sstream</label>
+      </node>
+      <node id="2">
+        <label>Friction.h</label>
+        <link refid="_friction_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>math.h</label>
+      </node>
+      <node id="33">
+        <label>GridManip.h</label>
+        <link refid="_grid_manip_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>Mesh.h</label>
+        <link refid="_mesh_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>iostream</label>
+      </node>
+      <node id="3">
+        <label>General.h</label>
+        <link refid="_general_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Arrays.h</label>
+        <link refid="_arrays_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>chrono</label>
+      </node>
+      <node id="22">
+        <label>thread</label>
+      </node>
+      <node id="16">
+        <label>algorithm</label>
+      </node>
+      <node id="6">
+        <label>stdio.h</label>
+      </node>
+      <node id="27">
+        <label>MemManagement.h</label>
+        <link refid="_mem_management_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>Read_netcdf.h</label>
+        <link refid="_read__netcdf_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>Spherical.h</label>
+        <link refid="_spherical_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="46" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="_friction_8cu_1a36262f64e922c05e1e6436e482a4629a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void bottomfrictionGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, T dt, T *cf, EvolvingP&lt; T &gt; XEvolv)</argsstring>
+        <name>bottomfrictionGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+<para>CUDA kernel for applying bottom friction to all active blocks. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Updates velocity components using the specified friction model (default, smart, or Manning) for each cell in all blocks.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>cf</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Friction coefficient array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="17" column="29" bodyfile="src/Friction.cu" bodystart="17" bodyend="71"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a70610d60fa29a5c40b79c139ed5cb06a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __global__ void</type>
+        <definition>template __global__ void bottomfrictionGPU&lt; float &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; float &gt; XBlock, float dt, float *cf, EvolvingP&lt; float &gt; XEvolv)</argsstring>
+        <name>bottomfrictionGPU&lt; float &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; float &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>float *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="72" column="21" declfile="src/Friction.cu" declline="72" declcolumn="21"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1ae884297ec5ad9da300b189215f563d09" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __global__ void</type>
+        <definition>template __global__ void bottomfrictionGPU&lt; double &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; double &gt; XBlock, double dt, double *cf, EvolvingP&lt; double &gt; XEvolv)</argsstring>
+        <name>bottomfrictionGPU&lt; double &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; double &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>double *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="73" column="21" declfile="src/Friction.cu" declline="73" declcolumn="21"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1af0b8d53f38f5bf256107707a315653f5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void bottomfrictionCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, T dt, T *cf, EvolvingP&lt; T &gt; XEvolv)</argsstring>
+        <name>bottomfrictionCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+<para>CPU routine for applying bottom friction to all active blocks. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Updates velocity components using the specified friction model (default, smart, or Manning) for each cell in all blocks.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>cf</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Friction coefficient array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="89" column="27" bodyfile="src/Friction.cu" bodystart="89" bodyend="148"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1aa291cd1c8de51443bdded37e0e23f17f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ void</type>
+        <definition>template __host__ void bottomfrictionCPU&lt; float &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; float &gt; XBlock, float dt, float *cf, EvolvingP&lt; float &gt; XEvolv)</argsstring>
+        <name>bottomfrictionCPU&lt; float &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; float &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>float *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="149" column="19" declfile="src/Friction.cu" declline="149" declcolumn="19"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a9bae5fe596087c7d4b0eb20057362e47" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ void</type>
+        <definition>template __host__ void bottomfrictionCPU&lt; double &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; double &gt; XBlock, double dt, double *cf, EvolvingP&lt; double &gt; XEvolv)</argsstring>
+        <name>bottomfrictionCPU&lt; double &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; double &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>double *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="150" column="19" declfile="src/Friction.cu" declline="150" declcolumn="19"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a6e344a350de00e300fb7a8979cb3cbf4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void XiafrictionCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, T dt, T *cf, EvolvingP&lt; T &gt; XEvolv, EvolvingP&lt; T &gt; XEvolv_o)</argsstring>
+        <name>XiafrictionCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv_o</declname>
+        </param>
+        <briefdescription>
+<para>CPU routine for applying bottom friction following Xia &amp; Lang (2018). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Updates velocity components using the Xia &amp; Lang friction model for each cell in all blocks, using both current and previous evolving variables. Reference: Xia and Lang (2018), <ulink url="https://doi.org/10.1016/j.advwatres.2018.05.004">https://doi.org/10.1016/j.advwatres.2018.05.004</ulink></para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>cf</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Friction coefficient array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Current evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv_o</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Previous evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="166" column="27" bodyfile="src/Friction.cu" bodystart="166" bodyend="225"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a812b9c3a70b20b582642a760f9d171cb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ void</type>
+        <definition>template __host__ void XiafrictionCPU&lt; float &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; float &gt; XBlock, float dt, float *cf, EvolvingP&lt; float &gt; XEvolv, EvolvingP&lt; float &gt; XEvolv_o)</argsstring>
+        <name>XiafrictionCPU&lt; float &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; float &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>float *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv_o</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="227" column="19" declfile="src/Friction.cu" declline="227" declcolumn="19"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1ac283e37b288fe24c4bf78bacdbb667aa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ void</type>
+        <definition>template __host__ void XiafrictionCPU&lt; double &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; double &gt; XBlock, double dt, double *cf, EvolvingP&lt; double &gt; XEvolv, EvolvingP&lt; double &gt; XEvolv_o)</argsstring>
+        <name>XiafrictionCPU&lt; double &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; double &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>double *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv_o</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="228" column="19" declfile="src/Friction.cu" declline="228" declcolumn="19"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a237e9ffcd102e8c5b14f5799455c2f10" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void XiafrictionGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, T dt, T *cf, EvolvingP&lt; T &gt; XEvolv, EvolvingP&lt; T &gt; XEvolv_o)</argsstring>
+        <name>XiafrictionGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv_o</declname>
+        </param>
+        <briefdescription>
+<para>CUDA kernel for applying Xia &amp; Lang (2018) bottom friction to all active blocks. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Updates velocity components using the Xia &amp; Lang friction model for each cell in all blocks, using both current and previous evolving variables.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>cf</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Friction coefficient array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Current evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv_o</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Previous evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="243" column="29" bodyfile="src/Friction.cu" bodystart="243" bodyend="302"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a18363d1c4b582fce5fb9aadc2dd1c943" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __global__ void</type>
+        <definition>template __global__ void XiafrictionGPU&lt; float &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; float &gt; XBlock, float dt, float *cf, EvolvingP&lt; float &gt; XEvolv, EvolvingP&lt; float &gt; XEvolv_o)</argsstring>
+        <name>XiafrictionGPU&lt; float &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; float &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>float *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv_o</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="303" column="21" declfile="src/Friction.cu" declline="303" declcolumn="21"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a072ad3e97b28e3f3b606c75eaf2b0ebe" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __global__ void</type>
+        <definition>template __global__ void XiafrictionGPU&lt; double &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; double &gt; XBlock, double dt, double *cf, EvolvingP&lt; double &gt; XEvolv, EvolvingP&lt; double &gt; XEvolv_o)</argsstring>
+        <name>XiafrictionGPU&lt; double &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; double &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>dt</declname>
+        </param>
+        <param>
+          <type>double *</type>
+          <declname>cf</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv_o</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="304" column="21" declfile="src/Friction.cu" declline="304" declcolumn="21"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a974cac10b20a26a81a1ae78ae3388e8f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T smartfriction</definition>
+        <argsstring>(T hi, T zo)</argsstring>
+        <name>smartfriction</name>
+        <param>
+          <type>T</type>
+          <declname>hi</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>zo</declname>
+        </param>
+        <briefdescription>
+<para>Smart friction model for roughness height. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Computes friction coefficient using a log-law based on water depth and roughness height.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>hi</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Water depth </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Roughness height </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Friction coefficient </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="317" column="35" bodyfile="src/Friction.cu" bodystart="317" bodyend="334"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1aa32273d235da2701fb6f59340159d389" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T manningfriction</definition>
+        <argsstring>(T g, T hi, T n)</argsstring>
+        <name>manningfriction</name>
+        <param>
+          <type>T</type>
+          <declname>g</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>hi</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>n</declname>
+        </param>
+        <briefdescription>
+<para>Manning friction model. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Computes friction coefficient using Manning&apos;s equation based on gravity, water depth, and Manning&apos;s n.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>g</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gravity </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>hi</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Water depth </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Manning&apos;s n </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Friction coefficient </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="347" column="35" bodyfile="src/Friction.cu" bodystart="347" bodyend="351"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1ad63a9a1303af21fb64e87be6eb45b31f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void TheresholdVelGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; XEvolv)</argsstring>
+        <name>TheresholdVelGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+<para>CUDA kernel for enforcing a velocity threshold. Function Used to prevent crazy velocity on the GPU. The function wraps the main function for the GPU. Updates velocity components to ensure they do not exceed a specified threshold. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="364" column="29" bodyfile="src/Friction.cu" bodystart="364" bodyend="397"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a8aa613f8007758940a6f77143a9424c4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __global__ void</type>
+        <definition>template __global__ void TheresholdVelGPU&lt; float &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; float &gt; XBlock, EvolvingP&lt; float &gt; XEvolv)</argsstring>
+        <name>TheresholdVelGPU&lt; float &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; float &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="398" column="21" declfile="src/Friction.cu" declline="398" declcolumn="21"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a9f62f9a66948acd66729d40b776712e5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __global__ void</type>
+        <definition>template __global__ void TheresholdVelGPU&lt; double &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; double &gt; XBlock, EvolvingP&lt; double &gt; XEvolv)</argsstring>
+        <name>TheresholdVelGPU&lt; double &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; double &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="399" column="21" declfile="src/Friction.cu" declline="399" declcolumn="21"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a07678d8890f3392fd6d67b83f5f827fa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void TheresholdVelCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; XEvolv)</argsstring>
+        <name>TheresholdVelCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+<para>CPU routine for enforcing a velocity threshold. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Updates velocity components to ensure they do not exceed a specified threshold. Function Used to prevent crazy velocity on the CPU</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEvolv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="413" column="27" bodyfile="src/Friction.cu" bodystart="413" bodyend="452"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a8d5942d50bde8fc29dc7f378dd42cdfa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ void</type>
+        <definition>template __host__ void TheresholdVelCPU&lt; float &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; float &gt; XBlock, EvolvingP&lt; float &gt; XEvolv)</argsstring>
+        <name>TheresholdVelCPU&lt; float &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; float &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; float &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="453" column="19" declfile="src/Friction.cu" declline="453" declcolumn="19"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1a909f811e62aa0edee7b3a2743bf98495" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ void</type>
+        <definition>template __host__ void TheresholdVelCPU&lt; double &gt;</definition>
+        <argsstring>(Param XParam, BlockP&lt; double &gt; XBlock, EvolvingP&lt; double &gt; XEvolv)</argsstring>
+        <name>TheresholdVelCPU&lt; double &gt;</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; double &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; double &gt;</type>
+          <declname>XEvolv</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="454" column="19" declfile="src/Friction.cu" declline="454" declcolumn="19"/>
+      </memberdef>
+      <memberdef kind="function" id="_friction_8cu_1ae6381b38ea567a629b1428f4bfe253a8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ bool</type>
+        <definition>__host__ __device__ bool ThresholdVelocity</definition>
+        <argsstring>(T Threshold, T &amp;u, T &amp;v)</argsstring>
+        <name>ThresholdVelocity</name>
+        <param>
+          <type>T</type>
+          <declname>Threshold</declname>
+        </param>
+        <param>
+          <type>T &amp;</type>
+          <declname>u</declname>
+        </param>
+        <param>
+          <type>T &amp;</type>
+          <declname>v</declname>
+        </param>
+        <briefdescription>
+<para>Function Used to prevent crazy velocity. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>The function scale velocities so it doesn&apos;t exceeds a given threshold. Default threshold is/should be 16.0m/s</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>Threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Velocity threshold </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>u</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Velocity component in x direction </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>v</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Velocity component in y direction </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if velocity was above threshold and has been scaled down, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Friction.cu" line="469" column="38" bodyfile="src/Friction.cu" bodystart="469" bodyend="481"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&quot;Friction.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>bottomfrictionGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T<sp/>dt,<sp/>T*<sp/>cf,<ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv)</highlight></codeline>
+<codeline lineno="18"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Shear<sp/>stress<sp/>equation:</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Taub=cf*rho*U*sqrt(U^2+V^2)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth<sp/>=<sp/>XParam.halowidth;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkmemwidth<sp/>=<sp/>blockDim.x<sp/>+<sp/>halowidth<sp/>*<sp/>2;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//unsigned<sp/>int<sp/>blksize<sp/>=<sp/>blkmemwidth<sp/>*<sp/>blkmemwidth;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ix<sp/>=<sp/>threadIdx.x;</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>threadIdx.y;</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ibl<sp/>=<sp/>blockIdx.x;</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ib<sp/>=<sp/>XBlock.active[ibl];</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>eps<sp/>=<sp/>T(XParam.eps);</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>g<sp/>=<sp/>T(XParam.g);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>frictionmodel<sp/>=<sp/>XParam.frictionmodel;</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>memloc(halowidth,<sp/>blkmemwidth,<sp/>ix,<sp/>iy,<sp/>ib);</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>normu,<sp/>hi,<sp/>ui,<sp/>vi;</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/>hi<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a350d5a1cef103428b6f3292acf5f7dd9" kindref="member">h</ref>[i];</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/>ui<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i];</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/>vi<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i];</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(hi<sp/>&gt;<sp/>eps)</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>normu<sp/>=<sp/>sqrt(ui<sp/>*<sp/>ui<sp/>+<sp/>vi<sp/>*<sp/>vi);</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>cfi;</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(frictionmodel<sp/>==<sp/>0)</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>cf[i];</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(frictionmodel<sp/>==<sp/>1)</highlight><highlight class="comment">//Smart<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>smartfriction(hi,<sp/>cf[i]);</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(frictionmodel<sp/>==<sp/>-1)</highlight><highlight class="comment">//<sp/>Manning<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>manningfriction(g,<sp/>hi,<sp/>cf[i]);</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>tb<sp/>=<sp/>cfi<sp/>*<sp/>normu<sp/>/<sp/>hi<sp/>*<sp/>dt;</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i]<sp/>=<sp/>ui<sp/>/<sp/>(T(1.0)<sp/>+<sp/>tb);</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i]<sp/>=<sp/>vi<sp/>/<sp/>(T(1.0)<sp/>+<sp/>tb);</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>bottomfrictionGPU&lt;float&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;float&gt;</ref><sp/>XBlock,</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>bottomfrictionGPU&lt;double&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;double&gt;</ref><sp/>XBlock,</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>bottomfrictionCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,T<sp/>dt,<sp/>T*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv)</highlight></codeline>
+<codeline lineno="90"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>eps<sp/>=<sp/>T(XParam.eps);</highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>g<sp/>=<sp/>T(XParam.g);</highlight></codeline>
+<codeline lineno="93"><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="95"><highlight class="normal"></highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>hi,<sp/>ui,<sp/>vi,normu;</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"></highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ib;</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth<sp/>=<sp/>XParam.halowidth;</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkmemwidth<sp/>=<sp/>XParam.blkmemwidth;</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"></highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ibl<sp/>=<sp/>0;<sp/>ibl<sp/>&lt;<sp/>XParam.nblk;<sp/>ibl++)</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ib<sp/>=<sp/>XBlock.active[ibl];</highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>0;<sp/>iy<sp/>&lt;<sp/>XParam.blkwidth;<sp/>iy++)</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ix<sp/>=<sp/>0;<sp/>ix<sp/>&lt;<sp/>XParam.blkwidth;<sp/>ix++)</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="110"><highlight class="normal"></highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>memloc(halowidth,<sp/>blkmemwidth,<sp/>ix,<sp/>iy,<sp/>ib);</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"></highlight></codeline>
+<codeline lineno="113"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>hi<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a350d5a1cef103428b6f3292acf5f7dd9" kindref="member">h</ref>[i];</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ui<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i];</highlight></codeline>
+<codeline lineno="115"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>vi<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i];</highlight></codeline>
+<codeline lineno="116"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(hi<sp/>&gt;<sp/>eps)</highlight></codeline>
+<codeline lineno="117"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="118"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>normu<sp/>=<sp/>sqrt(ui<sp/>*<sp/>ui<sp/>+<sp/>vi<sp/>*<sp/>vi);</highlight></codeline>
+<codeline lineno="119"><highlight class="normal"></highlight></codeline>
+<codeline lineno="120"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>cfi;</highlight></codeline>
+<codeline lineno="121"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.frictionmodel<sp/>==<sp/>0)</highlight></codeline>
+<codeline lineno="122"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="123"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>cf[i];</highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.frictionmodel<sp/>==<sp/>1)</highlight><highlight class="comment">//Smart<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="126"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="128"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>smartfriction(hi,<sp/>cf[i]);</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"></highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.frictionmodel<sp/>==<sp/>-1)</highlight><highlight class="comment">//<sp/>Manning<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="132"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>n<sp/>=<sp/>cf[i];</highlight></codeline>
+<codeline lineno="134"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>manningfriction(g,<sp/>hi,<sp/>n);</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"></highlight></codeline>
+<codeline lineno="136"><highlight class="normal"></highlight></codeline>
+<codeline lineno="137"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="138"><highlight class="normal"></highlight></codeline>
+<codeline lineno="139"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>tb<sp/>=<sp/>cfi<sp/>*<sp/>normu<sp/>/<sp/>hi<sp/>*<sp/>dt;</highlight></codeline>
+<codeline lineno="140"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i]<sp/>=<sp/>ui<sp/>/<sp/>(T(1.0)<sp/>+<sp/>tb);</highlight></codeline>
+<codeline lineno="141"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i]<sp/>=<sp/>vi<sp/>/<sp/>(T(1.0)<sp/>+<sp/>tb);</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="143"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="146"><highlight class="normal"></highlight></codeline>
+<codeline lineno="147"><highlight class="normal"></highlight></codeline>
+<codeline lineno="148"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>bottomfrictionCPU&lt;float&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;float&gt;</ref><sp/>XBlock,</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>bottomfrictionCPU&lt;double&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;double&gt;</ref><sp/>XBlock,</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"></highlight></codeline>
+<codeline lineno="166"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>XiafrictionCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T<sp/>dt,<sp/>T*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv_o)</highlight></codeline>
+<codeline lineno="167"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>eps<sp/>=<sp/>T(XParam.eps);</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>g<sp/>=<sp/>T(XParam.g);</highlight></codeline>
+<codeline lineno="170"><highlight class="normal"></highlight></codeline>
+<codeline lineno="171"><highlight class="normal"></highlight></codeline>
+<codeline lineno="172"><highlight class="normal"></highlight></codeline>
+<codeline lineno="173"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>hi,<sp/>ho,<sp/>ui,<sp/>vi,<sp/>normu;</highlight></codeline>
+<codeline lineno="174"><highlight class="normal"></highlight></codeline>
+<codeline lineno="175"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ib;</highlight></codeline>
+<codeline lineno="176"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth<sp/>=<sp/>XParam.halowidth;</highlight></codeline>
+<codeline lineno="177"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkmemwidth<sp/>=<sp/>XParam.blkmemwidth;</highlight></codeline>
+<codeline lineno="178"><highlight class="normal"></highlight></codeline>
+<codeline lineno="179"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ibl<sp/>=<sp/>0;<sp/>ibl<sp/>&lt;<sp/>XParam.nblk;<sp/>ibl++)</highlight></codeline>
+<codeline lineno="180"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ib<sp/>=<sp/>XBlock.active[ibl];</highlight></codeline>
+<codeline lineno="182"><highlight class="normal"></highlight></codeline>
+<codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>0;<sp/>iy<sp/>&lt;<sp/>XParam.blkwidth;<sp/>iy++)</highlight></codeline>
+<codeline lineno="184"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="185"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ix<sp/>=<sp/>0;<sp/>ix<sp/>&lt;<sp/>XParam.blkwidth;<sp/>ix++)</highlight></codeline>
+<codeline lineno="186"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"></highlight></codeline>
+<codeline lineno="188"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>memloc(halowidth,<sp/>blkmemwidth,<sp/>ix,<sp/>iy,<sp/>ib);</highlight></codeline>
+<codeline lineno="189"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ho<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a350d5a1cef103428b6f3292acf5f7dd9" kindref="member">h</ref>[i];</highlight></codeline>
+<codeline lineno="190"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>hi<sp/>=<sp/>XEvolv_o.<ref refid="struct_evolving_p_1a350d5a1cef103428b6f3292acf5f7dd9" kindref="member">h</ref>[i];</highlight></codeline>
+<codeline lineno="191"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ui<sp/>=<sp/>XEvolv_o.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i];</highlight></codeline>
+<codeline lineno="192"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>vi<sp/>=<sp/>XEvolv_o.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i];</highlight></codeline>
+<codeline lineno="193"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(hi<sp/>&gt;<sp/>eps)</highlight></codeline>
+<codeline lineno="194"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="195"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>normu<sp/>=<sp/>sqrt(ui<sp/>*<sp/>ui<sp/>+<sp/>vi<sp/>*<sp/>vi);</highlight></codeline>
+<codeline lineno="196"><highlight class="normal"></highlight></codeline>
+<codeline lineno="197"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>cfi<sp/>=<sp/>cf[i];<sp/></highlight><highlight class="comment">//if<sp/>(XParam.frictionmodel<sp/>==<sp/>0)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="198"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.frictionmodel<sp/>==<sp/>1)</highlight><highlight class="comment">//Smart<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="199"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="200"><highlight class="normal"></highlight></codeline>
+<codeline lineno="201"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>smartfriction(hi,<sp/>cf[i]);</highlight></codeline>
+<codeline lineno="202"><highlight class="normal"></highlight></codeline>
+<codeline lineno="203"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="204"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.frictionmodel<sp/>==<sp/>-1)</highlight><highlight class="comment">//<sp/>Manning<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="205"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="206"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>n<sp/>=<sp/>cf[i];</highlight></codeline>
+<codeline lineno="207"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>manningfriction(g,<sp/>hi,<sp/>n);</highlight></codeline>
+<codeline lineno="208"><highlight class="normal"></highlight></codeline>
+<codeline lineno="209"><highlight class="normal"></highlight></codeline>
+<codeline lineno="210"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="211"><highlight class="normal"></highlight></codeline>
+<codeline lineno="212"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>tb<sp/>=<sp/>cfi<sp/>*<sp/>normu<sp/>*<sp/>hi/(ho*ho)<sp/>*<sp/>dt;</highlight></codeline>
+<codeline lineno="213"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(tb<sp/>&gt;=<sp/>T(1e-10))</highlight></codeline>
+<codeline lineno="214"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="215"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv_o.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i]<sp/>=<sp/>(ui<sp/>-<sp/>ui<sp/>*<sp/>sqrt(T(1.0)<sp/>+<sp/>T(4.0)<sp/>*<sp/>tb))<sp/>/<sp/>(T(-2.0)<sp/>*<sp/>tb);</highlight></codeline>
+<codeline lineno="216"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv_o.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i]<sp/>=<sp/>(vi<sp/>-<sp/>vi<sp/>*<sp/>sqrt(T(1.0)<sp/>+<sp/>T(4.0)<sp/>*<sp/>tb))<sp/>/<sp/>(T(-2.0)<sp/>*<sp/>tb);</highlight></codeline>
+<codeline lineno="217"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="218"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="219"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="220"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="221"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="222"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="223"><highlight class="normal"></highlight></codeline>
+<codeline lineno="224"><highlight class="normal"></highlight></codeline>
+<codeline lineno="225"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="226"><highlight class="normal"></highlight></codeline>
+<codeline lineno="227"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>XiafrictionCPU&lt;float&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;float&gt;</ref><sp/>XBlock,</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv_o);</highlight></codeline>
+<codeline lineno="228"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>XiafrictionCPU&lt;double&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;double&gt;</ref><sp/>XBlock,</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv_o);</highlight></codeline>
+<codeline lineno="229"><highlight class="normal"></highlight></codeline>
+<codeline lineno="243"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>XiafrictionGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T<sp/>dt,<sp/>T*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv_o)</highlight></codeline>
+<codeline lineno="244"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="245"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Shear<sp/>stress<sp/>equation:</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="246"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Taub=cf*rho*U*sqrt(U^2+V^2)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="247"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth<sp/>=<sp/>XParam.halowidth;</highlight></codeline>
+<codeline lineno="248"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkmemwidth<sp/>=<sp/>blockDim.x<sp/>+<sp/>halowidth<sp/>*<sp/>2;</highlight></codeline>
+<codeline lineno="249"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//unsigned<sp/>int<sp/>blksize<sp/>=<sp/>blkmemwidth<sp/>*<sp/>blkmemwidth;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="250"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ix<sp/>=<sp/>threadIdx.x;</highlight></codeline>
+<codeline lineno="251"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>threadIdx.y;</highlight></codeline>
+<codeline lineno="252"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ibl<sp/>=<sp/>blockIdx.x;</highlight></codeline>
+<codeline lineno="253"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ib<sp/>=<sp/>XBlock.active[ibl];</highlight></codeline>
+<codeline lineno="254"><highlight class="normal"></highlight></codeline>
+<codeline lineno="255"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>eps<sp/>=<sp/>T(XParam.eps);</highlight></codeline>
+<codeline lineno="256"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>g<sp/>=<sp/>T(XParam.g);</highlight></codeline>
+<codeline lineno="257"><highlight class="normal"></highlight></codeline>
+<codeline lineno="258"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//int<sp/>frictionmodel<sp/>=<sp/>XParam.frictionmodel;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="259"><highlight class="normal"></highlight></codeline>
+<codeline lineno="260"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>memloc(halowidth,<sp/>blkmemwidth,<sp/>ix,<sp/>iy,<sp/>ib);</highlight></codeline>
+<codeline lineno="261"><highlight class="normal"></highlight></codeline>
+<codeline lineno="262"><highlight class="normal"></highlight></codeline>
+<codeline lineno="263"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>normu,ho,<sp/>hi,<sp/>ui,<sp/>vi;</highlight></codeline>
+<codeline lineno="264"><highlight class="normal"></highlight></codeline>
+<codeline lineno="265"><highlight class="normal"></highlight></codeline>
+<codeline lineno="266"><highlight class="normal"></highlight></codeline>
+<codeline lineno="267"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="268"><highlight class="normal"><sp/><sp/><sp/><sp/>ho<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a350d5a1cef103428b6f3292acf5f7dd9" kindref="member">h</ref>[i];</highlight></codeline>
+<codeline lineno="269"><highlight class="normal"><sp/><sp/><sp/><sp/>hi<sp/>=<sp/>XEvolv_o.<ref refid="struct_evolving_p_1a350d5a1cef103428b6f3292acf5f7dd9" kindref="member">h</ref>[i];</highlight></codeline>
+<codeline lineno="270"><highlight class="normal"><sp/><sp/><sp/><sp/>ui<sp/>=<sp/>XEvolv_o.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i];</highlight></codeline>
+<codeline lineno="271"><highlight class="normal"><sp/><sp/><sp/><sp/>vi<sp/>=<sp/>XEvolv_o.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i];</highlight></codeline>
+<codeline lineno="272"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(hi<sp/>&gt;<sp/>eps)<sp/></highlight><highlight class="comment">//SHould<sp/>this<sp/>be<sp/>both<sp/>ho<sp/>and<sp/>hi<sp/>&gt;eps<sp/>?</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="273"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="274"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>normu<sp/>=<sp/>sqrt(ui<sp/>*<sp/>ui<sp/>+<sp/>vi<sp/>*<sp/>vi);</highlight></codeline>
+<codeline lineno="275"><highlight class="normal"></highlight></codeline>
+<codeline lineno="276"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>cfi<sp/>=<sp/>cf[i];<sp/></highlight><highlight class="comment">//if<sp/>(XParam.frictionmodel<sp/>==<sp/>0)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="277"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.frictionmodel<sp/>==<sp/>1)</highlight><highlight class="comment">//Smart<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="278"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="279"><highlight class="normal"></highlight></codeline>
+<codeline lineno="280"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>smartfriction(hi,<sp/>cf[i]);</highlight></codeline>
+<codeline lineno="281"><highlight class="normal"></highlight></codeline>
+<codeline lineno="282"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="283"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(XParam.frictionmodel<sp/>==<sp/>-1)</highlight><highlight class="comment">//<sp/>Manning<sp/>friction<sp/>formulation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="284"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="285"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>n<sp/>=<sp/>cf[i];</highlight></codeline>
+<codeline lineno="286"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>manningfriction(g,<sp/>hi,<sp/>n);</highlight></codeline>
+<codeline lineno="287"><highlight class="normal"></highlight></codeline>
+<codeline lineno="288"><highlight class="normal"></highlight></codeline>
+<codeline lineno="289"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="290"><highlight class="normal"></highlight></codeline>
+<codeline lineno="291"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>T<sp/>tb<sp/>=<sp/>cfi<sp/>*<sp/>normu<sp/>*<sp/>hi<sp/>/<sp/>(ho<sp/>*<sp/>ho)<sp/>*<sp/>dt;</highlight></codeline>
+<codeline lineno="292"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(tb<sp/>&gt;=<sp/>T(1e-10))</highlight></codeline>
+<codeline lineno="293"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="294"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv_o.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i]<sp/>=<sp/>(ui<sp/>-<sp/>ui<sp/>*<sp/>sqrt(T(1.0)<sp/>+<sp/>T(4.0)<sp/>*<sp/>tb))<sp/>/<sp/>(T(-2.0)<sp/>*<sp/>tb);</highlight></codeline>
+<codeline lineno="295"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv_o.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i]<sp/>=<sp/>(vi<sp/>-<sp/>vi<sp/>*<sp/>sqrt(T(1.0)<sp/>+<sp/>T(4.0)<sp/>*<sp/>tb))<sp/>/<sp/>(T(-2.0)<sp/>*<sp/>tb);</highlight></codeline>
+<codeline lineno="296"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="297"><highlight class="normal"></highlight></codeline>
+<codeline lineno="298"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="299"><highlight class="normal"></highlight></codeline>
+<codeline lineno="300"><highlight class="normal"></highlight></codeline>
+<codeline lineno="301"><highlight class="normal"></highlight></codeline>
+<codeline lineno="302"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="303"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>XiafrictionGPU&lt;float&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;float&gt;</ref><sp/>XBlock,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv_o);</highlight></codeline>
+<codeline lineno="304"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>XiafrictionGPU&lt;double&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;double&gt;</ref><sp/>XBlock,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dt,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal">*<sp/>cf,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv_o);</highlight></codeline>
+<codeline lineno="305"><highlight class="normal"></highlight></codeline>
+<codeline lineno="306"><highlight class="normal"></highlight></codeline>
+<codeline lineno="317"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>T<sp/>smartfriction(T<sp/>hi,T<sp/>zo)</highlight></codeline>
+<codeline lineno="318"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="319"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>cfi;</highlight></codeline>
+<codeline lineno="320"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>ee<sp/>=<sp/>T(2.71828182845905);</highlight></codeline>
+<codeline lineno="321"><highlight class="normal"></highlight></codeline>
+<codeline lineno="322"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>Hbar<sp/>=<sp/>hi<sp/>/<sp/>zo;</highlight></codeline>
+<codeline lineno="323"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(Hbar<sp/>&lt;=<sp/>ee)</highlight></codeline>
+<codeline lineno="324"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="325"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>T(1.0)<sp/>/<sp/>(T(0.46)<sp/>*<sp/>Hbar);</highlight></codeline>
+<codeline lineno="326"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="327"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="328"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="329"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>T(1.0)<sp/>/<sp/>(T(2.5)<sp/>*<sp/>(log(Hbar)<sp/>-<sp/>T(1.0)<sp/>+<sp/>T(1.359)<sp/>/<sp/>Hbar));</highlight></codeline>
+<codeline lineno="330"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="331"><highlight class="normal"><sp/><sp/><sp/><sp/>cfi<sp/>=<sp/>cfi<sp/>*<sp/>cfi;<sp/></highlight><highlight class="comment">//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="332"><highlight class="normal"></highlight></codeline>
+<codeline lineno="333"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>cfi;</highlight></codeline>
+<codeline lineno="334"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="335"><highlight class="normal"></highlight></codeline>
+<codeline lineno="347"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>T<sp/>manningfriction(T<sp/>g,<sp/>T<sp/>hi,<sp/>T<sp/>n)</highlight></codeline>
+<codeline lineno="348"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="349"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>cfi=<sp/>g<sp/>*<sp/>n<sp/>*<sp/>n<sp/>/<sp/>cbrt(hi);</highlight></codeline>
+<codeline lineno="350"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>cfi;</highlight></codeline>
+<codeline lineno="351"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="352"><highlight class="normal"></highlight></codeline>
+<codeline lineno="353"><highlight class="normal"></highlight></codeline>
+<codeline lineno="364"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TheresholdVelGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv)</highlight></codeline>
+<codeline lineno="365"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="366"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="367"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth<sp/>=<sp/>XParam.halowidth;</highlight></codeline>
+<codeline lineno="368"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkmemwidth<sp/>=<sp/>blockDim.x<sp/>+<sp/>halowidth<sp/>*<sp/>2;</highlight></codeline>
+<codeline lineno="369"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//unsigned<sp/>int<sp/>blksize<sp/>=<sp/>blkmemwidth<sp/>*<sp/>blkmemwidth;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="370"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ix<sp/>=<sp/>threadIdx.x;</highlight></codeline>
+<codeline lineno="371"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>threadIdx.y;</highlight></codeline>
+<codeline lineno="372"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ibl<sp/>=<sp/>blockIdx.x;</highlight></codeline>
+<codeline lineno="373"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ib<sp/>=<sp/>XBlock.active[ibl];</highlight></codeline>
+<codeline lineno="374"><highlight class="normal"></highlight></codeline>
+<codeline lineno="375"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>memloc(halowidth,<sp/>blkmemwidth,<sp/>ix,<sp/>iy,<sp/>ib);</highlight></codeline>
+<codeline lineno="376"><highlight class="normal"></highlight></codeline>
+<codeline lineno="377"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>bustedThreshold<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="378"><highlight class="normal"></highlight></codeline>
+<codeline lineno="379"><highlight class="normal"></highlight></codeline>
+<codeline lineno="380"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>ui,<sp/>vi;</highlight></codeline>
+<codeline lineno="381"><highlight class="normal"></highlight></codeline>
+<codeline lineno="382"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="383"><highlight class="normal"><sp/><sp/><sp/><sp/>ui<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i];</highlight></codeline>
+<codeline lineno="384"><highlight class="normal"><sp/><sp/><sp/><sp/>vi<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i];</highlight></codeline>
+<codeline lineno="385"><highlight class="normal"></highlight></codeline>
+<codeline lineno="386"><highlight class="normal"><sp/><sp/><sp/><sp/>bustedThreshold<sp/>=<sp/>ThresholdVelocity(T(XParam.VelThreshold),<sp/>ui,<sp/>vi);</highlight></codeline>
+<codeline lineno="387"><highlight class="normal"></highlight></codeline>
+<codeline lineno="388"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(bustedThreshold)</highlight></codeline>
+<codeline lineno="389"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="390"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i]<sp/>=<sp/>ui;</highlight></codeline>
+<codeline lineno="391"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i]<sp/>=<sp/>vi;</highlight></codeline>
+<codeline lineno="392"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="393"><highlight class="normal"></highlight></codeline>
+<codeline lineno="394"><highlight class="normal"></highlight></codeline>
+<codeline lineno="395"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="396"><highlight class="normal"></highlight></codeline>
+<codeline lineno="397"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="398"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TheresholdVelGPU&lt;float&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;float&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="399"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TheresholdVelGPU&lt;double&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;double&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="400"><highlight class="normal"></highlight></codeline>
+<codeline lineno="413"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TheresholdVelCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEvolv)</highlight></codeline>
+<codeline lineno="414"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="415"><highlight class="normal"></highlight></codeline>
+<codeline lineno="416"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>ui,<sp/>vi;</highlight></codeline>
+<codeline lineno="417"><highlight class="normal"></highlight></codeline>
+<codeline lineno="418"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ib;</highlight></codeline>
+<codeline lineno="419"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth<sp/>=<sp/>XParam.halowidth;</highlight></codeline>
+<codeline lineno="420"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkmemwidth<sp/>=<sp/>XParam.blkmemwidth;</highlight></codeline>
+<codeline lineno="421"><highlight class="normal"></highlight></codeline>
+<codeline lineno="422"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="423"><highlight class="normal"></highlight></codeline>
+<codeline lineno="424"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ibl<sp/>=<sp/>0;<sp/>ibl<sp/>&lt;<sp/>XParam.nblk;<sp/>ibl++)</highlight></codeline>
+<codeline lineno="425"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="426"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ib<sp/>=<sp/>XBlock.active[ibl];</highlight></codeline>
+<codeline lineno="427"><highlight class="normal"></highlight></codeline>
+<codeline lineno="428"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>0;<sp/>iy<sp/>&lt;<sp/>XParam.blkwidth;<sp/>iy++)</highlight></codeline>
+<codeline lineno="429"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="430"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ix<sp/>=<sp/>0;<sp/>ix<sp/>&lt;<sp/>XParam.blkwidth;<sp/>ix++)</highlight></codeline>
+<codeline lineno="431"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="432"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>bustedThreshold<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="433"><highlight class="normal"></highlight></codeline>
+<codeline lineno="434"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>memloc(halowidth,<sp/>blkmemwidth,<sp/>ix,<sp/>iy,<sp/>ib);</highlight></codeline>
+<codeline lineno="435"><highlight class="normal"></highlight></codeline>
+<codeline lineno="436"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ui<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i];</highlight></codeline>
+<codeline lineno="437"><highlight class="normal"></highlight></codeline>
+<codeline lineno="438"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>vi<sp/>=<sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i];</highlight></codeline>
+<codeline lineno="439"><highlight class="normal"></highlight></codeline>
+<codeline lineno="440"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>bustedThreshold<sp/>=<sp/>ThresholdVelocity(T(XParam.VelThreshold),<sp/>ui,<sp/>vi);</highlight></codeline>
+<codeline lineno="441"><highlight class="normal"></highlight></codeline>
+<codeline lineno="442"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(bustedThreshold)</highlight></codeline>
+<codeline lineno="443"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="444"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>log(</highlight><highlight class="stringliteral">&quot;Velocity<sp/>Threshold<sp/>exceeded!&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="445"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="446"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1addf0f1e2e0672ff7d32890c1867d1586" kindref="member">u</ref>[i]<sp/>=<sp/>ui;</highlight></codeline>
+<codeline lineno="447"><highlight class="normal"></highlight></codeline>
+<codeline lineno="448"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>XEvolv.<ref refid="struct_evolving_p_1a5f61fdbd33ae88a62d35dd5235d8f375" kindref="member">v</ref>[i]<sp/>=<sp/>vi;</highlight></codeline>
+<codeline lineno="449"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="450"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="451"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="452"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="453"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TheresholdVelCPU&lt;float&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;float&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;float&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="454"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TheresholdVelCPU&lt;double&gt;(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;double&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;double&gt;</ref><sp/>XEvolv);</highlight></codeline>
+<codeline lineno="455"><highlight class="normal"></highlight></codeline>
+<codeline lineno="469"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>ThresholdVelocity(T<sp/>Threshold,<sp/>T&amp;<sp/>u,<sp/>T&amp;<sp/>v)</highlight></codeline>
+<codeline lineno="470"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="471"><highlight class="normal"><sp/><sp/><sp/><sp/>T<sp/>normvel<sp/>=<sp/>sqrt(u<sp/>*<sp/>u<sp/>+<sp/>v<sp/>*<sp/>v);</highlight></codeline>
+<codeline lineno="472"><highlight class="normal"></highlight></codeline>
+<codeline lineno="473"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>alert<sp/>=<sp/>normvel<sp/>&gt;<sp/>Threshold;</highlight></codeline>
+<codeline lineno="474"><highlight class="normal"></highlight></codeline>
+<codeline lineno="475"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(alert)</highlight></codeline>
+<codeline lineno="476"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="477"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>u<sp/>/=<sp/>normvel<sp/>/<sp/>Threshold;</highlight></codeline>
+<codeline lineno="478"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>v<sp/>/=<sp/>normvel<sp/>/<sp/>Threshold;</highlight></codeline>
+<codeline lineno="479"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="480"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>alert;</highlight></codeline>
+<codeline lineno="481"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="482"><highlight class="normal"></highlight></codeline>
+<codeline lineno="483"><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="src/Friction.cu"/>
+  </compounddef>
+</doxygen>

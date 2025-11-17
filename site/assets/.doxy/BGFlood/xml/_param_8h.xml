@@ -1,0 +1,913 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="_param_8h" kind="file" language="C++">
+    <compoundname>Param.h</compoundname>
+    <includes refid="_general_8h" local="yes">General.h</includes>
+    <includes refid="_input_8h" local="yes">Input.h</includes>
+    <includedby refid="_adaptation_8h" local="yes">src/Adaptation.h</includedby>
+    <includedby refid="_adapt_criteria_8h" local="yes">src/AdaptCriteria.h</includedby>
+    <includedby refid="_advection_8h" local="yes">src/Advection.h</includedby>
+    <includedby refid="_b_g___flood_8h" local="yes">src/BG_Flood.h</includedby>
+    <includedby refid="_conserve_elevation_8h" local="yes">src/ConserveElevation.h</includedby>
+    <includedby refid="_flow_c_p_u_8h" local="yes">src/FlowCPU.h</includedby>
+    <includedby refid="_flow_g_p_u_8h" local="yes">src/FlowGPU.h</includedby>
+    <includedby refid="_flow_m_l_g_p_u_8h" local="yes">src/FlowMLGPU.h</includedby>
+    <includedby refid="_friction_8h" local="yes">src/Friction.h</includedby>
+    <includedby refid="_gradients_8h" local="yes">src/Gradients.h</includedby>
+    <includedby refid="_grid_manip_8h" local="yes">src/GridManip.h</includedby>
+    <includedby refid="_halo_8h" local="yes">src/Halo.h</includedby>
+    <includedby refid="_init_evolv_8h" local="yes">src/InitEvolv.h</includedby>
+    <includedby refid="_initial_conditions_8h" local="yes">src/InitialConditions.h</includedby>
+    <includedby refid="_kurganov_8h" local="yes">src/Kurganov.h</includedby>
+    <includedby refid="_mainloop_8h" local="yes">src/Mainloop.h</includedby>
+    <includedby refid="_meanmax_8h" local="yes">src/Meanmax.h</includedby>
+    <includedby refid="_mem_management_8h" local="yes">src/MemManagement.h</includedby>
+    <includedby refid="_mesh_8h" local="yes">src/Mesh.h</includedby>
+    <includedby refid="_multilayer_8h" local="yes">src/Multilayer.h</includedby>
+    <includedby refid="_poly_8h" local="yes">src/Poly.h</includedby>
+    <includedby refid="_read_forcing_8h" local="yes">src/ReadForcing.h</includedby>
+    <includedby refid="_read_input_8h" local="yes">src/ReadInput.h</includedby>
+    <includedby refid="_reimann_8h" local="yes">src/Reimann.h</includedby>
+    <includedby refid="_setup___g_p_u_8h" local="yes">src/Setup_GPU.h</includedby>
+    <includedby refid="_spherical_8h" local="yes">src/Spherical.h</includedby>
+    <includedby refid="_testing_8h" local="yes">src/Testing.h</includedby>
+    <includedby refid="_updateforcing_8h" local="yes">src/Updateforcing.h</includedby>
+    <includedby refid="_util___c_p_u_8h" local="yes">src/Util_CPU.h</includedby>
+    <includedby refid="_write__netcdf_8h" local="yes">src/Write_netcdf.h</includedby>
+    <includedby refid="_write__txtlog_8h" local="yes">src/Write_txtlog.h</includedby>
+    <incdepgraph>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="22">
+        <label>Input.h</label>
+        <link refid="_input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Param.h</label>
+        <link refid="_param_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="_general_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="25">
+        <label>src/ReadForcing.h</label>
+        <link refid="_read_forcing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>src/Multilayer.h</label>
+        <link refid="_multilayer_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>src/Write_netcdf.h</label>
+        <link refid="_write__netcdf_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/Testing.h</label>
+        <link refid="_testing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/FlowGPU.h</label>
+        <link refid="_flow_g_p_u_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>src/ConserveElevation.h</label>
+        <link refid="_conserve_elevation_8h_source"/>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>src/Halo.h</label>
+        <link refid="_halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>src/utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>src/Reimann.h</label>
+        <link refid="_reimann_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>src/Boundary.h</label>
+        <link refid="_boundary_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>src/InitEvolv.h</label>
+        <link refid="_init_evolv_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>src/Updateforcing.h</label>
+        <link refid="_updateforcing_8h_source"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/FlowCPU.h</label>
+        <link refid="_flow_c_p_u_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>src/Util_CPU.h</label>
+        <link refid="_util___c_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>src/Write_txtlog.h</label>
+        <link refid="_write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>src/Gradients.h</label>
+        <link refid="_gradients_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/Advection.h</label>
+        <link refid="_advection_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>src/ReadInput.h</label>
+        <link refid="_read_input_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Param.h</label>
+        <link refid="_param_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>src/Poly.h</label>
+        <link refid="_poly_8h_source"/>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/BG_Flood.h</label>
+        <link refid="_b_g___flood_8h_source"/>
+      </node>
+      <node id="2">
+        <label>src/Adaptation.h</label>
+        <link refid="_adaptation_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>src/Setup_GPU.h</label>
+        <link refid="_setup___g_p_u_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>src/Kurganov.h</label>
+        <link refid="_kurganov_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>src/InitialConditions.h</label>
+        <link refid="_initial_conditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>src/Mesh.cu</label>
+        <link refid="_mesh_8cu"/>
+      </node>
+      <node id="19">
+        <label>src/Friction.h</label>
+        <link refid="_friction_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>src/GridManip.h</label>
+        <link refid="_grid_manip_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>src/Mesh.h</label>
+        <link refid="_mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/AdaptCriteria.h</label>
+        <link refid="_adapt_criteria_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>src/Mainloop.h</label>
+        <link refid="_mainloop_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="_flow_m_l_g_p_u_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>src/Meanmax.h</label>
+        <link refid="_meanmax_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>src/MemManagement.h</label>
+        <link refid="_mem_management_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>src/Read_netcdf.h</label>
+        <link refid="_read__netcdf_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>src/Spherical.h</label>
+        <link refid="_spherical_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="class_param" prot="public">Param</innerclass>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#ifndef<sp/>PARAM_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>PARAM_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Input.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10" refid="class_param" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="class_param" kindref="compound">Param</ref><sp/>{</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*General<sp/>parameters</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>test<sp/>=<sp/>-1;<sp/></highlight><highlight class="comment">//-1:<sp/>no<sp/>test,<sp/>99:<sp/>run<sp/>all<sp/>independent<sp/>tests,<sp/>X:<sp/>run<sp/>test<sp/>X</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>g<sp/>=<sp/>9.81;<sp/></highlight><highlight class="comment">//<sp/>Acceleration<sp/>of<sp/>gravity<sp/>in<sp/>m.s-2</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>rho<sp/>=<sp/>1025.0;<sp/></highlight><highlight class="comment">//<sp/>Fluid<sp/>density<sp/>in<sp/>kg.m-3</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>eps<sp/>=<sp/>0.0001;<sp/></highlight><highlight class="comment">//<sp/>Drying<sp/>height<sp/>in<sp/>m<sp/>(if<sp/>h&lt;eps,<sp/>the<sp/>surface<sp/>is<sp/>concidered<sp/>dry)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dt<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//<sp/>Model<sp/>time<sp/>step<sp/>in<sp/>s.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>CFL<sp/>=<sp/>0.5;<sp/></highlight><highlight class="comment">//<sp/>Current<sp/>Freidrich<sp/>Limiter<sp/>criterium<sp/>(between<sp/>0<sp/>and<sp/>1.<sp/>Higher<sp/>values<sp/>may<sp/>make<sp/>the<sp/>model<sp/>unstable)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>theta<sp/>=<sp/>1.3;<sp/></highlight><highlight class="comment">//<sp/>Minmod<sp/>limiter<sp/>parameter,<sp/>theta<sp/>in<sp/>[1,2].<sp/>&lt;br&gt;Can<sp/>be<sp/>used<sp/>to<sp/>tune<sp/>the<sp/>momentum<sp/>dissipation<sp/>(theta=1<sp/>gives<sp/>minmod<sp/>the<sp/>most<sp/>dissipative<sp/>limiter<sp/>and<sp/>theta<sp/>=<sp/>2<sp/>gives<sp/><sp/><sp/><sp/>superbee,<sp/>the<sp/>least<sp/>dissipative).</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>VelThreshold<sp/>=<sp/>-1.0;<sp/></highlight><highlight class="comment">//<sp/>Using<sp/>Velocity<sp/>threshold<sp/>if<sp/>the<sp/>the<sp/>velocuity<sp/>exceeds<sp/>that<sp/>threshold.<sp/>Advice<sp/>value<sp/>of<sp/>16.0<sp/>to<sp/>use<sp/>or<sp/>negative<sp/>value<sp/>(-1)<sp/>to<sp/>turn<sp/>off</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>frictionmodel<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Bottom<sp/>friction<sp/>model<sp/>flag<sp/>(-1:<sp/>Manning<sp/>model,<sp/>0:<sp/>quadratic,<sp/>1:<sp/>Smart<sp/>roughtness<sp/>length<sp/>model)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>cf<sp/>=<sp/>0.0001;<sp/></highlight><highlight class="comment">//<sp/>Bottom<sp/>friction<sp/>coefficient<sp/>for<sp/>the<sp/>model<sp/>(if<sp/>constant)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Cd<sp/>=<sp/>0.002;<sp/></highlight><highlight class="comment">//<sp/>Wind<sp/>drag<sp/>coefficient</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>il<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//Initial<sp/>Loss<sp/>value<sp/>(if<sp/>constant)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>cl<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//Continuous<sp/>Loss<sp/>value<sp/>(if<sp/>constant)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>windforcing<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//not<sp/>working<sp/>yet</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>atmpforcing<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>rainforcing<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>infiltration<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>conserveElevation<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//Switch<sp/>to<sp/>force<sp/>the<sp/>conservation<sp/>of<sp/>zs<sp/>instead<sp/>of<sp/>h<sp/>at<sp/>the<sp/>interface<sp/>between<sp/>coarse<sp/>and<sp/>fine<sp/>blocks</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>wetdryfix<sp/>=<sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>Switch<sp/>to<sp/>remove<sp/>wet/dry<sp/>instability<sp/>(i.e.<sp/>true<sp/>reoves<sp/>instability<sp/>and<sp/>false<sp/>leaves<sp/>the<sp/>model<sp/>as<sp/>is)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>ForceMassConserve<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>Switch<sp/>to<sp/>enforce<sp/>mass<sp/>conservation<sp/>only<sp/>useful<sp/>on<sp/>steep<sp/>slope</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Pa2m<sp/>=<sp/>0.00009916;<sp/></highlight><highlight class="comment">//<sp/>Conversion<sp/>between<sp/>atmospheric<sp/>pressure<sp/>changes<sp/>to<sp/>water<sp/>level<sp/>changes<sp/>in<sp/>Pa<sp/>(if<sp/>unit<sp/>is<sp/>hPa<sp/>then<sp/>user<sp/>should<sp/>use<sp/>0.009916)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Paref<sp/>=<sp/>101300.0;<sp/></highlight><highlight class="comment">//<sp/>Reference<sp/>pressure<sp/>in<sp/>Pa<sp/>(if<sp/>unit<sp/>is<sp/>hPa<sp/>then<sp/>user<sp/>should<sp/>use<sp/>1013.0)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>lat<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//<sp/>Model<sp/>latitude.<sp/>This<sp/>is<sp/>ignored<sp/>in<sp/>spherical<sp/>case</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>GPUDEVICE<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>0:<sp/>first<sp/>available<sp/>GPU,<sp/>-1:<sp/>CPU<sp/>single<sp/>core,<sp/>2+:<sp/>other<sp/>GPU</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>doubleprecision<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>0:<sp/>float<sp/>precision,<sp/>1:<sp/>double<sp/>precision<sp/>(for<sp/>the<sp/>solver<sp/>and<sp/>math)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>savebyblk<sp/>=<sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>engine<sp/>=<sp/>1;<sp/></highlight><highlight class="comment">//<sp/>1:<sp/>Buttinger-Kreuzhuber<sp/>et<sp/>al.<sp/>2019,<sp/>2:<sp/>Kurganov<sp/>(Popinet<sp/>2011),<sp/>3:<sp/>KurganovATMP<sp/>same<sp/>as<sp/>Kurganov<sp/>but<sp/>with<sp/>atmospheric<sp/>forcing<sp/>terms<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*Grid<sp/>parameters</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dx<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//<sp/>Grid<sp/>resolution,<sp/>in<sp/>m<sp/>for<sp/>a<sp/>metric<sp/>grid<sp/>or<sp/>in<sp/>decimal<sp/>degree<sp/>for<sp/>a<sp/>sperical<sp/>grid.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>delta;<sp/></highlight><highlight class="comment">//<sp/>Grid<sp/>resolution<sp/>for<sp/>the<sp/>model.<sp/>in<sp/>Spherical<sp/>coordinates<sp/>this<sp/>is<sp/>dx<sp/>*<sp/>Radius*pi<sp/>/<sp/>180.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nx<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Initial/input<sp/>grid<sp/>size<sp/>(number<sp/>of<sp/>nodes)<sp/>in<sp/>x<sp/>direction</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ny<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//Initial/input<sp/>grid<sp/>size<sp/>(number<sp/>of<sp/>nodes)<sp/>in<sp/>y<sp/>direction</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nblk<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Number<sp/>of<sp/>compute<sp/>blocks</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkwidth<sp/>=<sp/>16;<sp/></highlight><highlight class="comment">//Block<sp/>width<sp/>in<sp/>number<sp/>of<sp/>cells</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blkmemwidth<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Calculated<sp/>in<sp/>sanity<sp/>check<sp/>as<sp/>blkwidth+2*halowidth</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blksize<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Calculated<sp/>in<sp/>sanity<sp/>check<sp/>as<sp/>blkmemwidth*blkmemwidth</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth<sp/>=<sp/>1;<sp/></highlight><highlight class="comment">//<sp/>Use<sp/>a<sp/>halo<sp/>around<sp/>the<sp/>blocks<sp/>default<sp/>is<sp/>1<sp/>cell:<sp/>the<sp/>memory<sp/>for<sp/>each<sp/>blk<sp/>is<sp/>18x18<sp/>when<sp/>blkwidth<sp/>is<sp/>16</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>xo<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//<sp/>Grid<sp/>x<sp/>origin<sp/>(if<sp/>not<sp/>alter<sp/>by<sp/>the<sp/>user,<sp/>will<sp/>be<sp/>defined<sp/>based<sp/>on<sp/>the<sp/>topography/bathymetry<sp/>input<sp/>map)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>yo<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//<sp/>Grid<sp/>y<sp/>origin<sp/>(if<sp/>not<sp/>alter<sp/>by<sp/>the<sp/>user,<sp/>will<sp/>be<sp/>defined<sp/>based<sp/>on<sp/>the<sp/>topography/bathymetry<sp/>input<sp/>map)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>ymax<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//<sp/>Grid<sp/>ymax<sp/>(if<sp/>not<sp/>alter<sp/>by<sp/>the<sp/>user,<sp/>will<sp/>be<sp/>defined<sp/>based<sp/>on<sp/>the<sp/>topography/bathymetry<sp/>input<sp/>map)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>xmax<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//<sp/>Grid<sp/>xmax<sp/>(if<sp/>not<sp/>alter<sp/>by<sp/>the<sp/>user,<sp/>will<sp/>be<sp/>defined<sp/>based<sp/>on<sp/>the<sp/>topography/bathymetry<sp/>input<sp/>map)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>grdalpha<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//<sp/>Grid<sp/>rotation<sp/>on<sp/>Y<sp/>axis<sp/>from<sp/>the<sp/>North<sp/>input<sp/>in<sp/>degrees<sp/>but<sp/>later<sp/>converted<sp/>to<sp/>rad</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>posdown<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Flag<sp/>for<sp/>bathy<sp/>input.<sp/>Model<sp/>requirement<sp/>is<sp/>positive<sp/>up<sp/><sp/>so<sp/>if<sp/>posdown<sp/>==1<sp/>then<sp/>zb=zb*-1.0f</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>spherical<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Flag<sp/>for<sp/>sperical<sp/>coordinate<sp/>(still<sp/>in<sp/>development)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>Radius<sp/>=<sp/>6371220.;<sp/></highlight><highlight class="comment">//Earth<sp/>radius<sp/>[m]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>mask<sp/>=<sp/>9999.0;<sp/></highlight><highlight class="comment">//Mask<sp/>any<sp/>zb<sp/>above<sp/>this<sp/>value.<sp/>If<sp/>the<sp/>entire<sp/>Block<sp/>is<sp/>masked<sp/>then<sp/>it<sp/>is<sp/>not<sp/>allocated<sp/>in<sp/>the<sp/>memory</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*Adaptation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>initlevel<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//Initial<sp/>level<sp/>of<sp/>grid<sp/>adaptation<sp/>(based<sp/>on<sp/>dx<sp/>if<sp/>defined<sp/>by<sp/>the<sp/>user<sp/>or<sp/>on<sp/>the<sp/>resolution<sp/>of<sp/>the<sp/>topography/bathymetry<sp/>input)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>maxlevel<sp/>=<sp/>-99999;<sp/></highlight><highlight class="comment">//Maximum<sp/>level<sp/>for<sp/>grid<sp/>adaptation<sp/>(overwrite<sp/>the<sp/>adaptation<sp/>map<sp/>if<sp/>use)<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>minlevel<sp/>=<sp/>-99999;<sp/></highlight><highlight class="comment">//Minumim<sp/>level<sp/>for<sp/>grid<sp/>adaptation<sp/>(overwrite<sp/>the<sp/>adaptation<sp/>map<sp/>if<sp/>use)<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nblkmem<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>navailblk<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>membuffer<sp/>=<sp/>1.05;<sp/></highlight><highlight class="comment">//Needs<sp/>to<sp/>allocate<sp/>more<sp/>memory<sp/>than<sp/>initially<sp/>needed<sp/>so<sp/>adaptation<sp/>can<sp/>happen<sp/>without<sp/>memory<sp/>reallocation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*Timekeeping</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//double<sp/>outputtimeinit<sp/>=<sp/>-99999;<sp/>//Initial<sp/>time<sp/>for<sp/>the<sp/>output,<sp/>initialised<sp/>to<sp/>initial<sp/>running<sp/>time</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>outputtimestep<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//Number<sp/>of<sp/>seconds<sp/>between<sp/>netCDF<sp/>outputs,<sp/>0.0<sp/>for<sp/>none</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>endtime<sp/>=<sp/>std::numeric_limits&lt;double&gt;::max();<sp/></highlight><highlight class="comment">//<sp/>Total<sp/>runtime<sp/>in<sp/>s,<sp/>will<sp/>be<sp/>calculated<sp/>based<sp/>on<sp/>bnd<sp/>input<sp/>as<sp/>min(length<sp/>of<sp/>the<sp/>shortest<sp/>time<sp/>series,<sp/>user<sp/>defined)<sp/>and<sp/>should<sp/>be<sp/>shorter<sp/>than<sp/>any<sp/>time-varying<sp/>forcing</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>totaltime<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//<sp/>Total<sp/>simulation<sp/>time<sp/>in<sp/>s</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>inittime<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//<sp/>Initital<sp/>model<sp/>time.<sp/>At<sp/>start<sp/>of<sp/>simulation<sp/>inittime==totaltime</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dtinit<sp/>=<sp/>-1;<sp/></highlight><highlight class="comment">//<sp/>Maximum<sp/>initial<sp/>time<sp/>steps<sp/>in<sp/>s<sp/>(should<sp/>be<sp/>positive,<sp/>advice<sp/>0.1<sp/>if<sp/>dry<sp/>domain<sp/>initialement)<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dtmin<sp/>=<sp/>0.0005;<sp/></highlight><highlight class="comment">//Minimum<sp/>accepted<sp/>time<sp/>steps<sp/>in<sp/>s<sp/>(a<sp/>lower<sp/>value<sp/>will<sp/>be<sp/>concidered<sp/>a<sp/>crash<sp/>of<sp/>the<sp/>code,<sp/>and<sp/>stop<sp/>the<sp/>run)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>reftime<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>Reference<sp/>time<sp/>string<sp/>as<sp/>yyyy-mm-ddTHH:MM:SS</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>crs_ref<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;no_crs&quot;</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//&quot;PROJCS[\&quot;NZGD2000<sp/>/<sp/>New<sp/>Zealand<sp/>Transverse<sp/>Mercator<sp/>2000\&quot;,GEOGCS[\&quot;NZGD2000\&quot;,DATUM[\&quot;New_Zealand_Geodetic_Datum_2000\&quot;,SPHEROID[\&quot;GRS<sp/>1980\&quot;,6378137,298.257222101]],PRIMEM[\&quot;Greenwich\&quot;,0],UNIT[\&quot;degree\&quot;,0.0174532925199433,AUTHORITY[\&quot;EPSG\&quot;,\&quot;9122\&quot;]],AUTHORITY[\&quot;EPSG\&quot;,\&quot;4167\&quot;]],PROJECTION[\&quot;Transverse_Mercator\&quot;],PARAMETER[\&quot;latitude_of_origin\&quot;,0],PARAMETER[\&quot;central_meridian\&quot;,173],PARAMETER[\&quot;scale_factor\&quot;,0.9996],PARAMETER[\&quot;false_easting\&quot;,1600000],PARAMETER[\&quot;false_northing\&quot;,10000000],UNIT[\&quot;metre\&quot;,1],AXIS[\&quot;Northing\&quot;,NORTH],AXIS[\&quot;Easting\&quot;,EAST],AUTHORITY[\&quot;EPSG\&quot;,\&quot;2193\&quot;]]&quot;;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89"><highlight class="normal"></highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*Boundaries</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>leftbnd<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>bnd<sp/>is<sp/>forced<sp/>(i.e.<sp/>not<sp/>a<sp/>wall<sp/>or<sp/>neuman)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>rightbnd<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>bnd<sp/>is<sp/>forced<sp/>(i.e.<sp/>not<sp/>a<sp/>wall<sp/>or<sp/>neuman)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>topbnd<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>bnd<sp/>is<sp/>forced<sp/>(i.e.<sp/>not<sp/>a<sp/>wall<sp/>or<sp/>neuman)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>botbnd<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>bnd<sp/>is<sp/>forced<sp/>(i.e.<sp/>not<sp/>a<sp/>wall<sp/>or<sp/>neuman)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="95"><highlight class="normal"></highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>aoibnd<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Boundary<sp/>type<sp/>for<sp/>AOI:<sp/>0=wall;<sp/>1<sp/>neumann;<sp/>3<sp/>absorbing</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>bndrelaxtime<sp/>=<sp/>3600.0;<sp/></highlight><highlight class="comment">//<sp/>Realxation<sp/>time<sp/>for<sp/>absorbing<sp/>boundary</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>bndfiltertime<sp/>=<sp/>60.0;<sp/></highlight><highlight class="comment">//<sp/>Filtering<sp/>time<sp/>for<sp/>absorbing<sp/>boundary</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="99"><highlight class="normal"></highlight></codeline>
+<codeline lineno="100"><highlight class="normal"></highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*<sp/>Initialisation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>zsinit<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//Init<sp/>zs<sp/>for<sp/>cold<sp/>start<sp/>in<sp/>m.<sp/>If<sp/>not<sp/>specified<sp/>by<sp/>user<sp/>and<sp/>no<sp/>bnd<sp/>file<sp/>=<sp/>1<sp/>then<sp/>sanity<sp/>check<sp/>will<sp/>set<sp/>it<sp/>to<sp/>0.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="103"><highlight class="normal"></highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>zsoffset<sp/>=<sp/>nan(</highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//Add<sp/>a<sp/>water<sp/>level<sp/>offset<sp/>in<sp/>m<sp/>to<sp/>initial<sp/>conditions<sp/>and<sp/>boundaries<sp/>(0.0<sp/>by<sp/>default)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="105"><highlight class="normal"></highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>hotstartfile;</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*Allow<sp/>to<sp/>hotstart<sp/>(or<sp/>restart)<sp/>the<sp/>computation<sp/>providing<sp/>a<sp/>netcdf<sp/>file<sp/>containing<sp/>at<sp/>least<sp/>zb,<sp/>h<sp/>or<sp/>zs,<sp/>u<sp/>and<sp/>v</highlight></codeline>
+<codeline lineno="108"><highlight class="comment"><sp/><sp/><sp/><sp/>Default:<sp/>None</highlight></codeline>
+<codeline lineno="109"><highlight class="comment"><sp/><sp/><sp/><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//std::string<sp/>deformfile;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>hotstep<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//Step<sp/>to<sp/>read<sp/>if<sp/>hotstart<sp/>file<sp/>has<sp/>multiple<sp/>steps<sp/>(step<sp/>and<sp/>not<sp/>(computation)<sp/>time)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="112"><highlight class="normal"></highlight></codeline>
+<codeline lineno="113"><highlight class="normal"></highlight></codeline>
+<codeline lineno="114"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>bndtaper<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//<sp/>number<sp/>of<sp/>second<sp/>to<sp/>taper<sp/>boundary<sp/>values<sp/>to<sp/>smooth<sp/>transition<sp/>with<sp/>initial<sp/>conditions<sp/>default<sp/>is<sp/>no<sp/>tapering<sp/>but<sp/>600s<sp/>is<sp/>good<sp/>practice</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="115"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//other</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="116"><highlight class="normal"><sp/><sp/><sp/><sp/>clock_t<sp/>startcputime,<sp/>endcputime,<sp/>setupcputime;</highlight></codeline>
+<codeline lineno="117"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>GPU_initmem_byte,<sp/>GPU_totalmem_byte;</highlight></codeline>
+<codeline lineno="118"><highlight class="normal"></highlight></codeline>
+<codeline lineno="119"><highlight class="normal"></highlight></codeline>
+<codeline lineno="120"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*Outputs</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="121"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//std::string<sp/>Bathymetryfile;//<sp/>bathymetry<sp/>file<sp/>name</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="122"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//inputmap<sp/>Bathymetry;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="123"><highlight class="normal"></highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="class_t__output" kindref="compound">T_output</ref><sp/>Toutput;</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Flexible<sp/>time<sp/>definition<sp/>for<sp/>outputs<sp/>(nc<sp/>files)</highlight></codeline>
+<codeline lineno="126"><highlight class="comment"><sp/><sp/><sp/><sp/>Example:<sp/>&quot;Toutput<sp/>=<sp/>0.0:3600:7200,7000,7100;<sp/>which<sp/>mean<sp/>every<sp/>3600s<sp/>from<sp/>0<sp/>to<sp/>7200s,<sp/>and<sp/>the<sp/>two<sp/>times<sp/>7000<sp/>and<sp/>7100&quot;</highlight></codeline>
+<codeline lineno="127"><highlight class="comment"><sp/><sp/><sp/><sp/>Default<sp/>=<sp/>First<sp/>and<sp/>last<sp/>timne<sp/>steps*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="128"><highlight class="normal"></highlight></codeline>
+<codeline lineno="129"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Timeseries<sp/>output<sp/>(save<sp/>as<sp/>a<sp/>vector<sp/>containing<sp/>information<sp/>for<sp/>each<sp/>Time<sp/>Serie<sp/>output)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/><sp/><sp/><sp/>std::vector&lt;TSoutnode&gt;<sp/>TSnodesout;</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*Time<sp/>serie<sp/>output,<sp/>giving<sp/>a<sp/>file<sp/>name<sp/>and<sp/>a<sp/>(x,y)<sp/>position</highlight></codeline>
+<codeline lineno="132"><highlight class="comment"><sp/><sp/><sp/><sp/>(which<sp/>will<sp/>be<sp/>converted<sp/>to<sp/>nearest<sp/>grid<sp/>position).</highlight></codeline>
+<codeline lineno="133"><highlight class="comment"><sp/><sp/><sp/><sp/>This<sp/>keyword<sp/>can<sp/>be<sp/>used<sp/>multiple<sp/>times<sp/>to<sp/>extract<sp/>time<sp/>series<sp/>at<sp/>different<sp/>locations.</highlight></codeline>
+<codeline lineno="134"><highlight class="comment"><sp/><sp/><sp/><sp/>The<sp/>data<sp/>is<sp/>stocked<sp/>for<sp/>each<sp/>timestep<sp/>and<sp/>written<sp/>by<sp/>flocs.</highlight></codeline>
+<codeline lineno="135"><highlight class="comment"><sp/><sp/><sp/><sp/>The<sp/>resulting<sp/>file<sp/>contains<sp/>(t,zs,h,u,v)</highlight></codeline>
+<codeline lineno="136"><highlight class="comment"><sp/><sp/><sp/><sp/>Example:<sp/>&quot;TSnodesout<sp/>=<sp/>Offshore.txt,3101.00,4982.57&quot;<sp/>(*filename,x,y*)</highlight></codeline>
+<codeline lineno="137"><highlight class="comment"><sp/><sp/><sp/><sp/>Default:<sp/>None</highlight></codeline>
+<codeline lineno="138"><highlight class="comment"><sp/><sp/><sp/><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="139"><highlight class="normal"></highlight></codeline>
+<codeline lineno="140"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>outfile<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;Output.nc&quot;</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>Netcdf<sp/>output<sp/>file<sp/>name<sp/>(if<sp/>it<sp/>exists,<sp/>a<sp/>number<sp/>will<sp/>be<sp/>happened<sp/>to<sp/>the<sp/>file<sp/>name<sp/>to<sp/>not<sp/>overwrite<sp/>it)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="141"><highlight class="normal"><sp/><sp/><sp/><sp/>std::vector&lt;std::string&gt;<sp/>outvars;<sp/></highlight></codeline>
+<codeline lineno="142"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*List<sp/>of<sp/>names<sp/>of<sp/>the<sp/>variables<sp/>to<sp/>output<sp/>(for<sp/>2D<sp/>maps)</highlight></codeline>
+<codeline lineno="143"><highlight class="comment"><sp/><sp/><sp/><sp/>Supported<sp/>variables<sp/>=<sp/>&quot;zb&quot;,<sp/>&quot;zs&quot;,<sp/>&quot;u&quot;,<sp/>&quot;v&quot;,<sp/>&quot;h&quot;,<sp/>&quot;hmean&quot;,<sp/>&quot;zsmean&quot;,<sp/>&quot;umean&quot;,<sp/>&quot;vmean&quot;,<sp/>&quot;hUmean&quot;,<sp/>&quot;Umean&quot;,<sp/>&quot;hmax&quot;,<sp/>&quot;zsmax&quot;,<sp/>&quot;umax&quot;,<sp/>&quot;vmax&quot;,<sp/>&quot;hUmax&quot;,<sp/>&quot;Umax&quot;,<sp/>&quot;twet&quot;,<sp/>&quot;dhdx&quot;,&quot;dhdy&quot;,&quot;dzsdx&quot;,&quot;dzsdy&quot;,&quot;dudx&quot;,&quot;dudy&quot;,&quot;dvdx&quot;,&quot;dvdy&quot;,&quot;Fhu&quot;,&quot;Fhv&quot;,&quot;Fqux&quot;,&quot;Fqvy&quot;,&quot;Fquy&quot;,&quot;Fqvx&quot;,&quot;Su&quot;,&quot;Sv&quot;,&quot;dh&quot;,&quot;dhu&quot;,&quot;dhv&quot;,&quot;cf&quot;,&quot;Patm&quot;,<sp/>&quot;datmpdx&quot;,&quot;datmpdy&quot;,&quot;il&quot;,&quot;cl&quot;,&quot;hgw&quot;;</highlight></codeline>
+<codeline lineno="144"><highlight class="comment"><sp/><sp/><sp/><sp/>Example:<sp/>&quot;outvars<sp/>=<sp/>zs,h,u,v,zb,hmax,Umax;&quot;</highlight></codeline>
+<codeline lineno="145"><highlight class="comment"><sp/><sp/><sp/><sp/>Default:<sp/>&quot;zb&quot;,<sp/>&quot;zs&quot;,<sp/>&quot;u&quot;,<sp/>&quot;v&quot;,<sp/>&quot;h&quot;</highlight></codeline>
+<codeline lineno="146"><highlight class="comment"><sp/><sp/><sp/><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>wet_threshold<sp/>=<sp/>0.1;<sp/></highlight><highlight class="comment">//in<sp/>m.<sp/>Limit<sp/>to<sp/>consider<sp/>a<sp/>cell<sp/>wet<sp/>for<sp/>the<sp/>twet<sp/>output<sp/>(duration<sp/>of<sp/>inundation<sp/>(s))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="148"><highlight class="normal"></highlight></codeline>
+<codeline lineno="149"><highlight class="normal"><sp/><sp/><sp/><sp/>std::vector&lt;outzoneP&gt;<sp/>outzone;</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*Zoned<sp/>output<sp/>(netcdf<sp/>file),<sp/>giving<sp/>a<sp/>file<sp/>name<sp/>and<sp/>the<sp/>position<sp/>of<sp/>two<sp/>corner<sp/>points</highlight></codeline>
+<codeline lineno="151"><highlight class="comment"><sp/><sp/><sp/><sp/>(which<sp/>will<sp/>be<sp/>converted<sp/>to<sp/>a<sp/>rectagle<sp/>containing<sp/>full<sp/>blocks).</highlight></codeline>
+<codeline lineno="152"><highlight class="comment"><sp/><sp/><sp/><sp/>Time<sp/>vector<sp/>or<sp/>values<sp/>can<sp/>also<sp/>be<sp/>added<sp/>to<sp/>specified<sp/>special<sp/>outputs<sp/>for<sp/>this<sp/>one<sp/>in<sp/>particular.</highlight></codeline>
+<codeline lineno="153"><highlight class="comment"><sp/><sp/><sp/><sp/>This<sp/>keyword<sp/>can<sp/>be<sp/>used<sp/>multiple<sp/>times<sp/>to<sp/>output<sp/>maps<sp/>of<sp/>different<sp/>areas.</highlight></codeline>
+<codeline lineno="154"><highlight class="comment"><sp/><sp/><sp/><sp/>Example:<sp/>&quot;outzone=zoomed.nc,5.3,5.4,0.5,0.8;&quot;<sp/>(*filename,x1,x2,y1,y2*)<sp/>or<sp/>&quot;outzone=zoomed.nc,5.3,5.4,0.5,0.8,<sp/>3600:360:7200;&quot;<sp/>(*filename,x1,x2,y1,y2,<sp/>t_init:t_step:t_end*)</highlight></codeline>
+<codeline lineno="155"><highlight class="comment"><sp/><sp/><sp/><sp/>Default:<sp/>Full<sp/>domain</highlight></codeline>
+<codeline lineno="156"><highlight class="comment"><sp/><sp/><sp/><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="157"><highlight class="normal"></highlight></codeline>
+<codeline lineno="158"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>maxTSstorage<sp/>=<sp/>16384;<sp/></highlight><highlight class="comment">//maximum<sp/>strorage<sp/>(nTSnodes*4*nTSsteps)<sp/>before<sp/>time<sp/>series<sp/>output<sp/>are<sp/>flushed<sp/>to<sp/>disk<sp/>[2^14]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="159"><highlight class="normal"></highlight></codeline>
+<codeline lineno="160"><highlight class="normal"></highlight></codeline>
+<codeline lineno="161"><highlight class="normal"></highlight></codeline>
+<codeline lineno="162"><highlight class="normal"></highlight></codeline>
+<codeline lineno="163"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Output<sp/>switch<sp/>controls</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="164"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>resetmax<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//Switch<sp/>to<sp/>reset<sp/>the<sp/>&quot;max&quot;<sp/>outputs<sp/>after<sp/>each<sp/>output<sp/>(reset<sp/>if<sp/>1,<sp/>no<sp/>reset<sp/>if<sp/>0)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="165"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>outmax<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="166"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>outmean<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="167"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//bool<sp/>outvort<sp/>=<sp/>false;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>outtwet<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//bool<sp/>outU<sp/>=<sp/>false;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="170"><highlight class="normal"></highlight></codeline>
+<codeline lineno="171"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>WARNING<sp/>FOR<sp/>DEBUGGING<sp/>PURPOSE<sp/>ONLY</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="172"><highlight class="normal"></highlight><highlight class="comment">//<sp/>For<sp/>debugging<sp/>one<sp/>can<sp/>shift<sp/>the<sp/>output<sp/>by<sp/>1<sp/>or<sp/>-1<sp/>in<sp/>the<sp/>i<sp/>and<sp/>j<sp/>direction.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="173"><highlight class="normal"></highlight><highlight class="comment">//<sp/>this<sp/>will<sp/>save<sp/>the<sp/>value<sp/>in<sp/>the<sp/>halo<sp/>to<sp/>the<sp/>output<sp/>file<sp/>allowing<sp/>debugging<sp/>of<sp/>values<sp/>there.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="174"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>outishift<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//DEBUGGING<sp/>ONLY:<sp/>allow<sp/>cell<sp/>shift<sp/>(1<sp/>or<sp/>-1)<sp/>in<sp/>x<sp/>direction<sp/>to<sp/>visualise<sp/>the<sp/>halo<sp/>around<sp/>blocks<sp/>in<sp/>the<sp/>output<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="175"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>outjshift<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//DEBUGGING<sp/>ONLY:<sp/>allow<sp/>cell<sp/>shift<sp/>(1<sp/>or<sp/>-1)<sp/>in<sp/>y<sp/>direction<sp/>to<sp/>visualise<sp/>the<sp/>halo<sp/>around<sp/>blocks<sp/>in<sp/>the<sp/>output<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="176"><highlight class="normal"></highlight></codeline>
+<codeline lineno="177"><highlight class="normal"></highlight></codeline>
+<codeline lineno="178"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Rivers</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="179"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//std::vector&lt;River&gt;<sp/>Rivers;<sp/>//<sp/>empty<sp/>vector<sp/>to<sp/>hold<sp/>river<sp/>location<sp/>and<sp/>discharge<sp/>time<sp/>series</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="180"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nrivers<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nblkriver<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="182"><highlight class="normal"></highlight></codeline>
+<codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>length<sp/>of<sp/>bnd<sp/>blk,<sp/>redundant<sp/>from<sp/>XForcing<sp/>but<sp/>useful</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="184"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nbndblkleft<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="185"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nbndblkright<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="186"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nbndblktop<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nbndblkbot<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="188"><highlight class="normal"></highlight></codeline>
+<codeline lineno="189"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nmaskblk<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="190"><highlight class="normal"></highlight></codeline>
+<codeline lineno="191"><highlight class="normal"></highlight></codeline>
+<codeline lineno="192"><highlight class="normal"></highlight></codeline>
+<codeline lineno="193"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*Netcdf<sp/>parameters</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="194"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>smallnc<sp/>=<sp/>1;<sp/></highlight><highlight class="comment">//Short<sp/>integer<sp/>conversion<sp/>for<sp/>netcdf<sp/>outputs.<sp/>1:<sp/>save<sp/>as<sp/>short<sp/>integer<sp/>for<sp/>the<sp/>netcdf<sp/>file,<sp/>if<sp/>0<sp/>then<sp/>save<sp/>all<sp/>variables<sp/>as<sp/>float</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="195"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>scalefactor<sp/>=<sp/>0.01f;<sp/></highlight><highlight class="comment">//Scale<sp/>factor<sp/>used<sp/>for<sp/>the<sp/>short<sp/>integer<sp/>conversion<sp/>for<sp/>netcdf<sp/>outputs.<sp/>This<sp/>follow<sp/>the<sp/>COARDS<sp/>convention.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="196"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>addoffset<sp/>=<sp/>0.0f;<sp/></highlight><highlight class="comment">//Offset<sp/>add<sp/>during<sp/>the<sp/>short<sp/>integer<sp/>conversion<sp/>for<sp/>netcdf<sp/>outputs<sp/>(follow<sp/>the<sp/>COARDS<sp/>convention)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="197"><highlight class="normal"></highlight></codeline>
+<codeline lineno="198"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>USE_CATALYST</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="199"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//*<sp/>ParaView<sp/>Catalyst<sp/>parameters<sp/>(special<sp/>use<sp/>with<sp/>ParaView)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="200"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>use_catalyst<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Switch<sp/>to<sp/>use<sp/>ParaView<sp/>Catalyst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="201"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>catalyst_python_pipeline<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//Pipeline<sp/>to<sp/>use<sp/>ParaView<sp/>Catalyst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="202"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>vtk_output_frequency<sp/>=<sp/>0;<sp/></highlight><highlight class="comment">//<sp/>Output<sp/>frequency<sp/>for<sp/>ParaView<sp/>Catalyst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="203"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>vtk_output_time_interval<sp/>=<sp/>1.0;<sp/></highlight><highlight class="comment">//<sp/>Output<sp/>time<sp/>step<sp/>for<sp/>ParaView<sp/>Catalyst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="204"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>vtk_outputfile_root<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;bg_out&quot;</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//output<sp/>file<sp/>name<sp/>for<sp/>ParaView<sp/>Catalyst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="205"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>python_pipeline<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;coproc.py&quot;</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//python<sp/>pipeline<sp/>for<sp/>ParaView<sp/>Catalyst</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="206"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="207"><highlight class="normal"></highlight></codeline>
+<codeline lineno="208"><highlight class="normal"></highlight></codeline>
+<codeline lineno="209"><highlight class="normal"></highlight></codeline>
+<codeline lineno="210"><highlight class="normal"></highlight></codeline>
+<codeline lineno="211"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>info<sp/>of<sp/>the<sp/>mapped<sp/>cf</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="212"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//inputmap<sp/>roughnessmap;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="213"><highlight class="normal"></highlight></codeline>
+<codeline lineno="214"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//forcingmap<sp/>windU;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="215"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//forcingmap<sp/>windV;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="216"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//forcingmap<sp/>atmP;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="217"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//forcingmap<sp/>Rainongrid;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="218"><highlight class="normal"></highlight></codeline>
+<codeline lineno="219"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>deformation<sp/>forcing<sp/>for<sp/>tsunami<sp/>generation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="220"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//std::vector&lt;deformmap&gt;<sp/>deform;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="221"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>deformmaxtime<sp/>=<sp/>0.0;<sp/></highlight><highlight class="comment">//<sp/>time<sp/>(s)<sp/>after<sp/>which<sp/>no<sp/>deformation<sp/>occurs<sp/>(internal<sp/>parameter<sp/>to<sp/>cut<sp/>some<sp/>of<sp/>the<sp/>loops)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="222"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>rainbnd<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>when<sp/>false<sp/>it<sp/>force<sp/>the<sp/>rain<sp/>forcing<sp/>on<sp/>the<sp/>bnd<sp/>cells<sp/>to<sp/>be<sp/>null.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="223"><highlight class="normal"></highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>This<sp/>here<sp/>should<sp/>be<sp/>stored<sp/>in<sp/>a<sp/>structure<sp/>at<sp/>a<sp/>later<sp/>stage</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="225"><highlight class="normal"></highlight></codeline>
+<codeline lineno="226"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>AdaptCrit;</highlight></codeline>
+<codeline lineno="227"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>AdaptCrit_funct_pointer;</highlight></codeline>
+<codeline lineno="228"><highlight class="normal"></highlight></codeline>
+<codeline lineno="229"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>Adapt_arg1,<sp/>Adapt_arg2,<sp/>Adapt_arg3,<sp/>Adapt_arg4,<sp/>Adapt_arg5;</highlight></codeline>
+<codeline lineno="230"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>adaptmaxiteration<sp/>=<sp/>20;<sp/></highlight><highlight class="comment">//<sp/>Maximum<sp/>number<sp/>of<sp/>iteration<sp/>for<sp/>adaptation.<sp/>default<sp/>20</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="231"><highlight class="normal"></highlight></codeline>
+<codeline lineno="232"><highlight class="normal"></highlight></codeline>
+<codeline lineno="233"><highlight class="normal"></highlight></codeline>
+<codeline lineno="234"><highlight class="normal"></highlight></codeline>
+<codeline lineno="235"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="236"><highlight class="normal"></highlight></codeline>
+<codeline lineno="237"><highlight class="normal"></highlight></codeline>
+<codeline lineno="238"><highlight class="normal"></highlight></codeline>
+<codeline lineno="239"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="240"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/Param.h"/>
+  </compounddef>
+</doxygen>

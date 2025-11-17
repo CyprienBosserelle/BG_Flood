@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_flux_m_l_p" kind="struct" language="C++" prot="public">
+    <compoundname>FluxMLP</compoundname>
+    <includes refid="_arrays_8h" local="no">Arrays.h</includes>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_flux_m_l_p_1a530a89934d80b1618555be1672154607" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hu</definition>
+        <argsstring></argsstring>
+        <name>hu</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Water depth flux in u-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="141" column="3" bodyfile="src/Arrays.h" bodystart="141" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1a7678dd32cdff6c0b60ec2cd7d6f759ae" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hv</definition>
+        <argsstring></argsstring>
+        <name>hv</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Water depth flux in v-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="143" column="3" bodyfile="src/Arrays.h" bodystart="143" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1ad1ef419c40e8269d0983d305f484fb11" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hfu</definition>
+        <argsstring></argsstring>
+        <name>hfu</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>h*f flux in u-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="145" column="3" bodyfile="src/Arrays.h" bodystart="145" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1add3565da46ec8c0f97716af03a7c0c68" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hfv</definition>
+        <argsstring></argsstring>
+        <name>hfv</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>h*f flux in v-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="147" column="3" bodyfile="src/Arrays.h" bodystart="147" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1a1ba388f579392b35430bc05b84e90a22" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hau</definition>
+        <argsstring></argsstring>
+        <name>hau</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>h*a flux in u-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="149" column="3" bodyfile="src/Arrays.h" bodystart="149" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1a7e0dcbdc612397da837e477e80d00824" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::hav</definition>
+        <argsstring></argsstring>
+        <name>hav</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>h*a flux in v-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="151" column="3" bodyfile="src/Arrays.h" bodystart="151" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1aca5373a94cc9cd28142645a1120167b7" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::Fux</definition>
+        <argsstring></argsstring>
+        <name>Fux</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of u in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="153" column="3" bodyfile="src/Arrays.h" bodystart="153" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1a090df7c69122626ace93f5a3ccac9ee0" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::Fvy</definition>
+        <argsstring></argsstring>
+        <name>Fvy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of v in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="155" column="3" bodyfile="src/Arrays.h" bodystart="155" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1a04e4113d7cc416e22d7f9608fcdbe380" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::Fuy</definition>
+        <argsstring></argsstring>
+        <name>Fuy</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of u in y-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="157" column="3" bodyfile="src/Arrays.h" bodystart="157" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_flux_m_l_p_1a927b950ba03d779d5f5fb4c6a69a91ac" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* FluxMLP&lt; T &gt;::Fvx</definition>
+        <argsstring></argsstring>
+        <name>Fvx</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Flux of v in x-direction </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="159" column="3" bodyfile="src/Arrays.h" bodystart="159" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Structure holding flux variables (no z relative variables). </para>
+    </briefdescription>
+    <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="138" column="1" bodyfile="src/Arrays.h" bodystart="139" bodyend="160"/>
+    <listofallmembers>
+      <member refid="struct_flux_m_l_p_1aca5373a94cc9cd28142645a1120167b7" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fux</name></member>
+      <member refid="struct_flux_m_l_p_1a04e4113d7cc416e22d7f9608fcdbe380" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fuy</name></member>
+      <member refid="struct_flux_m_l_p_1a927b950ba03d779d5f5fb4c6a69a91ac" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fvx</name></member>
+      <member refid="struct_flux_m_l_p_1a090df7c69122626ace93f5a3ccac9ee0" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>Fvy</name></member>
+      <member refid="struct_flux_m_l_p_1a1ba388f579392b35430bc05b84e90a22" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hau</name></member>
+      <member refid="struct_flux_m_l_p_1a7e0dcbdc612397da837e477e80d00824" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hav</name></member>
+      <member refid="struct_flux_m_l_p_1ad1ef419c40e8269d0983d305f484fb11" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hfu</name></member>
+      <member refid="struct_flux_m_l_p_1add3565da46ec8c0f97716af03a7c0c68" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hfv</name></member>
+      <member refid="struct_flux_m_l_p_1a530a89934d80b1618555be1672154607" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hu</name></member>
+      <member refid="struct_flux_m_l_p_1a7678dd32cdff6c0b60ec2cd7d6f759ae" prot="public" virt="non-virtual"><scope>FluxMLP</scope><name>hv</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

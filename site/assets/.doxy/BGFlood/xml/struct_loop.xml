@@ -1,0 +1,395 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_loop" kind="struct" language="C++" prot="public">
+    <compoundname>Loop</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_loop_1ac91b2b218fc8bdf6c736627084f3adfc" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double Loop&lt; T &gt;::nextoutputtime</definition>
+        <argsstring></argsstring>
+        <name>nextoutputtime</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="360" column="8" bodyfile="src/Arrays.h" bodystart="360" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1ac0c824d5c4752e9d273052879f516196" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double Loop&lt; T &gt;::dt</definition>
+        <argsstring></argsstring>
+        <name>dt</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="361" column="8" bodyfile="src/Arrays.h" bodystart="361" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a2450b9f51147e5b489ffabb358382edf" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double Loop&lt; T &gt;::dtmax</definition>
+        <argsstring></argsstring>
+        <name>dtmax</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="362" column="8" bodyfile="src/Arrays.h" bodystart="362" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a9a526d0edf22bbfba6121acdd7eb585b" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double Loop&lt; T &gt;::totaltime</definition>
+        <argsstring></argsstring>
+        <name>totaltime</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="363" column="8" bodyfile="src/Arrays.h" bodystart="363" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a83d5311ba65215aa0d66aecc90bfd3b1" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Loop&lt; T &gt;::nstep</definition>
+        <argsstring></argsstring>
+        <name>nstep</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="367" column="5" bodyfile="src/Arrays.h" bodystart="367" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a5f4b6a2a12188e1aefde0fe49979b5dc" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Loop&lt; T &gt;::nstepout</definition>
+        <argsstring></argsstring>
+        <name>nstepout</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="369" column="5" bodyfile="src/Arrays.h" bodystart="369" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a2166bcfff33532161e920418ba731e53" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Loop&lt; T &gt;::indNextoutputtime</definition>
+        <argsstring></argsstring>
+        <name>indNextoutputtime</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="371" column="5" bodyfile="src/Arrays.h" bodystart="371" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1adb71998a04e94f8771c19f81d1157ca6" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Loop&lt; T &gt;::nTSsteps</definition>
+        <argsstring></argsstring>
+        <name>nTSsteps</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="374" column="5" bodyfile="src/Arrays.h" bodystart="374" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1aec82658bbe1e6aa12dc62648b7c8f71f" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; std::vector&lt; <ref refid="class_pointout" kindref="compound">Pointout</ref> &gt; &gt;</type>
+        <definition>std::vector&lt; std::vector&lt; Pointout &gt; &gt; Loop&lt; T &gt;::TSAllout</definition>
+        <argsstring></argsstring>
+        <name>TSAllout</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="375" column="13" bodyfile="src/Arrays.h" bodystart="375" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1aedc47e5afc03119d884ef9e557b9dff9" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Loop&lt; T &gt;::windstep</definition>
+        <argsstring></argsstring>
+        <name>windstep</name>
+        <initializer>= 1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="377" column="5" bodyfile="src/Arrays.h" bodystart="377" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1af0f56c1060a30f5e3a336f7104b6ecf1" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Loop&lt; T &gt;::atmpstep</definition>
+        <argsstring></argsstring>
+        <name>atmpstep</name>
+        <initializer>= 1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="378" column="5" bodyfile="src/Arrays.h" bodystart="378" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1aa05506805cd0f3bac5cf5685d9c0fdaa" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Loop&lt; T &gt;::rainstep</definition>
+        <argsstring></argsstring>
+        <name>rainstep</name>
+        <initializer>= 1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="379" column="5" bodyfile="src/Arrays.h" bodystart="379" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a9b2d264be27b75bf914c708dd79e8527" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool Loop&lt; T &gt;::winduniform</definition>
+        <argsstring></argsstring>
+        <name>winduniform</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="381" column="6" bodyfile="src/Arrays.h" bodystart="381" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1aa27720775868f01f2274224b2b21d38e" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool Loop&lt; T &gt;::rainuniform</definition>
+        <argsstring></argsstring>
+        <name>rainuniform</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="382" column="6" bodyfile="src/Arrays.h" bodystart="382" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a49bcc692450e05b0bd04bc60bca18047" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool Loop&lt; T &gt;::atmpuniform</definition>
+        <argsstring></argsstring>
+        <name>atmpuniform</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="383" column="6" bodyfile="src/Arrays.h" bodystart="383" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1ac75c92e103d160837c449ff730521902" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Loop&lt; T &gt;::uwinduni</definition>
+        <argsstring></argsstring>
+        <name>uwinduni</name>
+        <initializer>= T(0.0)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="385" column="3" bodyfile="src/Arrays.h" bodystart="385" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1ac50cfd6c56a5bc1fec2ce06664388091" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Loop&lt; T &gt;::vwinduni</definition>
+        <argsstring></argsstring>
+        <name>vwinduni</name>
+        <initializer>= T(0.0)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="386" column="3" bodyfile="src/Arrays.h" bodystart="386" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a06049126383ba4d25a35d860f0a643c7" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Loop&lt; T &gt;::atmpuni</definition>
+        <argsstring></argsstring>
+        <name>atmpuni</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="387" column="3" bodyfile="src/Arrays.h" bodystart="387" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1adcd4e074aa287a9e0f726897acc83449" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Loop&lt; T &gt;::rainuni</definition>
+        <argsstring></argsstring>
+        <name>rainuni</name>
+        <initializer>= T(0.0)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="388" column="3" bodyfile="src/Arrays.h" bodystart="388" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1ab17d60e0e287e4cee5aea17a2ef41bdd" prot="public" static="no" mutable="no">
+        <type>dim3</type>
+        <definition>dim3 Loop&lt; T &gt;::blockDim</definition>
+        <argsstring></argsstring>
+        <name>blockDim</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="392" column="6" bodyfile="src/Arrays.h" bodystart="392" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a93929edda1b29e1230cf44fb08f8791d" prot="public" static="no" mutable="no">
+        <type>dim3</type>
+        <definition>dim3 Loop&lt; T &gt;::gridDim</definition>
+        <argsstring></argsstring>
+        <name>gridDim</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="393" column="6" bodyfile="src/Arrays.h" bodystart="393" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1aef744b50597ad9f604ef70c7012e81d7" prot="public" static="no" mutable="no">
+        <type>const int</type>
+        <definition>const int Loop&lt; T &gt;::num_streams</definition>
+        <argsstring></argsstring>
+        <name>num_streams</name>
+        <initializer>= 4</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="395" column="11" bodyfile="src/Arrays.h" bodystart="395" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1ad216698448a4842ab0ba783c67ab3301" prot="public" static="no" mutable="no">
+        <type>cudaStream_t</type>
+        <definition>cudaStream_t Loop&lt; T &gt;::streams[4]</definition>
+        <argsstring>[4]</argsstring>
+        <name>streams</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="397" column="14" bodyfile="src/Arrays.h" bodystart="397" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1aeb1af056bf9bff528a186d443b8c8e1c" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Loop&lt; T &gt;::epsilon</definition>
+        <argsstring></argsstring>
+        <name>epsilon</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="399" column="3" bodyfile="src/Arrays.h" bodystart="399" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a324fbf87aacab45d22f4ad92cb2a2ffa" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Loop&lt; T &gt;::hugeposval</definition>
+        <argsstring></argsstring>
+        <name>hugeposval</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="400" column="3" bodyfile="src/Arrays.h" bodystart="400" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_loop_1a4f456faf0de9b08f099e0dd44c790388" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Loop&lt; T &gt;::hugenegval</definition>
+        <argsstring></argsstring>
+        <name>hugenegval</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="401" column="3" bodyfile="src/Arrays.h" bodystart="401" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="358" column="1" bodyfile="src/Arrays.h" bodystart="359" bodyend="403"/>
+    <listofallmembers>
+      <member refid="struct_loop_1af0f56c1060a30f5e3a336f7104b6ecf1" prot="public" virt="non-virtual"><scope>Loop</scope><name>atmpstep</name></member>
+      <member refid="struct_loop_1a06049126383ba4d25a35d860f0a643c7" prot="public" virt="non-virtual"><scope>Loop</scope><name>atmpuni</name></member>
+      <member refid="struct_loop_1a49bcc692450e05b0bd04bc60bca18047" prot="public" virt="non-virtual"><scope>Loop</scope><name>atmpuniform</name></member>
+      <member refid="struct_loop_1ab17d60e0e287e4cee5aea17a2ef41bdd" prot="public" virt="non-virtual"><scope>Loop</scope><name>blockDim</name></member>
+      <member refid="struct_loop_1ac0c824d5c4752e9d273052879f516196" prot="public" virt="non-virtual"><scope>Loop</scope><name>dt</name></member>
+      <member refid="struct_loop_1a2450b9f51147e5b489ffabb358382edf" prot="public" virt="non-virtual"><scope>Loop</scope><name>dtmax</name></member>
+      <member refid="struct_loop_1aeb1af056bf9bff528a186d443b8c8e1c" prot="public" virt="non-virtual"><scope>Loop</scope><name>epsilon</name></member>
+      <member refid="struct_loop_1a93929edda1b29e1230cf44fb08f8791d" prot="public" virt="non-virtual"><scope>Loop</scope><name>gridDim</name></member>
+      <member refid="struct_loop_1a4f456faf0de9b08f099e0dd44c790388" prot="public" virt="non-virtual"><scope>Loop</scope><name>hugenegval</name></member>
+      <member refid="struct_loop_1a324fbf87aacab45d22f4ad92cb2a2ffa" prot="public" virt="non-virtual"><scope>Loop</scope><name>hugeposval</name></member>
+      <member refid="struct_loop_1a2166bcfff33532161e920418ba731e53" prot="public" virt="non-virtual"><scope>Loop</scope><name>indNextoutputtime</name></member>
+      <member refid="struct_loop_1ac91b2b218fc8bdf6c736627084f3adfc" prot="public" virt="non-virtual"><scope>Loop</scope><name>nextoutputtime</name></member>
+      <member refid="struct_loop_1a83d5311ba65215aa0d66aecc90bfd3b1" prot="public" virt="non-virtual"><scope>Loop</scope><name>nstep</name></member>
+      <member refid="struct_loop_1a5f4b6a2a12188e1aefde0fe49979b5dc" prot="public" virt="non-virtual"><scope>Loop</scope><name>nstepout</name></member>
+      <member refid="struct_loop_1adb71998a04e94f8771c19f81d1157ca6" prot="public" virt="non-virtual"><scope>Loop</scope><name>nTSsteps</name></member>
+      <member refid="struct_loop_1aef744b50597ad9f604ef70c7012e81d7" prot="public" virt="non-virtual"><scope>Loop</scope><name>num_streams</name></member>
+      <member refid="struct_loop_1aa05506805cd0f3bac5cf5685d9c0fdaa" prot="public" virt="non-virtual"><scope>Loop</scope><name>rainstep</name></member>
+      <member refid="struct_loop_1adcd4e074aa287a9e0f726897acc83449" prot="public" virt="non-virtual"><scope>Loop</scope><name>rainuni</name></member>
+      <member refid="struct_loop_1aa27720775868f01f2274224b2b21d38e" prot="public" virt="non-virtual"><scope>Loop</scope><name>rainuniform</name></member>
+      <member refid="struct_loop_1ad216698448a4842ab0ba783c67ab3301" prot="public" virt="non-virtual"><scope>Loop</scope><name>streams</name></member>
+      <member refid="struct_loop_1a9a526d0edf22bbfba6121acdd7eb585b" prot="public" virt="non-virtual"><scope>Loop</scope><name>totaltime</name></member>
+      <member refid="struct_loop_1aec82658bbe1e6aa12dc62648b7c8f71f" prot="public" virt="non-virtual"><scope>Loop</scope><name>TSAllout</name></member>
+      <member refid="struct_loop_1ac75c92e103d160837c449ff730521902" prot="public" virt="non-virtual"><scope>Loop</scope><name>uwinduni</name></member>
+      <member refid="struct_loop_1ac50cfd6c56a5bc1fec2ce06664388091" prot="public" virt="non-virtual"><scope>Loop</scope><name>vwinduni</name></member>
+      <member refid="struct_loop_1aedc47e5afc03119d884ef9e557b9dff9" prot="public" virt="non-virtual"><scope>Loop</scope><name>windstep</name></member>
+      <member refid="struct_loop_1a9b2d264be27b75bf914c708dd79e8527" prot="public" virt="non-virtual"><scope>Loop</scope><name>winduniform</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_block_p" kind="struct" language="C++" prot="public">
+    <compoundname>BlockP</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_block_p_1a5af5e17893cd56c272274e5658bdb8d7" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* BlockP&lt; T &gt;::xo</definition>
+        <argsstring></argsstring>
+        <name>xo</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="234" column="3" bodyfile="src/Arrays.h" bodystart="234" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a7f7a582523839c2905d05bac58b7ea1e" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T * BlockP&lt; T &gt;::yo</definition>
+        <argsstring></argsstring>
+        <name>yo</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="234" column="6" bodyfile="src/Arrays.h" bodystart="234" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a8e336147ca4bec57a7b16f794bfcf98d" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* BlockP&lt; T &gt;::BotLeft</definition>
+        <argsstring></argsstring>
+        <name>BotLeft</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="235" column="5" bodyfile="src/Arrays.h" bodystart="235" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a740eaf3d6b13954bfb54a128b717c5db" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int * BlockP&lt; T &gt;::BotRight</definition>
+        <argsstring></argsstring>
+        <name>BotRight</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="235" column="13" bodyfile="src/Arrays.h" bodystart="235" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1ae27b64dc4a1886020123699e18281456" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* BlockP&lt; T &gt;::TopLeft</definition>
+        <argsstring></argsstring>
+        <name>TopLeft</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="236" column="5" bodyfile="src/Arrays.h" bodystart="236" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a59251386f69008454603e88458804967" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int * BlockP&lt; T &gt;::TopRight</definition>
+        <argsstring></argsstring>
+        <name>TopRight</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="236" column="13" bodyfile="src/Arrays.h" bodystart="236" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a146d79b3807d8272fd7cc9b11968c6fa" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* BlockP&lt; T &gt;::LeftBot</definition>
+        <argsstring></argsstring>
+        <name>LeftBot</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="237" column="5" bodyfile="src/Arrays.h" bodystart="237" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1ac239e628c84b6da629630247d80a66e9" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int * BlockP&lt; T &gt;::LeftTop</definition>
+        <argsstring></argsstring>
+        <name>LeftTop</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="237" column="13" bodyfile="src/Arrays.h" bodystart="237" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a3d61984094f55f18d969f1c9837b6201" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* BlockP&lt; T &gt;::RightBot</definition>
+        <argsstring></argsstring>
+        <name>RightBot</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="238" column="5" bodyfile="src/Arrays.h" bodystart="238" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1adc50059e5f397597c9773fd58bc6c13f" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int * BlockP&lt; T &gt;::RightTop</definition>
+        <argsstring></argsstring>
+        <name>RightTop</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="238" column="14" bodyfile="src/Arrays.h" bodystart="238" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a83447e3a07552fb0d212b8e63e429848" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* BlockP&lt; T &gt;::level</definition>
+        <argsstring></argsstring>
+        <name>level</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="240" column="5" bodyfile="src/Arrays.h" bodystart="240" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a0a7885212ce2cb05836b726837a56b49" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* BlockP&lt; T &gt;::active</definition>
+        <argsstring></argsstring>
+        <name>active</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="241" column="5" bodyfile="src/Arrays.h" bodystart="241" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1a352b9d6faaf4d3f4f0299d764f1db2d7" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* BlockP&lt; T &gt;::activeCell</definition>
+        <argsstring></argsstring>
+        <name>activeCell</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="242" column="5" bodyfile="src/Arrays.h" bodystart="242" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1ae50af1069ae3564dc41221be995b6cf6" prot="public" static="no" mutable="no">
+        <type><ref refid="structmaskinfo" kindref="compound">maskinfo</ref></type>
+        <definition>maskinfo BlockP&lt; T &gt;::mask</definition>
+        <argsstring></argsstring>
+        <name>mask</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="244" column="10" bodyfile="src/Arrays.h" bodystart="244" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_block_p_1aaa9283c4162b2f11207a7f553f4d6fc1" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="structoutzone_b" kindref="compound">outzoneB</ref> &gt;</type>
+        <definition>std::vector&lt;outzoneB&gt; BlockP&lt; T &gt;::outZone</definition>
+        <argsstring></argsstring>
+        <name>outZone</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="246" column="13" bodyfile="src/Arrays.h" bodystart="246" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="1">
+        <label>BlockP&lt; T &gt;</label>
+        <link refid="struct_block_p"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>mask</edgelabel>
+        </childnode>
+      </node>
+      <node id="2">
+        <label>maskinfo</label>
+        <link refid="structmaskinfo"/>
+      </node>
+    </collaborationgraph>
+    <location file="src/Arrays.h" line="232" column="1" bodyfile="src/Arrays.h" bodystart="233" bodyend="247"/>
+    <listofallmembers>
+      <member refid="struct_block_p_1a0a7885212ce2cb05836b726837a56b49" prot="public" virt="non-virtual"><scope>BlockP</scope><name>active</name></member>
+      <member refid="struct_block_p_1a352b9d6faaf4d3f4f0299d764f1db2d7" prot="public" virt="non-virtual"><scope>BlockP</scope><name>activeCell</name></member>
+      <member refid="struct_block_p_1a8e336147ca4bec57a7b16f794bfcf98d" prot="public" virt="non-virtual"><scope>BlockP</scope><name>BotLeft</name></member>
+      <member refid="struct_block_p_1a740eaf3d6b13954bfb54a128b717c5db" prot="public" virt="non-virtual"><scope>BlockP</scope><name>BotRight</name></member>
+      <member refid="struct_block_p_1a146d79b3807d8272fd7cc9b11968c6fa" prot="public" virt="non-virtual"><scope>BlockP</scope><name>LeftBot</name></member>
+      <member refid="struct_block_p_1ac239e628c84b6da629630247d80a66e9" prot="public" virt="non-virtual"><scope>BlockP</scope><name>LeftTop</name></member>
+      <member refid="struct_block_p_1a83447e3a07552fb0d212b8e63e429848" prot="public" virt="non-virtual"><scope>BlockP</scope><name>level</name></member>
+      <member refid="struct_block_p_1ae50af1069ae3564dc41221be995b6cf6" prot="public" virt="non-virtual"><scope>BlockP</scope><name>mask</name></member>
+      <member refid="struct_block_p_1aaa9283c4162b2f11207a7f553f4d6fc1" prot="public" virt="non-virtual"><scope>BlockP</scope><name>outZone</name></member>
+      <member refid="struct_block_p_1a3d61984094f55f18d969f1c9837b6201" prot="public" virt="non-virtual"><scope>BlockP</scope><name>RightBot</name></member>
+      <member refid="struct_block_p_1adc50059e5f397597c9773fd58bc6c13f" prot="public" virt="non-virtual"><scope>BlockP</scope><name>RightTop</name></member>
+      <member refid="struct_block_p_1ae27b64dc4a1886020123699e18281456" prot="public" virt="non-virtual"><scope>BlockP</scope><name>TopLeft</name></member>
+      <member refid="struct_block_p_1a59251386f69008454603e88458804967" prot="public" virt="non-virtual"><scope>BlockP</scope><name>TopRight</name></member>
+      <member refid="struct_block_p_1a5af5e17893cd56c272274e5658bdb8d7" prot="public" virt="non-virtual"><scope>BlockP</scope><name>xo</name></member>
+      <member refid="struct_block_p_1a7f7a582523839c2905d05bac58b7ea1e" prot="public" virt="non-virtual"><scope>BlockP</scope><name>yo</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

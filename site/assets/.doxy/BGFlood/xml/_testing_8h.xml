@@ -1,0 +1,1779 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="_testing_8h" kind="file" language="C++">
+    <compoundname>Testing.h</compoundname>
+    <includes refid="_general_8h" local="yes">General.h</includes>
+    <includes refid="_param_8h" local="yes">Param.h</includes>
+    <includes refid="_write__txtlog_8h" local="yes">Write_txtlog.h</includes>
+    <includes refid="_read_input_8h" local="yes">ReadInput.h</includes>
+    <includes refid="_read_forcing_8h" local="yes">ReadForcing.h</includes>
+    <includes refid="_util___c_p_u_8h" local="yes">Util_CPU.h</includes>
+    <includes refid="_arrays_8h" local="yes">Arrays.h</includes>
+    <includes refid="_forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="_mesh_8h" local="yes">Mesh.h</includes>
+    <includes refid="_setup___g_p_u_8h" local="yes">Setup_GPU.h</includes>
+    <includes refid="_mainloop_8h" local="yes">Mainloop.h</includes>
+    <includes refid="_flow_c_p_u_8h" local="yes">FlowCPU.h</includes>
+    <includes refid="_flow_g_p_u_8h" local="yes">FlowGPU.h</includes>
+    <includes refid="_adaptation_8h" local="yes">Adaptation.h</includes>
+    <includes refid="utctime_8h" local="yes">utctime.h</includes>
+    <includedby refid="_adaptation_8h" local="yes">src/Adaptation.h</includedby>
+    <includedby refid="_b_g___flood_8h" local="yes">src/BG_Flood.h</includedby>
+    <includedby refid="_testing_8cu" local="yes">src/Testing.cu</includedby>
+    <incdepgraph>
+      <node id="29">
+        <label>ReadForcing.h</label>
+        <link refid="_read_forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="55">
+        <label>Multilayer.h</label>
+        <link refid="_multilayer_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>Write_netcdf.h</label>
+        <link refid="_write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="1">
+        <label>src/Testing.h</label>
+        <link refid="_testing_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="47" relation="include">
+        </childnode>
+        <childnode refid="52" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+        <childnode refid="56" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="48">
+        <label>FlowGPU.h</label>
+        <link refid="_flow_g_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+        <childnode refid="49" relation="include">
+        </childnode>
+        <childnode refid="50" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="51" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="46">
+        <label>ConserveElevation.h</label>
+        <link refid="_conserve_elevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="35">
+        <label>Halo.h</label>
+        <link refid="_halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="46" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="51">
+        <label>Reimann.h</label>
+        <link refid="_reimann_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>Boundary.h</label>
+        <link refid="_boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>Forcing.h</label>
+        <link refid="_forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>InitEvolv.h</label>
+        <link refid="_init_evolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="40">
+        <label>Updateforcing.h</label>
+        <link refid="_updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="52">
+        <label>FlowCPU.h</label>
+        <link refid="_flow_c_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+        <childnode refid="49" relation="include">
+        </childnode>
+        <childnode refid="50" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="51" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="27">
+        <label>Util_CPU.h</label>
+        <link refid="_util___c_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Write_txtlog.h</label>
+        <link refid="_write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Gradients.h</label>
+        <link refid="_gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="49">
+        <label>Advection.h</label>
+        <link refid="_advection_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="23">
+        <label>Input.h</label>
+        <link refid="_input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>ReadInput.h</label>
+        <link refid="_read_input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Param.h</label>
+        <link refid="_param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Poly.h</label>
+        <link refid="_poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="56">
+        <label>Adaptation.h</label>
+        <link refid="_adaptation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="57" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="34">
+        <label>Setup_GPU.h</label>
+        <link refid="_setup___g_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>Kurganov.h</label>
+        <link refid="_kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+      <node id="41">
+        <label>InitialConditions.h</label>
+        <link refid="_initial_conditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="50">
+        <label>Friction.h</label>
+        <link refid="_friction_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="37">
+        <label>GridManip.h</label>
+        <link refid="_grid_manip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>Mesh.h</label>
+        <link refid="_mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="57">
+        <label>AdaptCriteria.h</label>
+        <link refid="_adapt_criteria_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="47">
+        <label>Mainloop.h</label>
+        <link refid="_mainloop_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+        <childnode refid="52" relation="include">
+        </childnode>
+        <childnode refid="53" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="54" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="_general_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>Arrays.h</label>
+        <link refid="_arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="54">
+        <label>FlowMLGPU.h</label>
+        <link refid="_flow_m_l_g_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="55" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+        <childnode refid="49" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="53">
+        <label>Meanmax.h</label>
+        <link refid="_meanmax_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="32">
+        <label>MemManagement.h</label>
+        <link refid="_mem_management_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Read_netcdf.h</label>
+        <link refid="_read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Spherical.h</label>
+        <link refid="_spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="1">
+        <label>src/Testing.h</label>
+        <link refid="_testing_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/BG_Flood.h</label>
+        <link refid="_b_g___flood_8h_source"/>
+      </node>
+      <node id="2">
+        <label>src/Adaptation.h</label>
+        <link refid="_adaptation_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="_testing_8h_1a1803abe24ad2daba8d11e5e46c783762" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool Testing</definition>
+        <argsstring>(Param XParam, Forcing&lt; float &gt; XForcing, Model&lt; T &gt; XModel, Model&lt; T &gt; XModel_g)</argsstring>
+        <name>Testing</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_forcing" kindref="compound">Forcing</ref>&lt; float &gt;</type>
+          <declname>XForcing</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel_g</declname>
+        </param>
+        <briefdescription>
+<para>Wrapping function for all the inbuilt test This function is the entry point to other function below. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Test 0 is a gausian hump propagating on a flat uniorm cartesian mesh (both GPU and CPU version tested) Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU or CPU version) Test 2 Gaussian wave on Cartesian grid (same as test 0): CPU vs GPU (GPU required) Test 3 Test Reduction algorithm Test 4 Boundary condition test Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme Test 6 Mass conservation on a slope Test 7 Mass conservation with rain fall on grid Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map) Test 9 Zoned output (test zoned outputs with adaptative grid) Test 10 Initial Loss / Continuous Loss on a slope, under uniform rain Test 11 Wet/dry Instability test with Conserve Elevation Test 12 Calendar time to second conversion Test 13 Multi bathy and roughness map input Test 14 Test AOI bnds aswall to start with Test 15 Flexible times reading</para>
+<para>Test 99 Run all the test with test number &lt; 99.</para>
+<para>The following test are not independant, they are tools to check or debug a personnal case Test 998 Compare resuts between the CPU and GPU Flow functions (GPU required) Test 999 Run the main loop and engine in debug mode</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_forcing" kindref="compound">Forcing</ref> data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Host model data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel_g</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Device model data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if all the tests passed </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="25" column="18" bodyfile="src/Testing.cu" bodystart="42" bodyend="400" declfile="src/Testing.h" declline="25" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1ae86d66a5e761a12f3957ee5927c690bd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool GaussianHumptest</definition>
+        <argsstring>(T zsnit, int gpu, bool compare)</argsstring>
+        <name>GaussianHumptest</name>
+        <param>
+          <type>T</type>
+          <declname>zsnit</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>compare</declname>
+        </param>
+        <briefdescription>
+<para>Gaussian hump propagation test. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>!</para>
+<para>This function tests the full hydrodynamics model and compares the results with pre-conmputed (Hard wired) values The function creates it own model setup and mesh independantly to what the user might want to do The setup consist of a centrally located gaussian hump radiating away The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk This function also compares the result of the GPU and CPU code (until they diverge) <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>zsnit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial water surface elevation at the centre of the domain </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU device number to use (-1 for CPU only) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>compare</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>If true, compare GPU and CPU results (GPU required) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the test passed (results within 1e-6 of reference values) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="27" column="18" bodyfile="src/Testing.cu" bodystart="418" bodyend="691" declfile="src/Testing.h" declline="27" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1ac72746cb1a6853204ce8c741857f9804" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void TestingOutput</definition>
+        <argsstring>(Param XParam, Model&lt; T &gt; XModel)</argsstring>
+        <name>TestingOutput</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <briefdescription>
+<para>OUTDATED ?Test the output functions of the model OUTDATED? This function tests the output functions of the model by running a simple simulation and writing the output to a netcdf file. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> structure (CPU) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="30" column="18" bodyfile="src/Testing.cu" bodystart="5537" bodyend="5613" declfile="src/Testing.h" declline="30" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1ad37a8675a32dfb60da77c258b0b7306c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void copyID2var</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, T *z)</argsstring>
+        <name>copyID2var</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>z</declname>
+        </param>
+        <briefdescription>
+<para>Copies block ID to an output variable This function copies block info to an output variable This function is somewhat useful when checking bugs in the mesh refinement or coarsening one needs to provide a pointer(z) allocated on the CPU to store the clockinfo This fonction only works on CPU. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>!</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters (only nblk, blkwidth, xo, yo, xmax, ymax and dx are used) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters (only active is used) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>z</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to fill </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="31" column="18" bodyfile="src/Testing.cu" bodystart="5629" bodyend="5644" declfile="src/Testing.h" declline="31" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a1b34ab7d726ca571f42f637756cd8120" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void copyBlockinfo2var</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, int *blkinfo, T *z)</argsstring>
+        <name>copyBlockinfo2var</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>blkinfo</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>z</declname>
+        </param>
+        <briefdescription>
+<para>Copies block info to an output variable This function copies block info to an output variable This function is somewhat useful when checking bugs in the mesh refinement or coarsening one needs to provide a pointer(z) allocated on the CPU to store the clockinfo This fonction only works on CPU. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>!</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters (only nblk, blkwidth, xo, yo, xmax, ymax and dx are used) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters (only active is used) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>blkinfo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information array (CPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>z</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to fill </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="32" column="18" bodyfile="src/Testing.cu" bodystart="5662" bodyend="5678" declfile="src/Testing.h" declline="32" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a4974ca541eb0c671b0b437f594b63aba" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void CompareCPUvsGPU</definition>
+        <argsstring>(Param XParam, Model&lt; T &gt; XModel, Model&lt; T &gt; XModel_g, std::vector&lt; std::string &gt; varlist, bool checkhalo)</argsstring>
+        <name>CompareCPUvsGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel_g</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; std::string &gt;</type>
+          <declname>varlist</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>checkhalo</declname>
+        </param>
+        <briefdescription>
+<para>Compares the Variables in a CPU model and a GPU models This function is quite useful when checking both are identical enough one needs to provide a list (vector&lt;string&gt;) of variable to check. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> structure (CPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel_g</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> structure (GPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>varlist</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>List of variable names to check (as in OutputVarMap) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>checkhalo</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>true if halo cells should be checked, false otherwise </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="33" column="18" bodyfile="src/Testing.cu" bodystart="5693" bodyend="5754" declfile="src/Testing.h" declline="33" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1acc6f019daa444fd2d639ba48ff173d15" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>std::vector&lt; float &gt;</type>
+        <definition>std::vector&lt;float&gt; Raintestmap</definition>
+        <argsstring>(int gpu, int dimf, T zinit)</argsstring>
+        <name>Raintestmap</name>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>dimf</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>zinit</declname>
+        </param>
+        <briefdescription>
+<para>Test the rain input options and return the flux at the bottom of the slope This function return the flux at the bottom of the 3 part slope for different types of rain forcings using the test case based on Iwagaki1955. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! \fnstd::vector&lt;float&gt; Raintestmap(int gpu, int dimf, T zinit) <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU device to use (or -1 for CPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dimf</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Dimension of the rain forcing (1=uniform, 3=2 </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zinit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial water level </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>vector of flux at the bottom of the slope </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="35" column="25" bodyfile="src/Testing.cu" bodystart="3062" bodyend="3448" declfile="src/Testing.h" declline="35" declcolumn="25"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a6a029027bd2060a3ecad9f8d09807962" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool Raintestinput</definition>
+        <argsstring>(int gpu)</argsstring>
+        <name>Raintestinput</name>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <briefdescription>
+<para>Test the rain input options This function tests the different inputs for rain forcing. This test is based on the paper Aureli2020, the 3 slopes test with regional rain. The experiment has been presented in Iwagaki1955. The first test compares a time varying rain input using a uniform time serie forcing and a time varying 2D field (with same value). The second test check the 3D rain forcing (comparing it to expected values). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU device to use (or -1 for CPU) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if test passed </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="36" column="6" bodyfile="src/Testing.cu" bodystart="2996" bodyend="3051" declfile="src/Testing.h" declline="36" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a80d8f8532ece9c965802d60aa031d46d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool Rivertest</definition>
+        <argsstring>(T zsnit, int gpu)</argsstring>
+        <name>Rivertest</name>
+        <param>
+          <type>T</type>
+          <declname>zsnit</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <briefdescription>
+<para><ref refid="class_river" kindref="compound">River</ref> inflow mass conservation test. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>!</para>
+<para>This function tests the mass conservation of the vertical injection (used for rivers) The function creates it own model setup and mesh independantly to what the user might want to do This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results with zsnit=0.1 that is approx 20 steps <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>zsnit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial water surface elevation at the centre of the domain </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU device number to use (-1 for CPU only) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the test is successful (mass is conserved within 0.1% of the theoretical value) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="37" column="18" bodyfile="src/Testing.cu" bodystart="706" bodyend="928" declfile="src/Testing.h" declline="37" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a7b6329079d1c7902af71dd17677dae15" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool MassConserveSteepSlope</definition>
+        <argsstring>(T zsnit, int gpu)</argsstring>
+        <name>MassConserveSteepSlope</name>
+        <param>
+          <type>T</type>
+          <declname>zsnit</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <briefdescription>
+<para><ref refid="class_river" kindref="compound">River</ref> inflow mass conservation test on steep slope. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>!</para>
+<para>This function tests the mass conservation of the vertical injection (used for rivers) The function creates it own model setup and mesh independantly to what the user might want to do This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results with zsnit=0.1 that is approx 20 steps <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>zsnit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial water surface elevation at the centre of the domain </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU device number to use (-1 for CPU only) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the test passed (mass conservation within 5%) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="38" column="18" bodyfile="src/Testing.cu" bodystart="945" bodyend="1191" declfile="src/Testing.h" declline="38" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a31b092b81a7e3ff99df93441e5d0bb62" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool Raintest</definition>
+        <argsstring>(T zsnit, int gpu, float alpha, int engine)</argsstring>
+        <name>Raintest</name>
+        <param>
+          <type>T</type>
+          <declname>zsnit</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>alpha</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>engine</declname>
+        </param>
+        <briefdescription>
+<para>Test the rain input and mass conservation This function tests the mass conservation of the spacial injection (used to model rain on grid) The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsnit=0.0 is dry) and runs for 0.1s before comparing results with zsnit=0.1 that is approx 20 steps. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>zsnit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial water level </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU device to use (or -1 for CPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>alpha</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Slope of the bathymetry in % </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>engine</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Engine to use (0=non-hydrostatic, 1=hydrostatic) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if test passed </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="39" column="18" bodyfile="src/Testing.cu" bodystart="2830" bodyend="2982" declfile="src/Testing.h" declline="39" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a1f58fd96fa0d9473ed0c863d5b789485" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool testboundaries</definition>
+        <argsstring>(Param XParam, T maxslope)</argsstring>
+        <name>testboundaries</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>maxslope</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="40" column="18" bodyfile="src/Testing.cu" bodystart="2019" bodyend="2121" declfile="src/Testing.h" declline="40" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a0755c7670bec1082029464abce5504ad" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool ZoneOutputTest</definition>
+        <argsstring>(int nzones, T zsinit)</argsstring>
+        <name>ZoneOutputTest</name>
+        <param>
+          <type>int</type>
+          <declname>nzones</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>zsinit</declname>
+        </param>
+        <briefdescription>
+<para>Test the zoned output This function test the zoned output for a basic configuration. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>nzones</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of zones to test (1 or 3) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zsinit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial water level </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if test passed </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="41" column="18" bodyfile="src/Testing.cu" bodystart="3460" bodyend="3675" declfile="src/Testing.h" declline="41" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1a6645fef2658aa8f5bb8f72823d17019c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool Rainlossestest</definition>
+        <argsstring>(T zsnit, int gpu, float alpha)</argsstring>
+        <name>Rainlossestest</name>
+        <param>
+          <type>T</type>
+          <declname>zsnit</declname>
+          <defname>zsinit</defname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>alpha</declname>
+        </param>
+        <briefdescription>
+<para>Test the Initial and Continuous losses implementation This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain. The function creates its own model setup and mesh independantly to what the user inputs. This starts with a initial water level (zsinit=0.0 is dry) and runs for 1s comparing results every 0.1s (that is approx 20 steps) </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>zsinit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial water level </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU device to use (or -1 for CPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>alpha</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Tolerance for the test (relative error) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if test passed </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="42" column="18" bodyfile="src/Testing.cu" bodystart="3692" bodyend="3911" declfile="src/Testing.h" declline="42" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1aee83c778b6d86fde8c183b3a896cdc71" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool TestMultiBathyRough</definition>
+        <argsstring>(int gpu, T ref, int secnario)</argsstring>
+        <name>TestMultiBathyRough</name>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>ref</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>secnario</declname>
+          <defname>scenario</defname>
+        </param>
+        <briefdescription>
+<para>Test the reading of multiple bathymetry and roughness files. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>!</para>
+<para>This function creates bathy and roughtness files and tests their reading (and interpolation) The objectif is particularly to test multi bathy/roughness inputs and value/file input.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU to use (-1 for CPU only) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>ref</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference elevation for the bathymetry files </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>scenario</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scenario to test (0: R1 in the middle of the domain, 1: R1 covering the whole domain) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if test passed (i.e. the model runs without crashing and gives a reasonable result) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="43" column="18" bodyfile="src/Testing.cu" bodystart="4417" bodyend="4687" declfile="src/Testing.h" declline="43" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_testing_8h_1ad474adad94a69be09516b5f538fc460a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool TestFlexibleOutputTimes</definition>
+        <argsstring>(int gpu, T ref, int scenario)</argsstring>
+        <name>TestFlexibleOutputTimes</name>
+        <param>
+          <type>int</type>
+          <declname>gpu</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>ref</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>scenario</declname>
+        </param>
+        <briefdescription>
+<para>Test the reading of flexible output times. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>This function creates a case set-up with a param file, read it. It tests the reading and default values used for times outputs. It checks the vectors for time outputs. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>gpu</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>GPU to use (-1 for CPU only) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>ref</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference elevation for the bathymetry files </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>scenario</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scenario to test (not used here but could be used to test different input cases) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if test passed (i.e. the model runs without crashing and gives a reasonable result) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Testing.h" line="44" column="18" bodyfile="src/Testing.cu" bodystart="4703" bodyend="4807" declfile="src/Testing.h" declline="44" declcolumn="18"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>TESTING_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>TESTING_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Write_txtlog.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;ReadInput.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;ReadForcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Arrays.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Mesh.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Setup_GPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Mainloop.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;FlowCPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;FlowGPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Adaptation.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;utctime.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Testing(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_forcing" kindref="compound">Forcing&lt;float&gt;</ref><sp/>XForcing,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel_g);</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>GaussianHumptest(T<sp/>zsnit,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu,</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>compare);</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TestingOutput(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>copyID2var(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T*<sp/>z);</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>copyBlockinfo2var(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>blkinfo,<sp/>T*<sp/>z);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>CompareCPUvsGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel_g,<sp/>std::vector&lt;std::string&gt;<sp/>varlist,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>checkhalo);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight><highlight class="comment">//template<sp/>&lt;class<sp/>T&gt;<sp/>void<sp/>Gaussianhump(Param<sp/>XParam,<sp/>Model&lt;T&gt;<sp/>XModel,<sp/>Model&lt;T&gt;<sp/>XModel_g);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>std::vector&lt;float&gt;<sp/>Raintestmap(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>dimf,<sp/>T<sp/>zinit);</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Raintestinput(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu);</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Rivertest(T<sp/>zsnit,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu);</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>MassConserveSteepSlope(T<sp/>zsnit,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu);</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Raintest(T<sp/>zsnit,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>alpha,</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>engine);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>testboundaries(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/>T<sp/>maxslope);</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>ZoneOutputTest(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nzones,<sp/>T<sp/>zsinit);</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Rainlossestest(T<sp/>zsnit,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>alpha);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>TestMultiBathyRough(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu,<sp/>T<sp/>ref,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>secnario);</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>TestFlexibleOutputTimes(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>gpu,<sp/>T<sp/>ref,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>scenario);</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/Testing.h"/>
+  </compounddef>
+</doxygen>

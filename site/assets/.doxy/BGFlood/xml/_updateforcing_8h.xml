@@ -1,0 +1,2237 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="_updateforcing_8h" kind="file" language="C++">
+    <compoundname>Updateforcing.h</compoundname>
+    <includes refid="_general_8h" local="yes">General.h</includes>
+    <includes refid="_param_8h" local="yes">Param.h</includes>
+    <includes refid="_arrays_8h" local="yes">Arrays.h</includes>
+    <includes refid="_forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="_initial_conditions_8h" local="yes">InitialConditions.h</includes>
+    <includes refid="_mem_management_8h" local="yes">MemManagement.h</includes>
+    <includes refid="_read_forcing_8h" local="yes">ReadForcing.h</includes>
+    <includes refid="_grid_manip_8h" local="yes">GridManip.h</includes>
+    <includes refid="_util___c_p_u_8h" local="yes">Util_CPU.h</includes>
+    <includedby refid="_boundary_8h" local="yes">src/Boundary.h</includedby>
+    <includedby refid="_flow_c_p_u_8h" local="yes">src/FlowCPU.h</includedby>
+    <includedby refid="_flow_g_p_u_8h" local="yes">src/FlowGPU.h</includedby>
+    <includedby refid="_init_evolv_8h" local="yes">src/InitEvolv.h</includedby>
+    <includedby refid="_mainloop_8h" local="yes">src/Mainloop.h</includedby>
+    <includedby refid="_updateforcing_8cu" local="yes">src/Updateforcing.cu</includedby>
+    <incdepgraph>
+      <node id="41">
+        <label>ReadForcing.h</label>
+        <link refid="_read_forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>Write_netcdf.h</label>
+        <link refid="_write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="36">
+        <label>ConserveElevation.h</label>
+        <link refid="_conserve_elevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="29">
+        <label>Halo.h</label>
+        <link refid="_halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Boundary.h</label>
+        <link refid="_boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Forcing.h</label>
+        <link refid="_forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>InitEvolv.h</label>
+        <link refid="_init_evolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="1">
+        <label>src/Updateforcing.h</label>
+        <link refid="_updateforcing_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="31">
+        <label>Util_CPU.h</label>
+        <link refid="_util___c_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Write_txtlog.h</label>
+        <link refid="_write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Gradients.h</label>
+        <link refid="_gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="23">
+        <label>Input.h</label>
+        <link refid="_input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>ReadInput.h</label>
+        <link refid="_read_input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Param.h</label>
+        <link refid="_param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Poly.h</label>
+        <link refid="_poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="28">
+        <label>Setup_GPU.h</label>
+        <link refid="_setup___g_p_u_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>Kurganov.h</label>
+        <link refid="_kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+      <node id="26">
+        <label>InitialConditions.h</label>
+        <link refid="_initial_conditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="33">
+        <label>GridManip.h</label>
+        <link refid="_grid_manip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>Mesh.h</label>
+        <link refid="_mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="_general_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Arrays.h</label>
+        <link refid="_arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="27">
+        <label>MemManagement.h</label>
+        <link refid="_mem_management_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Read_netcdf.h</label>
+        <link refid="_read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Spherical.h</label>
+        <link refid="_spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="25">
+        <label>src/ReadForcing.h</label>
+        <link refid="_read_forcing_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>src/Multilayer.h</label>
+        <link refid="_multilayer_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>src/Write_netcdf.h</label>
+        <link refid="_write__netcdf_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/Testing.h</label>
+        <link refid="_testing_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/FlowGPU.h</label>
+        <link refid="_flow_g_p_u_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>src/ConserveElevation.h</label>
+        <link refid="_conserve_elevation_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>src/Halo.h</label>
+        <link refid="_halo_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>src/utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>src/Reimann.h</label>
+        <link refid="_reimann_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/Boundary.h</label>
+        <link refid="_boundary_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>src/InitEvolv.h</label>
+        <link refid="_init_evolv_8h_source"/>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Updateforcing.h</label>
+        <link refid="_updateforcing_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>src/FlowCPU.h</label>
+        <link refid="_flow_c_p_u_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>src/Gradients.h</label>
+        <link refid="_gradients_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>src/Advection.h</label>
+        <link refid="_advection_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>src/ReadInput.h</label>
+        <link refid="_read_input_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>src/Poly.h</label>
+        <link refid="_poly_8h_source"/>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/BG_Flood.h</label>
+        <link refid="_b_g___flood_8h_source"/>
+      </node>
+      <node id="8">
+        <label>src/Adaptation.h</label>
+        <link refid="_adaptation_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>src/Setup_GPU.h</label>
+        <link refid="_setup___g_p_u_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>src/Kurganov.h</label>
+        <link refid="_kurganov_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>src/InitialConditions.h</label>
+        <link refid="_initial_conditions_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>src/Mesh.cu</label>
+        <link refid="_mesh_8cu"/>
+      </node>
+      <node id="19">
+        <label>src/Friction.h</label>
+        <link refid="_friction_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>src/GridManip.h</label>
+        <link refid="_grid_manip_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>src/Mesh.h</label>
+        <link refid="_mesh_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>src/AdaptCriteria.h</label>
+        <link refid="_adapt_criteria_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/Mainloop.h</label>
+        <link refid="_mainloop_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="_flow_m_l_g_p_u_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/Meanmax.h</label>
+        <link refid="_meanmax_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>src/MemManagement.h</label>
+        <link refid="_mem_management_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>src/Read_netcdf.h</label>
+        <link refid="_read__netcdf_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>src/Spherical.h</label>
+        <link refid="_spherical_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="_updateforcing_8h_1a0705de14eb2d66a5da26fd5894f8985f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void updateforcing</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, Forcing&lt; float &gt; &amp;XForcing)</argsstring>
+        <name>updateforcing</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_loop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_forcing" kindref="compound">Forcing</ref>&lt; float &gt; &amp;</type>
+          <declname>XForcing</declname>
+        </param>
+        <briefdescription>
+<para>Update dynamic forcings for the current simulation step. Updates the dynamic forcing data for the current simulation time step. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_forcing" kindref="compound">Forcing</ref> data structure to update </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="15" column="18" bodyfile="src/Updateforcing.cu" bodystart="12" bodyend="38" declfile="src/Updateforcing.h" declline="15" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a3e39c9d702154fb36bfd0e673598dc0c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void Forcingthisstep</definition>
+        <argsstring>(Param XParam, double totaltime, DynForcingP&lt; float &gt; &amp;XDynForcing)</argsstring>
+        <name>Forcingthisstep</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>totaltime</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt; &amp;</type>
+          <declname>XDynForcing</declname>
+        </param>
+        <briefdescription>
+<para>Update dynamic forcing for the current simulation step. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Updates the dynamic forcing data for the current simulation time step, handling uniform and non-uniform cases.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>totaltime</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Current simulation time </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XDynForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Dynamic forcing structure to update </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="17" column="6" bodyfile="src/Updateforcing.cu" bodystart="54" bodyend="136" declfile="src/Updateforcing.h" declline="17" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a599e215dbff69667f7542b4d6489a8ac" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__device__ T</type>
+        <definition>__device__ T interpDyn2BUQ</definition>
+        <argsstring>(T x, T y, TexSetP Forcing)</argsstring>
+        <name>interpDyn2BUQ</name>
+        <param>
+          <type>T</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>y</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_tex_set_p" kindref="compound">TexSetP</ref></type>
+          <declname>Forcing</declname>
+        </param>
+        <briefdescription>
+<para>Interpolate dynamic forcing data at given coordinates on the GPU. Interpolates dynamic forcing data at specified coordinates using bilinear interpolation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>X-coordinate </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Y-coordinate </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername><ref refid="struct_forcing" kindref="compound">Forcing</ref></parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Dynamic forcing data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="19" column="26" bodyfile="src/Updateforcing.cu" bodystart="911" bodyend="923" declfile="src/Updateforcing.h" declline="19" declcolumn="26"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1ae983e63add8e6fddb8e05657c8c1e5bc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void AddwindforcingCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; Uwind, DynForcingP&lt; float &gt; Vwind, AdvanceP&lt; T &gt; XAdv)</argsstring>
+        <name>AddwindforcingCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Uwind</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Vwind</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_advance_p" kindref="compound">AdvanceP</ref>&lt; T &gt;</type>
+          <declname>XAdv</declname>
+        </param>
+        <briefdescription>
+<para>Add wind forcing to the model on the CPU. Adds wind forcing to the model based on wind data and current simulation time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Uwind</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>U-component of wind dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Vwind</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>V-component of wind dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XAdv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Advance data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="21" column="27" bodyfile="src/Updateforcing.cu" bodystart="795" bodyend="843" declfile="src/Updateforcing.h" declline="21" declcolumn="27"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a2e20aa963e644b76928293bf72fa9bbf" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void AddwindforcingGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; Uwind, DynForcingP&lt; float &gt; Vwind, AdvanceP&lt; T &gt; XAdv)</argsstring>
+        <name>AddwindforcingGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Uwind</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Vwind</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_advance_p" kindref="compound">AdvanceP</ref>&lt; T &gt;</type>
+          <declname>XAdv</declname>
+        </param>
+        <briefdescription>
+<para>Add wind forcing to the model on the GPU. Adds wind forcing to the model based on wind data and current simulation time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Uwind</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>U-component of wind dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Vwind</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>V-component of wind dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XAdv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Advance data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="22" column="29" bodyfile="src/Updateforcing.cu" bodystart="699" bodyend="743" declfile="src/Updateforcing.h" declline="22" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a4714a6b865498ee74a816b360f86b760" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void AddrainforcingCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; Rain, AdvanceP&lt; T &gt; XAdv)</argsstring>
+        <name>AddrainforcingCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Rain</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_advance_p" kindref="compound">AdvanceP</ref>&lt; T &gt;</type>
+          <declname>XAdv</declname>
+        </param>
+        <briefdescription>
+<para>Add rainfall forcing to the model on the CPU. Adds rainfall forcing to the model based on rainfall data and current simulation time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Rain</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Rainfall dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XAdv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Advance data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="24" column="27" bodyfile="src/Updateforcing.cu" bodystart="473" bodyend="517" declfile="src/Updateforcing.h" declline="24" declcolumn="27"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1ad230d34875656856d2f06cf295ea0a8c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void AddrainforcingImplicitCPU</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; Rain, EvolvingP&lt; T &gt; XEv)</argsstring>
+        <name>AddrainforcingImplicitCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_loop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Rain</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <briefdescription>
+<para>Add rainfall forcing to the model implicitly on the CPU. Adds rainfall forcing to the model based on rainfall data and current simulation time, updating water depth and surface elevation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Rain</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Rainfall dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="25" column="27" bodyfile="src/Updateforcing.cu" bodystart="530" bodyend="581" declfile="src/Updateforcing.h" declline="25" declcolumn="27"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a2b0c1b79bd69bf944a0134425ec3871a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void AddrainforcingGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; Rain, AdvanceP&lt; T &gt; XAdv)</argsstring>
+        <name>AddrainforcingGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Rain</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_advance_p" kindref="compound">AdvanceP</ref>&lt; T &gt;</type>
+          <declname>XAdv</declname>
+        </param>
+        <briefdescription>
+<para>Add rainfall forcing to the model on the GPU. Adds rainfall forcing to the model based on rainfall data and current simulation time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Rain</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Rainfall dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XAdv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Advance data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="26" column="29" bodyfile="src/Updateforcing.cu" bodystart="376" bodyend="407" declfile="src/Updateforcing.h" declline="26" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a060cf5195bfe4c31b1a889b80ddee658" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void AddrainforcingImplicitGPU</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; Rain, EvolvingP&lt; T &gt; XEv)</argsstring>
+        <name>AddrainforcingImplicitGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_loop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>Rain</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <briefdescription>
+<para>Add rainfall forcing to the model implicitly on the GPU. Adds rainfall forcing to the model based on rainfall data and current simulation time, updating water depth and surface elevation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Rain</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Rainfall dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="27" column="29" bodyfile="src/Updateforcing.cu" bodystart="420" bodyend="461" declfile="src/Updateforcing.h" declline="27" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1ad13e319a421a8ddb774a162050b0c1d1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void AddinfiltrationImplicitCPU</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, BlockP&lt; T &gt; XBlock, T *il, T *cl, EvolvingP&lt; T &gt; XEv, T *hgw)</argsstring>
+        <name>AddinfiltrationImplicitCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_loop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>il</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>cl</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>hgw</declname>
+        </param>
+        <briefdescription>
+<para>Add infiltration forcing to the model implicitly on the CPU. Adds infiltration forcing to the model based on infiltration data and current water depth, updating water depth and surface elevation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>il</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial infiltration rates array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>cl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Continuous infiltration rates array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>hgw</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Groundwater height array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="29" column="28" bodyfile="src/Updateforcing.cu" bodystart="596" bodyend="637" declfile="src/Updateforcing.h" declline="29" declcolumn="28"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a1fea5c7b910bcdd8356cab6576fc9f86" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void AddinfiltrationImplicitGPU</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, BlockP&lt; T &gt; XBlock, T *il, T *cl, EvolvingP&lt; T &gt; XEv, T *hgw)</argsstring>
+        <name>AddinfiltrationImplicitGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_loop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>il</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>cl</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>hgw</declname>
+        </param>
+        <briefdescription>
+<para>Add infiltration forcing to the model implicitly on the GPU. Adds infiltration forcing to the model based on infiltration data and current water depth, updating water depth and surface elevation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>il</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Initial infiltration rates array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>cl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Continuous infiltration rates array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>hgw</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Groundwater height array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="30" column="29" bodyfile="src/Updateforcing.cu" bodystart="652" bodyend="685" declfile="src/Updateforcing.h" declline="30" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1acf937003de037aec20b2b23b1f7a8b5b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void AddPatmforcingGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; PAtm, Model&lt; T &gt; XModel)</argsstring>
+        <name>AddPatmforcingGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>PAtm</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <briefdescription>
+<para>Add atmospheric pressure forcing to the model on the GPU. Adds atmospheric pressure forcing to the model based on pressure data and current simulation time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PAtm</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Atmospheric pressure dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="32" column="29" bodyfile="src/Updateforcing.cu" bodystart="755" bodyend="781" declfile="src/Updateforcing.h" declline="32" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a84e00f06851cebb36d1a639e73172dd9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void AddPatmforcingCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, DynForcingP&lt; float &gt; PAtm, Model&lt; T &gt; XModel)</argsstring>
+        <name>AddPatmforcingCPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP</ref>&lt; float &gt;</type>
+          <declname>PAtm</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <briefdescription>
+<para>Add atmospheric pressure forcing to the model on the CPU. Adds atmospheric pressure forcing to the model based on pressure data and current simulation time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>PAtm</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Atmospheric pressure dynamic forcing structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="33" column="27" bodyfile="src/Updateforcing.cu" bodystart="857" bodyend="898" declfile="src/Updateforcing.h" declline="33" declcolumn="27"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1a33601f4b4569c59bde52d4ca112ede89" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void AddRiverForcing</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, std::vector&lt; River &gt; XRivers, Model&lt; T &gt; XModel)</argsstring>
+        <name>AddRiverForcing</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_loop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; <ref refid="class_river" kindref="compound">River</ref> &gt;</type>
+          <declname>XRivers</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <briefdescription>
+<para>Add river forcing to the model. Adds river discharge forcing to the model based on river data and current simulation time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XRivers</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of river data structures </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="35" column="27" bodyfile="src/Updateforcing.cu" bodystart="146" bodyend="187" declfile="src/Updateforcing.h" declline="35" declcolumn="27"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1af4611c0475dad4b01cfc5dba1ad82c82" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void deformstep</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, std::vector&lt; deformmap&lt; float &gt;&gt; deform, Model&lt; T &gt; XModel, Model&lt; T &gt; XModel_g)</argsstring>
+        <name>deformstep</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_loop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; <ref refid="classdeformmap" kindref="compound">deformmap</ref>&lt; float &gt;&gt;</type>
+          <declname>deform</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_model" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel_g</declname>
+        </param>
+        <briefdescription>
+<para>Perform a deformation step on the model. Applies deformation maps to the model based on the current simulation time and deformation parameters. Overloaded function to handle both CPU and GPU models. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>deform</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of deformation maps </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel_g</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> data structure for GPU </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="37" column="18" bodyfile="src/Updateforcing.cu" bodystart="957" bodyend="969" declfile="src/Updateforcing.h" declline="37" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1ab32cde3ea8a907b071d24402886019d3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void InjectRiverGPU</definition>
+        <argsstring>(Param XParam, River XRiver, T qnow, int *Riverblks, BlockP&lt; T &gt; XBlock, AdvanceP&lt; T &gt; XAdv)</argsstring>
+        <name>InjectRiverGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="class_river" kindref="compound">River</ref></type>
+          <declname>XRiver</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>qnow</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>Riverblks</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_advance_p" kindref="compound">AdvanceP</ref>&lt; T &gt;</type>
+          <declname>XAdv</declname>
+        </param>
+        <briefdescription>
+<para>Inject river discharge into the model grid on the GPU. Injects river discharge into the model grid based on river geometry and discharge rate. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XRiver</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="class_river" kindref="compound">River</ref> data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>qnow</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Current river discharge rate </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Riverblks</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array of blocks affected by the river </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block data structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XAdv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Advance data structure </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="39" column="29" bodyfile="src/Updateforcing.cu" bodystart="201" bodyend="237" declfile="src/Updateforcing.h" declline="39" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="_updateforcing_8h_1ad60e7a01a4d6518f40023a51b1e5d96a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void AddDeformGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, deformmap&lt; float &gt; defmap, EvolvingP&lt; T &gt; XEv, T scale, T *zb)</argsstring>
+        <name>AddDeformGPU</name>
+        <param>
+          <type><ref refid="class_param" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_block_p" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="classdeformmap" kindref="compound">deformmap</ref>&lt; float &gt;</type>
+          <declname>defmap</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_evolving_p" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>scale</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Perform a deformation step on the model on the GPU. Applies deformation maps to the model based on the current simulation time and deformation parameters. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_loop" kindref="compound">Loop</ref> structure containing time information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>deform</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Vector of deformation maps </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="struct_model" kindref="compound">Model</ref> data structure for GPU </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Updateforcing.h" line="40" column="30" bodyfile="src/Updateforcing.cu" bodystart="1049" bodyend="1090" declfile="src/Updateforcing.h" declline="40" declcolumn="30"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>UPDATEFORCING_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>UPDATEFORCING_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Arrays.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;InitialConditions.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;MemManagement.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;ReadForcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;GridManip.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>updateforcing(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_loop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/><ref refid="struct_forcing" kindref="compound">Forcing&lt;float&gt;</ref>&amp;<sp/>XForcing);</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Forcingthisstep(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>totaltime,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref>&amp;<sp/>XDynForcing);</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__device__<sp/>T<sp/>interpDyn2BUQ(T<sp/>x,<sp/>T<sp/>y,<sp/><ref refid="struct_tex_set_p" kindref="compound">TexSetP</ref><sp/><ref refid="struct_forcing" kindref="compound">Forcing</ref>);</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddwindforcingCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Uwind,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Vwind,<sp/><ref refid="struct_advance_p" kindref="compound">AdvanceP&lt;T&gt;</ref><sp/>XAdv);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddwindforcingGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Uwind,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Vwind,<sp/><ref refid="struct_advance_p" kindref="compound">AdvanceP&lt;T&gt;</ref><sp/>XAdv);</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddrainforcingCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Rain,<sp/><ref refid="struct_advance_p" kindref="compound">AdvanceP&lt;T&gt;</ref><sp/>XAdv);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddrainforcingImplicitCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_loop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Rain,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv);</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddrainforcingGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Rain,<sp/><ref refid="struct_advance_p" kindref="compound">AdvanceP&lt;T&gt;</ref><sp/>XAdv);</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddrainforcingImplicitGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_loop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>Rain,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv);</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><sp/>AddinfiltrationImplicitCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_loop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T*<sp/>il,<sp/>T*<sp/>cl,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/>T*<sp/>hgw);</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddinfiltrationImplicitGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_loop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T*<sp/>il,<sp/>T*<sp/>cl,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/>T*<sp/>hgw);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddPatmforcingGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>PAtm,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddPatmforcingCPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_dyn_forcing_p" kindref="compound">DynForcingP&lt;float&gt;</ref><sp/>PAtm,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddRiverForcing(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_loop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/>std::vector&lt;River&gt;<sp/>XRivers,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel);</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>deformstep(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_loop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/>std::vector&lt;<ref refid="classdeformmap" kindref="compound">deformmap&lt;float&gt;</ref>&gt;<sp/>deform,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel,<sp/><ref refid="struct_model" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel_g);</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>InjectRiverGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="class_river" kindref="compound">River</ref><sp/>XRiver,<sp/>T<sp/>qnow,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>Riverblks,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="struct_advance_p" kindref="compound">AdvanceP&lt;T&gt;</ref><sp/>XAdv);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><sp/>AddDeformGPU(<ref refid="class_param" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="struct_block_p" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="classdeformmap" kindref="compound">deformmap&lt;float&gt;</ref><sp/>defmap,<sp/><ref refid="struct_evolving_p" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/>T<sp/>scale,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/Updateforcing.h"/>
+  </compounddef>
+</doxygen>

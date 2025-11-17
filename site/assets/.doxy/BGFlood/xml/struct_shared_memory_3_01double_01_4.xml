@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_shared_memory_3_01double_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>SharedMemory&lt; double &gt;</compoundname>
+    <templateparamlist>
+    </templateparamlist>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="struct_shared_memory_3_01double_01_4_1aa8dea20b03564c2ef3715f90d5613371" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>__device__</type>
+        <definition>__device__ SharedMemory&lt; double &gt;::operator double *</definition>
+        <argsstring>()</argsstring>
+        <name>operator double *</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Advection.cu" line="24" column="19" bodyfile="src/Advection.cu" bodystart="24" bodyend="28"/>
+      </memberdef>
+      <memberdef kind="function" id="struct_shared_memory_3_01double_01_4_1a6123f1d4ebd189a0160cd4b08760f9c4" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>__device__</type>
+        <definition>__device__ SharedMemory&lt; double &gt;::operator const double *</definition>
+        <argsstring>() const</argsstring>
+        <name>operator const double *</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Advection.cu" line="30" column="19" bodyfile="src/Advection.cu" bodystart="30" bodyend="34"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Advection.cu" line="22" column="1" bodyfile="src/Advection.cu" bodystart="23" bodyend="35"/>
+    <listofallmembers>
+      <member refid="struct_shared_memory_3_01double_01_4_1a6123f1d4ebd189a0160cd4b08760f9c4" prot="public" virt="non-virtual"><scope>SharedMemory&lt; double &gt;</scope><name>operator const double *</name></member>
+      <member refid="struct_shared_memory_3_01double_01_4_1aa8dea20b03564c2ef3715f90d5613371" prot="public" virt="non-virtual"><scope>SharedMemory&lt; double &gt;</scope><name>operator double *</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

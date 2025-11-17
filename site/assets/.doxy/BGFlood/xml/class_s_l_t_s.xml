@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="class_s_l_t_s" kind="class" language="C++" prot="public">
+    <compoundname>SLTS</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="class_s_l_t_s_1a237c1e22864bb3db6950a5d7e70ee702" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double SLTS::time</definition>
+        <argsstring></argsstring>
+        <name>time</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="77" column="8" bodyfile="src/Input.h" bodystart="77" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_s_l_t_s_1a739f0ad3b65683b5289687685c6baa4d" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; double &gt;</type>
+        <definition>std::vector&lt;double&gt; SLTS::wlevs</definition>
+        <argsstring></argsstring>
+        <name>wlevs</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="78" column="13" bodyfile="src/Input.h" bodystart="78" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_s_l_t_s_1a33fe99001808a7035044089bf0b56972" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; double &gt;</type>
+        <definition>std::vector&lt;double&gt; SLTS::uuvel</definition>
+        <argsstring></argsstring>
+        <name>uuvel</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="79" column="13" bodyfile="src/Input.h" bodystart="79" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_s_l_t_s_1ab372d07c30027a6d4ebcf00887a5e8f5" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; double &gt;</type>
+        <definition>std::vector&lt;double&gt; SLTS::vvvel</definition>
+        <argsstring></argsstring>
+        <name>vvvel</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="80" column="13" bodyfile="src/Input.h" bodystart="80" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Input.h" line="75" column="1" bodyfile="src/Input.h" bodystart="75" bodyend="82"/>
+    <listofallmembers>
+      <member refid="class_s_l_t_s_1a237c1e22864bb3db6950a5d7e70ee702" prot="public" virt="non-virtual"><scope>SLTS</scope><name>time</name></member>
+      <member refid="class_s_l_t_s_1a33fe99001808a7035044089bf0b56972" prot="public" virt="non-virtual"><scope>SLTS</scope><name>uuvel</name></member>
+      <member refid="class_s_l_t_s_1ab372d07c30027a6d4ebcf00887a5e8f5" prot="public" virt="non-virtual"><scope>SLTS</scope><name>vvvel</name></member>
+      <member refid="class_s_l_t_s_1a739f0ad3b65683b5289687685c6baa4d" prot="public" virt="non-virtual"><scope>SLTS</scope><name>wlevs</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

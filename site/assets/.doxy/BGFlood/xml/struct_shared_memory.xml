@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_shared_memory" kind="struct" language="C++" prot="public">
+    <compoundname>SharedMemory</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="struct_shared_memory_1aef8d7f8bfbaed9ac33514aa920722761" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>__device__</type>
+        <definition>__device__ SharedMemory&lt; T &gt;::operator T*</definition>
+        <argsstring>()</argsstring>
+        <name>operator T*</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Advection.cu" line="6" column="19" bodyfile="src/Advection.cu" bodystart="6" bodyend="10"/>
+      </memberdef>
+      <memberdef kind="function" id="struct_shared_memory_1aa0fff58aa91dad5e6a78659e5dfa594a" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>__device__</type>
+        <definition>__device__ SharedMemory&lt; T &gt;::operator const T *</definition>
+        <argsstring>() const</argsstring>
+        <name>operator const T *</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Advection.cu" line="12" column="19" bodyfile="src/Advection.cu" bodystart="12" bodyend="16"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Advection.cu" line="4" column="1" bodyfile="src/Advection.cu" bodystart="5" bodyend="17"/>
+    <listofallmembers>
+      <member refid="struct_shared_memory_1aa0fff58aa91dad5e6a78659e5dfa594a" prot="public" virt="non-virtual"><scope>SharedMemory</scope><name>operator const T *</name></member>
+      <member refid="struct_shared_memory_1aef8d7f8bfbaed9ac33514aa920722761" prot="public" virt="non-virtual"><scope>SharedMemory</scope><name>operator T*</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

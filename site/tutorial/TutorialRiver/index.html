@@ -1,0 +1,2201 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for BG_Flood, a C++ library for flood fill algorithms.">
+      
+      
+      
+        <link rel="canonical" href="https://mydomain.org/mysite/tutorial/TutorialRiver/">
+      
+      
+        <link rel="prev" href="../../Tutorial_intro/">
+      
+      
+        <link rel="next" href="../TutorialJetJulia/">
+      
+      
+      <link rel="icon" href="../../logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.20">
+    
+    
+      
+        <title>Pluvial and fluvial flooding - BG_Flood Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.e53b48f4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/css/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#river-flooding-tutorial" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="BG_Flood Documentation" class="md-header__button md-logo" aria-label="BG_Flood Documentation" data-md-component="logo">
+      
+  <img src="../../Logo_white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            BG_Flood Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Pluvial and fluvial flooding
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/CyprienBosserelle/BG_Flood" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    BG_Flood on GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="BG_Flood Documentation" class="md-nav__button md-logo" aria-label="BG_Flood Documentation" data-md-component="logo">
+      
+  <img src="../../Logo_white.png" alt="logo">
+
+    </a>
+    BG_Flood Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/CyprienBosserelle/BG_Flood" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    BG_Flood on GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Home/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ParametersList-py/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Parameters list
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Manual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Manual
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Tutorial_intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Pluvial and fluvial flooding
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Pluvial and fluvial flooding
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#param-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Param file
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Param file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preparation-of-the-topographybathymetry-dem-digital-elevation-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preparation of the topography/bathymetry (DEM: Digital Elevation Model)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-fluvial-flooding-set-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic fluvial flooding set-up
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic fluvial flooding set-up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#river-discharge" class="md-nav__link">
+    <span class="md-ellipsis">
+      River discharge
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timekeeping-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Timekeeping parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Outputs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Outputs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#map-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Map outputs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-serie-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Time-Serie outputs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resolution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-fluvial-innundation-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic fluvial innundation results
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#completing-the-set-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      Completing the set-up
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Completing the set-up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-boundary-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding boundary conditions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bottom-friction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bottom friction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initialisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialisation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model controls
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-the-rain" class="md-nav__link">
+    <span class="md-ellipsis">
+      ... Adding the rain
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="... Adding the rain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rain-forcing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rain forcing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refining-the-grid-in-area-of-interest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refining the grid in area of interest
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Refining the grid in area of interest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-incorporate-more-complex-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to incorporate more complex inputs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How to incorporate more complex inputs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#date-as-time-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date as time reference
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#map-boundary-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Map boundary conditions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-demroughness-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi DEM/roughness inputs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-river-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi river injection
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-bg_paramtxt-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Full BG_param.txt file
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ground-infiltration-losses-basic-ilcl-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ground infiltration losses (Basic ILCL model)
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TutorialJetJulia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jet and Julia
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Gaussian_Wave_Julia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gaussian wave
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Transpacific_tsunami/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transpacific tsunami
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TutorialMonaiJulia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Monai and Julia
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Rain_CEA2008/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Uniform rain on an idealised catchment
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RainMap_Aureli2020/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RainMap Aureli2020
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6">
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Recent Developments
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Recent Developments
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/RainLoss_ILCL-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ground infiltration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/NewGradient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    New Gradient Method
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/Wetdryfix-Conservelevation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Wet-dry fix
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../References/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    References
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code sources
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Code sources
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Links
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_2">
+        
+          
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Classes
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
+            <span class="md-nav__icon md-icon"></span>
+            Classes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/annotated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    List
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Index
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/hierarchy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Hierarchy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/class_members/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Members
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/class_member_functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/class_member_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/class_member_typedefs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Typedefs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/class_member_enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Enumerations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_3">
+        
+          
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Namespaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Namespaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/namespaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    List
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/namespace_members/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Members
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/namespace_member_functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/namespace_member_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/namespace_member_typedefs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Typedefs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/namespace_member_enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Member Enumerations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Macros
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BGFlood/files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<div><h1 id="river-flooding-tutorial">River flooding tutorial</h1>
+<p>The objectif of this tutorial is to explain how to use the code BG_Flood to model river flooding.
+As the code allows rain on grid, we will look at pluvial and fluvial flooding.</p>
+<p>This testcase aims to broadly reproduce the flooding event that occured from the 16 to the 18 of July 2021 (a 1 in 50 year flood event). 
+During this event, the Buller river, passing through the town of Westport, on the West Coast of the South Island of Aotearoa New Zealand, get out of its primary bed and flooded the Westport area.</p>
+<div class="admonition info">
+<p class="admonition-title">Prerequisite</p>
+<p>Before begining this tutoral, the user is expected to have downloaded the windows executable (<a href="https://github.com/CyprienBosserelle/BG_Flood/releases/latest">last release</a> on github) or compiled the sources (version &gt; 0.8) of the BG_flood code on linux.</p>
+</div>
+<p>During this tutorial, we will build, step by step, a test case. A relatively simple testcase will be build first. Then an example with more complex rain, tidal boundaries inputs will also be shared and explained.</p>
+<h2 id="param-file">Param file</h2>
+<p>The interface with BG_flood software is done using only a text file: <code>BG_param.txt</code>
+(This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG_Flood.)</p>
+<p>This file consists in a list of key words and inputs, separated by a "=" sign. 
+For a full list of the available key words and a further description of this file, please refer to the [parameter list]{../ParametersList-py.md} and the [manual]{../Manual.md}.</p>
+<h3 id="preparation-of-the-topographybathymetry-dem-digital-elevation-model">Preparation of the topography/bathymetry (DEM: Digital Elevation Model)</h3>
+<p>The DEM, topography or bathymetry file is the only necessary file to be added to BG_param file to run the model.
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>DEM = Wesport_DEM_8m.nc?z;
+</span></code></pre></div>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/Westport_topo.png" data-desc-position="bottom"><img alt="bathy" src="../../figure/Westport_topo.png"></a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Different formats can be used for this file ( ASCII: .asc or NetCDF .nc principally).
+As Netcdf files can contain different variables, the "?" follows by the name of the variable is needed.</p>
+</div>
+<p>Without further information, the code will run will default values for physical parameters and initialisation, Neumann boundaries and no external forcing:</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/Shell_output.png" data-desc-position="bottom"><img alt="shell" src="../../figure/Shell_output.png"></a></p>
+<p>A result files: <code>output.nc</code> is created (here opened with the [PyNcView]{https://pyncview.software.informer.com/}) </p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/outputs.png" data-desc-position="bottom"><img alt="outputs" src="../../figure/outputs.png"></a></p>
+<p>It contains 2D spatial fields saved regularly in time.
+It details the blocs information:</p>
+<ul>
+<li><code>blockid</code>: block index</li>
+<li><code>blocklevel</code>: level of refinement for each block</li>
+<li><code>blockstatus</code>: Is the block active ?</li>
+<li><code>blockwidth</code>: number of cells in x or y direction in the block (not considering halo cells for computational purpose only)</li>
+<li><code>blockxo</code>/<code>blockyo</code>: coordinate of the bottom left corner of he block</li>
+</ul>
+<p>the time 1D variables or coordinates:</p>
+<ul>
+<li><code>time</code>: time vector in second or real time</li>
+<li><code>xx</code>/<code>yy</code> axis: spacial coordinate in m (by default)</li>
+</ul>
+<p>and the by default outputs:</p>
+<ul>
+<li><code>h</code> : the water depth in m</li>
+<li><code>u</code> : the veloctity vector component in the x direction</li>
+<li><code>v</code>: the velocity vector component in the y direction</li>
+<li><code>zb</code>: the bottom/ground elevation (m from vertical projection reference)</li>
+<li><code>zs</code>: the surface water elevation (m from vertical projection reference)</li>
+</ul>
+<p>(see manual for further description of the variables).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In BG_Flood, the memory is organised in blocked for an optimal parallelisation on GPU. All the cells on a block will share some status and parameter such as the level of refinement (or cell size) and the active status.</p>
+</div>
+<p>A log file: <code>BG_log.txt</code> (very similaire to the shell outputs) is also created to keep the terminal output information:</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/log_file.png" data-desc-position="bottom"><img alt="logfile" src="../../figure/log_file.png"></a></p>
+<h2 id="basic-fluvial-flooding-set-up">Basic fluvial flooding set-up</h2>
+<h3 id="river-discharge">River discharge</h3>
+<p>The river are (at this stage) forced by a vertical discharge on a user defined rectagular area:
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
+</span></code></pre></div>
+where the four final numbers are: <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(x_2\)</span>, <span class="arithmatex">\(y_1\)</span>, <span class="arithmatex">\(y_2\)</span>, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time (<span class="arithmatex">\(s\)</span>) from reference time, second column: river discharge in <span class="arithmatex">\(m^3s^{-1}\)</span>).
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/river_discharge.png" data-desc-position="bottom"><img alt="riverfile" src="../../figure/river_discharge.png"></a></p>
+<p>This file has been generated from an observed hydrograph, with data saved every <span class="arithmatex">\(5\)</span>min, in second from the begining of the simulation (or event):</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/TE_Kuha_hydrograph.png" data-desc-position="bottom"><img alt="riverF" src="../../figure/TE_Kuha_hydrograph.png"></a></p>
+<p>For each new river, just add the a similar river input line in the parameter file.</p>
+<h3 id="timekeeping-parameters">Timekeeping parameters</h3>
+<p>In this code, the time is defined in second, relative to some reference or the start of the simulation by default.</p>
+<p>The end of the simulation is prescribed in second as :
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>endtime = 21600;
+</span></code></pre></div>
+<p>The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, <span class="arithmatex">\(CFL=0.5000\)</span> by default.</p>
+<p>The simulation begin, by default at <span class="arithmatex">\(t=0(s)\)</span>, but this can modify using "totaltime": 
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>totaltime = 3600;
+</span></code></pre></div>
+to begin one hour after the reference time (used in the forcings for example).
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The code was initially designed to consider time only through duration in second. We can now use dates to defined time in the forcings and the param file, including a time reference. </p>
+</div>
+<h3 id="outputs">Outputs</h3>
+<p>There is two types of outputs:</p>
+<ul>
+<li>map outputs of 2D variables regularly through time</li>
+<li>time-serie (TS) output of basic values, at a chosen point position, at each time step.</li>
+</ul>
+<h4 id="map-outputs">Map outputs</h4>
+<p>By default, there is only a map output at the begining and end of the simulation.</p>
+<p>The map output can be modify by:</p>
+<ul>
+<li>defining a timestep (in s) for these outputs:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>outputtimestep = 3600.0;
+</span></code></pre></div></li>
+<li>changing the set of variables in the output file (from the list given in the manual)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
+</span></code></pre></div>
+The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.
+There is also special variables for risk assesment after inundation (Umax, hmax, hUmax, twet)</li>
+<li>changing the name of the output file:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>outfile = Results_tuto_basicRun.nc;
+</span></code></pre></div></li>
+<li>saving the output as float (variables are saved as short integer by default.):
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>smallnc = 0;
+</span></code></pre></div></li>
+</ul>
+<h4 id="time-serie-outputs">Time-Serie outputs</h4>
+<p>For each TS output needed, a line with the destination file and the postition is needed:</p>
+<p></p><div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>TSnodesout=Offshore.txt,1482120,53814890;
+</span></code></pre></div>
+corresponding to <code>TSnodesout=filename.txt,x_p,y_p;</code>
+The file contains 5 colums <span class="arithmatex">\((t, zs, h, u,v)\)</span> with the value at the nearest grid point (to the position defined by the user).
+<h3 id="resolution">Resolution</h3>
+<p>For a first test, we will modify the resolution and set it to 40m to decrease the computational time:
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dx=40;
+</span></code></pre></div>
+<h3 id="basic-fluvial-innundation-results">Basic fluvial innundation results</h3>
+<p>This the shell output:
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/Shell_output2.png" data-desc-position="bottom"><img alt="shell2" src="../../figure/Shell_output2.png"></a>
+It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).</p>
+<p>In the outputs, we get the different fields requested, for 6 different times.
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/outputs_v2.png" data-desc-position="bottom"><img alt="output2" src="../../figure/outputs_v2.png"></a></p>
+<p>The Time-Serie output is:
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/offshore.png" data-desc-position="bottom"><img alt="TS2" src="../../figure/offshore.png"></a></p>
+<h2 id="completing-the-set-up">Completing the set-up</h2>
+<h3 id="adding-boundary-conditions">Adding boundary conditions</h3>
+<p>Boundaries' conditions are refered by their position, using 'top/bottom/right/left' keywords. They are associated to a boundary type ( 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d) and possibly a file containing a time serie. In this case, the file name is placed before the type, coma-separated. </p>
+<p>In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.e. for the top, left and right boundaries.
+At the bottom, we will conserve the default value: 1.
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>left = tide_westport.txt,2; 
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>right = tide_westport.txt,2; 
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>top = tide_westport.txt,2; 
+</span></code></pre></div>
+<p>In this case, as the boundaries are relatively small compared to the time wave length, we will used the same value along all the boundaries. We will then have only two columns in the file: Time and one elevation.
+tide_file
+</p><div class="language-text highlight"><span class="filename">tide_westport.txt</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>0.000000    0.714714 
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>600.000000  0.794714 
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>1200.000000     0.864714 
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>1800.000000     0.934714 
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>2400.000000     0.994714 
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>3000.000000     1.054714 
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>3600.000000     1.104714 
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>4200.000000     1.144714 
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>4800.000000     1.174714 
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>5400.000000     1.194714 
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>6000.000000     1.214714 
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>6600.000000     1.214714 
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>7200.000000     1.214714 
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>7800.000000     1.204714 
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>8400.000000     1.184714 
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>          ...
+</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>336600.000000   -0.635286 
+</span><span id="__span-11-18"><a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>337200.000000   -0.705286 
+</span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>337800.000000   -0.765286 
+</span><span id="__span-11-20"><a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>338400.000000   -0.825286 
+</span><span id="__span-11-21"><a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>339000.000000   -0.875286 
+</span><span id="__span-11-22"><a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a>339600.000000   -0.915286 
+</span><span id="__span-11-23"><a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a>340200.000000   -0.955286 
+</span></code></pre></div>
+<p>They correspond to a classic time Serie observed offshore of the river mouth.</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/tide_westport.png" data-desc-position="bottom"><img alt="Tide" src="../../figure/tide_westport.png"></a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If more values are added to the file (more columns), they will be regularly spread along the boundary and the forcing will be linearly interpolated between these values. </p>
+</div>
+<h3 id="bottom-friction">Bottom friction</h3>
+<p>Different models from bottom friction are available.
+By default, the model used is -1 corresponding to a Manning model.
+Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models).
+The associated field (ASC or netCDF) or value must be enter with the key word
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>frictionmodel=1;
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
+</span></code></pre></div>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/Bottom_friction_zo.png" data-desc-position="bottom"><img alt="Friction" src="../../figure/Bottom_friction_zo.png"></a></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The model allows a roughness heigh or manning number map smaller than the computational domain and will extrapolate outside of the map.</p>
+</div>
+<h3 id="initialisation">Initialisation</h3>
+<p>By default, the model is initialised by a plane water surface located at <span class="arithmatex">\(z=0.0\)</span>.</p>
+<p>This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using:
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>zsinit=-1.39; #in metre
+</span></code></pre></div>
+The model can also be initialised using a restart/hot start.
+A file containing a least the files zb, h or zs, u and v must be provided, with the steps (and no the time value) to use for the restart.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>hotstartfile = output_4.nc;
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>hotstep=5;
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>the code can be restarted only from an uniform grid (and not from results with multi-level of resolutions).</p>
+</div>
+<h3 id="model-controls">Model controls</h3>
+<p>Some variables can be used to adjust the model (see Manual for more details):</p>
+<ul>
+<li>run on CPU (or choose a GPU to run on):
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>gpudevice=0;
+</span></code></pre></div>
+By default, the code will detect if there is a suitable GPU on the machine.</li>
+<li>Double precision instead of a float precision during the computation:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>doubleprecision = 1;
+</span></code></pre></div></li>
+<li>Minmod limiter parameter (to tune momentum dissipation <span class="arithmatex">\(\in [1,2]\)</span>)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>theta=1.3; #default value=1.3
+</span></code></pre></div></li>
+<li>Minimum heigh to concidere a cell wet (m)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>eps = 0.00010000; #default=0.0001
+</span></code></pre></div></li>
+</ul>
+<h2 id="adding-the-rain">... Adding the rain</h2>
+<p>The model allows rain on grid forcing to model pluvial inundations.</p>
+<h3 id="rain-forcing">Rain forcing</h3>
+<p>A rain intensity in <span class="arithmatex">\(mm.h^{-1}\)</span>, time and space varying can be forced in the model.</p>
+<p>The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:</p>
+<ul>
+<li>Time serie forcing:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>rainfall=rain_westport.txt
+</span></code></pre></div></li>
+<li>Spacial file forcing:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>rainfile=VCSN_buller_202107_dailynzcsmcov_disaggdaily_500m_nztm_clipped.nc?depth;
+</span></code></pre></div>
+Here, we will use a time serie:
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/rain_westport.png" data-desc-position="bottom"><img alt="RainTS" src="../../figure/rain_westport.png"></a></li>
+</ul>
+<p>If the data is given in "rain height", a post-processing to turn it in rain intensity will be needed (at least at this stage of development).</p>
+<p>Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. 
+Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:</p>
+<ul>
+<li>using the <code>x0</code> / <code>xmax</code> / <code>y0</code> / <code>ymax</code> keywords to restrain the extend of the computational domain (but still rectangular)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>x0=1475000; #m
+</span></code></pre></div></li>
+<li>a manual mask with values 999 in the bathymetry will be read by the code as "non-active" area</li>
+<li>masking all the bloc with all cells having an elevation superior to some value:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>mask=250; #m
+</span></code></pre></div></li>
+<li>using a shape file to define a "area of interest":
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>AOI=Domain_buffered-sea2.gmt;
+</span></code></pre></div></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Method advised</p>
+<p>The last method, consisting in using a contour to identify the area we want to include, is advised as the method allows for example to select a catchment, or any complex contour shape. The expected shape is a *.gmt file that can be generated from a contour using <a href="https://www.generic-mapping-tools.org/">GMT</a> tools or directly as a column of x,y points looped (first point = last point).</p>
+</div>
+<h2 id="refining-the-grid-in-area-of-interest">Refining the grid in area of interest</h2>
+<p>The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
+These blocks can have different resolutions (but resolution does not change during the computation at this stage).</p>
+<p>The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  <span class="arithmatex">\(n\)</span> , the resolution  <span class="arithmatex">\(dx_n\)</span> will be:
+$$
+dx_n=\frac{dx_0}{2^n}
+$$</p>
+<p>with  <span class="arithmatex">\(dx_0\)</span> the resolution at level 0. </p>
+<p>When refinning using the level implementation, different key words are expected:</p>
+<ul>
+<li><code>Initlevel</code>: level used to create the first mesh created by the code in the mesh refinement process</li>
+<li><code>Maxlevel</code>: maximim level of refinement (over-ruling other commands)</li>
+<li><code>Minlevel</code>: minimum level of refinement (over-ruling other commands)</li>
+</ul>
+<p>The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)</p>
+<p>The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:</p>
+<ul>
+<li><code>Threshold</code>: impose a threshold for a different level of resolution</li>
+<li><code>Inrange</code>: impose a range for a different level of resolutuion or it can be defined using a map of target levels for refinement:</li>
+<li><code>Targetlevel</code>: the levels of resolution will be targeted but will be overruled by the maxlevel, minlevel entrance.</li>
+</ul>
+<p>To refine the grid for this case, we will use the <em>former coarse simulation</em> and create a map for values where hmax is strictly positive (and/or <span class="arithmatex">\(umax\)</span>,<span class="arithmatex">\(vmax\)</span> different from zero), after removing the sea area. </p>
+<p>Here, the bathymetry map resolution is a 10m resolution (<span class="arithmatex">\(dx=10m\)</span>). We will impose:</p>
+<ul>
+<li>a level -3 resolution ( <span class="arithmatex">\(dx_{-3}=80m\)</span>) in the background domain, </li>
+<li>a level 1 resolution ( <span class="arithmatex">\(dx_1=5m\)</span>) in the flooded area</li>
+<li>a level 2 resolution ( <span class="arithmatex">\(dx_2=2.5m\)</span>)  in the main river bed area. </li>
+</ul>
+<figure>
+  <a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/coarse.png" data-desc-position="bottom"><img alt="coarseRun" src="../../figure/coarse.png" width="400"></a>
+<br>
+<figcaption>Maximum water depth obtained using a coarse uniform mesh, used to inform refinement.</figcaption>
+</figure>
+<figure>
+  <a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/refine.png" data-desc-position="bottom"><img alt="refine" src="../../figure/refine.png" width="400"></a>
+<br>
+<figcaption>Refinement map obtained based on coarse model, used to enforce refinement.</figcaption>
+</figure>
+<figure>
+  <a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/test_1.png" data-desc-position="bottom"><img alt="meshrefine" src="../../figure/test_1.png" width="400"></a>
+<br>
+<figcaption>Mesh refinement generated by the code.</figcaption>
+</figure>
+<p>To use it, the following options need to be added to the param file:
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>initlevel = -3 ;
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>maxlevel = 2 ;
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>minlevel = -3 ;
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>Adaptation = Targetlevel,refin_mask.nc?z ;
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order to optimise the results when using a refined grid, different bathymetry files can be provided. A higher resolution one with smaller extend can be provided as a second DEM and will be use by the code when refining the grid (the code will use the last entered, having the info available):
+ </p><div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>DEM = Wesport_DEM_8m.nc?z;
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>DEM = Wesport_DEM_2m_zoomed.nc?z;
+</span></code></pre></div>
+ Similarly, different input files can be used for the roughness coefficient.
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note again ...</p>
+<p>The code also allows for zone outputs: the output of different zones defined by the user (<code>output-file-name,x1,x2,y1,y2</code>):
+ </p><div class="language-text highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>outzone=zoomed.nc,5.3,5.4,0.5,0.8;
+</span></code></pre></div>
+</div>
+<h3 id="results">Results:</h3>
+<p>This is the logfile:
+</p><div class="language-text highlight"><span class="filename">BG_log.txt</span><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>#################################
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>BG_Flood v0.8
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>#################################
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>#################################
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>#
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>model started at 21-02-2023 21:22:53
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>Reading parameter file: BG_param.txt ...
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>
+</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>Reading bathymetry grid data...
+</span><span id="__span-27-11"><a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>Reading forcing metadata. file: Westport_DEM_8m.nc extension: nc
+</span><span id="__span-27-12"><a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a>Forcing grid info: nx=2604 ny=3137 dx=8.000000 grdalpha=0.000000 xo=1474101.125000 xmax=1494925.125000 yo=5364343.000000 ymax=5389431.000000
+</span><span id="__span-27-13"><a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a>
+</span><span id="__span-27-14"><a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a>Reading boundary data...
+</span><span id="__span-27-15"><a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a>
+</span><span id="__span-27-16"><a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>Read Roughness map (cf) data...
+</span><span id="__span-27-17"><a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>Reading forcing metadata. file: z0_100423_rec3.asc extension: asc
+</span><span id="__span-27-18"><a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a>For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)
+</span><span id="__span-27-19"><a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a>Forcing grid info: nx=1724 ny=2420 dx=4.800000 grdalpha=0.000000 xo=1480847.600000 xmax=1489118.000000 yo=5369291.600000 ymax=5380902.800000
+</span><span id="__span-27-20"><a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a>
+</span><span id="__span-27-21"><a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a>Read Target level data...
+</span><span id="__span-27-22"><a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a>Reading forcing metadata. file: refin_mask.nc extension: nc
+</span><span id="__span-27-23"><a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a>Forcing grid info: nx=624 ny=400 dx=50.000000 grdalpha=0.000000 xo=1469074.407363 xmax=1500224.407363 yo=5364597.770576 ymax=5384547.770576
+</span><span id="__span-27-24"><a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a>
+</span><span id="__span-27-25"><a id="__codelineno-27-25" name="__codelineno-27-25" href="#__codelineno-27-25"></a>Preparing rivers (1 rivers)
+</span><span id="__span-27-26"><a id="__codelineno-27-26" name="__codelineno-27-26" href="#__codelineno-27-26"></a>
+</span><span id="__span-27-27"><a id="__codelineno-27-27" name="__codelineno-27-27" href="#__codelineno-27-27"></a>Preparing Rain forcing
+</span><span id="__span-27-28"><a id="__codelineno-27-28" name="__codelineno-27-28" href="#__codelineno-27-28"></a>
+</span><span id="__span-27-29"><a id="__codelineno-27-29" name="__codelineno-27-29" href="#__codelineno-27-29"></a>Adjusted model domain (xo/xmax/yo/ymax): 
+</span><span id="__span-27-30"><a id="__codelineno-27-30" name="__codelineno-27-30" href="#__codelineno-27-30"></a>    1474097.125000/1495057.125000/5364339.000000/5389459.000000
+</span><span id="__span-27-31"><a id="__codelineno-27-31" name="__codelineno-27-31" href="#__codelineno-27-31"></a>     Initial resolution (level 2) = 10.000000
+</span><span id="__span-27-32"><a id="__codelineno-27-32" name="__codelineno-27-32" href="#__codelineno-27-32"></a>There are 1 GPU devices on this machine
+</span><span id="__span-27-33"><a id="__codelineno-27-33" name="__codelineno-27-33" href="#__codelineno-27-33"></a>Using Device: NVIDIA T500
+</span><span id="__span-27-34"><a id="__codelineno-27-34" name="__codelineno-27-34" href="#__codelineno-27-34"></a>
+</span><span id="__span-27-35"><a id="__codelineno-27-35" name="__codelineno-27-35" href="#__codelineno-27-35"></a>Initializing mesh
+</span><span id="__span-27-36"><a id="__codelineno-27-36" name="__codelineno-27-36" href="#__codelineno-27-36"></a>    Initial number of blocks: 20567; Will be allocating 21596 in memory.
+</span><span id="__span-27-37"><a id="__codelineno-27-37" name="__codelineno-27-37" href="#__codelineno-27-37"></a>
+</span><span id="__span-27-38"><a id="__codelineno-27-38" name="__codelineno-27-38" href="#__codelineno-27-38"></a>Initial condition:
+</span><span id="__span-27-39"><a id="__codelineno-27-39" name="__codelineno-27-39" href="#__codelineno-27-39"></a>    Warm start
+</span><span id="__span-27-40"><a id="__codelineno-27-40" name="__codelineno-27-40" href="#__codelineno-27-40"></a>    Initializing rivers
+</span><span id="__span-27-41"><a id="__codelineno-27-41" name="__codelineno-27-41" href="#__codelineno-27-41"></a>Adapting mesh
+</span><span id="__span-27-42"><a id="__codelineno-27-42" name="__codelineno-27-42" href="#__codelineno-27-42"></a>     Iteration 1
+</span><span id="__span-27-43"><a id="__codelineno-27-43" name="__codelineno-27-43" href="#__codelineno-27-43"></a>        There are 20567 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 4723 blocks to be coarsen (with neighbour); 1675 blocks untouched; 14169 blocks to be freed (1029 are already available) 0 new blocks will be created
+</span><span id="__span-27-44"><a id="__codelineno-27-44" name="__codelineno-27-44" href="#__codelineno-27-44"></a>     Iteration 2
+</span><span id="__span-27-45"><a id="__codelineno-27-45" name="__codelineno-27-45" href="#__codelineno-27-45"></a>        There are 6398 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1023 blocks to be coarsen (with neighbour); 2306 blocks untouched; 3069 blocks to be freed (15198 are already available) 0 new blocks will be created
+</span><span id="__span-27-46"><a id="__codelineno-27-46" name="__codelineno-27-46" href="#__codelineno-27-46"></a>     Iteration 3
+</span><span id="__span-27-47"><a id="__codelineno-27-47" name="__codelineno-27-47" href="#__codelineno-27-47"></a>        There are 3329 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 179 blocks to be coarsen (with neighbour); 2613 blocks untouched; 537 blocks to be freed (18267 are already available) 0 new blocks will be created
+</span><span id="__span-27-48"><a id="__codelineno-27-48" name="__codelineno-27-48" href="#__codelineno-27-48"></a>     Iteration 4
+</span><span id="__span-27-49"><a id="__codelineno-27-49" name="__codelineno-27-49" href="#__codelineno-27-49"></a>        There are 2792 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 18 blocks to be coarsen (with neighbour); 2720 blocks untouched; 54 blocks to be freed (18804 are already available) 0 new blocks will be created
+</span><span id="__span-27-50"><a id="__codelineno-27-50" name="__codelineno-27-50" href="#__codelineno-27-50"></a>     Iteration 5
+</span><span id="__span-27-51"><a id="__codelineno-27-51" name="__codelineno-27-51" href="#__codelineno-27-51"></a>        There are 2738 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1 blocks to be coarsen (with neighbour); 2734 blocks untouched; 3 blocks to be freed (18858 are already available) 0 new blocks will be created
+</span><span id="__span-27-52"><a id="__codelineno-27-52" name="__codelineno-27-52" href="#__codelineno-27-52"></a>     Iteration 6
+</span><span id="__span-27-53"><a id="__codelineno-27-53" name="__codelineno-27-53" href="#__codelineno-27-53"></a>        There are 2735 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 0 blocks to be coarsen (with neighbour); 2735 blocks untouched; 0 blocks to be freed (18861 are already available) 0 new blocks will be created
+</span><span id="__span-27-54"><a id="__codelineno-27-54" name="__codelineno-27-54" href="#__codelineno-27-54"></a>
+</span><span id="__span-27-55"><a id="__codelineno-27-55" name="__codelineno-27-55" href="#__codelineno-27-55"></a>Initial condition:
+</span><span id="__span-27-56"><a id="__codelineno-27-56" name="__codelineno-27-56" href="#__codelineno-27-56"></a>    Warm start
+</span><span id="__span-27-57"><a id="__codelineno-27-57" name="__codelineno-27-57" href="#__codelineno-27-57"></a>    Initializing rivers
+</span><span id="__span-27-58"><a id="__codelineno-27-58" name="__codelineno-27-58" href="#__codelineno-27-58"></a>Setting up GPU
+</span><span id="__span-27-59"><a id="__codelineno-27-59" name="__codelineno-27-59" href="#__codelineno-27-59"></a>
+</span><span id="__span-27-60"><a id="__codelineno-27-60" name="__codelineno-27-60" href="#__codelineno-27-60"></a>Model setup complete
+</span><span id="__span-27-61"><a id="__codelineno-27-61" name="__codelineno-27-61" href="#__codelineno-27-61"></a>#################################
+</span><span id="__span-27-62"><a id="__codelineno-27-62" name="__codelineno-27-62" href="#__codelineno-27-62"></a>Initialising model main loop
+</span><span id="__span-27-63"><a id="__codelineno-27-63" name="__codelineno-27-63" href="#__codelineno-27-63"></a>Create netCDF output file...
+</span><span id="__span-27-64"><a id="__codelineno-27-64" name="__codelineno-27-64" href="#__codelineno-27-64"></a>Warning! Output file name already exist   
+</span><span id="__span-27-65"><a id="__codelineno-27-65" name="__codelineno-27-65" href="#__codelineno-27-65"></a>New file name: Results_tuto_basicRun_2.nc
+</span><span id="__span-27-66"><a id="__codelineno-27-66" name="__codelineno-27-66" href="#__codelineno-27-66"></a>        Completed
+</span><span id="__span-27-67"><a id="__codelineno-27-67" name="__codelineno-27-67" href="#__codelineno-27-67"></a>Model Running...
+</span><span id="__span-27-68"><a id="__codelineno-27-68" name="__codelineno-27-68" href="#__codelineno-27-68"></a>Output to map. Totaltime = 7200.000000 s; Mean dt = 2.230207e-01 s
+</span></code></pre></div>
+In the model output, each resolution is store independently. 
+When open with pyncview, we can visualise each layer. QGIS can merge all these layer togather or a postratement steps will be needed.
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/outputs_v3.png" data-desc-position="bottom"><img alt="output_v3" src="../../figure/outputs_v3.png"></a></p>
+<h2 id="how-to-incorporate-more-complex-inputs">How to incorporate more complex inputs</h2>
+<p>Some more complex inputs can be used in this type of realistic model:</p>
+<h3 id="date-as-time-reference">Date as time reference</h3>
+<p>Up to here, the time was define as a duration in second from an arbitrary reference (begining of the simulation for example). All the inputs and the BG_param.txt file used this definition. Due to this convention, most of the inputs had to be modified to change date to duration in seconds, and the resluts are also in second (which can be confusing).
+The solver can use dates in the inputs (same time zone for all dates) and in the BG_param.txt, as:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>reftime = 2018-02-16T01:00:00
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>starttime = 2018-02-16T02:00:00
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>outputtimestep = 3600.000000
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>endtime = 2018-02-18T17:00:00
+</span></code></pre></div>
+<p>where:</p>
+<ul>
+<li><code>reftime</code> is the reference time for the simulation</li>
+<li>time convention is : <span class="arithmatex">\(yyyy-mm-dd\textbf{T}hh:mm:ss\)</span></li>
+</ul>
+<h3 id="map-boundary-conditions">Map boundary conditions</h3>
+<p>To improve the boundary forcing, there is possibility to use a netcdf file associated to contours to define the boundary based on a time evolving 2D surface. It can be use to impose water elevation to impose tide or any open-water forcing for example, specially in a nested configuration.</p>
+<p></p><div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>bndseg = tidebndpoly.bnd,tidebnd.nc,3;
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>bndtaper = 7200.000000
+</span></code></pre></div>
+where:
+-  <code>tidebnb.nc</code> is a 2D time varying map of water surface elevation.
+- <code>3</code> is the type of boundary (absorbing boundary).
+- <code>tidebndpoly.bnd</code> is a polygon where the boundary is applied
+- <code>bndtaper</code> is the duration of the relaxation of the boundary (<span class="arithmatex">\(s\)</span>)
+<p>As mention earlier, the computationnal domain can be define (or more specifically reduce from default DEM based domain) using an "aoi" (area of interest) which consist in a looped list of points.
+The boundary by default along it is a wall but can be modified by the following parameter <code>aoibnd</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>aoi = aoi_BGFLOOD.txt
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>aoibnd = 3;
+</span></code></pre></div>
+<h3 id="multi-demroughness-inputs">Multi DEM/roughness inputs</h3>
+<p>The code support different inputs of DEMs or roughness maps. It will use the first DEM to define the computational extend by default. Then, for each grid point, it will use the last DEM provided where a valide value is defined at this location.
+One can for example provide a low resolution DEM of all the domain then add a high resolution of a given urban area if higher resolution will be sought after there. Similar set-up is also allowed for roughness maps.
+</p><div class="language-text highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a># DEM for the full domain, 8m resolution
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>topofile = geofabric_8m_rupp_and_smart.nc?z;
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a># DEM for the urban center, 2m resolution
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>topofile = geofabric_2m_town.nc?z;
+</span></code></pre></div>
+<h3 id="multi-river-injection">Multi river injection</h3>
+<p>Any number of river injection can be added (tested up to a thousand).
+Just repeat the river injection line as many times as needed.</p>
+<h3 id="full-bg_paramtxt-file">Full BG_param.txt file</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>##########
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a># DEM    #
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>##########
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a># DEM for the full domain, 8m resolution
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>topofile = geofabric_8m_rupp_and_smart.nc?z;
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a># DEM for the urban center, 2m resolution
+</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a>topofile = geofabric_2m_town.nc?z;
+</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a>
+</span><span id="__span-32-11"><a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a>
+</span><span id="__span-32-12"><a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a>xmin = 1465335.000000
+</span><span id="__span-32-13"><a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a>xmax = 1497847.000000
+</span><span id="__span-32-14"><a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a>ymin = 5351567.000000
+</span><span id="__span-32-15"><a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a>ymax = 5388175.000000
+</span><span id="__span-32-16"><a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a>aoi = aoi_BGFLOOD.txt
+</span><span id="__span-32-17"><a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a>dx = 64.000000
+</span><span id="__span-32-18"><a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a>
+</span><span id="__span-32-19"><a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a>##############
+</span><span id="__span-32-20"><a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a># Forcing    #
+</span><span id="__span-32-21"><a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a>##############
+</span><span id="__span-32-22"><a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a>
+</span><span id="__span-32-23"><a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a>zsoffset = 0.000000
+</span><span id="__span-32-24"><a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a>zsinit = -1.000000
+</span><span id="__span-32-25"><a id="__codelineno-32-25" name="__codelineno-32-25" href="#__codelineno-32-25"></a>frictionmodel = 1
+</span><span id="__span-32-26"><a id="__codelineno-32-26" name="__codelineno-32-26" href="#__codelineno-32-26"></a>cfmap = Roughness.nc?zo
+</span><span id="__span-32-27"><a id="__codelineno-32-27" name="__codelineno-32-27" href="#__codelineno-32-27"></a>
+</span><span id="__span-32-28"><a id="__codelineno-32-28" name="__codelineno-32-28" href="#__codelineno-32-28"></a>rainfile =outputrain_test.nc?depth
+</span><span id="__span-32-29"><a id="__codelineno-32-29" name="__codelineno-32-29" href="#__codelineno-32-29"></a>
+</span><span id="__span-32-30"><a id="__codelineno-32-30" name="__codelineno-32-30" href="#__codelineno-32-30"></a>##########
+</span><span id="__span-32-31"><a id="__codelineno-32-31" name="__codelineno-32-31" href="#__codelineno-32-31"></a># Rivers #
+</span><span id="__span-32-32"><a id="__codelineno-32-32" name="__codelineno-32-32" href="#__codelineno-32-32"></a>##########
+</span><span id="__span-32-33"><a id="__codelineno-32-33" name="__codelineno-32-33" href="#__codelineno-32-33"></a>
+</span><span id="__span-32-34"><a id="__codelineno-32-34" name="__codelineno-32-34" href="#__codelineno-32-34"></a>
+</span><span id="__span-32-35"><a id="__codelineno-32-35" name="__codelineno-32-35" href="#__codelineno-32-35"></a>
+</span><span id="__span-32-36"><a id="__codelineno-32-36" name="__codelineno-32-36" href="#__codelineno-32-36"></a>
+</span><span id="__span-32-37"><a id="__codelineno-32-37" name="__codelineno-32-37" href="#__codelineno-32-37"></a>###############
+</span><span id="__span-32-38"><a id="__codelineno-32-38" name="__codelineno-32-38" href="#__codelineno-32-38"></a># Adaptation  #
+</span><span id="__span-32-39"><a id="__codelineno-32-39" name="__codelineno-32-39" href="#__codelineno-32-39"></a>###############
+</span><span id="__span-32-40"><a id="__codelineno-32-40" name="__codelineno-32-40" href="#__codelineno-32-40"></a>
+</span><span id="__span-32-41"><a id="__codelineno-32-41" name="__codelineno-32-41" href="#__codelineno-32-41"></a>initlevel = 0
+</span><span id="__span-32-42"><a id="__codelineno-32-42" name="__codelineno-32-42" href="#__codelineno-32-42"></a>Adaptation = Targetlevel,refine_mask_town.nc
+</span><span id="__span-32-43"><a id="__codelineno-32-43" name="__codelineno-32-43" href="#__codelineno-32-43"></a>minlevel = 0
+</span><span id="__span-32-44"><a id="__codelineno-32-44" name="__codelineno-32-44" href="#__codelineno-32-44"></a>maxlevel = 4
+</span><span id="__span-32-45"><a id="__codelineno-32-45" name="__codelineno-32-45" href="#__codelineno-32-45"></a>
+</span><span id="__span-32-46"><a id="__codelineno-32-46" name="__codelineno-32-46" href="#__codelineno-32-46"></a>################
+</span><span id="__span-32-47"><a id="__codelineno-32-47" name="__codelineno-32-47" href="#__codelineno-32-47"></a># Boundaries   #
+</span><span id="__span-32-48"><a id="__codelineno-32-48" name="__codelineno-32-48" href="#__codelineno-32-48"></a>################
+</span><span id="__span-32-49"><a id="__codelineno-32-49" name="__codelineno-32-49" href="#__codelineno-32-49"></a>
+</span><span id="__span-32-50"><a id="__codelineno-32-50" name="__codelineno-32-50" href="#__codelineno-32-50"></a>aoibnd = 3;
+</span><span id="__span-32-51"><a id="__codelineno-32-51" name="__codelineno-32-51" href="#__codelineno-32-51"></a>bndseg = tidebndpoly.bnd,tidebnd.nc,3;
+</span><span id="__span-32-52"><a id="__codelineno-32-52" name="__codelineno-32-52" href="#__codelineno-32-52"></a>
+</span><span id="__span-32-53"><a id="__codelineno-32-53" name="__codelineno-32-53" href="#__codelineno-32-53"></a>#############
+</span><span id="__span-32-54"><a id="__codelineno-32-54" name="__codelineno-32-54" href="#__codelineno-32-54"></a># Timing    #
+</span><span id="__span-32-55"><a id="__codelineno-32-55" name="__codelineno-32-55" href="#__codelineno-32-55"></a>#############
+</span><span id="__span-32-56"><a id="__codelineno-32-56" name="__codelineno-32-56" href="#__codelineno-32-56"></a>
+</span><span id="__span-32-57"><a id="__codelineno-32-57" name="__codelineno-32-57" href="#__codelineno-32-57"></a>bndtaper = 7200.000000
+</span><span id="__span-32-58"><a id="__codelineno-32-58" name="__codelineno-32-58" href="#__codelineno-32-58"></a>
+</span><span id="__span-32-59"><a id="__codelineno-32-59" name="__codelineno-32-59" href="#__codelineno-32-59"></a>reftime = 2018-02-16T01:00:00
+</span><span id="__span-32-60"><a id="__codelineno-32-60" name="__codelineno-32-60" href="#__codelineno-32-60"></a>
+</span><span id="__span-32-61"><a id="__codelineno-32-61" name="__codelineno-32-61" href="#__codelineno-32-61"></a>starttime = 2018-02-16T02:00:00
+</span><span id="__span-32-62"><a id="__codelineno-32-62" name="__codelineno-32-62" href="#__codelineno-32-62"></a>
+</span><span id="__span-32-63"><a id="__codelineno-32-63" name="__codelineno-32-63" href="#__codelineno-32-63"></a>outputtimestep = 3600.000000
+</span><span id="__span-32-64"><a id="__codelineno-32-64" name="__codelineno-32-64" href="#__codelineno-32-64"></a>
+</span><span id="__span-32-65"><a id="__codelineno-32-65" name="__codelineno-32-65" href="#__codelineno-32-65"></a>endtime = 2018-02-18T17:00:00
+</span><span id="__span-32-66"><a id="__codelineno-32-66" name="__codelineno-32-66" href="#__codelineno-32-66"></a>
+</span><span id="__span-32-67"><a id="__codelineno-32-67" name="__codelineno-32-67" href="#__codelineno-32-67"></a>#############
+</span><span id="__span-32-68"><a id="__codelineno-32-68" name="__codelineno-32-68" href="#__codelineno-32-68"></a># Others    #
+</span><span id="__span-32-69"><a id="__codelineno-32-69" name="__codelineno-32-69" href="#__codelineno-32-69"></a>#############
+</span><span id="__span-32-70"><a id="__codelineno-32-70" name="__codelineno-32-70" href="#__codelineno-32-70"></a>
+</span><span id="__span-32-71"><a id="__codelineno-32-71" name="__codelineno-32-71" href="#__codelineno-32-71"></a>gpudevice = 0
+</span><span id="__span-32-72"><a id="__codelineno-32-72" name="__codelineno-32-72" href="#__codelineno-32-72"></a>
+</span><span id="__span-32-73"><a id="__codelineno-32-73" name="__codelineno-32-73" href="#__codelineno-32-73"></a>vmax = 10.000000
+</span><span id="__span-32-74"><a id="__codelineno-32-74" name="__codelineno-32-74" href="#__codelineno-32-74"></a>
+</span><span id="__span-32-75"><a id="__codelineno-32-75" name="__codelineno-32-75" href="#__codelineno-32-75"></a>#############
+</span><span id="__span-32-76"><a id="__codelineno-32-76" name="__codelineno-32-76" href="#__codelineno-32-76"></a># Output    #
+</span><span id="__span-32-77"><a id="__codelineno-32-77" name="__codelineno-32-77" href="#__codelineno-32-77"></a>#############
+</span><span id="__span-32-78"><a id="__codelineno-32-78" name="__codelineno-32-78" href="#__codelineno-32-78"></a>
+</span><span id="__span-32-79"><a id="__codelineno-32-79" name="__codelineno-32-79" href="#__codelineno-32-79"></a>smallnc = 0
+</span><span id="__span-32-80"><a id="__codelineno-32-80" name="__codelineno-32-80" href="#__codelineno-32-80"></a>
+</span><span id="__span-32-81"><a id="__codelineno-32-81" name="__codelineno-32-81" href="#__codelineno-32-81"></a>savebyblk= false
+</span><span id="__span-32-82"><a id="__codelineno-32-82" name="__codelineno-32-82" href="#__codelineno-32-82"></a>
+</span><span id="__span-32-83"><a id="__codelineno-32-83" name="__codelineno-32-83" href="#__codelineno-32-83"></a>outvars = zs, u, v, h, hmax, zsmax, U, hUmax, Umax;
+</span><span id="__span-32-84"><a id="__codelineno-32-84" name="__codelineno-32-84" href="#__codelineno-32-84"></a>
+</span><span id="__span-32-85"><a id="__codelineno-32-85" name="__codelineno-32-85" href="#__codelineno-32-85"></a>outfile = Westport_Inundation.nc
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a real configuration run that would take about 15h on a A100 GPU. Not to be run on laptop GPU, but can be tested locally with decreased resolution (<code>dx</code>)</p>
+</div>
+<h2 id="ground-infiltration-losses-basic-ilcl-model">Ground infiltration losses (Basic ILCL model)</h2>
+<p>An Initial Loss, Continuous Loss model has been implemented in the code (see ILCL page). 
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../../figure/Ex_Merge.png" data-desc-position="bottom"><img alt="ILCL_tuto" src="../../figure/Ex_Merge.png"></a></p>
+<p>To use it, provide maps for the two coefficient as follow:</p>
+<p></p><div class="language-text highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>initialloss=InitialLoss.asc;
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>continuousloss=ContinuousLoss.asc;
+</span></code></pre></div>
+NetCDF files can also be used for these inputs.
+<h1 id="_1"></h1></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections", "toc.integrate", "content.code.copy", "content.code.select"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

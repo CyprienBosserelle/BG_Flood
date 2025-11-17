@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="struct_river_info" kind="struct" language="C++" prot="public">
+    <compoundname>RiverInfo</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_river_info_1a19983c223ae3307413c6dfbfa2bfc10c" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int RiverInfo&lt; T &gt;::nbir</definition>
+        <argsstring></argsstring>
+        <name>nbir</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="202" column="5" bodyfile="src/Arrays.h" bodystart="202" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1a123aace1c12e12e1ae09222d1e2519e2" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int RiverInfo&lt; T &gt;::nburmax</definition>
+        <argsstring></argsstring>
+        <name>nburmax</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="203" column="5" bodyfile="src/Arrays.h" bodystart="203" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1a97f76364c16c04fc0f64508d4032d6e6" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int RiverInfo&lt; T &gt;::nribmax</definition>
+        <argsstring></argsstring>
+        <name>nribmax</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="204" column="5" bodyfile="src/Arrays.h" bodystart="204" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1a7f02a9cb9938b6767e51051838605089" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* RiverInfo&lt; T &gt;::Xbidir</definition>
+        <argsstring></argsstring>
+        <name>Xbidir</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="205" column="5" bodyfile="src/Arrays.h" bodystart="205" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1acc47339b2971d13c38df210e6d53d327" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* RiverInfo&lt; T &gt;::Xridib</definition>
+        <argsstring></argsstring>
+        <name>Xridib</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="206" column="5" bodyfile="src/Arrays.h" bodystart="206" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1abcfa5ec4780a04924870b8a029f89ebb" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* RiverInfo&lt; T &gt;::xstart</definition>
+        <argsstring></argsstring>
+        <name>xstart</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="207" column="3" bodyfile="src/Arrays.h" bodystart="207" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1a8103114b3b37725689519ee0f3305d0d" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* RiverInfo&lt; T &gt;::xend</definition>
+        <argsstring></argsstring>
+        <name>xend</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="208" column="3" bodyfile="src/Arrays.h" bodystart="208" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1a69472a0470108c02a599606fa3ad25d8" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* RiverInfo&lt; T &gt;::ystart</definition>
+        <argsstring></argsstring>
+        <name>ystart</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="209" column="3" bodyfile="src/Arrays.h" bodystart="209" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1a6967584f565303137724a9e8a6d9331d" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* RiverInfo&lt; T &gt;::yend</definition>
+        <argsstring></argsstring>
+        <name>yend</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="210" column="3" bodyfile="src/Arrays.h" bodystart="210" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1abbe411cc11b1aa94d6a187c0217441ee" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* RiverInfo&lt; T &gt;::qnow</definition>
+        <argsstring></argsstring>
+        <name>qnow</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="211" column="3" bodyfile="src/Arrays.h" bodystart="211" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_river_info_1a3ee5137ec4603bb1eff4b703615b45a1" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* RiverInfo&lt; T &gt;::qnow_g</definition>
+        <argsstring></argsstring>
+        <name>qnow_g</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="212" column="3" bodyfile="src/Arrays.h" bodystart="212" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="200" column="1" bodyfile="src/Arrays.h" bodystart="201" bodyend="214"/>
+    <listofallmembers>
+      <member refid="struct_river_info_1a19983c223ae3307413c6dfbfa2bfc10c" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>nbir</name></member>
+      <member refid="struct_river_info_1a123aace1c12e12e1ae09222d1e2519e2" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>nburmax</name></member>
+      <member refid="struct_river_info_1a97f76364c16c04fc0f64508d4032d6e6" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>nribmax</name></member>
+      <member refid="struct_river_info_1abbe411cc11b1aa94d6a187c0217441ee" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>qnow</name></member>
+      <member refid="struct_river_info_1a3ee5137ec4603bb1eff4b703615b45a1" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>qnow_g</name></member>
+      <member refid="struct_river_info_1a7f02a9cb9938b6767e51051838605089" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>Xbidir</name></member>
+      <member refid="struct_river_info_1a8103114b3b37725689519ee0f3305d0d" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>xend</name></member>
+      <member refid="struct_river_info_1acc47339b2971d13c38df210e6d53d327" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>Xridib</name></member>
+      <member refid="struct_river_info_1abcfa5ec4780a04924870b8a029f89ebb" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>xstart</name></member>
+      <member refid="struct_river_info_1a6967584f565303137724a9e8a6d9331d" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>yend</name></member>
+      <member refid="struct_river_info_1a69472a0470108c02a599606fa3ad25d8" prot="public" virt="non-virtual"><scope>RiverInfo</scope><name>ystart</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
