@@ -49,8 +49,15 @@ This code is an open-source shallow water solver. Designed to be fast, it run on
 
 
  
-![type:video](./videos/Westport_flooding.mp4)
-![type:video](./videos/Tsunami_AtmosphericP.mp4)
+<!--![type:video](./videos/Westport_flooding.mp4) -->
+
+<video src="./videos/Westport_flooding.mp4" controls loop autoplay muted style="width:65%;">
+  Your browser does not support the video tag.
+</video>
+<video src="./videos/Tsunami_AtmosphericP.mp4" controls loop autoplay muted style="width:80%;">
+  Your browser does not support the video tag.
+</video>
+<!--![type:video](./videos/Tsunami_AtmosphericP.mp4)-->
 ![Tsunami](./videos/Tsunami_multi-levels.gif)
 ![Nadi](./videos/Nadi_Flooding.gif)
 
