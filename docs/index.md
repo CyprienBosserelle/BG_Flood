@@ -63,9 +63,7 @@ This code is an open-source shallow water solver. Designed to be fast, it run on
 
 
 # Model development stage
-BG-Flood has now reach the first release stage but some further development are already ongoing or planned.       
-
-The master branch is at stage 4 of development with 5 stage planned as below:
+BG-Flood has now reach the first release stage but some further development are already ongoing or planned:
 
 - [x] Block Uniform formulation at constant level with masked blocks (with a full swing of _user friendly_ capabilities)
 - [x] Static Block uniform Quad-tree formulation (i.e. adapted mesh at the first step only), grid self-generated
