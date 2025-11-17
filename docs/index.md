@@ -2,7 +2,7 @@
 
 
 # <span style="color: blue;">Welcome to the BG_Flood documentation !</span>
-BG-Flood is a Shallow Water Equation (SWE) model based on the St Venant formulation of [Basilisk](http://basilisk.fr/) but applied to a Block Uniform Quadtree memory structure on the GPU (based on [Vacondio _et al._](https://dl.acm.org/citation.cfm?id=3031292)).
+BG-Flood is a Shallow Water Equation (SWE) model based on the St Venant formulation of [Basilisk](http://basilisk.fr/) but applied to a Block Uniform Quadtree memory structure on the GPU (based on [Vacondio _et al._](https://dl.acm.org/citation.cfm?id=3031292)). The code is a shock-capturing finite volume water solver, design to handle complex topography.
 
 The model is designed to simulate [flood/inundation](https://english.stackexchange.com/questions/131195/difference-between-flooding-and-inundation) caused by tsunami, river, rain, tide or storm surge (from wind stress or atmospherique pressure differential) or any combination of these. The model does not (yet) include the effect of wind waves. The model is not restricted to simulating inundation hazard and can also be used for depth averaged circulation simulation. 
 
