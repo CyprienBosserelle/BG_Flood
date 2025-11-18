@@ -264,7 +264,7 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
-	T CFL_H = CFL//T(0.5);// Should be different in Multi layer
+	T CFL_H = CFL;//T(0.5);// Should be different in Multi layer
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
