@@ -8,9 +8,7 @@ The adaptive version of the model is currently under heavy development. Makefile
 
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
-
-[![Documentation (Work in progress)](https://img.shields.io/badge/MkDocs-526CFE?logo=materialformkdocs&logoColor=fff)](https://cyprienbosserelle.github.io/BG_Flood/)
+[![DocumentationNNN](https://img.shields.io/badge/Documentation-MkDocs-blue?logo=materialformkdocs)](https://cyprienbosserelle.github.io/BG_Flood/)
 
 ## Reference
 
