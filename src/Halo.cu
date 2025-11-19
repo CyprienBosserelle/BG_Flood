@@ -149,12 +149,12 @@ template void Recalculatehh<double>(Param XParam, BlockP<double> XBlock, Evolvin
 */
 template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
-	unsigned int blkmemwidth = XParam.blkmemwidth;
+	int blkmemwidth = XParam.blkmemwidth;
 	
 	int ix = threadIdx.x -1;
 	int iy = threadIdx.y -1;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 	
 	int  n;
 	
@@ -211,6 +211,8 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t
 {
 
 	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+
+	dim3 blockDimHaloLR2(1, XParam.blkwidth*2, 1);
 	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
@@ -220,6 +222,12 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t
 	fillRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
 	//fillRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.RightBot, XBlock.RightTop, XBlock.LeftBot, XBlock.BotLeft, XBlock.TopLeft, z);
 	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
+	//fillLeftright << <gridDim, blockDimHaloLR2, 0 >> > (XParam, XBlock, z);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	
+
 	fillBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, z);
 	//fillBot <<<gridDim, blockDimHaloBT, 0>>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.BotLeft, XBlock.BotRight, XBlock.TopLeft, XBlock.LeftTop, XBlock.RightTop, z);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -256,6 +264,8 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock,  T* z)
 }
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock,double* z);
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+
+
 
 
 /*! \fn void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
@@ -894,6 +904,51 @@ template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T>
 template __global__ void refine_linear_LeftGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_LeftGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+template <class T> __global__ void refine_bilinear_LeftGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int LB = XBlock.LeftBot[ib];
+	
+
+
+
+
+
+	if (XBlock.level[LB] < XBlock.level[ib])
+	{
+		if (iy > 0 && iy < XParam.blkwidth - 1)
+		{
+			int j = iy;
+
+			int jj = XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+
+			T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
+
+			
+			int write = memloc(XParam.halowidth, blkmemwidth, -1, j, ib);
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+			iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj + 1, LB);
+			iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj, LB);
+			iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, jj + 1, LB);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), jr);
+
+		}
+
+	}
+}
+template __global__ void refine_bilinear_LeftGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_LeftGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 
 template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
@@ -923,7 +978,7 @@ template void refine_linear_Right<double>(Param XParam, int ib, BlockP<double> X
 
 template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	
 	int iy = threadIdx.y;
@@ -955,6 +1010,50 @@ template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T
 }
 template __global__ void refine_linear_RightGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_RightGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
+
+template <class T> __global__ void refine_bilinear_RightGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int RB = XBlock.RightBot[ib];
+
+
+	if (XBlock.level[RB] < XBlock.level[ib])
+	{
+		if (iy > 0 && iy < XParam.blkwidth - 1)
+		{
+
+
+			int j = iy;
+			int jj = XBlock.LeftBot[RB] == ib ? floor(j * (T)0.5) : floor(j * (T)0.5) + XParam.blkwidth / 2;
+
+			T jr = ceil(iy * (T)0.5) * 2 > iy ? T(0.25) : T(0.75);
+
+
+			int write = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth,- 1, jj, RB);
+			iib = memloc(XParam.halowidth, blkmemwidth,- 1, jj + 1, RB);
+			iic = memloc(XParam.halowidth, blkmemwidth, 0, jj, RB);
+			iid = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, RB);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), jr);
+
+
+		}
+
+
+	}
+}
+template __global__ void refine_bilinear_RightGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_RightGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
@@ -1017,6 +1116,49 @@ template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> 
 template __global__ void refine_linear_BotGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_BotGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+template <class T> __global__ void refine_bilinear_BotGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int BL = XBlock.BotLeft[ib];
+
+	if (XBlock.level[BL] < XBlock.level[ib])
+	{
+		if (ix > 0 && ix < XParam.blkwidth - 1)
+		{
+
+
+			int i = ix;
+			int ii = XBlock.TopLeft[BL] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
+
+			int write = memloc(XParam.halowidth, blkmemwidth, i, -1, ib);
+
+			T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
+
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth, ii, XParam.blkwidth - 1, BL);
+			iib = memloc(XParam.halowidth, blkmemwidth, ii, XParam.blkwidth, BL);
+			iic = memloc(XParam.halowidth, blkmemwidth, ii + 1, XParam.blkwidth - 1, BL);
+			iid = memloc(XParam.halowidth, blkmemwidth, ii + 1, XParam.blkwidth, BL);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.25));
+
+		}
+
+
+
+	}
+}
+template __global__ void refine_bilinear_BotGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_BotGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
@@ -1076,6 +1218,44 @@ template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> 
 template __global__ void refine_linear_TopGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_TopGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+template <class T> __global__ void refine_bilinear_TopGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int TL = XBlock.TopLeft[ib];
+
+	if (XBlock.level[TL] < XBlock.level[ib])
+	{
+		if (ix > 0 && ix < XParam.blkwidth - 1)
+		{
+
+			int i = ix;
+			int ii = XBlock.BotLeft[TL] == ib ? floor(i * (T)0.5) : floor(i * (T)0.5) + XParam.blkwidth / 2;
+
+			T jr = ceil(ix * (T)0.5) * 2 > ix ? T(0.25) : T(0.75);
+			int write = memloc(XParam.halowidth, blkmemwidth, i, XParam.blkwidth, ib);
+
+			int iia, iib, iic, iid;
+
+			iia = memloc(XParam.halowidth, blkmemwidth, ii, -1, TL);
+			iib = memloc(XParam.halowidth, blkmemwidth, ii, 0, TL);
+			iic = memloc(XParam.halowidth, blkmemwidth, ii + 1, -1, TL);
+			iid = memloc(XParam.halowidth, blkmemwidth, ii + 1, 0, TL);
+
+			z[write] = BilinearInterpolation(z[iia], z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), jr, T(0.75));
+		}
+
+
+	}
+}
+template __global__ void refine_bilinear_TopGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__ void refine_bilinear_TopGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
+
 template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1105,6 +1285,21 @@ template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T
 }
 template void refine_linearGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linearGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
+
+template <class T> void refine_bilinearGPU(Param XParam, BlockP<T> XBlock, T* z)
+{
+	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	refine_bilinear_LeftGPU << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, z);
+	refine_bilinear_RightGPU << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, z);
+	refine_bilinear_TopGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z);
+	refine_bilinear_BotGPU << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, z);
+	CUDA_CHECK(cudaDeviceSynchronize());
+}
+template void refine_bilinearGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
+template void refine_bilinearGPU<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 
 template <class T> void HaloFluxCPULR(Param XParam, int ib, BlockP<T> XBlock, T *z)
@@ -1408,6 +1603,223 @@ template <class T> __global__  void HaloFluxGPULRnew(Param XParam, BlockP<T> XBl
 		}
 	}
 }
+template <class T> __global__  void HaloFluxGPULMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	if (ibl < XParam.nblk)
+	{
+
+		int ib = XBlock.active[ibl];
+
+
+		int j = iy;
+
+		i = memloc(XParam.halowidth, blkmemwidth, -1, j, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])
+		{
+
+
+
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockLeft = j < (XParam.blkwidth / 2) ? XBlock.LeftBot[ib] : XBlock.LeftTop[ib];
+
+			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, BlockLeft);
+			iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj + 1, BlockLeft);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.LeftBot[ib]] <= XBlock.level[ib])
+		{
+			jj = XBlock.level[XBlock.LeftBot[ib]] == XBlock.level[ib] ? j : XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
+			zout = z[iia];
+
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPULMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPULMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> __global__  void HaloFluxGPUBMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	//unsigned int iy = threadIdx.x;
+	int ibl = blockIdx.x;
+
+
+	int j = ix;
+
+
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+
+		i = memloc(XParam.halowidth, blkmemwidth, j, -1, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+
+
+
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockBot = j < (XParam.blkwidth / 2) ? XBlock.BotLeft[ib] : XBlock.BotRight[ib];
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BlockBot);
+			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, XParam.blkwidth - 1, BlockBot);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.BotLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		{
+			jj = XBlock.level[XBlock.BotLeft[ib]] == XBlock.level[ib] ? j : XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
+			zout = z[iia];
+
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPUBMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPUBMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	if (ibl < XParam.nblk)
+	{
+
+		int ib = XBlock.active[ibl];
+
+
+		int j = iy;
+
+		i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.RightBot[ib]] > XBlock.level[ib])
+		{
+
+			
+			
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockRight = j < (XParam.blkwidth / 2) ? XBlock.RightBot[ib] : XBlock.RightTop[ib];
+				
+			iia = memloc(XParam.halowidth, blkmemwidth, 0, jj, BlockRight);
+			iib = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, BlockRight);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.RightBot[ib]] <= XBlock.level[ib] )
+		{
+			jj = XBlock.level[XBlock.RightBot[ib]] == XBlock.level[ib] ? j : XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * T(0.5)) : floor(j *T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
+			zout = z[iia];
+		
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPURMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPURMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	//unsigned int iy = threadIdx.x;
+	int ibl = blockIdx.x;
+	
+
+	int j = ix;
+
+
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+
+		i = memloc(XParam.halowidth, blkmemwidth, j, XParam.blkwidth, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+		{
+
+
+
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockTop = j < (XParam.blkwidth / 2) ? XBlock.TopLeft[ib] : XBlock.TopRight[ib];
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, 0, BlockTop);
+			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, 0, BlockTop);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.TopLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		{
+			jj = XBlock.level[XBlock.TopLeft[ib]] == XBlock.level[ib] ? j : XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopLeft[ib]);
+			zout = z[iia];
+
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPUTMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPUTMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 template <class T> void HaloFluxCPUBT(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
@@ -1914,12 +2326,12 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 
 template <class T> __global__ void fillLeft(int halowidth, int* active, int * level, int* leftbot, int * lefttop, int * rightbot, int* botright,int * topright, T * a)
 {
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = 0;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int lev = level[ib];
 	int LB = leftbot[ib];
@@ -2083,6 +2495,350 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 }
 template __global__ void fillLeft<float>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, float* a);
 template __global__ void fillLeft<double>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, double* a);
+
+
+template <class T> __global__ void fillLeftright(Param XParam, BlockP<T> XBlock, T* a)
+{
+	
+	int blkwidth = XParam.blkwidth;
+	
+	int halowidth = XParam.halowidth;
+		
+	int blkmemwidth = blkwidth + XParam.halowidth * 2;
+
+	int iy, ibl, ib, lev;
+	int jj, ii, ir, it, itr;
+	int write,read;
+	T a_read;
+	T w1, w2, w3;
+	ibl = blockIdx.x;
+	ib = XBlock.active[ibl];
+	lev = XBlock.level[ib];
+
+
+	if (threadIdx.y < blkwidth)//left side
+	{
+
+		iy = threadIdx.y;
+		write = memloc(halowidth, blkmemwidth, -1, iy, ib);
+
+		
+
+		int LB = XBlock.LeftBot[ib];
+		int LT = XBlock.LeftTop[ib];
+		int RBLB = XBlock.RightBot[LB];
+		int BRLB = XBlock.BotRight[LB];
+		int TRLT = XBlock.TopRight[LT];
+
+		int levBRLB = XBlock.level[BRLB];
+		int levTRLT = XBlock.level[TRLT];
+		int levLB = XBlock.level[LB];
+		int levLT = XBlock.level[LT];
+		if (LB == ib)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				read = memloc(halowidth, blkmemwidth, 0, iy, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				if (LT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, 0, iy, ib);
+					a_read = a[read];
+
+				}
+				else
+				{
+
+					jj = (iy - (blkwidth / 2)) * 2;
+					ii = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj, LT);
+					ir = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj, LT);
+					it = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj + 1, LT);
+					itr = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj + 1, LT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+
+		}
+		else if (levLB == lev)
+		{
+			read = memloc(halowidth, blkmemwidth, (blkwidth - 1), iy, LB);
+			a_read = a[read];
+		}
+		else if (levLB > lev)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				jj = iy * 2;
+				ii = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj, LB);
+				ir = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj, LB);
+				it = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj + 1, LB);
+				itr = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj + 1, LB);
+				a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			else
+			{
+				if (LT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, 0, iy, ib);
+					a_read = a[read];
+				}
+				else
+				{
+					jj = (iy - (blkwidth / 2)) * 2;
+
+					ii = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj, LT);
+					ir = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj, LT);
+					it = memloc(halowidth, blkmemwidth, (blkwidth - 1), jj + 1, LT);
+					itr = memloc(halowidth, blkmemwidth, (blkwidth - 2), jj + 1, LT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+		}
+		else if (levLB < lev)
+		{
+			jj = RBLB == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + blkwidth / 2;
+			w1 = (T)1.0 / (T)3.0;
+			w2 = ceil(iy * (T)0.5) * 2 > iy ? T(1.0 / 6.0) : T(0.5);
+			w3 = ceil(iy * (T)0.5) * 2 > iy ? T(0.5) : T(1.0 / 6.0);
+
+			ii = memloc(halowidth, blkmemwidth, 0, iy, ib);
+			ir = memloc(halowidth, blkmemwidth, blkwidth - 1, jj, LB);
+			it = memloc(halowidth, blkmemwidth, blkwidth - 1, jj - 1, LB);
+			if (RBLB == ib)
+			{
+				if (iy == 0)
+				{
+					if (BRLB == LB)
+					{
+						w3 = (T)0.5 * (1.0 - w1);
+						w2 = w3;
+						it = ir;
+					}
+					else if (levBRLB < levLB)
+					{
+						w1 = T(4.0 / 10.0);
+						w2 = T(5.0 / 10.0);
+						w3 = T(1.0 / 10.0);
+						it = memloc(halowidth, blkmemwidth, blkwidth - 1, blkwidth - 1, BRLB);
+
+					}
+					else if (levBRLB == levLB)
+					{
+						it = memloc(halowidth, blkmemwidth, blkwidth - 1, blkwidth - 1, BRLB);
+					}
+					else if (levBRLB > levLB)
+					{
+						w1 = T(1.0 / 4.0);
+						w2 = T(1.0 / 2.0);
+						w3 = T(1.0 / 4.0);
+						it = memloc(halowidth, blkmemwidth, blkwidth - 1, blkwidth - 1, BRLB);
+					}
+				}
+			}
+			else
+			{
+				if (iy == (blkwidth - 1))
+				{
+					if (TRLT == LT)
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						ir = it;
+					}
+					else if (levTRLT < levLT)
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 1.0 / 10.0;
+						w3 = 5.0 / 10.0;
+						ir = memloc(halowidth, blkmemwidth, blkwidth - 1, 0, TRLT);
+					}
+					else if (levTRLT == levLT)
+					{
+						ir = memloc(halowidth, blkmemwidth, blkwidth - 1, 0, TRLT);
+					}
+					else if (levTRLT > levLT)
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						ir = memloc(halowidth, blkmemwidth, blkwidth - 1, 0, TRLT);
+
+					}
+				}
+			}
+			a_read = w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		}
+
+		a[write] = a_read;
+	}
+	else//right side
+	{
+		iy = threadIdx.y - blkwidth;
+
+		int RB = XBlock.RightBot[ib];
+		int RT = XBlock.RightTop[ib];
+		//int LB = leftbot[ib];
+		//int BL = botleft[ib];
+		int LBRB = XBlock.LeftBot[RB];
+		int TLRT = XBlock.TopLeft[RT];
+		int BLRB = XBlock.BotLeft[RB];
+
+		int levRB = XBlock.level[RB];
+		int levRT = XBlock.level[RT];
+		int levBLRB = XBlock.level[BLRB];
+		int levTLRT = XBlock.level[TLRT];
+
+
+		if (RB == ib)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				read = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+				a_read = a[read];
+			}
+			else
+			{
+				if (RT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+					a_read = a[read];
+				}
+				else
+				{
+					jj = (iy - (blkwidth / 2)) * 2;
+					ii = memloc(halowidth, blkmemwidth, 0, jj, RT);
+					ir = memloc(halowidth, blkmemwidth, 1, jj, RT);
+					it = memloc(halowidth, blkmemwidth, 0, jj + 1, RT);
+					itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+		}
+		else if (levRB == lev)
+		{
+			read = memloc(halowidth, blkmemwidth, 0, iy, RB);
+			a_read = a[read];
+		}
+		else if (levRB > lev)
+		{
+			if (iy < (blkwidth / 2))
+			{
+				jj = iy * 2;
+
+
+				ii = memloc(halowidth, blkmemwidth, 0, jj, RB);
+				ir = memloc(halowidth, blkmemwidth, 1, jj, RB);
+				it = memloc(halowidth, blkmemwidth, 0, jj + 1, RB);
+				itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RB);
+
+				a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+			}
+			else
+			{
+				if (RT == ib)
+				{
+					read = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+					a_read = a[read];
+				}
+				else
+				{
+					jj = (iy - (blkwidth / 2)) * 2;
+
+					ii = memloc(halowidth, blkmemwidth, 0, jj, RT);
+					ir = memloc(halowidth, blkmemwidth, 1, jj, RT);
+					it = memloc(halowidth, blkmemwidth, 0, jj + 1, RT);
+					itr = memloc(halowidth, blkmemwidth, 1, jj + 1, RT);
+
+					a_read = T(0.25) * (a[ii] + a[ir] + a[it] + a[itr]);
+				}
+			}
+		}
+		else if (levRB < lev)
+		{
+			//
+			jj = LBRB == ib ? ceil(iy * (T)0.5) : ceil(iy * (T)0.5) + blkwidth / 2;
+			w1 = 1.0 / 3.0;
+			w2 = ceil(iy * (T)0.5) * 2 > iy ? T(1.0 / 6.0) : T(0.5);
+			w3 = ceil(iy * (T)0.5) * 2 > iy ? T(0.5) : T(1.0 / 6.0);
+			ii = memloc(halowidth, blkmemwidth, blkwidth - 1, iy, ib);
+			ir = memloc(halowidth, blkmemwidth, 0, jj, RB);
+			it = memloc(halowidth, blkmemwidth, 0, jj - 1, RB);
+			if (LBRB == ib)
+			{
+				if (iy == 0)
+				{
+					if (BLRB == RB)
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						it = ir;
+					}
+					else if (levBLRB < levRB)
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 5.0 / 10.0;
+						w3 = 1.0 / 10.0;
+						it = memloc(halowidth, blkmemwidth, 0, blkwidth - 1, BLRB);
+					}
+					else if (levBLRB == levRB)
+					{
+						it = memloc(halowidth, blkmemwidth, 0, blkwidth - 1, BLRB);
+					}
+					else if (levBLRB > levRB)
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						it = memloc(halowidth, blkmemwidth, 0, blkwidth - 1, BLRB);
+					}
+				}
+			}
+			else
+			{
+				if (iy == (blkwidth - 1))
+				{
+					if (TLRT == RT)
+					{
+						w3 = 0.5 * (1.0 - w1);
+						w2 = w3;
+						ir = it;
+					}
+					else if (levTLRT < levRT)
+					{
+						w1 = 4.0 / 10.0;
+						w2 = 1.0 / 10.0;
+						w3 = 5.0 / 10.0;
+						ir = memloc(halowidth, blkmemwidth, 0, 0, TLRT);
+					}
+					else if (levTLRT == levRT)
+					{
+						ir = memloc(halowidth, blkmemwidth, 0, 0, TLRT);
+					}
+					else if (levTLRT > levRT)
+					{
+						w1 = 1.0 / 4.0;
+						w2 = 1.0 / 2.0;
+						w3 = 1.0 / 4.0;
+						ir = memloc(halowidth, blkmemwidth, 0, 0, TLRT);
+					}
+				}
+			}
+
+			a_read = w1 * a[ii] + w2 * a[ir] + w3 * a[it];
+		}
+		a[write] = a_read;
+		
+	}
+}
+template __global__ void fillLeftright<float>(Param XParam, BlockP<float> XBlock, float* a);
+template __global__ void fillLeftright<double>(Param XParam, BlockP<double> XBlock, double* a);
+
 
 /*! \fn void void fillLeftnew(...)
 * \brief New way of filling the left halo 2 blocks at a time to maximize GPU occupancy
@@ -2613,12 +3369,12 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 template <class T> __global__ void fillRight(int halowidth, int* active, int* level, int * rightbot,int* righttop,int * leftbot,int*botleft,int* topleft, T* a)
 {
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = blockDim.y - 1;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
@@ -3100,12 +3856,12 @@ template void fillRightFlux<double>(Param XParam, bool doProlongation, int ib, B
 
 template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
 {
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.y + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	//unsigned int ix = blockDim.y - 1;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int RB = rightbot[ib];
 	int RT = righttop[ib];
@@ -4550,12 +5306,12 @@ template void fillTopFlux<double>(Param XParam, bool doProlongation, int ib, Blo
 
 template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
 {
-	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
+	int ix = threadIdx.x;
 	//unsigned int iy = blockDim.x - 1;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = active[ibl];
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
 
 	int TL = topleft[ib];
 	int TR = topright[ib];
@@ -4847,106 +5603,699 @@ template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock
 	int RB = XBlock.RightBot[ib];
 	int RT = XBlock.RightTop[ib];
 
+	int Cornerblk;
+
 	//int LBTL = XBlock.leftbot[TL];
 	//int BLTL = XBlock.botleft[TL];
 	//int RBTR = XBlock.rightbot[TR];
+	int iia, iib, iic, iid,iit;
+
 
 	int iout, ii;
+	
+	T zout;
 	
 
 	if (ix == 0)
 	{
 		// Bot left corner
+		iout = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth, ib);
+		Cornerblk = XBlock.BotRight[XBlock.LeftBot[ib]];
+		//or
+		//Cornerblk = XBlock.LeftTop[XBlock.BotLeft[ib]];
 
 		iout = memloc(halowidth, blkmemwidth, -1, -1, ib);
+
+		bool prefBL, prefLB;
+		prefBL = BL == ib ? false : XBlock.level[ib] == XBlock.level[BL];
+		prefLB = LB == ib ? false : XBlock.level[ib] == XBlock.level[LB];
 
 
 		if (BL == ib && LB == ib)//
 		{
 			ii = memloc(halowidth, blkmemwidth, 0, 0, ib);
+			zout = z[ii];
 		}
 		else
 		{
-			if (BL != ib)
+			if (prefBL)
 			{
 				ii = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
+				zout = z[ii];
+			}
+			else if (prefLB)
+			{
+				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
+				zout = z[ii];
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
+				//if (BL != ib)
+				//{
+				//	if (XBlock.level[BL] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
+				//		//iib = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 2, BL);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth - 1, BL);
+				//		zout = z[ii];
+
+				//	}
+
+				//}
+				//else // with LB instead of BL
+				//{
+				//	if (XBlock.level[LB] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
+				//		//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, -1, LB);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, -1, LB);
+				//		zout = z[ii];
+
+				//	}
+				//}
+				if (XBlock.level[Cornerblk] == XBlock.level[ib])
+				{
+
+					ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					zout = z[ii];
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 1))
+				{
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, Cornerblk);
+
+					zout = 0.25 * (z[iia] + z[iib] + z[iic] + z[iid]);
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 2))
+				{
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, Cornerblk);
+
+					zout = (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 3, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 3, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 4, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 4, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 2, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 3, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 3, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 4, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 4, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					zout = zout / 16;
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+				{
+
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, 1, ib);
+
+					T ziid = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					zout = BilinearInterpolation(z[iia], z[iib], z[iic], ziid, T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), T(0.25));
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+				{
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
+
+					T ziid = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 4, ib);
+
+					ziid += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 4, ib);
+
+					ziid += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 2, ib);
+
+					ziid += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					ziid = ziid / 16;
+
+
+
+					zout = BilinearInterpolation(z[iia], z[iib], z[iic], ziid, T(0.0), T(1.0), T(0.0), T(1.0), T(0.375), T(0.375));
+				}
 			}
 
 		}
-		z[iout] = z[ii];
+		z[iout] = zout;
 	}
 	if (ix == 1)
 	{
 	
 		// Top left corner
 		iout = memloc(halowidth, blkmemwidth, -1, XParam.blkwidth, ib);
+		Cornerblk = XBlock.TopRight[XBlock.LeftTop[ib]];
+		//or
+		//Cornerblk = XBlock.LeftBot[XBlock.TopLeft[ib]];
+
+		bool prefTL, prefLT;
+		prefTL = TL == ib ? false : XBlock.level[ib] == XBlock.level[TL];
+		prefLT = LT == ib ? false : XBlock.level[ib] == XBlock.level[LT];
+
 		if (TL == ib && LT == ib)//
 		{
+
 			ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+			zout = z[ii];
 		}
 		else
 		{
-			if (TL != ib)
+			if (prefTL)
 			{
 				ii = memloc(halowidth, blkmemwidth, -1, 0, TL);
+				zout = z[ii];
+			}
+			else if (prefLT)
+			{
+				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth , LT);
+				zout = z[ii];
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, LT);
+				//if (TL != ib)
+				//{
+				//	if (XBlock.level[TL] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, -1, 0, TL);
+				//		//iib = memloc(halowidth, blkmemwidth, -1, 1, TL);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, -1, 0, TL);
+				//		zout = z[ii];
+
+				//	}
+				//}
+				//else //with LT instead of TL
+				//{
+				//	if (XBlock.level[LT] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, XParam.blkwidth -1, XParam.blkwidth, LT);
+				//		//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth -2, XParam.blkwidth, LT);
+				//		zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth -1, XParam.blkwidth , LT);
+				//		zout = z[ii];
+
+				//	}
+				//}
+				if (XBlock.level[Cornerblk] == XBlock.level[ib])
+				{
+
+					ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					zout = z[ii];
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 1))
+				{
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, Cornerblk);
+
+					zout = 0.25 * (z[iia] + z[iib] + z[iic] + z[iid]);
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 2))
+				{
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, Cornerblk);
+
+					zout = (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 2, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 2, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 3, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 3, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 0, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 0, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 1, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 1, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 2, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 2, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 3, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 3, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					zout = zout / 16;
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+				{
+
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, -1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, 0, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
+
+					T ziic = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.25), T(0.75));
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+				{
+					iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, -1, Cornerblk);
+					iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, 0, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, 0, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, ib);
+
+					T ziic = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 4, ib);
+
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 3, ib);
+					iilb = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 3, ib);
+					iilc = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 4, ib);
+					iild = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 4, ib);
+
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+					iila = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 1, ib);
+					iilb = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 1, ib);
+					iilc = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 2, ib);
+					iild = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 2, ib);
+
+					ziic += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					ziic = ziic / 16;
+
+
+
+					zout = BilinearInterpolation(z[iia], z[iib], ziic, z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.375), T(0.625));
+				}
 			}
+			
 
 		}
-		z[iout] = z[ii];
+		z[iout] = zout;
 	
 	}
 	if (ix == 2)
 	{
 		// Top right corner
 		iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth, ib);
+
+		Cornerblk = XBlock.RightBot[XBlock.TopRight[ib]];
+		//or
+		//Cornerblk = XBlock.TopRight[XBlock.RightTop[ib]];
+
+		bool prefTR, prefRT;
+		prefTR = TR == ib ? false : XBlock.level[ib] == XBlock.level[TR];
+		prefRT = RT == ib ? false : XBlock.level[ib] == XBlock.level[RT];
+
 		if (TR == ib && RT == ib)//
 		{
 			ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
+			zout = z[ii];
 		}
 		else
 		{
-			if (TR != ib)
+			if (prefTR)
 			{
 				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
+				zout = z[ii];
+			}
+			else if (prefRT)
+			{
+				ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
+				zout = z[ii];
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
+				//if (TR != ib)
+				//{
+				//	if (XBlock.level[TR] > XBlock.level[ib])
+				//	{
+				//		iit = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
+				//		//iib = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, TR);
+				//		zout = z[iit];// T(0.5)* (z[iit] + z[iib]);
+				//	}
+				//	else
+				//	{
+				//		ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, 0, TR);
+				//		zout = z[ii];
+
+				//	}
+				//}
+				//else //with RLT instead of TR
+				//{
+					//if (XBlock.level[TR] > XBlock.level[ib])
+					//{
+					//	iit = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
+					//	//iib = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, RT);
+					//	zout = z[iit];//T(0.5) * (z[iit] + z[iib]);
+					//}
+					//else
+					//{
+					//	ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth, RT);
+					//	zout = z[ii];
+
+					//}
+					if (XBlock.level[Cornerblk] == XBlock.level[ib])
+					{
+
+						ii = memloc(halowidth, blkmemwidth, 0, 0, Cornerblk);
+						zout = z[ii];
+					}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 1))
+					{
+						iia = memloc(halowidth, blkmemwidth, 0, 0, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 1, 0, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 0, 1, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 1, 1, Cornerblk);
+
+						zout = 0.25 * (z[iia] + z[iib] + z[iic] + z[iid]);
+					}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 2))
+					{
+						iia = memloc(halowidth, blkmemwidth, 0, 0, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 1, 0, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 0, 1, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 1, 1, Cornerblk);
+
+						zout = (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						iia = memloc(halowidth, blkmemwidth, 2, 2, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 3, 2, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 2, 3, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 3, 3, Cornerblk);
+
+						zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						iia = memloc(halowidth, blkmemwidth, 2, 0, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 3, 0, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 2, 1, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 3, 1, Cornerblk);
+
+						zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						iia = memloc(halowidth, blkmemwidth, 0, 2, Cornerblk);
+						iib = memloc(halowidth, blkmemwidth, 1, 2, Cornerblk);
+						iic = memloc(halowidth, blkmemwidth, 0, 3, Cornerblk);
+						iid = memloc(halowidth, blkmemwidth, 1, 3, Cornerblk);
+
+						zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+						zout = zout / 16;
+					}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+					{
+
+						iib = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iic = memloc(XParam.halowidth, blkmemwidth, 0, -1, Cornerblk);
+						iid = memloc(XParam.halowidth, blkmemwidth, 0, 0, Cornerblk);
+
+						int iila, iilb, iilc, iild;
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, ib);
+
+						T ziia = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						zout = BilinearInterpolation(ziia, z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), T(0.75));
+					}
+					else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+					{
+						iib = memloc(XParam.halowidth, blkmemwidth, -1, 0, Cornerblk);
+						iic = memloc(XParam.halowidth, blkmemwidth, 0, -1, Cornerblk);
+						iid = memloc(XParam.halowidth, blkmemwidth, 0, 0, Cornerblk);
+
+						int iila, iilb, iilc, iild;
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, ib);
+
+						T ziia = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 3, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 3, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 4, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 4, ib);
+
+						ziia += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 1, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 1, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, XParam.blkwidth - 2, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, XParam.blkwidth - 2, ib);
+
+						ziia += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+						iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 3, ib);
+						iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 3, ib);
+						iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 4, ib);
+						iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 4, ib);
+
+						ziia += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+						ziia = ziia / 16;
+
+
+
+						zout = BilinearInterpolation(ziia, z[iib], z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.625), T(0.625));
+					}
+				//}
 			}
 
 		}
-		z[iout] = z[ii];
+		z[iout] = zout;
 
 	}
 	if (ix == 3)
 	{
 		// Bot right corner
 		iout = memloc(halowidth, blkmemwidth, XParam.blkwidth, -1, ib);
+
+		Cornerblk = XBlock.RightTop[XBlock.BotRight[ib]];
+		//or
+		//Cornerblk = XBlock.BotLeft[XBlock.RightBot[ib]];
+
+		bool prefBR, prefRB;
+		prefBR = BR == ib ? false : XBlock.level[ib] == XBlock.level[BR];
+		prefRB = RB == ib ? false : XBlock.level[ib] == XBlock.level[RB];
+
+		
+
 		if (BR == ib && RB == ib)//
 		{
 			ii = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, ib);
+			zout = z[ii];
 		}
 		else
 		{
-			if (BR != ib)
+			if (prefBR)
 			{
 				ii = memloc(halowidth, blkmemwidth, XParam.blkwidth, XParam.blkwidth - 1, BR);
+				zout = z[ii];
+			}
+			else if (prefRB)
+			{
+				ii = memloc(halowidth, blkmemwidth, 0, -1, RB);
+				zout = z[ii];
 			}
 			else
 			{
-				ii = memloc(halowidth, blkmemwidth, 0, -1, RB);
+				if (XBlock.level[Cornerblk] == XBlock.level[ib])
+				{
+
+					ii = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					zout = z[ii];
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 1))
+				{
+					iia = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, Cornerblk);
+
+					zout = 0.25*(z[iia]+ z[iib]+ z[iic]+ z[iid]);
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] + 2))
+				{
+					iia = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 2, Cornerblk);
+
+					zout =(z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 3, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 3, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 4, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 4, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 1, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, 2, XParam.blkwidth - 2, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, 3, XParam.blkwidth - 2, Cornerblk);
+					
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					iia = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 3, Cornerblk);
+					iib = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 3, Cornerblk);
+					iic = memloc(halowidth, blkmemwidth, 0, XParam.blkwidth - 4, Cornerblk);
+					iid = memloc(halowidth, blkmemwidth, 1, XParam.blkwidth - 4, Cornerblk);
+
+					zout += (z[iia] + z[iib] + z[iic] + z[iid]);
+
+					zout = zout / 16;
+
+
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 1))
+				{
+					
+					iia = memloc(XParam.halowidth, blkmemwidth, -1, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, ib);
+
+					T ziib = 0.25 * (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.75), T(0.25));
+				}
+				else if (XBlock.level[Cornerblk] == (XBlock.level[ib] - 2))
+				{
+					iia = memloc(XParam.halowidth, blkmemwidth, -1, XParam.blkwidth - 1, Cornerblk);
+					iic = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth - 1, Cornerblk);
+					iid = memloc(XParam.halowidth, blkmemwidth, 0, XParam.blkwidth, Cornerblk);
+
+					int iila, iilb, iilc, iild;
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 1, ib);
+
+					T ziib = (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 2, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 2, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 3, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 3, ib);
+
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 0, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 0, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 3, 1, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 4, 1, ib);
+
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+
+					iila = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 2, ib);
+					iilb = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 2, ib);
+					iilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, 3, ib);
+					iild = memloc(halowidth, blkmemwidth, XParam.blkwidth - 2, 3, ib);
+
+					ziib += (z[iila] + z[iilb] + z[iilc] + z[iild]);
+
+					ziib = ziib / 16;
+
+
+
+					zout = BilinearInterpolation(z[iia], ziib, z[iic], z[iid], T(0.0), T(1.0), T(0.0), T(1.0), T(0.625), T(0.375));
+				}
 			}
 
 		}
-		z[iout] = z[ii];
+		z[iout] = zout;
 	}
 	
 }

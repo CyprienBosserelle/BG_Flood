@@ -246,7 +246,7 @@ template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<
 
 
 		refine_linearGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
-		//refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
 		refine_linearGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
 		refine_linearGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
 
@@ -380,6 +380,181 @@ template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<
 }
 template void gradientGPUnew<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float* zb);
 template void gradientGPUnew<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double* zb);
+
+template <class T> void gradientGPUML(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb)
+{
+
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 blockDimLR(1, XParam.blkwidth, 1);
+	dim3 blockDimBT(XParam.blkwidth, 1, 1);
+	dim3 blockDimLR2(2, XParam.blkwidth, 1);
+	dim3 blockDimBT2(XParam.blkwidth, 2, 1);
+	dim3 blockDimfull(XParam.blkmemwidth, XParam.blkmemwidth, 1);
+
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	const int num_streams = 4;
+
+	cudaStream_t streams[num_streams];
+
+	for (int i = 0; i < num_streams; i++)
+	{
+		CUDA_CHECK(cudaStreamCreate(&streams[i]));
+	}
+
+	//gradient <<< gridDim, blockDim, 0, streams[1] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	gradientSMC << < gridDim, blockDim, 0, streams[0] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradient <<< gridDim, blockDim, 0, streams[2] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	gradientSMC << < gridDim, blockDim, 0, streams[1] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradient <<< gridDim, blockDim, 0, streams[3] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+	gradientSMC << < gridDim, blockDim, 0, streams[2] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.u, XGrad.dudx, XGrad.dudy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//gradient <<< gridDim, blockDim, 0, streams[0] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	gradientSMC << < gridDim, blockDim, 0, streams[3] >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.v, XGrad.dvdx, XGrad.dvdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	//CUDA_CHECK(cudaDeviceSynchronize());
+	for (int i = 0; i < num_streams; i++)
+	{
+		cudaStreamDestroy(streams[i]);
+	}
+
+
+
+	//fillHaloGPU(XParam, XBlock, XGrad);
+	gradientHaloGPUnew(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+	gradientHaloGPUnew(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	gradientHaloGPUnew(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	gradientHaloGPUnew(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+	if (XParam.maxlevel > XParam.minlevel)
+	{
+
+		if (XParam.conserveElevation)
+		{
+			conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
+		}
+
+
+		refine_linearGPU(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		refine_linearGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		refine_linearGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+		refine_linearGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+		if (XParam.conserveElevation)
+		{
+			conserveElevationGPU(XParam, XBlock, XEv, zb);
+		}
+		else if (XParam.wetdryfix)
+		{
+			WetDryProlongationGPU(XParam, XBlock, XEv, zb);
+		}
+
+		//RecalculateZsGPU << < gridDim, blockDimfull, 0 >> > (XParam, XBlock, XEv, zb);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		/*
+		//gradient <<< gridDim, blockDim, 0, streams[1] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		gradientSM <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//gradient <<< gridDim, blockDim, 0, streams[2] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		gradientSM <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//gradient <<< gridDim, blockDim, 0, streams[3] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+		gradientSM <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx, XGrad.dudy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//gradient <<< gridDim, blockDim, 0, streams[0] >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+		gradientSM <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx, XGrad.dvdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+		*/
+		/*
+		const int num_streams = 16;
+
+		cudaStream_t streams[num_streams];
+
+		for (int i = 0; i < num_streams; i++)
+		{
+			CUDA_CHECK(cudaStreamCreate(&streams[i]));
+		}
+		*/
+
+
+
+		gradientedgeX << < gridDim, blockDimLR2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.h, XGrad.dhdx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeX <<< gridDim, blockDimLR, 0 >>> (XParam.halowidth, XParam.blkwidth-1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientedgeY << < gridDim, blockDimBT2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.h, XGrad.dhdy);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeY <<< gridDim, blockDimBT, 0>>> (XParam.halowidth, XParam.blkwidth-1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.h, XGrad.dhdy);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientedgeX << < gridDim, blockDimLR2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.zs, XGrad.dzsdx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeX <<< gridDim, blockDimLR, 0 >>> (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientedgeY << < gridDim, blockDimBT2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.zs, XGrad.dzsdy);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeY <<< gridDim, blockDimBT, 0 >>> (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.zs, XGrad.dzsdy);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientedgeX << < gridDim, blockDimLR2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.u, XGrad.dudx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeX <<< gridDim, blockDimLR, 0 >>> (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientedgeY << < gridDim, blockDimBT2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.u, XGrad.dudy);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeY <<< gridDim, blockDimBT, 0 >>> (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.u, XGrad.dudy);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientedgeX << < gridDim, blockDimLR2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.v, XGrad.dvdx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeX <<< gridDim, blockDimLR, 0 >>> (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdx);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		gradientedgeY << < gridDim, blockDimBT2, 0 >> > (XParam.halowidth, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.delta, XEv.v, XGrad.dvdy);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+		//gradientedgeY <<< gridDim, blockDimBT, 0 >>> (XParam.halowidth, XParam.blkwidth - 1, XBlock.active, XBlock.level, (T)XParam.theta, (T)XParam.dx, XEv.v, XGrad.dvdy);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		/*
+		for (int i = 0; i < num_streams; i++)
+		{
+			cudaStreamDestroy(streams[i]);
+		}
+		*/
+		gradientHaloGPUnew(XParam, XBlock, XEv.h, XGrad.dhdx, XGrad.dhdy);
+		gradientHaloGPUnew(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+		gradientHaloGPUnew(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+		gradientHaloGPUnew(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+		if (XParam.conserveElevation)
+		{
+			conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
+		}
+	}
+
+
+
+	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.zs, XGrad.dzsdx, XGrad.dzsdy);
+	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.u, XGrad.dudx, XGrad.dudy);
+	//conserveElevationGradHaloGPU(XParam, XBlock, XEv.v, XGrad.dvdx, XGrad.dvdy);
+
+}
+template void gradientGPUML<float>(Param XParam, BlockP<float>XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, float* zb);
+template void gradientGPUML<double>(Param XParam, BlockP<double>XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, double* zb);
 
 
 /*! \fn void gradient(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
@@ -2409,6 +2584,8 @@ template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, 
 
 
 }
+template void gradientHaloGPUnew<float>(Param XParam, BlockP<float>XBlock, float* a, float* dadx, float* dady);
+template void gradientHaloGPUnew<double>(Param XParam, BlockP<double>XBlock, double* a, double* dadx, double* dady);
 
 
 template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)

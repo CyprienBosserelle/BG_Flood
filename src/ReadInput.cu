@@ -175,7 +175,7 @@ Param readparamstr(std::string line, Param param)
 		}
 		if (!foo)
 		{
-			param.engine = 5;
+			param.engine = std::stoi(parametervalue);
 		}
 	}
 	///////////////////////////////////////////////////////
@@ -482,7 +482,9 @@ Param readparamstr(std::string line, Param param)
 			//Need to add more here
 
 
-			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","zso","uo","vo","ho","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+
+
 
 
 			std::string vvar = trim(vars[nv], " ");
@@ -1375,7 +1377,12 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	if (!XForcing.Atmp.inputfile.empty())
 	{
 		XParam.atmpforcing = true;
-		XParam.engine = 3;
+
+		if (XParam.engine < 3)
+		{
+			XParam.engine = 3;
+		}
+		
 	}
 
 
@@ -1385,7 +1392,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Engine checks
 	if (XParam.engine == 5)
 	{
-		XParam.CFL = utils::max(XParam.CFL, 0.25);
+		XParam.CFL = utils::min(XParam.CFL, 0.5);
 		//XParam.eps = 0.0000000001;
 	}
 

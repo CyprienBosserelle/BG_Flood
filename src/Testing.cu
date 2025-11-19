@@ -57,20 +57,20 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t ### Gaussian wave on Cartesian grid ###");
 			//set gpu is -1 for cpu test
 
-			bumptest = GaussianHumptest(0.1, -1, false);
+			bumptest = GaussianHumptest(0.1, -1, false,2);
 			result = bumptest ? "successful" : "failed";
-			log("\t\tCPU test: " + result);
+			log("\t\tCPU test: " + result + " for engine = 2");
 
 			// If original XParam tried to use GPU we try also
 			if (XParam.GPUDEVICE >= 0)
 			{
-				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false, XParam.engine);
 				result = bumptestGPU ? "successful" : "failed";
-				log("\t\tGPU test: " + result);
+				log("\t\tGPU test: " + result + " for engine = " + std::to_string(XParam.engine));
 
 				if (!bumptestGPU)
 				{
-					bumptestComp = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+					bumptestComp = GaussianHumptest(0.1, XParam.GPUDEVICE, true, XParam.engine);
 				}
 			}
 			isfailed = ((bumptest == true) && (bumptestGPU == true)) ? false : true;
@@ -107,7 +107,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			{
 				bool GPUvsCPUtest;
 				log("\t### Gaussian wave on Cartesian grid: CPU vs GPU ###");
-				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+				if (XParam.engine == 5)
+				{
+					log("\t CPU vs GPU only woks for engine 1 and 2 switching to 1");
+					XParam.engine = 1;
+				}
+				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true, XParam.engine);
 				result = GPUvsCPUtest ? "successful" : "failed";
 				log("\t\tCPU vs GPU test: " + result);
 				isfailed = (!GPUvsCPUtest || isfailed) ? true : false;
@@ -345,7 +350,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 	if (mytest == 900)
 	{
-		GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+		GaussianHumptest(0.1, XParam.GPUDEVICE, false, XParam.engine);
 	}
 
 		if (mytest == 994)
@@ -403,7 +408,7 @@ template bool Testing<double>(Param XParam, Forcing<float> XForcing, Model<doubl
 *	The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk
 *	This function also compares the result of the GPU and CPU code (until they diverge)
 */
-template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
+template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare, int engine)
 {
 	log("#####");
 	// this is a preplica of the tutorial case for Basilisk
@@ -412,19 +417,53 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	T x, y, delta;
 	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
 
-	//XParam.engine = 2;
+	
 
 	T a = T(1.0); //Gaussian wave amplitude
 
 	// Verification data
 	// This is a transect across iy=15:16:127 at ix=127 (or vice versa because the solution is symetrical)
 	// These values are based on single precision output from Netcdf file so are only accurate to 10-7 
-	//double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
+	double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
 	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
+	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
+	double ZsVerifML[8] = { 0.100000000067, 0.100000115531, 0.100133955622, 0.191131915213, 0.134547876957, 0.0854242010962, 0.066553872453, 0.0638724233535 };
 	double ZsVerifButtinger[8] = { 0.100000000023, 0.100000063119, 0.100093580546, 0.195088199869, 0.136767978925, 0.0850706353898, 0.0663028448129, 0.063727949607 };
 
 
+	double ZsVerif[8];
 
+	XParam.engine = engine;
+
+	if (XParam.engine >= 3 && XParam.engine <= 4)
+	{
+		XParam.engine = 2;
+	}
+	if (gpu == -1 && XParam.engine == 5 )
+	{
+		gpu = 0;// i.e. no CPU version for engine 5
+	}
+
+
+	if (XParam.engine == 1)
+	{
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifButtinger[i];
+		}
+	}
+	else if (XParam.engine == 2)
+	{
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifKurganov[i];
+		}
+	}
+	else if (XParam.engine == 5)
+	{
+		XParam.eps = 0.00001;
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifML[i];
+		}
+	}
 
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 8));
@@ -457,16 +496,16 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::string outvi[18] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "ho", "vo", "uo", "cf" };
+	/*std::string outvi[18] = { "zb","h","zs","u","v" };
 
 	std::vector<std::string> outv;
 
 	for (int nv = 0; nv < 18; nv++)
 	{
 		outv.push_back(outvi[nv]);
-	}
-
-	XParam.outvars = outv;
+	}*/
+	std::vector<std::string> outv = { "zb", "h", "zs", "u", "v" };
+	XParam.outvars = { "zb","h","zs","u","v" };
 
 	// create Model setup
 	Model<T> XModel;
@@ -582,7 +621,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		{
 			if (XParam.engine == 5)
 			{
-				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+				FlowMLGPU(XParam, XLoop_g, XForcing, XModel_g);
 			}
 			else
 			{
@@ -651,14 +690,14 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 				int n = memloc(XParam, ix, iy, ib);
 
-				diff = abs(T(XModel.evolv.zs[n]) - ZsVerifButtinger[iv]);
+				diff = abs(T(XModel.evolv.zs[n]) - ZsVerif[iv]);
 
 
 
 				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
 				{
 
-					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerifButtinger[iv], diff);
+					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerif[iv], diff);
 					modelgood = false;
 					creatncfileBUQ(XParam, XModel.blocks);
 					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs, XModel.blocks.outZone[0]);
@@ -677,8 +716,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	log("#####");
 	return modelgood;
 }
-template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare);
-template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare);
+template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare, int engine);
+template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare, int engine);
 
 /*! \fn bool Rivertest(T zsnit, int gpu)
 *

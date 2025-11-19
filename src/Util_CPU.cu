@@ -101,8 +101,8 @@ double interptime(double next, double prev, double timenext, double time)
 	return prev + (time) / (timenext)*(next - prev);
 }
 
-
-
+//
+//q11 is Bottom Left q12 is top left q21 is bottom right and q22 is top right
 template <class T> __host__ __device__ T BilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y)
 {
 	T x2x1, y2y1, x2x, y2y, yy1, xx1;

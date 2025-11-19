@@ -860,9 +860,9 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 	
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -992,9 +992,9 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 	
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int RB = XBlock.RightBot[ib];
@@ -1125,10 +1125,10 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 {
 	
 	
-	unsigned int iy = blockDim.x - 1;
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = blockDim.x - 1;
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int TL = XBlock.TopLeft[ib];
@@ -1258,9 +1258,9 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 	
 	
 	
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int BL = XBlock.BotLeft[ib];
@@ -1384,12 +1384,12 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 
 template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -1447,12 +1447,12 @@ template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T>
 
 template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 
 
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -1489,12 +1489,12 @@ template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, Block
 
 template <class T> __global__ void WetDryRestrictionGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 
 
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -1576,12 +1576,12 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 
 template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int RB = XBlock.RightBot[ib];
@@ -1773,12 +1773,12 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 
 template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	
 	
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int TL = XBlock.TopLeft[ib];
@@ -1970,12 +1970,12 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 
 template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	
 	
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int BL = XBlock.BotLeft[ib];

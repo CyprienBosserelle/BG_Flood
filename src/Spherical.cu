@@ -9,7 +9,7 @@
 template <class T> 
 __host__ __device__ T calcCM(T Radius, T delta, T yo, int iy)
 {
-	T y = yo + (iy+0.5) * delta / Radius * T(180.0 / pi);
+	T y = yo + (iy+T(0.5)) * delta / Radius * T(180.0 / pi);
 	// THis should be the y of the face so fo the v face you need to remove 0.5*delta
 
 	T phi = y * T(pi / 180.0);
@@ -29,7 +29,7 @@ template <class T>
 __host__ __device__  T calcFM(T Radius, T delta, T yo, T iy)
 {
 	T dy = delta / Radius * T(180.0 / pi);
-	T y = yo + iy * dy;
+	T y = yo + (iy) * dy;
 	// THis should be the y of the face so fo the v face you need to remove 0.5*delta
 
 	T phi = y * T(pi / 180.0);

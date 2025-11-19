@@ -23,7 +23,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (XParam.atmpforcing)
 	{
 		//Update atm press forcing
-		AddPatmforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Atmp, XModel);
+		AddPatmforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.Atmp, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		//Fill atmp halo
@@ -33,24 +33,27 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		CUDA_CHECK(cudaDeviceSynchronize());
 		cudaStreamDestroy(atmpstreams[0]);
 
-		//Calc dpdx and dpdy
+		if (XParam.engine < 5)
+		{
 
-		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			//Calc dpdx and dpdy
 
-		
-		CUDA_CHECK(cudaDeviceSynchronize());
-		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-		//
-			
-
-		refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-
-		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 
 
+			CUDA_CHECK(cudaDeviceSynchronize());
+			gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			//
+
+
+			refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			CUDA_CHECK(cudaDeviceSynchronize());
+
+			gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		}
 	}
 
 		
