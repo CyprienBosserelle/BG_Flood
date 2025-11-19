@@ -91,6 +91,9 @@ template <class T> __global__ void HaloFluxGPUBTnew(Param XParam, BlockP<T> XBlo
 template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XBlock, T* z);
 template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XBlock, T* z);
 
+template <class T> __global__  void HaloFluxGPULMLnew(Param XParam, BlockP<T> XBlock, T* z);
+template <class T> __global__  void HaloFluxGPUBMLnew(Param XParam, BlockP<T> XBlock, T* z);
+
 
 template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock, T* z);
 

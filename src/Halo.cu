@@ -1603,6 +1603,114 @@ template <class T> __global__  void HaloFluxGPULRnew(Param XParam, BlockP<T> XBl
 		}
 	}
 }
+template <class T> __global__  void HaloFluxGPULMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	if (ibl < XParam.nblk)
+	{
+
+		int ib = XBlock.active[ibl];
+
+
+		int j = iy;
+
+		i = memloc(XParam.halowidth, blkmemwidth, -1, j, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])
+		{
+
+
+
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockLeft = j < (XParam.blkwidth / 2) ? XBlock.LeftBot[ib] : XBlock.LeftTop[ib];
+
+			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, BlockLeft);
+			iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj + 1, BlockLeft);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.LeftBot[ib]] <= XBlock.level[ib])
+		{
+			jj = XBlock.level[XBlock.LeftBot[ib]] == XBlock.level[ib] ? j : XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
+			zout = z[iia];
+
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPULMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPULMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
+
+template <class T> __global__  void HaloFluxGPUBMLnew(Param XParam, BlockP<T> XBlock, T* z)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	//unsigned int iy = threadIdx.x;
+	int ibl = blockIdx.x;
+
+
+	int j = ix;
+
+
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+
+		i = memloc(XParam.halowidth, blkmemwidth, j, -1, ib);
+		T zout;
+
+		if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+
+
+
+
+
+			jj = j < (XParam.blkwidth / 2) ? j * 2 : (j - XParam.blkwidth / 2) * 2;
+
+			int BlockBot = j < (XParam.blkwidth / 2) ? XBlock.BotLeft[ib] : XBlock.BotRight[ib];
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BlockBot);
+			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, XParam.blkwidth - 1, BlockBot);
+
+			zout = T(0.5) * (z[iia] + z[iib]);
+
+
+		}
+		if (XBlock.level[XBlock.BotLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		{
+			jj = XBlock.level[XBlock.BotLeft[ib]] == XBlock.level[ib] ? j : XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
+
+
+			iia = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
+			zout = z[iia];
+
+			//
+		}
+		z[i] = zout;
+
+	}
+}
+template __global__  void HaloFluxGPUBMLnew<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void HaloFluxGPUBMLnew<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XBlock, T* z)
 {
