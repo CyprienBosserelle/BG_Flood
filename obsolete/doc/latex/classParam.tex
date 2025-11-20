@@ -1,0 +1,896 @@
+\hypertarget{classParam}{}\doxysection{Param Class Reference}
+\label{classParam}\index{Param@{Param}}
+
+
+{\ttfamily \#include $<$Param.\+h$>$}
+
+
+
+Collaboration diagram for Param\+:
+% FIG 0
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{classParam_aebff63c48a1896157348a2279aec8937}{test}} = -\/1
+\item 
+double \mbox{\hyperlink{classParam_aa65664b83c1d6d4977593a242d44d8e9}{g}} = 9.\+81
+\item 
+double \mbox{\hyperlink{classParam_a64e4771382f292437b487340f8016e41}{rho}} = 1025.\+0
+\item 
+double \mbox{\hyperlink{classParam_a3905d1b9b0d610f48973ec7a9490a80f}{eps}} = 0.\+0001
+\item 
+double \mbox{\hyperlink{classParam_a90eeb558478ef46be9d39df8bbbe9440}{dt}} = 0.\+0
+\item 
+double \mbox{\hyperlink{classParam_acadd4440149db3955039d7865890b391}{CFL}} = 0.\+5
+\item 
+double \mbox{\hyperlink{classParam_ac67fbcc225fc93d258f018a5820e10bb}{theta}} = 1.\+3
+\item 
+double \mbox{\hyperlink{classParam_a6103d3cfe34ca555ce4138e785e82866}{Vel\+Threshold}} = -\/1.\+0
+\item 
+int \mbox{\hyperlink{classParam_a7b55ea8669b639a4c017bb6742155096}{frictionmodel}} = 0
+\item 
+double \mbox{\hyperlink{classParam_a6294cc3b34858ec859b809535d62faa1}{cf}} = 0.\+0001
+\item 
+double \mbox{\hyperlink{classParam_a31e15f3847a2e75b936ab0aea996900a}{Cd}} = 0.\+002
+\item 
+double \mbox{\hyperlink{classParam_a5e4968c3d1eb9dcbfbe4841313dd526e}{il}} = 0.\+0
+\item 
+double \mbox{\hyperlink{classParam_ac156ae8354a898c377f440732a4a5983}{cl}} = 0.\+0
+\item 
+bool \mbox{\hyperlink{classParam_a63560d0910c087fd7fc4e9a8e8345922}{windforcing}} = false
+\item 
+bool \mbox{\hyperlink{classParam_abaaf2f49bde9fed254f80a88ec32a30d}{atmpforcing}} = false
+\item 
+bool \mbox{\hyperlink{classParam_ace2c6fb0c083cda07513420c62d91c3f}{rainforcing}} = false
+\item 
+bool \mbox{\hyperlink{classParam_afa652351c19bcec42888cb0767c8db27}{infiltration}} = false
+\item 
+bool \mbox{\hyperlink{classParam_adf63cfa3d4df365208074857ff9aecd3}{conserve\+Elevation}} = false
+\item 
+bool \mbox{\hyperlink{classParam_ac1b0f48735d022dbbaf72b33a90ca5d7}{wetdryfix}} = true
+\item 
+bool \mbox{\hyperlink{classParam_ad726f6cdd31ef755e528ddb0e6625cf2}{Force\+Mass\+Conserve}} = false
+\item 
+double \mbox{\hyperlink{classParam_adccee86eade735a53ed48f73c2086098}{Pa2m}} = 0.\+00009916
+\item 
+double \mbox{\hyperlink{classParam_a8577e367c7199062016b9dc9749192ad}{Paref}} = 101300.\+0
+\item 
+double \mbox{\hyperlink{classParam_a450988e007ced6f1110f9b5374cf6b69}{lat}} = 0.\+0
+\item 
+int \mbox{\hyperlink{classParam_a3514b705695b7d22f9c84ecd7debbb0e}{GPUDEVICE}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a639a4d2d05a49d96bc60d5008c1defd3}{doubleprecision}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a56642e1252852231103bd5cd633a0e07}{engine}} = 1
+\item 
+double \mbox{\hyperlink{classParam_af7c9194409a8c611a9bfb994d80e39c2}{dx}} = nan(\char`\"{}\char`\"{})
+\item 
+double \mbox{\hyperlink{classParam_ae1db26b566a5187da8dee205ffa181cd}{delta}}
+\item 
+int \mbox{\hyperlink{classParam_ad9c0cc1d671ec7b218240e35a93976e6}{nx}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a6a94e31672ba1949b96e64f6df4cb9bd}{ny}} = 0
+\item 
+int \mbox{\hyperlink{classParam_ab421674b5f81ae25d6c3dc00ce6a0aec}{nblk}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a9b78247d02d09ac3b0752470218ddd8a}{blkwidth}} = 16
+\item 
+int \mbox{\hyperlink{classParam_a6ee61d74630d1a7c1dcf909d713a7256}{blkmemwidth}} = 0
+\item 
+int \mbox{\hyperlink{classParam_ac2f93f0267d3cefa290805fe2d81ee5b}{blksize}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a38757e1aa08f10b78b466a3b21e6a470}{halowidth}} = 1
+\item 
+double \mbox{\hyperlink{classParam_ac50b1582f59df115435c4df8fafe5d22}{xo}} = nan(\char`\"{}\char`\"{})
+\item 
+double \mbox{\hyperlink{classParam_a6ae40eba7fb31dc21c3cd4213f2403b6}{yo}} = nan(\char`\"{}\char`\"{})
+\item 
+double \mbox{\hyperlink{classParam_a23bd2f3c81355fa3506fa5368dae2212}{ymax}} = nan(\char`\"{}\char`\"{})
+\item 
+double \mbox{\hyperlink{classParam_a23140d149004e514aaacb413747c21c3}{xmax}} = nan(\char`\"{}\char`\"{})
+\item 
+double \mbox{\hyperlink{classParam_af85123c8e6ad62f834df061df5cafa25}{grdalpha}} = nan(\char`\"{}\char`\"{})
+\item 
+int \mbox{\hyperlink{classParam_a5e566a6b64bbb2d2aae7202695b0d371}{posdown}} = 0
+\item 
+bool \mbox{\hyperlink{classParam_a245439e7a28e89165ad3084af27c8da7}{spherical}} = 0
+\item 
+double \mbox{\hyperlink{classParam_a85094868d69eb0e50469af461bd925b3}{Radius}} = 6371220.
+\item 
+double \mbox{\hyperlink{classParam_a59981aed45aa424e9f4856ae9107f21b}{mask}} = 9999.\+0
+\item 
+int \mbox{\hyperlink{classParam_aac4696364843ddccbb8b47961023cd4c}{initlevel}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a602c2223020d433369cf8c1dbd236517}{maxlevel}} = -\/99999
+\item 
+int \mbox{\hyperlink{classParam_a974d1451ddd209fb3550b554726e12ad}{minlevel}} = -\/99999
+\item 
+int \mbox{\hyperlink{classParam_acb234cabc3637721b8115f04363157d8}{nblkmem}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a84b9506f6d699bf3201c6b80783ce0a1}{navailblk}} = 0
+\item 
+double \mbox{\hyperlink{classParam_a82248332d20759fbb16209cba4fef780}{membuffer}} = 1.\+05
+\item 
+double \mbox{\hyperlink{classParam_a0bfe307e5614456c51685a69161ebdf6}{outputtimestep}} = 0.\+0
+\item 
+double \mbox{\hyperlink{classParam_a3a2075d8dade68288089733ca5969930}{endtime}} = std\+::numeric\+\_\+limits$<$double$>$\+::max()
+\item 
+double \mbox{\hyperlink{classParam_a71491afdf2a212a74e76fddf574a08a7}{totaltime}} = 0.\+0
+\item 
+double \mbox{\hyperlink{classParam_a1b5ddadef2ac55650e66c35152ef1f85}{inittime}} = 0.\+0
+\item 
+double \mbox{\hyperlink{classParam_ade28be53ad4e21dbebf789b57fb03fce}{dtinit}} = -\/1
+\item 
+double \mbox{\hyperlink{classParam_a2f28cb8d294f1ca1f120a3abe201e352}{dtmin}} = 0.\+0005
+\item 
+\mbox{\hyperlink{classT__output}{T\+\_\+output}} \mbox{\hyperlink{classParam_a9d5ff5efd69fdda52b5606a9de43fa9c}{Toutput}}
+\item 
+bool \mbox{\hyperlink{classParam_a716b643890ebd9d7fda0280d2b46f0cf}{leftbnd}} = false
+\item 
+bool \mbox{\hyperlink{classParam_af3d39fb85e682bb8624647de01410206}{rightbnd}} = false
+\item 
+bool \mbox{\hyperlink{classParam_afadd1eca80d4fb49c1541bb7b27d0263}{topbnd}} = false
+\item 
+bool \mbox{\hyperlink{classParam_af6b337ecf38a10803f3cd8e5e06cdd5c}{botbnd}} = false
+\item 
+int \mbox{\hyperlink{classParam_a33a0f36d752bf9dedafceb1c06444966}{aoibnd}} = 0
+\item 
+double \mbox{\hyperlink{classParam_ae18c9950d026334710c66888898a9cf9}{bndrelaxtime}} = 3600.\+0
+\item 
+double \mbox{\hyperlink{classParam_a2ae1aa9ba67896297450f9e7aca0ad1a}{bndfiltertime}} = 60.\+0
+\item 
+double \mbox{\hyperlink{classParam_a63a70c37cfb0eec2968ece3d623318a4}{zsinit}} = nan(\char`\"{}\char`\"{})
+\item 
+double \mbox{\hyperlink{classParam_a3c29fe5c8af313e37bbb5d9faad470f9}{zsoffset}} = nan(\char`\"{}\char`\"{})
+\item 
+std\+::string \mbox{\hyperlink{classParam_af885609128acc8bb3ddb29c58c0a53ba}{hotstartfile}}
+\item 
+int \mbox{\hyperlink{classParam_a6800bcfe3bbe46d0fcfe61c868d8efb3}{hotstep}} = 0
+\item 
+double \mbox{\hyperlink{classParam_a56143e8c0b9724a460afb4eadd45d0e9}{bndtaper}} = 0.\+0
+\item 
+clock\+\_\+t \mbox{\hyperlink{classParam_acd500b97cb6da25e98425b35a79e1941}{startcputime}}
+\item 
+clock\+\_\+t \mbox{\hyperlink{classParam_a5c6e621b2fc07c7d2c2475b183a1eaab}{endcputime}}
+\item 
+clock\+\_\+t \mbox{\hyperlink{classParam_aadddc7a9f3adce58331df3954c543b86}{setupcputime}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classParam_a3fa874c4ca1ca2c3704fec25d0ecfbe7}{GPU\+\_\+initmem\+\_\+byte}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classParam_a3cf625db84b7901df2879a08b20ba89e}{GPU\+\_\+totalmem\+\_\+byte}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{classTSoutnode}{TSoutnode}} $>$ \mbox{\hyperlink{classParam_a2cf9401adaa530c2c933a9923d4c987e}{TSnodesout}}
+\item 
+std\+::string \mbox{\hyperlink{classParam_a4f3dd9db16a7a85d68788d96b0410948}{outfile}} = \char`\"{}Output.\+nc\char`\"{}
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{classParam_a298d3b6178c4ecc617b3291f585f830e}{outvars}}
+\item 
+double \mbox{\hyperlink{classParam_a40b0d69eaa98a025f6830a3eeb53f58e}{wet\+\_\+threshold}} = 0.\+1
+\item 
+std\+::vector$<$ \mbox{\hyperlink{classoutzoneP}{outzoneP}} $>$ \mbox{\hyperlink{classParam_ae1fd449af4800dc4fcd115d52d8d5e79}{outzone}}
+\item 
+int \mbox{\hyperlink{classParam_a49c52ab200a51e9a7ecbf2496b8aa427}{max\+TSstorage}} = 16384
+\item 
+bool \mbox{\hyperlink{classParam_a1b2b73b8bb774d884fc7be02210cbdf4}{resetmax}} = false
+\item 
+bool \mbox{\hyperlink{classParam_a5d62465fb8d50b14fc4103162fc73893}{outmax}} = false
+\item 
+bool \mbox{\hyperlink{classParam_af5c34a23c387ec32cc89d767609f919a}{outmean}} = false
+\item 
+bool \mbox{\hyperlink{classParam_a0b182d05dbb44e9c3ff5d614f5b66f2a}{outtwet}} = false
+\item 
+int \mbox{\hyperlink{classParam_a325acb3e5f45d3decef390c35267e6ac}{outishift}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a049063e8613dfc6e6afb308a3f9a321b}{outjshift}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a5b3dc65c920920cbd38978d92f4d5dc8}{nrivers}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a5e2cb85f4af67f83049c30efb058e6a6}{nblkriver}} = 0
+\item 
+int \mbox{\hyperlink{classParam_aedec49f5d6ffce9c5e593aadb02a4140}{nbndblkleft}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a399ccfff4456cbeb79c6e06cd2f3f306}{nbndblkright}} = 0
+\item 
+int \mbox{\hyperlink{classParam_ad24480245e6d9a43f620db1dd6169e15}{nbndblktop}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a1117b41e71c9e9274f4cc770d08bc6d2}{nbndblkbot}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a8b9aad30fcca1c201265cfc637af8d30}{nmaskblk}} = 0
+\item 
+int \mbox{\hyperlink{classParam_a62bb5a23b6367d6a008ad218bf430f06}{smallnc}} = 1
+\item 
+float \mbox{\hyperlink{classParam_af668a9cbd70f1a24d7cf6b9c99cacf9e}{scalefactor}} = 0.\+01f
+\item 
+float \mbox{\hyperlink{classParam_a97dd0e2f07bbac654aac3a19f25ce97d}{addoffset}} = 0.\+0f
+\item 
+double \mbox{\hyperlink{classParam_aa77daf8f531c8696764da0ed3a9d299e}{deformmaxtime}} = 0.\+0
+\item 
+bool \mbox{\hyperlink{classParam_a7e5cc3ae91c9e7a42be0219a1b437382}{rainbnd}} = false
+\item 
+std\+::string \mbox{\hyperlink{classParam_aaa22e1a00d4234e25ffdc28f4286d8be}{Adapt\+Crit}}
+\item 
+int $\ast$ \mbox{\hyperlink{classParam_acb152e4cc174113b6831aee3048d2a19}{Adapt\+Crit\+\_\+funct\+\_\+pointer}}
+\item 
+std\+::string \mbox{\hyperlink{classParam_a98a2267c29739aa7a0b5259a3172c7cf}{Adapt\+\_\+arg1}}
+\item 
+std\+::string \mbox{\hyperlink{classParam_ac484442a0235eed29fb34f975aaefb8a}{Adapt\+\_\+arg2}}
+\item 
+std\+::string \mbox{\hyperlink{classParam_a131fabb0018ddc3ebfe1ecfcb357a7c9}{Adapt\+\_\+arg3}}
+\item 
+std\+::string \mbox{\hyperlink{classParam_a49ea40358f9235a361c3350cd53e4af8}{Adapt\+\_\+arg4}}
+\item 
+std\+::string \mbox{\hyperlink{classParam_afc41c7225a81bfb714a509525b9b19ca}{Adapt\+\_\+arg5}}
+\item 
+int \mbox{\hyperlink{classParam_a0e640148fd6c5ee78f06a14deeae92f6}{adaptmaxiteration}} = 20
+\item 
+std\+::string \mbox{\hyperlink{classParam_a152bd97e4b0ad04634500f42e09dc1d8}{reftime}} = \char`\"{}\char`\"{}
+\item 
+std\+::string \mbox{\hyperlink{classParam_a84d4da11b6ae2adecbefe10da3891323}{crs\+\_\+ref}} = \char`\"{}no\+\_\+crs\char`\"{}
+\item 
+bool \mbox{\hyperlink{classParam_ab19a5460fef554a9dd7da2983540ab43}{savebyblk}} = true
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A class. A class for holding model parameters. 
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classParam_a98a2267c29739aa7a0b5259a3172c7cf}\label{classParam_a98a2267c29739aa7a0b5259a3172c7cf}} 
+\index{Param@{Param}!Adapt\_arg1@{Adapt\_arg1}}
+\index{Adapt\_arg1@{Adapt\_arg1}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Adapt\_arg1}{Adapt\_arg1}}
+{\footnotesize\ttfamily std\+::string Param\+::\+Adapt\+\_\+arg1}
+
+\mbox{\Hypertarget{classParam_ac484442a0235eed29fb34f975aaefb8a}\label{classParam_ac484442a0235eed29fb34f975aaefb8a}} 
+\index{Param@{Param}!Adapt\_arg2@{Adapt\_arg2}}
+\index{Adapt\_arg2@{Adapt\_arg2}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Adapt\_arg2}{Adapt\_arg2}}
+{\footnotesize\ttfamily std\+::string Param\+::\+Adapt\+\_\+arg2}
+
+\mbox{\Hypertarget{classParam_a131fabb0018ddc3ebfe1ecfcb357a7c9}\label{classParam_a131fabb0018ddc3ebfe1ecfcb357a7c9}} 
+\index{Param@{Param}!Adapt\_arg3@{Adapt\_arg3}}
+\index{Adapt\_arg3@{Adapt\_arg3}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Adapt\_arg3}{Adapt\_arg3}}
+{\footnotesize\ttfamily std\+::string Param\+::\+Adapt\+\_\+arg3}
+
+\mbox{\Hypertarget{classParam_a49ea40358f9235a361c3350cd53e4af8}\label{classParam_a49ea40358f9235a361c3350cd53e4af8}} 
+\index{Param@{Param}!Adapt\_arg4@{Adapt\_arg4}}
+\index{Adapt\_arg4@{Adapt\_arg4}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Adapt\_arg4}{Adapt\_arg4}}
+{\footnotesize\ttfamily std\+::string Param\+::\+Adapt\+\_\+arg4}
+
+\mbox{\Hypertarget{classParam_afc41c7225a81bfb714a509525b9b19ca}\label{classParam_afc41c7225a81bfb714a509525b9b19ca}} 
+\index{Param@{Param}!Adapt\_arg5@{Adapt\_arg5}}
+\index{Adapt\_arg5@{Adapt\_arg5}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Adapt\_arg5}{Adapt\_arg5}}
+{\footnotesize\ttfamily std\+::string Param\+::\+Adapt\+\_\+arg5}
+
+\mbox{\Hypertarget{classParam_aaa22e1a00d4234e25ffdc28f4286d8be}\label{classParam_aaa22e1a00d4234e25ffdc28f4286d8be}} 
+\index{Param@{Param}!AdaptCrit@{AdaptCrit}}
+\index{AdaptCrit@{AdaptCrit}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{AdaptCrit}{AdaptCrit}}
+{\footnotesize\ttfamily std\+::string Param\+::\+Adapt\+Crit}
+
+\mbox{\Hypertarget{classParam_acb152e4cc174113b6831aee3048d2a19}\label{classParam_acb152e4cc174113b6831aee3048d2a19}} 
+\index{Param@{Param}!AdaptCrit\_funct\_pointer@{AdaptCrit\_funct\_pointer}}
+\index{AdaptCrit\_funct\_pointer@{AdaptCrit\_funct\_pointer}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{AdaptCrit\_funct\_pointer}{AdaptCrit\_funct\_pointer}}
+{\footnotesize\ttfamily int$\ast$ Param\+::\+Adapt\+Crit\+\_\+funct\+\_\+pointer}
+
+\mbox{\Hypertarget{classParam_a0e640148fd6c5ee78f06a14deeae92f6}\label{classParam_a0e640148fd6c5ee78f06a14deeae92f6}} 
+\index{Param@{Param}!adaptmaxiteration@{adaptmaxiteration}}
+\index{adaptmaxiteration@{adaptmaxiteration}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{adaptmaxiteration}{adaptmaxiteration}}
+{\footnotesize\ttfamily int Param\+::adaptmaxiteration = 20}
+
+\mbox{\Hypertarget{classParam_a97dd0e2f07bbac654aac3a19f25ce97d}\label{classParam_a97dd0e2f07bbac654aac3a19f25ce97d}} 
+\index{Param@{Param}!addoffset@{addoffset}}
+\index{addoffset@{addoffset}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{addoffset}{addoffset}}
+{\footnotesize\ttfamily float Param\+::addoffset = 0.\+0f}
+
+\mbox{\Hypertarget{classParam_a33a0f36d752bf9dedafceb1c06444966}\label{classParam_a33a0f36d752bf9dedafceb1c06444966}} 
+\index{Param@{Param}!aoibnd@{aoibnd}}
+\index{aoibnd@{aoibnd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{aoibnd}{aoibnd}}
+{\footnotesize\ttfamily int Param\+::aoibnd = 0}
+
+\mbox{\Hypertarget{classParam_abaaf2f49bde9fed254f80a88ec32a30d}\label{classParam_abaaf2f49bde9fed254f80a88ec32a30d}} 
+\index{Param@{Param}!atmpforcing@{atmpforcing}}
+\index{atmpforcing@{atmpforcing}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{atmpforcing}{atmpforcing}}
+{\footnotesize\ttfamily bool Param\+::atmpforcing = false}
+
+\mbox{\Hypertarget{classParam_a6ee61d74630d1a7c1dcf909d713a7256}\label{classParam_a6ee61d74630d1a7c1dcf909d713a7256}} 
+\index{Param@{Param}!blkmemwidth@{blkmemwidth}}
+\index{blkmemwidth@{blkmemwidth}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{blkmemwidth}{blkmemwidth}}
+{\footnotesize\ttfamily int Param\+::blkmemwidth = 0}
+
+\mbox{\Hypertarget{classParam_ac2f93f0267d3cefa290805fe2d81ee5b}\label{classParam_ac2f93f0267d3cefa290805fe2d81ee5b}} 
+\index{Param@{Param}!blksize@{blksize}}
+\index{blksize@{blksize}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{blksize}{blksize}}
+{\footnotesize\ttfamily int Param\+::blksize = 0}
+
+\mbox{\Hypertarget{classParam_a9b78247d02d09ac3b0752470218ddd8a}\label{classParam_a9b78247d02d09ac3b0752470218ddd8a}} 
+\index{Param@{Param}!blkwidth@{blkwidth}}
+\index{blkwidth@{blkwidth}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{blkwidth}{blkwidth}}
+{\footnotesize\ttfamily int Param\+::blkwidth = 16}
+
+\mbox{\Hypertarget{classParam_a2ae1aa9ba67896297450f9e7aca0ad1a}\label{classParam_a2ae1aa9ba67896297450f9e7aca0ad1a}} 
+\index{Param@{Param}!bndfiltertime@{bndfiltertime}}
+\index{bndfiltertime@{bndfiltertime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{bndfiltertime}{bndfiltertime}}
+{\footnotesize\ttfamily double Param\+::bndfiltertime = 60.\+0}
+
+\mbox{\Hypertarget{classParam_ae18c9950d026334710c66888898a9cf9}\label{classParam_ae18c9950d026334710c66888898a9cf9}} 
+\index{Param@{Param}!bndrelaxtime@{bndrelaxtime}}
+\index{bndrelaxtime@{bndrelaxtime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{bndrelaxtime}{bndrelaxtime}}
+{\footnotesize\ttfamily double Param\+::bndrelaxtime = 3600.\+0}
+
+\mbox{\Hypertarget{classParam_a56143e8c0b9724a460afb4eadd45d0e9}\label{classParam_a56143e8c0b9724a460afb4eadd45d0e9}} 
+\index{Param@{Param}!bndtaper@{bndtaper}}
+\index{bndtaper@{bndtaper}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{bndtaper}{bndtaper}}
+{\footnotesize\ttfamily double Param\+::bndtaper = 0.\+0}
+
+\mbox{\Hypertarget{classParam_af6b337ecf38a10803f3cd8e5e06cdd5c}\label{classParam_af6b337ecf38a10803f3cd8e5e06cdd5c}} 
+\index{Param@{Param}!botbnd@{botbnd}}
+\index{botbnd@{botbnd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{botbnd}{botbnd}}
+{\footnotesize\ttfamily bool Param\+::botbnd = false}
+
+\mbox{\Hypertarget{classParam_a31e15f3847a2e75b936ab0aea996900a}\label{classParam_a31e15f3847a2e75b936ab0aea996900a}} 
+\index{Param@{Param}!Cd@{Cd}}
+\index{Cd@{Cd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Cd}{Cd}}
+{\footnotesize\ttfamily double Param\+::\+Cd = 0.\+002}
+
+\mbox{\Hypertarget{classParam_a6294cc3b34858ec859b809535d62faa1}\label{classParam_a6294cc3b34858ec859b809535d62faa1}} 
+\index{Param@{Param}!cf@{cf}}
+\index{cf@{cf}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{cf}{cf}}
+{\footnotesize\ttfamily double Param\+::cf = 0.\+0001}
+
+\mbox{\Hypertarget{classParam_acadd4440149db3955039d7865890b391}\label{classParam_acadd4440149db3955039d7865890b391}} 
+\index{Param@{Param}!CFL@{CFL}}
+\index{CFL@{CFL}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{CFL}{CFL}}
+{\footnotesize\ttfamily double Param\+::\+CFL = 0.\+5}
+
+\mbox{\Hypertarget{classParam_ac156ae8354a898c377f440732a4a5983}\label{classParam_ac156ae8354a898c377f440732a4a5983}} 
+\index{Param@{Param}!cl@{cl}}
+\index{cl@{cl}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{cl}{cl}}
+{\footnotesize\ttfamily double Param\+::cl = 0.\+0}
+
+\mbox{\Hypertarget{classParam_adf63cfa3d4df365208074857ff9aecd3}\label{classParam_adf63cfa3d4df365208074857ff9aecd3}} 
+\index{Param@{Param}!conserveElevation@{conserveElevation}}
+\index{conserveElevation@{conserveElevation}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{conserveElevation}{conserveElevation}}
+{\footnotesize\ttfamily bool Param\+::conserve\+Elevation = false}
+
+\mbox{\Hypertarget{classParam_a84d4da11b6ae2adecbefe10da3891323}\label{classParam_a84d4da11b6ae2adecbefe10da3891323}} 
+\index{Param@{Param}!crs\_ref@{crs\_ref}}
+\index{crs\_ref@{crs\_ref}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{crs\_ref}{crs\_ref}}
+{\footnotesize\ttfamily std\+::string Param\+::crs\+\_\+ref = \char`\"{}no\+\_\+crs\char`\"{}}
+
+\mbox{\Hypertarget{classParam_aa77daf8f531c8696764da0ed3a9d299e}\label{classParam_aa77daf8f531c8696764da0ed3a9d299e}} 
+\index{Param@{Param}!deformmaxtime@{deformmaxtime}}
+\index{deformmaxtime@{deformmaxtime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{deformmaxtime}{deformmaxtime}}
+{\footnotesize\ttfamily double Param\+::deformmaxtime = 0.\+0}
+
+\mbox{\Hypertarget{classParam_ae1db26b566a5187da8dee205ffa181cd}\label{classParam_ae1db26b566a5187da8dee205ffa181cd}} 
+\index{Param@{Param}!delta@{delta}}
+\index{delta@{delta}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{delta}{delta}}
+{\footnotesize\ttfamily double Param\+::delta}
+
+\mbox{\Hypertarget{classParam_a639a4d2d05a49d96bc60d5008c1defd3}\label{classParam_a639a4d2d05a49d96bc60d5008c1defd3}} 
+\index{Param@{Param}!doubleprecision@{doubleprecision}}
+\index{doubleprecision@{doubleprecision}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{doubleprecision}{doubleprecision}}
+{\footnotesize\ttfamily int Param\+::doubleprecision = 0}
+
+\mbox{\Hypertarget{classParam_a90eeb558478ef46be9d39df8bbbe9440}\label{classParam_a90eeb558478ef46be9d39df8bbbe9440}} 
+\index{Param@{Param}!dt@{dt}}
+\index{dt@{dt}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{dt}{dt}}
+{\footnotesize\ttfamily double Param\+::dt = 0.\+0}
+
+\mbox{\Hypertarget{classParam_ade28be53ad4e21dbebf789b57fb03fce}\label{classParam_ade28be53ad4e21dbebf789b57fb03fce}} 
+\index{Param@{Param}!dtinit@{dtinit}}
+\index{dtinit@{dtinit}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{dtinit}{dtinit}}
+{\footnotesize\ttfamily double Param\+::dtinit = -\/1}
+
+\mbox{\Hypertarget{classParam_a2f28cb8d294f1ca1f120a3abe201e352}\label{classParam_a2f28cb8d294f1ca1f120a3abe201e352}} 
+\index{Param@{Param}!dtmin@{dtmin}}
+\index{dtmin@{dtmin}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{dtmin}{dtmin}}
+{\footnotesize\ttfamily double Param\+::dtmin = 0.\+0005}
+
+\mbox{\Hypertarget{classParam_af7c9194409a8c611a9bfb994d80e39c2}\label{classParam_af7c9194409a8c611a9bfb994d80e39c2}} 
+\index{Param@{Param}!dx@{dx}}
+\index{dx@{dx}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{dx}{dx}}
+{\footnotesize\ttfamily double Param\+::dx = nan(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{classParam_a5c6e621b2fc07c7d2c2475b183a1eaab}\label{classParam_a5c6e621b2fc07c7d2c2475b183a1eaab}} 
+\index{Param@{Param}!endcputime@{endcputime}}
+\index{endcputime@{endcputime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{endcputime}{endcputime}}
+{\footnotesize\ttfamily clock\+\_\+t Param\+::endcputime}
+
+\mbox{\Hypertarget{classParam_a3a2075d8dade68288089733ca5969930}\label{classParam_a3a2075d8dade68288089733ca5969930}} 
+\index{Param@{Param}!endtime@{endtime}}
+\index{endtime@{endtime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{endtime}{endtime}}
+{\footnotesize\ttfamily double Param\+::endtime = std\+::numeric\+\_\+limits$<$double$>$\+::max()}
+
+\mbox{\Hypertarget{classParam_a56642e1252852231103bd5cd633a0e07}\label{classParam_a56642e1252852231103bd5cd633a0e07}} 
+\index{Param@{Param}!engine@{engine}}
+\index{engine@{engine}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{engine}{engine}}
+{\footnotesize\ttfamily int Param\+::engine = 1}
+
+\mbox{\Hypertarget{classParam_a3905d1b9b0d610f48973ec7a9490a80f}\label{classParam_a3905d1b9b0d610f48973ec7a9490a80f}} 
+\index{Param@{Param}!eps@{eps}}
+\index{eps@{eps}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{eps}{eps}}
+{\footnotesize\ttfamily double Param\+::eps = 0.\+0001}
+
+\mbox{\Hypertarget{classParam_ad726f6cdd31ef755e528ddb0e6625cf2}\label{classParam_ad726f6cdd31ef755e528ddb0e6625cf2}} 
+\index{Param@{Param}!ForceMassConserve@{ForceMassConserve}}
+\index{ForceMassConserve@{ForceMassConserve}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{ForceMassConserve}{ForceMassConserve}}
+{\footnotesize\ttfamily bool Param\+::\+Force\+Mass\+Conserve = false}
+
+\mbox{\Hypertarget{classParam_a7b55ea8669b639a4c017bb6742155096}\label{classParam_a7b55ea8669b639a4c017bb6742155096}} 
+\index{Param@{Param}!frictionmodel@{frictionmodel}}
+\index{frictionmodel@{frictionmodel}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{frictionmodel}{frictionmodel}}
+{\footnotesize\ttfamily int Param\+::frictionmodel = 0}
+
+\mbox{\Hypertarget{classParam_aa65664b83c1d6d4977593a242d44d8e9}\label{classParam_aa65664b83c1d6d4977593a242d44d8e9}} 
+\index{Param@{Param}!g@{g}}
+\index{g@{g}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{g}{g}}
+{\footnotesize\ttfamily double Param\+::g = 9.\+81}
+
+\mbox{\Hypertarget{classParam_a3fa874c4ca1ca2c3704fec25d0ecfbe7}\label{classParam_a3fa874c4ca1ca2c3704fec25d0ecfbe7}} 
+\index{Param@{Param}!GPU\_initmem\_byte@{GPU\_initmem\_byte}}
+\index{GPU\_initmem\_byte@{GPU\_initmem\_byte}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{GPU\_initmem\_byte}{GPU\_initmem\_byte}}
+{\footnotesize\ttfamily size\+\_\+t Param\+::\+GPU\+\_\+initmem\+\_\+byte}
+
+\mbox{\Hypertarget{classParam_a3cf625db84b7901df2879a08b20ba89e}\label{classParam_a3cf625db84b7901df2879a08b20ba89e}} 
+\index{Param@{Param}!GPU\_totalmem\_byte@{GPU\_totalmem\_byte}}
+\index{GPU\_totalmem\_byte@{GPU\_totalmem\_byte}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{GPU\_totalmem\_byte}{GPU\_totalmem\_byte}}
+{\footnotesize\ttfamily size\+\_\+t Param\+::\+GPU\+\_\+totalmem\+\_\+byte}
+
+\mbox{\Hypertarget{classParam_a3514b705695b7d22f9c84ecd7debbb0e}\label{classParam_a3514b705695b7d22f9c84ecd7debbb0e}} 
+\index{Param@{Param}!GPUDEVICE@{GPUDEVICE}}
+\index{GPUDEVICE@{GPUDEVICE}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{GPUDEVICE}{GPUDEVICE}}
+{\footnotesize\ttfamily int Param\+::\+GPUDEVICE = 0}
+
+\mbox{\Hypertarget{classParam_af85123c8e6ad62f834df061df5cafa25}\label{classParam_af85123c8e6ad62f834df061df5cafa25}} 
+\index{Param@{Param}!grdalpha@{grdalpha}}
+\index{grdalpha@{grdalpha}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{grdalpha}{grdalpha}}
+{\footnotesize\ttfamily double Param\+::grdalpha = nan(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{classParam_a38757e1aa08f10b78b466a3b21e6a470}\label{classParam_a38757e1aa08f10b78b466a3b21e6a470}} 
+\index{Param@{Param}!halowidth@{halowidth}}
+\index{halowidth@{halowidth}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{halowidth}{halowidth}}
+{\footnotesize\ttfamily int Param\+::halowidth = 1}
+
+\mbox{\Hypertarget{classParam_af885609128acc8bb3ddb29c58c0a53ba}\label{classParam_af885609128acc8bb3ddb29c58c0a53ba}} 
+\index{Param@{Param}!hotstartfile@{hotstartfile}}
+\index{hotstartfile@{hotstartfile}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{hotstartfile}{hotstartfile}}
+{\footnotesize\ttfamily std\+::string Param\+::hotstartfile}
+
+\mbox{\Hypertarget{classParam_a6800bcfe3bbe46d0fcfe61c868d8efb3}\label{classParam_a6800bcfe3bbe46d0fcfe61c868d8efb3}} 
+\index{Param@{Param}!hotstep@{hotstep}}
+\index{hotstep@{hotstep}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{hotstep}{hotstep}}
+{\footnotesize\ttfamily int Param\+::hotstep = 0}
+
+\mbox{\Hypertarget{classParam_a5e4968c3d1eb9dcbfbe4841313dd526e}\label{classParam_a5e4968c3d1eb9dcbfbe4841313dd526e}} 
+\index{Param@{Param}!il@{il}}
+\index{il@{il}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{il}{il}}
+{\footnotesize\ttfamily double Param\+::il = 0.\+0}
+
+\mbox{\Hypertarget{classParam_afa652351c19bcec42888cb0767c8db27}\label{classParam_afa652351c19bcec42888cb0767c8db27}} 
+\index{Param@{Param}!infiltration@{infiltration}}
+\index{infiltration@{infiltration}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{infiltration}{infiltration}}
+{\footnotesize\ttfamily bool Param\+::infiltration = false}
+
+\mbox{\Hypertarget{classParam_aac4696364843ddccbb8b47961023cd4c}\label{classParam_aac4696364843ddccbb8b47961023cd4c}} 
+\index{Param@{Param}!initlevel@{initlevel}}
+\index{initlevel@{initlevel}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{initlevel}{initlevel}}
+{\footnotesize\ttfamily int Param\+::initlevel = 0}
+
+\mbox{\Hypertarget{classParam_a1b5ddadef2ac55650e66c35152ef1f85}\label{classParam_a1b5ddadef2ac55650e66c35152ef1f85}} 
+\index{Param@{Param}!inittime@{inittime}}
+\index{inittime@{inittime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{inittime}{inittime}}
+{\footnotesize\ttfamily double Param\+::inittime = 0.\+0}
+
+\mbox{\Hypertarget{classParam_a450988e007ced6f1110f9b5374cf6b69}\label{classParam_a450988e007ced6f1110f9b5374cf6b69}} 
+\index{Param@{Param}!lat@{lat}}
+\index{lat@{lat}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{lat}{lat}}
+{\footnotesize\ttfamily double Param\+::lat = 0.\+0}
+
+\mbox{\Hypertarget{classParam_a716b643890ebd9d7fda0280d2b46f0cf}\label{classParam_a716b643890ebd9d7fda0280d2b46f0cf}} 
+\index{Param@{Param}!leftbnd@{leftbnd}}
+\index{leftbnd@{leftbnd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{leftbnd}{leftbnd}}
+{\footnotesize\ttfamily bool Param\+::leftbnd = false}
+
+\mbox{\Hypertarget{classParam_a59981aed45aa424e9f4856ae9107f21b}\label{classParam_a59981aed45aa424e9f4856ae9107f21b}} 
+\index{Param@{Param}!mask@{mask}}
+\index{mask@{mask}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{mask}{mask}}
+{\footnotesize\ttfamily double Param\+::mask = 9999.\+0}
+
+\mbox{\Hypertarget{classParam_a602c2223020d433369cf8c1dbd236517}\label{classParam_a602c2223020d433369cf8c1dbd236517}} 
+\index{Param@{Param}!maxlevel@{maxlevel}}
+\index{maxlevel@{maxlevel}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{maxlevel}{maxlevel}}
+{\footnotesize\ttfamily int Param\+::maxlevel = -\/99999}
+
+\mbox{\Hypertarget{classParam_a49c52ab200a51e9a7ecbf2496b8aa427}\label{classParam_a49c52ab200a51e9a7ecbf2496b8aa427}} 
+\index{Param@{Param}!maxTSstorage@{maxTSstorage}}
+\index{maxTSstorage@{maxTSstorage}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{maxTSstorage}{maxTSstorage}}
+{\footnotesize\ttfamily int Param\+::max\+TSstorage = 16384}
+
+\mbox{\Hypertarget{classParam_a82248332d20759fbb16209cba4fef780}\label{classParam_a82248332d20759fbb16209cba4fef780}} 
+\index{Param@{Param}!membuffer@{membuffer}}
+\index{membuffer@{membuffer}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{membuffer}{membuffer}}
+{\footnotesize\ttfamily double Param\+::membuffer = 1.\+05}
+
+\mbox{\Hypertarget{classParam_a974d1451ddd209fb3550b554726e12ad}\label{classParam_a974d1451ddd209fb3550b554726e12ad}} 
+\index{Param@{Param}!minlevel@{minlevel}}
+\index{minlevel@{minlevel}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{minlevel}{minlevel}}
+{\footnotesize\ttfamily int Param\+::minlevel = -\/99999}
+
+\mbox{\Hypertarget{classParam_a84b9506f6d699bf3201c6b80783ce0a1}\label{classParam_a84b9506f6d699bf3201c6b80783ce0a1}} 
+\index{Param@{Param}!navailblk@{navailblk}}
+\index{navailblk@{navailblk}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{navailblk}{navailblk}}
+{\footnotesize\ttfamily int Param\+::navailblk = 0}
+
+\mbox{\Hypertarget{classParam_ab421674b5f81ae25d6c3dc00ce6a0aec}\label{classParam_ab421674b5f81ae25d6c3dc00ce6a0aec}} 
+\index{Param@{Param}!nblk@{nblk}}
+\index{nblk@{nblk}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nblk}{nblk}}
+{\footnotesize\ttfamily int Param\+::nblk = 0}
+
+\mbox{\Hypertarget{classParam_acb234cabc3637721b8115f04363157d8}\label{classParam_acb234cabc3637721b8115f04363157d8}} 
+\index{Param@{Param}!nblkmem@{nblkmem}}
+\index{nblkmem@{nblkmem}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nblkmem}{nblkmem}}
+{\footnotesize\ttfamily int Param\+::nblkmem = 0}
+
+\mbox{\Hypertarget{classParam_a5e2cb85f4af67f83049c30efb058e6a6}\label{classParam_a5e2cb85f4af67f83049c30efb058e6a6}} 
+\index{Param@{Param}!nblkriver@{nblkriver}}
+\index{nblkriver@{nblkriver}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nblkriver}{nblkriver}}
+{\footnotesize\ttfamily int Param\+::nblkriver = 0}
+
+\mbox{\Hypertarget{classParam_a1117b41e71c9e9274f4cc770d08bc6d2}\label{classParam_a1117b41e71c9e9274f4cc770d08bc6d2}} 
+\index{Param@{Param}!nbndblkbot@{nbndblkbot}}
+\index{nbndblkbot@{nbndblkbot}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nbndblkbot}{nbndblkbot}}
+{\footnotesize\ttfamily int Param\+::nbndblkbot = 0}
+
+\mbox{\Hypertarget{classParam_aedec49f5d6ffce9c5e593aadb02a4140}\label{classParam_aedec49f5d6ffce9c5e593aadb02a4140}} 
+\index{Param@{Param}!nbndblkleft@{nbndblkleft}}
+\index{nbndblkleft@{nbndblkleft}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nbndblkleft}{nbndblkleft}}
+{\footnotesize\ttfamily int Param\+::nbndblkleft = 0}
+
+\mbox{\Hypertarget{classParam_a399ccfff4456cbeb79c6e06cd2f3f306}\label{classParam_a399ccfff4456cbeb79c6e06cd2f3f306}} 
+\index{Param@{Param}!nbndblkright@{nbndblkright}}
+\index{nbndblkright@{nbndblkright}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nbndblkright}{nbndblkright}}
+{\footnotesize\ttfamily int Param\+::nbndblkright = 0}
+
+\mbox{\Hypertarget{classParam_ad24480245e6d9a43f620db1dd6169e15}\label{classParam_ad24480245e6d9a43f620db1dd6169e15}} 
+\index{Param@{Param}!nbndblktop@{nbndblktop}}
+\index{nbndblktop@{nbndblktop}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nbndblktop}{nbndblktop}}
+{\footnotesize\ttfamily int Param\+::nbndblktop = 0}
+
+\mbox{\Hypertarget{classParam_a8b9aad30fcca1c201265cfc637af8d30}\label{classParam_a8b9aad30fcca1c201265cfc637af8d30}} 
+\index{Param@{Param}!nmaskblk@{nmaskblk}}
+\index{nmaskblk@{nmaskblk}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nmaskblk}{nmaskblk}}
+{\footnotesize\ttfamily int Param\+::nmaskblk = 0}
+
+\mbox{\Hypertarget{classParam_a5b3dc65c920920cbd38978d92f4d5dc8}\label{classParam_a5b3dc65c920920cbd38978d92f4d5dc8}} 
+\index{Param@{Param}!nrivers@{nrivers}}
+\index{nrivers@{nrivers}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nrivers}{nrivers}}
+{\footnotesize\ttfamily int Param\+::nrivers = 0}
+
+\mbox{\Hypertarget{classParam_ad9c0cc1d671ec7b218240e35a93976e6}\label{classParam_ad9c0cc1d671ec7b218240e35a93976e6}} 
+\index{Param@{Param}!nx@{nx}}
+\index{nx@{nx}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{nx}{nx}}
+{\footnotesize\ttfamily int Param\+::nx = 0}
+
+\mbox{\Hypertarget{classParam_a6a94e31672ba1949b96e64f6df4cb9bd}\label{classParam_a6a94e31672ba1949b96e64f6df4cb9bd}} 
+\index{Param@{Param}!ny@{ny}}
+\index{ny@{ny}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{ny}{ny}}
+{\footnotesize\ttfamily int Param\+::ny = 0}
+
+\mbox{\Hypertarget{classParam_a4f3dd9db16a7a85d68788d96b0410948}\label{classParam_a4f3dd9db16a7a85d68788d96b0410948}} 
+\index{Param@{Param}!outfile@{outfile}}
+\index{outfile@{outfile}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outfile}{outfile}}
+{\footnotesize\ttfamily std\+::string Param\+::outfile = \char`\"{}Output.\+nc\char`\"{}}
+
+\mbox{\Hypertarget{classParam_a325acb3e5f45d3decef390c35267e6ac}\label{classParam_a325acb3e5f45d3decef390c35267e6ac}} 
+\index{Param@{Param}!outishift@{outishift}}
+\index{outishift@{outishift}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outishift}{outishift}}
+{\footnotesize\ttfamily int Param\+::outishift = 0}
+
+\mbox{\Hypertarget{classParam_a049063e8613dfc6e6afb308a3f9a321b}\label{classParam_a049063e8613dfc6e6afb308a3f9a321b}} 
+\index{Param@{Param}!outjshift@{outjshift}}
+\index{outjshift@{outjshift}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outjshift}{outjshift}}
+{\footnotesize\ttfamily int Param\+::outjshift = 0}
+
+\mbox{\Hypertarget{classParam_a5d62465fb8d50b14fc4103162fc73893}\label{classParam_a5d62465fb8d50b14fc4103162fc73893}} 
+\index{Param@{Param}!outmax@{outmax}}
+\index{outmax@{outmax}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outmax}{outmax}}
+{\footnotesize\ttfamily bool Param\+::outmax = false}
+
+\mbox{\Hypertarget{classParam_af5c34a23c387ec32cc89d767609f919a}\label{classParam_af5c34a23c387ec32cc89d767609f919a}} 
+\index{Param@{Param}!outmean@{outmean}}
+\index{outmean@{outmean}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outmean}{outmean}}
+{\footnotesize\ttfamily bool Param\+::outmean = false}
+
+\mbox{\Hypertarget{classParam_a0bfe307e5614456c51685a69161ebdf6}\label{classParam_a0bfe307e5614456c51685a69161ebdf6}} 
+\index{Param@{Param}!outputtimestep@{outputtimestep}}
+\index{outputtimestep@{outputtimestep}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outputtimestep}{outputtimestep}}
+{\footnotesize\ttfamily double Param\+::outputtimestep = 0.\+0}
+
+\mbox{\Hypertarget{classParam_a0b182d05dbb44e9c3ff5d614f5b66f2a}\label{classParam_a0b182d05dbb44e9c3ff5d614f5b66f2a}} 
+\index{Param@{Param}!outtwet@{outtwet}}
+\index{outtwet@{outtwet}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outtwet}{outtwet}}
+{\footnotesize\ttfamily bool Param\+::outtwet = false}
+
+\mbox{\Hypertarget{classParam_a298d3b6178c4ecc617b3291f585f830e}\label{classParam_a298d3b6178c4ecc617b3291f585f830e}} 
+\index{Param@{Param}!outvars@{outvars}}
+\index{outvars@{outvars}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outvars}{outvars}}
+{\footnotesize\ttfamily std\+::vector$<$std\+::string$>$ Param\+::outvars}
+
+\mbox{\Hypertarget{classParam_ae1fd449af4800dc4fcd115d52d8d5e79}\label{classParam_ae1fd449af4800dc4fcd115d52d8d5e79}} 
+\index{Param@{Param}!outzone@{outzone}}
+\index{outzone@{outzone}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{outzone}{outzone}}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classoutzoneP}{outzoneP}}$>$ Param\+::outzone}
+
+\mbox{\Hypertarget{classParam_adccee86eade735a53ed48f73c2086098}\label{classParam_adccee86eade735a53ed48f73c2086098}} 
+\index{Param@{Param}!Pa2m@{Pa2m}}
+\index{Pa2m@{Pa2m}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Pa2m}{Pa2m}}
+{\footnotesize\ttfamily double Param\+::\+Pa2m = 0.\+00009916}
+
+\mbox{\Hypertarget{classParam_a8577e367c7199062016b9dc9749192ad}\label{classParam_a8577e367c7199062016b9dc9749192ad}} 
+\index{Param@{Param}!Paref@{Paref}}
+\index{Paref@{Paref}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Paref}{Paref}}
+{\footnotesize\ttfamily double Param\+::\+Paref = 101300.\+0}
+
+\mbox{\Hypertarget{classParam_a5e566a6b64bbb2d2aae7202695b0d371}\label{classParam_a5e566a6b64bbb2d2aae7202695b0d371}} 
+\index{Param@{Param}!posdown@{posdown}}
+\index{posdown@{posdown}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{posdown}{posdown}}
+{\footnotesize\ttfamily int Param\+::posdown = 0}
+
+\mbox{\Hypertarget{classParam_a85094868d69eb0e50469af461bd925b3}\label{classParam_a85094868d69eb0e50469af461bd925b3}} 
+\index{Param@{Param}!Radius@{Radius}}
+\index{Radius@{Radius}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Radius}{Radius}}
+{\footnotesize\ttfamily double Param\+::\+Radius = 6371220.}
+
+\mbox{\Hypertarget{classParam_a7e5cc3ae91c9e7a42be0219a1b437382}\label{classParam_a7e5cc3ae91c9e7a42be0219a1b437382}} 
+\index{Param@{Param}!rainbnd@{rainbnd}}
+\index{rainbnd@{rainbnd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{rainbnd}{rainbnd}}
+{\footnotesize\ttfamily bool Param\+::rainbnd = false}
+
+\mbox{\Hypertarget{classParam_ace2c6fb0c083cda07513420c62d91c3f}\label{classParam_ace2c6fb0c083cda07513420c62d91c3f}} 
+\index{Param@{Param}!rainforcing@{rainforcing}}
+\index{rainforcing@{rainforcing}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{rainforcing}{rainforcing}}
+{\footnotesize\ttfamily bool Param\+::rainforcing = false}
+
+\mbox{\Hypertarget{classParam_a152bd97e4b0ad04634500f42e09dc1d8}\label{classParam_a152bd97e4b0ad04634500f42e09dc1d8}} 
+\index{Param@{Param}!reftime@{reftime}}
+\index{reftime@{reftime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{reftime}{reftime}}
+{\footnotesize\ttfamily std\+::string Param\+::reftime = \char`\"{}\char`\"{}}
+
+\mbox{\Hypertarget{classParam_a1b2b73b8bb774d884fc7be02210cbdf4}\label{classParam_a1b2b73b8bb774d884fc7be02210cbdf4}} 
+\index{Param@{Param}!resetmax@{resetmax}}
+\index{resetmax@{resetmax}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{resetmax}{resetmax}}
+{\footnotesize\ttfamily bool Param\+::resetmax = false}
+
+\mbox{\Hypertarget{classParam_a64e4771382f292437b487340f8016e41}\label{classParam_a64e4771382f292437b487340f8016e41}} 
+\index{Param@{Param}!rho@{rho}}
+\index{rho@{rho}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{rho}{rho}}
+{\footnotesize\ttfamily double Param\+::rho = 1025.\+0}
+
+\mbox{\Hypertarget{classParam_af3d39fb85e682bb8624647de01410206}\label{classParam_af3d39fb85e682bb8624647de01410206}} 
+\index{Param@{Param}!rightbnd@{rightbnd}}
+\index{rightbnd@{rightbnd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{rightbnd}{rightbnd}}
+{\footnotesize\ttfamily bool Param\+::rightbnd = false}
+
+\mbox{\Hypertarget{classParam_ab19a5460fef554a9dd7da2983540ab43}\label{classParam_ab19a5460fef554a9dd7da2983540ab43}} 
+\index{Param@{Param}!savebyblk@{savebyblk}}
+\index{savebyblk@{savebyblk}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{savebyblk}{savebyblk}}
+{\footnotesize\ttfamily bool Param\+::savebyblk = true}
+
+\mbox{\Hypertarget{classParam_af668a9cbd70f1a24d7cf6b9c99cacf9e}\label{classParam_af668a9cbd70f1a24d7cf6b9c99cacf9e}} 
+\index{Param@{Param}!scalefactor@{scalefactor}}
+\index{scalefactor@{scalefactor}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{scalefactor}{scalefactor}}
+{\footnotesize\ttfamily float Param\+::scalefactor = 0.\+01f}
+
+\mbox{\Hypertarget{classParam_aadddc7a9f3adce58331df3954c543b86}\label{classParam_aadddc7a9f3adce58331df3954c543b86}} 
+\index{Param@{Param}!setupcputime@{setupcputime}}
+\index{setupcputime@{setupcputime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{setupcputime}{setupcputime}}
+{\footnotesize\ttfamily clock\+\_\+t Param\+::setupcputime}
+
+\mbox{\Hypertarget{classParam_a62bb5a23b6367d6a008ad218bf430f06}\label{classParam_a62bb5a23b6367d6a008ad218bf430f06}} 
+\index{Param@{Param}!smallnc@{smallnc}}
+\index{smallnc@{smallnc}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{smallnc}{smallnc}}
+{\footnotesize\ttfamily int Param\+::smallnc = 1}
+
+\mbox{\Hypertarget{classParam_a245439e7a28e89165ad3084af27c8da7}\label{classParam_a245439e7a28e89165ad3084af27c8da7}} 
+\index{Param@{Param}!spherical@{spherical}}
+\index{spherical@{spherical}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{spherical}{spherical}}
+{\footnotesize\ttfamily bool Param\+::spherical = 0}
+
+\mbox{\Hypertarget{classParam_acd500b97cb6da25e98425b35a79e1941}\label{classParam_acd500b97cb6da25e98425b35a79e1941}} 
+\index{Param@{Param}!startcputime@{startcputime}}
+\index{startcputime@{startcputime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{startcputime}{startcputime}}
+{\footnotesize\ttfamily clock\+\_\+t Param\+::startcputime}
+
+\mbox{\Hypertarget{classParam_aebff63c48a1896157348a2279aec8937}\label{classParam_aebff63c48a1896157348a2279aec8937}} 
+\index{Param@{Param}!test@{test}}
+\index{test@{test}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{test}{test}}
+{\footnotesize\ttfamily int Param\+::test = -\/1}
+
+\mbox{\Hypertarget{classParam_ac67fbcc225fc93d258f018a5820e10bb}\label{classParam_ac67fbcc225fc93d258f018a5820e10bb}} 
+\index{Param@{Param}!theta@{theta}}
+\index{theta@{theta}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{theta}{theta}}
+{\footnotesize\ttfamily double Param\+::theta = 1.\+3}
+
+\mbox{\Hypertarget{classParam_afadd1eca80d4fb49c1541bb7b27d0263}\label{classParam_afadd1eca80d4fb49c1541bb7b27d0263}} 
+\index{Param@{Param}!topbnd@{topbnd}}
+\index{topbnd@{topbnd}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{topbnd}{topbnd}}
+{\footnotesize\ttfamily bool Param\+::topbnd = false}
+
+\mbox{\Hypertarget{classParam_a71491afdf2a212a74e76fddf574a08a7}\label{classParam_a71491afdf2a212a74e76fddf574a08a7}} 
+\index{Param@{Param}!totaltime@{totaltime}}
+\index{totaltime@{totaltime}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{totaltime}{totaltime}}
+{\footnotesize\ttfamily double Param\+::totaltime = 0.\+0}
+
+\mbox{\Hypertarget{classParam_a9d5ff5efd69fdda52b5606a9de43fa9c}\label{classParam_a9d5ff5efd69fdda52b5606a9de43fa9c}} 
+\index{Param@{Param}!Toutput@{Toutput}}
+\index{Toutput@{Toutput}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{Toutput}{Toutput}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classT__output}{T\+\_\+output}} Param\+::\+Toutput}
+
+\mbox{\Hypertarget{classParam_a2cf9401adaa530c2c933a9923d4c987e}\label{classParam_a2cf9401adaa530c2c933a9923d4c987e}} 
+\index{Param@{Param}!TSnodesout@{TSnodesout}}
+\index{TSnodesout@{TSnodesout}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{TSnodesout}{TSnodesout}}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{classTSoutnode}{TSoutnode}}$>$ Param\+::\+TSnodesout}
+
+\mbox{\Hypertarget{classParam_a6103d3cfe34ca555ce4138e785e82866}\label{classParam_a6103d3cfe34ca555ce4138e785e82866}} 
+\index{Param@{Param}!VelThreshold@{VelThreshold}}
+\index{VelThreshold@{VelThreshold}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{VelThreshold}{VelThreshold}}
+{\footnotesize\ttfamily double Param\+::\+Vel\+Threshold = -\/1.\+0}
+
+\mbox{\Hypertarget{classParam_a40b0d69eaa98a025f6830a3eeb53f58e}\label{classParam_a40b0d69eaa98a025f6830a3eeb53f58e}} 
+\index{Param@{Param}!wet\_threshold@{wet\_threshold}}
+\index{wet\_threshold@{wet\_threshold}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{wet\_threshold}{wet\_threshold}}
+{\footnotesize\ttfamily double Param\+::wet\+\_\+threshold = 0.\+1}
+
+\mbox{\Hypertarget{classParam_ac1b0f48735d022dbbaf72b33a90ca5d7}\label{classParam_ac1b0f48735d022dbbaf72b33a90ca5d7}} 
+\index{Param@{Param}!wetdryfix@{wetdryfix}}
+\index{wetdryfix@{wetdryfix}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{wetdryfix}{wetdryfix}}
+{\footnotesize\ttfamily bool Param\+::wetdryfix = true}
+
+\mbox{\Hypertarget{classParam_a63560d0910c087fd7fc4e9a8e8345922}\label{classParam_a63560d0910c087fd7fc4e9a8e8345922}} 
+\index{Param@{Param}!windforcing@{windforcing}}
+\index{windforcing@{windforcing}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{windforcing}{windforcing}}
+{\footnotesize\ttfamily bool Param\+::windforcing = false}
+
+\mbox{\Hypertarget{classParam_a23140d149004e514aaacb413747c21c3}\label{classParam_a23140d149004e514aaacb413747c21c3}} 
+\index{Param@{Param}!xmax@{xmax}}
+\index{xmax@{xmax}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{xmax}{xmax}}
+{\footnotesize\ttfamily double Param\+::xmax = nan(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{classParam_ac50b1582f59df115435c4df8fafe5d22}\label{classParam_ac50b1582f59df115435c4df8fafe5d22}} 
+\index{Param@{Param}!xo@{xo}}
+\index{xo@{xo}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{xo}{xo}}
+{\footnotesize\ttfamily double Param\+::xo = nan(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{classParam_a23bd2f3c81355fa3506fa5368dae2212}\label{classParam_a23bd2f3c81355fa3506fa5368dae2212}} 
+\index{Param@{Param}!ymax@{ymax}}
+\index{ymax@{ymax}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{ymax}{ymax}}
+{\footnotesize\ttfamily double Param\+::ymax = nan(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{classParam_a6ae40eba7fb31dc21c3cd4213f2403b6}\label{classParam_a6ae40eba7fb31dc21c3cd4213f2403b6}} 
+\index{Param@{Param}!yo@{yo}}
+\index{yo@{yo}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{yo}{yo}}
+{\footnotesize\ttfamily double Param\+::yo = nan(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{classParam_a63a70c37cfb0eec2968ece3d623318a4}\label{classParam_a63a70c37cfb0eec2968ece3d623318a4}} 
+\index{Param@{Param}!zsinit@{zsinit}}
+\index{zsinit@{zsinit}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{zsinit}{zsinit}}
+{\footnotesize\ttfamily double Param\+::zsinit = nan(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{classParam_a3c29fe5c8af313e37bbb5d9faad470f9}\label{classParam_a3c29fe5c8af313e37bbb5d9faad470f9}} 
+\index{Param@{Param}!zsoffset@{zsoffset}}
+\index{zsoffset@{zsoffset}!Param@{Param}}
+\doxysubsubsection{\texorpdfstring{zsoffset}{zsoffset}}
+{\footnotesize\ttfamily double Param\+::zsoffset = nan(\char`\"{}\char`\"{})}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{Param_8h}{Param.\+h}}\end{DoxyCompactItemize}

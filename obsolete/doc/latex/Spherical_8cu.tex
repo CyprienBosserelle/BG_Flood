@@ -1,0 +1,95 @@
+\hypertarget{Spherical_8cu}{}\doxysection{src/\+Spherical.cu File Reference}
+\label{Spherical_8cu}\index{src/Spherical.cu@{src/Spherical.cu}}
+{\ttfamily \#include \char`\"{}Spherical.\+h\char`\"{}}\newline
+Include dependency graph for Spherical.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Spherical_8cu_aa51d79491639eba3f8f5a31f8eeb7727}{calc\+CM}} (T Radius, T delta, T yo, int iy)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Spherical_8cu_ae478c8f86777487f8607d2e1c88bf1a1}{calc\+CM}} (double Radius, double delta, double yo, int iy)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Spherical_8cu_ab276e609913a50bc46f4361b846edada}{calc\+CM}} (float Radius, float delta, float yo, int iy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Spherical_8cu_a666d2d611d7884e7376e09b68e7f62ee}{calc\+FM}} (T Radius, T delta, T yo, T iy)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Spherical_8cu_a05851dfc47abc9ad761ad86720acd202}{calc\+FM}} (double Radius, double delta, double yo, double iy)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Spherical_8cu_a133b3082fbe1a4bdb3d4ccfbffbc203d}{calc\+FM}} (float Radius, float delta, float yo, float iy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Spherical_8cu_a764c2542590cff5957da576f197c0d98}{haversin}} (T Radius, T lon1, T lat1, T lon2, T lat2)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Spherical_8cu_acaec182e726b1bca8a3fcea4870f8920}{spharea}} (T Radius, T lon, T lat, T dx)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double \mbox{\hyperlink{Spherical_8cu_a9b406b2002b8323f64ae1bd62de78fea}{spharea}} (double Radius, double lon, double lat, double dx)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float \mbox{\hyperlink{Spherical_8cu_a21d3cd905990922f0332d6385e387df3}{spharea}} (float Radius, float lon, float lat, float dx)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Spherical_8cu_ae478c8f86777487f8607d2e1c88bf1a1}\label{Spherical_8cu_ae478c8f86777487f8607d2e1c88bf1a1}} 
+\index{Spherical.cu@{Spherical.cu}!calcCM@{calcCM}}
+\index{calcCM@{calcCM}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{calcCM()}{calcCM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double calc\+CM (\begin{DoxyParamCaption}\item[{double}]{Radius,  }\item[{double}]{delta,  }\item[{double}]{yo,  }\item[{int}]{iy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8cu_ab276e609913a50bc46f4361b846edada}\label{Spherical_8cu_ab276e609913a50bc46f4361b846edada}} 
+\index{Spherical.cu@{Spherical.cu}!calcCM@{calcCM}}
+\index{calcCM@{calcCM}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{calcCM()}{calcCM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float calc\+CM (\begin{DoxyParamCaption}\item[{float}]{Radius,  }\item[{float}]{delta,  }\item[{float}]{yo,  }\item[{int}]{iy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8cu_aa51d79491639eba3f8f5a31f8eeb7727}\label{Spherical_8cu_aa51d79491639eba3f8f5a31f8eeb7727}} 
+\index{Spherical.cu@{Spherical.cu}!calcCM@{calcCM}}
+\index{calcCM@{calcCM}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{calcCM()}{calcCM()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T calc\+CM (\begin{DoxyParamCaption}\item[{T}]{Radius,  }\item[{T}]{delta,  }\item[{T}]{yo,  }\item[{int}]{iy }\end{DoxyParamCaption})}
+
+Scale factor for y face length (x face lengh scale is always 1 in spherical model assuming that lat long are entered) \mbox{\Hypertarget{Spherical_8cu_a05851dfc47abc9ad761ad86720acd202}\label{Spherical_8cu_a05851dfc47abc9ad761ad86720acd202}} 
+\index{Spherical.cu@{Spherical.cu}!calcFM@{calcFM}}
+\index{calcFM@{calcFM}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{calcFM()}{calcFM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double calc\+FM (\begin{DoxyParamCaption}\item[{double}]{Radius,  }\item[{double}]{delta,  }\item[{double}]{yo,  }\item[{double}]{iy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8cu_a133b3082fbe1a4bdb3d4ccfbffbc203d}\label{Spherical_8cu_a133b3082fbe1a4bdb3d4ccfbffbc203d}} 
+\index{Spherical.cu@{Spherical.cu}!calcFM@{calcFM}}
+\index{calcFM@{calcFM}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{calcFM()}{calcFM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float calc\+FM (\begin{DoxyParamCaption}\item[{float}]{Radius,  }\item[{float}]{delta,  }\item[{float}]{yo,  }\item[{float}]{iy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8cu_a666d2d611d7884e7376e09b68e7f62ee}\label{Spherical_8cu_a666d2d611d7884e7376e09b68e7f62ee}} 
+\index{Spherical.cu@{Spherical.cu}!calcFM@{calcFM}}
+\index{calcFM@{calcFM}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{calcFM()}{calcFM()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T calc\+FM (\begin{DoxyParamCaption}\item[{T}]{Radius,  }\item[{T}]{delta,  }\item[{T}]{yo,  }\item[{T}]{iy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8cu_a764c2542590cff5957da576f197c0d98}\label{Spherical_8cu_a764c2542590cff5957da576f197c0d98}} 
+\index{Spherical.cu@{Spherical.cu}!haversin@{haversin}}
+\index{haversin@{haversin}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{haversin()}{haversin()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+T haversin (\begin{DoxyParamCaption}\item[{T}]{Radius,  }\item[{T}]{lon1,  }\item[{T}]{lat1,  }\item[{T}]{lon2,  }\item[{T}]{lat2 }\end{DoxyParamCaption})}
+
+Classic haversin function The function is too slow to use directly in BG\+\_\+flood engine but is more usable (i.\+e. naive) for model setup \mbox{\Hypertarget{Spherical_8cu_a9b406b2002b8323f64ae1bd62de78fea}\label{Spherical_8cu_a9b406b2002b8323f64ae1bd62de78fea}} 
+\index{Spherical.cu@{Spherical.cu}!spharea@{spharea}}
+\index{spharea@{spharea}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{spharea()}{spharea()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ double spharea (\begin{DoxyParamCaption}\item[{double}]{Radius,  }\item[{double}]{lon,  }\item[{double}]{lat,  }\item[{double}]{dx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8cu_a21d3cd905990922f0332d6385e387df3}\label{Spherical_8cu_a21d3cd905990922f0332d6385e387df3}} 
+\index{Spherical.cu@{Spherical.cu}!spharea@{spharea}}
+\index{spharea@{spharea}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{spharea()}{spharea()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ float spharea (\begin{DoxyParamCaption}\item[{float}]{Radius,  }\item[{float}]{lon,  }\item[{float}]{lat,  }\item[{float}]{dx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8cu_acaec182e726b1bca8a3fcea4870f8920}\label{Spherical_8cu_acaec182e726b1bca8a3fcea4870f8920}} 
+\index{Spherical.cu@{Spherical.cu}!spharea@{spharea}}
+\index{spharea@{spharea}!Spherical.cu@{Spherical.cu}}
+\doxysubsubsection{\texorpdfstring{spharea()}{spharea()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T spharea (\begin{DoxyParamCaption}\item[{T}]{Radius,  }\item[{T}]{lon,  }\item[{T}]{lat,  }\item[{T}]{dx }\end{DoxyParamCaption})}
+

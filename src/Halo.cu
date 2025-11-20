@@ -1,14 +1,18 @@
 ﻿#include "Halo.h"
 
 
-/*! \fn void void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
-* \brief Wrapping function for calculating halos on CPU on every side of a block of a single variable
-* 
-* ## Description
-* This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean.
-* In a sense this is the third (and last) layer of wrapping
-* 
-*/
+/**! \fn void void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
+ * @brief Wrapping function for calculating halos on CPU on every side of a block of a single variable
+ * 
+ * ## Description
+ * This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean.
+ * In a sense this is the third (and last) layer of wrapping
+ * 
+ * @param XParam The model parameters
+ * @param ib The block index to work on
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to work on
+ */
 template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
 	
@@ -25,14 +29,17 @@ template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 template void fillHaloD<double>(Param XParam, int ib, BlockP<double> XBlock, double* z);
 template void fillHaloD<float>(Param XParam, int ib, BlockP<float> XBlock, float* z);
 
-/*! \fn void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
-* \brief Wrapping function for calculating halos for each block of a single variable on CPU.
-*
-* ## Description
-* This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo CPU function.
-* This is layer 2 of 3 wrap so the candy doesn't stick too much.
-*
-*/
+/**! \fn void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
+ * @brief Wrapping function for calculating halos for each block of a single variable on CPU.
+ *
+ * ## Description
+ * This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo CPU function.
+ * This is layer 2 of 3 wrap so the candy doesn't stick too much.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to work on
+ * 
+ */
 template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 {
 	int ib;
@@ -45,17 +52,23 @@ template <class T> void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
 template void fillHaloC<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillHaloC<double>(Param XParam, BlockP<double> XBlock, double* z);
 
-/*! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
-* \brief Recalculate water surface after recalculating the values on the halo on the CPU
-*
-* ## Description
-* Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated
-* at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps.  
-* zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)
-* 
-* ## Warning
-* This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction
-*/
+/**! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+ * @brief Recalculate water surface after recalculating the values on the halo on the CPU
+ *
+ * ## Description
+ * Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated
+ * at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps.  
+ * zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)
+ * 
+ * @warning This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction
+ * 
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @param zb The bottom elevation variable
+ * @tparam T The data type (float or double)
+ * 
+ */
 template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	int ib, n;
@@ -95,6 +108,18 @@ template <class T> void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<
 template void RecalculateZs<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template void RecalculateZs<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+/**
+ * @brief Recalculate water depth after recalculating the values on the halo on the CPU
+ * ## Description
+ * Recalculate water depth after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated
+ * at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps.
+ * zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @param zb The bottom elevation variable
+ * @tparam T The data type (float or double)
+ */
 template <class T> void Recalculatehh(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	int ib, n;
@@ -136,16 +161,21 @@ template void Recalculatehh<float>(Param XParam, BlockP<float> XBlock, EvolvingP
 template void Recalculatehh<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
 
-/*! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
-* \brief Recalculate water surface after recalculating the values on the halo on the GPU
-*
-* ## Description
-* Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated
-* at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps.
-* zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)
-*
-* ## Warning
-* This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction
+/**! \fn void RecalculateZs(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+ * @brief Recalculate water surface after recalculating the values on the halo on the GPU
+ *
+ * ## Description
+ * Recalculate water surface after recalculating the values on the halo on the CPU. zb (bottom elevation) on each halo is calculated
+ * at the start of the loop or as part of the initial condition. When conserve-elevation is not required, only h is recalculated on the halo at ever 1/2 steps.
+ * zs then needs to be recalculated to obtain a mass-conservative solution (if zs is conserved then mass conservation is not garanteed)
+ *
+ * @warning This function calculate zs everywhere in the block... this is a bit unecessary. Instead it should recalculate only where there is a prolongation or a restiction
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @param zb The bottom elevation variable
+ * @tparam T The data type (float or double)
+ * 
 */
 template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
@@ -173,16 +203,11 @@ template <class T> __global__ void RecalculateZsGPU(Param XParam, BlockP<T> XBlo
 template __global__ void RecalculateZsGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void RecalculateZsGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
-/*! \fn void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
-* \brief Wrapping function for calculating flux in the halos for a block and a single variable on CPU.
-* ## Depreciated
-* This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn't preserve the balance of fluxes on the restiction interface
-* It should be deleted soon
-* ## Description
-* 
-* 
-*
-*/
+/**! \fn void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
+ * @brief Wrapping function for calculating flux in the halos for a block and a single variable on CPU.
+ * @deprecated This function is was never sucessful and will never be used. It is fundamentally flawed because is doesn't preserve the balance of fluxes on the restiction interface. It should be deleted soon.
+ * 
+ */
 template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> XBlock, T* z)
 {
 	int ib;
@@ -199,14 +224,18 @@ template <class T> void fillHaloF(Param XParam, bool doProlongation, BlockP<T> X
 template void fillHaloF<float>(Param XParam, bool doProlongation, BlockP<float> XBlock, float* z);
 template void fillHaloF<double>(Param XParam, bool doProlongation, BlockP<double> XBlock, double* z);
 
-/*! \fn void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
-* \brief Wrapping function for calculating halos for each block of a single variable on GPU.
-*
-* ## Description
-* This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function.
-* The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
-* 
-*/
+/**! \fn void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
+ * @brief Wrapping function for calculating halos for each block of a single variable on GPU.
+ *
+ * ## Description
+ * This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function.
+ * The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ *  
+ */
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
@@ -232,6 +261,14 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, cudaStream_t
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, cudaStream_t stream, double* z);
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
+/**
+ * @brief Wrapping function for calculating halos for each block of a single variable on GPU.
+ * @deprecated
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ */
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock,  T* z)
 {
 
@@ -258,7 +295,13 @@ template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock,double* z)
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, float* z);
 
 
-/*! \fn void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
+/**! \fn void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
+ * @brief Wrapping function for calculating halos for each block of a single variable on GPU. New version.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ * 
 */
 template <class T> void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
@@ -289,14 +332,17 @@ template void fillHaloGPUnew<double>(Param XParam, BlockP<double> XBlock, cudaSt
 template void fillHaloGPUnew<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
 
-/*! \fn void  fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
-* \brief Wrapping function for calculating flux for halos for each block of a single variable on GPU.
-*
-* ## Description
-* This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function.
-* The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
-*
-*/
+/**
+ * @brief Wrapping function for calculating flux for halos for each block of a single variable on GPU.
+ *
+ * ## Description
+ * This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function.
+ * The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to work on
+ * @note For flux term and actually most terms, only top and right neighbours are needed!
+ */
 template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 {
 	// for flux term and actually most terms, only top and right neighbours are needed!
@@ -320,6 +366,13 @@ template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z)
 template void fillHaloTopRightC<double>(Param XParam, BlockP<double> XBlock, double* z);
 template void fillHaloTopRightC<float>(Param XParam, BlockP<float> XBlock, float* z);
 
+/**
+ * @brief Wrapping function for calculating flux for halos for each block of a single variable on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to work on
+ * @note For flux term and actually most terms, only top and right neighbours are needed!
+ */
 template <class T> void fillHaloLRFluxC(Param XParam, BlockP<T> XBlock, T* z)
 {
 	// for flux term and actually most terms, only top and right neighbours are needed!
@@ -343,6 +396,13 @@ template <class T> void fillHaloLRFluxC(Param XParam, BlockP<T> XBlock, T* z)
 template void fillHaloLRFluxC<double>(Param XParam, BlockP<double> XBlock, double* z);
 template void fillHaloLRFluxC<float>(Param XParam, BlockP<float> XBlock, float* z);
 
+/**
+ * @brief Wrapping function for calculating flux for halos for each block of a single variable on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to work on
+ * @note For flux term and actually most terms, only top and right neighbours are needed!
+ */
 template <class T> void fillHaloBTFluxC(Param XParam, BlockP<T> XBlock, T* z)
 {
 	// for flux term and actually most terms, only top and right neighbours are needed!
@@ -367,7 +427,14 @@ template void fillHaloBTFluxC<double>(Param XParam, BlockP<double> XBlock, doubl
 template void fillHaloBTFluxC<float>(Param XParam, BlockP<float> XBlock, float* z);
 
 
-
+/**
+ * @brief Wrapping function for calculating flux for halos for each block of a single variable on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information	
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ * @note For flux term and actually most terms, only top and right neighbours are needed!
+ */
 template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
@@ -389,6 +456,15 @@ template <class T> void fillHaloTopRightGPU(Param XParam, BlockP<T> XBlock, cuda
 template void fillHaloTopRightGPU<double>(Param XParam, BlockP<double> XBlock, cudaStream_t stream, double* z);
 template void fillHaloTopRightGPU<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
+
+/**
+ * @brief Wrapping function for calculating for halos for each block of a single variable on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ * @note For flux term and actually most terms, only top and right neighbours are needed!
+ */
 template <class T> void fillHaloLeftRightGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
@@ -410,6 +486,14 @@ template <class T> void fillHaloLeftRightGPU(Param XParam, BlockP<T> XBlock, cud
 template void fillHaloLeftRightGPU<double>(Param XParam, BlockP<double> XBlock, cudaStream_t stream, double* z);
 template void fillHaloLeftRightGPU<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
+
+/**
+ * @brief Wrapping function for calculating for halos for each block of a single variable on GPU. New version.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ */
 template <class T> void fillHaloLeftRightGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
@@ -425,6 +509,18 @@ template <class T> void fillHaloLeftRightGPUnew(Param XParam, BlockP<T> XBlock, 
 template void fillHaloLeftRightGPUnew<double>(Param XParam, BlockP<double> XBlock, cudaStream_t stream, double* z);
 template void fillHaloLeftRightGPUnew<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
+/**
+ * @brief Wrapping function for calculating flux for halos for each block of a single variable on GPU.
+ *
+ * ## Description
+ * This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function.
+ * The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ *  
+ */
 template <class T> void fillHaloBotTopGPU(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
@@ -446,6 +542,18 @@ template <class T> void fillHaloBotTopGPU(Param XParam, BlockP<T> XBlock, cudaSt
 template void fillHaloBotTopGPU<double>(Param XParam, BlockP<double> XBlock, cudaStream_t stream, double* z);
 template void fillHaloBotTopGPU<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
+/**
+ * @brief Wrapping function for calculating flux for halos for each block of a single variable on GPU. New version.
+ *
+ * ## Description
+ * This function is a wraping function of the halo flux functions on GPU. It is called from the main Halo GPU function.
+ * The present imnplementation is naive and slow one that calls the rather complex fillLeft type functions
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param stream The cuda stream to use
+ * @param z The variable to work on
+ *  
+ */
 template <class T> void fillHaloBotTopGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z)
 {
 
@@ -462,6 +570,19 @@ template void fillHaloBotTopGPUnew<double>(Param XParam, BlockP<double> XBlock, 
 template void fillHaloBotTopGPUnew<float>(Param XParam, BlockP<float> XBlock, cudaStream_t stream, float* z);
 
 
+/**
+ * @brief Wrapping function for calculating halos for each block and each variable on CPU.
+ *
+ * ## Description
+ * This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo function.
+ * It uses multithreading to calculate the halos of the 4 variables in parallel.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @param zb The bottom elevation variable
+ * @tparam T The data type (float or double)
+ * 
+ */
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
 {
 	
@@ -496,6 +617,18 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float *zb);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev,double * zb);
 
+/**
+ * @brief Wrapping function for calculating halos for each block and each variable on CPU.
+ *
+ * ## Description
+ * This function is a wraping fuction of the halo functions on CPU. It is called from the main Halo function.
+ * It uses multithreading to calculate the halos of the 4 variables in parallel.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @tparam T The data type (float or double)
+ * 
+ */
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev)
 {
 
@@ -516,7 +649,13 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xe
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev);
 
-
+/**
+ * @brief Wrapping function for calculating halos for each block and each variable on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @tparam T The data type (float or double)
+ */
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev)
 {
 	const int num_streams = 4;
@@ -542,6 +681,21 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev);
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev);
 
+/**
+ * @brief Wrapping function for calculating halos for each block and each variable on GPU.
+ *
+ * ## Description
+ * This function is a wraping fuction of the halo functions on GPU. It is called from the main Halo GPU function.
+ * It uses multiple cuda streams to calculate the halos of the 4 variables in parallel.
+ * After filling the halos, it applies either the elevation conservation or wet-dry fix if enabled in parameters.
+ * Finally, it recalculates the surface elevation zs based on the updated water depth h and bottom elevation zb.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @param zb The bottom elevation variable
+ * @tparam T The data type (float or double)
+ * 
+ */
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev,T * zb)
 {
 	const int num_streams = 4;
@@ -597,6 +751,17 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T>
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev,float *zb);
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev,double* zb);
 
+/**
+ * @brief Wrapping function for calculating halos for each block and each variable on CPU.
+ * 
+ * ## Description
+ * This function is a wrapping function of the halo functions on CPU. It is called from the main Halo function.
+ * It uses multithreading to calculate the halos of the 4 variables in parallel.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Grad The gradients structure containing the gradients
+ * @tparam T The data type (float or double)
+ */
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad)
 {
 	
@@ -636,6 +801,13 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> G
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, GradientsP<float> Grad);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, GradientsP<double> Grad);
 
+/**
+ * @brief Wrapping function for calculating halos for each block and each variable on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Grad The gradients structure containing the gradients
+ * @tparam T The data type (float or double)
+ */
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad)
 {
 	const int num_streams = 8;
@@ -667,6 +839,13 @@ template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, GradientsP<
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, GradientsP<double> Grad);
 
 
+/**
+ * @brief Wrapping function for calculating flux halos for each block and each variable on CPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Flux The flux structure containing the flux variables
+ * @tparam T The data type (float or double)
+ */
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 {
 	
@@ -706,6 +885,13 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 template void fillHalo<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
 template void fillHalo<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
+/**
+ * @brief Wrapping function for calculating flux halos for each block and each variable on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Flux The flux structure containing the flux variables
+ * @tparam T The data type (float or double)
+ */
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 {
 	const int num_streams = 8;
@@ -760,6 +946,14 @@ template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flu
 template void fillHaloGPU<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
 template void fillHaloGPU<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
+/**
+ * @brief Wrapping function for applying boundary masks to flux variables on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param Xev The evolving structure containing the evolving variables
+ * @param Flux The flux structure containing the flux variables
+ * @tparam T The data type (float or double)
+ */
 template <class T> void bndmaskGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux)
 {
 	const int num_streams = 8;
@@ -832,6 +1026,21 @@ template void bndmaskGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<
 //template void refine_linearCPU<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 //template void refine_linearCPU<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+/**
+ * @brief Refine a block on the left side using linear reconstruction.
+ *
+ * ## Description
+ * This function refines a block on the left side using linear reconstruction. It checks if the neighboring block on the left is at a coarser level.
+ * If so, it calculates the new values for the left boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring a smooth transition between different resolution levels.
+ * @param XParam The model parameters
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ * @tparam T The data type (float or double)
+ */
 template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBlock, T* z, T * dzdx, T * dzdy)
 {
 	if (XBlock.level[XBlock.LeftBot[ib]] < XBlock.level[ib])
@@ -858,6 +1067,22 @@ template <class T> void refine_linear_Left(Param XParam, int ib, BlockP<T> XBloc
 template void refine_linear_Left<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linear_Left<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+
+/**
+ * @brief GPU kernel to refine a block on the left side using linear reconstruction.
+ * ## Description
+ * This GPU kernel refines a block on the left side using linear reconstruction. It checks if the neighboring block on the left is at a coarser level.
+ * If so, it calculates the new values for the left boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring a smooth transition between different resolution levels.
+ * Each thread processes a specific row of the block, allowing for parallel computation across multiple blocks.		
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ * @param T The data type (float or double)
+ * 
+ */
 template <class T> __global__ void refine_linear_LeftGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx,T*dzdy)
 {
 	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
@@ -895,6 +1120,21 @@ template __global__ void refine_linear_LeftGPU<float>(Param XParam, BlockP<float
 template __global__ void refine_linear_LeftGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
 
+/**
+ * @brief Refine a block on the right side using linear reconstruction.
+ *
+ * ## Description
+ * This function refines a block on the right side using linear reconstruction. It checks if the neighboring block on the right is at a coarser level.
+ * If so, it calculates the new values for the right boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring a smooth transition between different resolution levels.
+ * @param XParam The model parameters
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ * @tparam T The data type (float or double)
+ */
 template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	if (XBlock.level[XBlock.RightBot[ib]] < XBlock.level[ib])
@@ -921,6 +1161,21 @@ template <class T> void refine_linear_Right(Param XParam, int ib, BlockP<T> XBlo
 template void refine_linear_Right<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linear_Right<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+/**
+ * @brief GPU kernel to refine a block on the right side using linear reconstruction.
+ * ## Description
+ * This GPU kernel refines a block on the right side using linear reconstruction. It checks if the neighboring block on the right is at a coarser level.
+ * If so, it calculates the new values for the right boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring a smooth transition between different resolution levels.
+ * Each thread processes a specific row of the block, allowing for parallel computation across multiple blocks.		
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ * @param T The data type (float or double)
+ * 
+ */
 template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
@@ -956,6 +1211,19 @@ template <class T> __global__ void refine_linear_RightGPU(Param XParam, BlockP<T
 template __global__ void refine_linear_RightGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_RightGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+/**
+ * @brief Refine a block on the bottom side using linear reconstruction.
+ * ## Description
+ * This function refines a block on the bottom side using linear reconstruction. It checks if the neighboring block on the bottom is at a coarser level.
+ * If so, it calculates the new values for the bottom boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring	 a smooth transition between different resolution levels.
+ * @param XParam The model parameters
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction	
+ */
 template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	if (XBlock.level[XBlock.BotLeft[ib]] < XBlock.level[ib])
@@ -983,7 +1251,19 @@ template <class T> void refine_linear_Bot(Param XParam, int ib, BlockP<T> XBlock
 template void refine_linear_Bot<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linear_Bot<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
-
+/** 
+ * @brief GPU kernel to refine a block on the bottom side using linear reconstruction.
+ * ## Description
+ * This GPU kernel refines a block on the bottom side using linear reconstruction. It checks if the neighboring block on the bottom is at a coarser level.
+ * If so, it calculates the new values for the bottom boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring a smooth transition between different resolution levels.
+ * Each thread processes a specific column of the block, allowing for parallel computation across multiple blocks.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ */
 template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
@@ -1017,6 +1297,19 @@ template <class T> __global__ void refine_linear_BotGPU(Param XParam, BlockP<T> 
 template __global__ void refine_linear_BotGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_BotGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+/**
+ * @brief Refine a block on the top side using linear reconstruction.
+ * ## Description
+ * This function refines a block on the top side using linear reconstruction. It checks if the neighboring block on the top is at a coarser level.
+ * If so, it calculates the new values for the top boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring a smooth transition between different resolution levels.
+ * @param XParam The model parameters
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction	
+ */
 template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	if (XBlock.level[XBlock.TopLeft[ib]] < XBlock.level[ib])
@@ -1044,6 +1337,20 @@ template <class T> void refine_linear_Top(Param XParam, int ib, BlockP<T> XBlock
 template void refine_linear_Top<float>(Param XParam, int ib, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linear_Top<double>(Param XParam, int ib, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+/**
+ * @brief GPU kernel to refine a block on the top side using linear reconstruction.
+ * ## Description
+ * This GPU kernel refines a block on the top side using linear reconstruction. It checks if the neighboring block on the top is at a coarser level.
+ * If so, it calculates the new values for the top boundary of the current block using the gradients in the x and y directions.
+ * The new values are computed based on the distance to the neighboring block and the gradients, ensuring a smooth transition between different resolution levels.
+ * Each thread processes a specific column of the block, allowing for parallel computation across multiple blocks.	
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ * @param T The data type (float or double)
+ */
 template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
@@ -1076,6 +1383,15 @@ template <class T> __global__ void refine_linear_TopGPU(Param XParam, BlockP<T> 
 template __global__ void refine_linear_TopGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template __global__ void refine_linear_TopGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+/**
+ * @brief Wrapping function for refining all sides of active blocks using linear reconstruction.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ * @tparam T The data type (float or double)
+ */
 template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -1090,6 +1406,15 @@ template <class T> void refine_linear(Param XParam, BlockP<T> XBlock, T* z, T* d
 template void refine_linear<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linear<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
+/**
+ * @brief Wrapping function for refining all sides of active blocks using linear reconstruction on GPU.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @param dzdx The gradient of z in the x direction
+ * @param dzdy The gradient of z in the y direction
+ * @tparam T The data type (float or double)
+ */
 template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T* dzdx, T* dzdy)
 {
 	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
@@ -1106,7 +1431,13 @@ template <class T> void refine_linearGPU(Param XParam, BlockP<T> XBlock, T* z, T
 template void refine_linearGPU<float>(Param XParam, BlockP<float> XBlock, float* z, float* dzdx, float* dzdy);
 template void refine_linearGPU<double>(Param XParam, BlockP<double> XBlock, double* z, double* dzdx, double* dzdy);
 
-
+/**
+ * @brief CPU function for applying halo flux correction on the left and right boundaries.
+ * @param XParam The model parameters
+ * @param ib The index of the block
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ */
 template <class T> void HaloFluxCPULR(Param XParam, int ib, BlockP<T> XBlock, T *z)
 {
 	int jj, i,il,itl;
@@ -1197,6 +1528,14 @@ template <class T> void HaloFluxCPULR(Param XParam, int ib, BlockP<T> XBlock, T 
 	}
 }
 
+/**
+ * @brief Wrapping function for applying halo flux correction on the left and right boundaries of all active blocks.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @tparam T The data type (float or double)
+ * 
+ */
 template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock, T* z)
 {
 	int jj, i, il, itl;
@@ -1300,6 +1639,14 @@ template <class T> __global__  void HaloFluxGPULR(Param XParam, BlockP<T> XBlock
 		//
 	}
 }
+
+/**
+ * @brief GPU kernel for applying halo flux correction on the left and right boundaries of all active blocks.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @tparam T The data type (float or double)
+ */
 
 template <class T> __global__  void HaloFluxGPULRnew(Param XParam, BlockP<T> XBlock, T* z)
 {
@@ -1409,6 +1756,13 @@ template <class T> __global__  void HaloFluxGPULRnew(Param XParam, BlockP<T> XBl
 	}
 }
 
+/**
+ * @brief Wrapping function for applying halo flux correction on the left and right boundaries of all active blocks on GPU.
+ * @param XParam The model parameters	
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @tparam T The data type (float or double)
+ */
 template <class T> void HaloFluxCPUBT(Param XParam, int ib, BlockP<T> XBlock, T* z)
 {
 	int jj, i, il, itl;
@@ -1499,6 +1853,13 @@ template <class T> void HaloFluxCPUBT(Param XParam, int ib, BlockP<T> XBlock, T*
 	}
 }
 
+/**
+ * @brief GPU kernel for applying halo flux correction on the top and bottom boundaries of all active blocks.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @tparam T The data type (float or double)
+ */
 template <class T> __global__ void HaloFluxGPUBT(Param XParam, BlockP<T> XBlock, T* z)
 {
 	int jj, i, il, itl;
@@ -1598,6 +1959,13 @@ template <class T> __global__ void HaloFluxGPUBT(Param XParam, BlockP<T> XBlock,
 	}
 }
 
+/**
+ * @brief GPU kernel for applying halo flux correction on the top and bottom boundaries of all active blocks.
+ * @param XParam The model parameters
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @tparam T The data type (float or double)
+ */
 template <class T> __global__ void HaloFluxGPUBTnew(Param XParam, BlockP<T> XBlock, T* z)
 {
 	int jj, i, il, itl;
@@ -1704,7 +2072,14 @@ template <class T> __global__ void HaloFluxGPUBTnew(Param XParam, BlockP<T> XBlo
 }
 
 
-
+/**
+ * @brief Applying halo flux correction on the left boundaries of all active blocks on GPU.
+ * @param XParam The model parameters
+ * @param ib The block index
+ * @param XBlock The block structure containing the block information
+ * @param z The variable to be refined
+ * @tparam T The data type (float or double)
+ */
 template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 {
 	int jj,bb;
@@ -1911,7 +2286,19 @@ template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
 }
 
 
-
+/**
+ * @brief GPU kernel for applying halo flux correction on the left boundaries of all active blocks.
+ * @param halowidth The width of the halo region
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param lefttop The array of left top neighbor block indices
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param botright The array of bottom right neighbor block indices
+ * @param topright The array of top right neighbor block indices
+ * @param a The variable to be refined
+ * @param T The data type (float or double)
+ */
 template <class T> __global__ void fillLeft(int halowidth, int* active, int * level, int* leftbot, int * lefttop, int * rightbot, int* botright,int * topright, T * a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
@@ -2084,14 +2471,24 @@ template <class T> __global__ void fillLeft(int halowidth, int* active, int * le
 template __global__ void fillLeft<float>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, float* a);
 template __global__ void fillLeft<double>(int halowidth, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, double* a);
 
-/*! \fn void void fillLeftnew(...)
-* \brief New way of filling the left halo 2 blocks at a time to maximize GPU occupancy
-*
-* ## Description
-* This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean.
-* In a sense this is the third (and last) layer of wrapping
-*
-*/
+/**
+ * @brief New way of filling the left halo 2 blocks at a time to maximize GPU occupancy
+ *
+ * ## Description
+ * This fuction is a wraping fuction of the halo functions for CPU. It is called from another wraping function to keep things clean.
+ * In a sense this is the third (and last) layer of wrapping
+ *
+ * @param halowidth The width of the halo region
+ * @param nblk The number of active blocks
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param lefttop The array of left top neighbor block indices
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param botright The array of bottom right neighbor block indices
+ * @param topright The array of top right neighbor block indices
+ * @param a The variable to be refined
+ */
 template <class T> __global__ void fillLeftnew(int halowidth, int nblk, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, T* a)
 {
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -2270,7 +2667,14 @@ template <class T> __global__ void fillLeftnew(int halowidth, int nblk, int* act
 template __global__ void fillLeftnew<float>(int halowidth, int nblk, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, float* a);
 template __global__ void fillLeftnew<double>(int halowidth, int nblk, int* active, int* level, int* leftbot, int* lefttop, int* rightbot, int* botright, int* topright, double* a);
 
-
+/**
+ * @brief CPU function for applying halo flux correction on the left boundaries of a specific block.
+ * @param XParam The simulation parameters
+ * @param doProlongation Flag indicating whether to perform prolongation
+ * @param ib The index of the block to process
+ * @param XBlock The block structure containing neighbor information
+ * @param z The variable to be refined
+ */
 template <class T> void fillLeftFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -2404,7 +2808,13 @@ template <class T> void fillLeftFlux(Param XParam, bool doProlongation, int ib, 
 }
 
 
-
+/**
+ * @brief Fills the right halo region of a block.
+ * @param XParam The simulation parameters
+ * @param ib The index of the block to process
+ * @param XBlock The block structure containing neighbor information
+ * @param z The variable to be refined
+ */
 template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -2610,7 +3020,20 @@ template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 }
 
 
-
+/**
+ * @brief CUDA kernel to fill the right halo region of blocks in parallel.
+ * @param halowidth The width of the halo region
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param righttop The array of right top neighbor block indices
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param botleft The array of bottom left neighbor block indices
+ * @param topleft The array of top left neighbor block indices
+ * @param a The variable to be refined
+ * @tparam T The data type of the variable (e.g., float, double)
+ * 
+ */
 template <class T> __global__ void fillRight(int halowidth, int* active, int* level, int * rightbot,int* righttop,int * leftbot,int*botleft,int* topleft, T* a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
@@ -2786,6 +3209,21 @@ template <class T> __global__ void fillRight(int halowidth, int* active, int* le
 template __global__ void fillRight<float>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, float* a);
 template __global__ void fillRight<double>(int halowidth, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
 
+/**
+ * @brief CUDA kernel to fill the right halo region of blocks in parallel (new version).
+ * @param halowidth The width of the halo region
+ * @param nblk The number of active blocks
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param righttop The array of right top neighbor block indices
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param botleft The array of bottom left neighbor block indices
+ * @param topleft The array of top left neighbor block indices
+ * @param a The variable to be refined
+ * @tparam T The data type of the variable (e.g., float, double)
+ * 
+ */
 template <class T> __global__ void fillRightnew(int halowidth,int nblk, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
 {
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -2965,7 +3403,15 @@ template __global__ void fillRightnew<float>(int halowidth, int nblk, int* activ
 template __global__ void fillRightnew<double>(int halowidth, int nblk, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
 
 
-
+/**
+ * @brief Function to fill the right halo region of a block, handling various neighbor configurations.
+ * @param XParam The parameters of the grid and blocks
+ * @param doProlongation Flag indicating whether to perform prolongation
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing neighbor information
+ * @param z The variable to be refined
+ * @tparam T The data type of the variable (e.g., float, double)
+ */
 template <class T> void fillRightFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -3097,7 +3543,20 @@ template void fillRightFlux<float>(Param XParam, bool doProlongation, int ib, Bl
 template void fillRightFlux<double>(Param XParam, bool doProlongation, int ib, BlockP<double> XBlock, double*& z);
 
 
-
+/**
+ * @brief CUDA kernel to fill the right halo region of blocks in parallel for flux variables, handling various neighbor configurations.
+ * @param halowidth The width of the halo region
+ * @param doProlongation Flag indicating whether to perform prolongation
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param righttop The array of right top neighbor block indices
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param botleft The array of bottom left neighbor block indices
+ * @param topleft The array of top left neighbor block indices
+ * @param a The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ */
 template <class T> __global__ void fillRightFlux(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, T* a)
 {
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
@@ -3214,7 +3673,15 @@ template __global__ void fillRightFlux<float>(int halowidth, bool doProlongation
 template __global__ void fillRightFlux<double>(int halowidth, bool doProlongation, int* active, int* level, int* rightbot, int* righttop, int* leftbot, int* botleft, int* topleft, double* a);
 
 
-
+/**
+ * @brief Function to fill the bottom halo region of a block, handling various neighbor configurations.
+ * @param XParam The parameters of the grid and blocks
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing neighbor information
+ * @param z The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ * 
+ */
 template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -3417,7 +3884,20 @@ template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 }
 
-
+/**
+ * @brief CUDA kernel to fill the bottom halo region of blocks in parallel, handling various neighbor configurations.
+ * @param halowidth The width of the halo region
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param botleft The array of bottom left neighbor block indices
+ * @param botright The array of bottom right neighbor block indices
+ * @param topleft The array of top left neighbor block indices
+ * @param lefttop The array of left top neighbor block indices
+ * @param righttop The array of right top neighbor block indices
+ * @param a The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ * 
+ */
 template <class T> __global__ void fillBot(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, T* a)
 {
 	int blkmemwidth = blockDim.x + halowidth * 2;
@@ -3583,6 +4063,20 @@ template <class T> __global__ void fillBot(int halowidth, int* active, int* leve
 template __global__ void fillBot<float>(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, float* a);
 template __global__ void fillBot<double>(int halowidth, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, double* a);
 
+/**
+ * @brief CUDA kernel to fill the bottom halo region of blocks in parallel for new refinement, handling various neighbor configurations, new version
+ * @param halowidth The width of the halo region
+ * @param nblk The number of active blocks
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param botleft The array of bottom left neighbor block indices
+ * @param botright The array of bottom right neighbor block indices
+ * @param topleft The array of top left neighbor block indices
+ * @param lefttop The array of left top neighbor block indices
+ * @param righttop The array of right top neighbor block indices
+ * @param a The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ */
 template <class T> __global__ void fillBotnew(int halowidth, int nblk, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, T* a)
 {
 	int blkmemwidth = blockDim.x + halowidth * 2;
@@ -3750,6 +4244,15 @@ template <class T> __global__ void fillBotnew(int halowidth, int nblk, int* acti
 template __global__ void fillBotnew<float>(int halowidth, int nblk, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, float* a);
 template __global__ void fillBotnew<double>(int halowidth, int nblk, int* active, int* level, int* botleft, int* botright, int* topleft, int* lefttop, int* righttop, double* a);
 
+/**
+ * @brief Fills the bottom halo region of a block, handling various neighbor configurations.
+ * @param XParam The parameters of the grid/block structure
+ * @param doProlongation Flag indicating whether to perform prolongation
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing neighbor information
+ * @param z The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ */
 template <class T> void fillBotFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -3880,6 +4383,14 @@ template <class T> void fillBotFlux(Param XParam, bool doProlongation, int ib, B
 
 }
 
+/**
+ * @brief Fills the top halo region of a block, handling various neighbor configurations.
+ * @param XParam The parameters of the grid/block structure
+ * @param ib The index of the current block
+ * @param XBlock The block structure containing neighbor information
+ * @param z The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ */
 template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -4082,6 +4593,20 @@ template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 
 }
 
+/**
+ * @brief CUDA kernel to fill the top halo region of blocks in parallel for new refinement, handling various neighbor configurations, new version
+ * @param halowidth The width of the halo region
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param topleft The array of top left neighbor block indices
+ * @param topright The array of top right neighbor block indices
+ * @param botleft The array of bottom left neighbor block indices
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param a The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ * 
+ */
 template <class T> __global__ void fillTop(int halowidth, int* active, int* level,int * topleft, int * topright,int * botleft, int* leftbot, int* rightbot,  T* a)
 {
 	int blkmemwidth = blockDim.x + halowidth * 2;
@@ -4249,6 +4774,20 @@ template <class T> __global__ void fillTop(int halowidth, int* active, int* leve
 template __global__ void fillTop<float>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, float* a);
 template __global__ void fillTop<double>(int halowidth, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
 
+/***
+ * @brief CUDA kernel to fill the top halo region of blocks in parallel for new refinement, handling various neighbor configurations, new version
+ * @param halowidth The width of the halo region
+ * @param nblk The number of active blocks
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param topleft The array of top left neighbor block indices
+ * @param topright The array of top right neighbor block indices
+ * @param botleft The array of bottom left neighbor block indices
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param a The variable to be refined
+ * 
+ */
 template <class T> __global__ void fillTopnew(int halowidth, int nblk, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
 {
 	int blkmemwidth = blockDim.x + halowidth * 2;
@@ -4419,7 +4958,15 @@ template <class T> __global__ void fillTopnew(int halowidth, int nblk, int* acti
 template __global__ void fillTopnew<float>(int halowidth, int nblk, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, float* a);
 template __global__ void fillTopnew<double>(int halowidth, int nblk, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
 
-
+/**
+ * @brief Function to fill the top halo region of a block for new refinement, handling various neighbor configurations
+ * @param XParam The parameters of the grid and blocks
+ * @param doProlongation Flag indicating whether to perform prolongation
+ * @param ib The index of the block to be processed
+ * @param XBlock The structure containing block neighbor information
+ * @param z The variable to be refined
+ * @tparam T The data type of the variable (e.g., float, double)
+ */
 template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, BlockP<T> XBlock, T*& z)
 {
 	int jj, bb;
@@ -4548,6 +5095,21 @@ template <class T> void fillTopFlux(Param XParam, bool doProlongation, int ib, B
 template void fillTopFlux<float>(Param XParam, bool doProlongation, int ib, BlockP<float> XBlock, float*& z);
 template void fillTopFlux<double>(Param XParam, bool doProlongation, int ib, BlockP<double> XBlock, double*& z);
 
+/**
+ * @brief CUDA kernel to fill the top halo region of blocks in parallel for new refinement, handling various neighbor configurations, new version
+ * @param halowidth The width of the halo region
+ * @param doProlongation Flag indicating whether to perform prolongation
+ * @param active The array of active block indices
+ * @param level The array of block levels
+ * @param topleft The array of top left neighbor block indices
+ * @param topright The array of top right neighbor block indices
+ * @param botleft The array of bottom left neighbor block indices
+ * @param leftbot The array of left bottom neighbor block indices
+ * @param rightbot The array of right bottom neighbor block indices
+ * @param a The variable to be refined
+ * @param T The data type of the variable (e.g., float, double)
+ * 
+ */
 template <class T> __global__ void fillTopFlux(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, T* a)
 {
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
@@ -4655,7 +5217,13 @@ template __global__ void fillTopFlux<float>(int halowidth, bool doProlongation, 
 template __global__ void fillTopFlux<double>(int halowidth, bool doProlongation, int* active, int* level, int* topleft, int* topright, int* botleft, int* leftbot, int* rightbot, double* a);
 
 
-
+/**
+ * @brief Function to fill the corner halo regions for all active blocks
+ * @param XParam The parameters of the grid and blocks
+ * @param XBlock The structure containing block neighbor information
+ * @param z The variable to be processed
+ * @tparam T The data type of the variable (e.g., float, double)
+ */
 template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, T*& z)
 {
 	int ib;
@@ -4672,6 +5240,14 @@ template void fillCorners<float>(Param XParam, BlockP<float> XBlock, float*& z);
 template void fillCorners<double>(Param XParam, BlockP<double> XBlock, double*& z);
 
 
+/**
+ * @brief Function to fill the corner halo regions for all active blocks and all evolving variables
+ * @param XParam The parameters of the grid and blocks
+ * @param XBlock The structure containing block neighbor information
+ * @param Xev The structure containing evolving variables
+ * @tparam T The data type of the variables (e.g., float, double)
+ * 
+ */
 template <class T> void fillCorners(Param XParam, BlockP<T> XBlock, EvolvingP<T>& Xev)
 {
 	int ib;
@@ -4690,7 +5266,14 @@ template void fillCorners<float>(Param XParam, BlockP<float> XBlock, EvolvingP<f
 template void fillCorners<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double>& Xev);
 
 
-
+/**
+ * @brief Function to fill the corner halo regions for a specific block, handling various neighbor configurations
+ * @param XParam The parameters of the grid and blocks
+ * @param ib The index of the block to be processed
+ * @param XBlock The structure containing block neighbor information
+ * @param z The variable to be processed
+ * @param T The data type of the variable (e.g., float, double)
+ */
 template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& z)
 {
 	// Run only this function after the filling the other bit of halo (i.e. fctn fillleft...)
@@ -4826,7 +5409,14 @@ template <class T> void fillCorners(Param XParam, int ib, BlockP<T> XBlock, T*& 
 template void fillCorners<float>(Param XParam, int ib, BlockP<float> XBlock, float*& z);
 template void fillCorners<double>(Param XParam, int ib, BlockP<double> XBlock, double*& z);
 
-
+/**
+ * @brief CUDA kernel to fill the corner halo regions for all active blocks in parallel, handling various neighbor configurations
+ * @param XParam The parameters of the grid and blocks
+ * @param XBlock The structure containing block neighbor information
+ * @param z The variable to be processed
+ * @param T The data type of the variable (e.g., float, double)
+ * 
+ */
 template <class T> __global__ void fillCornersGPU(Param XParam, BlockP<T> XBlock, T* z)
 {
 	int blkmemwidth = XParam.blkwidth + XParam.halowidth * 2;

@@ -1,0 +1,80 @@
+\hypertarget{Mainloop_8h}{}\doxysection{src/\+Mainloop.h File Reference}
+\label{Mainloop_8h}\index{src/Mainloop.h@{src/Mainloop.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mesh.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Write\+\_\+netcdf.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Initial\+Conditions.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Boundary.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Flow\+GPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Flow\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Meanmax.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Updateforcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Flow\+MLGPU.\+h\char`\"{}}\newline
+Include dependency graph for Mainloop.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8h_a0ad0bb561885e36751fa9715e6961051}{Main\+Loop}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8h_af89df14ff4731cf4c1e19a3ff6ccebc7}{Debug\+Loop}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Mainloop_8h_ac06b5925460adb1f6e1e2f76b5055ef0}{initdt}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \mbox{\hyperlink{Mainloop_8h_afbe3a9aff3a86ad4dec214c4e73a08d1}{Init\+Loop}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8h_a5ee1aa7982bcbec879af949e36814276}{printstatus}} (T totaltime, T dt)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Mainloop_8h_a1426e758c00aafa841ffa54c08d5ad30}{store\+TSout}} (\mbox{\hyperlink{classParam}{Param}} XParam, int noutnodes, int outnode, int istep, int blknode, int inode, int jnode, int $\ast$blk\+TS, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$store)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Mainloop_8h_af89df14ff4731cf4c1e19a3ff6ccebc7}\label{Mainloop_8h_af89df14ff4731cf4c1e19a3ff6ccebc7}} 
+\index{Mainloop.h@{Mainloop.h}!DebugLoop@{DebugLoop}}
+\index{DebugLoop@{DebugLoop}!Mainloop.h@{Mainloop.h}}
+\doxysubsubsection{\texorpdfstring{DebugLoop()}{DebugLoop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Debug\+Loop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+Debugging loop This function was crated to debug to properly wrap the debug flow engine of the model \mbox{\Hypertarget{Mainloop_8h_ac06b5925460adb1f6e1e2f76b5055ef0}\label{Mainloop_8h_ac06b5925460adb1f6e1e2f76b5055ef0}} 
+\index{Mainloop.h@{Mainloop.h}!initdt@{initdt}}
+\index{initdt@{initdt}!Mainloop.h@{Mainloop.h}}
+\doxysubsubsection{\texorpdfstring{initdt()}{initdt()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ double initdt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8h_afbe3a9aff3a86ad4dec214c4e73a08d1}\label{Mainloop_8h_afbe3a9aff3a86ad4dec214c4e73a08d1}} 
+\index{Mainloop.h@{Mainloop.h}!InitLoop@{InitLoop}}
+\index{InitLoop@{InitLoop}!Mainloop.h@{Mainloop.h}}
+\doxysubsubsection{\texorpdfstring{InitLoop()}{InitLoop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\mbox{\hyperlink{structLoop}{Loop}}$<$T$>$ Init\+Loop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8h_a0ad0bb561885e36751fa9715e6961051}\label{Mainloop_8h_a0ad0bb561885e36751fa9715e6961051}} 
+\index{Mainloop.h@{Mainloop.h}!MainLoop@{MainLoop}}
+\index{MainLoop@{MainLoop}!Mainloop.h@{Mainloop.h}}
+\doxysubsubsection{\texorpdfstring{MainLoop()}{MainLoop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Main\+Loop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8h_a5ee1aa7982bcbec879af949e36814276}\label{Mainloop_8h_a5ee1aa7982bcbec879af949e36814276}} 
+\index{Mainloop.h@{Mainloop.h}!printstatus@{printstatus}}
+\index{printstatus@{printstatus}!Mainloop.h@{Mainloop.h}}
+\doxysubsubsection{\texorpdfstring{printstatus()}{printstatus()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void printstatus (\begin{DoxyParamCaption}\item[{T}]{totaltime,  }\item[{T}]{dt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8h_a1426e758c00aafa841ffa54c08d5ad30}\label{Mainloop_8h_a1426e758c00aafa841ffa54c08d5ad30}} 
+\index{Mainloop.h@{Mainloop.h}!storeTSout@{storeTSout}}
+\index{storeTSout@{storeTSout}!Mainloop.h@{Mainloop.h}}
+\doxysubsubsection{\texorpdfstring{storeTSout()}{storeTSout()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void store\+TSout (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{noutnodes,  }\item[{int}]{outnode,  }\item[{int}]{istep,  }\item[{int}]{blknode,  }\item[{int}]{inode,  }\item[{int}]{jnode,  }\item[{int $\ast$}]{blk\+TS,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{store }\end{DoxyParamCaption})}
+

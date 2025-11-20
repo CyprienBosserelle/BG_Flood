@@ -1,0 +1,57 @@
+Welcome to the BG-\/\+Flood documentation ! \hypertarget{index_autotoc_md0}{}\doxysection{Introduction}\label{index_autotoc_md0}
+BG-\/\+Flood is a Shallow Water Equation (SWE) model based on the St Venant formulation of \href{http://basilisk.fr/}{\texttt{ Basilisk}} but applied to a Block Uniform Quadtree memory structure on the GPU (based on \href{https://dl.acm.org/citation.cfm?id=3031292}{\texttt{ Vacondio {\itshape et al.}}}).
+
+The model is designed to simulate \href{https://english.stackexchange.com/questions/131195/difference-between-flooding-and-inundation}{\texttt{ flood/inundation}} caused by tsunami, river, rain, tide or storm surge (from wind stress or atm pressure differential) or any combination of these. The model does not (yet) include the effect of wind waves. The model is not restricted to simulating inundation hazard and can also be used for depth averaged circulation simulation.
+
+This wiki is to help users getting started on using the model. This is work in progress... If you have any issue/question post it on the issue board. While the model is fairly user friendly, it was designed for users with a basic understanding of hydrodynamics and some experience in modelling. The wiki (and the model) expect that users have some experience in basic file manipulations and are comfortable with handling Net\+CDF files for input and output.
+
+\DoxyHorRuler{0}
+\hypertarget{index_autotoc_md2}{}\doxysubsection{Model development stage}\label{index_autotoc_md2}
+BG-\/\+Flood is still in early development stage but is already useful for real inundation simulation. ~\newline
+
+
+The master branch is at stage 4 of development with 5 stage planned as below
+\begin{DoxyEnumerate}
+\item \sout{Cartesian naive formulation}
+\item \sout{Same but with some ease of use for modelling studies}
+\item \sout{Block Uniform formulation at constant level with masked blocks (with a full swing of {\itshape user friendly} capabilities)}
+\item \sout{Static Block uniform Quad-\/tree formulation (i.\+e. adapted mesh at the first step only )}
+\item fully adaptive Block uniform Quad-\/tree formulation (i.\+e. basilisk style wavelet refine)
+\end{DoxyEnumerate}
+
+\href{https://www.gnu.org/licenses/gpl-3.0}{\texttt{ }} \href{https://www.codacy.com/project/CyprienBosserelle/Basil_Cart_StV/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=CyprienBosserelle/Basil_Cart_StV&amp;utm_campaign=Badge_Grade_Dashboard}{\texttt{ }} \href{https://cyprienbosserelle.github.io/BG_Flood/}{\texttt{ }}
+
+{\bfseries{Testing}} CI test (development branch)\+:
+
+\DoxyHorRuler{0}
+\hypertarget{index_autotoc_md4}{}\doxysubsection{How to install}\label{index_autotoc_md4}
+\hypertarget{index_autotoc_md5}{}\doxysubsubsection{From precompiled binaries (\+Win10 only)}\label{index_autotoc_md5}
+
+\begin{DoxyEnumerate}
+\item download the zip from any release
+\item unzip into preferred path
+\item Add path to \char`\"{}\+Path\char`\"{} in environment variables (search for \char`\"{}\+Edit environment variables for your account\char`\"{})
+\item When updating/upgrading BG\+\_\+\+Flood simply repeat 1 and 2
+\end{DoxyEnumerate}\hypertarget{index_autotoc_md6}{}\doxysubsubsection{On Linux machines}\label{index_autotoc_md6}
+
+\begin{DoxyItemize}
+\item Compile-\/under-\/linux
+\item Use-\/\+On-\/\+Super\+Computer
+\end{DoxyItemize}
+
+\DoxyHorRuler{0}
+\hypertarget{index_User}{}\doxysubsection{How to use the model}\label{index_User}
+
+\begin{DoxyItemize}
+\item \mbox{\hyperlink{Manual}{Manual}}
+\item \mbox{\hyperlink{Modules}{Modules}}
+\item \mbox{\hyperlink{Tutorials}{Tutorials}}
+\item \mbox{\hyperlink{Test-and-Examples}{Examples}}
+\end{DoxyItemize}
+
+\DoxyHorRuler{0}
+\hypertarget{index_Developer}{}\doxysubsection{How to use/change the code}\label{index_Developer}
+
+\begin{DoxyItemize}
+\item Code-\/map 
+\end{DoxyItemize}

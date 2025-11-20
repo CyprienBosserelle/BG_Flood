@@ -1,4 +1,5 @@
-# This is a basic workflow to help you get started with Actions
+# This workflow builds the Doxygen documentation and deploys it to GitHub Pages.
+# It is triggered on pushes to the development, documentation2, or main branches.
 
 name: Documentation
 
@@ -6,29 +7,61 @@ name: Documentation
 # events but only for the master branch
 on:
   push:
-    branches: [ development ]
+    branches: [ main, Doc_mkdoc ]
 
 jobs:
   build-documentation:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    
-    # Build the HTML documentation
-    - name: Doxygen Action
-      uses: mattnotmitt/doxygen-action@v1.9.5
+    - uses: actions/checkout@v4
+
+    # Create the MD file listing the input keys
+    - name: Create the MD file listing the input keys
+      run:  python ReadInput.py
+
+    # Update Input table
+    - name: Update Input table
+      uses: test-room-7/action-update-file@v1
       with:
-          doxyfile-path: ./Doxygenfile
-          working-directory: .
-          enable-latex: true
-    
-    # Deploy the HTML documentation to GitHub Pages
+        file-path: docs/ParametersList-py.md
+        commit-msg: Automatic update of Input parameter list
+        github-token: ${{ secrets.GITHUB_TOKEN }}  
+
+    # Install Doxygen
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+    # Install uv and set up Python environment
+    - name: Install uv
+      run: |
+        curl -Ls https://github.com/astral-sh/uv/releases/latest/download/uv-installer.sh | bash
+
+    - name: Set up Python and install dependencies with uv
+      run: |
+        uv venv
+        uv pip install .
+
+      # Build the HTML documentation
+   # - name: Build Doxygen Documentation
+   #   run: doxygen ./Doxygenfile
+
+    # Build Doxygen XML Documentation
+    - name: Build Doxygen XML Documentation
+      run: doxygen Doxygenfile
+
+    # Build MkDocs Documentation
+    - name: Build MkDocs Documentation
+      run: |
+        source .venv/bin/activate
+        mkdocs build
+
+    # Deploy the MkDocs documentation to GitHub Pages
     - name: GH Pages Deployment
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./doc/html/
+        publish_dir: ./site
         enable_jekyll: false
         allow_empty_commit: false
         force_orphan: true

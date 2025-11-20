@@ -1,0 +1,167 @@
+\hypertarget{Mainloop_8cu}{}\doxysection{src/\+Mainloop.cu File Reference}
+\label{Mainloop_8cu}\index{src/Mainloop.cu@{src/Mainloop.cu}}
+{\ttfamily \#include \char`\"{}Mainloop.\+h\char`\"{}}\newline
+Include dependency graph for Mainloop.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8cu_a0ad0bb561885e36751fa9715e6961051}{Main\+Loop}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel\+\_\+g)
+\item 
+template void \mbox{\hyperlink{Mainloop_8cu_adff364e1194fc346eac96e01113e124c}{Main\+Loop$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel\+\_\+g)
+\item 
+template void \mbox{\hyperlink{Mainloop_8cu_a496ecb2e695a4983d15c7b2fefd5970b}{Main\+Loop$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8cu_af89df14ff4731cf4c1e19a3ff6ccebc7}{Debug\+Loop}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel\+\_\+g)
+\item 
+template void \mbox{\hyperlink{Mainloop_8cu_a5be7a1a8c94f601bb07a7b88f2f6696a}{Debug\+Loop$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel\+\_\+g)
+\item 
+template void \mbox{\hyperlink{Mainloop_8cu_ac42a1709199b0654725a59c7a2ccfeed}{Debug\+Loop$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \mbox{\hyperlink{Mainloop_8cu_afbe3a9aff3a86ad4dec214c4e73a08d1}{Init\+Loop}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8cu_a5d44ee2fd1fddf77e67cfc581452ea14}{update\+Bnd}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8cu_a7ca4e5a3d0599c8bc3f4b3baaf862f92}{mapoutput}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8cu_afc8cc64b555b230ac47cfec2ad25a5ef}{pointoutputstep}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Mainloop_8cu_a1426e758c00aafa841ffa54c08d5ad30}{store\+TSout}} (\mbox{\hyperlink{classParam}{Param}} XParam, int noutnodes, int outnode, int istep, int blknode, int inode, int jnode, int $\ast$blk\+TS, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, T $\ast$store)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Mainloop_8cu_ac06b5925460adb1f6e1e2f76b5055ef0}{initdt}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Mainloop_8cu_ac95b46b80297413bffd13cc76afe37ae}{initdt$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ XModel)
+\item 
+template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Mainloop_8cu_a9d04cc034736c9be397ca120a700cc1b}{initdt$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Mainloop_8cu_a611007c28bcf818496049abd9d27cda8}{Calc\+Initdt\+CPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv, T $\ast$dtmax)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Mainloop_8cu_afd8b5e67b5028e7fb82b3feea069911e}{Calc\+Initdt\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEvolv, T $\ast$dtmax)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8cu_a5ee1aa7982bcbec879af949e36814276}{printstatus}} (T totaltime, T dt)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Mainloop_8cu_aaebf310e4c9ed1bda8f6af3d2b453760}{Crash\+Detection}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Mainloop_8cu_a611007c28bcf818496049abd9d27cda8}\label{Mainloop_8cu_a611007c28bcf818496049abd9d27cda8}} 
+\index{Mainloop.cu@{Mainloop.cu}!CalcInitdtCPU@{CalcInitdtCPU}}
+\index{CalcInitdtCPU@{CalcInitdtCPU}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{CalcInitdtCPU()}{CalcInitdtCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Calc\+Initdt\+CPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv,  }\item[{T $\ast$}]{dtmax }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_afd8b5e67b5028e7fb82b3feea069911e}\label{Mainloop_8cu_afd8b5e67b5028e7fb82b3feea069911e}} 
+\index{Mainloop.cu@{Mainloop.cu}!CalcInitdtGPU@{CalcInitdtGPU}}
+\index{CalcInitdtGPU@{CalcInitdtGPU}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{CalcInitdtGPU()}{CalcInitdtGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Calc\+Initdt\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEvolv,  }\item[{T $\ast$}]{dtmax }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_aaebf310e4c9ed1bda8f6af3d2b453760}\label{Mainloop_8cu_aaebf310e4c9ed1bda8f6af3d2b453760}} 
+\index{Mainloop.cu@{Mainloop.cu}!CrashDetection@{CrashDetection}}
+\index{CrashDetection@{CrashDetection}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{CrashDetection()}{CrashDetection()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Crash\+Detection (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_af89df14ff4731cf4c1e19a3ff6ccebc7}\label{Mainloop_8cu_af89df14ff4731cf4c1e19a3ff6ccebc7}} 
+\index{Mainloop.cu@{Mainloop.cu}!DebugLoop@{DebugLoop}}
+\index{DebugLoop@{DebugLoop}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{DebugLoop()}{DebugLoop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Debug\+Loop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+Debugging loop This function was crated to debug to properly wrap the debug flow engine of the model \mbox{\Hypertarget{Mainloop_8cu_ac42a1709199b0654725a59c7a2ccfeed}\label{Mainloop_8cu_ac42a1709199b0654725a59c7a2ccfeed}} 
+\index{Mainloop.cu@{Mainloop.cu}!DebugLoop$<$ double $>$@{DebugLoop$<$ double $>$}}
+\index{DebugLoop$<$ double $>$@{DebugLoop$<$ double $>$}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{DebugLoop$<$ double $>$()}{DebugLoop< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Mainloop_8h_af89df14ff4731cf4c1e19a3ff6ccebc7}{Debug\+Loop}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a5be7a1a8c94f601bb07a7b88f2f6696a}\label{Mainloop_8cu_a5be7a1a8c94f601bb07a7b88f2f6696a}} 
+\index{Mainloop.cu@{Mainloop.cu}!DebugLoop$<$ float $>$@{DebugLoop$<$ float $>$}}
+\index{DebugLoop$<$ float $>$@{DebugLoop$<$ float $>$}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{DebugLoop$<$ float $>$()}{DebugLoop< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Mainloop_8h_af89df14ff4731cf4c1e19a3ff6ccebc7}{Debug\+Loop}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_ac06b5925460adb1f6e1e2f76b5055ef0}\label{Mainloop_8cu_ac06b5925460adb1f6e1e2f76b5055ef0}} 
+\index{Mainloop.cu@{Mainloop.cu}!initdt@{initdt}}
+\index{initdt@{initdt}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{initdt()}{initdt()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ double initdt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a9d04cc034736c9be397ca120a700cc1b}\label{Mainloop_8cu_a9d04cc034736c9be397ca120a700cc1b}} 
+\index{Mainloop.cu@{Mainloop.cu}!initdt$<$ double $>$@{initdt$<$ double $>$}}
+\index{initdt$<$ double $>$@{initdt$<$ double $>$}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{initdt$<$ double $>$()}{initdt< double >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Mainloop_8h_ac06b5925460adb1f6e1e2f76b5055ef0}{initdt}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_ac95b46b80297413bffd13cc76afe37ae}\label{Mainloop_8cu_ac95b46b80297413bffd13cc76afe37ae}} 
+\index{Mainloop.cu@{Mainloop.cu}!initdt$<$ float $>$@{initdt$<$ float $>$}}
+\index{initdt$<$ float $>$@{initdt$<$ float $>$}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{initdt$<$ float $>$()}{initdt< float >()}}
+{\footnotesize\ttfamily template \+\_\+\+\_\+host\+\_\+\+\_\+ double \mbox{\hyperlink{Mainloop_8h_ac06b5925460adb1f6e1e2f76b5055ef0}{initdt}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_afbe3a9aff3a86ad4dec214c4e73a08d1}\label{Mainloop_8cu_afbe3a9aff3a86ad4dec214c4e73a08d1}} 
+\index{Mainloop.cu@{Mainloop.cu}!InitLoop@{InitLoop}}
+\index{InitLoop@{InitLoop}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{InitLoop()}{InitLoop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\mbox{\hyperlink{structLoop}{Loop}}$<$T$>$ Init\+Loop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a0ad0bb561885e36751fa9715e6961051}\label{Mainloop_8cu_a0ad0bb561885e36751fa9715e6961051}} 
+\index{Mainloop.cu@{Mainloop.cu}!MainLoop@{MainLoop}}
+\index{MainLoop@{MainLoop}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{MainLoop()}{MainLoop()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Main\+Loop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a496ecb2e695a4983d15c7b2fefd5970b}\label{Mainloop_8cu_a496ecb2e695a4983d15c7b2fefd5970b}} 
+\index{Mainloop.cu@{Mainloop.cu}!MainLoop$<$ double $>$@{MainLoop$<$ double $>$}}
+\index{MainLoop$<$ double $>$@{MainLoop$<$ double $>$}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{MainLoop$<$ double $>$()}{MainLoop< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Mainloop_8h_a0ad0bb561885e36751fa9715e6961051}{Main\+Loop}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_adff364e1194fc346eac96e01113e124c}\label{Mainloop_8cu_adff364e1194fc346eac96e01113e124c}} 
+\index{Mainloop.cu@{Mainloop.cu}!MainLoop$<$ float $>$@{MainLoop$<$ float $>$}}
+\index{MainLoop$<$ float $>$@{MainLoop$<$ float $>$}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{MainLoop$<$ float $>$()}{MainLoop< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Mainloop_8h_a0ad0bb561885e36751fa9715e6961051}{Main\+Loop}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a7ca4e5a3d0599c8bc3f4b3baaf862f92}\label{Mainloop_8cu_a7ca4e5a3d0599c8bc3f4b3baaf862f92}} 
+\index{Mainloop.cu@{Mainloop.cu}!mapoutput@{mapoutput}}
+\index{mapoutput@{mapoutput}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{mapoutput()}{mapoutput()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void mapoutput (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_afc8cc64b555b230ac47cfec2ad25a5ef}\label{Mainloop_8cu_afc8cc64b555b230ac47cfec2ad25a5ef}} 
+\index{Mainloop.cu@{Mainloop.cu}!pointoutputstep@{pointoutputstep}}
+\index{pointoutputstep@{pointoutputstep}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{pointoutputstep()}{pointoutputstep()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void pointoutputstep (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a5ee1aa7982bcbec879af949e36814276}\label{Mainloop_8cu_a5ee1aa7982bcbec879af949e36814276}} 
+\index{Mainloop.cu@{Mainloop.cu}!printstatus@{printstatus}}
+\index{printstatus@{printstatus}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{printstatus()}{printstatus()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void printstatus (\begin{DoxyParamCaption}\item[{T}]{totaltime,  }\item[{T}]{dt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a1426e758c00aafa841ffa54c08d5ad30}\label{Mainloop_8cu_a1426e758c00aafa841ffa54c08d5ad30}} 
+\index{Mainloop.cu@{Mainloop.cu}!storeTSout@{storeTSout}}
+\index{storeTSout@{storeTSout}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{storeTSout()}{storeTSout()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void store\+TSout (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{noutnodes,  }\item[{int}]{outnode,  }\item[{int}]{istep,  }\item[{int}]{blknode,  }\item[{int}]{inode,  }\item[{int}]{jnode,  }\item[{int $\ast$}]{blk\+TS,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{T $\ast$}]{store }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Mainloop_8cu_a5d44ee2fd1fddf77e67cfc581452ea14}\label{Mainloop_8cu_a5d44ee2fd1fddf77e67cfc581452ea14}} 
+\index{Mainloop.cu@{Mainloop.cu}!updateBnd@{updateBnd}}
+\index{updateBnd@{updateBnd}!Mainloop.cu@{Mainloop.cu}}
+\doxysubsubsection{\texorpdfstring{updateBnd()}{updateBnd()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void update\+Bnd (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+

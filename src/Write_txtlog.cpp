@@ -27,6 +27,13 @@ void log(std::string text)
 
 }
 
+/**
+ * @brief Create a log file for BG-Flood.
+ * Creates a log file named "BG_log.txt" for BG-Flood.
+ * The log file is reset if it already exists.
+ * The function also writes a header with the current date and time.
+ * 
+ */
 void create_logfile()
 {
 	// Reset the log file
@@ -74,7 +81,9 @@ void create_logfile()
 
 
 	log("#################################");
+
 	log("BG_Flood v0.95");
+
 	log("#################################");
 	//log("model started at " + ss.str());
 	log("#################################");
@@ -83,6 +92,11 @@ void create_logfile()
 	write_text_to_log_file("model started at " + strtimenow);
 }
 
+/**
+ * @brief Write text to the log file.
+ * Writes the given text to the log file "BG_log.txt".
+ * @param text The text to write to the log file
+ */
 void write_text_to_log_file(std::string text)
 {
 	std::ofstream log_file(
@@ -91,6 +105,11 @@ void write_text_to_log_file(std::string text)
 	log_file.close(); //destructor implicitly does it
 }
 
+/**
+ * @brief Save model parameters to the log file.
+ * Saves the model parameters from the given Param object to the log file "BG_log.txt".
+ * @param XParam The Param object containing the model parameters
+ */
 void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 {
 	write_text_to_log_file("\n");
@@ -213,7 +232,13 @@ void SaveParamtolog(Param XParam)// need to bring in Xforcing info too!
 }
 
 
-
+/**
+ * @brief Save model parameters to a NetCDF file.
+ * Saves the model parameters from the given Param object to a NetCDF file.
+ * @param ncid The NetCDF file ID
+ * @param bgfid The NetCDF group ID for the parameters
+ * @param XParam The Param object containing the model parameters
+ */
 void saveparam2netCDF(int ncid, int bgfid, Param XParam)
 {
 	int status, boolanswer;

@@ -1,0 +1,31 @@
+\hypertarget{FlowMLGPU_8h}{}\doxysection{src/\+Flow\+MLGPU.h File Reference}
+\label{FlowMLGPU_8h}\index{src/FlowMLGPU.h@{src/FlowMLGPU.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Multilayer.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Flow\+GPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Advection.\+h\char`\"{}}\newline
+Include dependency graph for Flow\+MLGPU.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{FlowMLGPU_8h_ad4c25bc7dfd0a11430b556aa0af3ebbe}{Flow\+MLGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{FlowMLGPU_8h_ad4c25bc7dfd0a11430b556aa0af3ebbe}\label{FlowMLGPU_8h_ad4c25bc7dfd0a11430b556aa0af3ebbe}} 
+\index{FlowMLGPU.h@{FlowMLGPU.h}!FlowMLGPU@{FlowMLGPU}}
+\index{FlowMLGPU@{FlowMLGPU}!FlowMLGPU.h@{FlowMLGPU.h}}
+\doxysubsubsection{\texorpdfstring{FlowMLGPU()}{FlowMLGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Flow\+MLGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel }\end{DoxyParamCaption})}
+
+Xiafriction\+GPU $<$$<$$<$ grid\+Dim, block\+Dim, 0 $>$$>$$>$ (XParam, XModel.\+blocks, XModel.\+time.\+dt, XModel.\+cf, XModel.\+evolv, XModel.\+evolv\+\_\+o);

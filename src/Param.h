@@ -12,18 +12,18 @@ public:
 
 	//*General parameters
 	int test = -1; //-1: no test, 99: run all independent tests, X: run test X
-	double g = 9.81; // Gravity in m.s-2
+	double g = 9.81; // Acceleration of gravity in m.s-2
 	double rho = 1025.0; // Fluid density in kg.m-3
 	double eps = 0.0001; // Drying height in m (if h<eps, the surface is concidered dry)
 	double dt = 0.0; // Model time step in s.
-	double CFL = 0.5; // Current Freidrich Limiter
+	double CFL = 0.5; // Current Freidrich Limiter criterium (between 0 and 1. Higher values may make the model unstable)
 	double theta = 1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
 	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
-	int frictionmodel = 0; // Bottom friction model (-1: Manning model, 0: quadratic, 1: Smart model)
-	double cf = 0.0001; // Bottom friction coefficient for flow model (if constant)
+	int frictionmodel = 0; // Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)
+	double cf = 0.0001; // Bottom friction coefficient for the model (if constant)
 	double Cd = 0.002; // Wind drag coefficient
-	double il = 0.0; //Initial Loss (if constant)
-	double cl = 0.0; //Continuous Loss (if constant)
+	double il = 0.0; //Initial Loss value (if constant)
+	double cl = 0.0; //Continuous Loss value (if constant)
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
@@ -38,15 +38,16 @@ public:
 	double lat = 0.0; // Model latitude. This is ignored in spherical case
 	int GPUDEVICE = 0; // 0: first available GPU, -1: CPU single core, 2+: other GPU
 
-	int doubleprecision = 0; // 0: float precision, 1: double precision
+	int doubleprecision = 0; // 0: float precision, 1: double precision (for the solver and math)
+	bool savebyblk = true;
 
 	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
 
 	//*Grid parameters
-	double dx = nan(""); // Grid resolution in the coordinate system unit in m.
+	double dx = nan(""); // Grid resolution, in m for a metric grid or in decimal degree for a sperical grid.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
-	int nx = 0; // Initial grid size in x direction
-	int ny = 0; //Initial grid size in y direction
+	int nx = 0; // Initial/input grid size (number of nodes) in x direction
+	int ny = 0; //Initial/input grid size (number of nodes) in y direction
 	int nblk = 0; // Number of compute blocks
 	int blkwidth = 16; //Block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
@@ -58,7 +59,7 @@ public:
 	double yo = nan(""); // Grid y origin (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double ymax = nan(""); // Grid ymax (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
-	double grdalpha = nan(""); // Grid rotation Y axis from the North input in degrees but later converted to rad
+	double grdalpha = nan(""); // Grid rotation on Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
 	bool spherical = 0; // Flag for sperical coordinate (still in development)
 	double Radius = 6371220.; //Earth radius [m]
@@ -79,13 +80,13 @@ public:
 	double outputtimestep = 0.0; //Number of seconds between netCDF outputs, 0.0 for none
 	double endtime = std::numeric_limits<double>::max(); // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
-	double inittime = 0.0; // initital model time. At start of simulation inittime==totaltime
+	double inittime = 0.0; // Initital model time. At start of simulation inittime==totaltime
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
+	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
+	std::string crs_ref = "no_crs"; //crs reference string 
+	//"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
 
-	T_output Toutput; /* Flexible time definition for outputs (nc files)
-	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"
-	Default = First and last timne steps*/
 
 	//*Boundaries
 	bool leftbnd = false; // bnd is forced (i.e. not a wall or neuman)
@@ -96,6 +97,11 @@ public:
 	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
 	double bndrelaxtime = 3600.0; // Realxation time for absorbing boundary
 	double bndfiltertime = 60.0; // Filtering time for absorbing boundary
+
+	// deformation forcing for tsunami generation
+	//std::vector<deformmap> deform;
+	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
+	bool rainbnd = false; // when false it force the rain forcing on the bnd cells to be null.
 
 
 	//* Initialisation
@@ -121,6 +127,11 @@ public:
 	//std::string Bathymetryfile;// bathymetry file name
 	//inputmap Bathymetry;
 
+	T_output Toutput;
+	/*Flexible time definition for outputs (nc files)
+	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"
+	Default = First and last time steps
+	*/
 
 	//Timeseries output (save as a vector containing information for each Time Serie output)
 	std::vector<TSoutnode> TSnodesout;
@@ -133,10 +144,11 @@ public:
 	Default: None
 	*/
 
-	std::string outfile = "Output.nc"; // netcdf output file name
-	std::vector<std::string> outvars;
+	std::string outfile = "Output.nc"; // Netcdf output file name (if it exists, a number will be happened to the file name to not overwrite it)
+	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
 	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
+	Example: "outvars = zs,h,u,v,zb,hmax,Umax;"
 	Default: "zb", "zs", "u", "v", "h"
 	*/
 	double wet_threshold = 0.1; //in m. Limit to consider a cell wet for the twet output (duration of inundation (s))
@@ -156,7 +168,7 @@ public:
 
 
 	// Output switch controls
-	bool resetmax = false; //Switch to reset the "max" outputs after each output
+	bool resetmax = false; //Switch to reset the "max" outputs after each output (reset if 1, no reset if 0)
 	bool outmax = false;
 	bool outmean = false;
 	//bool outvort = false;
@@ -187,11 +199,11 @@ public:
 
 	//*Netcdf parameters
 	int smallnc = 1; //Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float
-	float scalefactor = 0.01f; //Scale factor used for the short integer conversion for netcdf outputs
-	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs
+	float scalefactor = 0.01f; //Scale factor used for the short integer conversion for netcdf outputs. This follow the COARDS convention.
+	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs (follow the COARDS convention)
 
 #ifdef USE_CATALYST
-		//* ParaView Catalyst parameters (SPECIAL USE WITH PARAVIEW)
+		//* ParaView Catalyst parameters (special use with ParaView)
 	int use_catalyst = 0; // Switch to use ParaView Catalyst
 	int catalyst_python_pipeline = 0; //Pipeline to use ParaView Catalyst
 	int vtk_output_frequency = 0; // Output frequency for ParaView Catalyst
@@ -211,10 +223,7 @@ public:
 	//forcingmap atmP;
 	//forcingmap Rainongrid;
 
-	// deformation forcing for tsunami generation
-	//std::vector<deformmap> deform;
-	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-	bool rainbnd = false; // when false it force the rain foring on the bnd cells to be null.
+
 
 	// This here should be stored in a structure at a later stage
 
@@ -224,11 +233,8 @@ public:
 	std::string Adapt_arg1, Adapt_arg2, Adapt_arg3, Adapt_arg4, Adapt_arg5;
 	int adaptmaxiteration = 20; // Maximum number of iteration for adaptation. default 20
 
-	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
-	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
 
 
-	bool savebyblk = true;
 
 };
 

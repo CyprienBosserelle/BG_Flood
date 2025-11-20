@@ -6,89 +6,171 @@
 #include "Input.h"
 
 
+/**
+ * @brief Structure holding gradient arrays for physical variables.
+ * @tparam T Data type
+ */
 template <class T>
 struct GradientsP
 {
+	/** Surface elevation gradient in x-direction */
 	T* dzsdx;
+	/** Water depth gradient in x-direction */
 	T* dhdx;
+	/** Velocity u gradient in x-direction */
 	T* dudx;
+	/** Velocity v gradient in x-direction */
 	T* dvdx;
 
+	/** Surface elevation gradient in y-direction */
 	T* dzsdy;
+	/** Water depth gradient in y-direction */
 	T* dhdy;
+	/** Velocity u gradient in y-direction */
 	T* dudy;
+	/** Velocity v gradient in y-direction */
 	T* dvdy;
 
+	/** Bed elevation gradient in x-direction */
 	T* dzbdx;
+	/** Bed elevation gradient in y-direction */
 	T* dzbdy;
 };
 
+/**
+ * @brief Structure holding gradient arrays (no z relative variables).
+ * @tparam T Data type
+ */
 template <class T>
 struct GradientsMLP
 {
-	
+	/** Water depth gradient in x-direction */
 	T* dhdx;
+	/** Velocity u gradient in x-direction */
 	T* dudx;
+	/** Velocity v gradient in x-direction */
 	T* dvdx;
-
-	
+	/** Water depth gradient in y-direction */
 	T* dhdy;
+	/** Velocity u gradient in y-direction */
 	T* dudy;
+	/** Velocity v gradient in y-direction */
 	T* dvdy;
 };
 
 
+/**
+ * @brief Structure holding evolving physical variables.
+ * @tparam T Data type
+ */
 template <class T>
 struct EvolvingP
 {
+	/** Surface elevation */
 	T* zs;
+	/** Water depth */
 	T* h;
+	/** X velocity component u */
 	T* u;
+	/** Y velocity component v */
 	T* v;
 };
 
+/**
+ * @brief Structure holding evolving variables (no z relative variables).
+ * @tparam T Data type
+ */
 template <class T>
 struct EvolvingMLP
 {
+	/** Water depth */
 	T* h;
+	/** Velocity u */
 	T* u;
+	/** Velocity v */
 	T* v;
 };
 
 //subclass inheriting from EvolvingP for Mean/Max
+/**
+ * @brief Structure for mean/max evolving variables, inherits from EvolvingP.
+ * @tparam T Data type
+ */
 template <class T>
 struct EvolvingP_M : public EvolvingP<T>
 {
-	T* U;  //Norm of the velocity
-	T* hU; //h*sqrt(u^2+v^2)
+	/** Norm of the velocity */
+	T* U;
+	/** Product of water depth and velocity norm */
+	T* hU;
 };
 
+/**
+ * @brief Structure holding flux variables for advection.
+ * @tparam T Data type
+ */
 template <class T>
 struct FluxP
 {
-	T* Su,* Sv;
-	T* Fqux, * Fquy;
-	T* Fqvx, * Fqvy;
-	T* Fhu, * Fhv;
+	/** Source term for u */
+	T* Su;
+	/** Source term for v */
+	T* Sv;
+	/** Flux of u in x-direction */
+	T* Fqux;
+	/** Flux of u in y-direction */
+	T* Fquy;
+	/** Flux of v in x-direction */
+	T* Fqvx;
+	/** Flux of v in y-direction */
+	T* Fqvy;
+	/** Flux of h in u-direction */
+	T* Fhu;
+	/** Flux of h in v-direction */
+	T* Fhv;
 };
 
+/**
+ * @brief Structure holding flux variables (no z relative variables).
+ * @tparam T Data type
+ */
 template <class T>
 struct FluxMLP
 {
-	//
-	T* hu, * hv;
-	T* hfu, * hfv;
-	T* hau, * hav;
-	T* Fux, * Fvy;
-	T* Fuy, * Fvx;
-
+	/** Water depth flux in u-direction */
+	T* hu;
+	/** Water depth flux in v-direction */
+	T* hv;
+	/** h*f flux in u-direction */
+	T* hfu;
+	/** h*f flux in v-direction */
+	T* hfv;
+	/** h*a flux in u-direction */
+	T* hau;
+	/** h*a flux in v-direction */
+	T* hav;
+	/** Flux of u in x-direction */
+	T* Fux;
+	/** Flux of v in y-direction */
+	T* Fvy;
+	/** Flux of u in y-direction */
+	T* Fuy;
+	/** Flux of v in x-direction */
+	T* Fvx;
 };
 
+/**
+ * @brief Structure holding advance variables for time stepping.
+ * @tparam T Data type
+ */
 template <class T>
 struct AdvanceP
 {
+	/** Change in water depth */
 	T* dh;
+	/** Change in velocity u */
 	T* dhu;
+	/** Change in velocity v */
 	T* dhv;
 };
 
@@ -112,8 +194,6 @@ struct maskinfo
 	int* side; // e.g. 11000000 for the entire left side being a mask
 
 	int type = 0;
-
-
 };
 
 template <class T>

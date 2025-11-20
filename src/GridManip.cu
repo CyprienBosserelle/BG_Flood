@@ -26,6 +26,20 @@
 
 
 
+#include "GridManip.h"
+
+/**
+ * @brief Initialize a block-structured array with a given value.
+ *
+ * Sets all elements of Arr for each active block to initval.
+ *
+ * @tparam T Data type (float, double, int, bool)
+ * @tparam F Block type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param initval Value to initialize
+ * @param Arr Array to initialize
+ */
 template <class T,class F> void InitArrayBUQ(Param XParam, BlockP<F> XBlock,  T initval, T*& Arr)
 {
 	int ib, n;
@@ -57,6 +71,18 @@ template void InitArrayBUQ<bool, double>(Param XParam, BlockP<double> XBlock, bo
 
 
 
+/**
+ * @brief Initialize a block-level array with a given value.
+ *
+ * Sets each block's entry in Arr to initval.
+ *
+ * @tparam T Data type
+ * @tparam F Block type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param initval Value to initialize
+ * @param Arr Array to initialize
+ */
 template <class T, class F> void InitBlkBUQ(Param XParam, BlockP<F> XBlock, T initval, T*& Arr)
 {
 	int ib;
@@ -81,6 +107,18 @@ template void InitBlkBUQ<float, double>(Param XParam, BlockP<double> XBlock, flo
 template void InitBlkBUQ<double, double>(Param XParam, BlockP<double> XBlock, double initval, double*& Arr);
 
 
+/**
+ * @brief Copy values from source array to destination array for all blocks.
+ *
+ * Copies all elements for each active block from source to dest.
+ *
+ * @tparam T Data type
+ * @tparam F Block type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param source Source array
+ * @param dest Destination array
+ */
 template <class T,class F> void CopyArrayBUQ(Param XParam,BlockP<F> XBlock, T* source, T* & dest)
 {
 	int ib,n;
@@ -111,6 +149,17 @@ template void CopyArrayBUQ<float, double>(Param XParam, BlockP<double> XBlock, f
 template void CopyArrayBUQ<double, double>(Param XParam, BlockP<double> XBlock, double* source, double*& dest);
 
 
+/**
+ * @brief Copy all evolving variables from source to destination.
+ *
+ * Copies h, u, v, zs arrays for all blocks.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param source Source evolving variables
+ * @param dest Destination evolving variables
+ */
 template <class T> void CopyArrayBUQ(Param XParam, BlockP<T> XBlock, EvolvingP<T> source, EvolvingP<T>& dest)
 {
 	CopyArrayBUQ(XParam, XBlock, source.h, dest.h);
@@ -121,6 +170,17 @@ template <class T> void CopyArrayBUQ(Param XParam, BlockP<T> XBlock, EvolvingP<T
 template void CopyArrayBUQ<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> source, EvolvingP<float>& dest);
 template void CopyArrayBUQ<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> source, EvolvingP<double>& dest);
 
+/**
+ * @brief Copy all evolving variables and compute derived quantities (U, hU).
+ *
+ * Copies h, u, v, zs arrays and computes U and hU for all blocks.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param source Source evolving variables
+ * @param dest Destination evolving variables (with derived quantities)
+ */
 template <class T> void CopyArrayBUQ(Param XParam, BlockP<T> XBlock, EvolvingP<T> source, EvolvingP_M<T>& dest)
 {
 	CopyArrayBUQ(XParam, XBlock, source.h, dest.h);
@@ -149,6 +209,16 @@ template void CopyArrayBUQ<float>(Param XParam, BlockP<float> XBlock, EvolvingP<
 template void CopyArrayBUQ<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> source, EvolvingP_M<double>& dest);
 
 
+/**
+ * @brief Set edge values for bathymetry array at domain boundaries.
+ *
+ * Copies values from interior to boundary cells for blocks with no neighbor.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ */
 template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 {
 	// template <class T> void setedges(int nblk, int nx, int ny, double xo, double yo, double dx, int * leftblk, int *rightblk, int * topblk, int* botblk, double *blockxo, double * blockyo, T *&zb)
@@ -179,6 +249,20 @@ template <class T>  void setedges(Param XParam, BlockP<T> XBlock, T *&zb)
 template void setedges<float>(Param XParam, BlockP<float> XBlock, float*& zb);
 template void setedges<double>(Param XParam, BlockP<double> XBlock, double*& zb);
 
+/**
+ * @brief Set left/right edge values for bathymetry array.
+ *
+ * Copies values from interior to boundary cells for left/right edges.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param ib Block index
+ * @param blkA Neighbor block A
+ * @param blkB Neighbor block B
+ * @param iread Index to read from
+ * @param iwrite Index to write to
+ * @param zb Bathymetry array
+ */
 template <class T>  void setedgessideLR(Param XParam, int ib,int blkA, int blkB, int iread, int iwrite, T*& zb)
 {
 	if (blkA == ib || blkA == ib)
@@ -199,6 +283,20 @@ template <class T>  void setedgessideLR(Param XParam, int ib,int blkA, int blkB,
 	}
 }
 
+/**
+ * @brief Set bottom/top edge values for bathymetry array.
+ *
+ * Copies values from interior to boundary cells for bottom/top edges.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param ib Block index
+ * @param blkA Neighbor block A
+ * @param blkB Neighbor block B
+ * @param jread Index to read from
+ * @param jwrite Index to write to
+ * @param zb Bathymetry array
+ */
 template <class T>  void setedgessideBT(Param XParam, int ib, int blkA, int blkB, int jread, int jwrite, T*& zb)
 {
 	if (blkA == ib || blkB == ib)
@@ -220,6 +318,18 @@ template <class T>  void setedgessideBT(Param XParam, int ib, int blkA, int blkB
 }
 
 
+/**
+ * @brief Interpolate values from forcing map to block array using bilinear interpolation.
+ *
+ * Fills z array for each block using bilinear interpolation from forcing map(s).
+ *
+ * @tparam T Data type
+ * @tparam F Forcing type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param forcing Forcing map(s)
+ * @param z Output array
+ */
 template <class T, class F> void interp2BUQ(Param XParam, BlockP<T> XBlock, F forcing, T*& z)
 {
 	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
@@ -256,6 +366,17 @@ template void interp2BUQ<double, deformmap<float>>(Param XParam, BlockP<double> 
 template void interp2BUQ<float, DynForcingP<float>>(Param XParam, BlockP<float> XBlock, DynForcingP<float> forcing, float*& z);
 template void interp2BUQ<double, DynForcingP<float>>(Param XParam, BlockP<double> XBlock, DynForcingP<float> forcing, double*& z);
 
+/**
+ * @brief Interpolate values from multiple forcing maps to block array using bilinear interpolation.
+ *
+ * Fills z array for each block using bilinear interpolation from multiple forcing maps.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param forcing Vector of forcing maps
+ * @param z Output array
+ */
 template <class T> void interp2BUQ(Param XParam, BlockP<T> XBlock, std::vector<StaticForcingP<float>> forcing, T* z)
 {
 	// This function interpolates the values in bathy maps or roughness map to cf using a bilinear interpolation
@@ -319,6 +440,19 @@ template void interp2BUQ<float>(Param XParam, BlockP<float> XBlock, std::vector<
 template void interp2BUQ<double>(Param XParam, BlockP<double> XBlock, std::vector<StaticForcingP<float>> forcing, double* z);
 
 
+/**
+ * @brief Interpolate value at (x, y) using either bilinear or blockmean interpolation.
+ *
+ * Chooses interpolation method based on grid spacing dx.
+ *
+ * @tparam T Data type
+ * @tparam F Forcing type
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param dx Grid spacing
+ * @param forcing Forcing map
+ * @return Interpolated value
+ */
 template <class T, class F> T interp2BUQ(T x, T y, T dx, F forcing)
 {
 	T z;
@@ -334,6 +468,19 @@ template <class T, class F> T interp2BUQ(T x, T y, T dx, F forcing)
 }
 
 
+/**
+ * @brief Compute block mean value for (x, y) over grid spacing dx.
+ *
+ * Averages values in the forcing map over the block centered at (x, y).
+ *
+ * @tparam T Data type
+ * @tparam F Forcing type
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param dx Grid spacing
+ * @param forcing Forcing map
+ * @return Block mean value
+ */
 template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 {
 	double xmin, xmax, ymin, ymax;
@@ -378,6 +525,18 @@ template <class T, class F> T blockmean(T x, T y,T dx, F forcing)
 
 }
 
+/**
+ * @brief Bilinear interpolation for value at (x, y) from forcing map.
+ *
+ * Performs bilinear interpolation using surrounding grid points in forcing map.
+ *
+ * @tparam T Data type
+ * @tparam F Forcing type
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param forcing Forcing map
+ * @return Interpolated value
+ */
 template <class T, class F> T interp2BUQ(T x, T y, F forcing)
 {
 	//this is safer!
@@ -424,6 +583,22 @@ template float interp2BUQ<float, DynForcingP<float>>(float x, float y, DynForcin
 template double interp2BUQ<double, DynForcingP<float>>(double x, double y, DynForcingP<float> forcing);
 
 
+/**
+ * @brief CPU routine for time interpolation of solution arrays.
+ *
+ * Interpolates between Uo and Un to compute Ux at a given time step.
+ *
+ * @tparam T Data type
+ * @tparam F Time type
+ * @param nx Number of x grid points
+ * @param ny Number of y grid points
+ * @param hdstep Time step index
+ * @param totaltime Total simulation time
+ * @param hddt Time step size
+ * @param Ux Output array
+ * @param Uo Previous solution array
+ * @param Un Next solution array
+ */
 template <class T, class F> void InterpstepCPU(int nx, int ny, int hdstep, F totaltime, F hddt, T *&Ux, T *Uo, T *Un)
 {
 	//float fac = 1.0;
@@ -453,6 +628,21 @@ template void InterpstepCPU<float, double>(int nx, int ny, int hdstep, double to
 template void InterpstepCPU<double, double>(int nx, int ny, int hdstep, double totaltime, double hddt, double*& Ux, double* Uo, double* Un);
 
 
+/**
+ * @brief GPU kernel for time interpolation of solution arrays.
+ *
+ * Interpolates between Uo and Un to compute Ux at a given time using shared memory.
+ *
+ * @tparam T Data type
+ * @param nx Number of x grid points
+ * @param ny Number of y grid points
+ * @param totaltime Total simulation time
+ * @param beforetime Previous time
+ * @param aftertime Next time
+ * @param Ux Output array
+ * @param Uo Previous solution array
+ * @param Un Next solution array
+ */
 template <class T> __global__ void InterpstepGPU(int nx, int ny, T totaltime, T beforetime, T aftertime, T*Ux, T* Uo, T* Un)
 {
 	unsigned int ix = blockIdx.x * blockDim.x + threadIdx.x;
@@ -480,6 +670,17 @@ template __global__ void InterpstepGPU<double>(int nx, int ny, double totaltime,
 
 
 
+/**
+ * @brief Copy values from source to destination for a Cartesian grid.
+ *
+ * Copies all values from src to dest for a regular Cartesian grid.
+ *
+ * @tparam T Data type
+ * @param nx Number of x grid points
+ * @param ny Number of y grid points
+ * @param dest Destination array
+ * @param src Source array
+ */
 template <class T> void Copy2CartCPU(int nx, int ny, T* dest, T* src)
 {
 	for (int i = 0; i < nx; i++)

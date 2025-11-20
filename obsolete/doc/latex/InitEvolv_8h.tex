@@ -1,0 +1,68 @@
+\hypertarget{InitEvolv_8h}{}\doxysection{src/\+Init\+Evolv.h File Reference}
+\label{InitEvolv_8h}\index{src/InitEvolv.h@{src/InitEvolv.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Write\+\_\+txtlog.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Grid\+Manip.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Read\+\_\+netcdf.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Read\+Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Updateforcing.\+h\char`\"{}}\newline
+Include dependency graph for Init\+Evolv.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitEvolv_8h_a6cadd35d79d134af18f47a2fa86e500c}{initevolv}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&XEv, T $\ast$\&zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{InitEvolv_8h_addab31c7158e0a9a5cef70d38616be3a}{coldstart}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&XEv)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{InitEvolv_8h_a0831d7ffc3b6f6689bbc0572e0ffabc3}{warmstart}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$ XForcing, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$zb, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&XEv)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{InitEvolv_8h_ac25b19d857c6899099322406558826bf}{Add\+ZSoffset}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&XEv, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{InitEvolv_8h_acff23dccc956433e8500e1d8d6d831b6}{readhotstartfile}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&XEv, T $\ast$\&zb)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{InitEvolv_8h_ac25b19d857c6899099322406558826bf}\label{InitEvolv_8h_ac25b19d857c6899099322406558826bf}} 
+\index{InitEvolv.h@{InitEvolv.h}!AddZSoffset@{AddZSoffset}}
+\index{AddZSoffset@{AddZSoffset}!InitEvolv.h@{InitEvolv.h}}
+\doxysubsubsection{\texorpdfstring{AddZSoffset()}{AddZSoffset()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int Add\+ZSoffset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{XEv,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InitEvolv_8h_addab31c7158e0a9a5cef70d38616be3a}\label{InitEvolv_8h_addab31c7158e0a9a5cef70d38616be3a}} 
+\index{InitEvolv.h@{InitEvolv.h}!coldstart@{coldstart}}
+\index{coldstart@{coldstart}!InitEvolv.h@{InitEvolv.h}}
+\doxysubsubsection{\texorpdfstring{coldstart()}{coldstart()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int coldstart (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{XEv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InitEvolv_8h_a6cadd35d79d134af18f47a2fa86e500c}\label{InitEvolv_8h_a6cadd35d79d134af18f47a2fa86e500c}} 
+\index{InitEvolv.h@{InitEvolv.h}!initevolv@{initevolv}}
+\index{initevolv@{initevolv}!InitEvolv.h@{InitEvolv.h}}
+\doxysubsubsection{\texorpdfstring{initevolv()}{initevolv()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void initevolv (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{XEv,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+left\+WLbnd.\+empty()\mbox{\Hypertarget{InitEvolv_8h_acff23dccc956433e8500e1d8d6d831b6}\label{InitEvolv_8h_acff23dccc956433e8500e1d8d6d831b6}} 
+\index{InitEvolv.h@{InitEvolv.h}!readhotstartfile@{readhotstartfile}}
+\index{readhotstartfile@{readhotstartfile}!InitEvolv.h@{InitEvolv.h}}
+\doxysubsubsection{\texorpdfstring{readhotstartfile()}{readhotstartfile()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int readhotstartfile (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{XEv,  }\item[{T $\ast$\&}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InitEvolv_8h_a0831d7ffc3b6f6689bbc0572e0ffabc3}\label{InitEvolv_8h_a0831d7ffc3b6f6689bbc0572e0ffabc3}} 
+\index{InitEvolv.h@{InitEvolv.h}!warmstart@{warmstart}}
+\index{warmstart@{warmstart}!InitEvolv.h@{InitEvolv.h}}
+\doxysubsubsection{\texorpdfstring{warmstart()}{warmstart()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void warmstart (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structForcing}{Forcing}}$<$ float $>$}]{XForcing,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{zb,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ \&}]{XEv }\end{DoxyParamCaption})}
+

@@ -1,0 +1,278 @@
+\hypertarget{Write__netcdf_8cu}{}\doxysection{src/\+Write\+\_\+netcdf.cu File Reference}
+\label{Write__netcdf_8cu}\index{src/Write\_netcdf.cu@{src/Write\_netcdf.cu}}
+{\ttfamily \#include \char`\"{}Write\+\_\+netcdf.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+Include dependency graph for Write\+\_\+netcdf.\+cu\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_acd23cfd734db5604e86925f669812e28}{handle\+\_\+ncerror}} (int status)
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_a5666e1c5adffc97737e2d5f328d72972}{Calcnxny}} (\mbox{\hyperlink{classParam}{Param}} XParam, int level, int \&nx, int \&ny)
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_aeed751836e9ad26405798e1c7ce7aabf}{Calcnxnyzone}} (\mbox{\hyperlink{classParam}{Param}} XParam, int level, int \&nx, int \&ny, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+std\+::vector$<$ int $>$ \mbox{\hyperlink{Write__netcdf_8cu_aec8e8f5634a6db7ce2b80076c8cb10f8}{Calcactiveblockzone}} (\mbox{\hyperlink{classParam}{Param}} XParam, int $\ast$activeblk, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_abca0f32949c20adb437f5ea902a054d2}{creatncfile\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, int $\ast$activeblk, int $\ast$level, T $\ast$blockxo, T $\ast$blockyo, \mbox{\hyperlink{structoutzoneB}{outzoneB}} \&Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_a4aaa1a294b152d3b7e0a4de9b7891b2f}{creatncfile\+BUQ$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, int $\ast$activeblk, int $\ast$level, float $\ast$blockxo, float $\ast$blockyo, \mbox{\hyperlink{structoutzoneB}{outzoneB}} \&Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_a44f70a1712e949e9b1719e6853176685}{creatncfile\+BUQ$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, int $\ast$activeblk, int $\ast$level, double $\ast$blockxo, double $\ast$blockyo, \mbox{\hyperlink{structoutzoneB}{outzoneB}} \&Xzone)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_a60de80f688bea9725528d5a62b9bae73}{creatncfile\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&XBlock)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_a2e63284605ca3c48b71247bc7cca391b}{creatncfile\+BUQ$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&XBlock)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_aacd4c5f98d2927f2ab87557b16fb9111}{creatncfile\+BUQ$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&XBlock)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_a8dd381d7653068671c8411aa43e0d17e}{defncvar\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, int $\ast$activeblk, int $\ast$level, T $\ast$blockxo, T $\ast$blockyo, std\+::string varst, int vdim, T $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_aa420122017ecc7bed646516cddf153b3}{defncvar\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, int $\ast$activeblk, int $\ast$level, T $\ast$blockxo, T $\ast$blockyo, std\+::string varst, std\+::string longname, std\+::string stdname, std\+::string unit, int vdim, T $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_aced8cfa4b8ee71be182959123fd47664}{defncvar\+BUQ$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int $\ast$activeblk, int $\ast$level, float $\ast$blockxo, float $\ast$blockyo, std\+::string varst, int vdim, float $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_a1fc56ada52ea91ecd21cf9b3d7752d9e}{defncvar\+BUQ$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int $\ast$activeblk, int $\ast$level, double $\ast$blockxo, double $\ast$blockyo, std\+::string varst, int vdim, double $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_a7e0c9281429ac6377708253ca8bedc66}{defncvar\+BUQlev}} (\mbox{\hyperlink{classParam}{Param}} XParam, int $\ast$activeblk, int $\ast$level, T $\ast$blockxo, T $\ast$blockyo, std\+::string varst, std\+::string longname, std\+::string stdname, std\+::string unit, int vdim, T $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_afcf742190cac3a9c04d966ad71c515ca}{writencvarstep\+BUQ}} (\mbox{\hyperlink{classParam}{Param}} XParam, int vdim, int $\ast$activeblk, int $\ast$level, T $\ast$blockxo, T $\ast$blockyo, std\+::string varst, T $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_a86b264630059dfcb379c5a1ad7aa0dc3}{writencvarstep\+BUQ$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int vdim, int $\ast$activeblk, int $\ast$level, float $\ast$blockxo, float $\ast$blockyo, std\+::string varst, float $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_aded28dfbc4eefb50b70a55158c5edb60}{writencvarstep\+BUQ$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int vdim, int $\ast$activeblk, int $\ast$level, double $\ast$blockxo, double $\ast$blockyo, std\+::string varst, double $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_a7baa2f1395758b42afb5ce020605abd0}{writenctimestep}} (std\+::string outfile, double totaltime)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_ae033c4f8292065e848c5b16c46229596}{writencvarstep\+BUQlev}} (\mbox{\hyperlink{classParam}{Param}} XParam, int vdim, int $\ast$activeblk, int $\ast$level, T $\ast$blockxo, T $\ast$blockyo, std\+::string varst, T $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_a5ad7eeef41bae971145a3cace4d9e8b3}{writencvarstep\+BUQlev$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int vdim, int $\ast$activeblk, int $\ast$level, float $\ast$blockxo, float $\ast$blockyo, std\+::string varst, float $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_aa855390045fa6b057668256d9eca209f}{writencvarstep\+BUQlev$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, int vdim, int $\ast$activeblk, int $\ast$level, double $\ast$blockxo, double $\ast$blockyo, std\+::string varst, double $\ast$var, \mbox{\hyperlink{structoutzoneB}{outzoneB}} Xzone)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_a30a4c8f75da0210b6762b38e005c2942}{Init\+Save2\+Netcdf}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_a0c37239aeabe849f227417a08c816d96}{Init\+Save2\+Netcdf$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_adf40c39fcb294c876322c5c0aadccde1}{Init\+Save2\+Netcdf$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} \&XParam, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Write__netcdf_8cu_af2d239f5cce35afc5cac0ad32bf8fe7d}{Save2\+Netcdf}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_aa8fa65b596cbff0f537f2111d1ed5b35}{Save2\+Netcdf$<$ float $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&XModel)
+\item 
+template void \mbox{\hyperlink{Write__netcdf_8cu_afae22b9d0f3a8ef2b78b25f306e15fee}{Save2\+Netcdf$<$ double $>$}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&XModel)
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_aeed9da1a9c25e765c9c2588e44efcadd}{create2dnc}} (char $\ast$filename, int nx, int ny, double $\ast$xx, double $\ast$yy, double $\ast$var, char $\ast$varname)
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_aa7b7f1fe1864e3ad6d4bac1982e3a561}{create3dnc}} (char $\ast$name, int nx, int ny, int nt, double $\ast$xx, double $\ast$yy, double $\ast$theta, double $\ast$var, char $\ast$varname)
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_aa73c1b56cf74fcfb460986caca0df756}{write3dvarnc}} (int nx, int ny, int nt, double totaltime, double $\ast$var)
+\item 
+void \mbox{\hyperlink{Write__netcdf_8cu_ae6f75b11a4428da84c143c0d1cad9f07}{write2dvarnc}} (int nx, int ny, double totaltime, double $\ast$var)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Write__netcdf_8cu_aec8e8f5634a6db7ce2b80076c8cb10f8}\label{Write__netcdf_8cu_aec8e8f5634a6db7ce2b80076c8cb10f8}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!Calcactiveblockzone@{Calcactiveblockzone}}
+\index{Calcactiveblockzone@{Calcactiveblockzone}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{Calcactiveblockzone()}{Calcactiveblockzone()}}
+{\footnotesize\ttfamily std\+::vector$<$int$>$ Calcactiveblockzone (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a5666e1c5adffc97737e2d5f328d72972}\label{Write__netcdf_8cu_a5666e1c5adffc97737e2d5f328d72972}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!Calcnxny@{Calcnxny}}
+\index{Calcnxny@{Calcnxny}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{Calcnxny()}{Calcnxny()}}
+{\footnotesize\ttfamily void Calcnxny (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{level,  }\item[{int \&}]{nx,  }\item[{int \&}]{ny }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aeed751836e9ad26405798e1c7ce7aabf}\label{Write__netcdf_8cu_aeed751836e9ad26405798e1c7ce7aabf}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!Calcnxnyzone@{Calcnxnyzone}}
+\index{Calcnxnyzone@{Calcnxnyzone}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{Calcnxnyzone()}{Calcnxnyzone()}}
+{\footnotesize\ttfamily void Calcnxnyzone (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{level,  }\item[{int \&}]{nx,  }\item[{int \&}]{ny,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aeed9da1a9c25e765c9c2588e44efcadd}\label{Write__netcdf_8cu_aeed9da1a9c25e765c9c2588e44efcadd}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!create2dnc@{create2dnc}}
+\index{create2dnc@{create2dnc}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{create2dnc()}{create2dnc()}}
+{\footnotesize\ttfamily void create2dnc (\begin{DoxyParamCaption}\item[{char $\ast$}]{filename,  }\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double $\ast$}]{xx,  }\item[{double $\ast$}]{yy,  }\item[{double $\ast$}]{var,  }\item[{char $\ast$}]{varname }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aa7b7f1fe1864e3ad6d4bac1982e3a561}\label{Write__netcdf_8cu_aa7b7f1fe1864e3ad6d4bac1982e3a561}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!create3dnc@{create3dnc}}
+\index{create3dnc@{create3dnc}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{create3dnc()}{create3dnc()}}
+{\footnotesize\ttfamily void create3dnc (\begin{DoxyParamCaption}\item[{char $\ast$}]{name,  }\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{nt,  }\item[{double $\ast$}]{xx,  }\item[{double $\ast$}]{yy,  }\item[{double $\ast$}]{theta,  }\item[{double $\ast$}]{var,  }\item[{char $\ast$}]{varname }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a60de80f688bea9725528d5a62b9bae73}\label{Write__netcdf_8cu_a60de80f688bea9725528d5a62b9bae73}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!creatncfileBUQ@{creatncfileBUQ}}
+\index{creatncfileBUQ@{creatncfileBUQ}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{creatncfileBUQ()}{creatncfileBUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void creatncfile\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ \&}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_abca0f32949c20adb437f5ea902a054d2}\label{Write__netcdf_8cu_abca0f32949c20adb437f5ea902a054d2}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!creatncfileBUQ@{creatncfileBUQ}}
+\index{creatncfileBUQ@{creatncfileBUQ}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{creatncfileBUQ()}{creatncfileBUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void creatncfile\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{T $\ast$}]{blockxo,  }\item[{T $\ast$}]{blockyo,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}} \&}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aacd4c5f98d2927f2ab87557b16fb9111}\label{Write__netcdf_8cu_aacd4c5f98d2927f2ab87557b16fb9111}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!creatncfileBUQ$<$ double $>$@{creatncfileBUQ$<$ double $>$}}
+\index{creatncfileBUQ$<$ double $>$@{creatncfileBUQ$<$ double $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{creatncfileBUQ$<$ double $>$()}{creatncfileBUQ< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a60de80f688bea9725528d5a62b9bae73}{creatncfile\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ double $>$ \&}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a44f70a1712e949e9b1719e6853176685}\label{Write__netcdf_8cu_a44f70a1712e949e9b1719e6853176685}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!creatncfileBUQ$<$ double $>$@{creatncfileBUQ$<$ double $>$}}
+\index{creatncfileBUQ$<$ double $>$@{creatncfileBUQ$<$ double $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{creatncfileBUQ$<$ double $>$()}{creatncfileBUQ< double >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a60de80f688bea9725528d5a62b9bae73}{creatncfile\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{double $\ast$}]{blockxo,  }\item[{double $\ast$}]{blockyo,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}} \&}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a2e63284605ca3c48b71247bc7cca391b}\label{Write__netcdf_8cu_a2e63284605ca3c48b71247bc7cca391b}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!creatncfileBUQ$<$ float $>$@{creatncfileBUQ$<$ float $>$}}
+\index{creatncfileBUQ$<$ float $>$@{creatncfileBUQ$<$ float $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{creatncfileBUQ$<$ float $>$()}{creatncfileBUQ< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a60de80f688bea9725528d5a62b9bae73}{creatncfile\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ float $>$ \&}]{XBlock }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a4aaa1a294b152d3b7e0a4de9b7891b2f}\label{Write__netcdf_8cu_a4aaa1a294b152d3b7e0a4de9b7891b2f}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!creatncfileBUQ$<$ float $>$@{creatncfileBUQ$<$ float $>$}}
+\index{creatncfileBUQ$<$ float $>$@{creatncfileBUQ$<$ float $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{creatncfileBUQ$<$ float $>$()}{creatncfileBUQ< float >()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a60de80f688bea9725528d5a62b9bae73}{creatncfile\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{float $\ast$}]{blockxo,  }\item[{float $\ast$}]{blockyo,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}} \&}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a8dd381d7653068671c8411aa43e0d17e}\label{Write__netcdf_8cu_a8dd381d7653068671c8411aa43e0d17e}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!defncvarBUQ@{defncvarBUQ}}
+\index{defncvarBUQ@{defncvarBUQ}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{defncvarBUQ()}{defncvarBUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void defncvar\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{T $\ast$}]{blockxo,  }\item[{T $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{int}]{vdim,  }\item[{T $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aa420122017ecc7bed646516cddf153b3}\label{Write__netcdf_8cu_aa420122017ecc7bed646516cddf153b3}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!defncvarBUQ@{defncvarBUQ}}
+\index{defncvarBUQ@{defncvarBUQ}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{defncvarBUQ()}{defncvarBUQ()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void defncvar\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{T $\ast$}]{blockxo,  }\item[{T $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{std\+::string}]{longname,  }\item[{std\+::string}]{stdname,  }\item[{std\+::string}]{unit,  }\item[{int}]{vdim,  }\item[{T $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a1fc56ada52ea91ecd21cf9b3d7752d9e}\label{Write__netcdf_8cu_a1fc56ada52ea91ecd21cf9b3d7752d9e}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!defncvarBUQ$<$ double $>$@{defncvarBUQ$<$ double $>$}}
+\index{defncvarBUQ$<$ double $>$@{defncvarBUQ$<$ double $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{defncvarBUQ$<$ double $>$()}{defncvarBUQ< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a8dd381d7653068671c8411aa43e0d17e}{defncvar\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{double $\ast$}]{blockxo,  }\item[{double $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{int}]{vdim,  }\item[{double $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aced8cfa4b8ee71be182959123fd47664}\label{Write__netcdf_8cu_aced8cfa4b8ee71be182959123fd47664}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!defncvarBUQ$<$ float $>$@{defncvarBUQ$<$ float $>$}}
+\index{defncvarBUQ$<$ float $>$@{defncvarBUQ$<$ float $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{defncvarBUQ$<$ float $>$()}{defncvarBUQ< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a8dd381d7653068671c8411aa43e0d17e}{defncvar\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{float $\ast$}]{blockxo,  }\item[{float $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{int}]{vdim,  }\item[{float $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a7e0c9281429ac6377708253ca8bedc66}\label{Write__netcdf_8cu_a7e0c9281429ac6377708253ca8bedc66}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!defncvarBUQlev@{defncvarBUQlev}}
+\index{defncvarBUQlev@{defncvarBUQlev}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{defncvarBUQlev()}{defncvarBUQlev()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void defncvar\+BUQlev (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{T $\ast$}]{blockxo,  }\item[{T $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{std\+::string}]{longname,  }\item[{std\+::string}]{stdname,  }\item[{std\+::string}]{unit,  }\item[{int}]{vdim,  }\item[{T $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_acd23cfd734db5604e86925f669812e28}\label{Write__netcdf_8cu_acd23cfd734db5604e86925f669812e28}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!handle\_ncerror@{handle\_ncerror}}
+\index{handle\_ncerror@{handle\_ncerror}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{handle\_ncerror()}{handle\_ncerror()}}
+{\footnotesize\ttfamily void handle\+\_\+ncerror (\begin{DoxyParamCaption}\item[{int}]{status }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a30a4c8f75da0210b6762b38e005c2942}\label{Write__netcdf_8cu_a30a4c8f75da0210b6762b38e005c2942}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!InitSave2Netcdf@{InitSave2Netcdf}}
+\index{InitSave2Netcdf@{InitSave2Netcdf}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{InitSave2Netcdf()}{InitSave2Netcdf()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Init\+Save2\+Netcdf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_adf40c39fcb294c876322c5c0aadccde1}\label{Write__netcdf_8cu_adf40c39fcb294c876322c5c0aadccde1}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!InitSave2Netcdf$<$ double $>$@{InitSave2Netcdf$<$ double $>$}}
+\index{InitSave2Netcdf$<$ double $>$@{InitSave2Netcdf$<$ double $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{InitSave2Netcdf$<$ double $>$()}{InitSave2Netcdf< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a30a4c8f75da0210b6762b38e005c2942}{Init\+Save2\+Netcdf}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a0c37239aeabe849f227417a08c816d96}\label{Write__netcdf_8cu_a0c37239aeabe849f227417a08c816d96}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!InitSave2Netcdf$<$ float $>$@{InitSave2Netcdf$<$ float $>$}}
+\index{InitSave2Netcdf$<$ float $>$@{InitSave2Netcdf$<$ float $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{InitSave2Netcdf$<$ float $>$()}{InitSave2Netcdf< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_a30a4c8f75da0210b6762b38e005c2942}{Init\+Save2\+Netcdf}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}} \&}]{XParam,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_af2d239f5cce35afc5cac0ad32bf8fe7d}\label{Write__netcdf_8cu_af2d239f5cce35afc5cac0ad32bf8fe7d}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!Save2Netcdf@{Save2Netcdf}}
+\index{Save2Netcdf@{Save2Netcdf}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{Save2Netcdf()}{Save2Netcdf()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Save2\+Netcdf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_afae22b9d0f3a8ef2b78b25f306e15fee}\label{Write__netcdf_8cu_afae22b9d0f3a8ef2b78b25f306e15fee}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!Save2Netcdf$<$ double $>$@{Save2Netcdf$<$ double $>$}}
+\index{Save2Netcdf$<$ double $>$@{Save2Netcdf$<$ double $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{Save2Netcdf$<$ double $>$()}{Save2Netcdf< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_af2d239f5cce35afc5cac0ad32bf8fe7d}{Save2\+Netcdf}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ double $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ double $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aa8fa65b596cbff0f537f2111d1ed5b35}\label{Write__netcdf_8cu_aa8fa65b596cbff0f537f2111d1ed5b35}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!Save2Netcdf$<$ float $>$@{Save2Netcdf$<$ float $>$}}
+\index{Save2Netcdf$<$ float $>$@{Save2Netcdf$<$ float $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{Save2Netcdf$<$ float $>$()}{Save2Netcdf< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_af2d239f5cce35afc5cac0ad32bf8fe7d}{Save2\+Netcdf}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ float $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ float $>$ \&}]{XModel }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_ae6f75b11a4428da84c143c0d1cad9f07}\label{Write__netcdf_8cu_ae6f75b11a4428da84c143c0d1cad9f07}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!write2dvarnc@{write2dvarnc}}
+\index{write2dvarnc@{write2dvarnc}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{write2dvarnc()}{write2dvarnc()}}
+{\footnotesize\ttfamily void write2dvarnc (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{double}]{totaltime,  }\item[{double $\ast$}]{var }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aa73c1b56cf74fcfb460986caca0df756}\label{Write__netcdf_8cu_aa73c1b56cf74fcfb460986caca0df756}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!write3dvarnc@{write3dvarnc}}
+\index{write3dvarnc@{write3dvarnc}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{write3dvarnc()}{write3dvarnc()}}
+{\footnotesize\ttfamily void write3dvarnc (\begin{DoxyParamCaption}\item[{int}]{nx,  }\item[{int}]{ny,  }\item[{int}]{nt,  }\item[{double}]{totaltime,  }\item[{double $\ast$}]{var }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a7baa2f1395758b42afb5ce020605abd0}\label{Write__netcdf_8cu_a7baa2f1395758b42afb5ce020605abd0}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!writenctimestep@{writenctimestep}}
+\index{writenctimestep@{writenctimestep}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{writenctimestep()}{writenctimestep()}}
+{\footnotesize\ttfamily void writenctimestep (\begin{DoxyParamCaption}\item[{std\+::string}]{outfile,  }\item[{double}]{totaltime }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_afcf742190cac3a9c04d966ad71c515ca}\label{Write__netcdf_8cu_afcf742190cac3a9c04d966ad71c515ca}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!writencvarstepBUQ@{writencvarstepBUQ}}
+\index{writencvarstepBUQ@{writencvarstepBUQ}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{writencvarstepBUQ()}{writencvarstepBUQ()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void writencvarstep\+BUQ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{vdim,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{T $\ast$}]{blockxo,  }\item[{T $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{T $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aded28dfbc4eefb50b70a55158c5edb60}\label{Write__netcdf_8cu_aded28dfbc4eefb50b70a55158c5edb60}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!writencvarstepBUQ$<$ double $>$@{writencvarstepBUQ$<$ double $>$}}
+\index{writencvarstepBUQ$<$ double $>$@{writencvarstepBUQ$<$ double $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{writencvarstepBUQ$<$ double $>$()}{writencvarstepBUQ< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_afcf742190cac3a9c04d966ad71c515ca}{writencvarstep\+BUQ}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{vdim,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{double $\ast$}]{blockxo,  }\item[{double $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{double $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a86b264630059dfcb379c5a1ad7aa0dc3}\label{Write__netcdf_8cu_a86b264630059dfcb379c5a1ad7aa0dc3}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!writencvarstepBUQ$<$ float $>$@{writencvarstepBUQ$<$ float $>$}}
+\index{writencvarstepBUQ$<$ float $>$@{writencvarstepBUQ$<$ float $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{writencvarstepBUQ$<$ float $>$()}{writencvarstepBUQ< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8h_afcf742190cac3a9c04d966ad71c515ca}{writencvarstep\+BUQ}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{vdim,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{float $\ast$}]{blockxo,  }\item[{float $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{float $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_ae033c4f8292065e848c5b16c46229596}\label{Write__netcdf_8cu_ae033c4f8292065e848c5b16c46229596}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!writencvarstepBUQlev@{writencvarstepBUQlev}}
+\index{writencvarstepBUQlev@{writencvarstepBUQlev}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{writencvarstepBUQlev()}{writencvarstepBUQlev()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void writencvarstep\+BUQlev (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{vdim,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{T $\ast$}]{blockxo,  }\item[{T $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{T $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_aa855390045fa6b057668256d9eca209f}\label{Write__netcdf_8cu_aa855390045fa6b057668256d9eca209f}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!writencvarstepBUQlev$<$ double $>$@{writencvarstepBUQlev$<$ double $>$}}
+\index{writencvarstepBUQlev$<$ double $>$@{writencvarstepBUQlev$<$ double $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{writencvarstepBUQlev$<$ double $>$()}{writencvarstepBUQlev< double >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8cu_ae033c4f8292065e848c5b16c46229596}{writencvarstep\+BUQlev}}$<$ double $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{vdim,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{double $\ast$}]{blockxo,  }\item[{double $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{double $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Write__netcdf_8cu_a5ad7eeef41bae971145a3cace4d9e8b3}\label{Write__netcdf_8cu_a5ad7eeef41bae971145a3cace4d9e8b3}} 
+\index{Write\_netcdf.cu@{Write\_netcdf.cu}!writencvarstepBUQlev$<$ float $>$@{writencvarstepBUQlev$<$ float $>$}}
+\index{writencvarstepBUQlev$<$ float $>$@{writencvarstepBUQlev$<$ float $>$}!Write\_netcdf.cu@{Write\_netcdf.cu}}
+\doxysubsubsection{\texorpdfstring{writencvarstepBUQlev$<$ float $>$()}{writencvarstepBUQlev< float >()}}
+{\footnotesize\ttfamily template void \mbox{\hyperlink{Write__netcdf_8cu_ae033c4f8292065e848c5b16c46229596}{writencvarstep\+BUQlev}}$<$ float $>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{int}]{vdim,  }\item[{int $\ast$}]{activeblk,  }\item[{int $\ast$}]{level,  }\item[{float $\ast$}]{blockxo,  }\item[{float $\ast$}]{blockyo,  }\item[{std\+::string}]{varst,  }\item[{float $\ast$}]{var,  }\item[{\mbox{\hyperlink{structoutzoneB}{outzoneB}}}]{Xzone }\end{DoxyParamCaption})}
+

@@ -18,6 +18,21 @@
 
 #include "InitEvolv.h"
 
+#include "InitEvolv.h"
+
+/**
+ * @brief Initialize evolving variables for the simulation.
+ *
+ * Handles hotstart, coldstart, and warmstart initialization of water level, velocity, and bathymetry arrays.
+ * Applies offsets and boundary conditions as needed.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XEv Evolving variables (output)
+ * @param zb Bathymetry array (input/output)
+ */
 template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> XForcing, EvolvingP<T> &XEv,T* &zb)
 {
 	//move this to a subroutine
@@ -100,6 +115,18 @@ template void initevolv<float>(Param XParam, BlockP<float> XBlock, Forcing<float
 template void initevolv<double>(Param XParam, BlockP< double > XBlock, Forcing<float> XForcing, EvolvingP< double > &XEv, double* &zb);
 
 
+/**
+ * @brief Cold start initialization of evolving variables.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using specified zsinit and zsoffset.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ * @return Success flag (1 if successful)
+ */
 template <class T>
 int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 {
@@ -137,6 +164,18 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 	return coldstartsucess;
 }
 
+/**
+ * @brief Warm start initialization using boundary conditions and interpolation.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using boundary segments and atmospheric pressure forcing.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ */
 template <class T>
 void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
@@ -237,6 +276,18 @@ void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, E
 }
 
 
+/**
+ * @brief Legacy warm start initialization using inverse distance to boundaries.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using inverse distance interpolation from boundaries.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ */
 template <class T>
 void warmstartold(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
@@ -456,6 +507,18 @@ void warmstartold(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb,
 }
 
 
+/**
+ * @brief Add offset to surface elevation (zs) and update water depth (h).
+ *
+ * Applies zsoffset to zs and updates h for all blocks where h > eps.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables (input/output)
+ * @param zb Bathymetry array
+ * @return Success flag (1 if successful)
+ */
 template <class T>
 int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 {
@@ -486,6 +549,18 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 }
 
 
+/**
+ * @brief Read BG_Flood hotstart file and extract block attributes.
+ *
+ * Opens NetCDF hotstart file, checks for BG_Flood attribute, and closes file.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param zb Bathymetry array
+ * @return Status code
+ */
 template <class T>
 int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
@@ -519,6 +594,19 @@ int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb
 	
 }
 
+/**
+ * @brief Read hotstart file and initialize evolving variables and bathymetry.
+ *
+ * Reads NetCDF hotstart file, extracts variables, and fills arrays for all blocks.
+ * Handles missing variables and applies edge corrections.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables (output)
+ * @param zb Bathymetry array (output)
+ * @return Success flag (1 if successful, 0 if fallback to cold start)
+ */
 template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
