@@ -16,13 +16,13 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
 |VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
 |frictionmodel|frictionmodel| 0|Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)|
-|Toutput|Toutput| 0|Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for the model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |il| il , Rain_il , initialloss | 0.0|Initial Loss value (if constant)|
 |cl| cl , Rain_cl , continuousloss | 0.0|Continuous Loss value (if constant)|
 |conserveElevation|conserveElevation| false|Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks|
 |wetdryfix| wetdryfix , reminstab , fixinstab | true|Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)|
+|ForceMassConserve| ForceMassConserve , MassConservation , MassCon , forcemassconservation , forcevolumeconservation , Volumeconservation , VolumeCon , ForceVolConserve | false|Switch to enforce mass conservation only useful on steep slope|
 |Pa2m|Pa2m| 0.00009916|Conversion between atmospheric pressure changes to water level changes in Pa (if unit is hPa then user should use 0.009916)|
 |Paref|Paref| 101300.0|Reference pressure in Pa (if unit is hPa then user should use 1013.0)|
 |GPUDEVICE| GPUDEVICE , gpu | 0|0: first available GPU, -1: CPU single core, 2+: other GPU|
@@ -63,6 +63,8 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
 |dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
 |reftime| reftime , referencetime , timeref | ""|Reference time string as yyyy-mm-ddTHH:MM:SS|
+|crs_ref| crs_ref , crs , spatialref , spatial_ref , wtk , crsinfo , crs_info | "no_crs"|crs reference string |
+|Toutput|Toutput| "no_crs"|crs reference string |
 
 ### Boundaries
 |_Reference_|_Keys_|_default_|_Explanation_|
@@ -70,6 +72,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |aoibnd| aoibnd , remainderbnd , remainbndtype , aoibndtype | 0; // Boundary type for AOI: 0=wall; 1 neumann|3 absorbing|
 |bndrelaxtime|bndrelaxtime| 3600.0|Realxation time for absorbing boundary|
 |bndfiltertime|bndfiltertime| 60.0|Filtering time for absorbing boundary|
+|rainbnd| rainbnd , rainonbnd | false|when false it force the rain forcing on the bnd cells to be null.|
 
 ###  Initialisation
 |_Reference_|_Keys_|_default_|_Explanation_|
@@ -107,7 +110,6 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |vtk_output_time_interval|vtk_output_time_interval| 1.0|Output time step for ParaView Catalyst|
 |vtk_outputfile_root|vtk_outputfile_root| "bg_out"|output file name for ParaView Catalyst|
 |python_pipeline|python_pipeline| "coproc.py"|python pipeline for ParaView Catalyst|
-|rainbnd| rainbnd , rainonbnd | false|when false it force the rain forcing on the bnd cells to be null.|
 |adaptmaxiteration| adaptmaxiteration , maxiterationadapt | 20|Maximum number of iteration for adaptation. default 20|
 
 
@@ -135,12 +137,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 
 |_Reference_|_Keys_|
 |---|---|
-|MassConservation| MassConservation , MassCon , forcemassconservation , forcevolumeconservation , Volumeconservation , VolumeCon , ForceMassConserve , ForceVolConserve |
 |Adaptation|Adaptation|
-|crs| crs , spatialref , spatial_ref , wtk , crsinfo , crs_info |
-|bathyfile|bathyfile|
-|bathymetry|bathymetry|
-|depfile|depfile|
 |bnd| bnd , bndseg |
 |cavity|cavity|
 
