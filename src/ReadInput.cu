@@ -434,7 +434,7 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	paramvec = { "MassConservation", "MassCon","forcemassconservation","forcevolumeconservation","Volumeconservation","VolumeCon", "ForceMassConserve", "ForceVolConserve" };
+	paramvec = { "ForceMassConserve", "MassConservation", "MassCon","forcemassconservation","forcevolumeconservation","Volumeconservation","VolumeCon", "ForceVolConserve" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -847,7 +847,7 @@ Param readparamstr(std::string line, Param param)
 		}
 	}
 
-	paramvec = { "crs", "spatialref", "spatial_ref", "wtk", "crsinfo","crs_info" };
+	paramvec = { "crs_ref", "crs", "spatialref", "spatial_ref", "wtk", "crsinfo","crs_info" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -912,36 +912,6 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		forcing.AOI.file = parametervalue;
 		forcing.AOI.active = true;
 	}
-
-	/*parameterstr = "bathyfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		StaticForcingP<float> infobathy;
-		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
-		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
-
-	parameterstr = "bathymetry";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		StaticForcingP<float> infobathy;
-		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
-		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
-
-	//
-	parameterstr = "depfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		StaticForcingP<float> infobathy;
-		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
-		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
-	}*/
 
 
 	// Boundaries

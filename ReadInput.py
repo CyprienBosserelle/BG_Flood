@@ -41,21 +41,23 @@ R.close()
 for line in lines:
 #    if not(re.findall('^\s*(//).*',line)):
     if (('param.' in line) or ('XParam.' in line)):
-        Params.append(re.findall("\.*(param.|XParam.)(\w+)\.*", line, re.IGNORECASE)[0][1])
+        Params.append(re.findall(r'(?:param\.|XParam\.)(\w+)', line, re.IGNORECASE)[0])
+        #Params.append(re.findall("\.*(param.|XParam.)(\w+)\.*", line, re.IGNORECASE)[0][1])
     if (('forcing.' in line) or ('XForcing.' in line)):
-        Forcings.append(re.findall("\.*(forcing.|XForcing.)(\w+)\.*", line, re.IGNORECASE)[0][1])
+        Forcings.append(re.findall(r'(?:forcing\.|XForcing\.)(\w+)', line, re.IGNORECASE)[0])
+        #Forcings.append(re.findall("\.*(forcing.|XForcing.)(\w+)\.*", line, re.IGNORECASE)[0][1])
     line=re.sub(r"[\t\s]*","",line)
     if ('parameterstr=' in line):
-        key_loc=re.findall("parameterstr=\"(\w+)\"\.*", line, re.IGNORECASE)[0]
+        key_loc=re.findall(r'parameterstr="([\w_]+)"', line, re.IGNORECASE)[0]
         if not (key_loc in keys):
             keys.append(key_loc)
             ref_name.append(key_loc)
     elif ('paramvec=' in line):
-        key_loc=re.findall(".*paramvec={(.*)}.*", line, re.IGNORECASE)[0]
+        key_loc=re.findall(r'.*paramvec={(.*)}.*', line, re.IGNORECASE)[0]
         key_loc=re.sub(r"\""," ",key_loc)
         if not (key_loc in keys):
             keys.append(key_loc)
-            ref_name.append(re.findall('(\w+) ,.*',key_loc,re.IGNORECASE)[0])
+            ref_name.append(re.findall(r'([\w_]+) ,.*',key_loc,re.IGNORECASE)[0])
 
 myParams=list(set(Params))
 myForcings=list(set(Forcings))

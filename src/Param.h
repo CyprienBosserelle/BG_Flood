@@ -84,7 +84,8 @@ public:
 	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
 	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
 	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
-	std::string crs_ref = "no_crs"; //"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
+	std::string crs_ref = "no_crs"; //crs reference string 
+	//"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
 
 
 	//*Boundaries
@@ -96,6 +97,11 @@ public:
 	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
 	double bndrelaxtime = 3600.0; // Realxation time for absorbing boundary
 	double bndfiltertime = 60.0; // Filtering time for absorbing boundary
+
+	// deformation forcing for tsunami generation
+	//std::vector<deformmap> deform;
+	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
+	bool rainbnd = false; // when false it force the rain forcing on the bnd cells to be null.
 
 
 	//* Initialisation
@@ -122,9 +128,10 @@ public:
 	//inputmap Bathymetry;
 
 	T_output Toutput;
-	/* Flexible time definition for outputs (nc files)
+	/*Flexible time definition for outputs (nc files)
 	Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"
-	Default = First and last timne steps*/
+	Default = First and last time steps
+	*/
 
 	//Timeseries output (save as a vector containing information for each Time Serie output)
 	std::vector<TSoutnode> TSnodesout;
@@ -216,10 +223,7 @@ public:
 	//forcingmap atmP;
 	//forcingmap Rainongrid;
 
-	// deformation forcing for tsunami generation
-	//std::vector<deformmap> deform;
-	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-	bool rainbnd = false; // when false it force the rain forcing on the bnd cells to be null.
+
 
 	// This here should be stored in a structure at a later stage
 
