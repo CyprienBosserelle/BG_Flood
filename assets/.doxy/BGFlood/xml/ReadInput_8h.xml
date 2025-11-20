@@ -1,0 +1,2040 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="ReadInput_8h" kind="file" language="C++">
+    <compoundname>ReadInput.h</compoundname>
+    <includes refid="General_8h" local="yes">General.h</includes>
+    <includes refid="Param_8h" local="yes">Param.h</includes>
+    <includes refid="Write__txtlog_8h" local="yes">Write_txtlog.h</includes>
+    <includes refid="Forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="Util__CPU_8h" local="yes">Util_CPU.h</includes>
+    <includes refid="utctime_8h" local="yes">utctime.h</includes>
+    <includes refid="Input_8h" local="yes">Input.h</includes>
+    <includes refid="ReadForcing_8h" local="yes">ReadForcing.h</includes>
+    <includedby refid="BG__Flood_8h" local="yes">src/BG_Flood.h</includedby>
+    <includedby refid="ReadInput_8cu" local="yes">src/ReadInput.cu</includedby>
+    <includedby refid="Read__netcdf_8h" local="yes">src/Read_netcdf.h</includedby>
+    <includedby refid="Testing_8h" local="yes">src/Testing.h</includedby>
+    <includedby refid="Write__netcdf_8h" local="yes">src/Write_netcdf.h</includedby>
+    <includedby refid="utctime_8h" local="yes">src/utctime.h</includedby>
+    <incdepgraph>
+      <node id="32">
+        <label>Arrays.h</label>
+        <link refid="Arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Forcing.h</label>
+        <link refid="Forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="General_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Input.h</label>
+        <link refid="Input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Param.h</label>
+        <link refid="Param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/ReadInput.h</label>
+        <link refid="ReadInput_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>Util_CPU.h</label>
+        <link refid="Util__CPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Write_txtlog.h</label>
+        <link refid="Write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="19">
+        <label>src/AdaptCriteria.h</label>
+        <link refid="AdaptCriteria_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/Adaptation.h</label>
+        <link refid="Adaptation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>src/Advection.h</label>
+        <link refid="Advection_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/BG_Flood.h</label>
+        <link refid="BG__Flood_8h_source"/>
+      </node>
+      <node id="17">
+        <label>src/Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>src/ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>src/FlowCPU.h</label>
+        <link refid="FlowCPU_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>src/FlowGPU.h</label>
+        <link refid="FlowGPU_8h_source"/>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="FlowMLGPU_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>src/Friction.h</label>
+        <link refid="Friction_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>src/Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>src/GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>src/Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>src/Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>src/Mainloop.h</label>
+        <link refid="Mainloop_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>src/Meanmax.h</label>
+        <link refid="Meanmax_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>src/MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>src/Mesh.cu</label>
+        <link refid="Mesh_8cu"/>
+      </node>
+      <node id="23">
+        <label>src/Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>src/Multilayer.h</label>
+        <link refid="Multilayer_8h_source"/>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>src/Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>src/ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/ReadInput.h</label>
+        <link refid="ReadInput_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>src/Reimann.h</label>
+        <link refid="Reimann_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>src/Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/Testing.h</label>
+        <link refid="Testing_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>src/Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>src/Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>src/utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="ReadInput_8h_1a4fd3d44799253e60792d8adf2c54a601" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>T</type>
+        <definition>T readfileinfo</definition>
+        <argsstring>(std::string input, T outinfo)</argsstring>
+        <name>readfileinfo</name>
+        <param>
+          <type>std::string</type>
+          <declname>input</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>outinfo</declname>
+        </param>
+        <briefdescription>
+<para>Parse a parameter string and update the parameter structure. Parses a line from the parameter file and updates the given parameter structure. Convert file name into name and extension. This is used for various input classes template inputmap readfileinfo&lt;inputmap&gt;(std::string input, inputmap outinfo); template forcingmap readfileinfo&lt;forcingmap&gt;(std::string input, forcingmap outinfo); template StaticForcingP&lt;float&gt; readfileinfo&lt;StaticForcingP&lt;float&gt;&gt;(std::string input, StaticForcingP&lt;float&gt; outinfo); template <ref refid="structDynForcingP" kindref="compound">DynForcingP&lt;float&gt;</ref> readfileinfo&lt;DynForcingP&lt;float&gt;&gt;(std::string input, DynForcingP&lt;float&gt; outinfo); template deformmap&lt;float&gt; readfileinfo&lt;deformmap&lt;float&gt;&gt;(std::string input, deformmap&lt;float&gt; outinfo);. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>line</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input line from parameter file </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>param</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Parameter structure to update </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Updated parameter structure</para>
+</simplesect>
+convert file name into name and extension This is used for various input classes</para>
+<para>template inputmap readfileinfo&lt;inputmap&gt;(std::string input, inputmap outinfo); template forcingmap readfileinfo&lt;forcingmap&gt;(std::string input, forcingmap outinfo); template StaticForcingP&lt;float&gt; readfileinfo&lt;StaticForcingP&lt;float&gt;&gt;(std::string input, StaticForcingP&lt;float&gt; outinfo); template <ref refid="structDynForcingP" kindref="compound">DynForcingP&lt;float&gt;</ref> readfileinfo&lt;DynForcingP&lt;float&gt;&gt;(std::string input, DynForcingP&lt;float&gt; outinfo); template deformmap&lt;float&gt; readfileinfo&lt;deformmap&lt;float&gt;&gt;(std::string input, deformmap&lt;float&gt; outinfo); </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="15" column="15" bodyfile="src/ReadInput.cu" bodystart="48" bodyend="81" declfile="src/ReadInput.h" declline="15" declcolumn="15"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1af8275cea8c05e6da8e4b0e5d32881e3e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void Readparamfile</definition>
+        <argsstring>(Param &amp;XParam, Forcing&lt; float &gt; &amp;XForcing, std::string Paramfile)</argsstring>
+        <name>Readparamfile</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; float &gt; &amp;</type>
+          <declname>XForcing</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>Paramfile</declname>
+        </param>
+        <briefdescription>
+<para>Read and parse the parameter file. Opens the specified parameter file (default: BG_param.txt file), reads its contents, and updates the provided parameter structures: <ref refid="classParam" kindref="compound">Param</ref> class (XParam) and <ref refid="structForcing" kindref="compound">Forcing</ref> class (XForcing). </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference to the parameter structure to be updated </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference to the forcing structure to be updated </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Paramfile</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Name of the parameter file to read </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="17" column="6" bodyfile="src/ReadInput.cu" bodystart="104" bodyend="141" declfile="src/ReadInput.h" declline="17" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1aade14ba4777ed9bfee8541774d76e8ce" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; T &gt;</type>
+        <definition>Forcing&lt; T &gt; readparamstr</definition>
+        <argsstring>(std::string line, Forcing&lt; T &gt; forcing)</argsstring>
+        <name>readparamstr</name>
+        <param>
+          <type>std::string</type>
+          <declname>line</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; T &gt;</type>
+          <declname>forcing</declname>
+        </param>
+        <briefdescription>
+<para>Parse a parameter string and update the forcing structure. Parses a line from the parameter file and updates the given forcing structure. Read BG_param.txt line and convert parameter to the right parameter in the class <linebreak/>
+ Return an updated <ref refid="structForcing" kindref="compound">Forcing</ref> class. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>line</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input line from parameter file </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>forcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structForcing" kindref="compound">Forcing</ref> structure to update </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Updated forcing structure</para>
+</simplesect>
+Read BG_param.txt line and convert parameter to the righ parameter in the class return an updated <ref refid="classParam" kindref="compound">Param</ref> class </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="19" column="21" bodyfile="src/ReadInput.cu" bodystart="892" bodyend="1175" declfile="src/ReadInput.h" declline="19" declcolumn="21"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a6c704f8d8527eecd6c4f1e0f253186f9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classParam" kindref="compound">Param</ref></type>
+        <definition>Param readparamstr</definition>
+        <argsstring>(std::string line, Param param)</argsstring>
+        <name>readparamstr</name>
+        <param>
+          <type>std::string</type>
+          <declname>line</declname>
+        </param>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>param</declname>
+        </param>
+        <briefdescription>
+<para>Parse a parameter string and update the parameter structure. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Parses a line from the parameter file and updates the given parameter structure. Read BG_param.txt line and convert parameter to the right parameter in the class Return an updated <ref refid="classParam" kindref="compound">Param</ref> class</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>line</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input line from parameter file </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>param</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Parameter structure to update </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Updated parameter structure</para>
+</simplesect>
+Read BG_param.txt line and convert parameter to the righ parameter in the class return an updated <ref refid="classParam" kindref="compound">Param</ref> class </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="21" column="7" bodyfile="src/ReadInput.cu" bodystart="162" bodyend="873" declfile="src/ReadInput.h" declline="21" declcolumn="7"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1ab913afa4b352bb9875bb4ec72521a193" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void checkparamsanity</definition>
+        <argsstring>(Param &amp;XParam, Forcing&lt; float &gt; &amp;XForcing)</argsstring>
+        <name>checkparamsanity</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; float &gt; &amp;</type>
+          <declname>XForcing</declname>
+        </param>
+        <briefdescription>
+<para>Check and adjust the sanity of model parameters and forcing data. This function checks the sanity of the model parameters and forcing data. It adjusts parameters as needed, ensuring they are within acceptable ranges and consistent with each other. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference to the model parameters structure to be checked and adjusted. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference to the forcing data structure to be checked and adjusted. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="24" column="6" bodyfile="src/ReadInput.cu" bodystart="1187" bodyend="1597" declfile="src/ReadInput.h" declline="24" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a16f53b241a2b708361e002670df091e6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double setendtime</definition>
+        <argsstring>(Param XParam, Forcing&lt; float &gt; XForcing)</argsstring>
+        <name>setendtime</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; float &gt;</type>
+          <declname>XForcing</declname>
+        </param>
+        <briefdescription>
+<para>Adjust the simulation &quot;endtime&quot; based on maximum time in forcings. This function checks the end times of boundary forcing data and adjusts the simulation end time if any boundary forcing ends before the specified end time. A warning is logged if the end time is reduced. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The <ref refid="classParam" kindref="compound">Param</ref> structure containing simulation parameters, including the initial end time. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The <ref refid="structForcing" kindref="compound">Forcing</ref> structure containing boundary forcing data. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="25" column="8" bodyfile="src/ReadInput.cu" bodystart="1636" bodyend="1669" declfile="src/ReadInput.h" declline="25" declcolumn="8"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a83b6362c0cf581af5b84e8040200857d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string findparameter</definition>
+        <argsstring>(std::vector&lt; std::string &gt; parameterstr, std::string line)</argsstring>
+        <name>findparameter</name>
+        <param>
+          <type>std::vector&lt; std::string &gt;</type>
+          <declname>parameterstr</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>line</declname>
+        </param>
+        <briefdescription>
+<para>Find and extract the value of a specified parameter from a configuration line. This function searches for a specified parameter in a given line of text, and extracts its associated value if found. It handles comments and whitespace appropriately. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parameterstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The parameter name to search for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>line</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The line of text to search within. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The extracted parameter value as a string, or an empty string if the parameter is not found. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="26" column="13" bodyfile="src/ReadInput.cu" bodystart="1680" bodyend="1725" declfile="src/ReadInput.h" declline="26" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a9b6b9f9b26d90d1c1b4dfe173be57e1c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string findparameter</definition>
+        <argsstring>(std::string parameterstr, std::string line)</argsstring>
+        <name>findparameter</name>
+        <param>
+          <type>std::string</type>
+          <declname>parameterstr</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>line</declname>
+        </param>
+        <briefdescription>
+<para>Find and extract the value of a specified parameter from a configuration line. This function searches for a specified parameter in a given line of text, and extracts its associated value if found. It handles comments and whitespace appropriately. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parameterstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The parameter name to search for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>line</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The line of text to search within. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The extracted parameter value as a string, or an empty string if the parameter is not found. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="27" column="13" bodyfile="src/ReadInput.cu" bodystart="1735" bodyend="1741" declfile="src/ReadInput.h" declline="27" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a7fdeaad11fab6949d565928655753fe8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void split</definition>
+        <argsstring>(const std::string &amp;s, char delim, std::vector&lt; std::string &gt; &amp;elems)</argsstring>
+        <name>split</name>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>s</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>delim</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; std::string &gt; &amp;</type>
+          <declname>elems</declname>
+        </param>
+        <briefdescription>
+<para>Split a string into tokens based on a specified delimiter, skipping empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Empty tokens resulting from consecutive delimiters are skipped. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input string to be split. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delim</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The character used as the delimiter for splitting the string. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>elems</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A reference to a vector where the resulting substrings will be stored. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="28" column="6" bodyfile="src/ReadInput.cu" bodystart="1753" bodyend="1764" declfile="src/ReadInput.h" declline="28" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a0711bc625a1e6944ca62107b5847365f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; std::string &gt;</type>
+        <definition>std::vector&lt; std::string &gt; split</definition>
+        <argsstring>(const std::string &amp;s, char delim)</argsstring>
+        <name>split</name>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>s</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>delim</declname>
+        </param>
+        <briefdescription>
+<para>Split a string into tokens based on a specified character delimiter, skipping empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Empty tokens resulting from consecutive delimiters are skipped. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input string to be split. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delim</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The character used as the delimiter for splitting the string. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A vector containing the resulting substrings. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="29" column="13" bodyfile="src/ReadInput.cu" bodystart="1775" bodyend="1779" declfile="src/ReadInput.h" declline="29" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a3bb2a577745ebc9687192e9ffe232805" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void split_full</definition>
+        <argsstring>(const std::string &amp;s, char delim, std::vector&lt; std::string &gt; &amp;elems)</argsstring>
+        <name>split_full</name>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>s</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>delim</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; std::string &gt; &amp;</type>
+          <declname>elems</declname>
+        </param>
+        <briefdescription>
+<para>Split a string into tokens based on a specified delimiter, preserving empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters. <linebreak/>
+ </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input string to be split. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delim</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The character used as the delimiter for splitting the string. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>elems</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A reference to a vector where the resulting substrings will be stored.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+split string based in character, conserving empty item </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="30" column="6" bodyfile="src/ReadInput.cu" bodystart="1795" bodyend="1809" declfile="src/ReadInput.h" declline="30" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1ae6af0198258d1543ed6fbc7b33da3010" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; std::string &gt;</type>
+        <definition>std::vector&lt; std::string &gt; split_full</definition>
+        <argsstring>(const std::string &amp;s, char delim)</argsstring>
+        <name>split_full</name>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>s</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>delim</declname>
+        </param>
+        <briefdescription>
+<para>Split a string into tokens based on a specified character delimiter, preserving empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters. <linebreak/>
+ </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input string to be split. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delim</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The character used as the delimiter for splitting the string.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+split string based in character, conserving empty items </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="31" column="13" bodyfile="src/ReadInput.cu" bodystart="1822" bodyend="1826" declfile="src/ReadInput.h" declline="31" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a2c2ca91bf22e464ce6e5ea21477e4462" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; std::string &gt;</type>
+        <definition>std::vector&lt; std::string &gt; split</definition>
+        <argsstring>(const std::string s, const std::string delim)</argsstring>
+        <name>split</name>
+        <param>
+          <type>const std::string</type>
+          <declname>s</declname>
+        </param>
+        <param>
+          <type>const std::string</type>
+          <declname>delim</declname>
+        </param>
+        <briefdescription>
+<para>Split a string into tokens based on a specified substring delimiter. This function takes a string and splits it into a vector of substrings using the specified substring delimiter. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input string to be split. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delim</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The substring used as the delimiter for splitting the string. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A vector containing the resulting substrings. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="32" column="13" bodyfile="src/ReadInput.cu" bodystart="1835" bodyend="1868" declfile="src/ReadInput.h" declline="32" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a61bb9a4530ff40c81495172a56719e36" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string trim</definition>
+        <argsstring>(const std::string &amp;str, const std::string &amp;whitespace)</argsstring>
+        <name>trim</name>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>str</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>whitespace</declname>
+        </param>
+        <briefdescription>
+<para>Trim leading and trailing whitespace from a string. This function removes all leading and trailing characters from the input string that are present in the specified whitespace string. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>str</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input string to be trimmed. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>whitespace</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A string containing all characters considered as whitespace.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+remove leading and trailing space in a string </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="33" column="13" bodyfile="src/ReadInput.cu" bodystart="1882" bodyend="1892" declfile="src/ReadInput.h" declline="33" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1aa1d5d87b815650c5b765af942c77f93e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::size_t</type>
+        <definition>std::size_t case_insensitive_compare</definition>
+        <argsstring>(std::string s1, std::string s2)</argsstring>
+        <name>case_insensitive_compare</name>
+        <param>
+          <type>std::string</type>
+          <declname>s1</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>s2</declname>
+        </param>
+        <briefdescription>
+<para>Perform a non case-insensitive comparison between two strings or a string and a vector of strings. This function converts both strings to lowercase and compares them. If a vector of strings is provided, it compares the first string against each string in the vector. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The first string to compare. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>s2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The second string to compare, or a vector of strings to compare against </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="34" column="13" bodyfile="src/ReadInput.cu" bodystart="1905" bodyend="1912" declfile="src/ReadInput.h" declline="34" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a56048a1bd60d79cb6a8dca48c33ce51f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::size_t</type>
+        <definition>std::size_t case_insensitive_compare</definition>
+        <argsstring>(std::string s1, std::vector&lt; std::string &gt; vecstr)</argsstring>
+        <name>case_insensitive_compare</name>
+        <param>
+          <type>std::string</type>
+          <declname>s1</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; std::string &gt;</type>
+          <declname>vecstr</declname>
+        </param>
+        <briefdescription>
+<para>Perform a non case-insensitive comparison between a string and a vector of strings. This function converts the first string to lowercase and compares it against each string in the vector. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The first string to compare. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>vecstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The vector of strings to compare against. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="35" column="13" bodyfile="src/ReadInput.cu" bodystart="1920" bodyend="1933" declfile="src/ReadInput.h" declline="35" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a769a0adefc87a67894d130f070e87a2c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool readparambool</definition>
+        <argsstring>(std::string paramstr, bool defaultval)</argsstring>
+        <name>readparambool</name>
+        <param>
+          <type>std::string</type>
+          <declname>paramstr</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>defaultval</declname>
+        </param>
+        <briefdescription>
+<para>Convert a parameter string to a boolean value, with a default fallback. This function interprets a parameter string as a boolean value, returning true for recognized true values and false for recognized false values. If the string does not match any known values, it returns a specified default value. <linebreak/>
+ </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>paramstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The parameter string to be interpreted. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>defaultval</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The default boolean value to return if the string does not match known values </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="36" column="6" bodyfile="src/ReadInput.cu" bodystart="2066" bodyend="2082" declfile="src/ReadInput.h" declline="36" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1ad04a1b1a00d15ecabb4c70df90f33b18" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void InitialiseToutput</definition>
+        <argsstring>(T_output &amp;Toutput, Param XParam)</argsstring>
+        <name>InitialiseToutput</name>
+        <param>
+          <type><ref refid="classT__output" kindref="compound">T_output</ref> &amp;</type>
+          <declname>Toutput</declname>
+          <defname>Toutput_loc</defname>
+        </param>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <briefdescription>
+<para>Initialise the Toutput structure with output times. This function reads the output times from a specified input string and ensures that the times are within the simulation time range. If no valid times are provided, it defaults to using the total time and end time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>Toutput_loc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference to the <ref refid="classT__output" kindref="compound">T_output</ref> structure to be initialised. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The <ref refid="classParam" kindref="compound">Param</ref> structure containing simulation parameters. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="37" column="6" bodyfile="src/ReadInput.cu" bodystart="1608" bodyend="1625" declfile="src/ReadInput.h" declline="37" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a85689aa928d7756ee19d30e163a334f1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classbndsegment" kindref="compound">bndsegment</ref></type>
+        <definition>bndsegment readbndline</definition>
+        <argsstring>(std::string parametervalue)</argsstring>
+        <name>readbndline</name>
+        <param>
+          <type>std::string</type>
+          <declname>parametervalue</declname>
+        </param>
+        <briefdescription>
+<para>Read boundary segment information from a parameter value string. This function parses a parameter value string to extract boundary segment information, including type, input file, and polygon file. It also reads file information and sets the expected type of input based on the file extension. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parametervalue</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The parameter value string containing boundary segment information. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="38" column="12" bodyfile="src/ReadInput.cu" bodystart="2005" bodyend="2055" declfile="src/ReadInput.h" declline="38" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a8251ca5f794b80f4fddf1159688f99e3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classbndsegment" kindref="compound">bndsegment</ref></type>
+        <definition>bndsegment readbndlineside</definition>
+        <argsstring>(std::string parametervalue, std::string side)</argsstring>
+        <name>readbndlineside</name>
+        <param>
+          <type>std::string</type>
+          <declname>parametervalue</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>side</declname>
+        </param>
+        <briefdescription>
+<para>Read boundary segment information from a parameter value string for a specific side. This function parses a parameter value string to extract boundary segment information, including type, input file, and polygon file for a specified side. It also reads file information and sets the expected type of input based on the file extension. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parametervalue</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The parameter value string containing boundary segment information. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>side</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The side (e.g., &quot;left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bot&quot;) for which the boundary segment is defined. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="39" column="12" bodyfile="src/ReadInput.cu" bodystart="1943" bodyend="1996" declfile="src/ReadInput.h" declline="39" declcolumn="12"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1afc9c1571349c5d599347eee5b80e15fd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; double &gt;</type>
+        <definition>std::vector&lt; double &gt; ReadToutput</definition>
+        <argsstring>(std::vector&lt; std::string &gt; paramstr, Param XParam)</argsstring>
+        <name>ReadToutput</name>
+        <param>
+          <type>std::vector&lt; std::string &gt;</type>
+          <declname>paramstr</declname>
+        </param>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <briefdescription>
+<para>Read and interpret output time specifications from a vector of parameter strings. This function processes a vector of parameter strings that specify output times, <linebreak/>
+ which can include individual time values or ranges defined by a start, step, and end. It converts these specifications into a vector of double values representing the output times, ensuring all times fall within the simulation&apos;s total time and end time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>paramstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A vector of strings specifying output times or ranges. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The <ref refid="classParam" kindref="compound">Param</ref> structure containing simulation parameters, including total time and end time. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A vector of double values representing the interpreted output times. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="42" column="13" bodyfile="src/ReadInput.cu" bodystart="2303" bodyend="2345" declfile="src/ReadInput.h" declline="42" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a8bc98a36fb09cc9317236c62d7bd8968" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; std::string &gt;</type>
+        <definition>std::vector&lt; std::string &gt; ReadToutSTR</definition>
+        <argsstring>(std::string paramstr)</argsstring>
+        <name>ReadToutSTR</name>
+        <param>
+          <type>std::string</type>
+          <declname>paramstr</declname>
+        </param>
+        <briefdescription>
+<para>Split a comma-separated parameter string into a vector of strings. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>This function takes a parameter string containing values separated by commas and splits it into a vector of individual strings. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>paramstr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The parameter string to be split. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A vector of strings obtained by splitting the input string at commas. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="44" column="13" bodyfile="src/ReadInput.cu" bodystart="2100" bodyend="2105" declfile="src/ReadInput.h" declline="44" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a446b06623deadaba4e4569c0ca0df865" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double ReadTvalstr</definition>
+        <argsstring>(std::string timestr, double start, double end, std::string reftime)</argsstring>
+        <name>ReadTvalstr</name>
+        <param>
+          <type>std::string</type>
+          <declname>timestr</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>start</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>end</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>reftime</declname>
+        </param>
+        <briefdescription>
+<para>Read and interpret a time value string, converting it to a double within specified bounds. This function interprets a time value string, which can represent specific keywords (&quot;start&quot;, &quot;end&quot;), relative times, or absolute date-time strings. It converts the <linebreak/>
+ string to a double value representing time, ensuring it falls within the provided start and end bounds. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timestr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The time value string to be interpreted. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>start</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The start time bound. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>end</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The end time bound. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>reftime</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The reference time for interpreting absolute date-time strings. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A double value representing the interpreted time, constrained within the start and end bounds. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="45" column="8" bodyfile="src/ReadInput.cu" bodystart="2118" bodyend="2145" declfile="src/ReadInput.h" declline="45" declcolumn="8"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1aaa5f4a338eaf18e39f17e40c50a56fa7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; double &gt;</type>
+        <definition>std::vector&lt; double &gt; ReadTRangestr</definition>
+        <argsstring>(std::vector&lt; std::string &gt; timestr, double start, double end, std::string reftime)</argsstring>
+        <name>ReadTRangestr</name>
+        <param>
+          <type>std::vector&lt; std::string &gt;</type>
+          <declname>timestr</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>start</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>end</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>reftime</declname>
+        </param>
+        <briefdescription>
+<para>Read and interpret a time range string, converting it to a vector of doubles within specified bounds. This function interprets a time range string formatted as &quot;t_init:t_step:t_end&quot;, where each component can be a specific time value or a keyword representing the start or end of the overall time range. It converts the range into a vector of double values representing discrete time steps, ensuring all values fall within the provided start and end bounds. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timestr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A vector of strings representing the time range components: [t_init, t_step, t_end]. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>start</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The start time bound. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>end</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The end time bound. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>reftime</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The reference time for interpreting absolute date-time strings. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A vector of double values representing the interpreted time steps within the specified range. <linebreak/>
+ </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="46" column="13" bodyfile="src/ReadInput.cu" bodystart="2159" bodyend="2224" declfile="src/ReadInput.h" declline="46" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="ReadInput_8h_1a6815c049735d6d8a741ef3c2fa257f23" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double readApproxtimestr</definition>
+        <argsstring>(std::string input)</argsstring>
+        <name>readApproxtimestr</name>
+        <param>
+          <type>std::string</type>
+          <declname>input</declname>
+        </param>
+        <briefdescription>
+<para>Convert an approximate time string to a double value in seconds. This function interprets a time string that may include a numeric value followed by a time unit (e.g., &quot;seconds&quot;, &quot;minutes&quot;, &quot;hours&quot;, &quot;days&quot;, &quot;months&quot;, &quot;years&quot;) and converts it to a double value representing the equivalent time in seconds. If the unit is not recognized, it defaults to seconds. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>input</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The approximate time string to be converted (e.g., &quot;10 minutes&quot;, &quot;2.5 hours&quot;). </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A double value representing the time in seconds. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/ReadInput.h" line="47" column="8" bodyfile="src/ReadInput.cu" bodystart="2234" bodyend="2291" declfile="src/ReadInput.h" declline="47" declcolumn="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>READINPUT_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>READINPUT_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Write_txtlog.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;utctime.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Input.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;ReadForcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>T<sp/>readfileinfo(std::string<sp/>input,<sp/>T<sp/>outinfo);</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Readparamfile(<ref refid="classParam" kindref="compound">Param</ref>&amp;<sp/>XParam,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;float&gt;</ref>&amp;<sp/>XForcing,<sp/>std::string<sp/>Paramfile);</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;T&gt;</ref><sp/>readparamstr(std::string<sp/>line,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;T&gt;</ref><sp/>forcing);</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><ref refid="classParam" kindref="compound">Param</ref><sp/>readparamstr(std::string<sp/>line,<sp/><ref refid="classParam" kindref="compound">Param</ref><sp/>param);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<ref refid="structForcing" kindref="compound">Forcing&lt;T&gt;</ref><sp/>readparamstr(std::string<sp/>line,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;T&gt;</ref><sp/>forcing);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>checkparamsanity(<ref refid="classParam" kindref="compound">Param</ref>&amp;<sp/>XParam,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;float&gt;</ref>&amp;<sp/>XForcing);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>setendtime(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;float&gt;</ref><sp/>XForcing);</highlight></codeline>
+<codeline lineno="26"><highlight class="normal">std::string<sp/>findparameter(std::vector&lt;std::string&gt;<sp/>parameterstr,<sp/>std::string<sp/>line);</highlight></codeline>
+<codeline lineno="27"><highlight class="normal">std::string<sp/>findparameter(std::string<sp/>parameterstr,<sp/>std::string<sp/>line);</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>split(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string&amp;<sp/>s,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>delim,<sp/>std::vector&lt;std::string&gt;&amp;<sp/>elems);</highlight></codeline>
+<codeline lineno="29"><highlight class="normal">std::vector&lt;std::string&gt;<sp/>split(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string&amp;<sp/>s,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>delim);</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>split_full(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string&amp;<sp/>s,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>delim,<sp/>std::vector&lt;std::string&gt;&amp;<sp/>elems);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal">std::vector&lt;std::string&gt;<sp/>split_full(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string&amp;<sp/>s,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>delim);</highlight></codeline>
+<codeline lineno="32"><highlight class="normal">std::vector&lt;std::string&gt;<sp/>split(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>s,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>delim);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal">std::string<sp/>trim(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string&amp;<sp/>str,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string&amp;<sp/>whitespace);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal">std::size_t<sp/>case_insensitive_compare(std::string<sp/>s1,<sp/>std::string<sp/>s2);</highlight></codeline>
+<codeline lineno="35"><highlight class="normal">std::size_t<sp/>case_insensitive_compare(std::string<sp/>s1,<sp/>std::vector&lt;std::string&gt;<sp/>vecstr);</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>readparambool(std::string<sp/>paramstr,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>defaultval);</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>InitialiseToutput(<ref refid="classT__output" kindref="compound">T_output</ref>&amp;<sp/>Toutput,<sp/><ref refid="classParam" kindref="compound">Param</ref><sp/>XParam);</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><ref refid="classbndsegment" kindref="compound">bndsegment</ref><sp/>readbndline(std::string<sp/>parametervalue);</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><ref refid="classbndsegment" kindref="compound">bndsegment</ref><sp/>readbndlineside(std::string<sp/>parametervalue,<sp/>std::string<sp/>side);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="comment">//T_output<sp/>ReadToutput(std::vector&lt;std::string&gt;<sp/>paramstr,<sp/>Param<sp/>XParam);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal">std::vector&lt;double&gt;<sp/>ReadToutput(std::vector&lt;std::string&gt;<sp/>paramstr,<sp/><ref refid="classParam" kindref="compound">Param</ref><sp/>XParam);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal">std::vector&lt;std::string&gt;<sp/>ReadToutSTR(std::string<sp/>paramstr);</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>ReadTvalstr(std::string<sp/>timestr,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>start,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>end,<sp/>std::string<sp/>reftime);</highlight></codeline>
+<codeline lineno="46"><highlight class="normal">std::vector&lt;double&gt;<sp/>ReadTRangestr(std::vector&lt;std::string&gt;<sp/>timestr,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>start,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>end,<sp/>std::string<sp/>reftime);</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>readApproxtimestr(std::string<sp/>input);</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight><highlight class="comment">//inline<sp/>bool<sp/>fileexists(const<sp/>std::string&amp;<sp/>name);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/ReadInput.h"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classRiver" kind="class" language="C++" prot="public">
+    <compoundname>River</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classRiver_1a3139eb8ccb23eb00049fb27ffd04a99b" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; int &gt;</type>
+        <definition>std::vector&lt;int&gt; River::i</definition>
+        <argsstring></argsstring>
+        <name>i</name>
+        <qualifiedname>River::i</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="47" column="13" bodyfile="src/Input.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a9cdc0bb319caa1c9755599698371ed32" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; int &gt;</type>
+        <definition>std::vector&lt;int&gt; River::j</definition>
+        <argsstring></argsstring>
+        <name>j</name>
+        <qualifiedname>River::j</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="47" column="15" bodyfile="src/Input.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a0e2b06245028b97fa2d21c55f86f9f2d" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; int &gt;</type>
+        <definition>std::vector&lt;int&gt; River::block</definition>
+        <argsstring></argsstring>
+        <name>block</name>
+        <qualifiedname>River::block</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="47" column="17" bodyfile="src/Input.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a8dabaeb0865462540aaaa835bb009cce" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double River::disarea</definition>
+        <argsstring></argsstring>
+        <name>disarea</name>
+        <qualifiedname>River::disarea</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="48" column="8" bodyfile="src/Input.h" bodystart="48" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a10f971c095e12a43a080dbc05a743066" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double River::xstart</definition>
+        <argsstring></argsstring>
+        <name>xstart</name>
+        <qualifiedname>River::xstart</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="49" column="8" bodyfile="src/Input.h" bodystart="49" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a077d733ffaf62ab6795c7e0093a5fcb2" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double River::xend</definition>
+        <argsstring></argsstring>
+        <name>xend</name>
+        <qualifiedname>River::xend</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="49" column="14" bodyfile="src/Input.h" bodystart="49" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a2a245128a4a09f2234916575f8d59806" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double River::ystart</definition>
+        <argsstring></argsstring>
+        <name>ystart</name>
+        <qualifiedname>River::ystart</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="49" column="19" bodyfile="src/Input.h" bodystart="49" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a423c8984c0fb44357a2c3a9c9b36f5dc" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double River::yend</definition>
+        <argsstring></argsstring>
+        <name>yend</name>
+        <qualifiedname>River::yend</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="49" column="25" bodyfile="src/Input.h" bodystart="49" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1aea3142bb9030da79e392a5adcb0f02c1" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double River::to</definition>
+        <argsstring></argsstring>
+        <name>to</name>
+        <qualifiedname>River::to</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="50" column="8" bodyfile="src/Input.h" bodystart="50" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1aa1ff755d668788b28ce365f9914af8f5" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double River::tmax</definition>
+        <argsstring></argsstring>
+        <name>tmax</name>
+        <qualifiedname>River::tmax</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="50" column="11" bodyfile="src/Input.h" bodystart="50" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1ac049c89745407a573c02fe8da4a26348" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string River::Riverflowfile</definition>
+        <argsstring></argsstring>
+        <name>Riverflowfile</name>
+        <qualifiedname>River::Riverflowfile</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="51" column="13" bodyfile="src/Input.h" bodystart="51" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classRiver_1a503a9f1213f4419758d3226e189ac215" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="classFlowin" kindref="compound">Flowin</ref> &gt;</type>
+        <definition>std::vector&lt;Flowin&gt; River::flowinput</definition>
+        <argsstring></argsstring>
+        <name>flowinput</name>
+        <qualifiedname>River::flowinput</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="52" column="13" bodyfile="src/Input.h" bodystart="52" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Input.h" line="45" column="1" bodyfile="src/Input.h" bodystart="45" bodyend="54"/>
+    <listofallmembers>
+      <member refid="classRiver_1a0e2b06245028b97fa2d21c55f86f9f2d" prot="public" virt="non-virtual"><scope>River</scope><name>block</name></member>
+      <member refid="classRiver_1a8dabaeb0865462540aaaa835bb009cce" prot="public" virt="non-virtual"><scope>River</scope><name>disarea</name></member>
+      <member refid="classRiver_1a503a9f1213f4419758d3226e189ac215" prot="public" virt="non-virtual"><scope>River</scope><name>flowinput</name></member>
+      <member refid="classRiver_1a3139eb8ccb23eb00049fb27ffd04a99b" prot="public" virt="non-virtual"><scope>River</scope><name>i</name></member>
+      <member refid="classRiver_1a9cdc0bb319caa1c9755599698371ed32" prot="public" virt="non-virtual"><scope>River</scope><name>j</name></member>
+      <member refid="classRiver_1ac049c89745407a573c02fe8da4a26348" prot="public" virt="non-virtual"><scope>River</scope><name>Riverflowfile</name></member>
+      <member refid="classRiver_1aa1ff755d668788b28ce365f9914af8f5" prot="public" virt="non-virtual"><scope>River</scope><name>tmax</name></member>
+      <member refid="classRiver_1aea3142bb9030da79e392a5adcb0f02c1" prot="public" virt="non-virtual"><scope>River</scope><name>to</name></member>
+      <member refid="classRiver_1a077d733ffaf62ab6795c7e0093a5fcb2" prot="public" virt="non-virtual"><scope>River</scope><name>xend</name></member>
+      <member refid="classRiver_1a10f971c095e12a43a080dbc05a743066" prot="public" virt="non-virtual"><scope>River</scope><name>xstart</name></member>
+      <member refid="classRiver_1a423c8984c0fb44357a2c3a9c9b36f5dc" prot="public" virt="non-virtual"><scope>River</scope><name>yend</name></member>
+      <member refid="classRiver_1a2a245128a4a09f2234916575f8d59806" prot="public" virt="non-virtual"><scope>River</scope><name>ystart</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,1287 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="Mainloop_8h" kind="file" language="C++">
+    <compoundname>Mainloop.h</compoundname>
+    <includes refid="General_8h" local="yes">General.h</includes>
+    <includes refid="Param_8h" local="yes">Param.h</includes>
+    <includes refid="Arrays_8h" local="yes">Arrays.h</includes>
+    <includes refid="Forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="Mesh_8h" local="yes">Mesh.h</includes>
+    <includes refid="Write__netcdf_8h" local="yes">Write_netcdf.h</includes>
+    <includes refid="InitialConditions_8h" local="yes">InitialConditions.h</includes>
+    <includes refid="MemManagement_8h" local="yes">MemManagement.h</includes>
+    <includes refid="Boundary_8h" local="yes">Boundary.h</includes>
+    <includes refid="FlowGPU_8h" local="yes">FlowGPU.h</includes>
+    <includes refid="FlowCPU_8h" local="yes">FlowCPU.h</includes>
+    <includes refid="Meanmax_8h" local="yes">Meanmax.h</includes>
+    <includes refid="Updateforcing_8h" local="yes">Updateforcing.h</includes>
+    <includes refid="FlowMLGPU_8h" local="yes">FlowMLGPU.h</includes>
+    <includedby refid="BG__Flood_8h" local="yes">src/BG_Flood.h</includedby>
+    <includedby refid="Mainloop_8cu" local="yes">src/Mainloop.cu</includedby>
+    <includedby refid="Testing_8h" local="yes">src/Testing.h</includedby>
+    <incdepgraph>
+      <node id="48">
+        <label>Advection.h</label>
+        <link refid="Advection_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Arrays.h</label>
+        <link refid="Arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="46">
+        <label>ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="51">
+        <label>FlowCPU.h</label>
+        <link refid="FlowCPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+        <childnode refid="49" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="50" relation="include">
+        </childnode>
+      </node>
+      <node id="47">
+        <label>FlowGPU.h</label>
+        <link refid="FlowGPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+        <childnode refid="49" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="50" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="53">
+        <label>FlowMLGPU.h</label>
+        <link refid="FlowMLGPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="54" relation="include">
+        </childnode>
+        <childnode refid="47" relation="include">
+        </childnode>
+        <childnode refid="48" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Forcing.h</label>
+        <link refid="Forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="49">
+        <label>Friction.h</label>
+        <link refid="Friction_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="General_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="46" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Input.h</label>
+        <link refid="Input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Mainloop.h</label>
+        <link refid="Mainloop_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="47" relation="include">
+        </childnode>
+        <childnode refid="51" relation="include">
+        </childnode>
+        <childnode refid="52" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="53" relation="include">
+        </childnode>
+      </node>
+      <node id="52">
+        <label>Meanmax.h</label>
+        <link refid="Meanmax_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="47" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="54">
+        <label>Multilayer.h</label>
+        <link refid="Multilayer_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Param.h</label>
+        <link refid="Param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="50">
+        <label>Reimann.h</label>
+        <link refid="Reimann_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>Util_CPU.h</label>
+        <link refid="Util__CPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Write_txtlog.h</label>
+        <link refid="Write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="4">
+        <label>src/Adaptation.h</label>
+        <link refid="Adaptation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/BG_Flood.h</label>
+        <link refid="BG__Flood_8h_source"/>
+      </node>
+      <node id="1">
+        <label>src/Mainloop.h</label>
+        <link refid="Mainloop_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/Testing.h</label>
+        <link refid="Testing_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="Mainloop_8h_1a0ad0bb561885e36751fa9715e6961051" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void MainLoop</definition>
+        <argsstring>(Param &amp;XParam, Forcing&lt; float &gt; XForcing, Model&lt; T &gt; &amp;XModel, Model&lt; T &gt; &amp;XModel_g)</argsstring>
+        <name>MainLoop</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; float &gt;</type>
+          <declname>XForcing</declname>
+        </param>
+        <param>
+          <type><ref refid="structModel" kindref="compound">Model</ref>&lt; T &gt; &amp;</type>
+          <declname>XModel</declname>
+        </param>
+        <param>
+          <type><ref refid="structModel" kindref="compound">Model</ref>&lt; T &gt; &amp;</type>
+          <declname>XModel_g</declname>
+        </param>
+        <briefdescription>
+<para>Main simulation loop for the flood model. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Advances the simulation in time, applying boundary conditions, forcing, core engine, output, and crash detection. Handles both CPU and GPU execution paths.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structForcing" kindref="compound">Forcing</ref> data (float) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> state (CPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel_g</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> state (GPU) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Mainloop.h" line="19" column="18" bodyfile="src/Mainloop.cu" bodystart="17" bodyend="91" declfile="src/Mainloop.h" declline="19" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Mainloop_8h_1af89df14ff4731cf4c1e19a3ff6ccebc7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void DebugLoop</definition>
+        <argsstring>(Param &amp;XParam, Forcing&lt; float &gt; XForcing, Model&lt; T &gt; &amp;XModel, Model&lt; T &gt; &amp;XModel_g)</argsstring>
+        <name>DebugLoop</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; float &gt;</type>
+          <declname>XForcing</declname>
+        </param>
+        <param>
+          <type><ref refid="structModel" kindref="compound">Model</ref>&lt; T &gt; &amp;</type>
+          <declname>XModel</declname>
+        </param>
+        <param>
+          <type><ref refid="structModel" kindref="compound">Model</ref>&lt; T &gt; &amp;</type>
+          <declname>XModel_g</declname>
+        </param>
+        <briefdescription>
+<para>Debugging loop for the flood model. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Used to debug and wrap the debug flow engine. Runs a fixed number of steps and outputs diagnostic information. Handles both CPU and GPU execution paths.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structForcing" kindref="compound">Forcing</ref> data (float) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> state (CPU) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel_g</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> state (GPU) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Mainloop.h" line="21" column="18" bodyfile="src/Mainloop.cu" bodystart="109" bodyend="190" declfile="src/Mainloop.h" declline="21" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Mainloop_8h_1ac06b5925460adb1f6e1e2f76b5055ef0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ double</type>
+        <definition>__host__ double initdt</definition>
+        <argsstring>(Param XParam, Loop&lt; T &gt; XLoop, Model&lt; T &gt; XModel)</argsstring>
+        <name>initdt</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structLoop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+          <declname>XLoop</declname>
+        </param>
+        <param>
+          <type><ref refid="structModel" kindref="compound">Model</ref>&lt; T &gt;</type>
+          <declname>XModel</declname>
+        </param>
+        <briefdescription>
+<para>Initialize the simulation time step. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Calculates the initial time step based on user input or model parameters. Uses either a user-specified value or computes a safe initial value based on water depth and cell resolution.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XLoop</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structLoop" kindref="compound">Loop</ref> control structure </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> state </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Initial time step value </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Mainloop.h" line="23" column="29" bodyfile="src/Mainloop.cu" bodystart="515" bodyend="554" declfile="src/Mainloop.h" declline="23" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Mainloop_8h_1a446715e79d5f4e6b31588012da5acc13" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type><ref refid="structLoop" kindref="compound">Loop</ref>&lt; T &gt;</type>
+        <definition>Loop&lt; T &gt; InitLoop</definition>
+        <argsstring>(Param &amp;XParam, Model&lt; T &gt; &amp;XModel)</argsstring>
+        <name>InitLoop</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref> &amp;</type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structModel" kindref="compound">Model</ref>&lt; T &gt; &amp;</type>
+          <declname>XModel</declname>
+        </param>
+        <briefdescription>
+<para>Initialize the simulation loop structure. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Sets up loop control variables, output buffers, and initial time step.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XModel</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> state </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Initialized loop control structure </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Mainloop.h" line="25" column="18" bodyfile="src/Mainloop.cu" bodystart="207" bodyend="243" declfile="src/Mainloop.h" declline="25" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Mainloop_8h_1a5ee1aa7982bcbec879af949e36814276" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void printstatus</definition>
+        <argsstring>(T totaltime, T dt)</argsstring>
+        <name>printstatus</name>
+        <param>
+          <type>T</type>
+          <declname>totaltime</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dt</declname>
+        </param>
+        <briefdescription>
+<para>Print the current simulation time and time step to the console. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Displays the total simulation time and current time step in a formatted manner.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>totaltime</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Current simulation time </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dt</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Current time step </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Mainloop.h" line="27" column="18" bodyfile="src/Mainloop.cu" bodystart="628" bodyend="634" declfile="src/Mainloop.h" declline="27" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Mainloop_8h_1a1426e758c00aafa841ffa54c08d5ad30" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void storeTSout</definition>
+        <argsstring>(Param XParam, int noutnodes, int outnode, int istep, int blknode, int inode, int jnode, int *blkTS, EvolvingP&lt; T &gt; XEv, T *store)</argsstring>
+        <name>storeTSout</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>noutnodes</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>outnode</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>istep</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>blknode</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>inode</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>jnode</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>blkTS</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>store</declname>
+        </param>
+        <briefdescription>
+<para>CUDA kernel to store time series output for specified nodes. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Writes evolving variables for selected nodes and time steps to output storage array.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="structModel" kindref="compound">Model</ref> parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>noutnodes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of output nodes </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>outnode</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output node index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>istep</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time step index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>blknode</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>inode</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Node i-index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>jnode</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Node j-index </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>blkTS</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block time series mapping </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving state variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>store</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output storage array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Mainloop.h" line="30" column="29" bodyfile="src/Mainloop.cu" bodystart="475" bodyend="500" declfile="src/Mainloop.h" declline="30" declcolumn="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#ifndef<sp/>MAINLOOP_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>MAINLOOP_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Arrays.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Mesh.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Write_netcdf.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;InitialConditions.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;MemManagement.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Boundary.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;FlowGPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;FlowCPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Meanmax.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Updateforcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;FlowMLGPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>MainLoop(<ref refid="classParam" kindref="compound">Param</ref>&amp;<sp/>XParam,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;float&gt;</ref><sp/>XForcing,<sp/><ref refid="structModel" kindref="compound">Model&lt;T&gt;</ref>&amp;<sp/>XModel,<sp/><ref refid="structModel" kindref="compound">Model&lt;T&gt;</ref>&amp;<sp/>XModel_g);</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>DebugLoop(<ref refid="classParam" kindref="compound">Param</ref>&amp;<sp/>XParam,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;float&gt;</ref><sp/>XForcing,<sp/><ref refid="structModel" kindref="compound">Model&lt;T&gt;</ref>&amp;<sp/>XModel,<sp/><ref refid="structModel" kindref="compound">Model&lt;T&gt;</ref>&amp;<sp/>XModel_g);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>initdt(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structLoop" kindref="compound">Loop&lt;T&gt;</ref><sp/>XLoop,<sp/><ref refid="structModel" kindref="compound">Model&lt;T&gt;</ref><sp/>XModel);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/><ref refid="structLoop" kindref="compound">Loop&lt;T&gt;</ref><sp/>InitLoop(<ref refid="classParam" kindref="compound">Param</ref>&amp;<sp/>XParam,<sp/><ref refid="structModel" kindref="compound">Model&lt;T&gt;</ref>&amp;<sp/>XModel);</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>printstatus(T<sp/>totaltime,<sp/>T<sp/>dt);</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>storeTSout(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>noutnodes,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>outnode,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>istep,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>blknode,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>inode,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>jnode,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>blkTS,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/>T*<sp/>store);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/Mainloop.h"/>
+  </compounddef>
+</doxygen>

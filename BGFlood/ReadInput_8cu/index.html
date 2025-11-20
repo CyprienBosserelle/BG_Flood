@@ -1,0 +1,2146 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for BG_Flood, a C++ library for flood fill algorithms.">
+      
+      
+      
+        <link rel="canonical" href="https://mydomain.org/mysite/BGFlood/ReadInput_8cu/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>File ReadInput.cu - BG_Flood Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/css/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#file-readinputcu" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="BG_Flood Documentation" class="md-header__button md-logo" aria-label="BG_Flood Documentation" data-md-component="logo">
+      
+  <img src="../../Logo_white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            BG_Flood Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              File ReadInput.cu
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/CyprienBosserelle/BG_Flood" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    BG_Flood on GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="BG_Flood Documentation" class="md-nav__button md-logo" aria-label="BG_Flood Documentation" data-md-component="logo">
+      
+  <img src="../../Logo_white.png" alt="logo">
+
+    </a>
+    BG_Flood Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/CyprienBosserelle/BG_Flood" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    BG_Flood on GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ParametersList-py/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parameters list
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Manual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Tutorial_intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/TutorialRiver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pluvial and fluvial flooding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/TutorialJetJulia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jet and Julia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/Gaussian_Wave_Julia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian wave
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/Transpacific_tsunami/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transpacific tsunami
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/TutorialMonaiJulia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monai and Julia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/Rain_CEA2008/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uniform rain on an idealised catchment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/RainMap_Aureli2020/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RainMap Aureli2020
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6">
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recent Developments
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recent Developments
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/RainLoss_ILCL-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ground infiltration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/NewGradient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Gradient Method
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/Wetdryfix-Conservelevation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wet-dry fix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../References/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code sources
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Code sources
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Links
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_2">
+        
+          
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Classes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../annotated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    List
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hierarchy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hierarchy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../class_members/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Members
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../class_member_functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../class_member_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../class_member_typedefs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Typedefs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../class_member_enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_3">
+        
+          
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Namespaces
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Namespaces
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../namespaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    List
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../namespace_members/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Members
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../namespace_member_functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../namespace_member_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../namespace_member_typedefs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Typedefs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../namespace_member_enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Macros
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<div><h1 id="file-readinputcu">File ReadInput.cu</h1>
+<p><a href="../files/"><strong>FileList</strong></a> <strong>&gt;</strong> <a href="../dir_68267d1309a1af8e8297ef4c3efbcdba/"><strong>src</strong></a> <strong>&gt;</strong> <a href="./"><strong>ReadInput.cu</strong></a></p>
+<p><a href="../ReadInput_8cu_source/">Go to the source code of this file</a></p>
+<ul>
+<li><code>#include "ReadInput.h"</code></li>
+</ul>
+<h2 id="public-functions">Public Functions</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Type</th>
+<th style="text-align: left;">Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">void</td>
+<td style="text-align: left;"><a href="#function-initialisetoutput"><strong>InitialiseToutput</strong></a> (<a href="../classT__output/"><strong>T_output</strong></a> &amp; Toutput_loc, <a href="../classParam/"><strong>Param</strong></a> XParam) <br><em>Initialise the Toutput structure with output times. This function reads the output times from a specified input string and ensures that the times are within the simulation time range. If no valid times are provided, it defaults to using the total time and end time.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::vector&lt; double &gt;</td>
+<td style="text-align: left;"><a href="#function-readtrangestr"><strong>ReadTRangestr</strong></a> (std::vector&lt; std::string &gt; timestr, double start, double end, std::string reftime) <br><em>Read and interpret a time range string, converting it to a vector of doubles within specified bounds. This function interprets a time range string formatted as "t_init:t_step:t_end", where each component can be a specific time value or a keyword representing the start or end of the overall time range. It converts the range into a vector of double values representing discrete time steps, ensuring all values fall within the provided start and end bounds.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::vector&lt; std::string &gt;</td>
+<td style="text-align: left;"><a href="#function-readtoutstr"><strong>ReadToutSTR</strong></a> (std::string paramstr) <br><em>Split a comma-separated parameter string into a vector of strings.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::vector&lt; double &gt;</td>
+<td style="text-align: left;"><a href="#function-readtoutput"><strong>ReadToutput</strong></a> (std::vector&lt; std::string &gt; paramstr, <a href="../classParam/"><strong>Param</strong></a> XParam) <br><em>Read and interpret output time specifications from a vector of parameter strings. This function processes a vector of parameter strings that specify output times,</em>  <em>which can include individual time values or ranges defined by a start, step, and end. It converts these specifications into a vector of double values representing the output times, ensuring all times fall within the simulation's total time and end time.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">double</td>
+<td style="text-align: left;"><a href="#function-readtvalstr"><strong>ReadTvalstr</strong></a> (std::string timestr, double start, double end, std::string reftime) <br><em>Read and interpret a time value string, converting it to a double within specified bounds. This function interprets a time value string, which can represent specific keywords ("start", "end"), relative times, or absolute date-time strings. It converts the</em>  <em>string to a double value representing time, ensuring it falls within the provided start and end bounds.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">void</td>
+<td style="text-align: left;"><a href="#function-readparamfile"><strong>Readparamfile</strong></a> (<a href="../classParam/"><strong>Param</strong></a> &amp; XParam, <a href="../structForcing/"><strong>Forcing</strong></a>&lt; float &gt; &amp; XForcing, std::string Paramfile) <br><em>Read and parse the parameter file. Opens the specified parameter file (default: BG_param.txt file), reads its contents, and updates the provided parameter structures:</em> <a href="../classParam/"><em><strong>Param</strong></em></a> <em>class (XParam) and</em><a href="../structForcing/"><em><strong>Forcing</strong></em></a> <em>class (XForcing).</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::size_t</td>
+<td style="text-align: left;"><a href="#function-case_insensitive_compare"><strong>case_insensitive_compare</strong></a> (std::string s1, std::string s2) <br><em>Perform a non case-insensitive comparison between two strings or a string and a vector of strings. This function converts both strings to lowercase and compares them. If a vector of strings is provided, it compares the first string against each string in the vector.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::size_t</td>
+<td style="text-align: left;"><a href="#function-case_insensitive_compare"><strong>case_insensitive_compare</strong></a> (std::string s1, std::vector&lt; std::string &gt; vecstr) <br><em>Perform a non case-insensitive comparison between a string and a vector of strings. This function converts the first string to lowercase and compares it against each string in the vector.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">void</td>
+<td style="text-align: left;"><a href="#function-checkparamsanity"><strong>checkparamsanity</strong></a> (<a href="../classParam/"><strong>Param</strong></a> &amp; XParam, <a href="../structForcing/"><strong>Forcing</strong></a>&lt; float &gt; &amp; XForcing) <br><em>Check and adjust the sanity of model parameters and forcing data. This function checks the sanity of the model parameters and forcing data. It adjusts parameters as needed, ensuring they are within acceptable ranges and consistent with each other.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::string</td>
+<td style="text-align: left;"><a href="#function-findparameter"><strong>findparameter</strong></a> (std::vector&lt; std::string &gt; parameterstr, std::string line) <br><em>Find and extract the value of a specified parameter from a configuration line. This function searches for a specified parameter in a given line of text, and extracts its associated value if found. It handles comments and whitespace appropriately.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::string</td>
+<td style="text-align: left;"><a href="#function-findparameter"><strong>findparameter</strong></a> (std::string parameterstr, std::string line) <br><em>Find and extract the value of a specified parameter from a configuration line. This function searches for a specified parameter in a given line of text, and extracts its associated value if found. It handles comments and whitespace appropriately.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">double</td>
+<td style="text-align: left;"><a href="#function-readapproxtimestr"><strong>readApproxtimestr</strong></a> (std::string input) <br><em>Convert an approximate time string to a double value in seconds. This function interprets a time string that may include a numeric value followed by a time unit (e.g., "seconds", "minutes", "hours", "days", "months", "years") and converts it to a double value representing the equivalent time in seconds. If the unit is not recognized, it defaults to seconds.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;"><a href="../classbndsegment/"><strong>bndsegment</strong></a></td>
+<td style="text-align: left;"><a href="#function-readbndline"><strong>readbndline</strong></a> (std::string parametervalue) <br><em>Read boundary segment information from a parameter value string. This function parses a parameter value string to extract boundary segment information, including type, input file, and polygon file. It also reads file information and sets the expected type of input based on the file extension.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;"><a href="../classbndsegment/"><strong>bndsegment</strong></a></td>
+<td style="text-align: left;"><a href="#function-readbndlineside"><strong>readbndlineside</strong></a> (std::string parametervalue, std::string side) <br><em>Read boundary segment information from a parameter value string for a specific side. This function parses a parameter value string to extract boundary segment information, including type, input file, and polygon file for a specified side. It also reads file information and sets the expected type of input based on the file extension.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">T</td>
+<td style="text-align: left;"><a href="#function-readfileinfo"><strong>readfileinfo</strong></a> (std::string input, T outinfo) <br><em>Parse a parameter string and update the parameter structure. Parses a line from the parameter file and updates the given parameter structure. Convert file name into name and extension. This is used for various input classes template inputmap readfileinfo&lt;inputmap&gt;(std::string input, inputmap outinfo); template forcingmap readfileinfo&lt;forcingmap&gt;(std::string input, forcingmap outinfo); template StaticForcingP&lt;float&gt; readfileinfo&lt;StaticForcingP&lt;float&gt;&gt;(std::string input, StaticForcingP&lt;float&gt; outinfo); template</em> <a href="../structDynForcingP/"><em><strong>DynForcingP&lt;float&gt;</strong></em></a> <em>readfileinfo&lt;DynForcingP&lt;float&gt;&gt;(std::string input, DynForcingP&lt;float&gt; outinfo); template deformmap&lt;float&gt; readfileinfo&lt;deformmap&lt;float&gt;&gt;(std::string input, deformmap&lt;float&gt; outinfo);.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">template <a href="../structDynForcingP/"><strong>DynForcingP</strong></a>&lt; float &gt;</td>
+<td style="text-align: left;"><a href="#function-readfileinfo-dynforcingp-float"><strong>readfileinfo&lt; DynForcingP&lt; float &gt; &gt;</strong></a> (std::string input, <a href="../structDynForcingP/"><strong>DynForcingP</strong></a>&lt; float &gt; outinfo) <br></td>
+</tr>
+<tr>
+<td style="text-align: right;">template <a href="../structStaticForcingP/"><strong>StaticForcingP</strong></a>&lt; float &gt;</td>
+<td style="text-align: left;"><a href="#function-readfileinfo-staticforcingp-float"><strong>readfileinfo&lt; StaticForcingP&lt; float &gt; &gt;</strong></a> (std::string input, <a href="../structStaticForcingP/"><strong>StaticForcingP</strong></a>&lt; float &gt; outinfo) <br></td>
+</tr>
+<tr>
+<td style="text-align: right;">template <a href="../classdeformmap/"><strong>deformmap</strong></a>&lt; float &gt;</td>
+<td style="text-align: left;"><a href="#function-readfileinfo-deformmap-float"><strong>readfileinfo&lt; deformmap&lt; float &gt; &gt;</strong></a> (std::string input, <a href="../classdeformmap/"><strong>deformmap</strong></a>&lt; float &gt; outinfo) <br></td>
+</tr>
+<tr>
+<td style="text-align: right;">template <a href="../classforcingmap/"><strong>forcingmap</strong></a></td>
+<td style="text-align: left;"><a href="#function-readfileinfo-forcingmap"><strong>readfileinfo&lt; forcingmap &gt;</strong></a> (std::string input, <a href="../classforcingmap/"><strong>forcingmap</strong></a> outinfo) <br></td>
+</tr>
+<tr>
+<td style="text-align: right;">template <a href="../classinputmap/"><strong>inputmap</strong></a></td>
+<td style="text-align: left;"><a href="#function-readfileinfo-inputmap"><strong>readfileinfo&lt; inputmap &gt;</strong></a> (std::string input, <a href="../classinputmap/"><strong>inputmap</strong></a> outinfo) <br></td>
+</tr>
+<tr>
+<td style="text-align: right;">bool</td>
+<td style="text-align: left;"><a href="#function-readparambool"><strong>readparambool</strong></a> (std::string paramstr, bool defaultval) <br><em>Convert a parameter string to a boolean value, with a default fallback. This function interprets a parameter string as a boolean value, returning true for recognized true values and false for recognized false values. If the string does not match any known values, it returns a specified default value.</em>  __</td>
+</tr>
+<tr>
+<td style="text-align: right;"><a href="../classParam/"><strong>Param</strong></a></td>
+<td style="text-align: left;"><a href="#function-readparamstr"><strong>readparamstr</strong></a> (std::string line, <a href="../classParam/"><strong>Param</strong></a> param) <br><em>Parse a parameter string and update the parameter structure.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;"><a href="../structForcing/"><strong>Forcing</strong></a>&lt; T &gt;</td>
+<td style="text-align: left;"><a href="#function-readparamstr"><strong>readparamstr</strong></a> (std::string line, <a href="../structForcing/"><strong>Forcing</strong></a>&lt; T &gt; forcing) <br><em>Parse a parameter string and update the forcing structure. Parses a line from the parameter file and updates the given forcing structure. Read BG_param.txt line and convert parameter to the right parameter in the class</em>  <em>Return an updated</em><a href="../structForcing/"><em><strong>Forcing</strong></em></a> <em>class.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">double</td>
+<td style="text-align: left;"><a href="#function-setendtime"><strong>setendtime</strong></a> (<a href="../classParam/"><strong>Param</strong></a> XParam, <a href="../structForcing/"><strong>Forcing</strong></a>&lt; float &gt; XForcing) <br><em>Adjust the simulation "endtime" based on maximum time in forcings. This function checks the end times of boundary forcing data and adjusts the simulation end time if any boundary forcing ends before the specified end time. A warning is logged if the end time is reduced.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">void</td>
+<td style="text-align: left;"><a href="#function-split"><strong>split</strong></a> (const std::string &amp; s, char delim, std::vector&lt; std::string &gt; &amp; elems) <br><em>Split a string into tokens based on a specified delimiter, skipping empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Empty tokens resulting from consecutive delimiters are skipped.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::vector&lt; std::string &gt;</td>
+<td style="text-align: left;"><a href="#function-split"><strong>split</strong></a> (const std::string &amp; s, char delim) <br><em>Split a string into tokens based on a specified character delimiter, skipping empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Empty tokens resulting from consecutive delimiters are skipped.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">std::vector&lt; std::string &gt;</td>
+<td style="text-align: left;"><a href="#function-split"><strong>split</strong></a> (const std::string s, const std::string delim) <br><em>Split a string into tokens based on a specified substring delimiter. This function takes a string and splits it into a vector of substrings using the specified substring delimiter.</em></td>
+</tr>
+<tr>
+<td style="text-align: right;">void</td>
+<td style="text-align: left;"><a href="#function-split_full"><strong>split_full</strong></a> (const std::string &amp; s, char delim, std::vector&lt; std::string &gt; &amp; elems) <br><em>Split a string into tokens based on a specified delimiter, preserving empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.</em>  __</td>
+</tr>
+<tr>
+<td style="text-align: right;">std::vector&lt; std::string &gt;</td>
+<td style="text-align: left;"><a href="#function-split_full"><strong>split_full</strong></a> (const std::string &amp; s, char delim) <br><em>Split a string into tokens based on a specified character delimiter, preserving empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.</em>  __</td>
+</tr>
+<tr>
+<td style="text-align: right;">std::string</td>
+<td style="text-align: left;"><a href="#function-trim"><strong>trim</strong></a> (const std::string &amp; str, const std::string &amp; whitespace) <br><em>Trim leading and trailing whitespace from a string. This function removes all leading and trailing characters from the input string that are present in the specified whitespace string.</em></td>
+</tr>
+</tbody>
+</table>
+<h2 id="public-functions-documentation">Public Functions Documentation</h2>
+<h3 id="function-initialisetoutput">function InitialiseToutput</h3>
+<p><em>Initialise the Toutput structure with output times. This function reads the output times from a specified input string and ensures that the times are within the simulation time range. If no valid times are provided, it defaults to using the total time and end time.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">InitialiseToutput</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">T_output</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">Toutput_loc</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">Param</span><span class="w"> </span><span class="n">XParam</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>Toutput_loc</code> Reference to the <a href="../classT__output/"><strong>T_output</strong></a> structure to be initialised. </li>
+<li><code>XParam</code> The <a href="../classParam/"><strong>Param</strong></a> structure containing simulation parameters. </li>
+</ul>
+<hr>
+
+<h3 id="function-readtrangestr">function ReadTRangestr</h3>
+<p><em>Read and interpret a time range string, converting it to a vector of doubles within specified bounds. This function interprets a time range string formatted as "t_init:t_step:t_end", where each component can be a specific time value or a keyword representing the start or end of the overall time range. It converts the range into a vector of double values representing discrete time steps, ensuring all values fall within the provided start and end bounds.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">ReadTRangestr</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">timestr</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">start</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">end</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">reftime</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>timestr</code> A vector of strings representing the time range components: [t_init, t_step, t_end]. </li>
+<li><code>start</code> The start time bound. </li>
+<li><code>end</code> The end time bound. </li>
+<li><code>reftime</code> The reference time for interpreting absolute date-time strings. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>A vector of double values representing the interpreted time steps within the specified range. </p>
+<hr>
+
+<h3 id="function-readtoutstr">function ReadToutSTR</h3>
+<p><em>Split a comma-separated parameter string into a vector of strings.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">ReadToutSTR</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">paramstr</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p>This function takes a parameter string containing values separated by commas and splits it into a vector of individual strings. </p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>paramstr</code> The parameter string to be split. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>A vector of strings obtained by splitting the input string at commas. </p>
+<hr>
+
+<h3 id="function-readtoutput">function ReadToutput</h3>
+<p><em>Read and interpret output time specifications from a vector of parameter strings. This function processes a vector of parameter strings that specify output times,</em>  <em>which can include individual time values or ranges defined by a start, step, and end. It converts these specifications into a vector of double values representing the output times, ensuring all times fall within the simulation's total time and end time.</em>
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">ReadToutput</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">paramstr</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">Param</span><span class="w"> </span><span class="n">XParam</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>paramstr</code> A vector of strings specifying output times or ranges. </li>
+<li><code>XParam</code> The <a href="../classParam/"><strong>Param</strong></a> structure containing simulation parameters, including total time and end time. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>A vector of double values representing the interpreted output times. </p>
+<hr>
+
+<h3 id="function-readtvalstr">function ReadTvalstr</h3>
+<p><em>Read and interpret a time value string, converting it to a double within specified bounds. This function interprets a time value string, which can represent specific keywords ("start", "end"), relative times, or absolute date-time strings. It converts the</em>  <em>string to a double value representing time, ensuring it falls within the provided start and end bounds.</em>
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">ReadTvalstr</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">timestr</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">start</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">end</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">reftime</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>timestr</code> The time value string to be interpreted. </li>
+<li><code>start</code> The start time bound. </li>
+<li><code>end</code> The end time bound. </li>
+<li><code>reftime</code> The reference time for interpreting absolute date-time strings. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>A double value representing the interpreted time, constrained within the start and end bounds. </p>
+<hr>
+
+<h3 id="function-readparamfile">function Readparamfile</h3>
+<p><em>Read and parse the parameter file. Opens the specified parameter file (default: BG_param.txt file), reads its contents, and updates the provided parameter structures:</em> <a href="../classParam/"><em><strong>Param</strong></em></a> <em>class (XParam) and</em><a href="../structForcing/"><em><strong>Forcing</strong></em></a> <em>class (XForcing).</em>
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">Readparamfile</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">Param</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">XParam</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">Forcing</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">XForcing</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">Paramfile</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>XParam</code> Reference to the parameter structure to be updated </li>
+<li><code>XForcing</code> Reference to the forcing structure to be updated </li>
+<li><code>Paramfile</code> Name of the parameter file to read </li>
+</ul>
+<hr>
+
+<h3 id="function-case_insensitive_compare">function case_insensitive_compare</h3>
+<p><em>Perform a non case-insensitive comparison between two strings or a string and a vector of strings. This function converts both strings to lowercase and compares them. If a vector of strings is provided, it compares the first string against each string in the vector.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">case_insensitive_compare</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s1</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s2</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>s1</code> The first string to compare. </li>
+<li><code>s2</code> The second string to compare, or a vector of strings to compare against </li>
+</ul>
+<hr>
+
+<h3 id="function-case_insensitive_compare_1">function case_insensitive_compare</h3>
+<p><em>Perform a non case-insensitive comparison between a string and a vector of strings. This function converts the first string to lowercase and compares it against each string in the vector.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">case_insensitive_compare</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s1</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">vecstr</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>s1</code> The first string to compare. </li>
+<li><code>vecstr</code> The vector of strings to compare against. </li>
+</ul>
+<hr>
+
+<h3 id="function-checkparamsanity">function checkparamsanity</h3>
+<p><em>Check and adjust the sanity of model parameters and forcing data. This function checks the sanity of the model parameters and forcing data. It adjusts parameters as needed, ensuring they are within acceptable ranges and consistent with each other.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">checkparamsanity</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">Param</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">XParam</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">Forcing</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">XForcing</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>XParam</code> Reference to the model parameters structure to be checked and adjusted. </li>
+<li><code>XForcing</code> Reference to the forcing data structure to be checked and adjusted. </li>
+</ul>
+<hr>
+
+<h3 id="function-findparameter">function findparameter</h3>
+<p><em>Find and extract the value of a specified parameter from a configuration line. This function searches for a specified parameter in a given line of text, and extracts its associated value if found. It handles comments and whitespace appropriately.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">findparameter</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">parameterstr</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">line</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>parameterstr</code> The parameter name to search for. </li>
+<li><code>line</code> The line of text to search within. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>The extracted parameter value as a string, or an empty string if the parameter is not found. </p>
+<hr>
+
+<h3 id="function-findparameter_1">function findparameter</h3>
+<p><em>Find and extract the value of a specified parameter from a configuration line. This function searches for a specified parameter in a given line of text, and extracts its associated value if found. It handles comments and whitespace appropriately.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">findparameter</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">parameterstr</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">line</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>parameterstr</code> The parameter name to search for. </li>
+<li><code>line</code> The line of text to search within. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>The extracted parameter value as a string, or an empty string if the parameter is not found. </p>
+<hr>
+
+<h3 id="function-readapproxtimestr">function readApproxtimestr</h3>
+<p><em>Convert an approximate time string to a double value in seconds. This function interprets a time string that may include a numeric value followed by a time unit (e.g., "seconds", "minutes", "hours", "days", "months", "years") and converts it to a double value representing the equivalent time in seconds. If the unit is not recognized, it defaults to seconds.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">readApproxtimestr</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">input</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>input</code> The approximate time string to be converted (e.g., "10 minutes", "2.5 hours"). </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>A double value representing the time in seconds. </p>
+<hr>
+
+<h3 id="function-readbndline">function readbndline</h3>
+<p><em>Read boundary segment information from a parameter value string. This function parses a parameter value string to extract boundary segment information, including type, input file, and polygon file. It also reads file information and sets the expected type of input based on the file extension.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">bndsegment</span><span class="w"> </span><span class="n">readbndline</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">parametervalue</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>parametervalue</code> The parameter value string containing boundary segment information. </li>
+</ul>
+<hr>
+
+<h3 id="function-readbndlineside">function readbndlineside</h3>
+<p><em>Read boundary segment information from a parameter value string for a specific side. This function parses a parameter value string to extract boundary segment information, including type, input file, and polygon file for a specified side. It also reads file information and sets the expected type of input based on the file extension.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">bndsegment</span><span class="w"> </span><span class="n">readbndlineside</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">parametervalue</span><span class="p">,</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">side</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>parametervalue</code> The parameter value string containing boundary segment information. </li>
+<li><code>side</code> The side (e.g., "left", "right", "top", "bot") for which the boundary segment is defined. </li>
+</ul>
+<hr>
+
+<h3 id="function-readfileinfo">function readfileinfo</h3>
+<p><em>Parse a parameter string and update the parameter structure. Parses a line from the parameter file and updates the given parameter structure. Convert file name into name and extension. This is used for various input classes template inputmap readfileinfo&lt;inputmap&gt;(std::string input, inputmap outinfo); template forcingmap readfileinfo&lt;forcingmap&gt;(std::string input, forcingmap outinfo); template StaticForcingP&lt;float&gt; readfileinfo&lt;StaticForcingP&lt;float&gt;&gt;(std::string input, StaticForcingP&lt;float&gt; outinfo); template</em> <a href="../structDynForcingP/"><em><strong>DynForcingP&lt;float&gt;</strong></em></a> <em>readfileinfo&lt;DynForcingP&lt;float&gt;&gt;(std::string input, DynForcingP&lt;float&gt; outinfo); template deformmap&lt;float&gt; readfileinfo&lt;deformmap&lt;float&gt;&gt;(std::string input, deformmap&lt;float&gt; outinfo);.</em>
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">T</span><span class="w"> </span><span class="n">readfileinfo</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">input</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="n">outinfo</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>line</code> Input line from parameter file </li>
+<li><code>param</code> Parameter structure to update </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>Updated parameter structure</p>
+<p>convert file name into name and extension This is used for various input classes</p>
+<p>template inputmap readfileinfo&lt;inputmap&gt;(std::string input, inputmap outinfo); template forcingmap readfileinfo&lt;forcingmap&gt;(std::string input, forcingmap outinfo); template StaticForcingP&lt;float&gt; readfileinfo&lt;StaticForcingP&lt;float&gt;&gt;(std::string input, StaticForcingP&lt;float&gt; outinfo); template <a href="../structDynForcingP/"><strong>DynForcingP&lt;float&gt;</strong></a> readfileinfo&lt;DynForcingP&lt;float&gt;&gt;(std::string input, DynForcingP&lt;float&gt; outinfo); template deformmap&lt;float&gt; readfileinfo&lt;deformmap&lt;float&gt;&gt;(std::string input, deformmap&lt;float&gt; outinfo); </p>
+<hr>
+
+<h3 id="function-readfileinfo-dynforcingp-float">function readfileinfo&lt; DynForcingP&lt; float &gt; &gt;</h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">template</span><span class="w"> </span><span class="n">DynForcingP</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">readfileinfo</span><span class="o">&lt;</span><span class="w"> </span><span class="n">DynForcingP</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">input</span><span class="p">,</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="n">DynForcingP</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">outinfo</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-readfileinfo-staticforcingp-float">function readfileinfo&lt; StaticForcingP&lt; float &gt; &gt;</h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">template</span><span class="w"> </span><span class="n">StaticForcingP</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">readfileinfo</span><span class="o">&lt;</span><span class="w"> </span><span class="n">StaticForcingP</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">input</span><span class="p">,</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="n">StaticForcingP</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">outinfo</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-readfileinfo-deformmap-float">function readfileinfo&lt; deformmap&lt; float &gt; &gt;</h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">template</span><span class="w"> </span><span class="n">deformmap</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">readfileinfo</span><span class="o">&lt;</span><span class="w"> </span><span class="n">deformmap</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">input</span><span class="p">,</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="n">deformmap</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">outinfo</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-readfileinfo-forcingmap">function readfileinfo&lt; forcingmap &gt;</h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">template</span><span class="w"> </span><span class="n">forcingmap</span><span class="w"> </span><span class="n">readfileinfo</span><span class="o">&lt;</span><span class="w"> </span><span class="n">forcingmap</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">input</span><span class="p">,</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="n">forcingmap</span><span class="w"> </span><span class="n">outinfo</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-readfileinfo-inputmap">function readfileinfo&lt; inputmap &gt;</h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">template</span><span class="w"> </span><span class="n">inputmap</span><span class="w"> </span><span class="n">readfileinfo</span><span class="o">&lt;</span><span class="w"> </span><span class="n">inputmap</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">input</span><span class="p">,</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="n">inputmap</span><span class="w"> </span><span class="n">outinfo</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-readparambool">function readparambool</h3>
+<p><em>Convert a parameter string to a boolean value, with a default fallback. This function interprets a parameter string as a boolean value, returning true for recognized true values and false for recognized false values. If the string does not match any known values, it returns a specified default value.</em>  __
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">readparambool</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">paramstr</span><span class="p">,</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">defaultval</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>paramstr</code> The parameter string to be interpreted. </li>
+<li><code>defaultval</code> The default boolean value to return if the string does not match known values </li>
+</ul>
+<hr>
+
+<h3 id="function-readparamstr">function readparamstr</h3>
+<p><em>Parse a parameter string and update the parameter structure.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">Param</span><span class="w"> </span><span class="n">readparamstr</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">line</span><span class="p">,</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="n">Param</span><span class="w"> </span><span class="n">param</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p>Parses a line from the parameter file and updates the given parameter structure. Read BG_param.txt line and convert parameter to the right parameter in the class Return an updated <a href="../classParam/"><strong>Param</strong></a> class</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>line</code> Input line from parameter file </li>
+<li><code>param</code> Parameter structure to update </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>Updated parameter structure</p>
+<p>Read BG_param.txt line and convert parameter to the righ parameter in the class return an updated <a href="../classParam/"><strong>Param</strong></a> class </p>
+<hr>
+
+<h3 id="function-readparamstr_1">function readparamstr</h3>
+<p><em>Parse a parameter string and update the forcing structure. Parses a line from the parameter file and updates the given forcing structure. Read BG_param.txt line and convert parameter to the right parameter in the class</em>  <em>Return an updated</em><a href="../structForcing/"><em><strong>Forcing</strong></em></a> <em>class.</em>
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">Forcing</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">readparamstr</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">line</span><span class="p">,</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="n">Forcing</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">forcing</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>line</code> Input line from parameter file </li>
+<li><code>forcing</code> <a href="../structForcing/"><strong>Forcing</strong></a> structure to update </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>Updated forcing structure</p>
+<p>Read BG_param.txt line and convert parameter to the righ parameter in the class return an updated <a href="../classParam/"><strong>Param</strong></a> class </p>
+<hr>
+
+<h3 id="function-setendtime">function setendtime</h3>
+<p><em>Adjust the simulation "endtime" based on maximum time in forcings. This function checks the end times of boundary forcing data and adjusts the simulation end time if any boundary forcing ends before the specified end time. A warning is logged if the end time is reduced.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">setendtime</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">    </span><span class="n">Param</span><span class="w"> </span><span class="n">XParam</span><span class="p">,</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">    </span><span class="n">Forcing</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">XForcing</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>XParam</code> The <a href="../classParam/"><strong>Param</strong></a> structure containing simulation parameters, including the initial end time. </li>
+<li><code>XForcing</code> The <a href="../structForcing/"><strong>Forcing</strong></a> structure containing boundary forcing data. </li>
+</ul>
+<hr>
+
+<h3 id="function-split">function split</h3>
+<p><em>Split a string into tokens based on a specified delimiter, skipping empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Empty tokens resulting from consecutive delimiters are skipped.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">split</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">,</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">delim</span><span class="p">,</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">elems</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>s</code> The input string to be split. </li>
+<li><code>delim</code> The character used as the delimiter for splitting the string. </li>
+<li><code>elems</code> A reference to a vector where the resulting substrings will be stored. </li>
+</ul>
+<hr>
+
+<h3 id="function-split_1">function split</h3>
+<p><em>Split a string into tokens based on a specified character delimiter, skipping empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Empty tokens resulting from consecutive delimiters are skipped.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">split</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">,</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">delim</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>s</code> The input string to be split. </li>
+<li><code>delim</code> The character used as the delimiter for splitting the string. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>A vector containing the resulting substrings. </p>
+<hr>
+
+<h3 id="function-split_2">function split</h3>
+<p><em>Split a string into tokens based on a specified substring delimiter. This function takes a string and splits it into a vector of substrings using the specified substring delimiter.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">split</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s</span><span class="p">,</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">delim</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>s</code> The input string to be split. </li>
+<li><code>delim</code> The substring used as the delimiter for splitting the string. </li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>A vector containing the resulting substrings. </p>
+<hr>
+
+<h3 id="function-split_full">function split_full</h3>
+<p><em>Split a string into tokens based on a specified delimiter, preserving empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.</em>  __
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">split_full</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">,</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">delim</span><span class="p">,</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">elems</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>s</code> The input string to be split. </li>
+<li><code>delim</code> The character used as the delimiter for splitting the string. </li>
+<li><code>elems</code> A reference to a vector where the resulting substrings will be stored.</li>
+</ul>
+<p>split string based in character, conserving empty item </p>
+<hr>
+
+<h3 id="function-split_full_1">function split_full</h3>
+<p><em>Split a string into tokens based on a specified character delimiter, preserving empty tokens. This function takes a string and splits it into a vector of substrings using the specified delimiter. Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.</em>  __
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">split_full</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">s</span><span class="p">,</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">delim</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>s</code> The input string to be split. </li>
+<li><code>delim</code> The character used as the delimiter for splitting the string.</li>
+</ul>
+<p>split string based in character, conserving empty items </p>
+<hr>
+
+<h3 id="function-trim">function trim</h3>
+<p><em>Trim leading and trailing whitespace from a string. This function removes all leading and trailing characters from the input string that are present in the specified whitespace string.</em> 
+</p><div class="language-C++ highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">trim</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">str</span><span class="p">,</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">whitespace</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>str</code> The input string to be trimmed. </li>
+<li><code>whitespace</code> A string containing all characters considered as whitespace.</li>
+</ul>
+<p>remove leading and trailing space in a string </p>
+<hr>
+
+<hr>
+<p>The documentation for this class was generated from the following file <code>src/ReadInput.cu</code></p></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "toc.integrate", "content.code.copy", "content.code.select"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

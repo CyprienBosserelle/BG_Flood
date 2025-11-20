@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classVertex" kind="class" language="C++" prot="public">
+    <compoundname>Vertex</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classVertex_1af2602132c3297d81bc9f8ee54867445b" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double Vertex::x</definition>
+        <argsstring></argsstring>
+        <name>x</name>
+        <qualifiedname>Vertex::x</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="104" column="8" bodyfile="src/Input.h" bodystart="104" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classVertex_1a7563c83da86f4a0831144bc823fec2b0" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double Vertex::y</definition>
+        <argsstring></argsstring>
+        <name>y</name>
+        <qualifiedname>Vertex::y</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="104" column="10" bodyfile="src/Input.h" bodystart="104" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Input.h" line="102" column="1" bodyfile="src/Input.h" bodystart="102" bodyend="105"/>
+    <listofallmembers>
+      <member refid="classVertex_1af2602132c3297d81bc9f8ee54867445b" prot="public" virt="non-virtual"><scope>Vertex</scope><name>x</name></member>
+      <member refid="classVertex_1a7563c83da86f4a0831144bc823fec2b0" prot="public" virt="non-virtual"><scope>Vertex</scope><name>y</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

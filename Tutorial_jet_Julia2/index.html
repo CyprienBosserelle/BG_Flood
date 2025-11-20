@@ -1,0 +1,1809 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for BG_Flood, a C++ library for flood fill algorithms.">
+      
+      
+      
+        <link rel="canonical" href="https://mydomain.org/mysite/Tutorial_jet_Julia2/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Tutorial jet Julia2 - BG_Flood Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#make-a-bathymetry" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="BG_Flood Documentation" class="md-header__button md-logo" aria-label="BG_Flood Documentation" data-md-component="logo">
+      
+  <img src="../Logo_white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            BG_Flood Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tutorial jet Julia2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/CyprienBosserelle/BG_Flood" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    BG_Flood on GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="BG_Flood Documentation" class="md-nav__button md-logo" aria-label="BG_Flood Documentation" data-md-component="logo">
+      
+  <img src="../Logo_white.png" alt="logo">
+
+    </a>
+    BG_Flood Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/CyprienBosserelle/BG_Flood" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    BG_Flood on GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ParametersList-py/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parameters list
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Manual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Tutorial_intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/TutorialRiver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pluvial and fluvial flooding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/TutorialJetJulia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jet and Julia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/Gaussian_Wave_Julia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian wave
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/Transpacific_tsunami/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transpacific tsunami
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/TutorialMonaiJulia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monai and Julia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/Rain_CEA2008/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uniform rain on an idealised catchment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/RainMap_Aureli2020/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RainMap Aureli2020
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6">
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recent Developments
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recent Developments
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/RainLoss_ILCL-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ground infiltration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/NewGradient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Gradient Method
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/Wetdryfix-Conservelevation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wet-dry fix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../References/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code sources
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Code sources
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Links
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_2">
+        
+          
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Classes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/annotated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    List
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/hierarchy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hierarchy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/class_members/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Members
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/class_member_functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/class_member_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/class_member_typedefs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Typedefs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/class_member_enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_3">
+        
+          
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Namespaces
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Namespaces
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/namespaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    List
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/namespace_members/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Members
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/namespace_member_functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/namespace_member_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/namespace_member_typedefs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Typedefs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/namespace_member_enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Member Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/macros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Macros
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BGFlood/files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<div><p>@page TutorialJetJulia Jet tutorial with Julia</p>
+<p>This is a very simple example that shows the model stability in transitional flows.</p>
+<h2 id="make-a-bathymetry">Make a bathymetry</h2>
+<p>Below is a Julia script to make the bathymetry.</p>
+<div class="language-text highlight"><pre><span></span><code>using GMT
+
+ny=16*16;
+nx=16*32;
+
+dx=5.0;
+
+xmin=0;
+xmax=nx*dx;
+
+ymin=0;
+ymax=ny*dx;
+
+Bathy=zeros(nx,ny);
+
+Bathy.=-5.0;
+
+Bathy[170:172,:].=5.0;
+Bathy[170:172,127:129].=-5.0;
+
+Bathy[:,1:2].=5.0;
+Bathy[:,(end-1):end].=5.0;
+
+G = mat2grid(transpose(Bathy), 1,[xmin xmax ymin ymax -5.0 5.0 1 dx dx])
+cmap = grd2cpt(G);      # Compute a colormap with the grid's data range
+grdimage(G, lw=:thinnest, color=cmap, fmt=:png, show=true)
+
+gmtwrite("bathy.asc", G; id="ef");
+</code></pre></div>
+<p>The result is a grid domain looking like this:
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="https://github.com/CyprienBosserelle/BG/blob/development/Examples/Jet/bathy_jet.png" data-desc-position="bottom"><img alt="Bathy file" src="https://github.com/CyprienBosserelle/BG/blob/development/Examples/Jet/bathy_jet.png"></a>
+You can also use the bathy.asc file in the example folder.</p>
+<h2 id="make-bnd-files">Make Bnd files</h2>
+<p>We are going to set the water level to 0.0m on the right and 1.0 on the left and keep it constant. To dio that we create 2 files <code>right.txt</code> and <code>left.bnd</code></p>
+<h3 id="rightbnd"><code>right.bnd</code></h3>
+<div class="language-text highlight"><pre><span></span><code># This is the right boundary
+0.0 0.0
+3600.0 0.0
+</code></pre></div>
+<h3 id="leftbnd"><code>left.bnd</code></h3>
+<div class="language-text highlight"><pre><span></span><code># This is the right boundary
+0.0 1.0
+3600.0 1.0
+</code></pre></div>
+<h2 id="set-up-the-bg_paramtxt-file">Set up the <code>BG_param.txt</code> file</h2>
+<p>First it is good practice to document your parameter file:</p>
+<div class="language-text highlight"><pre><span></span><code>##############################
+## Jet demo
+# CB 04/05/2019
+</code></pre></div>
+<p>Then specify the bathymetry file to use. We will use the entire domain and resolution of the file so no need for other parameter for specifying the domain.</p>
+<div class="language-text highlight"><pre><span></span><code>bathy=bathy.asc
+</code></pre></div>
+<p>Specify the parameter theta to control the numerical diffusion of the model. but first let's leave it to the default.</p>
+<div class="language-text highlight"><pre><span></span><code>theta=1.3;
+</code></pre></div>
+<p>This is a relatively small model so we can force the netcdf variable to be saved as floats.</p>
+<div class="language-text highlight"><pre><span></span><code>smallnc=0
+</code></pre></div>
+<p>Sepcify the model duration, output timestep and output file name and variables</p>
+<div class="language-text highlight"><pre><span></span><code>endtime=1800
+outtimestep=10
+outfile=Jet_demo.nc
+outvars=zb,uu,vv,zs,vort;
+</code></pre></div>
+<p>Specify absorbing boundaries for left and right (There is a wal at the top and bottom so no need to specify any boundary there).</p>
+<div class="language-text highlight"><pre><span></span><code>right = 3; # Absorbing bnd
+rightbndfile = right.bnd
+
+left=3; # Absorbing bnd
+leftbndfile = left.txt
+</code></pre></div>
+<h2 id="run-the-model">Run the model</h2>
+<p>If you are on windows simply double-click on the executable and in linux launch the binary.</p>
+<p>Vorticity output should look like this:</p>
+<video src="https://github.com/CyprienBosserelle/BG/blob/development/Examples/Jet/anim_01.mp4" width="320" height="200" controls preload></video>
+<p><a href="https://youtu.be/f1A7EeeMlls">Video</a></p>
+<h2 id="things-to-try">Things to try</h2>
+<ul>
+<li>What happens when using a different value for theta (1-2.0)</li>
+<li>What happens when specifying a different type of boundary on the right </li>
+<li>What happens when you bring the boundary close to the jet</li>
+<li>Why is the jet so unstable/asymmetrical? (what are the initial condition like?)</li>
+</ul>
+<h1 id="gaussian-wave">Gaussian Wave</h1>
+<p>This is a great example to test whether there are bugs in the model and how the boundary work.</p>
+<h2 id="bathymetry">Bathymetry</h2>
+<p>We start with a flat bathymetry with 0.0 everywhere. You still need a file for that!</p>
+<p>Here a couple of suggestion on making the file:
+Using GMT:
+<code>grdmath -R-5/5/-5/5 -I0.03921 0 MUL = bathy.nc</code></p>
+<p>Using Julia: See section below with the hotstart file.</p>
+<p>In any case you can pick up the file in the example folder.</p>
+<h2 id="hortstart">Hortstart</h2>
+<p>We want to setup a bump in the water level centered in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.</p>
+<div class="language-text highlight"><pre><span></span><code>using GMT
+
+xo=-5;
+yo=-5;
+
+nx=16*16;
+ny=16*16;
+
+len=10.0;
+
+dx=len/(nx-1);
+
+xx=collect(xo:len/(nx-1):(len+xo));
+yy=collect(yo:len/(ny-1):(len+yo));
+
+# Make a bathy file
+zb=zeros(nx,ny);
+G = mat2grid(transpose(zb), 1,[xx[1] xx[end] yy[1] yy[end] minimum(zb) maximum(zb) 1 dx dx])
+gmtwrite("bathy.asc", G; id="ef");
+
+#make the hotstart file
+hh=zeros(nx,ny);
+for i=1:nx
+    for j=1:ny
+        hh[i,j] = 1.0.+ 1.0.*exp.(-1.0*(xx[i].*xx[i] .+ yy[j].*yy[j]));
+        #hh[i,j] =
+    end
+end
+
+G = mat2grid(transpose(hh), 1,[xx[1] xx[end] yy[1] yy[end] minimum(hh) maximum(hh) 1 dx dx])
+cmap = grd2cpt(G);      # Compute a colormap with the grid's data range
+grdimage(G, lw=:thinnest, color=cmap, fmt=:png, show=true)
+
+gmtwrite("gauss.asc", G; id="ef");
+gmtwrite("gauss.nc", G);
+# GMT netcdf variable is "z" by default but the hotstart file needs "zs" for water surface
+gmt("grdmath gauss.nc 1.0 MUL = gauss_zs.nc?zs");
+</code></pre></div>
+<h2 id="make-bnd-files_1">Make Bnd files</h2>
+<p>We are going to set the water level to 0.0m on all 4 sides and keep it constant. To do that we create 1 files <code>zero.txt</code>:</p>
+<div class="language-text highlight"><pre><span></span><code># This is the a boundary
+0.0 0.0
+3600.0 0.0
+</code></pre></div>
+<h2 id="set-up-the-bg_paramtxt-file_1">Set up the <code>BG_param.txt</code> file</h2>
+<p>First it is good practice to document your parameter file:</p>
+<div class="language-text highlight"><pre><span></span><code>##############################
+## Gaussian bump demo
+# CB 04/05/2019
+</code></pre></div>
+<p>Then specify the bathymetry file to use. We will use the entire domain and resolution of the file so no need for other parameter for specifying the domain.</p>
+<div class="language-text highlight"><pre><span></span><code>bathy=bathy.asc
+</code></pre></div>
+<p>This is a relatively small model so we can force the netcdf variable to be saved as floats.</p>
+<div class="language-text highlight"><pre><span></span><code>smallnc=0
+</code></pre></div>
+<p>Specify the hotstart file:</p>
+<div class="language-text highlight"><pre><span></span><code>hotstartfile=gauss_zs.nc;
+</code></pre></div>
+<p>Boundary conditions are all the same :</p>
+<div class="language-text highlight"><pre><span></span><code>right = 3; # Absorbing bnd
+rightbndfile = zeros.txt
+
+top = 3; # Absorbing bnd
+topbndfile = zeros.txt
+
+bot = 3; # Absorbing bnd
+botbndfile = zeros.txt
+
+left=3; # Absorbing bnd
+leftbndfile=zeros.txt
+</code></pre></div>
+<p>Time keeping:</p>
+<div class="language-text highlight"><pre><span></span><code>endtime=20;
+outtimestep=1;
+</code></pre></div>
+<p>Output parameters:</p>
+<div class="language-text highlight"><pre><span></span><code># Netcdf file for snapshot of the model domain
+outfile=Gauss_demo.nc
+outvars=zb,uu,vv,zs,vort;
+
+# Outpout a single txt file with all the model steps at the nearest node to location x=0.0, y=-4.0
+# This file will contain 5 column: time,zs,hh,uu,vv
+TSOfile=Southside.txt;
+TSnode=0.0,-4.0;
+</code></pre></div>
+<h2 id="run-the-model_1">Run the model</h2>
+<p>Plot Southside.txt in your favorite tool.</p>
+<h2 id="things-to-try_1">Things to try:</h2>
+<ul>
+<li>What happens with different boundary types</li>
+<li>Try running with double precision. What is the difference?</li>
+</ul>
+<h1 id="transpacific-tsunami">Transpacific tsunami</h1>
+<p>This tutorial is the next stat from the Gaussian wave. Here we produce a realistic tsunami and let it propagate across the Pacific.</p>
+<h2 id="bathy-and-domain-definition">Bathy and domain definition</h2>
+<p>The bathymetry file we are using was extracted from the GEBCO gobal bathymetry using GMT command grdcut / grdsample. This section needs a tutorial of its own. Here in the <code>BG_param.txt</code> we specify the file name and that it is a spherical model domain.</p>
+<div class="language-text highlight"><pre><span></span><code># Bathymetry file
+bathy = Tpac_big.asc;
+spherical = 1;
+</code></pre></div>
+<p>The file covers a bigger area than we want to use for the simulation so we restict the domain:</p>
+<div class="language-text highlight"><pre><span></span><code>ymin=-78.0
+ymax=14.32
+
+dx=0.08;
+</code></pre></div>
+<p>Also we do not want to simulate Blocks that are entirely covered in land where the elevation is bigger than say 30.0m above the datum</p>
+<div class="language-text highlight"><pre><span></span><code>mask = 30.0;
+</code></pre></div>
+<h2 id="initial-tsunami-wave">Initial tsunami wave</h2>
+<p>See matlab file in the folder or simply use:</p>
+<div class="language-text highlight"><pre><span></span><code>hotstartfile=Maule_zs_init_simpleflt.nc;
+</code></pre></div>
+<h2 id="boundary">Boundary</h2>
+<p>In the previous tutorial you have seen how different boundary type let's wave through with minimal reflection. You choose.</p>
+<h2 id="time-keeping">Time Keeping</h2>
+<div class="language-text highlight"><pre><span></span><code>totaltime = 0.000000; # Start time
+endtime = 54000.000000;
+outputtimestep = 600.000000;
+</code></pre></div>
+<h2 id="outputs">Outputs</h2>
+<div class="language-text highlight"><pre><span></span><code>outvars = hh,zs,zsmax;
+# Files
+outfile = Output_simple_fault.nc;
+smallnc = 0; #if smallnc==1 all Output are scaled and saved as a short int
+
+TSnode = -86.374,-17.984
+TSOfile = SW_Lima.txt
+</code></pre></div>
+<h2 id="things-to-try_2">Things to try</h2>
+<ul>
+<li>Try changing the model domain and resolution. What happens if part of the domain is outside of the area covered by the bathymetry?</li>
+<li>Try outputing a time series near Christchurch</li>
+</ul>
+<h1 id="river-rain-waikanae-example">River + Rain = Waikanae example</h1>
+<p>Here we setup a model of the Waikanae Catchment (on the Kapiti Coast in New Zealand) force the tide on one of the open boundary </p></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.sections", "toc.integrate", "content.code.copy", "content.code.select"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

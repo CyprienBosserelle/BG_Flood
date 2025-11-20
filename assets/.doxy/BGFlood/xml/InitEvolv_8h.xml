@@ -1,0 +1,1347 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="InitEvolv_8h" kind="file" language="C++">
+    <compoundname>InitEvolv.h</compoundname>
+    <includes refid="General_8h" local="yes">General.h</includes>
+    <includes refid="Param_8h" local="yes">Param.h</includes>
+    <includes refid="Forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="MemManagement_8h" local="yes">MemManagement.h</includes>
+    <includes refid="Util__CPU_8h" local="yes">Util_CPU.h</includes>
+    <includes refid="Arrays_8h" local="yes">Arrays.h</includes>
+    <includes refid="Write__txtlog_8h" local="yes">Write_txtlog.h</includes>
+    <includes refid="GridManip_8h" local="yes">GridManip.h</includes>
+    <includes refid="Read__netcdf_8h" local="yes">Read_netcdf.h</includes>
+    <includes refid="ReadForcing_8h" local="yes">ReadForcing.h</includes>
+    <includes refid="Updateforcing_8h" local="yes">Updateforcing.h</includes>
+    <includedby refid="InitEvolv_8cu" local="yes">src/InitEvolv.cu</includedby>
+    <includedby refid="InitialConditions_8h" local="yes">src/InitialConditions.h</includedby>
+    <incdepgraph>
+      <node id="26">
+        <label>Arrays.h</label>
+        <link refid="Arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Forcing.h</label>
+        <link refid="Forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="General_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/InitEvolv.h</label>
+        <link refid="InitEvolv_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Input.h</label>
+        <link refid="Input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Param.h</label>
+        <link refid="Param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Util_CPU.h</label>
+        <link refid="Util__CPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>Write_txtlog.h</label>
+        <link refid="Write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="17">
+        <label>src/AdaptCriteria.h</label>
+        <link refid="AdaptCriteria_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/Adaptation.h</label>
+        <link refid="Adaptation_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>src/Advection.h</label>
+        <link refid="Advection_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/BG_Flood.h</label>
+        <link refid="BG__Flood_8h_source"/>
+      </node>
+      <node id="15">
+        <label>src/Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>src/ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/FlowCPU.h</label>
+        <link refid="FlowCPU_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>src/FlowGPU.h</label>
+        <link refid="FlowGPU_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="FlowMLGPU_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>src/Friction.h</label>
+        <link refid="Friction_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>src/Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>src/GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>src/Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/InitEvolv.h</label>
+        <link refid="InitEvolv_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>src/Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/Mainloop.h</label>
+        <link refid="Mainloop_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>src/Meanmax.h</label>
+        <link refid="Meanmax_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>src/MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>src/Mesh.cu</label>
+        <link refid="Mesh_8cu"/>
+      </node>
+      <node id="21">
+        <label>src/Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>src/Multilayer.h</label>
+        <link refid="Multilayer_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>src/Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>src/ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>src/ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>src/Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>src/Reimann.h</label>
+        <link refid="Reimann_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>src/Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/Testing.h</label>
+        <link refid="Testing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>src/Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>src/Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>src/utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="InitEvolv_8h_1a6cadd35d79d134af18f47a2fa86e500c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void initevolv</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, Forcing&lt; float &gt; XForcing, EvolvingP&lt; T &gt; &amp;XEv, T *&amp;zb)</argsstring>
+        <name>initevolv</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; float &gt;</type>
+          <declname>XForcing</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt; &amp;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Initialize evolving variables for the simulation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Handles hotstart, coldstart, and warmstart initialization of water level, velocity, and bathymetry arrays. Applies offsets and boundary conditions as needed.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Forcing/boundary conditions </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables (output) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array (input/output) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+<para>leftWLbnd.empty()</para>
+        </inbodydescription>
+        <location file="src/InitEvolv.h" line="18" column="18" bodyfile="src/InitEvolv.cu" bodystart="36" bodyend="113" declfile="src/InitEvolv.h" declline="18" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="InitEvolv_8h_1addab31c7158e0a9a5cef70d38616be3a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int coldstart</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, T *zb, EvolvingP&lt; T &gt; &amp;XEv)</argsstring>
+        <name>coldstart</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt; &amp;</type>
+          <declname>XEv</declname>
+        </param>
+        <briefdescription>
+<para>Cold start initialization of evolving variables. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Sets initial water level, velocity, and bathymetry arrays for all blocks using specified zsinit and zsoffset.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables (output) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Success flag (1 if successful) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/InitEvolv.h" line="19" column="17" bodyfile="src/InitEvolv.cu" bodystart="131" bodyend="165" declfile="src/InitEvolv.h" declline="19" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="InitEvolv_8h_1a0831d7ffc3b6f6689bbc0572e0ffabc3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void warmstart</definition>
+        <argsstring>(Param XParam, Forcing&lt; float &gt; XForcing, BlockP&lt; T &gt; XBlock, T *zb, EvolvingP&lt; T &gt; &amp;XEv)</argsstring>
+        <name>warmstart</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structForcing" kindref="compound">Forcing</ref>&lt; float &gt;</type>
+          <declname>XForcing</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt; &amp;</type>
+          <declname>XEv</declname>
+        </param>
+        <briefdescription>
+<para>Warm start initialization using boundary conditions and interpolation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Sets initial water level, velocity, and bathymetry arrays for all blocks using boundary segments and atmospheric pressure forcing.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XForcing</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Forcing/boundary conditions </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables (output) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/InitEvolv.h" line="20" column="18" bodyfile="src/InitEvolv.cu" bodystart="180" bodyend="276" declfile="src/InitEvolv.h" declline="20" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="InitEvolv_8h_1ac25b19d857c6899099322406558826bf" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int AddZSoffset</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; &amp;XEv, T *zb)</argsstring>
+        <name>AddZSoffset</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt; &amp;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Add offset to surface elevation (zs) and update water depth (h). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Applies zsoffset to zs and updates h for all blocks where h &gt; eps.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables (input/output) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Success flag (1 if successful) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/InitEvolv.h" line="21" column="17" bodyfile="src/InitEvolv.cu" bodystart="523" bodyend="549" declfile="src/InitEvolv.h" declline="21" declcolumn="17"/>
+      </memberdef>
+      <memberdef kind="function" id="InitEvolv_8h_1acff23dccc956433e8500e1d8d6d831b6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int readhotstartfile</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; &amp;XEv, T *&amp;zb)</argsstring>
+        <name>readhotstartfile</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt; &amp;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type>T *&amp;</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Read hotstart file and initialize evolving variables and bathymetry. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Reads NetCDF hotstart file, extracts variables, and fills arrays for all blocks. Handles missing variables and applies edge corrections.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables (output) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array (output) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Success flag (1 if successful, 0 if fallback to cold start) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/InitEvolv.h" line="23" column="17" bodyfile="src/InitEvolv.cu" bodystart="611" bodyend="833" declfile="src/InitEvolv.h" declline="23" declcolumn="17"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>INITEVOLV_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>INITEVOLV_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;MemManagement.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Arrays.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Write_txtlog.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;GridManip.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Read_netcdf.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;ReadForcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Updateforcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>initevolv(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;float&gt;</ref><sp/>XForcing,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref>&amp;<sp/>XEv,<sp/>T*&amp;<sp/>zb);</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>coldstart(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T*<sp/>zb,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref>&amp;<sp/>XEv);</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>warmstart(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structForcing" kindref="compound">Forcing&lt;float&gt;</ref><sp/>XForcing,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T*<sp/>zb,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref>&amp;<sp/>XEv);</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>AddZSoffset(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref>&amp;<sp/>XEv,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>readhotstartfile(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref>&amp;<sp/>XEv,<sp/>T*&amp;<sp/>zb);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/InitEvolv.h"/>
+  </compounddef>
+</doxygen>

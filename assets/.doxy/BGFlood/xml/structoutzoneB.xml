@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structoutzoneB" kind="struct" language="C++" prot="public">
+    <compoundname>outzoneB</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structoutzoneB_1a9a9296c17b299c6189a0ced26499c49e" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int outzoneB::nblk</definition>
+        <argsstring></argsstring>
+        <name>nblk</name>
+        <qualifiedname>outzoneB::nblk</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="220" column="5" bodyfile="src/Arrays.h" bodystart="220" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1a2dd7d35d3fea6a4661afcf0943f9446f" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* outzoneB::blk</definition>
+        <argsstring></argsstring>
+        <name>blk</name>
+        <qualifiedname>outzoneB::blk</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="221" column="5" bodyfile="src/Arrays.h" bodystart="221" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1a7f099d21eb84d9096544bc192f5c7516" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outzoneB::xo</definition>
+        <argsstring></argsstring>
+        <name>xo</name>
+        <qualifiedname>outzoneB::xo</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="222" column="8" bodyfile="src/Arrays.h" bodystart="222" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1add98cb30978d1c5a8c0d9b0153f6bdc0" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outzoneB::xmax</definition>
+        <argsstring></argsstring>
+        <name>xmax</name>
+        <qualifiedname>outzoneB::xmax</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="222" column="11" bodyfile="src/Arrays.h" bodystart="222" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1ac2a7615f485b4c82a0ddafdbd674eb14" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outzoneB::yo</definition>
+        <argsstring></argsstring>
+        <name>yo</name>
+        <qualifiedname>outzoneB::yo</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="222" column="16" bodyfile="src/Arrays.h" bodystart="222" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1aafa24404ba9cfb170ec3758007631b80" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double outzoneB::ymax</definition>
+        <argsstring></argsstring>
+        <name>ymax</name>
+        <qualifiedname>outzoneB::ymax</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="222" column="19" bodyfile="src/Arrays.h" bodystart="222" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1ac9d3d088243c32875158df19617055dc" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string outzoneB::outname</definition>
+        <argsstring></argsstring>
+        <name>outname</name>
+        <qualifiedname>outzoneB::outname</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="223" column="13" bodyfile="src/Arrays.h" bodystart="223" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1ad73f4abaeb9bf64cd6d08a07868cacfd" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int outzoneB::maxlevel</definition>
+        <argsstring></argsstring>
+        <name>maxlevel</name>
+        <qualifiedname>outzoneB::maxlevel</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="224" column="5" bodyfile="src/Arrays.h" bodystart="224" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1ab2aac586d57ddea4daf2e84bfd9680f0" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int outzoneB::minlevel</definition>
+        <argsstring></argsstring>
+        <name>minlevel</name>
+        <qualifiedname>outzoneB::minlevel</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="225" column="5" bodyfile="src/Arrays.h" bodystart="225" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1a80d8b091211532c80441f89d8b3fca6d" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; double &gt;</type>
+        <definition>std::vector&lt;double&gt; outzoneB::OutputT</definition>
+        <argsstring></argsstring>
+        <name>OutputT</name>
+        <qualifiedname>outzoneB::OutputT</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="226" column="13" bodyfile="src/Arrays.h" bodystart="226" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structoutzoneB_1a20094fee5e2d685bdcc3ed727c449a85" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int outzoneB::index_next_OutputT</definition>
+        <argsstring></argsstring>
+        <name>index_next_OutputT</name>
+        <qualifiedname>outzoneB::index_next_OutputT</qualifiedname>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="227" column="5" bodyfile="src/Arrays.h" bodystart="227" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="218" column="1" bodyfile="src/Arrays.h" bodystart="219" bodyend="228"/>
+    <listofallmembers>
+      <member refid="structoutzoneB_1a2dd7d35d3fea6a4661afcf0943f9446f" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>blk</name></member>
+      <member refid="structoutzoneB_1a20094fee5e2d685bdcc3ed727c449a85" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>index_next_OutputT</name></member>
+      <member refid="structoutzoneB_1ad73f4abaeb9bf64cd6d08a07868cacfd" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>maxlevel</name></member>
+      <member refid="structoutzoneB_1ab2aac586d57ddea4daf2e84bfd9680f0" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>minlevel</name></member>
+      <member refid="structoutzoneB_1a9a9296c17b299c6189a0ced26499c49e" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>nblk</name></member>
+      <member refid="structoutzoneB_1ac9d3d088243c32875158df19617055dc" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>outname</name></member>
+      <member refid="structoutzoneB_1a80d8b091211532c80441f89d8b3fca6d" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>OutputT</name></member>
+      <member refid="structoutzoneB_1add98cb30978d1c5a8c0d9b0153f6bdc0" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>xmax</name></member>
+      <member refid="structoutzoneB_1a7f099d21eb84d9096544bc192f5c7516" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>xo</name></member>
+      <member refid="structoutzoneB_1aafa24404ba9cfb170ec3758007631b80" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>ymax</name></member>
+      <member refid="structoutzoneB_1ac2a7615f485b4c82a0ddafdbd674eb14" prot="public" virt="non-virtual"><scope>outzoneB</scope><name>yo</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
