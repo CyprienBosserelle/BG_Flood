@@ -24,5 +24,7 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, CulvertF<T> XCulvertF);
 
 template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt);
+template <class T> __host__ __device__ void CulvertOneWay(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt);
+
 
 #endif

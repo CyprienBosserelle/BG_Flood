@@ -165,10 +165,19 @@ struct CulvertF
 	T* zs2;
 	T* h1;
 	T* h2;
+	T* u1;
+	T* u2;
+	T* v1;
+	T* v2;
 	T* dq; //positive if frow from P1 toward P2
 	int* type;
 	double* Qmax;
 	double* dx1;
+	double* hc;//critical depth in the culvert
+	double* hn;//normal depth in the culvert
+	double* h_en;//entrance head loss
+	double* h_ex;//exit head loss
+	double slope;//flow line slope in the cluvert
 };
 
 
