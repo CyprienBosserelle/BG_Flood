@@ -310,35 +310,36 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 	for (cc = 0; cc < XCulverts.size(); cc++)
 	{
 
-	//Pump system	
+		//Pump system	
 		if (XCulverts[cc].type == 0)
 		{
 			CulvertPump(XCulverts[cc].Qmax, XCulverts[cc].dx1, XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], dt);
 		}
-		
-	//One way (clapped) culvert
+
+		//One way (clapped) culvert
 		if (XCulverts[cc].type == 1)
 		{
-			CulvertOneWay(XCulvertF.zs1[cc], XCulvertF.h1[cc], XCulvertF.zs2[cc], XCulvertF.h2[cc], XCulvertF.dq[cc]);
 			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
-				XCulvertF.dq[cc] = 0;
+				CulvertOneWay(XCulvertF.zs1[cc], XCulvertF.h1[cc], XCulvertF.zs2[cc], XCulvertF.h2[cc], XCulvertF.dq[cc]);
 			}
 			else
 			{
 				XCulvertF.dq[cc] = 0;
 			}
-			Qmax = T(XCulverts[cc].Qmax);
+
 			Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
-			Q = T(Vol1 * XParam.dt);
-			if (Q > Qmax)
+			Qmax = T(Vol1 * XParam.dt);
+			if (XCulvertF.dq[cc] > Qmax)
 			{
 				XCulvertF.dq[cc] = Qmax;
 			}
-			else
-			{
-				XCulvertF.dq[cc] = Q;
-			}
+		}
+		// Basic 2way culvert
+		if (XCulverts[cc].type == 2)
+		{
+			CulvertTwoWay(XCulverts[cc].Qmax, XCulverts[cc].dx1, XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], dt);
+
 		}
 	}
 }
@@ -543,8 +544,6 @@ __host__ __device__ double manning_Q(double A, double R, double n, double S);
 		Q = 0.0;
 	}
 }
-template __host__ __device__ void OutletControled<float>(double Qmax, double dx1, float h1, float h2, float zs1, float zs2, float& dq, double dt);
-template __host__ __device__ void OutletControled<double>(double Qmax, double dx1, double h1, double h2, double zs1, double zs2, double& dq, double dt);
 
 \template <class T> __host__ __device__ void InletControledUnsubmerged(T& Q, double k_en, double A, double g, T zs1, T u1, T v1)
 {
