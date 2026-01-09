@@ -307,6 +307,7 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 {
 	T Qmax, Vol1, Q;
 	int cc;
+
 	for (cc = 0; cc < XCulverts.size(); cc++)
 	{
 
@@ -321,25 +322,25 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 		{
 			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
-				CulvertOneWay(XCulvertF.zs1[cc], XCulvertF.h1[cc], XCulvertF.zs2[cc], XCulvertF.h2[cc], XCulvertF.dq[cc]);
+				CulvertDischarge(XCulverts[cc].shape, XCulverts[cc].width, XCulverts[cc].height, XCulverts[cc].length, XCulverts[cc].zb1, XCulverts[cc].zb2, XCulverts[cc].k_ex, XCulverts[cc].k_en, XCulverts[cc].n, XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 			}
 			else
 			{
-				XCulvertF.dq[cc] = 0;
+				Q = 0;
 			}
 
 			Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
 			Qmax = T(Vol1 * XParam.dt);
-			if (XCulvertF.dq[cc] > Qmax)
-			{
-				XCulvertF.dq[cc] = Qmax;
-			}
+			XCulvertF.dq[cc] = min(Qmax,Q);
 		}
 		// Basic 2way culvert
 		if (XCulverts[cc].type == 2)
 		{
-			CulvertTwoWay(XCulverts[cc].Qmax, XCulverts[cc].dx1, XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], dt);
-
+			//NEED TO BE COMPLETED BY ADDED A change in 1/2 location if the flow is reversed.
+			CulvertDischarge(XCulverts[cc].shape, XCulverts[cc].width, XCulverts[cc].height, XCulverts[cc].length, XCulverts[cc].zb1, XCulverts[cc].zb2, XCulverts[cc].k_ex, XCulverts[cc].k_en, XCulverts[cc].n, XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+			Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
+			Qmax = T(Vol1 * XParam.dt);
+			XCulvertF.dq[cc] = min(Qmax, Q);
 		}
 	}
 }
@@ -366,71 +367,71 @@ template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1,
 template __host__ __device__ void CulvertPump<float>(double Qmax, double dx1, float h1, float h2, float zs1, float zs2, float& dq, double dt);
 template __host__ __device__ void CulvertPump<double>(double Qmax, double dx1, double h1, double h2, double zs1, double zs2, double& dq, double dt);
 
-template <class T> __host__ __device__ void CulvertOneWay(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt)
-{
-	//One way (clapped) culvert
-	Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
-	Q = T(Vol1 * XParam.dt);
-	if (zs1 >= zs2 && h1 > 0.0)
-	{
-		if (Q > Qmax)
-		{
-			dq = Qmax;
-		}
-		else
-		{
-			dq = Q;
-		}
-	}
-	else
-	{
-		dq = 0;
-	}
-}
-template __host__ __device__ void CulvertOneWay<float>(double Qmax, double dx1, float h1, float h2, float zs1, float zs2, float& dq, double dt);
-template __host__ __device__ void CulvertOneWay<double>(double Qmax, double dx1, double h1, double h2, double zs1, double zs2, double& dq, double dt);
+//template <class T> __host__ __device__ void CulvertOneWay(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt)
+//{
+//	//One way (clapped) culvert
+//	Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
+//	Q = T(Vol1 * XParam.dt);
+//	if (zs1 >= zs2 && h1 > 0.0)
+//	{
+//		if (Q > Qmax)
+//		{
+//			dq = Qmax;
+//		}
+//		else
+//		{
+//			dq = Q;
+//		}
+//	}
+//	else
+//	{
+//		dq = 0;
+//	}
+//}
+//template __host__ __device__ void CulvertOneWay<float>(double Qmax, double dx1, float h1, float h2, float zs1, float zs2, float& dq, double dt);
+//template __host__ __device__ void CulvertOneWay<double>(double Qmax, double dx1, double h1, double h2, double zs1, double zs2, double& dq, double dt);
+//
+//template <class T> __host__ __device__ void CulvertTwoWay(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt)
+//{
+//	//Basic 2way culvert flow computation
+//
+//	if zs1 >0.0 || zs2 > 0.0
+//	{
+//		if (zs2 > zs1)
+//		{
+//			Vol1 = h1 * T(dx1 * dx1);
+//			Qmax = T(Vol1 * T(dt));
+//			
+//			if (Q > Qmax)
+//			{
+//				dq = Qmax;
+//			}
+//			else
+//			{
+//				dq = Q;
+//			}
+//		}
+//		else
+//		{
+//			Vol2 = h2 * T(dx2 * dx2);
+//			Q = T(Vol2 * T(dt));
+//			if (Q > Qmax)
+//			{
+//				dq = -Qmax;
+//			}
+//			else
+//			{
+//				dq = -Q;
+//			}
+//		}
+//	}
+//	else
+//	{
+//		dq = 0;
+//	}
+//}
 
-template <class T> __host__ __device__ void CulvertTwoWay(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt)
-{
-	//Basic 2way culvert flow computation
-
-	if zs1 >0.0 || zs2 > 0.0
-	{
-		if (zs2 > zs1)
-		{
-			Vol1 = h1 * T(dx1 * dx1);
-			Qmax = T(Vol1 * T(dt));
-			
-			if (Q > Qmax)
-			{
-				dq = Qmax;
-			}
-			else
-			{
-				dq = Q;
-			}
-		}
-		else
-		{
-			Vol2 = h2 * T(dx2 * dx2);
-			Q = T(Vol2 * T(dt));
-			if (Q > Qmax)
-			{
-				dq = -Qmax;
-			}
-			else
-			{
-				dq = -Q;
-			}
-		}
-	}
-	else
-	{
-		dq = 0;
-	}
-}
-
-\template <class T> __host__ __device__ void culvert_discharge(T& Q, double k_en, double A, double g, T zs1, T u1, T v1, T H_2)
+template <class T> __host__ __device__ void CulvertDischarge(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double n, T zs1, T zs2, T u1, T u2, T v1, T v2, T & Q);
 {
 	// A simplified method is used to calculate the discharge through the culvert.
 	// 1- The wetted area and hydraulic radius are estimated based on the inlet depth.
@@ -442,95 +443,115 @@ template <class T> __host__ __device__ void CulvertTwoWay(double Qmax, double dx
 
 	double h_wet;
 	double A_wet, P_wet, R_wet, A, P, R;
-	T Q_inlet, Q_outlet;
+	T Q_inlet, Q_outlet, Q_estimated;
+	double S; //slope
+	double H_L; //head loss
+	double g = 9.81; //gravity
+	double C_d; //discharge coefficient for submerged inlet controled flow
+	double H_inlet, H_outlet;
+	double h_n; //normal depth
+	double h_c; //critical depth
 
 
 	//Base geometry
-	h_wet = double(h1 - XCulverts[cc].zb1); //Assuming inlet controled, the wetted height is equal to the inlet water depth
-	if (XCulverts[cc].shape == 0) //rectangular
+	h_wet = min(double(zs1 - zb1), height); //Assuming inlet controled, the wetted height is equal to the inlet water depth
+	if (shape == 0.0) //rectangular
 	{
-		rect_geom(double h, double& A, double& P, double& R, double& A_wet, double& P_wet, double& R_wet, double h_wet);
+		rect_geom(width, height, A, P, R, A_wet, P_wet, R_wet, h_wet);
 	}
-	if (XCulverts[cc].shape == 1) //circular
+	else if (shape == 1.0) //circular
 	{
-		circular_geom(double& A, double& P, double& R, double& A_wet, double& P_wet, double& R_wet, double h_wet);
+		height = width;
+		circular_geom(width/2, A, P, R, A_wet, P_wet, R_wet, h_wet);
 	}
 
 	//Inlet controled discharge
 	//Test if inlet is submerged or not
-	double H_inlet = double(zs1 + (u1 * u1 + v1 * v1) / (2 * g));
-	double H_outlet = double(zs2 + (u2 * u2 + v2 * v2) / (2 * g));
-	double H_L = H_inlet - H_outlet; //head loss
+	H_inlet = double(zs1 - zb1 + (u1 * u1 + v1 * v1) / (2 * g));
+	H_outlet = double(zs2 - zb1 + (u2 * u2 + v2 * v2) / (2 * g));
+	H_L = H_inlet - H_outlet; //head loss
 
-	if ((zs1 + h1) < (XCulverts[cc].zb1 + XCulverts[cc].h_culvert)
+	if (zs1 < (zb1 + h_culvert)
 	{
 		//Unsubmerged
-		InletControledUnsubmerged(T & Q_inlet, double k_en, double A, double g, double H_inlet);
+		Q = K_en * A * sqrt(2 * g * H_inlet);
 	}
 	else
 	{
 		//Submerged
-		InletControledSubmerged(T & Q_inlet, double k_en, double A, double g, double H_inlet, double H_outlet);
+		if (shape == 0)
+		{	
+			C_d = 0.62; //for rectangular culvert
+		} 
+		else if (shape == 1)
+		{	
+			C_d = 1.0; //for circular culvert
+		} 
+		else
+		{
+			Cd = 0.8; //default value
+		} 
+		Q = C_d * A * sqrt(2 * g * H_L);
 	}
 
 	//Outlet controled discharge (full flow)
-	OutletControled(T& Q_outlet, double k_ex, double k_en, double A_wet, double g, double H_L, double u2, double v2, double L, double R_wet, double n);
+	OutletControled(Q_outlet, k_ex, k_en, A_wet, g, H_L, u2, v2, length, R_wet, n);
 
 
 	//Normal depth at the outlet (suppose infinite flow)
 	//using Manning's equation, solve for depth where Q = (1/n)A R^(2/3) S^(1/2)
 	// Assume slope S = (d_inlet - d_outlet) / culvert_length
 	// Use the minmum discharge (from inlet controled / outlet controled estimation) to calculate the normal depth
-	double S = max(1e-6, (zs1 + h1 - (zs2 + h2)) / XCulverts[cc].length);
-	T Q_estimated = min(Q_inlet, Q_outlet);
-	double h_n; //normal depth
+	S = max(1e-6, (zs1 + h1 - (zs2 + h2)) / length);
+	Q_estimated = min(Q_inlet, Q_outlet);
 
-	//An iterative approched to minimize the energy is used to find the normal depth in a rectangular culvert
-	normal_depth(T Q, h_culvert, b, n, S, h_n, (XCulverts[cc].shape)
+	//An iterative approched to minimize the energy is used to find the normal depth 
+	normal_depth(Q_estimated, height, width, n, S, h_n, shape);
 
 
-	//Critical depth at the outlet (corresponding to Fr=1)
-	double h_c; //critical depth
+		//Critical depth at the outlet (corresponding to Fr=1)
 	if (XCulverts[cc].shape == 0) //rectangular
 	{
-		h_c = pow(Q * Q / g / b / b, 1.0 / 3.0);
+		h_c = pow(Q_estimated * Q_estimated / g / width / width, 1.0 / 3.0);
 	}
 	if (XCulverts[cc].shape == 1) //circular
 	{
 		//An iterative approched to minimize the energy is used to find the critical depth in a circular culvert
-		critical_depth_circular(Q, R, h_culvert, h_c);
+		critical_depth_circular(Q, height, h_c);
 	}
 
 	//Decision logic to determine the flow regime
 	// - If headwater is high and tailwater is low, inlet control
     // - If tailwater is high (above critical and normal depth), outlet control
-	if ((zs2 + h2 - XCulverts[cc].zb2) < min(h_c, h_n))
+	if ((zs2 - zb2) < min(h_c, h_n))
 	{
 		//Outlet controled
 		Q = Q_outlet;
 	}
-	else if ((zs1 + h1) - XCulverts[cc].zb1 > h_c) && (zs2 + h2) - XCulverts[cc].zb2 > h_c))
+	else if ((zs1 - zb1) > h_c) && (zs2 + h2 - zb2) > h_c)
 	{
 		//Inlet controled
 		Q = Q_inlet;
 	}
 	else
 	{
-		//Transitional or ambiguous case, take the minimum
+		//Transitional or ambiguous case, take the minimum (often inlit controled)
 		Q = min(Q_inlet, Q_outlet);
 	}
 
 }
+template __host__ __device__ void CulvertDischarge<float>(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double n, float zs1, float zs2, float u1, float u2, float v1, float v2, float& Q);
+template __host__ __device__ void CulvertDischarge<double>(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double n, double zs1, double zs2, double u1, double u2, double v1, double v2, double& Q);
 
 
-__host__ __device__ double manning_Q(double A, double R, double n, double S);
+__host__ __device__ double manningQ(double A, double R, double n, double S);
 {
 	//Calculate the discharge using Manning's equation
 	return (1.0 / n) * A * pow(R, 2.0 / 3.0) * pow(S, 0.5); //in cfs
 }
 
 
-\template <class T> __host__ __device__ void OutletControled(T& Q, double k_ex, double k_en, double A_wet, double g, T H_L, T u2, T v2, double L, double R_wet, double n)
+template <class T> __host__ __device__ void OutletControled(T& Q, double k_ex, double k_en, double A_wet, double g, T H_L, T u2, T v2, double L, double R_wet, double n)
 {
 	//Calculation based on energy equation where the discharge is calculated from the head losses.
 	T V22 = u2 * u2 + v2 * v2; //V2 square
@@ -544,27 +565,21 @@ __host__ __device__ double manning_Q(double A, double R, double n, double S);
 		Q = 0.0;
 	}
 }
+template __host__ __device__ void OutletControled<float>(float& Q, double k_ex, double k_en, double A_wet, double g, float H_L, float u2, float v2, double L, double R_wet, double n);
+template __host__ __device__ void OutletControled<double>(double& Q, double k_ex, double k_en, double A_wet, double g, double H_L, double u2, double v2, double L, double R_wet, double n);
 
-\template <class T> __host__ __device__ void InletControledUnsubmerged(T& Q, double k_en, double A, double g, T zs1, T u1, T v1)
-{
-	//T g = 9.81;
-	T V12 = u1 * u1 + v1 * v1; //V1 square
-	T H_1 = zs1 + V12 / (2 * g);
+//\template <class T> __host__ __device__ void InletControledUnsubmerged(T& Q, double k_en, double A, double g, T zs1, T u1, T v1)
+//{
+//	// Inlet controled, unsubmerged
+//	Q = K_en * A * sqrt(2 * g * H_1);
+//	
+//}
 
-	// Inlet controled, unsubmerged
-	Q = K_en * A * sqrt(2 * g * H_1);
-	
-}
-
-\template <class T> __host__ __device__ void InletControledSubmerged(T& Q, double C_d, double A, double g, T zs1, T u1, T v1)
-{
-	//T g = 9.81;
-	T V12 = u1 * u1 + v1 * v1; //V1 square
-	T H_1 = zs1 + V12 / (2 * g);
-
-	// Inlet controled, submerged
-	Q = C_d * A * sqrt(2 * g * (H_1-H_2));
-}
+//\template <class T> __host__ __device__ void InletControledSubmerged(T& Q, double C_d, double A, double g, T H_L)
+//{
+//	// Inlet controled, submerged
+//	Q = C_d * A * sqrt(2 * g * H_L);
+//}
 
 __host__ __device__ double normal_flow_area(double V, double S, double n)
 {
@@ -595,7 +610,7 @@ __host__ __device__ double find_A_wet_rect(double b, double R_wet)
 
 
 
-__host__ __device__ void rect_geom(double h, double & A, double & P, double & R, double& A_wet, double& P_wet, double& R_wet, double h_wet)
+__host__ __device__ void rect_geom(double b, double h, double & A, double & P, double & R, double& A_wet, double& P_wet, double& R_wet, double h_wet)
 { 
 	//Calculate the full area, perimeter, wetted area and wetted perimeter of a rectangular culvert
 	A = b * h;
@@ -606,7 +621,7 @@ __host__ __device__ void rect_geom(double h, double & A, double & P, double & R,
 	R_wet = A_wet / P_wet;
 }
 
-__host__ __device__ void circular_geom(double & A, double & P, double & R, double& A_wet, double& P_wet, double& R_wet, double h_wet)
+__host__ __device__ void circular_geom(double R ,double & A, double & P, double& A_wet, double& P_wet, double& R_wet, double h_wet)
 {
 	T K;
 	T theta;
@@ -638,7 +653,7 @@ __host__ __device__ void circular_geom(double & A, double & P, double & R, doubl
 	}
 }
 
-\template <class T> __host__ __device__ void normal_depth(T Q, double h_culvert, double b, double n, double S, double & h_n, double shape)
+template <class T> __host__ __device__ void normal_depth(T Q, double h_culvert, double b, double n, double S, double & h_n, int shape)
 {
 	//An iterative approched to minimize the energy is used to find the normal depth in a rectangular and circular culvert
 	double h_guess;
@@ -650,14 +665,14 @@ __host__ __device__ void circular_geom(double & A, double & P, double & R, doubl
 		//Calculate A_wet, P_wet, R_wet based on current depth
 		if shape == 0 //rectangular
 		{
-			rect_geom(depth, A, P, R, A_wet, P_wet, R_wet, h_guess);
+			rect_geom(b, h_culvert, A, P, R, A_wet, P_wet, R_wet, h_guess);
 		}
 		else if shape == 1 //circular
 		{
-			circular_geom(A, P, R, A_wet, P_wet, R_wet, h_guess);
+			circular_geom(h_culvert/2, A, P, A_wet, P_wet, R_wet, h_guess);
 		}
 		//Calculate Q based on Manning's equation
-		Q_calc = manning_Q(A_wet, R_wet, n, S);
+		Q_calc = manningQ(A_wet, R_wet, n, S);
 		//Update depth based on difference between calculated Q and target Q
 		if (Q_calc >= Q)
 		{
@@ -667,18 +682,21 @@ __host__ __device__ void circular_geom(double & A, double & P, double & R, doubl
 	h_n = h_guess;
 }
 
-\template <class T> __host__ __device__ void critical_depth_circular(T Q, double R, double h_culvert, double & h_critical)
+template <class T> __host__ __device__ void critical_depth_circular(T Q, double h_culvert, double & h_critical)
 {
 	//An iterative approched to minimize the energy is used to find the critical depth in a circular culvert
 	double h_guess;
 	max_iter = 100;
 	double min_E = 0;
 	double g = 9.81;
+	double R = h_culvert / 2;
+
 	for (int iter = 0; iter < max_iter; iter++)
 	{
 		h_guess = iter * h_culvert / max_iter;
 		//Calculate A_wet, P_wet, R_wet based on current depth
-		circular_geom(A, P, R, A_wet, P_wet, R_wet, h_guess);
+		circular_geom(R, A, P, R, A_wet, P_wet, R_wet, h_guess);
+
 		// Test on energy
 		if (A_wet > 0)
 		{
