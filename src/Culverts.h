@@ -25,10 +25,10 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, 
 
 template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt);
 
-template <class T> __host__ __device__ void CulvertDischarge(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double n, T zs1, T zs2, T u1, T u2, T v1, T v2, T& Q);
+template <class T> __host__ __device__ void CulvertDischarge(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double C_d, double n, T zs1, T zs2, T u1, T u2, T v1, T v2, T& Q);
 
 __host__ __device__ double manningQ(double A, double R, double n, double S);
-template <class T> __host__ __device__ void OutletControled(T& Q, double k_ex, double k_en, double A_wet, double g, T H_L, T u2, T v2, double L, double R_wet, double n);
+template <class T> __host__ __device__ void OutletControled(T& Q, double k_ex, double k_en, double A_wet, double g, double H_L, T u2, T v2, double L, double R_wet, double n);
 
 __host__ __device__ void rect_geom(double b, double h, double& A, double& P, double& R, double& A_wet, double& P_wet, double& R_wet, double h_wet);
 __host__ __device__ void circular_geom(double R, double& A, double& P, double& A_wet, double& P_wet, double& R_wet, double h_wet);

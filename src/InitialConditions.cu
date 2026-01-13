@@ -396,7 +396,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 	if (XForcing.culverts.size() > 0)
 	{
 		//
-		double x1,x2,y1,y2;
+		double x1,x2,y1,y2,zb1,zb2;
 		int ib;
 		double levdx, dxblk;
 		double blkxmin, blkxmax, blkymin, blkymax;
@@ -444,11 +444,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 					XForcing.culverts[cc].dx2 = levdx;
 				}
 			}
-			//Calculate the length of the culvert
-			if (XForcing.culverts[cc].type > 0)
-			{
-				XForcing.culverts[cc].length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-			}
+
 			//Calculate the bottom elevation of the culvert
 			if (XForcing.culverts[cc].zb1 < -998.0) // i.e. not set by user so use the ground elevation
 			{
@@ -457,6 +453,33 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			if (XForcing.culverts[cc].zb2 < -998.0) // i.e. not set by user so use the ground elevation
 			{
 				XForcing.culverts[cc].zb2 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)];
+			}
+			//Calculate the length of the culvert
+			if (XForcing.culverts[cc].type > 0)
+			{
+				zb1 = XForcing.culverts[cc].zb1;
+				zb2 = XForcing.culverts[cc].zb2;
+				XForcing.culverts[cc].length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (zb2 - zb1) * (zb2 - zb1));
+			}
+			//initialise the height if not set (circulare or square culvert)
+			if (XForcing.culverts[cc].type > 0)
+			{
+				if (XForcing.culverts[cc].height == 0.0)
+				{
+					XForcing.culverts[cc].height = XForcing.culverts[cc].width;
+				}
+			}
+			//Adjust the Discharge coefficient for submerged inlet based on the shape if not user defined
+			if (XForcing.culverts[cc].C_d < 998.0)
+			{
+				if (XForcing.culverts[cc].shape == 1) //circular
+				{
+					XForcing.culverts[cc].C_d = 1.0;
+				}
+				if (XForcing.culverts[cc].shape == 0) //rectangular
+				{
+					XForcing.culverts[cc].C_d = 0.62;
+				}
 			}
 		}
 
@@ -489,8 +512,6 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		}
 
 
-		//Calculate the friction coefficient (L=0.3164*Re^(-0.25) if Re<100000 eq de Blasius)
-		// and the Head Loss coeff (coeff * V^2)
 
 		//Initialisation of the culvert states variables (and other needed on the GPUs)
 		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
@@ -500,6 +521,10 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			XModel.culvertsF.h2[cc] = 0.0;
 			XModel.culvertsF.zs1[cc] = 0.0;
 			XModel.culvertsF.zs2[cc] = 0.0;
+			XModel.culvertsF.u1[cc] = 0.0;
+			XModel.culvertsF.u2[cc] = 0.0;
+			XModel.culvertsF.v1[cc] = 0.0;
+			XModel.culvertsF.v2[cc] = 0.0;
 			XModel.culvertsF.type[cc] = XForcing.culverts[cc].type;
 			XModel.culvertsF.Qmax[cc] = XForcing.culverts[cc].Qmax;
 			XModel.culvertsF.dx1[cc] = XForcing.culverts[cc].dx1;

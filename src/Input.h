@@ -48,16 +48,17 @@ public:
 	int shape = 0; //Shape of the culvert (0: rectangular, 1: circular)
 	double x1, x2, y1, y2; // location of the input and outputs (or 2 points defining the culvert)
 	double width = 1.0; // Diameter (for circular shape) or width (for rectangular shape) of the culvert in m.
-	double height = 1.0; // height for rectangular shaped culverts, ignored for circular shaped ones. 
-	double length = 2.0; //Length of the culvert in m.
+	double height = 0.0; // height for rectangular shaped culverts, ignored for circular shaped ones. 
+	double length; //Length of the culvert in m.
 	int ix1, iy1, block1, ix2, iy2, block2; // start and end of the culvert cells (dx_local).
 	double dx1, dx2;// start and end of the culvert cells (dx_local).
 	double Qmax = 200.0; //Maximum discharge for the culvert in m3/s.
+	double n = 0.013; //Manning roughness coefficient inside the culvert (default for concrete)
+	double k_ex = 1.0; //Exit loss coefficient (default for sudden expansion of flow, such as in a typical culvert, down to 0.3 (minimum) if transition is less abrupt)
+	double k_en = 0.5; //Entrance loss coefficient (default for sharpedged culvert entrance with no rounding, 0.2 appropriated if well rounded entrance)
+	double C_d = -999.0; //Discharge coefficient for the submerged culvert (default of 1.0 for circular, 0.62 for rectangular)
 	double zb1 = -999.0; //Bottom elevation of the inlet / outlet given by the user or zb.
 	double zb2 = -999.0; //Bottom elevation of the inlet / outlet given by the user or zb.
-	double k_ex = 1.0; //Exit loss coefficient
-	double k_en = 0.5; //Entrance loss coefficient
-	double n = 0.013; //Manning roughness coefficient inside the culvert (default for concrete)
 };
 
 class inputmap {

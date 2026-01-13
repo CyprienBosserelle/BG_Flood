@@ -173,11 +173,6 @@ struct CulvertF
 	int* type;
 	double* Qmax;
 	double* dx1;
-	double* hc;//critical depth in the culvert
-	double* hn;//normal depth in the culvert
-	double* h_en;//entrance head loss
-	double* h_ex;//exit head loss
-	double slope;//flow line slope in the cluvert
 };
 
 

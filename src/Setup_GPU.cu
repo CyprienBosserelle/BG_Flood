@@ -132,6 +132,14 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.h1, XModel_g.culvertsF.h1);
 			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.h2);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.h2, XModel_g.culvertsF.h2);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.u1);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.u1, XModel_g.culvertsF.u1);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.u2);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.u2, XModel_g.culvertsF.u2);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.v1);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.v1, XModel_g.culvertsF.v1);
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.v2);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.v2, XModel_g.culvertsF.v2);
 			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.type);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.type, XModel_g.culvertsF.type);
 			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.Qmax);
