@@ -1706,7 +1706,11 @@ template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XMode
 	double tiny = 0.0000001;
 
 	char buffer[256];
-	double meanTspeps = (XModel.OutputT[XLoop.indNextoutputtime] - XModel.OutputT[XLoop.indNextoutputtime - T(1)]) / XLoop.nstepout;
+	double meanTspeps = 0.0;
+	if (XLoop.indNextoutputtime > 0)
+	{
+		meanTspeps = (XModel.OutputT[XLoop.indNextoutputtime] - XModel.OutputT[XLoop.indNextoutputtime - T(1)]) / XLoop.nstepout;
+	}
 	sprintf(buffer, "%e", meanTspeps);
 	std::string str(buffer);
 	//std::string maps;
@@ -1715,6 +1719,7 @@ template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XMode
 	{
 		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
+			//printf("\n  (int(XModel.blocks.outZone[o].OutputT.size() - 1)) = %d\n", (int(XModel.blocks.outZone[o].OutputT.size() - 1)));
 			int indLoc = min(XModel.blocks.outZone[o].index_next_OutputT, (int(XModel.blocks.outZone[o].OutputT.size() - 1)));
 			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[indLoc];
 			if (abs(XLoop.nextoutputtime - NextZoneOutTime) < tiny)
