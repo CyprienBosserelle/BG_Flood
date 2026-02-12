@@ -9,7 +9,7 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 	int cc;
 	int i;
 
-	printf("nblkculvert = %d, XCulverts.size() = %zu\n", XModel.bndblk.nblkculvert, XCulverts.size());
+	//printf("nblkculvert = %d, XCulverts.size() = %zu\n", XModel.bndblk.nblkculvert, XCulverts.size());
 	// Get the elevation/water column for each culvert edge and put it in the culvert structure (loop on concerned blocks)
 	
 	if (XParam.GPUDEVICE >= 0)
