@@ -44,7 +44,7 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 		//for (cc = 0; cc < XCulverts.size(); cc++)
 		{
 			int cc = 0;
-			DischargeCulvertGPU << < gridDimCulvert, blockDim, 0 >> > (XParam, dt, XModel.culvertsF);
+			DischargeCulvertGPU << < gridDimCulvert, blockDim, 0 >> > (XParam, dt, XModel.culvertsF, XCulverts[cc]);
 			//DischargeCulvertGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, XCulverts, XModel.culvertsF);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
@@ -277,11 +277,12 @@ template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culver
 template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
 
 
-template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, CulvertF<T> XCulvertF)
+template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, CulvertF<T> XCulvertF, Culvert XCulvert)
 {
 	//unsigned int ix = threadIdx.x;
 	//unsigned int iy = threadIdx.y;
 	int cci = blockIdx.x;
+	int cc = 0;
 	//unsigned int ib = Culvertblks[ibl];
 
 	//for (int cc = 0; cc < XCulverts.size(); cc++)
@@ -295,26 +296,26 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, 
 		{
 			CulvertPump(XCulvertF.Qmax[cci], XCulvertF.dx1[cci], XCulvertF.h1[cci], XCulvertF.h2[cci], XCulvertF.zs1[cci], XCulvertF.zs2[cci], XCulvertF.dq[cci], dt);
 		}
-		/*if (XCulvertF.type[cci] == 1)
+		if (XCulvertF.type[cci] == 1)
 		{
 			T Q = T(0.0);
 			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
-				CulvertDischarge(XCulverts[cc].shape, XCulverts[cc].width, XCulverts[cc].height, XCulverts[cc].length, XCulverts[cc].zb1, XCulverts[cc].zb2, XCulverts[cc].k_ex, XCulverts[cc].k_en, XCulverts[cc].C_d, XCulverts[cc].n, XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb1), T(XCulvert.zb2), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 			}
 			
 
-			T Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
+			T Vol1 = XCulvertF.h1[cc] * XCulvert.dx1 * XCulvert.dx1;
 			T Qmax = T(Vol1 / XParam.dt);
 			XCulvertF.dq[cc] = min(Qmax, Q);
-		}*/
+		}
 		//printf("DischargeCulvertGPU after: q=%f\n", XCulvertF.dq[cci]);
 
 	//}
 }
 
-template __global__ void DischargeCulvertGPU<float>(Param XParam, double dt, CulvertF<float>  XCulvertF);
-template __global__ void DischargeCulvertGPU<double>(Param XParam, double dt, CulvertF<double>  XCulvertF);
+template __global__ void DischargeCulvertGPU<float>(Param XParam, double dt, CulvertF<float>  XCulvertF, Culvert XCulvert);
+template __global__ void DischargeCulvertGPU<double>(Param XParam, double dt, CulvertF<double>  XCulvertF, Culvert XCulvert);
 
 template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks)
 {
