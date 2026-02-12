@@ -1101,9 +1101,11 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		std::vector<std::string> culvertpar = split(parametervalue, ',');
 
 		if (!culvertpar.empty())
-		{
+		{	
+			int MyCulvertType = std::stoi(culvertpar[0]);
 			Culvert myculvert;
-			myculvert.type = std::stoi(culvertpar[0]);
+			
+			myculvert.type = MyCulvertType;
 			if (culvertpar.size() > 1)
 				myculvert.x1 = std::stof(culvertpar[1]);
 			if (culvertpar.size() > 2)
@@ -1113,7 +1115,16 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			if (culvertpar.size() > 4)
 				myculvert.y2 = std::stof(culvertpar[4]);
 			if (culvertpar.size() > 5)
-				myculvert.shape = std::stof(culvertpar[5]);
+			{
+				if (MyCulvertType >= 1)
+				{
+					myculvert.shape = std::stof(culvertpar[5]);
+				}
+				else
+				{
+					myculvert.Qmax = std::stof(culvertpar[5]);
+				}
+			}
 			if (culvertpar.size() > 6)
 				myculvert.n = std::stof(culvertpar[6]);
 			if (culvertpar.size() > 7)
