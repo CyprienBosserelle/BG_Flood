@@ -164,21 +164,22 @@ template <class T> __global__ void InjectCulvertGPU(Param XParam, int cc, Culver
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = Culvertblks[ibl];
 
-	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int iinlet = memloc(halowidth, blkmemwidth, XCulvert.ix1, XCulvert.iy1, XCulvert.block1);
+	int ioutlet = memloc(halowidth, blkmemwidth, XCulvert.ix2, XCulvert.iy2, XCulvert.block2);
 
 	//for (int cc = 0; cc < XCulvert.size(); cc++)
 	//{
 		if (ix == XCulvert.ix1 && iy == XCulvert.iy1)
 		{
 			//printf("Before adding: h=%f\n", XAdv.dh[i]);
-			XAdv.dh[i] -= XCulvertF.dq[cc] / (XCulvert.dx1 * XCulvert.dx1);
+			XAdv.dh[iinlet] -= XCulvertF.dq[cc] / (XCulvert.dx1 * XCulvert.dx1);
 			//printf("After adding: h = % f\n", XAdv.dh[i]);
 
 		}
 		if (ix == XCulvert.ix2 && iy == XCulvert.iy2)
 		{
 			//printf("Before adding: h=%f\n", XAdv.dh[i]);
-			XAdv.dh[i] += XCulvertF.dq[cc] / (XCulvert.dx2 * XCulvert.dx2);
+			XAdv.dh[ioutlet] += XCulvertF.dq[cc] / (XCulvert.dx2 * XCulvert.dx2);
 			//printf("After adding: h=%f\n", XAdv.dh[i]);
 
 		}
@@ -294,6 +295,19 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, 
 		{
 			CulvertPump(XCulvertF.Qmax[cci], XCulvertF.dx1[cci], XCulvertF.h1[cci], XCulvertF.h2[cci], XCulvertF.zs1[cci], XCulvertF.zs2[cci], XCulvertF.dq[cci], dt);
 		}
+		/*if (XCulvertF.type[cci] == 1)
+		{
+			T Q = T(0.0);
+			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
+			{
+				CulvertDischarge(XCulverts[cc].shape, XCulverts[cc].width, XCulverts[cc].height, XCulverts[cc].length, XCulverts[cc].zb1, XCulverts[cc].zb2, XCulverts[cc].k_ex, XCulverts[cc].k_en, XCulverts[cc].C_d, XCulverts[cc].n, XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+			}
+			
+
+			T Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
+			T Qmax = T(Vol1 / XParam.dt);
+			XCulvertF.dq[cc] = min(Qmax, Q);
+		}*/
 		//printf("DischargeCulvertGPU after: q=%f\n", XCulvertF.dq[cci]);
 
 	//}
@@ -321,7 +335,7 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 		{
 			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
-				CulvertDischarge(XCulverts[cc].shape, XCulverts[cc].width, XCulverts[cc].height, XCulverts[cc].length, XCulverts[cc].zb1, XCulverts[cc].zb2, XCulverts[cc].k_ex, XCulverts[cc].k_en, XCulverts[cc].C_d, XCulverts[cc].n, XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+				CulvertDischarge(XCulverts[cc].shape, T(XCulverts[cc].width), T(XCulverts[cc].height), T(XCulverts[cc].length), T(XCulverts[cc].zb1), T(XCulverts[cc].zb2), T(XCulverts[cc].k_ex), T(XCulverts[cc].k_en), T(XCulverts[cc].C_d), T(XCulverts[cc].n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 			}
 			else
 			{
@@ -336,7 +350,7 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 		if (XCulverts[cc].type == 2)
 		{
 			//NEED TO BE COMPLETED BY ADDED A change in 1/2 location if the flow is reversed.
-			CulvertDischarge(XCulverts[cc].shape, XCulverts[cc].width, XCulverts[cc].height, XCulverts[cc].length, XCulverts[cc].zb1, XCulverts[cc].zb2, XCulverts[cc].k_ex, XCulverts[cc].k_en, XCulverts[cc].C_d, XCulverts[cc].n, XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+			CulvertDischarge(XCulverts[cc].shape, T(XCulverts[cc].width), T(XCulverts[cc].height), T(XCulverts[cc].length), T(XCulverts[cc].zb1), T(XCulverts[cc].zb2), T(XCulverts[cc].k_ex), T(XCulverts[cc].k_en), T(XCulverts[cc].C_d), T(XCulverts[cc].n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 			Vol1 = XCulvertF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
 			Qmax = T(Vol1 * XParam.dt);
 			XCulvertF.dq[cc] = min(Qmax, Q);
@@ -430,7 +444,7 @@ template __host__ __device__ void CulvertPump<double>(double Qmax, double dx1, d
 //	}
 //}
 
-template <class T> __host__ __device__ void CulvertDischarge(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double C_d, double n, T zs1, T zs2, T u1, T u2, T v1, T v2, T & Q)
+template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,T height, T length, T zb1, T zb2, T k_ex, T k_en, T C_d, T n, T zs1, T zs2, T u1, T u2, T v1, T v2, T & Q)
 {
 	// A simplified method is used to calculate the discharge through the culvert.
 	// 1- The wetted area and hydraulic radius are estimated based on the inlet depth.
@@ -440,33 +454,33 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, double w
 	// 5- The final discharge is calculated based on the flow regime.
 	// 
 
-	double h_wet;
-	double A_wet=0, P_wet=0, R_wet=0, A=0, P=0, R=height/2;
-	T Q_inlet=0, Q_outlet=0, Q_estimated=0;
-	double S; //slope
-	double H_L; //head loss
-	double g = 9.81; //gravity
-	double H_inlet, H_outlet;
-	double h_n; //normal depth
-	double h_c; //critical depth
+	T h_wet;
+	T A_wet=T(0.0), P_wet= T(0.0), R_wet= T(0.0), A= T(0.0), P= T(0.0), R=T(height/2);
+	T Q_inlet= T(0.0), Q_outlet= T(0.0), Q_estimated= T(0.0);
+	T S; //slope
+	T H_L; //head loss
+	T g = T(9.81); //gravity
+	T H_inlet, H_outlet;
+	T h_n; //normal depth
+	T h_c; //critical depth
 
 
 	//Base geometry
-	h_wet = fmin(double(zs1 - zb1), height); //Assuming inlet controled, the wetted height is equal to the inlet water depth
-	if (shape == 0.0) //rectangular
+	h_wet = min(T(zs1 - zb1), height); //Assuming inlet controled, the wetted height is equal to the inlet water depth
+	if (shape == 0) //rectangular
 	{
 		rect_geom(width, height, A, P, R, A_wet, P_wet, R_wet, h_wet);
 	}
-	else if (shape == 1.0) //circular
+	else if (shape == 1) //circular
 	{
 		height = width;
-		circular_geom(width/2, A, P, A_wet, P_wet, R_wet, h_wet);
+		circular_geom(width/T(2.0), A, P, A_wet, P_wet, R_wet, h_wet);
 	}
 
 	//Inlet controled discharge
 	//Test if inlet is submerged or not
-	H_inlet = double(zs1 - zb1 + (u1 * u1 + v1 * v1) / (2 * g));
-	H_outlet = double(zs2 - zb1 + (u2 * u2 + v2 * v2) / (2 * g));
+	H_inlet = T(zs1 - zb1 + (u1 * u1 + v1 * v1) / (2 * g));
+	H_outlet = T(zs2 - zb1 + (u2 * u2 + v2 * v2) / (2 * g));
 	H_L = H_inlet - H_outlet; //head loss
 
 	if (zs1 < (zb1 + height))
@@ -488,8 +502,8 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, double w
 	//using Manning's equation, solve for depth where Q = (1/n)A R^(2/3) S^(1/2)
 	// Assume slope S = (d_inlet - d_outlet) / culvert_length
 	// Use the minmum discharge (from inlet controled / outlet controled estimation) to calculate the normal depth
-	S = fmax(1e-6, (fmin(zs1, zb1 + height) - fmin(zs2, zb2 + height)) / length);
-	Q_estimated = fmin(Q_inlet, Q_outlet);
+	S = max(T(1e-6), (min(zs1, zb1 + height) - min(zs2, zb2 + height)) / length);
+	Q_estimated = min(Q_inlet, Q_outlet);
 
 	//An iterative approched to minimize the energy is used to find the normal depth 
 	normal_depth(Q_estimated, height, width, n, S, h_n, shape);
@@ -509,7 +523,7 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, double w
 	//Decision logic to determine the flow regime
 	// - If headwater is high and tailwater is low, inlet control
     // - If tailwater is high (above critical and normal depth), outlet control
-	if ((zs2 - zb2) < fmin(h_c, h_n))
+	if ((zs2 - zb2) < min(h_c, h_n))
 	{
 		//Outlet controled
 		Q = Q_outlet;
@@ -522,11 +536,11 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, double w
 	else
 	{
 		//Transitional or ambiguous case, take the minimum (often inlit controled)
-		Q = fmin(Q_inlet, Q_outlet);
+		Q = min(Q_inlet, Q_outlet);
 	}
 
 }
-template __host__ __device__ void CulvertDischarge<float>(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double C_d, double n, float zs1, float zs2, float u1, float u2, float v1, float v2, float& Q);
+template __host__ __device__ void CulvertDischarge<float>(int shape, float width, float height, float length, float zb1, float zb2, float k_ex, float k_en, float C_d, float n, float zs1, float zs2, float u1, float u2, float v1, float v2, float& Q);
 template __host__ __device__ void CulvertDischarge<double>(int shape, double width, double height, double length, double zb1, double zb2, double k_ex, double k_en, double C_d, double n, double zs1, double zs2, double u1, double u2, double v1, double v2, double& Q);
 
 
@@ -595,7 +609,7 @@ template __host__ __device__ void OutletControled<double>(double& Q, double k_ex
 
 
 
-__host__ __device__ void rect_geom(double b, double h, double & A, double & P, double & R, double& A_wet, double& P_wet, double& R_wet, double h_wet)
+template <class T> __host__ __device__ void rect_geom(T b, T h, T & A, T & P, T & R, T& A_wet, T& P_wet, T& R_wet, T h_wet)
 { 
 	//Calculate the full area, perimeter, wetted area and wetted perimeter of a rectangular culvert
 	A = b * h;
@@ -605,15 +619,18 @@ __host__ __device__ void rect_geom(double b, double h, double & A, double & P, d
 	P_wet = 2* b + 2 * h_wet;
 	R_wet = A_wet / P_wet;
 }
+template __host__ __device__ void rect_geom<float>(float b, float h, float& A, float& P, float& R, float& A_wet, float& P_wet, float& R_wet, float h_wet);
+template __host__ __device__ void rect_geom<double>(double b, double h, double& A, double& P, double& R, double& A_wet, double& P_wet, double& R_wet, double h_wet);
 
-__host__ __device__ void circular_geom(double R ,double & A, double & P, double& A_wet, double& P_wet, double& R_wet, double h_wet)
+
+template <class T>__host__ __device__ void circular_geom(T R ,T & A, T & P, T& A_wet, T& P_wet, T& R_wet, T h_wet)
 {
-	double K;
-	double theta;
+	T K;
+	T theta;
 
 	//Calculate the full area, perimeter, wetted area and wetted perimeter of a cylindic culvert, based on https://support.tygron.com/wiki/Culvert_formula_%28Water_Overlay%29
-	A = (3.14159) * R * R;
-	P = 2 * (3.14159) * R;
+	A = T(3.14159) * R * R;
+	P = 2 * T(3.14159) * R;
 	R = A / P;
 	if (h_wet > 0)
 	{
@@ -637,14 +654,16 @@ __host__ __device__ void circular_geom(double R ,double & A, double & P, double&
 		R_wet = 0;
 	}
 }
+template __host__ __device__ void circular_geom<float>(float R, float& A, float& P, float& A_wet, float& P_wet, float& R_wet, float h_wet);
+template __host__ __device__ void circular_geom<double>(double R, double& A, double& P, double& A_wet, double& P_wet, double& R_wet, double h_wet);
 
-template <class T> __host__ __device__ void normal_depth(T Q, double h_culvert, double b, double n, double S, double & h_n, int shape)
+template <class T> __host__ __device__ void normal_depth(T Q, T h_culvert, T b, T n, T S,T & h_n, int shape)
 {
 	//An iterative approched to minimize the energy is used to find the normal depth in a rectangular and circular culvert
-	double h_guess;
+	T h_guess;
 	int max_iter = 100;
-	double Q_calc;
-	double A_wet = 0, P_wet = 0, R_wet = 0, A = 0, P = 0, R = h_culvert / 2;
+	T Q_calc;
+	T A_wet = T(0.0), P_wet = T(0.0), R_wet = T(0.0), A = T(0.0), P = T(0.0), R = h_culvert / 2;
 
 	for (int iter = 0; iter < max_iter; iter++)
 	{
@@ -668,17 +687,20 @@ template <class T> __host__ __device__ void normal_depth(T Q, double h_culvert, 
 	}
 	h_n = h_guess;
 }
+template __host__ __device__ void normal_depth<float>(float Q, float h_culvert, float b, float n, float S, float& h_n, int shape);
+template __host__ __device__ void normal_depth<double>(double Q, double h_culvert, double b, double n, double S, double& h_n, int shape);
 
-template <class T> __host__ __device__ void critical_depth_circular(T Q, double h_culvert, double & h_critical)
+
+template <class T> __host__ __device__ void critical_depth_circular(T Q, T h_culvert, T & h_critical)
 {
 	//An iterative approched to minimize the energy is used to find the critical depth in a circular culvert
-	double h_guess;
+	T h_guess;
 	int max_iter = 100;
-	double min_E = 0;
-	double g = 9.81;
-	double R = h_culvert / 2;
-	double E, V ;
-	double A_wet = 0, P_wet = 0, R_wet = 0, A = 0, P = 0;
+	T min_E = 0;
+	T g = T(9.81);
+	T R = h_culvert / T(2.0);
+	T E, V ;
+	T A_wet = 0, P_wet = 0, R_wet = 0, A = 0, P = 0;
 
 	for (int iter = 0; iter < max_iter; iter++)
 	{
@@ -699,3 +721,5 @@ template <class T> __host__ __device__ void critical_depth_circular(T Q, double 
 		}
 	}
 }
+template __host__ __device__ void critical_depth_circular<float>(float Q, float h_culvert, float& h_critical);
+template __host__ __device__ void critical_depth_circular<double>(double Q, double h_culvert, double& h_critical);
