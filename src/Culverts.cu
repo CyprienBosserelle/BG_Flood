@@ -349,7 +349,7 @@ template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1,
 {
 	T Vol1, Q;
 	Vol1 = h1 * T(dx1 * dx1);
-	Q =  T(Vol1* T(dt));
+	Q =  T(Vol1 / T(dt));
 	//printf("DischargeCulvertGPU before: q=%f, Q=%f, Vol1=%f, h1=%f, dx1=%f, dt=%f\n", dq, Q, Vol1, h1, dx1, dt);
 
 	if (Q > Qmax)
@@ -360,7 +360,7 @@ template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1,
 	{
 		dq = Q;
 	}
-	//printf("DischargeCulvertGPU after: q=%f, Q=%f, Vol1=%f, h1=%f, dx1=%f, dt=%f\n", dq, Q, Vol1, h1, dx1, dt);
+	//printf("DischargeCulvertGPU after: q=%f, Q=%f, Vol1=%f, h1=%f, dx1=%f, dt=%f, Qmax=%f\n", dq, Q, Vol1, h1, dx1, dt,Qmax);
 
 }
 template __host__ __device__ void CulvertPump<float>(double Qmax, double dx1, float h1, float h2, float zs1, float zs2, float& dq, double dt);
