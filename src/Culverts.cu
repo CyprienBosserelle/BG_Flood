@@ -27,7 +27,7 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 
 			i = memloc(XParam.halowidth, XParam.blkmemwidth, XCulverts[cc].ix2, XCulverts[cc].iy2, XCulverts[cc].block2);
 			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.h2 + cc, XModel.evolv.h+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.zs2 + cc, XModel.evolv.h+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
+			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.zs2 + cc, XModel.evolv.zs+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
 			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.u2 + cc, XModel.evolv.u + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
 			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.v2 + cc, XModel.evolv.v + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
 		}
@@ -299,15 +299,16 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, 
 		if (XCulvertF.type[cci] == 1)
 		{
 			T Q = T(0.0);
-			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
+			if (XCulvertF.zs1[cc] > XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
 				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb1), T(XCulvert.zb2), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 			}
 			
+			//printf("zs1 = %f; zs2 = %f; h1 = %f; Q = %f\n", XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.h1[cc],  Q );
 
 			T Vol1 = XCulvertF.h1[cc] * XCulvert.dx1 * XCulvert.dx1;
 			T Qmax = T(Vol1 / XParam.dt);
-			XCulvertF.dq[cc] = min(Qmax, Q);
+			XCulvertF.dq[cc] = min(Qmax, max(Q,T(0.0)));
 		}
 		//printf("DischargeCulvertGPU after: q=%f\n", XCulvertF.dq[cci]);
 
@@ -456,7 +457,7 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	// 
 
 	T h_wet;
-	T A_wet=T(0.0), P_wet= T(0.0), R_wet= T(0.0), A= T(0.0), P= T(0.0), R=T(height/2);
+	T A_wet = T(0.0), P_wet = T(0.0), R_wet = T(0.0), A = T(0.0), P = T(0.0), R = T(0.0); T(width / 2);
 	T Q_inlet= T(0.0), Q_outlet= T(0.0), Q_estimated= T(0.0);
 	T S; //slope
 	T H_L; //head loss
