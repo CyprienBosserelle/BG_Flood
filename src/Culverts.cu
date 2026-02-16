@@ -296,12 +296,13 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, 
 		{
 			CulvertPump(XCulvertF.Qmax[cci], XCulvertF.dx1[cci], XCulvertF.h1[cci], XCulvertF.h2[cci], XCulvertF.zs1[cci], XCulvertF.zs2[cci], XCulvertF.dq[cci], dt);
 		}
-		if (XCulvertF.type[cci] == 1)
+		else if (XCulvertF.type[cci] == 1)
 		{
 			T Q = T(0.0);
 			if (XCulvertF.zs1[cc] > XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
 				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb1), T(XCulvert.zb2), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+			
 			}
 			
 			//printf("zs1 = %f; zs2 = %f; h1 = %f; Q = %f\n", XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.h1[cc],  Q );
@@ -309,6 +310,28 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, double dt, 
 			T Vol1 = XCulvertF.h1[cc] * XCulvert.dx1 * XCulvert.dx1;
 			T Qmax = T(Vol1 / XParam.dt);
 			XCulvertF.dq[cc] = min(Qmax, max(Q,T(0.0)));
+		}
+		else if (XCulvertF.type[cci] == 2)
+		{
+			T Q = T(0.0);
+			T Vol, Qmax;
+			if (XCulvertF.zs1[cc] > XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
+			{
+				Vol = XCulvertF.h1[cc] * XCulvert.dx1 * XCulvert.dx1;
+				Qmax = T(Vol / XParam.dt);
+				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb1), T(XCulvert.zb2), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+				Q = min(Qmax, max(Q, T(0.0)));
+			}
+			else if (XCulvertF.zs2[cc] > XCulvertF.zs1[cc] && XCulvertF.h2[cc] > 0.0)
+			{
+				Vol = XCulvertF.h2[cc] * XCulvert.dx2 * XCulvert.dx2;
+				Qmax = T(Vol / XParam.dt);
+				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb2), T(XCulvert.zb1), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs2[cc], XCulvertF.zs1[cc], XCulvertF.u2[cc], XCulvertF.u1[cc], XCulvertF.v2[cc], XCulvertF.v1[cc], Q);
+				Q = -1*min(Qmax, max(Q, T(0.0)));
+			}
+
+			
+			XCulvertF.dq[cc] = Q;
 		}
 		//printf("DischargeCulvertGPU after: q=%f\n", XCulvertF.dq[cci]);
 
