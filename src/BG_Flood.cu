@@ -145,7 +145,7 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 	{
 		//============================================
 		// MainLoop
-		printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
+		//printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
 		MainLoop(XParam, XForcing, XModel, XModel_g);
 	}
 	else
