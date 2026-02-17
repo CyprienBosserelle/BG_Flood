@@ -41,9 +41,9 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 
 	if (XParam.GPUDEVICE >= 0)
 	{
-		//for (cc = 0; cc < XCulverts.size(); cc++)
+		for (cc = 0; cc < XCulverts.size(); cc++)
 		{
-			int cc = 0;
+			//int cc = 0;
 			DischargeCulvertGPU << < gridDimCulvert, blockDim, 0 >> > (XParam, dt, XModel.culvertsF, XCulverts[cc]);
 			//DischargeCulvertGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, XCulverts, XModel.culvertsF);
 			CUDA_CHECK(cudaDeviceSynchronize());
