@@ -479,6 +479,8 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	// 5- The final discharge is calculated based on the flow regime.
 	// 
 
+	//printf("height = %f\n", height);
+
 	T h_wet;
 	T A_wet = T(0.0), P_wet = T(0.0), R_wet = T(0.0), A = T(0.0), P = T(0.0), R = T(0.0); T(width / 2);
 	T Q_inlet= T(0.0), Q_outlet= T(0.0), Q_estimated= T(0.0);
@@ -552,11 +554,13 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	{
 		//Outlet controled
 		Q = Q_outlet;
+		//printf("Outlet control\n");
 	}
 	else if (((zs1 - zb1) > h_c) && (zs2 - zb2) > h_c)
 	{
 		//Inlet controled
 		Q = Q_inlet;
+		//printf("Inlet control\n");
 	}
 	else
 	{
@@ -579,10 +583,21 @@ template <class T> __host__ __device__ void OutletControled(T& Q, double k_ex, d
 {
 	//Calculation based on energy equation where the discharge is calculated from the head losses.
 	T V22 = u2 * u2 + v2 * v2; //V2 square
-
+	T C = T(0.87);
+	T friction_const = T(19.62);
 	if (H_L > 0.0)
 	{
-		Q = A_wet * sqrt(H_L + k_ex / (2 * g) * V22 / (n * n * L / pow(R_wet, 4.0 / 3.0) + (k_en + k_ex) / (2 * g)));
+		//Alice Eq? Something's wrong but maybe because Q should not depend on V22 ?
+		//Q = A_wet * sqrt(H_L + k_ex / (2 * g) * V22 / (n * n * L / pow(R_wet, 4.0 / 3.0) + (k_en + k_ex) / (2 * g)));
+		
+		//USGS type 4 formula seem to work OK
+		//T friction_term = (T(2.0) * g * n *n * L) / (pow(R_wet, T(4.0 / 3.0)));
+		//Q = C * A_wet * sqrt((T(2.0) * g * H_L) / (1 + friction_term));
+
+		// HDS-5 Outlet Control
+		T loss_sum = k_en + k_ex + (friction_const * n * n * L) / (pow(R_wet, T(4.0 / 3.0)));
+		Q = A_wet * sqrt((2 * g * H_L) / loss_sum);
+
 	}
 	else
 	{
