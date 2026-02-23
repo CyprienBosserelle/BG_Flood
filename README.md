@@ -12,7 +12,7 @@ The adaptive version of the model is currently under heavy development. Makefile
 
 ## Reference
 
-Bosserelle C., Lane E., Harang A., (2021) BG-Flood: A GPU adaptive, open-source, general inundation hazard model. Proceedings of the Australasian Coasts & Ports 2021 Conference. 
+Bosserelle C., Lane E., Harang A., (2021) BG-Flood: A GPU adaptive, open-source, general inundation hazard model. Proceedings of the Australasian Coasts & Ports 2021 Conference. [PDF](doc/150_bosserelle_finalpaper.pdf)
 
 
 ## Testing
