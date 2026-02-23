@@ -31,26 +31,41 @@ date: 1 July 2025
 bibliography: paper.bib
 
 # Summary
-`BG_Flood` is a numerical model for simulating shallow water hydrodynamics on the GPU using an Adaptive Mesh Refinment type grid. The model was designed with the goal of simulating inundation (River, Storm surge or tsunami). The model uses a Block Uniform Quadtree approach that runs on the GPU with adaptive mesh being generated at the start of tee simulation.
+`BG_Flood` is a numerical model for simulating shallow water hydrodynamics on the GPU using an Adaptive Mesh Refinment type grid. The model was designed with the goal of simulating inundation (River, Storm surge or tsunami). The model uses a Block Uniform Quadtree approach that runs on the GPU with adaptive mesh being generated at the start of the simulation.
 
 The core SWE engines and adaptivity has been inspired and taken from St Venant solver from `Basilisk` (Popinet 2011) and the CUDA GPU memory model has been inspired by the work from (Vacondio et al. 2017). The model is implemented in CUDA-C to maximise GPU usage. 
 
 
 # Statement of need
-Flood hazard assessment and forecasting aften require physics-based simulations to accurately evalute areas exposed to hazard. These simulation are often completted using hydrodynamics models using high-resolution to capture small landscape and flow features (e.g. small drains, hydraulic jump), but also a large enough domain to capture large scale features where the hazard forms and or amplifies (e.g. river catchment, continental shelf).
+Flood hazard assessment and forecasting aften require physics-based simulations to accurately evalute areas exposed to hazard. These simulation are often completted using hydrodynamics models with high-resolution to capture small landscape and flow features (e.g. small drains, hydraulic jump), but also on a large enough domain to capture large scale features where the hazard forms and or amplifies (e.g. river catchment, continental shelf).
+
+Effectively capturing this cascade of scale is only acheivable with unstructured or adaptive mesh. Unstructured mesh generation rely heavily on user's input for generating a suitable mesh and do not generally offer the flexibility of modifying the mesh as the simulation progresses.
+
+Adaptive mesh on the other hand can be generated easily with minimal user input and adapted as the computation progresses but this flexibility comes with an increase in computational cost. Adaptive mesh allow a user to iteratively increase mesh complexity and resolution, starting from coarse simple fast model to detailed but efficient models. 
+
+For detailled largescale flood assessment, runtime is a significant limitation either of the highest resolution that can acheived or on the number of scnearios to be explored.  Codes compatible with Graphics Processing Unit offer a competitive computation time but .
+
+`BG_Flood` aims to offer a GPU nativemodel with a simple interface that can automatically generate mesh that allow user to quickly build both simple and complex models for environmental hydrodynamics simulations. Most available open-source model with similar features are closed-source or research code that require significant coding. 
+
+# Features
+BG_Flood interface is through text-based instruction file that is both easy to read by a human and easy to generate via scripts. 
+. Text based for 1-dimensional input/output (e.g. timeseries)
+. NetCDF based input/output for 2D and 3D input/outputs
+
+All gridded input are automatically interpolated to the model mesh by the model. The model also supports 
+
+BG_Flood is designed by a team of scientist for various flood hazard processes including
+. Tsunami / land/seafloor deformation (needs to be precomputed) at any instant for any durations
+. Wind forcing (either uniform or space-time varying )
+. Atmospheric pressure forcing (space-time varying NetCDF)
+. Rainfall
+. River "injection" as vertical
+. Absorbing boundary for water level (either uniform or space-time varying )
+. segment based boundary definition
+. non-rectangular domains 
+ 
 
 
-
-Effectivly capturing this cascade of scale is is only acheivable with unstructured or adaptive mesh. Unstructured mesh generation rely heavily on user's input for generating a suitable mesh. These model also do not generally offer the flexibility in of Adaptive mesh. Adaptive mesh on the other hand can be generated easily with small usier input and adapted as the computation progresses but this flixibility is linked to a significant increase in computationalcost. 
-
-`BG_Flood` aimes to offer a balance between 
-
-
-Most available open-source model also do not offer GPU enabled code that is well optimised and instead for the few that can offer  
-
-Enabling GPU and semi-automatic mesh refinement is critical to enable rapid devlopement of flood assessment that doesn't compromise physics simulated. 
-
-BG_Flood interface is through txt-based instruction and NetCDF ass well as txt file input to allow the model to be used in batch and automated systems 
 
 
 
