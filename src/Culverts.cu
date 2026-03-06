@@ -616,22 +616,22 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	//	printf("Transition flow\n");
 	//}
 
-	printf("Sanity check h_wet=%f; A_wet = %f;  Rwet=%f,h_n=%f, HLL=%f;  Qius=%f\n", h_wet, A_wet, R_wet, h_n,HLL, Q_inlet);
+	//printf("Sanity check h_wet=%f; A_wet = %f;  Rwet=%f,h_n=%f, HLL=%f;  Qius=%f\n", h_wet, A_wet, R_wet, h_n,HLL, Q_inlet);
 	if ((zs2 - zb2) > height)
 	{
 		Q = Q_outlet;
-		printf("Outlet control:Q=%f\n", Q_outlet);
+		//printf("Outlet control:Q=%f\n", Q_outlet);
 	}
 	else if (h_n <= h_c)
 	{
 		Q = min(Q_inlet, Q_outlet);
-		printf("Mixed control: Q=%f\n", Q);
+		//printf("Mixed control: Q=%f\n", Q);
 	}
 	else
 	{
 		
 		Q = Q_outlet;
-		printf("Outlet control:Q=%f\n", Q_outlet);
+		//printf("Outlet control:Q=%f\n", Q_outlet);
 	}
 
 
