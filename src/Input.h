@@ -48,6 +48,7 @@ public:
 	int shape = 0; //Shape of the culvert (0: rectangular, 1: circular)
 	double x1, x2, y1, y2; // location of the input and outputs (or 2 points defining the culvert)
 	double width = 1.0; // Diameter (for circular shape) or width (for rectangular shape) of the culvert in m.
+	double fac = 1.0; // Multiplier for accounting for multiple barrels (e.g. fac = 2.0) or partially blocked (e.g. fac=0.8)
 	double height = 0.0; // height for rectangular shaped culverts, ignored for circular shaped ones. 
 	double length; //Length of the culvert in m.
 	int ix1, iy1, block1, ix2, iy2, block2; // start and end of the culvert cells (dx_local).

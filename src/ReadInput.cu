@@ -1125,21 +1125,23 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 					myculvert.Qmax = std::stof(culvertpar[5]);
 				}
 			}
-
 			if (culvertpar.size() > 6)
-				myculvert.shape = std::stof(culvertpar[6]);
+				myculvert.fac = std::stof(culvertpar[6]);
+
 			if (culvertpar.size() > 7)
-				myculvert.n = std::stof(culvertpar[7]);
+				myculvert.shape = std::stof(culvertpar[7]);
 			if (culvertpar.size() > 8)
-				myculvert.k_ex = std::stof(culvertpar[8]);
+				myculvert.n = std::stof(culvertpar[8]);
 			if (culvertpar.size() > 9)
-				myculvert.k_en = std::stof(culvertpar[9]);
+				myculvert.k_ex = std::stof(culvertpar[9]);
 			if (culvertpar.size() > 10)
-				myculvert.C_d = std::stof(culvertpar[10]);
+				myculvert.k_en = std::stof(culvertpar[10]);
 			if (culvertpar.size() > 11)
-				myculvert.zb1 = std::stof(culvertpar[11]);
+				myculvert.C_d = std::stof(culvertpar[11]);
 			if (culvertpar.size() > 12)
-				myculvert.zb2 = std::stof(culvertpar[11]);
+				myculvert.zb1 = std::stof(culvertpar[12]);
+			if (culvertpar.size() > 13)
+				myculvert.zb2 = std::stof(culvertpar[13]);
 			forcing.culverts.push_back(myculvert);
 		}
 		else

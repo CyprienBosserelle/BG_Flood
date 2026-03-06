@@ -470,7 +470,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 				}
 			}
 			//Adjust the Discharge coefficient for submerged inlet based on the shape if not user defined
-			if (XForcing.culverts[cc].C_d < 998.0)
+			if (XForcing.culverts[cc].C_d < -998.0)
 			{
 				if (XForcing.culverts[cc].shape == 1) //circular
 				{
