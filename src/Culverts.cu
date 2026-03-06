@@ -514,8 +514,9 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	//Inlet controled discharge
 	//Test if inlet is submerged or not
 	H_inlet = T(zs1 - zb1 + (u1 * u1 + v1 * v1) / (2 * g));
-	H_outlet = T(zs2 - zb1 + (u2 * u2 + v2 * v2) / (2 * g));
+	H_outlet = T(zs2 - zb2 + (u2 * u2 + v2 * v2) / (2 * g));
 	H_L = H_inlet - H_outlet; //head loss
+	T HLL = T(zs1 - zb1) - T(zs2 - zb2);
 
 	if (zs1 < (zb1 + height))
 	{
@@ -530,7 +531,7 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	}
 
 	//Outlet controled discharge (full flow)
-	OutletControled(Q_outlet, k_ex, k_en, A_wet, g, H_L, u2, v2, length, R_wet, n);
+	OutletControled(Q_outlet, k_ex, k_en, A_wet, g, HLL, u2, v2, length, R_wet, n);
 
 
 	//Normal depth at the outlet (suppose infinite flow)
@@ -563,7 +564,7 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 
 		//h_c = pow(Q_estimated * Q_estimated / g / width / width, 1.0 / 3.0);
 	}
-	T num;
+	//T num;
 	//if (((H_inlet)/height)<1.2)//zs1 < (zb1 + height)) //HW / D<1.2
 	//{
 	//	//Unsubmerged
@@ -615,16 +616,22 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	//	printf("Transition flow\n");
 	//}
 
-	if (h_n <= h_c)
+	printf("Sanity check h_wet=%f; A_wet = %f;  h_c=%f,h_n=%f, HLL=%f;  Qius=%f\n", h_wet, A_wet, h_c, h_n,HLL, Q_inlet);
+	if ((zs2 - zb2) > height)
+	{
+		Q = Q_outlet;
+		printf("Outlet control:Q=%f\n", Q_outlet);
+	}
+	else if (h_n <= h_c)
 	{
 		Q = min(Q_inlet, Q_outlet);
-		//printf("Inlet control: Q=%f\n", Q);
+		printf("Mixed control: Q=%f\n", Q);
 	}
 	else
 	{
 		
 		Q = Q_outlet;
-		//printf("Outlet control:Q=%f\n", Q_outlet);
+		printf("Outlet control:Q=%f\n", Q_outlet);
 	}
 
 
@@ -645,7 +652,7 @@ template <class T> __host__ __device__ void OutletControled(T& Q, double k_ex, d
 	//Calculation based on energy equation where the discharge is calculated from the head losses.
 	T V22 = u2 * u2 + v2 * v2; //V2 square
 	T C = T(0.87);
-	T friction_const = T(19.62);
+	T friction_const =T(19.62);
 	if (H_L > 0.0)
 	{
 		//Alice Eq? Something's wrong but maybe because Q should not depend on V22 ?
@@ -732,7 +739,7 @@ template <class T>__host__ __device__ void circular_geom(T R ,T & A, T & P, T& A
 	//Calculate the full area, perimeter, wetted area and wetted perimeter of a cylindic culvert, based on https://support.tygron.com/wiki/Culvert_formula_%28Water_Overlay%29
 	A = T(3.14159) * R * R;
 	P = 2 * T(3.14159) * R;
-	//Rh = A / P;
+	//R = A / P;
 	if (h_wet > 0)
 	{
 		theta = 2 * acos((R - h_wet) / R); //angle corresponding to the water height
