@@ -43,5 +43,7 @@ template <class T> bool Rainlossestest(T zsnit, int gpu, float alpha);
 template <class T> bool TestMultiBathyRough(int gpu, T ref, int secnario);
 template <class T> bool TestCulvert(int gpu, T ref, int scenario);
 
+bool TestCulvertInletControl(int gpu);
+
 // End of global definition
 #endif
