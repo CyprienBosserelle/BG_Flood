@@ -45,5 +45,7 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario);
 
 bool TestCulvertInletControl(int gpu);
 
+bool TestCulvertOutletControl(int gpu);
+
 // End of global definition
 #endif

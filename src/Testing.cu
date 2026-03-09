@@ -339,6 +339,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		result = Inletcontrol ? "successful" : "failed";
 		log("\t\tCulvert test inlet controlled test : " + result);
 
+		Inletcontrol = TestCulvertOutletControl(1);
+		result = Inletcontrol ? "successful" : "failed";
+		log("\t\tCulvert test outlet controlled test : " + result);
+
 
 	}
 
@@ -4708,10 +4712,175 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	return result;
 }
 
-template <class T> bool TestCulvertOutletControl(int gpu)
+bool TestCulvertOutletControl(int gpu)
 {
+	log("#####");
+	// this is a preplica of the tutorial case for Basilisk
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy[0].xo = 0;
+	XForcing.Bathy[0].yo = 0;
+
+	XForcing.Bathy[0].xmax = 200.0;
+	XForcing.Bathy[0].ymax = 200.0;
+	XForcing.Bathy[0].nx = 201;
+	XForcing.Bathy[0].ny = 201;
+
+	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = 1.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+
+			if (i < 100)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.609600f;
+			}
+			else if (i < 106)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 5.0f;
+			}
+			else
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0f;
+			}
+		}
+	}
+
+	//xmin = 50.0;
+	//xmax = 150.0;
+	//ymin = 80.0
+	//ymax = 120.0
+	//dx = 3.0;
+
+	XParam.dx = 1.0;
+	XParam.xo = 80.0;
+	XParam.xmax = 120.0;
+	XParam.yo = 90.0;
+	XParam.ymax = 110.0;
+
+	//zsinit = 1.8288;
+	XParam.zsinit = 1.524;
+
+	XParam.endtime = 3000;
+	XParam.totaltime = 0.0;
+	XParam.outputtimestep = 1000.0;
+	XParam.outfile = "TestCulvertoutletControl.nc";
+
+	//culvert = 2, 90.0, 100.0, 120.48, 100.0, 3.048, 1.0, 1, 0.024
+	Culvert myculvert;
+	myculvert.type = 2;
+	myculvert.x1 = 96.0;
+	myculvert.y1 = 100;
+	myculvert.x2 = 111.24;
+	myculvert.y2 = 100;
+	myculvert.width = 1.2192;
+	myculvert.n = 0.012;
+
+	XForcing.culverts.push_back(myculvert);
+	float Q = 3.53961;
+
+
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "360000.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = 80.0;
+	thisriver.xend = 95.0;
+	thisriver.ystart = 90.0;
+	thisriver.yend = 110.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+
+	float rightlev = 1.524;
+
+	//Create a temporary file with river fluxes
+	std::ofstream bnd_file(
+		"bnd_Steadylevell.tmp", std::ios_base::out | std::ios_base::trunc);
+	bnd_file << "0.0 " + std::to_string(rightlev) << std::endl;
+	bnd_file << "360000.0 " + std::to_string(rightlev) << std::endl;
+	bnd_file.close(); //destructor implicitly does it
+
+	bndsegment bnd;
+
+	bnd.type = 2;
+	bnd.inputfile = "bnd_Steadylevell.tmp";
+	bnd.on = true;
+	bnd.polyfile = "right";
+	bnd.uniform == 1;
+
+	XForcing.bndseg.push_back(bnd);
+
+
+
+	checkparamsanity(XParam, XForcing);
+	XForcing.bndseg[0].data = readINfileUNI(XForcing.bndseg[0].inputfile, XParam.reftime);
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+
+		CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap["zs"], XModel_g.OutputVarMap["zs"], XParam.nblkmem * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+
+	}
+
+	float headwater,tailwater;
+
+	int iin = memloc(XParam, XForcing.culverts[0].ix1, XForcing.culverts[0].iy1, XForcing.culverts[0].block1);
+	int iout = memloc(XParam, XForcing.culverts[0].ix2, XForcing.culverts[0].iy2, XForcing.culverts[0].block2);
+
+	headwater = XModel.evolv.zs[iin];
+	tailwater = XModel.evolv.zs[iout];
+
+	bool result = false;
+	float eps = 0.1;
+	// IL is expected here to be value when dry and 0 where wet at the begining of the computation
+	if ((abs(headwater - tailwater - 0.66) < eps))
+	{
+		result = true;
+	}
+
+
+	//river = steadyflowExc1.txt, 60.0, 88.0, 80.0, 120.0
+	// 
+
+	//right = 2, steadylevelExc1.txt
+	//aoibnd = 0;
+
+	return result;
 
 }
+
 template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 {
 	T Z0 = ref + 0.0;
