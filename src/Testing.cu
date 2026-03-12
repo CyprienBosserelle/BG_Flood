@@ -335,13 +335,17 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		//log("\t\t ##### \n");
 		//isfailed = (!Culvert_type1 || isfailed) ? true : false;
 
-		bool Inletcontrol=TestCulvertInletControl(1);
+		bool Inletcontrol, outletcontrol;
+		Inletcontrol = TestCulvertInletControl(1);
 		result = Inletcontrol ? "successful" : "failed";
 		log("\t\tCulvert test inlet controlled test : " + result);
 
-		Inletcontrol = TestCulvertOutletControl(1);
-		result = Inletcontrol ? "successful" : "failed";
+		outletcontrol = TestCulvertOutletControl(1);
+		result = outletcontrol ? "successful" : "failed";
 		log("\t\tCulvert test outlet controlled test : " + result);
+
+		results = (outletcontrol & Inletcontrol) ? "successful" : "failed";
+		log("\t\tCulvert test : " + result);
 
 
 	}
