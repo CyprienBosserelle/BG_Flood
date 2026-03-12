@@ -1,6 +1,20 @@
 #include "Kurganov.h"
 
 
+/**
+ * @brief CUDA kernel for updating X-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb)
 {
 	
@@ -156,6 +170,22 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 template __global__ void updateKurgXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb);
 template __global__ void updateKurgXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
+/**
+ * @brief CUDA kernel for updating X-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdx Pressure gradient array
+ */
 template <class T> __global__ void updateKurgXATMGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm, T*dPdx)
 {
 
@@ -313,6 +343,19 @@ template __global__ void updateKurgXATMGPU<float>(Param XParam, BlockP<float> XB
 template __global__ void updateKurgXATMGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdx);
 
 
+/**
+ * @brief CUDA kernel for adding topographic slope source terms in X direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions (based on Kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T * zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -414,6 +457,20 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 template __global__ void AddSlopeSourceXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* zb);
 template __global__ void AddSlopeSourceXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* zb);
 
+/**
+ * @brief Host function for updating X-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb)
 {
 
@@ -585,6 +642,22 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 template __host__ void updateKurgXCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
 template __host__ void updateKurgXCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
+/**
+ * @brief Host function for updating X-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction on CPU, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdx Pressure gradient array
+ */
 template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb,T* Patm,T*dPdx)
 {
 
@@ -759,6 +832,19 @@ template __host__ void updateKurgXATMCPU<float>(Param XParam, BlockP<float> XBlo
 template __host__ void updateKurgXATMCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdx);
 
 
+/**
+ * @brief Host function for adding topographic slope source terms in X direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
 template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
 {
 	T delta;
@@ -874,6 +960,20 @@ template __host__ void AddSlopeSourceXCPU<double>(Param XParam, BlockP<double> X
 
 
 
+/**
+ * @brief CUDA kernel for updating Y-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1011,6 +1111,22 @@ template __global__ void updateKurgYGPU<float>(Param XParam, BlockP<float> XBloc
 template __global__ void updateKurgYGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
 
+/**
+ * @brief CUDA kernel for updating Y-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdy Pressure gradient array
+ */
 template <class T> __global__ void updateKurgYATMGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm,T* dPdy)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1156,6 +1272,19 @@ template __global__ void updateKurgYATMGPU<double>(Param XParam, BlockP<double> 
 
 
 
+/**
+ * @brief CUDA kernel for adding topographic slope source terms in Y direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions in Y direction (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1258,6 +1387,20 @@ template __global__ void AddSlopeSourceYGPU<double>(Param XParam, BlockP<double>
 
 
 
+/**
+ * @brief Host function for updating Y-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax,T*zb)
 {
 
@@ -1404,6 +1547,22 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 template __host__ void updateKurgYCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
 template __host__ void updateKurgYCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
+/**
+ * @brief Host function for updating Y-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction on CPU, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdy Pressure gradient array
+ */
 template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm, T* dPdy)
 {
 
@@ -1559,6 +1718,19 @@ template __host__ void updateKurgYATMCPU<float>(Param XParam, BlockP<float> XBlo
 template __host__ void updateKurgYATMCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdy);
 
 
+/**
+ * @brief Host function for adding topographic slope source terms in Y direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions in Y direction on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
 template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
 {
 	T delta;
@@ -1670,6 +1842,26 @@ template __host__ void AddSlopeSourceYCPU<double>(Param XParam, BlockP<double> X
 
 
 
+/**
+ * @brief Kurganov-Petrova approximate Riemann solver for fluxes and time step.
+ *
+ * Computes fluxes and time step for the Kurganov scheme given left/right states and velocities (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param g Gravity
+ * @param delta Cell size
+ * @param epsi Small epsilon for stability
+ * @param CFL CFL number
+ * @param cm Metric coefficient
+ * @param fm Flux metric
+ * @param hp Water depth (plus side)
+ * @param hm Water depth (minus side)
+ * @param up Velocity (plus side)
+ * @param um Velocity (minus side)
+ * @param fh Output: flux for h
+ * @param fu Output: flux for u
+ * @return Time step
+ */
 template <class T> __host__ __device__ T KurgSolver(T g, T delta,T epsi, T CFL, T cm, T fm,  T hp, T hm, T up,T um, T &fh, T &fu)
 {
 	//// Reimann solver

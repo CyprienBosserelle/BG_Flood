@@ -1,0 +1,129 @@
+site_name: BG_Flood Documentation
+site_url: https://mydomain.org/mysite
+repo_url: https://github.com/CyprienBosserelle/BG_Flood
+repo_name: BG_Flood on GitHub
+site_description: Documentation for BG_Flood, a C++ library for flood fill algorithms.
+theme:
+  name: material
+  logo: Logo_white.png
+  favicon: logo.png
+  features:
+  - navigation.instant
+  - navigation.sections
+  # - navigation.expand
+  - toc.integrate
+  - content.code.copy
+  - content.code.select
+extra_css:
+  - assets/css/extra.css
+
+
+plugins:
+  - search
+  - mkdocs-video
+  - glightbox
+  - mkdocs-jupyter
+  #- awesome-nav
+  - mkdoxy:
+      #doxygen-bin-path: C:\Program Files\doxygen\bin\doxygen.exe # path to doxygen binary
+      projects:
+        BGFlood: # name of project must be alphanumeric + numbers (without spaces)
+          src-dirs: src/ # path to source code (support multiple paths separated by space) => INPUT
+          full-doc: True # if you want to generate full documentation
+          doxy-cfg: # standard doxygen configuration (key: value)
+            #doxy-cfg-file: Doxygenfile  # relative path to the Doxygen configuration file (relative to the mkdocs.yml file)
+            FILE_PATTERNS: "*.cpp *.h *.cu" # specify file patterns to filter out
+            EXTENSION_MAPPING: "cu=c++" # map file extensions to languages
+            RECURSIVE: True # recursive search in source directories
+  - bibtex:
+      bib_file: docs/References.bib
+      cite_style: plain
+      # more options can be found in the mkdocs-bibtex documentation
+
+
+nav:
+  - Home: 'index.md'
+  #- TMP Examples of Mkdocs material: 'index.md'
+  - Installation: 'Install.md'
+  - Parameters list : 'ParametersList-py.md'
+  - Manual: 'Manual.md'
+  - Tutorials:
+      - Introduction: 'Tutorial_intro.md'
+      - 'Pluvial and fluvial flooding': 'tutorial/TutorialRiver.md'
+      - 'Jet and Julia': 'tutorial/TutorialJetJulia.md'
+      - 'Gaussian wave' : 'tutorial/Gaussian_Wave_Julia.md'
+      - 'Transpacific tsunami': 'tutorial/Transpacific_tsunami.md'
+      - 'Monai and Julia': 'tutorial/TutorialMonaiJulia.md'
+      - 'Rain on grid, experimental valley': 'tutorial/Rain_CEA2008.ipynb'
+      - 'Rain on grid, variable slope and intensity': 'tutorial/RainMap_Aureli2020.ipynb'
+  - Recent Developments:
+      - 'Ground infiltration': 'modules/RainLoss_ILCL-model.md'
+      - 'New Gradient Method': 'modules/NewGradient.md'
+      - 'Wet-dry fix': 'modules/Wetdryfix-Conservelevation.md'
+  - References: 'References.md'
+  #- Examples : 
+  - Code sources:
+      - 'Links': 'BGFlood/links.md'
+      - 'Classes':
+          - 'List': 'BGFlood/annotated.md'
+          - 'Index': 'BGFlood/classes.md'
+          - 'Hierarchy': 'BGFlood/hierarchy.md'
+          - 'Members': 'BGFlood/class_members.md'
+          - 'Member Functions': 'BGFlood/class_member_functions.md'
+          - 'Member Variables': 'BGFlood/class_member_variables.md'
+          - 'Member Typedefs': 'BGFlood/class_member_typedefs.md'
+          - 'Member Enumerations': 'BGFlood/class_member_enums.md'
+      - 'Namespaces':
+          - 'List': 'BGFlood/namespaces.md'
+          - 'Members': 'BGFlood/namespace_members.md'
+          - 'Member Functions': 'BGFlood/namespace_member_functions.md'
+          - 'Member Variables': 'BGFlood/namespace_member_variables.md'
+          - 'Member Typedefs': 'BGFlood/namespace_member_typedefs.md'
+          - 'Member Enumerations': 'BGFlood/namespace_member_enums.md'
+      - 'Functions': 'BGFlood/functions.md'
+      - 'Variables': 'BGFlood/variables.md'
+      - 'Macros': 'BGFlood/macros.md'
+      - 'Files': 'BGFlood/files.md'
+
+not_in_nav:
+  README_doc.md
+
+markdown_extensions:
+  # admonitions
+  - admonition
+  - pymdownx.details
+  # Code blocks
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  # Jupyter notebooks
+  - codehilite
+  # Latex
+  - pymdownx.arithmatex:
+      generic: true
+  # Tables
+  - tables
+  # Lists
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  # Images
+  - attr_list
+  - md_in_html
+  - pymdownx.blocks.caption
+  # Footnotes
+  - footnotes
+  # Icons and emojis
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js

@@ -44,7 +44,8 @@ template <class T>
 class deformmap : public inputmap
 {
 	//Deform are maps to applie to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave
-	// Here you can spread the deformation across a certain amount of time and apply it at any point in the model
+	// Here you can spread the deformation across a certain amount of time and apply it at any point in the model.
+	// To modify only zs, use the same structure with the key word "cavity"
 public:
 	double startime = 0.0;
 	double duration = 0.0;
@@ -157,8 +158,8 @@ struct Forcing
 	DynForcingP<T> UWind;
 	DynForcingP<T> VWind;
 	//Forcing the Wind;
-	/*Spacially varying: 2 files are given, 1st file is U wind and second is V wind ( no rotation of the data is performed)
-	Spacially uniform: 1 file is given then a 3 column file is expected, showing time, windspeed and direction.
+	/*Spacially varying (.nc): 2 files are given, 1st file is U wind and second is V wind (no rotation of the data is performed)
+	Spacially uniform (.txt): 1 file is given then a 3 column file is expected, showing time, windspeed and direction.
 	Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)
 	Ex: Wind = mywind.nc?uw,mywind.nc?vw
 	Ex: Wind = MyWind.txt
@@ -176,7 +177,7 @@ struct Forcing
 	*/
 
 	DynForcingP<T> Atmp;
-	/* The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using Pa2.
+	/* Atmospheric forcing file. The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using the Pa2m parameter.
 	Ex: Atmp=AtmosphericPressure.nc?p
 	Default: None
 	*/
@@ -195,8 +196,9 @@ struct Forcing
 	Default: None but input NECESSARY
 	*/
 
+
 	std::vector<StaticForcingP<T>> cf;
-	/*Bottom friction coefficient map (associated to the chosen bottom friction model)
+	/*Bottom friction coefficient map (associated to the chosen bottom friction model: n, z0, ...)
 	A list of roughness map can be provide. At any grid point, the last one defined will be used.
 	Ex: cf=0.001;
 	Ex: cf=bottom_friction.nc?bfc;
@@ -227,7 +229,7 @@ struct Forcing
 	
 
 	std::vector<River> rivers;
-	/*The river is added as a vertical discharge on a chosen area (the user input consisting in a Time serie and a rectangular area definition).
+	/*The river is added as a vertical discharge (m3/s) on a chosen area (the user input consists in a time serie and a rectangular area definition).
 	The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.
 	To add multiple rivers, just add different lines in the input file (one by river).
 	Ex: river = Votualevu_R.txt,1867430,1867455,3914065,3914090;

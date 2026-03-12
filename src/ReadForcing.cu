@@ -25,6 +25,15 @@
 * wrapping function for reading all the forcing data
 * 
 */
+/**
+ * @brief Wrapping function for reading all the forcing data.
+ *
+ * Reads bathymetry and other forcing data into the provided Forcing structure.
+ *
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data structure
+ */
 template <class T>
 void readforcing(Param & XParam, Forcing<T> & XForcing)
 {
@@ -398,6 +407,14 @@ template void readforcing<float>(Param& XParam, Forcing<float>& XForcing);
 *  single parameter version of  readstaticforcing(int step,T& Sforcing)
 * readstaticforcing(0, Sforcing);
 */
+/**
+ * @brief Single parameter version of readstaticforcing(int step, T& Sforcing).
+ *
+ * Calls readstaticforcing with step set to 0.
+ *
+ * @tparam T Data type
+ * @param Sforcing Static forcing structure to be read and allocated
+ */
 template <class T> void readstaticforcing(T& Sforcing)
 {
 	readstaticforcing(0, Sforcing);
@@ -411,6 +428,12 @@ template void readstaticforcing<StaticForcingP<int>>(StaticForcingP<int>& Sforci
 * Allocate and read static (i.e. not varying in time) forcing
 * Used for Bathy, roughness, deformation
 */
+/**
+ * @brief Allocate and read static (i.e. not varying in time) forcing data.
+ * Used for Bathymetry, roughness, deformation, etc.
+ * @param step Time step (usually 0 for static data)
+ * @param Sforcing Static forcing structure to be read and allocated
+ */
 template <class T> void readstaticforcing(int step,T& Sforcing)
 {
 	Sforcing=readforcinghead(Sforcing);
@@ -439,11 +462,17 @@ template void readstaticforcing<deformmap<float>>(int step, deformmap<float>& Sf
 template void readstaticforcing<StaticForcingP<float>>(int step, StaticForcingP<float>& Sforcing);
 template void readstaticforcing<StaticForcingP<int>>(int step, StaticForcingP<int>& Sforcing);
 
-/*! \fn void InitDynforcing(bool gpgpu,double totaltime,DynForcingP<float>& Dforcing)
-* 
-* Used for Rain, wind, Atm pressure
-*/
-void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
+
+/**
+ * @brief Initialize dynamic forcing data (Rain, wind, Atm pressure).
+ *
+ * Reads dynamic forcing header and allocates memory for dynamic forcing arrays.
+ *
+ * @param gpgpu Use GPU acceleration
+ * @param XParam Model parameters
+ * @param Dforcing Dynamic forcing structure
+ */
+void InitDynforcing(bool gpgpu, Param& XParam, DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing, XParam);
 
@@ -500,6 +529,15 @@ void InitDynforcing(bool gpgpu,Param& XParam,DynForcingP<float>& Dforcing)
 * This is a deprecated function! See InitDynforcing() instead
 *
 */
+/**
+ * @brief Deprecated function (!!!) to read dynamic forcing data for a given time.
+ *
+ * Reads and allocates dynamic forcing arrays for the specified time.
+ *
+ * @param gpgpu Use GPU acceleration
+ * @param totaltime Current simulation time
+ * @param Dforcing Dynamic forcing structure
+ */
 void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
 {
 	Dforcing = readforcinghead(Dforcing);
@@ -525,10 +563,15 @@ void readDynforcing(bool gpgpu, double totaltime, DynForcingP<float>& Dforcing)
 }
 
 
-/*! \fn  void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
-* special case of readstaticforcing(Sforcing);
-* where the data 
-*/
+
+/**
+ * @brief Read bathymetry data and apply corrections if needed.
+ *
+ * Reads static bathymetry data and applies correction for positive-down convention (special case of readstaticforcing(Sforcing)).
+ *
+ * @param posdown If 1, apply positive-down correction
+ * @param Sforcing Static forcing structure
+ */
 void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 {
 	readstaticforcing(Sforcing);
@@ -549,9 +592,15 @@ void readbathydata(int posdown, StaticForcingP<float> &Sforcing)
 	}
 }
 
-/*! \fn  void readCRSfrombathy(std::string crs_ref, StaticForcingP<float> &Sforcing)
-* Reading the CRS information from the bathymetry file (last one read);
-*/
+
+/**
+ * @brief Read CRS information from bathymetry file metadata (last one read).
+ * Reads CRS information from the metadata of the specified bathymetry file.
+ *
+ * @param crs_ref Reference to the CRS string
+ * @param Sforcing Static forcing structure
+ * @return CRS WKT string
+ */
 std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcing)
 {
 	int ncid, ncvarid, ncAttid, status;
@@ -661,6 +710,15 @@ std::string readCRSfrombathy(std::string crs_ref, StaticForcingP<float>& Sforcin
 	return crs_wkt;
 }
 
+/**
+ * @brief Read boundary polygon segment and create polygon structure.
+ *
+ * Reads boundary polygon segment based on specified keywords or file input.
+ *
+ * @param bnd Boundary segment structure
+ * @param XParam Model parameters
+ * @return Polygon structure representing the boundary segment
+ */
 Polygon readbndpolysegment(bndsegment bnd, Param XParam)
 {
 	Polygon bndpoly;
@@ -815,10 +873,16 @@ Polygon readbndpolysegment(bndsegment bnd, Param XParam)
 	return bndpoly;
 }
 
-/*! \fn std::vector<SLTS> readbndfile(std::string filename,Param XParam, int side)
-* Read boundary forcing files
-* 
-*/
+
+/**
+ * @brief Read boundary forcing files (water levels or nest files).
+ * 
+ * Reads boundary forcing files based on their extension (.nc for nest files, others for water level files).
+ * Applies zsoffset correction if specified in model parameters.
+ * @param filename Name of the boundary forcing file
+ * @param XParam Model parameters
+ * @return Vector of SLTS structures containing boundary information
+ */
 std::vector<SLTS> readbndfile(std::string filename,Param & XParam)
 {
 	// read bnd or nest file
@@ -911,10 +975,15 @@ std::vector<SLTS> readbndfile(std::string filename,Param & XParam)
 }
 
 
-/*! \fn std::vector<SLTS> readWLfile(std::string WLfilename)
-* Read boundary water level data
-*
-*/
+
+/**
+ * @brief Read water level boundary file.
+ * Reads water level boundary file and extracts time and water level data.
+ * Applies reference date adjustment if provided.
+ * @param WLfilename Name of the water level boundary file
+ * @param refdate Reference date for time adjustment	
+ * @return Vector of SLTS structures containing time and water level data
+ */
 std::vector<SLTS> readWLfile(std::string WLfilename, std::string & refdate)
 {
 	std::vector<SLTS> slbnd;
@@ -997,10 +1066,19 @@ std::vector<SLTS> readWLfile(std::string WLfilename, std::string & refdate)
 }
 
 
-/*! \fn std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,double eps, double bndxo, double bndxmax, double bndy)
-* Read boundary Nesting data
-*
-*/
+/**
+ * @brief Read boundary nesting data from a NetCDF file.
+ * Reads boundary nesting data from a specified NetCDF file and variable name.
+ * Supports both horizontal and vertical boundaries.
+ * @param ncfile Name of the NetCDF file
+ * @param varname Name of the variable to read
+ * @param hor If 1, read horizontal boundary (top/bottom); if 0 read vertical boundary (left/right)
+ * @param eps Small value to avoid numerical issues
+ * @param bndxo Starting coordinate of the boundary
+ * @param bndxmax Ending coordinate of the boundary
+ * @param bndy Fixed coordinate of the boundary
+ * @return Vector of SLTS structures containing time and water level data
+ */
 std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,double eps, double bndxo, double bndxmax, double bndy)
 {
 	// Prep boundary input vector from anorthe model output file
@@ -1187,10 +1265,15 @@ std::vector<SLTS> readNestfile(std::string ncfile,std::string varname, int hor ,
 	return slbnd;
 }
 
-/*! \fn std::vector<Flowin> readFlowfile(std::string Flowfilename)
-* Read flow data for river forcing
-*
-*/
+
+/**
+ * @brief Read flow data from a specified file, for river forcing for example.
+ * Reads flow data from a specified file and extracts time and flow rate information.
+ * Applies reference date adjustment if provided.
+ * @param Flowfilename Name of the flow data file
+ * @param refdate Reference date for time adjustment
+ * @return Vector of Flowin structures containing time and flow rate data
+ */
 std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string &refdate)
 {
 	std::vector<Flowin> slbnd;
@@ -1269,10 +1352,14 @@ std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string &refdate)
 }
 
 
-/*! \fn std::vector<Windin> readINfileUNI(std::string filename)
-* Read rain/atmpressure data for spatially uniform forcing
-*
-*/
+/**
+ * @brief Read rain/atmospheric pressure data from a specified file for spatially uniform forcing.
+ * Reads rain/atmospheric pressure data from a specified file and extracts time and wind speed information.
+ * Applies reference date adjustment if provided.
+ * @param filename Name of the rain/atmospheric pressure data file
+ * @param refdate Reference date for time adjustment
+ * @return Vector of Windin structures containing time and wind speed data
+ */
 std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate)
 {
 	std::vector<Windin> wndinput;
@@ -1338,10 +1425,15 @@ std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate)
 }
 
 
-/*! \fn std::vector<Windin> readWNDfileUNI(std::string filename, double grdalpha)
-* Read wind data for spatially uniform forcing
-*
-*/
+/**
+ * @brief Read wind data from a specified file for spatially uniform forcing.
+ * Reads wind data from a specified file and extracts time, wind speed, wind direction, and calculates u and v wind components.
+ * Applies reference date adjustment if provided.	
+ * @param filename Name of the wind data file
+ * @param refdate Reference date for time adjustment
+ * @param grdalpha Grid rotation angle in radians
+ * @return Vector of Windin structures containing time, wind speed, wind direction, and u/v components
+ */
 std::vector<Windin> readWNDfileUNI(std::string filename, std::string & refdate, double grdalpha)
 {
 	// Warning grdapha is expected in radian here
@@ -1434,11 +1526,13 @@ std::vector<Windin> readWNDfileUNI(std::string filename, std::string & refdate, 
 }
 
 
-
-/*! \fn void read
-* Read polygon
-*
-*/
+/**
+ * @brief Read polygon from a specified file.
+ * Reads polygon vertices from a specified file and ensures the polygon is closed.
+ * Calculates bounding box of the polygon.
+ * @param filename Name of the polygon file
+ * @return Polygon structure containing vertices and bounding box information
+ */
 Polygon readPolygon(std::string filename)
 {
 	Polygon poly, polyB;
@@ -1506,7 +1600,12 @@ Polygon readPolygon(std::string filename)
 	return polyB;
 }
 
-
+/**
+ * @brief Split a string into a vector of substrings based on a specified delimiter.
+ * @param s The input string to be split
+ * @param delim The delimiter character used for splitting
+ * @return Vector of substrings
+ */
 std::vector<std::string> DelimLine(std::string line, int n, char delim)
 {
 	std::vector<std::string> lineelements;
@@ -1520,6 +1619,13 @@ std::vector<std::string> DelimLine(std::string line, int n, char delim)
 	return lineelements;
 }
 
+/**
+ * @brief Split a string into a vector of substrings based on common delimiters (tab, space, comma).
+ * Tries tab, space, and comma as delimiters and returns the first successful split with the expected number of elements.
+ * @param line The input string to be split
+ * @param n The expected number of elements after splitting
+ * @return Vector of substrings if successful; empty vector otherwise
+ */
 std::vector<std::string> DelimLine(std::string line, int n)
 {
 	std::vector<std::string> LeTab;
@@ -1551,10 +1657,14 @@ std::vector<std::string> DelimLine(std::string line, int n)
 		
 }
 
-/*! \fn void readforcingdata(int step,T forcing)
-* Read static forcing data 
-*
-*/
+
+/**
+ * @brief Read static forcing data from various file formats based on the file extension.
+ * Supports reading from .md, .nc, .bot/.dep, and .asc files.
+ * @tparam T Type of the forcing parameter structure (e.g., StaticForcingP<float>, deformmap<float>, etc.)
+ * @param step Current time step for reading time-dependent data (if applicable)
+ * @param forcing Forcing parameter structure containing file information and data storage
+ */
 template <class T>
 void readforcingdata(int step,T forcing)
 {
@@ -1589,10 +1699,14 @@ template void readforcingdata<deformmap<float>>(int step, deformmap<float> forci
 template void readforcingdata<StaticForcingP<int>>(int step, StaticForcingP<int> forcing);
 //template void readforcingdata<DynForcingP<float>>(int step, DynForcingP<float> forcing);
 
-/*! \fn void readforcingdata(double totaltime, DynForcingP<float>& forcing)
-* Read Dynamic forcing data
-*
-*/
+
+/**
+ * @brief Read dynamic forcing data from a NetCDF file based on the current simulation time.
+ * Interpolates between time steps to obtain the current forcing values.
+ * Handles NaN values and clamps edges if specified.
+ * @param totaltime Current simulation time
+ * @param forcing Dynamic forcing parameter structure containing file information and data storage
+ */
 void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 {
 	int step = utils::min(utils::max((int)floor((totaltime - forcing.to) / forcing.dt), 0), forcing.nt - 2);
@@ -1609,10 +1723,14 @@ void readforcingdata(double totaltime, DynForcingP<float>& forcing)
 	forcing.val = forcing.now;
 }
 
-/*! \fn DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam)
-* Read Dynamic forcing meta/header data
-*
-*/
+
+/**
+ * @brief Read dynamic forcing metadata/header from a NetCDF file.
+ * Extracts grid size, spacing, origin, and time information.
+ * @param Fmap Dynamic forcing parameter structure containing file information
+ * @param XParam Simulation parameters (used for reference date)
+ * @return Updated dynamic forcing parameter structure with metadata
+ */
 DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam)
 {
 	// Read critical parameter for the forcing map
@@ -1640,11 +1758,14 @@ DynForcingP<float> readforcinghead(DynForcingP<float> Fmap, Param XParam)
 }
 
 
-
-/*! \fn T readforcinghead(T ForcingParam)
-* Read Static forcing meta/header data
-*
-*/
+/**
+ * @brief Read static forcing metadata/header from various file formats based on the file extension.
+ * Supports reading from .md, .nc, .bot/.dep, and .asc files.
+ * Extracts grid size, spacing, origin, and other relevant information.	
+ * @tparam T Type of the forcing parameter structure (e.g., StaticForcingP<float>, deformmap<float>, etc.)
+ * @param ForcingParam Forcing parameter structure containing file information
+ * @return Updated forcing parameter structure with metadata
+ */
 template<class T> T readforcinghead(T ForcingParam)
 {
 	//std::string fileext;
@@ -1742,10 +1863,15 @@ template forcingmap readforcinghead<forcingmap>(forcingmap BathyParam);
 template StaticForcingP<float> readforcinghead<StaticForcingP<float>>(StaticForcingP<float> ForcingParam);
 
 
-/*! \fn void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
-* Read MD file header data
-*
-*/
+/**
+ * @brief Read header information from an MD bathymetry file (or other MD input map).
+ * Extracts grid size (nx, ny), grid spacing (dx), and grid rotation angle (grdalpha).
+ * @param filename Name of the MD bathymetry file
+ * @param nx Reference to store the number of grid points in the x-direction
+ * @param ny Reference to store the number of grid points in the y-direction
+ * @param dx Reference to store the grid spacing
+ * @param grdalpha Reference to store the grid rotation angle in radians
+ */
 void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double &grdalpha)
 {
 	
@@ -1801,10 +1927,12 @@ void readbathyHeadMD(std::string filename, int &nx, int &ny, double &dx, double 
 }
 
 
-/*! \fn void readbathyMD(std::string filename, float*& zb)
-* Read MD file data
-*
-*/
+/**
+ * @brief Read bathymetry data from an MD file into a provided array.
+ * Parses the MD file format and fills the provided array with bathymetry values.	
+ * @param filename Name of the MD bathymetry file
+ * @param zb Reference to the array to store bathymetry values
+ */
 template <class T> void readbathyMD(std::string filename, T*& zb)
 {
 	// Shit that doesn'y wor... Needs fixing 
@@ -1880,10 +2008,15 @@ template <class T> void readbathyMD(std::string filename, T*& zb)
 template void readbathyMD<int>(std::string filename, int*& zb);
 template void readbathyMD<float>(std::string filename, float*& zb);
 
-/*! \fn  void readXBbathy(std::string filename, int nx,int ny, float *&zb)
-* Read XBeach style file data
-*
-*/
+
+/**
+ * @brief Read bathymetry data from an XBeach-style .bot/.dep file into a provided array.
+ * Parses the file format and fills the provided array with bathymetry values.
+ * @param filename Name of the XBeach-style bathymetry file
+ * @param nx Number of grid points in the x-direction
+ * @param ny Number of grid points in the y-direction
+ * @param zb Reference to the array to store bathymetry values
+ */
 template <class T> void readXBbathy(std::string filename, int nx,int ny, T *&zb)
 {
 	//read input data:
@@ -1919,9 +2052,17 @@ template void readXBbathy<int>(std::string filename, int nx, int ny, int*& zb);
 template void readXBbathy<float>(std::string filename, int nx, int ny, float*& zb);
 
 
- /*! \fn  void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha)
- * Read ASC file meta/header data
- *
+/**
+ * @brief Read header information from an ASC (bathymetry) file.
+ * Extracts grid size (nx, ny), grid spacing (dx), origin (xo, yo), and grid rotation angle (grdalpha).
+ * Adjusts origin if the file uses corner registration.
+ * @param filename Name of the ASC bathymetry file
+ * @param nx Reference to store the number of grid points in the x-direction
+ * @param ny Reference to store the number of grid points in the y-direction
+ * @param dx Reference to store the grid spacing in the x-direction
+ * @param xo Reference to store the x-coordinate of the grid origin
+ * @param yo Reference to store the y-coordinate of the grid origin
+ * @param grdalpha Reference to store the grid rotation angle in radians
  */
 void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double &xo, double &yo, double &grdalpha)
 {
@@ -2033,10 +2174,15 @@ void readbathyASCHead(std::string filename, int &nx, int &ny, double &dx, double
 }
 
 
-/*! \fn void readbathyASCzb(std::string filename,int nx, int ny, float* &zb)
-* Read ASC file data
-*
-*/
+
+/**
+ * @brief Read (bathymetry) data from an ASC file into a provided array.
+ * Parses the ASC file format and fills the provided array with bathymetry values.
+ * @param filename Name of the ASC bathymetry file
+ * @param nx Number of grid points in the x-direction
+ * @param ny Number of grid points in the y-direction
+ * @param zb Reference to the array to store bathymetry values
+ */
 template <class T> void readbathyASCzb(std::string filename,int nx, int ny, T* &zb)
 {
 	//
@@ -2075,6 +2221,14 @@ template <class T> void readbathyASCzb(std::string filename,int nx, int ny, T* &
 template void readbathyASCzb<int>(std::string filename, int nx, int ny, int*& zb);
 template void readbathyASCzb<float>(std::string filename, int nx, int ny, float*& zb);
 
+/**
+ * @brief Clamp the edges of a 2D array to a specified value.
+ * Sets the values at the edges of a 2D array to a specified clamp value.
+ * @param nx Number of grid points in the x-direction
+ * @param ny Number of grid points in the y-direction
+ * @param clamp Value to set at the edges
+ * @param z Pointer to the 2D array (flattened as 1D) to be modified
+ */
 template <class T> void clampedges(int nx, int ny, T clamp, T* z)
 {
 	//
@@ -2096,6 +2250,14 @@ template <class T> void clampedges(int nx, int ny, T clamp, T* z)
 	}
 }
 
+/**
+ * @brief Replace NaN values in a 2D array with a specified value.
+ * Iterates through a 2D array and replaces any NaN values with the specified denanval.
+ * @param nx Number of grid points in the x-direction
+ * @param ny Number of grid points in the y-direction
+ * @param denanval Value to replace NaN values with
+ * @param z Pointer to the 2D array (flattened as 1D) to be modified
+ */
 template <class T> void denan(int nx, int ny, float denanval, T* z)
 {
 	for (int j = 0; j < ny; j++)

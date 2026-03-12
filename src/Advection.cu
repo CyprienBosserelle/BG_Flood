@@ -35,6 +35,17 @@ struct SharedMemory<double>
 };
 
 
+/**
+ * @brief GPU kernel to update evolving variables (h, u, v, zs) for each block and cell.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables
+ * @param XFlux Flux variables
+ * @param XAdv Advance variables
+ *
+ * Computes new values for water height, velocity, and surface elevation using fluxes and advances.
+ */
 template <class T>__global__ void updateEVGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv)
 {
 
@@ -135,6 +146,17 @@ template __global__ void updateEVGPU<float>(Param XParam, BlockP<float> XBlock, 
 template __global__ void updateEVGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, FluxP<double> XFlux, AdvanceP<double> XAdv);
 
 
+/**
+ * @brief CPU routine to update evolving variables (h, u, v, zs) for each block and cell.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables
+ * @param XFlux Flux variables
+ * @param XAdv Advance variables
+ *
+ * Computes new values for water height, velocity, and surface elevation using fluxes and advances.
+ */
 template <class T>__host__ void updateEVCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, FluxP<T> XFlux, AdvanceP<T> XAdv)
 {
 
@@ -234,6 +256,19 @@ template __host__ void updateEVCPU<float>(Param XParam, BlockP<float> XBlock, Ev
 template __host__ void updateEVCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, FluxP<double> XFlux, AdvanceP<double> XAdv);
 
 
+/**
+ * @brief GPU kernel for advancing the solution in time for each block and cell.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param dt Time step
+ * @param zb Bed elevation array
+ * @param XEv Evolving variables
+ * @param XAdv Advance variables
+ * @param XEv_o Output evolving variables
+ *
+ * Updates water height, velocity, and surface elevation for the next time step.
+ */
 template <class T> __global__ void AdvkernelGPU(Param XParam, BlockP<T> XBlock, T dt ,T* zb, EvolvingP<T> XEv, AdvanceP<T> XAdv, EvolvingP<T> XEv_o)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -281,6 +316,19 @@ template __global__ void AdvkernelGPU<float>(Param XParam, BlockP<float> XBlock,
 template __global__ void AdvkernelGPU<double>(Param XParam, BlockP<double> XBlock, double dt, double* zb, EvolvingP<double> XEv, AdvanceP<double> XAdv, EvolvingP<double> XEv_o);
 
 
+/**
+ * @brief CPU routine for advancing the solution in time for each block and cell.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param dt Time step
+ * @param zb Bed elevation array
+ * @param XEv Evolving variables
+ * @param XAdv Advance variables
+ * @param XEv_o Output evolving variables
+ *
+ * Updates water height, velocity, and surface elevation for the next time step.
+ */
 template <class T> __host__ void AdvkernelCPU(Param XParam, BlockP<T> XBlock, T dt, T* zb, EvolvingP<T> XEv, AdvanceP<T> XAdv, EvolvingP<T> XEv_o)
 {
 	T eps = T(XParam.eps);
@@ -340,6 +388,14 @@ template __host__ void AdvkernelCPU<double>(Param XParam, BlockP<double> XBlock,
 
 
 
+/**
+ * @brief GPU kernel to clean up evolving variables after advection step.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables
+ * @param XEv_o Output evolving variables
+ */
 template <class T> __global__ void cleanupGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, EvolvingP<T> XEv_o)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -364,6 +420,14 @@ template __global__ void cleanupGPU<double>(Param XParam, BlockP<double> XBlock,
 
 
 
+/**
+ * @brief CPU routine to clean up evolving variables after advection step.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables
+ * @param XEv_o Output evolving variables
+ */
 template <class T> __host__ void cleanupCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, EvolvingP<T> XEv_o)
 {
 	int ib;
@@ -394,6 +458,15 @@ template __host__ void cleanupCPU<float>(Param XParam, BlockP<float> XBlock, Evo
 template __host__ void cleanupCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, EvolvingP<double> XEv_o);
 
 
+/**
+ * @brief CPU routine to compute the minimum allowed time step across all blocks and cells.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data structure
+ * @param XTime Time control structure
+ * @return Minimum allowed time step
+ */
 template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
 	int ib;
@@ -426,6 +499,15 @@ template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, 
 template __host__ float timestepreductionCPU(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
 template __host__ double timestepreductionCPU(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
 
+/**
+ * @brief CPU routine to calculate the next time step for the simulation.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data structure
+ * @param XTime Time control structure
+ * @return Computed time step
+ */
 template <class T> __host__ T CalctimestepCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
 	
@@ -455,6 +537,15 @@ template __host__ float CalctimestepCPU<float>(Param XParam, Loop<float> XLoop, 
 template __host__ double CalctimestepCPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
 
 
+/**
+ * @brief GPU routine to calculate the next time step for the simulation.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data structure
+ * @param XTime Time control structure
+ * @return Computed time step
+ */
 template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime)
 {
 	T* dummy;
@@ -533,6 +624,13 @@ template __host__ double CalctimestepGPU<double>(Param XParam, Loop<double> XLoo
 
 
 
+/**
+ * @brief GPU kernel to compute the minimum value in an array using parallel reduction.
+ * @tparam T Data type
+ * @param g_idata Input array
+ * @param g_odata Output array (min per block)
+ * @param n Number of elements
+ */
 template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned int n)
 {
 	//T *sdata = SharedMemory<T>();
@@ -567,6 +665,14 @@ template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned i
 }
 
 
+/**
+ * @brief GPU kernel to copy and densify data from block memory to output array.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param g_idata Input array
+ * @param g_odata Output array
+ */
 template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_idata, T* g_odata)
 {
 	unsigned int halowidth = XParam.halowidth;

@@ -1,0 +1,141 @@
+\hypertarget{Kurganov_8h}{}\doxysection{src/\+Kurganov.h File Reference}
+\label{Kurganov_8h}\index{src/Kurganov.h@{src/Kurganov.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Spherical.\+h\char`\"{}}\newline
+Include dependency graph for Kurganov.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a20767ce17df3140032c4351bf3a6c70a}{update\+Kurg\+XGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a257c9332dbd2b836979a9ca0c7b9fc8d}{Add\+Slope\+Source\+XGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a6f159caa201aeabca097747ba61a2f94}{update\+Kurg\+XCPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_ae50dfdfd5357ce24ebaad38fcb51ed33}{Add\+Slope\+Source\+XCPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_af420c712657be784e212c54c1265dcde}{update\+Kurg\+YGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_af53bbd1f6e57f4344fab2faf4eb74bf8}{Add\+Slope\+Source\+YGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_ae0cad1ccb8251b7060b27fac02c6bd3e}{update\+Kurg\+YCPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a38abf0dac2ddb64580d904e8d93203b6}{Add\+Slope\+Source\+YCPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$zb)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a1d3d229131f78d43fc9d4960e0ce578c}{update\+Kurg\+XATMGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb, T $\ast$Patm, T $\ast$d\+Pdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a0aa834064cd1e976021105883f96eada}{update\+Kurg\+XATMCPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb, T $\ast$Patm, T $\ast$d\+Pdx)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a6445b8b6ea7dd8666acf96d6844abb51}{update\+Kurg\+YATMGPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb, T $\ast$Patm, T $\ast$d\+Pdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kurganov_8h_a50bdce3a23fd5e41e66db7e9f3e99273}{update\+Kurg\+YATMCPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, \mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$ XEv, \mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$ XGrad, \mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$ XFlux, T $\ast$dtmax, T $\ast$zb, T $\ast$Patm, T $\ast$d\+Pdy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Kurganov_8h_a833907c90f809ccbe428469fdbbd3c07}{Kurg\+Solver}} (T g, T delta, T epsi, T CFL, T cm, T fm, T hp, T hm, T up, T um, T \&fh, T \&fu)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Kurganov_8h_ae50dfdfd5357ce24ebaad38fcb51ed33}\label{Kurganov_8h_ae50dfdfd5357ce24ebaad38fcb51ed33}} 
+\index{Kurganov.h@{Kurganov.h}!AddSlopeSourceXCPU@{AddSlopeSourceXCPU}}
+\index{AddSlopeSourceXCPU@{AddSlopeSourceXCPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{AddSlopeSourceXCPU()}{AddSlopeSourceXCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Add\+Slope\+Source\+XCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a257c9332dbd2b836979a9ca0c7b9fc8d}\label{Kurganov_8h_a257c9332dbd2b836979a9ca0c7b9fc8d}} 
+\index{Kurganov.h@{Kurganov.h}!AddSlopeSourceXGPU@{AddSlopeSourceXGPU}}
+\index{AddSlopeSourceXGPU@{AddSlopeSourceXGPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{AddSlopeSourceXGPU()}{AddSlopeSourceXGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Add\+Slope\+Source\+XGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a38abf0dac2ddb64580d904e8d93203b6}\label{Kurganov_8h_a38abf0dac2ddb64580d904e8d93203b6}} 
+\index{Kurganov.h@{Kurganov.h}!AddSlopeSourceYCPU@{AddSlopeSourceYCPU}}
+\index{AddSlopeSourceYCPU@{AddSlopeSourceYCPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{AddSlopeSourceYCPU()}{AddSlopeSourceYCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void Add\+Slope\+Source\+YCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_af53bbd1f6e57f4344fab2faf4eb74bf8}\label{Kurganov_8h_af53bbd1f6e57f4344fab2faf4eb74bf8}} 
+\index{Kurganov.h@{Kurganov.h}!AddSlopeSourceYGPU@{AddSlopeSourceYGPU}}
+\index{AddSlopeSourceYGPU@{AddSlopeSourceYGPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{AddSlopeSourceYGPU()}{AddSlopeSourceYGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void Add\+Slope\+Source\+YGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a833907c90f809ccbe428469fdbbd3c07}\label{Kurganov_8h_a833907c90f809ccbe428469fdbbd3c07}} 
+\index{Kurganov.h@{Kurganov.h}!KurgSolver@{KurgSolver}}
+\index{KurgSolver@{KurgSolver}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{KurgSolver()}{KurgSolver()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T Kurg\+Solver (\begin{DoxyParamCaption}\item[{T}]{g,  }\item[{T}]{delta,  }\item[{T}]{epsi,  }\item[{T}]{CFL,  }\item[{T}]{cm,  }\item[{T}]{fm,  }\item[{T}]{hp,  }\item[{T}]{hm,  }\item[{T}]{up,  }\item[{T}]{um,  }\item[{T \&}]{fh,  }\item[{T \&}]{fu }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a0aa834064cd1e976021105883f96eada}\label{Kurganov_8h_a0aa834064cd1e976021105883f96eada}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgXATMCPU@{updateKurgXATMCPU}}
+\index{updateKurgXATMCPU@{updateKurgXATMCPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgXATMCPU()}{updateKurgXATMCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void update\+Kurg\+XATMCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{Patm,  }\item[{T $\ast$}]{d\+Pdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a1d3d229131f78d43fc9d4960e0ce578c}\label{Kurganov_8h_a1d3d229131f78d43fc9d4960e0ce578c}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgXATMGPU@{updateKurgXATMGPU}}
+\index{updateKurgXATMGPU@{updateKurgXATMGPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgXATMGPU()}{updateKurgXATMGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void update\+Kurg\+XATMGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{Patm,  }\item[{T $\ast$}]{d\+Pdx }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a6f159caa201aeabca097747ba61a2f94}\label{Kurganov_8h_a6f159caa201aeabca097747ba61a2f94}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgXCPU@{updateKurgXCPU}}
+\index{updateKurgXCPU@{updateKurgXCPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgXCPU()}{updateKurgXCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void update\+Kurg\+XCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a20767ce17df3140032c4351bf3a6c70a}\label{Kurganov_8h_a20767ce17df3140032c4351bf3a6c70a}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgXGPU@{updateKurgXGPU}}
+\index{updateKurgXGPU@{updateKurgXGPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgXGPU()}{updateKurgXGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void update\+Kurg\+XGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kurganov_8h_a50bdce3a23fd5e41e66db7e9f3e99273}\label{Kurganov_8h_a50bdce3a23fd5e41e66db7e9f3e99273}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgYATMCPU@{updateKurgYATMCPU}}
+\index{updateKurgYATMCPU@{updateKurgYATMCPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgYATMCPU()}{updateKurgYATMCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void update\+Kurg\+YATMCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{Patm,  }\item[{T $\ast$}]{d\+Pdy }\end{DoxyParamCaption})}
+
+\hypertarget{Kurganov.cu_autotoc_md146}{}\doxysubparagraph{Topographic source term}\label{Kurganov.cu_autotoc_md146}
+In the case of adaptive refinement, care must be taken to ensure well-\/balancing at coarse/fine faces\mbox{\Hypertarget{Kurganov_8h_a6445b8b6ea7dd8666acf96d6844abb51}\label{Kurganov_8h_a6445b8b6ea7dd8666acf96d6844abb51}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgYATMGPU@{updateKurgYATMGPU}}
+\index{updateKurgYATMGPU@{updateKurgYATMGPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgYATMGPU()}{updateKurgYATMGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void update\+Kurg\+YATMGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb,  }\item[{T $\ast$}]{Patm,  }\item[{T $\ast$}]{d\+Pdy }\end{DoxyParamCaption})}
+
+\hypertarget{Kurganov.cu_autotoc_md144}{}\doxysubparagraph{Topographic source term}\label{Kurganov.cu_autotoc_md144}
+In the case of adaptive refinement, care must be taken to ensure well-\/balancing at coarse/fine faces (see \mbox{[}notes/balanced.\+tm\mbox{]}()).\mbox{\Hypertarget{Kurganov_8h_ae0cad1ccb8251b7060b27fac02c6bd3e}\label{Kurganov_8h_ae0cad1ccb8251b7060b27fac02c6bd3e}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgYCPU@{updateKurgYCPU}}
+\index{updateKurgYCPU@{updateKurgYCPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgYCPU()}{updateKurgYCPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ void update\+Kurg\+YCPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\hypertarget{Kurganov.cu_autotoc_md145}{}\doxysubparagraph{Topographic source term}\label{Kurganov.cu_autotoc_md145}
+In the case of adaptive refinement, care must be taken to ensure well-\/balancing at coarse/fine faces\mbox{\Hypertarget{Kurganov_8h_af420c712657be784e212c54c1265dcde}\label{Kurganov_8h_af420c712657be784e212c54c1265dcde}} 
+\index{Kurganov.h@{Kurganov.h}!updateKurgYGPU@{updateKurgYGPU}}
+\index{updateKurgYGPU@{updateKurgYGPU}!Kurganov.h@{Kurganov.h}}
+\doxysubsubsection{\texorpdfstring{updateKurgYGPU()}{updateKurgYGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void update\+Kurg\+YGPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{\mbox{\hyperlink{structEvolvingP}{EvolvingP}}$<$ T $>$}]{XEv,  }\item[{\mbox{\hyperlink{structGradientsP}{GradientsP}}$<$ T $>$}]{XGrad,  }\item[{\mbox{\hyperlink{structFluxP}{FluxP}}$<$ T $>$}]{XFlux,  }\item[{T $\ast$}]{dtmax,  }\item[{T $\ast$}]{zb }\end{DoxyParamCaption})}
+
+\hypertarget{Kurganov.cu_autotoc_md143}{}\doxysubparagraph{Topographic source term}\label{Kurganov.cu_autotoc_md143}
+In the case of adaptive refinement, care must be taken to ensure well-\/balancing at coarse/fine faces (see \mbox{[}notes/balanced.\+tm\mbox{]}()).

@@ -4,3 +4,14 @@ CMakeSettings.json
 .vs
 *.dll
 *.exe
+
+# Doxygen output
+docs/html/
+docs/latex/
+docs/xml/
+docs/man/
+docs/rtf/
+docs/doxygen.log
+
+# MkDocs build output
+site/

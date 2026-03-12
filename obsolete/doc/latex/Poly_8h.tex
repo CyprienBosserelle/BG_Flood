@@ -1,0 +1,65 @@
+\hypertarget{Poly_8h}{}\doxysection{src/\+Poly.h File Reference}
+\label{Poly_8h}\index{src/Poly.h@{src/Poly.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Input.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Write\+\_\+txtlog.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+Include dependency graph for Poly.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\bool \mbox{\hyperlink{Poly_8h_af9ab73ec676dff49cec8287499b88175}{blockinpoly}} (T xo, T yo, T dx, int blkwidth, \mbox{\hyperlink{classPolygon}{Polygon}} Poly)
+\begin{DoxyCompactList}\small\item\em check whether a block is inside or intersectin a polygon \end{DoxyCompactList}\item 
+{\footnotesize template$<$class T $>$ }\\int \mbox{\hyperlink{Poly_8h_a716f3869119a8a87911ad1f5cfada940}{wn\+\_\+\+Pn\+Poly}} (T Px, T Py, \mbox{\hyperlink{classPolygon}{Polygon}} Poly)
+\begin{DoxyCompactList}\small\item\em winding number test for a point in a polygon \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classPolygon}{Polygon}} \mbox{\hyperlink{Poly_8h_a0b6b1c685a658f30a3b9b9324116e472}{Counter\+CWPoly}} (\mbox{\hyperlink{classPolygon}{Polygon}} Poly)
+\begin{DoxyCompactList}\small\item\em check polygon handedness and reverse if necessary. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Poly_8h_af9ab73ec676dff49cec8287499b88175}\label{Poly_8h_af9ab73ec676dff49cec8287499b88175}} 
+\index{Poly.h@{Poly.h}!blockinpoly@{blockinpoly}}
+\index{blockinpoly@{blockinpoly}!Poly.h@{Poly.h}}
+\doxysubsubsection{\texorpdfstring{blockinpoly()}{blockinpoly()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool blockinpoly (\begin{DoxyParamCaption}\item[{T}]{xo,  }\item[{T}]{yo,  }\item[{T}]{dx,  }\item[{int}]{blkwidth,  }\item[{\mbox{\hyperlink{classPolygon}{Polygon}}}]{Poly }\end{DoxyParamCaption})}
+
+
+
+check whether a block is inside or intersectin a polygon 
+
+\hypertarget{Poly_8h_autotoc_md164}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md164}
+Check whether a block is inside or intersectin a polygon\hypertarget{Poly_8h_autotoc_md165}{}\doxysubsubsection{Usage blockinpoly( blockxo,  blockyo,  blockdx, blkwidth, Polygon)}\label{Poly_8h_autotoc_md165}
+\mbox{\Hypertarget{Poly_8h_a0b6b1c685a658f30a3b9b9324116e472}\label{Poly_8h_a0b6b1c685a658f30a3b9b9324116e472}} 
+\index{Poly.h@{Poly.h}!CounterCWPoly@{CounterCWPoly}}
+\index{CounterCWPoly@{CounterCWPoly}!Poly.h@{Poly.h}}
+\doxysubsubsection{\texorpdfstring{CounterCWPoly()}{CounterCWPoly()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classPolygon}{Polygon}} Counter\+CWPoly (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classPolygon}{Polygon}}}]{Poly }\end{DoxyParamCaption})}
+
+
+
+check polygon handedness and reverse if necessary. 
+
+\hypertarget{Poly_8h_autotoc_md160}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md160}
+check polygon handedness and enforce left-\/handesness (Counter-\/clockwise). This function is used to ensure the right polygon handedness for the winding number inpoly (using the isleft()) \mbox{\Hypertarget{Poly_8h_a716f3869119a8a87911ad1f5cfada940}\label{Poly_8h_a716f3869119a8a87911ad1f5cfada940}} 
+\index{Poly.h@{Poly.h}!wn\_PnPoly@{wn\_PnPoly}}
+\index{wn\_PnPoly@{wn\_PnPoly}!Poly.h@{Poly.h}}
+\doxysubsubsection{\texorpdfstring{wn\_PnPoly()}{wn\_PnPoly()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int wn\+\_\+\+Pn\+Poly (\begin{DoxyParamCaption}\item[{T}]{Px,  }\item[{T}]{Py,  }\item[{\mbox{\hyperlink{classPolygon}{Polygon}}}]{Poly }\end{DoxyParamCaption})}
+
+
+
+winding number test for a point in a polygon 
+
+\hypertarget{Poly_8h_autotoc_md157}{}\doxysubsubsection{Description}\label{Poly_8h_autotoc_md157}
+\mbox{\hyperlink{Poly_8cu_a26344a138da1b14b78397ad09d6b0024}{wn\+\_\+\+Pn\+Poly()}}\+: winding number test for a point in a polygon Input\+: P = a point, V\mbox{[}\mbox{]} = vertex points of a polygon V\mbox{[}n+1\mbox{]} with V\mbox{[}n\mbox{]}=V\mbox{[}0\mbox{]} Return\+: wn = the winding number (=0 only when P is outside)\hypertarget{Poly_8h_autotoc_md158}{}\doxysubsubsection{Where does this come from\+:}\label{Poly_8h_autotoc_md158}
+Copyright 2000 soft\+Surfer, 2012 Dan Sunday \hypertarget{Poly_8h_autotoc_md159}{}\doxyparagraph{Original Licence}\label{Poly_8h_autotoc_md159}
+This code may be freely used and modified for any purpose providing that this copyright notice is included with it. Soft\+Surfer makes no warranty for this code, and cannot be held liable for any real or imagined damage resulting from its use. Users of this code must verify correctness for their application. Code modified to fit the use in Disper\+GPU 

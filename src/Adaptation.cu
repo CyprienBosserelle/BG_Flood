@@ -5,6 +5,15 @@
 
 
 
+/**
+ * @brief Performs mesh adaptation (refinement/coarsening) for the model.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure
+ *
+ * Iteratively refines or coarsens the mesh based on adaptation criteria, updating block info and variables.
+ */
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int oldnblk = 0;
@@ -114,6 +123,13 @@ template void Adaptation<float>(Param& XParam, Forcing<float> XForcing, Model<fl
 template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
 
 //Initial adaptation also reruns initial conditions
+/**
+ * @brief Performs initial mesh adaptation and reruns initial conditions.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure
+ */
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel)
 {
 	if (XParam.maxlevel != XParam.minlevel)
@@ -301,6 +317,13 @@ int checkneighbourrefine(int neighbourib,int levelib, int levelneighbour, bool*&
 *
 *	Needs improvements
 */
+/**
+ * @brief Checks the consistency and sanity of the block uniform quadtree mesh.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @return True if mesh is sane, false otherwise.
+ */
 template <class T> bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 {
 	bool check = true;
@@ -360,6 +383,19 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 	return check;
 }
 
+/**
+ * @brief Checks if the distance between a block and its neighbor is consistent with their levels.
+ * @tparam T Data type
+ * @param dx Base grid spacing
+ * @param ib Block index
+ * @param levelib Block level
+ * @param blocko Block coordinate
+ * @param neighbourib Neighbor block index
+ * @param levelneighbour Neighbor block level
+ * @param neighbourblocko Neighbor block coordinate
+ * @param rightortop True if neighbor is right/top, false if left/bottom
+ * @return True if distance is consistent, false otherwise.
+ */
 template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T blocko, int neighbourib, int levelneighbour, T neighbourblocko, bool rightortop )
 {
 	T expecteddistance= blocko;
@@ -389,6 +425,13 @@ template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T
 
 
 
+/**
+ * @brief Applies adaptation (refinement/coarsening) to the mesh and updates variables.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure
+ */
 template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int nnewblk = CalcAvailblk(XParam, XModel.blocks, XModel.adapt);
@@ -481,6 +524,14 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 *
 *
 */
+/**
+ * @brief Calculates the number of available blocks for refinement.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ * @return Number of available blocks for refinement.
+ */
 template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAdapt)
 {
 	//
@@ -546,6 +597,14 @@ template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAd
 template int CalcAvailblk<float>(Param &XParam, BlockP<float> XBlock, AdaptP& XAdapt);
 template int CalcAvailblk<double>(Param &XParam, BlockP<double> XBlock, AdaptP& XAdapt);
 
+/**
+ * @brief Adds new blocks to the mesh for adaptation.
+ * @tparam T Data type
+ * @param nnewblk Number of new blocks to add
+ * @param XParam Model parameters
+ * @param XModel Model structure
+ * @return New total number of blocks in memory.
+ */
 template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel)
 {
 	//
@@ -606,6 +665,15 @@ template int AddBlocks<float>(int nnewblk, Param& XParam, Model<float>& XModel);
 template int AddBlocks<double>(int nnewblk, Param& XParam, Model<double>& XModel);
 
 
+/**
+ * @brief Coarsens mesh blocks and updates conserved variables.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ * @param XEvo Old evolving variables
+ * @param XEv New evolving variables
+ */
 template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,EvolvingP<T> XEvo, EvolvingP<T>& XEv )
 {
 	//=========================================================
@@ -937,6 +1005,15 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 template void coarsen<float>(Param XParam, BlockP<float>& XBlock, AdaptP& XAdapt, EvolvingP<float> XEvo, EvolvingP<float>& XEv);
 template void coarsen<double>(Param XParam, BlockP<double>& XBlock, AdaptP& XAdapt, EvolvingP<double> XEvo, EvolvingP<double>& XEv);
 
+/**
+ * @brief Refines mesh blocks and interpolates conserved variables.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ * @param XEvo Old evolving variables
+ * @param XEv New evolving variables
+ */
 template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T> XEvo, EvolvingP<T>& XEv)
 {
 	//==========================================================================
@@ -1718,6 +1795,15 @@ template void refine<float>(Param XParam, BlockP<float>& XBlock, AdaptP& XAdapt,
 template void refine<double>(Param XParam, BlockP<double>& XBlock, AdaptP& XAdapt, EvolvingP<double> XEvo, EvolvingP<double>& XEv);
 
 
+/**
+ * @brief Cleans up and updates block lists after adaptation.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ *
+ * Updates block levels, reorders active block list, and finalizes adaptation.
+ */
 template <class T> void Adaptationcleanup(Param &XParam, BlockP<T>& XBlock, AdaptP& XAdapt)
 {
 	//===========================================================

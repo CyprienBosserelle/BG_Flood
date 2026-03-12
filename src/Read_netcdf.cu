@@ -80,6 +80,29 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 
 //void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
 //void readgridncsize(forcingmap &Fmap, Param XParam)
+/**
+ * @brief Read grid size and metadata from a NetCDF file.
+ *
+ * Reads dimensions, coordinates, and time information for a variable in a NetCDF file.
+ *
+ * @param ncfilestr NetCDF filename
+ * @param varstr Variable name
+ * @param reftime Reference time string
+ * @param nx Number of x grid points
+ * @param ny Number of y grid points
+ * @param nt Number of time steps
+ * @param dx Grid spacing in x
+ * @param dy Grid spacing in y
+ * @param dt Time step size
+ * @param xo Origin x
+ * @param yo Origin y
+ * @param to Origin time
+ * @param xmax Maximum x
+ * @param ymax Maximum y
+ * @param tmax Maximum time
+ * @param flipx Flip x axis
+ * @param flipy Flip y axis
+ */
 void readgridncsize(const std::string ncfilestr, const std::string varstr, std::string reftime, int& nx, int& ny, int& nt, double& dx, double& dy, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy)
 {
 	//std::string ncfilestr = Fmap.inputfile;
@@ -323,6 +346,14 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, std::
 }
 
 
+/**
+ * @brief Read grid size and metadata for a forcing map.
+ *
+ * Reads grid size and metadata for a forcing map using model parameters.
+ *
+ * @param Fmap Forcing map structure
+ * @param XParam Model parameters
+ */
 void readgridncsize(forcingmap& Fmap, Param XParam)
 {
 
@@ -330,6 +361,14 @@ void readgridncsize(forcingmap& Fmap, Param XParam)
 }
 
 
+/**
+ * @brief Read grid size and metadata for a generic map type.
+ *
+ * Reads grid size and metadata for a generic map type (inputmap, forcingmap, etc.).
+ *
+ * @tparam T Map type
+ * @param Imap Map structure
+ */
 template<class T> void readgridncsize(T& Imap)
 {
 	double a, b, c;
@@ -344,6 +383,16 @@ template void readgridncsize<deformmap<float >>(deformmap<float >& Imap);
 template void readgridncsize<DynForcingP<float >>(DynForcingP<float >& Imap);
 
 
+/**
+ * @brief Read variable dimension info from a NetCDF file.
+ *
+ * Reads the dimensions for a variable in a NetCDF file.
+ *
+ * @param filename NetCDF filename
+ * @param Varname Variable name
+ * @param ddimU Output array for dimension sizes
+ * @return Number of dimensions
+ */
 int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 {
 	// This function reads the dimensions for each variables
@@ -386,6 +435,15 @@ int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 }
 
 
+/**
+ * @brief Read time variable from a NetCDF file.
+ *
+ * Reads the time variable from a NetCDF file into a double array.
+ *
+ * @param filename NetCDF filename
+ * @param time Output array for time values
+ * @return Status code
+ */
 int readnctime(std::string filename, double * &time)
 {
 	int status, ncid, varid;
@@ -427,6 +485,18 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
+/**
+ * @brief Read time variable from a NetCDF file with reference date.
+ *
+ * Reads the time variable from a NetCDF file using a reference date and time coordinate name.
+ *
+ * @param ncid NetCDF file ID
+ * @param timecoordname Time coordinate variable name
+ * @param refdate Reference date string
+ * @param nt Number of time steps
+ * @param time Output array for time values
+ * @return Status code
+ */
 int readnctime2(int ncid,char * timecoordname,std::string refdate,size_t nt, double*& time)
 {
 
@@ -555,8 +625,23 @@ int readnctime2(int ncid,char * timecoordname,std::string refdate,size_t nt, dou
 	
 }
 
-template <class T>
-int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T * &zsa)
+/**
+ * @brief Read a single level of data from a NetCDF file.
+ *
+ * Reads a single level of data for a variable from a NetCDF file.
+ *
+ * @tparam T Data type
+ * @param filename NetCDF filename
+ * @param varstr Variable name
+ * @param indx X index
+ * @param indy Y index
+ * @param indt Time index
+ * @param checkhh Check for missing values
+ * @param eps Epsilon for missing value detection
+ * @param zsa Output array for data
+ * @return Status code
+ */
+template <class T> int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T * &zsa)
 {
 	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr;
 	double scalefac, offset, missing, fillval;
@@ -721,8 +806,21 @@ template int readncslev1<float>(std::string filename, std::string varstr, size_t
 template int readncslev1<double>(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, double * &zsa);
 
 
-template <class T>
-int readvardata(std::string filename, std::string Varname, int step, T * &vardata, bool flipx, bool flipy)
+/**
+ * @brief Read variable data from a NetCDF file for a specific time step.
+ *
+ * Reads data for a variable from a NetCDF file for a given time step, with optional axis flipping.
+ *
+ * @tparam T Data type
+ * @param filename NetCDF filename
+ * @param Varname Variable name
+ * @param step Time step to read
+ * @param vardata Output array for data
+ * @param flipx Flip x axis
+ * @param flipy Flip y axis
+ * @return Status code
+ */
+template <class T> int readvardata(std::string filename, std::string Varname, int step, T * &vardata, bool flipx, bool flipy)
 {
 	// function to standardise the way to read netCDF data off a file
 	// The role of this function is to offload and simplify the rest of the code
@@ -910,7 +1008,19 @@ template int readvardata<double>(std::string filename, std::string Varname, int 
 
 
 
-
+/**
+ * @brief Check for the existence of NetCDF variable names and return the first found.
+ *
+ * Checks up to five possible variable names in a NetCDF file and returns the first one that exists.
+ *
+ * @param ncid NetCDF file ID
+ * @param stringA First variable name to check
+ * @param stringB Second variable name to check
+ * @param stringC Third variable name to check
+ * @param stringD Fourth variable name to check
+ * @param stringE Fifth variable name to check
+ * @return The first variable name found in the NetCDF file, or an empty string if none are found.
+ */
 std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE)
 {
 	int varid;
@@ -956,6 +1066,18 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 }
 
 //By default we want to read wind info as float because it will reside in a texture. the value is converted to the apropriate type only when it is used. so there is no need to template this function 
+/**
+ * @brief Read wind data from NetCDF files for a specific time step.
+ *
+ * Reads U and V wind components from NetCDF files for a given time step.
+ * By default we want to read wind info as float because it will reside in a texture. the value is converted to the apropriate type only when it is used. so there is no need to template this function
+ * 
+ * @param WNDUmap Forcing map for U wind
+ * @param WNDVmap Forcing map for V wind
+ * @param steptoread Time step to read
+ * @param Uo Output array for U wind
+ * @param Vo Output array for V wind
+ */
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo)
 {
 	//
@@ -1046,7 +1168,17 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 
 }
 
-//Atm pressure is same as wind we on;ly read floats and that is plenty for real world application
+//Atm pressure is same as wind we only read floats and that is plenty for real world application
+/**
+ * @brief Read atmospheric pressure data from NetCDF file for a specific time step.
+ *
+ * Reads atmospheric pressure data from a NetCDF file for a given time step.
+ * Atm pressure is same as wind we only read floats and that is plenty for real world application.
+ *
+ * @param ATMPmap Forcing map for atmospheric pressure
+ * @param steptoread Time step to read
+ * @param Po Output array for pressure data
+ */
 void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 {
 	//

@@ -25,27 +25,33 @@
 #include "BG_Flood.h"
 
 
-/*! \fn int main(int argc, char **argv)
-* Main function 
-* This function is the entry point to the software
-* The main function setups all the init of the model and then calls the mainloop to actually run the model
-*
-*	There are 3 main class storing information about the model: XParam (class Param), XModel (class Model) and XForcing (class Forcing)
-*	Leading X stands for eXecution and is to avoid confusion between the class variable and the class declaration
-*	When running with the GPU there is also XModel_g
-*	which is the same as XModel but with GPU specific pointers
-*
-*
-* This function does:
-* * Reads the inputs to the model
-* * Allocate memory on GPU and CPU
-* * Prepare and initialise memory and arrays on CPU and GPU
-* * Setup initial condition
-* * Adapt grid if require
-* * Prepare output file
-* * Run main loop
-* * Clean up and close
-*/
+/**
+ * @brief Main entry point for the BG_Flood model executable.
+ * @param argc Number of command-line arguments
+ * @param argv Array of command-line argument strings
+ * @return Status code (0 for success)
+ *
+ * Main function
+ * This function is the entry point to the software
+ * The main function setups all the init of the model and then calls the mainloop to actually run the model
+ *
+ * There are 3 main class storing information about the model: XParam (class Param), XModel (class Model) and XForcing (class Forcing)
+ * Leading X stands for eXecution and is to avoid confusion between the class variable and the class declaration
+ * When running with the GPU there is also XModel_g
+ * which is the same as XModel but with GPU specific pointers
+ *
+ * This function does:
+ * - Reads the inputs to the model
+ * - Allocate memory on GPU and CPU
+ * - Prepare and initialise memory and arrays on CPU and GPU
+ * - Setup initial condition
+ * - Adapt grid if require
+ * - Prepare output file
+ * - Run main loop
+ * - Clean up and close
+ *
+ * It coordinates CPU and GPU resources and calls the mainwork routine for model execution.
+ */
 int main(int argc, char* argv[])
 {
 	//===========================================
@@ -104,6 +110,25 @@ int main(int argc, char* argv[])
 
 }
 
+/**
+ * @brief Main model setup and execution routine for BG_Flood.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ * @return Status code (0 for success)
+ *
+ * This function performs the main setup and execution steps for the BG_Flood model:
+ * - Reads and verifies input/forcing data
+ * - Initializes mesh and initial conditions
+ * - Performs initial adaptation
+ * - Sets up GPU resources
+ * - Runs the main simulation loop (MainLoop)
+ * - Handles test mode if specified
+ *
+ * Integrates all major model components and coordinates CPU/GPU execution.
+ */
 template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
 	//============================================

@@ -2,6 +2,18 @@
 
 
 
+/**
+ * @brief Main simulation loop for the flood model.
+ *
+ * Advances the simulation in time, applying boundary conditions, forcing, core engine, output, and crash detection.
+ * Handles both CPU and GPU execution paths.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XForcing Forcing data (float)
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T> &XModel_g)
 {
 	
@@ -82,10 +94,18 @@ template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<dou
 
 
 
-/*! \fn  void  DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
-* Debugging loop 
-* This function was crated to debug to properly wrap the debug flow engine of the model
-*/
+/**
+ * @brief Debugging loop for the flood model.
+ *
+ * Used to debug and wrap the debug flow engine. Runs a fixed number of steps and outputs diagnostic information.
+ * Handles both CPU and GPU execution paths.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XForcing Forcing data (float)
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g)
 {
 
@@ -174,6 +194,16 @@ template void DebugLoop<double>(Param& XParam, Forcing<float> XForcing, Model<do
 
 
  
+/**
+ * @brief Initialize the simulation loop structure.
+ *
+ * Sets up loop control variables, output buffers, and initial time step.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XModel Model state
+ * @return Initialized loop control structure
+ */
 template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 {
 	Loop<T> XLoop;
@@ -212,6 +242,18 @@ template <class T> Loop<T> InitLoop(Param &XParam, Model<T> &XModel)
 
 }
 
+/**
+ * @brief Update boundary conditions for the simulation.
+ *
+ * Applies boundary flows for each segment, handling both CPU and GPU execution paths.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XForcing Forcing data (float)
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
 	for (int ibndseg = 0; ibndseg < XForcing.bndseg.size(); ibndseg++)
@@ -239,6 +281,17 @@ template <class T> void updateBnd(Param XParam, Loop<T> XLoop, Forcing<float> XF
 
 
 
+/**
+ * @brief Output map data at specified simulation times.
+ *
+ * Saves model state to NetCDF files when output times are reached, handling both CPU and GPU data transfer.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel, Model<T> XModel_g)
 {
 	XLoop.nstepout++;
@@ -292,6 +345,17 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 	
 }
 
+/**
+ * @brief Output time series data for specified nodes.
+ *
+ * Collects and writes time series output for selected nodes, handling both CPU and GPU data paths and buffer management.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	//
@@ -391,6 +455,23 @@ template <class T> void pointoutputstep(Param XParam, Loop<T> &XLoop, Model<T> X
 }
 
 
+/**
+ * @brief CUDA kernel to store time series output for specified nodes.
+ *
+ * Writes evolving variables for selected nodes and time steps to output storage array.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param noutnodes Number of output nodes
+ * @param outnode Output node index
+ * @param istep Time step index
+ * @param blknode Block index
+ * @param inode Node i-index
+ * @param jnode Node j-index
+ * @param blkTS Block time series mapping
+ * @param XEv Evolving state variables
+ * @param store Output storage array
+ */
 template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int outnode, int istep,int blknode, int inode,int jnode, int * blkTS, EvolvingP<T> XEv, T* store)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -419,6 +500,18 @@ template <class T> __global__ void storeTSout(Param XParam,int noutnodes, int ou
 }
 
 
+/**
+ * @brief Initialize the simulation time step.
+ *
+ * Calculates the initial time step based on user input or model parameters.
+ * Uses either a user-specified value or computes a safe initial value based on water depth and cell resolution.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XModel Model state
+ * @return Initial time step value
+ */
 template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> XModel)
 {
 	//dim3 blockDim = (XParam.blkwidth, XParam.blkwidth, 1);
@@ -462,6 +555,17 @@ template <class T> __host__ double initdt(Param XParam, Loop<T> XLoop, Model<T> 
 template __host__ double initdt<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
 template __host__ double initdt<double>(Param XParam, Loop<double> XLoop, Model<double> XModel);
 
+/**
+ * @brief Calculate initial time step values on the CPU for all blocks and nodes.
+ *
+ * Computes the maximum allowable time step for each cell based on local water depth and cell resolution.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param XEvolv Evolving state variables
+ * @param dtmax Output array for maximum time step per cell
+ */
 template <class T> __host__ void CalcInitdtCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv, T* dtmax)
 {
 	int ib;
@@ -484,6 +588,17 @@ template <class T> __host__ void CalcInitdtCPU(Param XParam, BlockP<T> XBlock, E
 	}
 }
 
+/**
+ * @brief CUDA kernel to calculate initial time step values on the GPU for all blocks and nodes.
+ *
+ * Computes the maximum allowable time step for each cell using GPU parallelism.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param XEvolv Evolving state variables
+ * @param dtmax Output array for maximum time step per cell
+ */
 template <class T> __global__ void CalcInitdtGPU(Param XParam, BlockP<T> XBlock,EvolvingP<T> XEvolv, T* dtmax)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -501,6 +616,15 @@ template <class T> __global__ void CalcInitdtGPU(Param XParam, BlockP<T> XBlock,
 }
 
 
+/**
+ * @brief Print the current simulation time and time step to the console.
+ *
+ * Displays the total simulation time and current time step in a formatted manner.
+ *
+ * @tparam T Data type (float or double)
+ * @param totaltime Current simulation time
+ * @param dt Current time step
+ */
 template <class T> void printstatus(T totaltime, T dt)
 {
 	std::cout << "\r\e[K" << std::flush;
@@ -509,6 +633,18 @@ template <class T> void printstatus(T totaltime, T dt)
 	//std::cout << std::endl; // all done
 }
 
+/**
+ * @brief Detects simulation crash due to small time steps and generates a crash report.
+ *
+ * If the time step falls below the minimum allowed value before the simulation end time, stops the model and writes output variables to a crash report file.
+ * Handles both CPU and GPU data transfer for output variables.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters (may be modified)
+ * @param XLoop Loop control structure
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ */
 template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XModel, Model<T> XModel_g)
 {
 	if ((XLoop.dt < XParam.dtmin) && (XLoop.totaltime < XParam.endtime))
