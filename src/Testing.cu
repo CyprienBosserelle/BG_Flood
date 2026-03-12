@@ -376,7 +376,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		result = outletcontrol ? "successful" : "failed";
 		log("\t\tCulvert test outlet controlled test : " + result);
 
-		results = (outletcontrol & Inletcontrol) ? "successful" : "failed";
+		result = (outletcontrol & Inletcontrol) ? "successful" : "failed";
 		log("\t\tCulvert test : " + result);
 
 
